@@ -9,10 +9,10 @@ library(SAScii)
 #Load the 2008 Survey of Income and Program Participation Wave 1 as an R data frame
 
 SIPP.08w1.SAS.read.in.instructions <-
-	"ftp://www.sipp.census.gov/pub/sipp/2008/l08puw1.sas"
+	"http://smpbff2.dsd.census.gov/pub/sipp/2008/l08puw1.sas"
 
 SIPP.08w1.file.location <-
-	"ftp://www.sipp.census.gov/pub/sipp/2008/l08puw1.zip"
+	"http://smpbff2.dsd.census.gov/pub/sipp/2008/l08puw1.zip"
 
 #store the SIPP file as an R data frame
 #note the text "INPUT" appears before the actual INPUT block of the SAS code
@@ -32,10 +32,10 @@ SIPP.08w1.df <-
 #2008 Survey of Income and Program Participation Wave 1 as an R data frame
 
 SIPP.repwgt.08w1.SAS.read.in.instructions <-
-	"ftp://www.sipp.census.gov/pub/sipp/2008/rw08wx.sas"
+	"http://smpbff2.dsd.census.gov/pub/sipp/2008/rw08wx.sas"
 
 SIPP.repwgt.08w1.file.location <-
-	"ftp://www.sipp.census.gov/pub/sipp/2008/rw08w1.zip"
+	"http://smpbff2.dsd.census.gov/pub/sipp/2008/rw08w1.zip"
 
 #store the SIPP file as an R data frame
 #note the text "INPUT" appears before the actual INPUT block of the SAS code
