@@ -95,6 +95,61 @@ nhissvy <-
 # analysis examples #
 #####################
 
+# count the total (unweighted) number of records in nhis #
+
+# simply use the nrow function
+nrow( nhissvy )
+
+# the nrow function which works on both data frame objects..
+class( NHIS.11.personsx.df )
+# ..and survey design objects
+class( nhissvy )
+
+# count the total (unweighted) number of records in nhis #
+# broken out by region of the country #
+
+svyby(
+	~age_p ,
+	~region ,
+	nhissvy ,
+	unwtd.count
+)
+
+
+
+# count the weighted number of individuals in nhis #
+
+# add a new variable 'one' that simply has the number 1 for each record #
+
+nhissvy <-
+	update( 
+		one = 1 ,
+		nhissvy
+	)
+
+# the civilian, non-institutionalized population of the united states #
+svytotal( 
+	~one , 
+	nhissvy 
+)
+
+
+# note that this is exactly equivalent to summing up the weight variable
+# from the original NHIS data frame
+# (assuming this data frame was not cleared out of RAM above)
+
+sum( NHIS.11.personsx.df$wtfa )
+
+# the civilian, non-institutionalized population of the united states #
+# by region of the country
+svyby(
+	~one ,
+	~region ,
+	nhissvy ,
+	svytotal
+)
+
+
 # calculate the mean of a linear variable #
 
 # average age - nationwide
