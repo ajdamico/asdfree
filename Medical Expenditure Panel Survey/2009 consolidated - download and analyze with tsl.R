@@ -22,6 +22,9 @@
 # available in the same folder
 
 
+# the statistics (means, medians, percents, and counts) from brr and tsl designs
+# will match exactly.  the standard errors and confidence intervals
+# will be slightly different. both methods are considered valid.
 
 
 ##############################################################################
@@ -63,7 +66,7 @@ MEPS.09.consolidated.file.location <-
 # for downloading and unzipping the MEPS consolidated file
 tf <- tempfile() ; td <- tempdir()
 
-# download the CPS repwgts zipped file
+# download the MEPS 2009 consolidated zipped file
 download.file( 
 	# download the file stored in the location designated above
 	MEPS.09.consolidated.file.location ,
