@@ -63,9 +63,9 @@ options( survey.replicates.mse = TRUE )
 
 
 
-#############################################
-#DATA LOADING COMPONENT - ONLY RUN THIS ONCE#
-#############################################
+###############################################
+# DATA LOADING COMPONENT - ONLY RUN THIS ONCE #
+###############################################
 
 # this process is slow.
 # the MEPS 2009 file has 36,855 records.
@@ -158,9 +158,9 @@ save(
 )
 
 
-########################################################################
-#END OF DATA LOADING COMPONENT - DO NOT RUN DATA LOADING COMMANDS AGAIN#
-########################################################################
+##########################################################################
+# END OF DATA LOADING COMPONENT - DO NOT RUN DATA LOADING COMMANDS AGAIN #
+##########################################################################
 
 # now the "MEPS.09.consolidated.df" data frame can be loaded directly
 # from your local hard drive.  this is much faster.
@@ -425,3 +425,67 @@ svymean(
 	design = meps.brr.design.female
 )
 
+
+
+###################
+# export examples #
+###################
+
+# calculate the distribution of a categorical variable #
+# by region of the country
+
+# store the results into a new object
+
+coverage.by.region <-
+	svyby( 
+		~INS09X , 
+		~REGION09 ,
+		design = meps.brr.design ,
+		svymean
+	)
+
+# print the results to the screen 
+coverage.by.region
+
+# now you have the results saved into a new object of type "svyby"
+class( coverage.by.region )
+
+# print only the statistics (coefficients) to the screen 
+coef( coverage.by.region )
+
+# print only the standard errors to the screen 
+SE( coverage.by.region )
+
+# this object can be coerced (converted) to a data frame.. 
+coverage.by.region <- data.frame( coverage.by.region )
+
+# ..and then immediately exported as a comma-separated value file 
+# into your current working directory 
+write.csv( coverage.by.region , "coverage by region.csv" )
+
+# ..or trimmed to only contain the values you need.
+# here's the uninsured percentage by region, 
+# with accompanying standard errors
+uninsured.rate.by.region <-
+	coverage.by.region[ 2:5 , c( "REGION09" , "INS09X2" , "se3" ) ]
+
+# that's rows 2 through 5, and the three specified columns
+
+
+# print the new results to the screen
+uninsured.rate.by.region
+
+# this can also be exported as a comma-separated value file 
+# into your current working directory 
+write.csv( uninsured.rate.by.region , "uninsured rate by region.csv" )
+
+# ..or directly made into a bar plot
+barplot(
+	uninsured.rate.by.region[ , 2 ] ,
+	main = "Uninsured Rate by Region of the Country" ,
+	names.arg = c( "Northeast" , "Midwest" , "South" , "West" ) ,
+	ylim = c( 0 , .25 )
+)
+
+# for more details on how to work with data in r
+# check out http://www.twotorials.com/
