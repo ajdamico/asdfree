@@ -122,32 +122,33 @@ load( "MEPS.09.consolidated.data.rda" )
 # create a character vector containing 
 # the variables you need for the analysis
 
-KeepVars <-
-	c( 
-		# unique identifiers
-		"DUPERSID" , "PANEL" ,
-		# cluster and strata variables used for complex survey design
-		"VARPSU" , "VARSTR" , 
-		# 2009 weight
-		"PERWT09F" , 
-		# annualized insurance coverage variable
-		"INS09X" , 
-		# total annual medical expenditure variable
-		"TOTEXP09" , 
-		# region of the country variable
-		"REGION09" , 
-		# gender variable
-		"SEX"
-	)
+# KeepVars <-
+	# c( 
+		# # unique identifiers
+		# "DUPERSID" , "PANEL" ,
+		# # cluster and strata variables used for complex survey design
+		# "VARPSU" , "VARSTR" , 
+		# # 2009 weight
+		# "PERWT09F" , 
+		# # annualized insurance coverage variable
+		# "INS09X" , 
+		# # total annual medical expenditure variable
+		# "TOTEXP09" , 
+		# # region of the country variable
+		# "REGION09" , 
+		# # gender variable
+		# "SEX"
+	# )
 
 # restrict the consolidated data table to
 # only the columns specified above
 
-MEPS.09.consolidated.df <-
-	MEPS.09.consolidated.df[ , KeepVars ]
+# MEPS.09.consolidated.df <-
+	# MEPS.09.consolidated.df[ , KeepVars ]
 
 # clear up RAM - garbage collection function
-gc()
+
+# gc()
 
 ############################
 # end of RAM-clearing code #
@@ -175,7 +176,8 @@ meps.tsl.design <-
 # if you are low on RAM, you can remove the data frame
 # by uncommenting these two lines:
 
-# MEPS.09.consolidated.df <- NULL
+# rm( MEPS.09.consolidated.df )
+
 # gc()
 
 	
