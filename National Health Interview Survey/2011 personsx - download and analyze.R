@@ -135,7 +135,7 @@ svyby(
 # does not allow calculation of standard errors
 
 # minimum, 25th, 50th, 75th, maximum 
-# ages in the united state
+# ages in the united states
 svyquantile( 
 	~age_p , 
 	design = nhissvy ,
