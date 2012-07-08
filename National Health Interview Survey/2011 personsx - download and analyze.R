@@ -1,0 +1,177 @@
+# importation and analysis of us government survey data
+# national health interview survey
+# 2011 personsx
+
+# anthony joseph damico
+# ajdamico@gmail.com
+
+# for further reading on cross-package comparisons, see:
+# http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
+
+
+########################################################################
+#Analyze the 2011 National Health Interview Survey personsx file with R#
+########################################################################
+
+
+# set your working directory.
+# the NHIS 2011 data file will be stored here
+# after downloading and importing it.
+# use forward slashes instead of back slashes
+
+setwd( "C:/My Directory/NHIS/" )
+
+
+# remove the # in order to run this install.packages line only once
+# install.packages( c( "survey" , "SAScii" ) )
+
+
+require(survey) # load survey package (analyzes complex design surveys)
+require(SAScii) # load the SAScii package (imports ascii data with a SAS script)
+
+
+# set R to produce conservative standard errors instead of crashing
+# http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
+options( survey.lonely.psu = "adjust" )
+
+#############################################
+#DATA LOADING COMPONENT - ONLY RUN THIS ONCE#
+#############################################
+
+# this process is slow.
+# note the record counter while waiting for these commands to run.
+# the NHIS 2011 personsx file has 101,875 records.
+
+NHIS.11.personsx.SAS.read.in.instructions <-
+	"ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Program_Code/NHIS/2011/personsx.sas"
+	
+NHIS.11.personsx.file.location <-
+	"ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2011/personsx.zip"
+
+# store the NHIS file as an R data frame
+NHIS.11.personsx.df <-
+	read.SAScii (
+		NHIS.11.personsx.file.location ,
+		NHIS.11.personsx.SAS.read.in.instructions ,
+		zipped = T 
+	)
+
+# the read.SAScii function produces column names with all capital letters
+# convert them all to lowercase
+names( NHIS.11.personsx.df ) <- tolower( names( NHIS.11.personsx.df ) )
+
+# save the data frame now for instantaneous loading later.
+# this stores the NHIS 2011 personsx table as an R data file.
+save( NHIS.11.personsx.df , file = "NHIS.11.personsx.data.rda" )
+
+########################################################################
+#END OF DATA LOADING COMPONENT - DO NOT RUN DATA LOADING COMMANDS AGAIN#
+########################################################################
+
+# now the "NHIS.11.personsx.df" data frame can be loaded directly
+# from your local hard drive.  this is much faster.
+load( "NHIS.11.personsx.data.rda" )
+	
+	
+#################################################
+# survey design for taylor-series linearization #
+#################################################
+
+# create survey design object with NHIS design information
+# using existing data frame of NHIS data
+nhissvy <- 
+	svydesign(
+		id = ~psu_p , 
+		strata = ~strat_p ,
+		nest = TRUE ,
+		weights = ~wtfa ,
+		data = NHIS.11.personsx.df
+	)
+
+# notice the 'nhissvy' object used in all subsequent analysis commands
+
+	
+#####################
+# analysis examples #
+#####################
+
+# calculate the mean of a linear variable #
+
+# average age - nationwide
+svymean( 
+	~age_p , 
+	design = nhissvy
+)
+
+# by region of the country
+svyby( 
+	~age_p , 
+	~region ,
+	design = nhissvy ,
+	svymean
+)
+
+
+# calculate the distribution of a categorical variable #
+
+# percent uninsured - nationwide
+svymean( 
+	~factor( notcov ) , 
+	design = nhissvy
+)
+
+# by region of the country
+svyby( 
+	~factor( notcov ) , 
+	~region ,
+	design = nhissvy ,
+	svymean
+)
+
+
+# calculate the median and other percentiles #
+
+# note that a taylor-series survey design
+# does not allow calculation of standard errors
+
+# minimum, 25th, 50th, 75th, maximum 
+# ages in the united state
+svyquantile( 
+	~age_p , 
+	design = nhissvy ,
+	c( 0 , .25 , .5 , .75 , 1 )
+)
+
+# by region of the country
+svyby( 
+	~age_p , 
+	~region ,
+	design = nhissvy ,
+	svyquantile ,
+	c( 0 , .25 , .5 , .75 , 1 ) ,
+	keep.var = F
+)
+
+######################
+# subsetting example #
+######################
+
+# restrict the nhissvy object to
+# females only
+nhissvy.female <-
+	subset(
+		nhissvy ,
+		sex %in% 2
+	)
+# now any of the above commands can be re-run
+# using the nhissvy.female object
+# instead of the nhissvy object
+# in order to analyze females only
+	
+# calculate the mean of a linear variable #
+
+# average age - nationwide, restricted to females
+svymean( 
+	~age_p , 
+	design = nhissvy.female
+)
