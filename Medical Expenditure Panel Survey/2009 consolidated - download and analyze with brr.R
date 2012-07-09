@@ -2,6 +2,11 @@
 # medical expenditure panel survey
 # 2009 consolidated
 
+# if you have never used the r language before,
+# watch this two minute video i made outlining
+# how to run this script from start to finish
+# http://www.screenr.com/Zpd8
+
 # anthony joseph damico
 # ajdamico@gmail.com
 
@@ -488,4 +493,5 @@ barplot(
 )
 
 # for more details on how to work with data in r
-# check out http://www.twotorials.com/
+# check out my two minute tutorial video site
+# http://www.twotorials.com/

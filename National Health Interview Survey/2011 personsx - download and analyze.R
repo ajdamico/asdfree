@@ -2,6 +2,11 @@
 # national health interview survey
 # 2011 personsx
 
+# if you have never used the r language before,
+# watch this two minute video i made outlining
+# how to run this script from start to finish
+# http://www.screenr.com/Zpd8
+
 # anthony joseph damico
 # ajdamico@gmail.com
 
@@ -273,7 +278,7 @@ write.csv( coverage.by.region , "coverage by region.csv" )
 # here's the uninsured percentage by region, 
 # with accompanying standard errors
 uninsured.rate.by.region <-
-	coverage.by.region[ , c( "region" , "notcov2" , "se3" ) ]
+	coverage.by.region[ , c( "region" , "factor.notcov.1" , "se.factor.notcov.1" ) ]
 
 # that's all four rows and the three specified columns
 
@@ -293,5 +298,7 @@ barplot(
 	ylim = c( 0 , .25 )
 )
 
+
 # for more details on how to work with data in r
-# check out http://www.twotorials.com/
+# check out my two minute tutorial video site
+# http://www.twotorials.com/
