@@ -18,8 +18,8 @@
 # balanced repeated replication (brr) version #
 
 # this script uses the brr method to calculate standard errors
-# brr has the disadvantage of being computationally harder
-# and the advantage of not producing standard errors or confidence intervals
+# brr has the disadvantage of being computationally more difficult
+# and the advantage of producing standard errors or confidence intervals
 # on percentile statistics
 # (for example, tsl cannot compute the confidence interval around a median)
 
@@ -56,6 +56,7 @@ require(survey)  # load survey package (analyzes complex design surveys)
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
 options( survey.lonely.psu = "adjust" )
+# this setting matches the MISSUNIT option in SUDAAN
 
 
 # if this option is set to TRUE

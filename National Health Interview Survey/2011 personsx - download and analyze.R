@@ -38,6 +38,8 @@ require(SAScii) # load the SAScii package (imports ascii data with a SAS script)
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
 options( survey.lonely.psu = "adjust" )
+# this setting matches the MISSUNIT option in SUDAAN
+
 
 ###############################################
 # DATA LOADING COMPONENT - ONLY RUN THIS ONCE #
@@ -141,7 +143,6 @@ svytotal(
 
 # note that this is exactly equivalent to summing up the weight variable
 # from the original NHIS data frame
-# (assuming this data frame was not cleared out of RAM above)
 
 sum( NHIS.11.personsx.df$wtfa )
 
