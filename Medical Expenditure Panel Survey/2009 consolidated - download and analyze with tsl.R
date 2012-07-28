@@ -10,6 +10,9 @@
 # anthony joseph damico
 # ajdamico@gmail.com
 
+# if you use this script for a project, please send me a note
+# it's always nice to hear about how people are using this stuff
+
 # for further reading on cross-package comparisons, see:
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
