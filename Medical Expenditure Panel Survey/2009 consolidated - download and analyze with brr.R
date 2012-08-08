@@ -476,7 +476,7 @@ write.csv( coverage.by.region , "coverage by region.csv" )
 # here's the uninsured percentage by region, 
 # with accompanying standard errors
 uninsured.rate.by.region <-
-	coverage.by.region[ 2:5 , c( "REGION09" , "INS09X2" , "se.INS09X2" ) ]
+	coverage.by.region[ 2:5 , c( "REGION09" , "INS09X2" , "se3" ) ]
 
 # that's rows 2 through 5, and the three specified columns
 
