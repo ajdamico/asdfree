@@ -146,7 +146,7 @@ save(
 	NHANES.0708.demographics.df ,
 	NHANES.0506.OHX_D.df ,
 	NHANES.0708.OHX_E.df ,
-	file = "NHANES.0508.data.to.replicate.cdc.figure.rda" 	# this is the output file name for the eight data frames
+	file = "NHANES.0508.data.to.replicate.cdc.figure.rda" 	# this is the output file name for the four data frames
 )
 
 # note that this .rda file will be stored in the local directory specified
@@ -157,7 +157,7 @@ save(
 ##########################################################################
 
 
-# now the eight data frames ending in ".df" can be loaded directly
+# now the two data frames ending in ".df" can be loaded directly
 # from your local hard drive.  this is much faster.
 load( "NHANES.0508.data.to.replicate.cdc.figure.rda" )
 
@@ -223,7 +223,7 @@ head( NHANES.0508.demographics.df )
 head( NHANES.0508.OHX.df )
 
 	
-# merge the first two data sets together into a new data frame
+# merge the two data sets together into a new data frame
 # note that a 'by' variable does not need to be specified, because
 # both data frames only share one variable - SEQN - 
 # which will be used as the merge variable by default
