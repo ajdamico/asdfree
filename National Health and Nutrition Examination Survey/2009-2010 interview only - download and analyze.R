@@ -71,12 +71,12 @@ NHANES.0910.HIQ_F.file.location <-
 	"ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/nhanes/2009-2010/HIQ_F.xpt"	# 2009-2010
 	
 
-###################################################
-# download and import these four data sets into r #
-# since the download and importation of all four  #
-# data sets involves similar commands,            #
-# create a function that automates the process    #
-###################################################
+##################################################
+# download and import these two data sets into r #
+# since the download and importation of all      #
+# data sets involves similar commands,           #
+# create a function that automates the process   #
+##################################################
 
 # download and importation function
 download.and.import.any.nhanes.file <-		# this line gives the function a name
@@ -227,6 +227,7 @@ x <- NHANES.0910.demo.and.HIQ_F.df
 
 # remove the merged data frame from memory, and start using the data frame x from now on
 rm( NHANES.0910.demo.and.HIQ_F.df )
+
 
 #####################################################
 # start of recodes to the merged (final) data frame #
