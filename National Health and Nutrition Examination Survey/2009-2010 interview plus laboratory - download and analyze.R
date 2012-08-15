@@ -22,9 +22,9 @@
 # for further reading on cross-package comparisons, see:
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
-######################################################################################################################
-# Analyze the 2009-2010 National Health and Nutrition Examination Survey demographics and questionnaire files with R #
-######################################################################################################################
+###################################################################################################################
+# Analyze the 2009-2010 National Health and Nutrition Examination Survey demographics and laboratory files with R #
+###################################################################################################################
 
 
 # set your working directory.

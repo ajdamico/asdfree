@@ -414,16 +414,18 @@ svytotal(
 # http://www.cdc.gov/nchs/data/databriefs/db96.pdf #
 
 # calculate the overall percent of 5 - 19 year olds with any sealant
-overall <- svymean( ~ANYSEAL , nhanes.tsl.design.kids , na.rm = T )
-print( overall ) # print overall results to the screen
+# ..and print overall results to the screen - parentheses outside a command prints that object
+( overall <- svymean( ~ANYSEAL , nhanes.tsl.design.kids , na.rm = T ) )
+
 
 # broken out by race/ethnicity categories #
-by.race <- svyby( ~ANYSEAL , ~race , nhanes.tsl.design.kids , svymean , na.rm = T )
-print( by.race ) # print by race results to the screen
+# ..and print by race results to the screen - parentheses outside a command prints that object
+( by.race <- svyby( ~ANYSEAL , ~race , nhanes.tsl.design.kids , svymean , na.rm = T ) )
+
 
 # broken out by poverty categories #
-by.poverty <- svyby( ~ANYSEAL , ~POVCAT , nhanes.tsl.design.kids , svymean , na.rm = T )
-print( by.poverty ) # print by poverty results to the screen
+# ..and print by poverty results to the screen - parentheses outside a command prints that object
+( by.poverty <- svyby( ~ANYSEAL , ~POVCAT , nhanes.tsl.design.kids , svymean , na.rm = T ) )
 
 ###########
 # t tests #
