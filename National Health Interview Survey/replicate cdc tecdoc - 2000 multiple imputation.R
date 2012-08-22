@@ -2,6 +2,11 @@
 # national health interview survey
 # 2000 personsx and incmimp
 
+# if you have never used the r language before,
+# watch this two minute video i made outlining
+# how to run this script from start to finish
+# http://www.screenr.com/Zpd8
+
 # anthony joseph damico
 # ajdamico@gmail.com
 
