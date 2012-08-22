@@ -1,7 +1,7 @@
 Analyze US Government Survey Data with the R Language
 ---------
 
-You don't have to buy expensive software to analyze US government data.  So don't.
+You don't have to buy expensive software to analyze us government survey data.  So don't.
 
 Current Analysis Examples
 
