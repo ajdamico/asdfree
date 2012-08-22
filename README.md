@@ -9,11 +9,11 @@ Current Analysis Examples
 
 Replication Scripts
 
-* match published numbers exactly, prove to the skeptics that R produces the same results as other statistical languages.
+* match published numbers exactly, prove that R produces the same results as other statistical languages.
 
 ------
 
-My [journal article](http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf), outlining how R precisely matches SAS, Sudaan, and Stata.
+My [journal article](http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf), outlining how R precisely matches SAS, Sudaan, and Stata with complex survey data.
 
 My [collection of two-minute videos](http://twotorials.com/) to help beginners learn the R language.
 
