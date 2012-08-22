@@ -15,4 +15,6 @@ Replication Scripts
 
 My [journal article](http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf), outlining how R precisely matches SAS, Sudaan, and Stata.
 
+My [collection of two-minute videos](http://twotorials.com/) to help beginners learn the R language.
+
 Talk to me! - [ajdamico@gmail.com](mailto:ajdamico@gmail.com)
