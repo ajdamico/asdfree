@@ -174,6 +174,9 @@ while( length( line <- readLines( incon , 1 ) ) > 0 ){
 		# blank out xwalk.10k #
 		xwalk.10k <- NULL
 		
+		# clear up RAM
+		gc()
+		
 		# print current progress to the screen #
 		cat( "   " , prettyNum( line.num  , big.mark = "," ) , "of approximately 400,000 cps asec lines processed" , "\r" )
 		
