@@ -131,6 +131,9 @@ for ( k in acs.datasets.to.download ){
 			# read the csv file in the temporary directory into an r data frame
 			current.df <- read.csv( paste0( td , '/ss10' , j , tolower( i ) , '.csv' ) )
 
+			# immediately convert all column names to lowercase
+			names( current.df ) <- tolower( names( current.df ) )
+			
 			# copy that data frame to another data frame with either h (household) or p (person) in the object name
 			assign( paste( 'current' , j , 'df' , sep = '.' ) , current.df )
 			
