@@ -166,10 +166,13 @@ while( length( line <- readLines( incon , 1 ) ) > 0 ){
 	line.num <- line.num + 1
 
 	# every 10k records..
-	if ( line.num %% 1000 == 0 ) {
+	if ( line.num %% 10000 == 0 ) {
 		
 		# add the current xwalk.10k to the bottom of the total xwalk #
 		xwalk <- rbind( xwalk , xwalk.10k )
+		
+		# blank out xwalk.10k #
+		xwalk.10k <- NULL
 		
 		# print current progress to the screen #
 		cat( "   " , prettyNum( line.num  , big.mark = "," ) , "of approximately 400,000 cps asec lines processed" , "\r" )
