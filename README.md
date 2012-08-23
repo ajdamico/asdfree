@@ -1,7 +1,7 @@
 Analyze US Government Survey Data with the R Language
 ---------
 
-You don't have to buy expensive software to analyze us government survey data.  So don't.
+You don't have to buy expensive software to analyze us government survey data.
 
 Current Analysis Examples
 
@@ -13,7 +13,7 @@ Replication Scripts
 
 ------
 
-My [journal article](http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf), outlining how R precisely matches SAS, Sudaan, and Stata with complex survey data.
+My [journal article](http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf), outlining how R precisely matches SAS, SUDAAN, and Stata with complex survey data.
 
 My [collection of two-minute videos](http://twotorials.com/) to help beginners learn the R language.
 
