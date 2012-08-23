@@ -166,7 +166,7 @@ while( length( line <- readLines( incon , 1 ) ) > 0 ){
 	line.num <- line.num + 1
 
 	# print current progress to the screen #
-	if ( line.num %% 1000 == 0 ) print( paste( prettyNum( line.num  , big.mark = "," ) , "of approximately 400,000 cps asec lines processed" ) )
+	if ( line.num %% 1000 == 0 ) cat( "   " , prettyNum( line.num  , big.mark = "," ) , " of approximately 400,000 cps asec lines processed" )
 	
 }
 
