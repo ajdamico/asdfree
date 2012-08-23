@@ -112,6 +112,9 @@ outcon.person <- file( tf.person , "w")
 
 # build a merge file at the same time as distributing the main file into three other files
 xwalk <- data.frame( NULL )
+
+# start line counter #
+line.num <- 0
 	
 # create a while-loop that continues until every line has been examined
 # cycle through every line in the downloaded CPS ASEC 2011 file..
@@ -159,6 +162,12 @@ while( length( line <- readLines( incon , 1 ) ) > 0 ){
 		
 	}
 
+	# add to the line counter #
+	line.num <- line.num + 1
+
+	# print current progress to the screen #
+	if ( line.num %% 1000 == 0 ) print( paste( prettyNum( line.num  , big.mark = "," ) , "of approximately 400,000 cps asec lines processed" ) )
+	
 }
 
 # close all four file connections
