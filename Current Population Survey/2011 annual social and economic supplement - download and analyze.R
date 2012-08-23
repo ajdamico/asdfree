@@ -111,7 +111,7 @@ outcon.family <- file( tf.family , "w")
 outcon.person <- file( tf.person , "w") 
 
 # build a merge file at the same time as distributing the main file into three other files
-xwalk <- data.frame( NULL )
+xwalk <- xwalk.10k <- data.frame( NULL )
 
 # start line counter #
 line.num <- 0
@@ -157,17 +157,24 @@ while( length( line <- readLines( incon , 1 ) ) > 0 ){
 		# ..and add the current unique household x family x person identifier values to the merge file
 		xwalk.temp <- data.frame( h_seq = curHH , ffpos = curFM , pppos = curPN )
 		
-		# ..and also stack it at the bottom of the current xwalk
-		xwalk <- rbind( xwalk , xwalk.temp )
+		# ..and also stack it at the bottom of the current xwalk.10k
+		xwalk.10k <- rbind( xwalk.10k , xwalk.temp )
 		
 	}
 
 	# add to the line counter #
 	line.num <- line.num + 1
 
-	# print current progress to the screen #
-	if ( line.num %% 1000 == 0 ) cat( "   " , prettyNum( line.num  , big.mark = "," ) , "of approximately 400,000 cps asec lines processed" , "\r" )
-	
+	# every 10k records..
+	if ( line.num %% 1000 == 0 ) {
+		
+		# add the current xwalk.10k to the bottom of the total xwalk #
+		xwalk <- rbind( xwalk , xwalk.10k )
+		
+		# print current progress to the screen #
+		cat( "   " , prettyNum( line.num  , big.mark = "," ) , "of approximately 400,000 cps asec lines processed" , "\r" )
+		
+	}
 }
 
 # close all four file connections
