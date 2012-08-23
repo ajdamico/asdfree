@@ -115,6 +115,12 @@ xwalk <- xwalk.10k <- data.frame( NULL )
 
 # start line counter #
 line.num <- 0
+
+# store the current scientific notation option..
+cur.sp <- getOption( "scipen" )
+
+# ..and change it
+options( scipen = 10 )
 	
 # create a while-loop that continues until every line has been examined
 # cycle through every line in the downloaded CPS ASEC 2011 file..
@@ -182,6 +188,9 @@ while( length( line <- readLines( incon , 1 ) ) > 0 ){
 		
 	}
 }
+
+# restore the original scientific notation option
+options( scipen = cur.sp )
 
 # close all four file connections
 close( outcon.household )
