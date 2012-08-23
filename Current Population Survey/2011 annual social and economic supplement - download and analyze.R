@@ -39,7 +39,7 @@ setwd( "C:/My Directory/CPS/" )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "survey" , "SAScii" )
+# install.packages( c( "survey" , "SAScii" ) )
 
 
 require(survey)		# load survey package (analyzes complex design surveys)
@@ -110,37 +110,67 @@ outcon.household <- file( tf.household , "w")
 outcon.family <- file( tf.family , "w") 
 outcon.person <- file( tf.person , "w") 
 
-
+# build a merge file at the same time as distributing the main file into three other files
+xwalk <- data.frame( NULL )
+	
 # create a while-loop that continues until every line has been examined
-# cycle through every line in the downloaded CPS ASEC file..
+# cycle through every line in the downloaded CPS ASEC 2011 file..
+
 while( length( line <- readLines( incon , 1 ) ) > 0 ){
 
 	# ..and if the first character is a 1, add it to the new household-only CPS file.
 	if ( substr( line , 1 , 1 ) == "1" ){
-		writeLines(line,outcon.household)
+		
+		# write the line to the household file
+		writeLines( line , outcon.household )
+		
+		# store the current unique household id
+		curHH <- substr( line , 2 , 6 )
+	
 	}
 	
 	# ..and if the first character is a 2, add it to the new family-only CPS file.
 	if ( substr( line , 1 , 1 ) == "2" ){
-		writeLines(line,outcon.family)
+	
+		# write the line to the family file
+		writeLines( line , outcon.family )
+		
+		# store the current unique family id
+		curFM <- substr( line , 7 , 8 )
+	
 	}
 	
 	# ..and if the first character is a 3, add it to the new person-only CPS file.
 	if ( substr( line , 1 , 1 ) == "3" ){
-		writeLines(line,outcon.person)
+		
+		# write the line to the person file
+		writeLines( line , outcon.person )
+		
+		# store the current unique person id
+		curPN <- substr( line , 7 , 8 )
+		
+		# merge file creation #
+		
+		# ..and add the current unique household x family x person identifier values to the merge file
+		xwalk.temp <- data.frame( h_seq = curHH , ffpos = curFM , pppos = curPN )
+		
+		# ..and also stack it at the bottom of the current xwalk
+		xwalk <- rbind( xwalk , xwalk.temp )
+		
 	}
+
 }
 
 # close all four file connections
 close( outcon.household )
 close( outcon.family )
 close( outcon.person )
-close( incon , add = T)
+close( incon , add = T )
 
 # the SAS file produced by the National Bureau of Economic Research (NBER)
-# begins the person-level INPUT after line 1209, 
+# begins each INPUT block after lines 988, 1121, and 1209, 
 # so skip SAS import instruction lines before that.
-# NOTE that this 'beginline' parameter of 1209 will change for different years.
+# NOTE that this 'beginline' parameters of 988, 1121, and 1209 will change for different years.
 
 # store CPS ASEC march 2011 household records as an R data frame
 cps.asec.mar11.household.df <- 
@@ -167,6 +197,60 @@ cps.asec.mar11.person.df <-
 		zipped = F )
 
 
+# convert all column names to lowercase #
+
+names( cps.asec.mar11.household.df ) <-
+	tolower( names( cps.asec.mar11.household.df ) )
+	
+names( cps.asec.mar11.family.df ) <-
+	tolower( names( cps.asec.mar11.family.df ) ) 
+	
+names( cps.asec.mar11.person.df ) <-
+	tolower( names( cps.asec.mar11.person.df ) ) 
+	
+
+# merge the crosswalk file with the household file
+
+h.xwalk <- 
+	merge(
+		xwalk ,
+		cps.asec.mar11.household.df 
+	)
+
+	
+# merge the crosswalk + household file with the family file
+
+h.f.xwalk <- 
+	merge(
+		h.xwalk ,
+		cps.asec.mar11.family.df ,
+		by.x = c( 'h_seq' , 'ffpos' ) ,
+		by.y = c( 'fh_seq' , 'ffpos' )
+	)
+
+	
+# merge the crosswalk + household + family file with the person file - this contains all three files #
+
+cps.asec.2011.df <- 
+	merge(
+		h.f.xwalk ,
+		cps.asec.mar11.person.df ,
+		by.x = c( 'h_seq' , 'pppos' ) ,
+		by.y = c( 'ph_seq' , 'pppos' )
+	)
+	
+
+# confirm that the number of records in the 2011 cps asec merged file
+# matches the number of records in the person file
+
+if ( nrow( cps.asec.2011.df ) != nrow( cps.asec.mar11.person.df ) ) stop( "problem with merge - merged file should have the same number of records as the original person file" )
+
+# remove unnecessary data frames from memory #
+rm( cps.asec.mar11.household.df , cps.asec.mar11.family.df , cps.asec.mar11.person.df , h.xwalk , h.f.xwalk , xwalk )
+
+# clear up RAM
+gc()
+
 # # # # # # # # # # # # # # # # # #
 # load the replicate weight file  #
 # # # # # # # # # # # # # # # # # #
@@ -189,31 +273,21 @@ cps.repwgt.mar11.df <-
 		CPS.replicate.weight.SAS.read.in.instructions , 
 		zipped = T )
 
-
-# # # # # # # # # # # # # # # # # #
-# prepare to save all four files  #
-# # # # # # # # # # # # # # # # # #
-
+		
 # convert all column names to lowercase #
-
-names( cps.asec.mar11.household.df ) <-
-	tolower( names( cps.asec.mar11.household.df ) )
-	
-names( cps.asec.mar11.family.df ) <-
-	tolower( names( cps.asec.mar11.family.df ) ) 
-	
-names( cps.asec.mar11.person.df ) <-
-	tolower( names( cps.asec.mar11.person.df ) ) 
-	
+		
 names( cps.repwgt.mar11.df ) <-
 	tolower( names( cps.repwgt.mar11.df ) ) 
+
 	
-# save all four data frames in a single ".rda" file #
+# # # # # # # # # #
+# save both files #
+# # # # # # # # # #
+
+# save both final data frames in a single ".rda" file #
 
 save(
-	cps.asec.mar11.household.df ,
-	cps.asec.mar11.family.df ,
-	cps.asec.mar11.person.df ,
+	cps.asec.2011.df ,
 	cps.repwgt.mar11.df ,
 	file = "CPS.asec.mar11.rda"
 )
@@ -230,26 +304,19 @@ load( "CPS.asec.mar11.rda" )
 
 
 ##################################################
-# merge persons file with replicate weights file #
+# merge cps asec file with replicate weights file #
 ##################################################
 
-
-
-# merge the person file
-# with the replicate weight file
 x <-
 	merge( 
-		cps.asec.mar11.person.df , 
-		cps.repwgt.mar11.df ,
-		by.x = c( 'ph_seq' , 'pppos' ) ,
-		by.y = c( 'h_seq' , 'pppos' )
+		cps.asec.2011.df , 
+		cps.repwgt.mar11.df 
 	)
-
 
 # confirm that the number of records in the 2011 person file
 # matches the number of records in the merged file
 
-if ( nrow( x ) != nrow( cps.asec.mar11.person.df ) ) stop( "problem with merge - merged file should have the same number of records as the original consolidated file" )
+if ( nrow( x ) != nrow( cps.asec.2011.df ) ) stop( "problem with merge - merged file should have the same number of records as the original consolidated file" )
 
 
 
