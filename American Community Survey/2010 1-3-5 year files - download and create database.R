@@ -153,7 +153,7 @@ for ( k in acs.datasets.to.download ){
 		dbWriteTable( db , paste0( k , '_p' ) , current.p.df , append = ap )
 		
 		# recode the filetype column as 'M' (merged)..
-		current.h.df$RT <- current.p.df$RT <- 'M'
+		current.h.df$rt <- current.p.df$rt <- 'M'
 		
 		# then merge the household and person data frames together
 		current.m.df <- merge( current.h.df , current.p.df )
