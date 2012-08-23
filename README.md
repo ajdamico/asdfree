@@ -1,7 +1,7 @@
 Analyze US Government Survey Data with the R Language
 ---------
 
-You don't have to buy expensive software to analyze us government survey data.
+Use free, open-source software to analyze us government survey data.
 
 Current Analysis Examples
 
@@ -9,7 +9,7 @@ Current Analysis Examples
 
 Replication Scripts
 
-* match published numbers exactly, prove that R produces the same results as other statistical languages.
+* match published numbers exactly to show that R produces the same results as other statistical languages.
 
 ------
 
