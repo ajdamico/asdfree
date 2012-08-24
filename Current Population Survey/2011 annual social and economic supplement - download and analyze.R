@@ -161,7 +161,12 @@ while( length( line <- readLines( incon , 1 ) ) > 0 ){
 		# merge file creation #
 		
 		# ..and add the current unique household x family x person identifier values to the merge file
-		xwalk.temp <- data.frame( h_seq = curHH , ffpos = curFM , pppos = curPN )
+		xwalk.temp <- 
+			data.frame( 
+				h_seq = as.numeric( curHH ) , 
+				ffpos = as.numeric( curFM ) , 
+				pppos = as.numeric( curPN ) 
+			)
 		
 		# ..and also stack it at the bottom of the current xwalk.10k
 		xwalk.10k <- rbind( xwalk.10k , xwalk.temp )
@@ -198,9 +203,6 @@ xwalk.10k <- NULL
 
 # clear up RAM
 gc()
-
-# convert all three xwalk columns to numeric
-for ( i in 1:ncol( xwalk ) ) xwalk[ , i ] <- as.numeric( xwalk[ , i ] )
 
 # restore the original scientific notation option
 options( scipen = cur.sp )
