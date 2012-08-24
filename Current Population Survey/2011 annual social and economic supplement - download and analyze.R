@@ -189,6 +189,16 @@ while( length( line <- readLines( incon , 1 ) ) > 0 ){
 	}
 }
 
+
+# add the remaining xwalk.10k to the bottom of the total xwalk #
+xwalk <- rbind( xwalk , xwalk.10k )
+
+# blank out xwalk.10k #
+xwalk.10k <- NULL
+
+# clear up RAM
+gc()
+
 # restore the original scientific notation option
 options( scipen = cur.sp )
 
