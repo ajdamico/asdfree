@@ -199,6 +199,9 @@ xwalk.10k <- NULL
 # clear up RAM
 gc()
 
+# convert all three xwalk columns to numeric
+for ( i in 1:ncol( xwalk ) ) xwalk[ , i ] <- as.numeric( xwalk[ , i ] )
+
 # restore the original scientific notation option
 options( scipen = cur.sp )
 
