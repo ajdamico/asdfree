@@ -226,6 +226,27 @@ cps.asec.mar11.household.df <-
 		beginline = 988 , 
 		zipped = F )
 
+# convert all column names to lowercase #
+
+names( cps.asec.mar11.household.df ) <-
+	tolower( names( cps.asec.mar11.household.df ) )
+	
+# merge the crosswalk file with the household file
+
+h.xwalk <- 
+	merge(
+		xwalk ,
+		cps.asec.mar11.household.df 
+	)
+
+# remove unnecessary data frames from memory #
+
+rm( xwalk , cps.asec.mar11.household.df )
+
+# clear up RAM
+
+gc()
+		
 # store CPS ASEC march 2011 family records as an R data frame
 cps.asec.mar11.family.df <- 
 	read.SAScii ( 
@@ -234,6 +255,32 @@ cps.asec.mar11.family.df <-
 		beginline = 1121 , 
 		zipped = F )
 
+
+# convert all column names to lowercase #
+
+names( cps.asec.mar11.family.df ) <-
+	tolower( names( cps.asec.mar11.family.df ) ) 
+		
+
+# merge the crosswalk + household file with the family file
+
+h.f.xwalk <- 
+	merge(
+		h.xwalk ,
+		cps.asec.mar11.family.df ,
+		by.x = c( 'h_seq' , 'ffpos' ) ,
+		by.y = c( 'fh_seq' , 'ffpos' )
+	)
+		
+# remove unnecessary data frames from memory #
+
+rm( h.xwalk , cps.asec.mar11.family.df )
+
+# clear up RAM
+
+gc()
+
+		
 # store CPS ASEC march 2011 person records as an R data frame
 cps.asec.mar11.person.df <- 
 	read.SAScii ( 
@@ -244,37 +291,11 @@ cps.asec.mar11.person.df <-
 
 
 # convert all column names to lowercase #
-
-names( cps.asec.mar11.household.df ) <-
-	tolower( names( cps.asec.mar11.household.df ) )
-	
-names( cps.asec.mar11.family.df ) <-
-	tolower( names( cps.asec.mar11.family.df ) ) 
 	
 names( cps.asec.mar11.person.df ) <-
 	tolower( names( cps.asec.mar11.person.df ) ) 
 	
 
-# merge the crosswalk file with the household file
-
-h.xwalk <- 
-	merge(
-		xwalk ,
-		cps.asec.mar11.household.df 
-	)
-
-	
-# merge the crosswalk + household file with the family file
-
-h.f.xwalk <- 
-	merge(
-		h.xwalk ,
-		cps.asec.mar11.family.df ,
-		by.x = c( 'h_seq' , 'ffpos' ) ,
-		by.y = c( 'fh_seq' , 'ffpos' )
-	)
-
-	
 # merge the crosswalk + household + family file with the person file - this contains all three files #
 
 cps.asec.2011.df <- 
@@ -291,8 +312,9 @@ cps.asec.2011.df <-
 
 if ( nrow( cps.asec.2011.df ) != nrow( cps.asec.mar11.person.df ) ) stop( "problem with merge - merged file should have the same number of records as the original person file" )
 
+
 # remove unnecessary data frames from memory #
-rm( cps.asec.mar11.household.df , cps.asec.mar11.family.df , cps.asec.mar11.person.df , h.xwalk , h.f.xwalk , xwalk )
+rm( cps.asec.mar11.person.df , h.f.xwalk )
 
 # clear up RAM
 gc()
