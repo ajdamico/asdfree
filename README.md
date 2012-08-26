@@ -18,4 +18,4 @@ My [journal article](http://journal.r-project.org/archive/2009-2/RJournal_2009-2
 
 My [collection of two-minute videos](http://twotorials.com/) to help beginners learn the R language.
 
-I like to hear how you're using my work.  Tell me what you're doing or even which data set to add next - [ajdamico@gmail.com](mailto:ajdamico@gmail.com)
+Talk to me!  I'd love to hear how you're using this or even which data set to add next - [ajdamico@gmail.com](mailto:ajdamico@gmail.com)
