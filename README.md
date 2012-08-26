@@ -18,4 +18,4 @@ My [journal article](http://journal.r-project.org/archive/2009-2/RJournal_2009-2
 
 My [collection of two-minute videos](http://twotorials.com/) to help beginners learn the R language.
 
-Talk to me! - [ajdamico@gmail.com](mailto:ajdamico@gmail.com)
+Talk to me about what you're doing or which data set to add next - [ajdamico@gmail.com](mailto:ajdamico@gmail.com)
