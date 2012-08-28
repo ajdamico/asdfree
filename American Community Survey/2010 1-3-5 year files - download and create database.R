@@ -63,6 +63,8 @@ acs.datasets.to.download <-
 # and only needs to be run once #
 #################################
 
+# add 'us' and puerto rico to the list of all states to download
+stab <- c( state.abb , "US" , "PR" )
 
 # loop through each of the acs data sets to be downloaded
 for ( k in acs.datasets.to.download ){
@@ -74,7 +76,7 @@ for ( k in acs.datasets.to.download ){
 	db <- dbConnect( SQLite() , dbname = paste0( k , ".db" ) )
 
 	# loop through each state (abbreviation)
-	for ( i in state.abb ){
+	for ( i in stab ){
 		
 		# loop through both household- and person-level files
 		for ( j in c( 'h' , 'p' ) ){
@@ -146,7 +148,7 @@ for ( k in acs.datasets.to.download ){
 
 		# if working on the first state, initiate the table (do not append to it)
 		# otherwise, append to whatever table already exists
-		ap <- ifelse( i == state.abb[ 1 ] , FALSE , TRUE )
+		ap <- ifelse( i == stab[ 1 ] , FALSE , TRUE )
 		
 		# store both household- and person-level data frames into the database (.db) file
 		dbWriteTable( db , paste0( k , '_h' ) , current.h.df , append = ap )
