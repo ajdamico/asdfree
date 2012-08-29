@@ -126,21 +126,6 @@ acs.10.m.design <- 									# name the survey object
 
 # end of low-RAM, incorrect-SE database-backed survey object creation #	
 
-
-# update the survey design to include age categories
-# acs.10.m.design <-
-	# update(
-		# acs.10.merged.design ,
-		# agecat = 
-			# cut( 
-				# agep , 
-				# c( seq( 0 , 25 , 5 ) , seq( 35 , 65 , 10 ) , 75 , 85 , Inf ) , 
-				# right = F , 
-				# include.lowest = T , 
-				# labels = 1:12 
-			# )
-	# )
-
 	
 # exclude puerto rico to match the published tables #
 
