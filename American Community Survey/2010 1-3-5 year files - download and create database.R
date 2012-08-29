@@ -178,7 +178,7 @@ for ( k in acs.datasets.to.download ){
 
 
 # the current working directory should now contain one database (.db) file
-# for each data set specified in the "acs.datasets.to.download" object
+# for each data set specified in the "acs.datasets.to.download" character vector object
 
 
 # once complete, this script does not need to be run again.
