@@ -94,7 +94,7 @@ fn <- 'acs2010_1yr' 		# analyze the 2010 single-year acs
 #######################################################################
 
 
-acs.10.merged.design <- 							# name the survey object
+acs.10.m.design <- 									# name the survey object
 	svrepdesign(									# svrepdesign function call.. type ?svrepdesign for more detail
 		weights = ~pwgtp, 							# person-level weights are stored in column "pwgtp"
 		repweights = "pwgtp[0-9]" ,					# the acs contains 80 replicate weights, pwgtp1 - pwgtp80.  this [0-9] format captures all numeric values
