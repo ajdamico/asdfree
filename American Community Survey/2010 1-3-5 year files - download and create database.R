@@ -63,8 +63,8 @@ acs.datasets.to.download <-
 # and only needs to be run once #
 #################################
 
-# add puerto rico to the list of all states to download
-stab <- c( state.abb , "PR" )
+# add the district and puerto rico to the list of all states to download
+stab <- c( state.abb , "DC" , "PR" )
 
 # loop through each of the acs data sets to be downloaded
 for ( k in acs.datasets.to.download ){
