@@ -170,7 +170,6 @@ svytotal( ~as.numeric( agep %in% 60:64 ) , acs.10.51.m.design )
 svytotal( ~as.numeric( agep %in% 65:74 ) , acs.10.51.m.design )
 svytotal( ~as.numeric( agep %in% 75:84 ) , acs.10.51.m.design )
 svytotal( ~as.numeric( agep %in% 85:200 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 85 ) , acs.10.51.m.design )
 
 
 # note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
@@ -263,18 +262,18 @@ acs.10.51.hh.design <-
 ######################################################
 	
 
-svytotal( ~as.numeric( type %in% 1 ) , acs10.51.hh.design )							# total housing units
-svytotal( ~as.numeric( ten %in% 1:4 ) , acs10.51.hh.design )						# occupied units
-svytotal( ~as.numeric( ten %in% 1:2 ) , acs10.51.hh.design )						# owner-occupied units
-svytotal( ~as.numeric( ten %in% 3:4 ) , acs10.51.hh.design )						# renter-occupied units
-svytotal( ~as.numeric( ten %in% 1 ) , acs10.51.hh.design )							# owned with mortgage
-svytotal( ~as.numeric( ten %in% 2 ) , acs10.51.hh.design )							# owned free and clear
-svytotal( ~as.numeric( ten %in% 3 ) , acs10.51.hh.design )							# rented for cash
-svytotal( ~as.numeric( ten %in% 4 ) , acs10.51.hh.design )							# no cash rent
-svytotal( ~as.numeric( vacs %in% 1:7 ) , acs10.51.hh.design )						# total vacant units
-svytotal( ~as.numeric( vacs %in% 1 ) , acs10.51.hh.design )							# for rent
-svytotal( ~as.numeric( vacs %in% 3 ) , acs10.51.hh.design )							# for sale only
-svytotal( ~as.numeric( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs10.51.hh.design )		# all other vacant
+svytotal( ~as.numeric( type %in% 1 ) , acs.10.51.hh.design )							# total housing units
+svytotal( ~as.numeric( ten %in% 1:4 ) , acs.10.51.hh.design )							# occupied units
+svytotal( ~as.numeric( ten %in% 1:2 ) , acs.10.51.hh.design )							# owner-occupied units
+svytotal( ~as.numeric( ten %in% 3:4 ) , acs.10.51.hh.design )							# renter-occupied units
+svytotal( ~as.numeric( ten %in% 1 ) , acs.10.51.hh.design )								# owned with mortgage
+svytotal( ~as.numeric( ten %in% 2 ) , acs.10.51.hh.design )								# owned free and clear
+svytotal( ~as.numeric( ten %in% 3 ) , acs.10.51.hh.design )								# rented for cash
+svytotal( ~as.numeric( ten %in% 4 ) , acs.10.51.hh.design )								# no cash rent
+svytotal( ~as.numeric( vacs %in% 1:7 ) , acs.10.51.hh.design )							# total vacant units
+svytotal( ~as.numeric( vacs %in% 1 ) , acs.10.51.hh.design )							# for rent
+svytotal( ~as.numeric( vacs %in% 3 ) , acs.10.51.hh.design )							# for sale only
+svytotal( ~as.numeric( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.10.51.hh.design )		# all other vacant
 
 
 # note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
