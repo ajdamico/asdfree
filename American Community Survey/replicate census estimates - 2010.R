@@ -282,3 +282,8 @@ svytotal( ~as.numeric( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.10.51.hh.design )
 ################################################
 # end of housing-level census code replication #
 ################################################
+
+
+# for more details on how to work with data in r
+# check out my two minute tutorial video site
+# http://www.twotorials.com/
