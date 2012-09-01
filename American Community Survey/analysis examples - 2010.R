@@ -464,14 +464,14 @@ svyby(
 # minimum, 25th, 50th, 75th, maximum 
 # ages of residents of the united states
 svyquantile( 
-	~age , 
+	~agep , 
 	design = acs.10.51.m.design ,
 	c( 0 , .25 , .5 , .75 , 1 )
 )
 
 # by state
 svyby( 
-	~age , 
+	~agep , 
 	~st ,
 	design = acs.10.51.m.design ,
 	svyquantile ,
@@ -499,7 +499,7 @@ acs.10.51.m.design.female <-
 
 # average age - nationwide, restricted to females
 svymean( 
-	~age , 
+	~agep , 
 	design = acs.10.51.m.design.female
 )
 
