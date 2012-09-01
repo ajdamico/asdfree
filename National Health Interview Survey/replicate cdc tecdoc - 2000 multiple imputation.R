@@ -1,4 +1,4 @@
-# importation and analysis of us government survey data
+# analyze us government survey data with the r language
 # national health interview survey
 # 2000 personsx and incmimp
 

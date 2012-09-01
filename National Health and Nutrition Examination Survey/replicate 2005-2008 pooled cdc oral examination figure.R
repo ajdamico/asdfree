@@ -1,4 +1,4 @@
-# importation and analysis of us government survey data
+# analyze us government survey data with the r language
 # national health and nutrition examination survey
 # replication of one figure published by the centers for disease control & prevention
 # using 2005-2006 and 2007-2008 demographics and examination files

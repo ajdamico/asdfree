@@ -1,4 +1,4 @@
-# importation and analysis of us government survey data
+# analyze us government survey data with the r language
 # american community survey
 # 2010 1-year, 3-year, and 5-year
 # household-level, person-level, and merged files

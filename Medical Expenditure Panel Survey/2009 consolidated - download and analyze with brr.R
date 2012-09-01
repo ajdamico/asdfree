@@ -1,4 +1,4 @@
-# importation and analysis of us government survey data
+# analyze us government survey data with the r language
 # medical expenditure panel survey
 # 2009 consolidated
 

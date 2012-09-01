@@ -1,4 +1,4 @@
-# importation and analysis of us government survey data
+# analyze us government survey data with the r language
 # american community survey
 # 2010 persons and household files
 
@@ -169,7 +169,7 @@ svytotal( ~as.numeric( agep %in% 55:59 ) , acs.10.51.m.design )
 svytotal( ~as.numeric( agep %in% 60:64 ) , acs.10.51.m.design )
 svytotal( ~as.numeric( agep %in% 65:74 ) , acs.10.51.m.design )
 svytotal( ~as.numeric( agep %in% 75:84 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 85:200 ) , acs.10.51.m.design )
+svytotal( ~as.numeric( agep %in% 85:100 ) , acs.10.51.m.design )
 
 
 # note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #

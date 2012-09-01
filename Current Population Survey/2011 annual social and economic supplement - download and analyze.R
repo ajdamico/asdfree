@@ -1,4 +1,4 @@
-# importation and analysis of us government survey data
+# analyze us government survey data with the r language
 # current population survey 
 # annual social and economic supplement
 # 2011

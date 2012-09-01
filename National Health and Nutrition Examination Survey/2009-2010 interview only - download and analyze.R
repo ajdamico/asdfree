@@ -1,4 +1,4 @@
-# importation and analysis of us government survey data
+# analyze us government survey data with the r language
 # national health and nutrition examination survey
 # 2009-2010 demographics and questionnaire files
 
