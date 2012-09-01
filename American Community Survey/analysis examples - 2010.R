@@ -547,7 +547,7 @@ write.csv( coverage.by.region , "coverage by region.csv" )
 # here's the uninsured percentage by region, 
 # with accompanying standard errors
 uninsured.rate.by.region <-
-	coverage.by.region[ , c( "region" , "factor(hicov)2" , "se2" ) ]
+	coverage.by.region[ , c( "region" , "factor.hicov.2" , "se2" ) ]
 
 
 # print the new results to the screen
