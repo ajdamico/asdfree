@@ -190,7 +190,7 @@ lrcyw.years.to.download <- c( "09" , "10" )
 # loop through each of the years specified..
 for ( i in lrcyw.years.to.download ){
 
-	# set the exact location of the sipp 2008 calendar-year year replicate weight data file on the census ftp
+	# set the exact location of the sipp 2008 calendar-year replicate weight data file on the census ftp
 	SIPP.08.cy.YY.file.location <-
 		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2008/repwgt120_cy" , i , ".zip" )
 
