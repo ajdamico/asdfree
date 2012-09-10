@@ -93,6 +93,23 @@ gc()
 SIPP.lr.08.YY.SAS.read.in.instructions <-
 	paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2004/lrw04_xx.sas" )
 
+# the sas input script specifies CTL_DATE and LGTWTTYP as numeric columns,
+# when they should be character columns.
+
+# download the sas read-in instructions..
+sas_lines <- readLines( SIPP.lr.08.YY.SAS.read.in.instructions )
+
+# alter those two lines
+sas_lines <- gsub( "CTL_DATE" , "CTL_DATE $" , sas_lines )
+sas_lines <- gsub( "LGTWTTYP" , "LGTWTTYP $" , sas_lines )
+
+# create a temporary file
+tf <- tempfile()
+
+# ..and write the fixed script to that temporary file.
+writeLines( sas_lines , tf )
+# which will now be used as part of the read.SAScii() call below
+	
 # specify which longitudinal replicate panel weight years to download
 lrpw.years.to.download <- c( "09" , "10" )
 
@@ -113,7 +130,7 @@ for ( i in lrpw.years.to.download ){
 	x <-
 		read.SAScii (
 			SIPP.08.pn.YY.file.location ,
-			SIPP.lr.08.YY.SAS.read.in.instructions ,
+			tf ,
 			beginline = 5 ,
 			zipped = T 
 		)
@@ -145,10 +162,27 @@ for ( i in lrpw.years.to.download ){
 # longitudinal replicate calendar-year weight files #
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# set the exact location of the sipp 2008 longitudinal replicate calendar-year weight sas input script on the census ftp
+# set the exact location of the sipp 2008 longitudinal replicate panel weight sas input script on the census ftp
 # this file is the same for all years, so don't include it within the loop
 SIPP.lr.08.YY.SAS.read.in.instructions <-
 	paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2004/lrw04_xx.sas" )
+
+# the sas input script specifies CTL_DATE and LGTWTTYP as numeric columns,
+# when they should be character columns.
+
+# download the sas read-in instructions..
+sas_lines <- readLines( SIPP.lr.08.YY.SAS.read.in.instructions )
+
+# alter those two lines
+sas_lines <- gsub( "CTL_DATE" , "CTL_DATE $" , sas_lines )
+sas_lines <- gsub( "LGTWTTYP" , "LGTWTTYP $" , sas_lines )
+
+# create a temporary file
+tf <- tempfile()
+
+# ..and write the fixed script to that temporary file.
+writeLines( sas_lines , tf )
+# which will now be used as part of the read.SAScii() call below
 
 # specify which longitudinal replicate calendar-year weight years to download
 lrcyw.years.to.download <- c( "09" , "10" )
@@ -170,7 +204,7 @@ for ( i in lrcyw.years.to.download ){
 	x <-
 		read.SAScii (
 			SIPP.08.cy.YY.file.location ,
-			SIPP.lr.08.YY.SAS.read.in.instructions ,
+			tf ,
 			beginline = 5 ,
 			zipped = T 
 		)
