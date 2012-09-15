@@ -123,6 +123,10 @@ read.SAScii.sql <-
 			
 				current.position <- current.position + nrow( part )
 
+				rm( part )
+				
+				gc()
+				
 				cat( 
 					"  current progress: read.SAScii.sql has read in" , 
 					prettyNum( 
