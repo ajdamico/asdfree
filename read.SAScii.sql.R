@@ -20,6 +20,14 @@ read.SAScii.sql <-
 		dbname 
 	) {
 
+	# scientific notation contains a decimal point when converted to a character string..
+	# so store the user's current value and get rid of it.
+	user.defined.scipen <- getOption( 'scipen' )
+	
+	# set scientific notation to something impossibly high.  Inf doesn't work.
+	options( scipen = 1000000 )
+	
+	
 	# read.SAScii.sql depends on two packages:
 	require(SAScii)
 	require(RSQLite)
@@ -73,7 +81,8 @@ read.SAScii.sql <-
 
 	dbGetQuery( db , sql )
 
-	colClasses <- ifelse( !y[ , 'char' ] , 'numeric' , 'character' )
+	# read in all columns as character-only (see colClasses paramter below)
+	# colClasses <- ifelse( !y[ , 'char' ] , 'numeric' , 'character' )
 	
 	sql.in <- 
 		sprintf( 
@@ -104,15 +113,16 @@ read.SAScii.sql <-
 		{
 			while (TRUE) {
 		
+				# read all columns in as character..
 				part <- 
 					read.fwf(
 						input , 
 						n = chunk_size , 
 						widths = x$width ,
-						colClasses = colClasses ,
+						colClasses = 'character' ,
 						comment.char = ""
 					)
-						
+					
 				dbGetPreparedQuery( 
 					db , 
 					sql.in , 
@@ -178,8 +188,15 @@ read.SAScii.sql <-
 	
 	}
 	
+	# close the database connection
 	dbDisconnect(db)
-
+	
+	# reset scientific notation length
+	options( scipen = user.defined.scipen )
+	
+	# close the file connection
+	close( input )
+		
 	NULL
 }
 	
