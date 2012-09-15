@@ -15,6 +15,7 @@ read.SAScii.sql <-
 		# n = -1 , 		# no n parameter available for this - you must read in the entire table!
 		lrecl = NULL , 
 		# skip.decimal.division = NULL , skipping decimal division not an option
+		tl = F ,		# convert all column names to lowercase?
 		tablename ,
 		dbname 
 	) {
@@ -24,6 +25,8 @@ read.SAScii.sql <-
 	require(RSQLite)
 	
 	x <- parse.SAScii( sas_ri , beginline , lrecl )
+	
+	if( tl ) x$varname <- tolower( x$varname )
 	
 	#only the width field should include negatives
 	y <- x[ !is.na( x[ , 'varname' ] ) , ]
