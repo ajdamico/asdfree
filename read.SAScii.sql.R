@@ -1,14 +1,14 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# warnings:
-# experimental!
-# decimal division isn't flexible
-# must read in the entire table
-# BUT multiple tables can contribute to a single final db-table
+# differences from the SAScii package's read.SAScii() --
+# 	3.5x faster
+# 	no RAM issues
+# 	decimal division isn't flexible
+# 	must read in the entire table
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 read.SAScii.sql <-
 	function( 
-		fn , 			# either a string pointing to an ASCII file or a character vector containing multiple!
+		fn ,
 		sas_ri , 
 		beginline = 1 , 
 		zipped = F , 
@@ -48,11 +48,9 @@ read.SAScii.sql <-
 	
 	# input actual SAS data text-delimited file to read in
 	
-	file_list <- fn
+	input <- file( fn , "r" )
 	
-	input <- file( file_list[1] , "r" )
-	
-	db <- dbConnect( SQLite(), dbname = dbname)
+	db <- dbConnect( SQLite(), dbname = dbname )
 
 	fields <- y$varname
 
@@ -93,7 +91,7 @@ read.SAScii.sql <-
 			)
 		)
 			
-	# read in 1000 records at a time!
+	# read in 1000 records at a time
 	chunk_size <- 1000
 	# increasing this doesn't noticeably improve speed..
 	# at least not 1,000 vs. 25,000
@@ -182,6 +180,7 @@ read.SAScii.sql <-
 	
 	dbDisconnect(db)
 
+	NULL
 }
 	
 
