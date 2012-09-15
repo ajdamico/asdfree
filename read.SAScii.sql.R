@@ -54,7 +54,7 @@ read.SAScii.sql <-
 
 	fields <- y$varname
 
-	colTypes <- rep( "TEXT" , length( fields ) )
+	colTypes <- ifelse( !y[ , 'char' ] , 'REAL' , 'TEXT' )
 
 	colDecl <- paste( fields , colTypes )
 
