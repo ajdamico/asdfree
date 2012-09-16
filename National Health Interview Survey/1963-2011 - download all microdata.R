@@ -293,10 +293,10 @@ for ( year in nhis.years.to.download ){
 		# use incmimp (because it matches more current years)
 		if ( identical( sort( sas.file ) , c( 'incimps.sas' , 'incmimp.sas' ) ) ) sas.file <- 'incmimp.sas'
 		
-		# if the SAS importation script is 'imcmimp' - then the starting line for read.SAScii should be 80
-		# if the SAS importation script is 'incimps' - then the starting line for read.SAScii should be 60
-		SAScii.start <- ifelse( sas.file == 'incmimp.sas' , 80 , 60 )
-		
+		# figure out the SAScii.start position
+		# in NHIS imputed income files, each INPUT block is directly preceded by the text "INPUT ALL VARIABLES"
+		# so just find it and add one line
+		SAScii.start <- grep( "INPUT ALL VARIABLES" , readLines( paste0( year.nhis.ftp , sas.file ) ) ) + 1
 		
 		# the data file to download should have the exact same prefix
 		# but either .exe or .zip as a suffix
