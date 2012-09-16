@@ -8,6 +8,10 @@ Current Analysis Examples
 
 * fully-commented, easy-to-modify examples of how to load, clean, configure, and analyze the most current data sets available.
 
+Massive FTP Download Automation
+
+* no-changes-necessary programs to download every microdata file from every survey year available as R data files on your local computer.
+
 Replication Scripts
 
 * match published numbers exactly to show that R produces the same results as other statistical languages.
