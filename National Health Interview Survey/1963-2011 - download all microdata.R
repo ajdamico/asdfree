@@ -283,11 +283,15 @@ for ( year in nhis.years.to.download ){
 		
 		# search for the SAS importation script (.sas)
 		# this will determine which data file to read in
-		sas.file <- ftp.files[ grepl( '.sas' , ftp.files ) ]
+		sas.file <- tolower( ftp.files[ grepl( '.sas' , ftp.files ) ] )
 
+		# if both incmimp.sas and incimps.sas are available,
+		# use incmimp (because it matches more current years)
+		if ( identical( sort( sas.file ) , c( 'incimps.sas' , 'incmimp.sas' ) ) ) sas.file <- 'incmimp.sas'
+		
 		# if the SAS importation script is 'imcmimp' - then the starting line for read.SAScii should be 80
 		# if the SAS importation script is 'incimps' - then the starting line for read.SAScii should be 60
-		SAScii.start <- ifelse( tolower( sas.file ) == 'incmimp.sas' , 80 , 60 )
+		SAScii.start <- ifelse( sas.file == 'incmimp.sas' , 80 , 60 )
 		
 		
 		# the data file to download should have the exact same prefix
