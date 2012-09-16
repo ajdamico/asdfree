@@ -185,7 +185,10 @@ for ( year in nhis.years.to.download ){
 	
 	# the healthin file has WTBDD2W and WTBDD2WB (in the SAS input file) in the wrong order
 	if ( year %in% c( 1972 , 1974 ) ) ftp.files <- ftp.files[ ! ( ftp.files %in% 'healthin.exe' ) ]
-		
+	
+	# skip this 1973 file with irregular SAS importation scripts
+	if ( year == 1973 ) ftp.files <- ftp.files[ ! ( ftp.files %in% "prgnancy.exe" ) ]
+	
 	# skip 1979 personsx file
 	if ( year == 1979 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( "personsx.exe" , "smokingx.exe" ) ) ]
 
