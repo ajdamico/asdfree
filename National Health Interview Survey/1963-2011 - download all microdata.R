@@ -168,11 +168,14 @@ for ( year in nhis.years.to.download ){
 	# data files to skip completely #
 	#################################
 	
-	# skip these 1963 files without end-of-file lines
+	# skip these 1963 files with irregular SAS importation scripts
 	if ( year == 1963 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( 'condition.exe' , 'family.exe' , 'hospital.exe' , 'health_exp.exe' ) ) ]
 	
-	# skip these 1964 files without end-of-file lines
+	# skip these 1964 files with irregular SAS importation scripts
 	if ( year == 1964 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( 'family.exe' , 'hospital.exe' , 'xray.exe' , 'person.exe' ) ) ]
+
+	# skip these 1965 files with irregular SAS importation scripts
+	if ( year == 1965 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( "condition.exe" , "diabetes.exe" , "person.exe" , "presmed.exe" ) ) ]
 
 	# the healthin file has WTBDD2W and WTBDD2WB (in the SAS input file) in the wrong order
 	if ( year %in% c( 1972 , 1974 ) ) ftp.files <- ftp.files[ ! ( ftp.files %in% 'healthin.exe' ) ]
