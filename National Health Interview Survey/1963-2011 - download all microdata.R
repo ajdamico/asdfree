@@ -118,6 +118,30 @@ for ( year in nhis.years.to.download ){
 	ftp.files <- getURL( year.nhis.ftp , dirlistonly = TRUE )
 	ftp.files <- tolower( strsplit( ftp.files , "\r*\n" )[[1]] )
 
+	
+	# if a file.zip and a file.exe both exist, only take the file.exe #
+	
+	# identify all .exe files..
+	exe.filenames <- ftp.files[ grepl( ".exe" , ftp.files ) ]
+	
+	# identify all .zip files..
+	zip.filenames <- ftp.files[ grepl( ".zip" , ftp.files ) ]
+	
+	# identify overlap between .zip and .exe files
+	exe.filenames <- gsub( ".exe" , "" , exe.filenames )
+	zip.filenames <- gsub( ".zip" , "" , zip.filenames )
+	duplicate.filenames <- zip.filenames[ (zip.filenames %in% exe.filenames) ]
+	zip.filenames.with.exe.matches <- paste( duplicate.filenames , ".zip" , sep = "" )
+	
+	# throw out .zip files that match a .exe file exactly
+	ftp.files <- ftp.files[ ! ( ftp.files %in% zip.filenames.with.exe.matches ) ]
+	
+	# end of throwing out file.zip files that match file.exe files #	
+	
+	# throw out folders (assumed to be files without a . in them)
+	# (any files in folders within the main year folder need to be downloaded separately)
+	ftp.files <- ftp.files[ grepl( "\\." , ftp.files ) ]
+
 
 	# # # # # # # # # # # # # # # # # # # #
 	# make a bunch of download exceptions #
@@ -170,29 +194,6 @@ for ( year in nhis.years.to.download ){
 	# # # # # # # # # # # # # # # # # # #
 	
 	
-	# if a file.zip and a file.exe both exist, only take the file.exe #
-	
-	# identify all .exe files..
-	exe.filenames <- ftp.files[ grepl( ".exe" , ftp.files ) ]
-	
-	# identify all .zip files..
-	zip.filenames <- ftp.files[ grepl( ".zip" , ftp.files ) ]
-	
-	# identify overlap between .zip and .exe files
-	exe.filenames <- gsub( ".exe" , "" , exe.filenames )
-	zip.filenames <- gsub( ".zip" , "" , zip.filenames )
-	duplicate.filenames <- zip.filenames[ (zip.filenames %in% exe.filenames) ]
-	zip.filenames.with.exe.matches <- paste( duplicate.filenames , ".zip" , sep = "" )
-	
-	# throw out .zip files that match a .exe file exactly
-	ftp.files <- ftp.files[ ! ( ftp.files %in% zip.filenames.with.exe.matches ) ]
-	
-	# end of throwing out file.zip files that match file.exe files #	
-	
-	# throw out folders (assumed to be files without a . in them)
-	# (any files in folders within the main year folder need to be downloaded separately)
-	ftp.files <- ftp.files[ grepl( "\\." , ftp.files ) ]
-
 	# loop through every fn (filename) inside of the ftp.files available
 	for ( fn in ftp.files ){
 	
