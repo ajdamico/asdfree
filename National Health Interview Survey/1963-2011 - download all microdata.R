@@ -285,6 +285,11 @@ for ( year in nhis.years.to.download ){
 		# this will determine which data file to read in
 		sas.file <- ftp.files[ grepl( '.sas' , ftp.files ) ]
 
+		# if the SAS importation script is 'imcmimp' - then the starting line for read.SAScii should be 80
+		# if the SAS importation script is 'incimps' - then the starting line for read.SAScii should be 60
+		SAScii.start <- ifelse( tolower( sas.file ) == 'incmimp.sas' , 80 , 60 )
+		
+		
 		# the data file to download should have the exact same prefix
 		# but either .exe or .zip as a suffix
 		possible.exe <- gsub( '.sas' , '.exe' , sas.file )
@@ -322,7 +327,7 @@ for ( year in nhis.years.to.download ){
 				read.SAScii( 
 					income.file.names[ i ] , 				# location of the ascii file in a temp directory on the local disk
 					paste0( year.nhis.ftp , sas.file ) ,	# location of the sas import instructions on the nhis ftp site
-					beginline = 80							# code line in the sas import instructions where the INPUT block begins
+					beginline = SAScii.start				# code line in the sas import instructions where the INPUT block begins (determined above)
 				)
 
 			# the read.SAScii function produces column names in whatever case specified by the sas importation script
