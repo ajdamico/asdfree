@@ -40,16 +40,17 @@ setwd( "C:/My Directory/NHIS/" )
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "SAScii" , "RCurl" ) )
 
+
 # define which years to download #
 
-# this command downloads every year of data available
-nhis.years.to.download <- 1963:2011
+# this line will download every year of data available
+nhis.years.to.download <- 2011:1963
 
 # uncomment this line to only download the most current year
 # nhis.years.to.download <- 2011
 
 # uncomment this line to download, for example, 2000 and 2009-2011
-# nhis.years.to.download <- c( 2000 , 2009:2011 )
+# nhis.years.to.download <- c( 2011:2009 , 2000 )
 
 
 # no need to edit anything below this line #
