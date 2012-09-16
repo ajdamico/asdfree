@@ -358,7 +358,7 @@ for ( year in nhis.years.to.download ){
 		ofn <- paste0( output.directory , gsub( '.sas' , '.rda' , sas.file ) )
 		
 		# then save ii1 - ii5 to that .rda file on the local disk
-		save( list = paste0( "ii" , 1:5 ) , file = "ii.rda" )
+		save( list = paste0( "ii" , 1:5 ) , file = ofn )
 		
 		# remove all five imputed income data tables from RAM
 		rm( list = paste0( "ii" , 1:5 ) )
