@@ -187,7 +187,7 @@ for ( year in nhis.years.to.download ){
 	if ( year %in% c( 1972 , 1974 ) ) ftp.files <- ftp.files[ ! ( ftp.files %in% 'healthin.exe' ) ]
 		
 	# skip 1979 personsx file
-	if ( year == 1979 ) ftp.files <- ftp.files[ ! ( ftp.files %in% "personsx.exe" ) ]
+	if ( year == 1979 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( "personsx.exe" , "smokingx.exe" ) ) ]
 
 	# skip 1988 mdevices file
 	if ( year == 1988 ) ftp.files <- ftp.files[ ! ( ftp.files %in% "mdevices.exe" ) ]
