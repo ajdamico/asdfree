@@ -10,7 +10,7 @@ Current Analysis Examples
 
 Massive FTP Download Automation
 
-* no-changes-necessary programs to download every microdata file from every survey year available as R data files on your local computer.
+* no-changes-necessary programs to download every microdata file from every survey year as an R data file on your local computer.
 
 Replication Scripts
 
