@@ -192,6 +192,9 @@ for ( year in nhis.years.to.download ){
 	# skip this 1973 file with irregular SAS importation scripts
 	if ( year == 1973 ) ftp.files <- ftp.files[ ! ( ftp.files %in% "prgnancy.exe" ) ]
 	
+	# skip these 1977 files with irregular SAS importation scripts
+	if ( year == 1977 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( "aidsspec.exe" , "influenza.exe" ) ) ]
+	
 	# skip 1979 personsx file
 	if ( year == 1979 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( "personsx.exe" , "smokingx.exe" ) ) ]
 
