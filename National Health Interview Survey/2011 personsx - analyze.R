@@ -17,25 +17,39 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################
+# prior to running this analysis script, the nhis 2011 personsx file must be loaded as an R data file (.rda) on the local machine.  #
+# running the "1963-2011 - download all microdata.R" script will create this R data file (note: only 2011 files need to be loaded)  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/National%20Health%20Interview%20Survey/1963-2011%20-%20download%20all%20microdata.R #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "/2011/personsx.rda" in C:/My Directory/NHIS (or wherever the working directory was chosen)        #
+#####################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
 ##########################################################################
 # Analyze the 2011 National Health Interview Survey personsx file with R #
 ##########################################################################
 
 
 # set your working directory.
-# the NHIS 2011 data file will be stored here
-# after downloading and importing it.
+# the NHIS 2011 personsx data file should have been
+# stored in a year-specific directory within this file.
+# so if the file "personsx.rda" exists in the directory "C:/My Directory/NHIS/2011/" 
+# then the working directory should be set to "C:/My Directory/NHIS/"
 # use forward slashes instead of back slashes
 
 setwd( "C:/My Directory/NHIS/" )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "SAScii" ) )
-
+# install.packages( "survey" )
 
 require(survey) # load survey package (analyzes complex design surveys)
-require(SAScii) # load the SAScii package (imports ascii data with a SAS script)
 
 
 # set R to produce conservative standard errors instead of crashing
@@ -44,45 +58,42 @@ options( survey.lonely.psu = "adjust" )
 # this setting matches the MISSUNIT option in SUDAAN
 
 
-###############################################
-# DATA LOADING COMPONENT - ONLY RUN THIS ONCE #
-###############################################
+# choose what year of data to analyze
+# note: this can be changed to any year that has already been downloaded locally
+# by the "1963-2011 - download all microdata.R" program above
+year <- 2011
 
-# this process is slow.
-# note the record counter while waiting for these commands to run.
-# the NHIS 2011 personsx file has 101,875 records.
 
-NHIS.11.personsx.SAS.read.in.instructions <-
-	"ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Program_Code/NHIS/2011/personsx.sas"
-	
-NHIS.11.personsx.file.location <-
-	"ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2011/personsx.zip"
+# construct the filepath (within the current working directory) to the personsx.rda file
+path.to.rda.file <- paste( getwd() , year , "personsx.rda" , sep = "/" )
 
-# store the NHIS file as an R data frame
-NHIS.11.personsx.df <-
-	read.SAScii (
-		NHIS.11.personsx.file.location ,
-		NHIS.11.personsx.SAS.read.in.instructions ,
-		zipped = T 
-	)
+# print that filepath to the screen
+print( path.to.rda.file )
 
-# the read.SAScii function produces column names with all capital letters
-# convert them all to lowercase
-names( NHIS.11.personsx.df ) <- tolower( names( NHIS.11.personsx.df ) )
-
-# save the data frame now for instantaneous loading later.
-# this stores the NHIS 2011 personsx table as an R data file.
-save( NHIS.11.personsx.df , file = "NHIS.11.personsx.data.rda" )
-
-##########################################################################
-# END OF DATA LOADING COMPONENT - DO NOT RUN DATA LOADING COMMANDS AGAIN #
-##########################################################################
 
 # now the "NHIS.11.personsx.df" data frame can be loaded directly
 # from your local hard drive.  this is much faster.
-load( "NHIS.11.personsx.data.rda" )
-	
-	
+load( path.to.rda.file )
+
+
+# construct a string containing the data frame name of the personsx data table
+# stored within the R data file (.rda)
+# note: for 2011, this data frame will be named "NHIS.11.personsx.df"
+# but constructing it dynamically will allow analyses of other years
+# by simply changing the 'year' variable above
+df.name <- paste( "NHIS" , substr( year , 3 , 4 ) , "personsx" , "df" , sep = "." )
+
+# copy the personsx data frame to the variable x for easier analyses
+# (because NHIS.11.personsx.df is unwieldy to keep typing)
+x <- get( df.name )
+
+# remove the original copy of the data frame from memory
+rm( list = df.name )
+
+# clear up RAM
+gc()
+
+
 #################################################
 # survey design for taylor-series linearization #
 #################################################
@@ -95,7 +106,7 @@ nhissvy <-
 		strata = ~strat_p ,
 		nest = TRUE ,
 		weights = ~wtfa ,
-		data = NHIS.11.personsx.df
+		data = x
 	)
 
 # notice the 'nhissvy' object used in all subsequent analysis commands
@@ -111,7 +122,7 @@ nhissvy <-
 nrow( nhissvy )
 
 # the nrow function which works on both data frame objects..
-class( NHIS.11.personsx.df )
+class( x )
 # ..and survey design objects
 class( nhissvy )
 
@@ -147,7 +158,7 @@ svytotal(
 # note that this is exactly equivalent to summing up the weight variable
 # from the original NHIS data frame
 
-sum( NHIS.11.personsx.df$wtfa )
+sum( x$wtfa )
 
 # the civilian, non-institutionalized population of the united states #
 # by region of the country
