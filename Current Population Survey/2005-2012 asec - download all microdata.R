@@ -317,7 +317,10 @@ for ( year in cps.years.to.download ){
 	# create an index to speed up the merge
 	dbSendQuery( db , paste0( "CREATE INDEX person_index ON person ( ph_seq , pppos )" ) )
 
-
+	# reset the database (.db)
+	dbBeginTransaction( db )
+	dbCommit( db )
+	
 	# store CPS ASEC march 2011 xwalk records as a SQLite database	
 	dbWriteTable( db , 'xwalk' , xwalk )
 	
