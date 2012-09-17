@@ -17,14 +17,15 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #############################################################################################################################################################
 # prior to running this analysis script, the meps 2009 consolidated file must be loaded as a sas transport (.ssp) file on the local machine.                #
 # running the 1996-2009 household component - download all microdata.R script will create this database file                                                #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/tree/master/Medical%20Expenditure%20Panel%20Survey/1996-2009%20household%20component%20-%20download%20all%20microdata.R #
+# https://raw.github.com/ajdamico/usgsd/master/Medical%20Expenditure%20Panel%20Survey/1996-2009%20household%20component%20-%20download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "acs2010_1yr.db" in C:/My Directory/MEPS or wherever the working directory was set during execution of the program         #
+# that script will create a file "2009 - consolidated.ssp" in C:/My Directory/MEPS (or wherever the working directory was chosen)                           #
 #############################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
