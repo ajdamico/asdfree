@@ -122,12 +122,12 @@ if ( sipp.household.extract ){
 	# write an example SAS import script using the dash method
 	sas.import.with.at.signs <-
 		"INPUT
-			@1		SSUID		12
-			@13		UHOWLGMT	2
-			@15		UHOWLGYR	4
-			@19		UWHNAPMT	2
-			@21		UWHNAPYR	4
-			@25		UWAITLST	1
+			@1   SSUID   12.
+			@13   UHOWLGMT   2.
+			@15   UHOWLGYR   4.
+			@19   UWHNAPMT   2.
+			@21   UWHNAPYR   4.
+			@25   UWAITLST   1.
 		;"
 		
 	# create a temporary file
@@ -174,16 +174,16 @@ if ( sipp.longitudinal.weights ){
 	# write an example SAS import script using the dash method
 	sas.import.with.at.signs <-
 		"INPUT
-			@1 		LGTKEY		8
-			@9		SPANEL 		4
-			@13		SSUID		12
-			@25		EPPPNUM		4
-			@29		LGTPNWT1	10
-			@39		LGTPNWT2	10
-			@49		LGTPNWT3	10
-			@59		LGTCY1WT	10
-			@69		LGTCY2WT	10
-			@79		LGTCY3WT	10
+			@1 	   LGTKEY      8.
+			@9      SPANEL       4.
+			@13      SSUID      12.
+			@25      EPPPNUM      4.
+			@29      LGTPNWT1   10.
+			@39      LGTPNWT2   10.
+			@49      LGTPNWT3   10.
+			@59      LGTCY1WT   10.
+			@69      LGTCY2WT   10.
+			@79      LGTCY3WT   10.
 		;"
 		
 	# create a temporary file
