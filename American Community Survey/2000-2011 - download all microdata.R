@@ -18,9 +18,9 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-#######################################################################################
-# Download and Create a Database with the 2010 American Community Survey files with R #
-#######################################################################################
+##########################################################################
+# Download and Create a Database with the American Community Survey in R #
+##########################################################################
 
 
 # set your working directory.
@@ -42,13 +42,28 @@ require(RSQLite) # load RSQLite package (creates database files in R)
 # if you have a big hard drive, hey why not download them all?
 
 # single-year datasets are available back to 2000
-single.year.datasets.to.download <- 2010:2000
+single.year.datasets.to.download <- 2000:2010
 	
 # three-year datasets are available back to 2007
-three.year.datasets.to.download <- 2010:2007
+three.year.datasets.to.download <- 2007:2010
 
 # five-year datasets are available back to 2009
-five.year.datasets.to.download <- 2010:2009
+five.year.datasets.to.download <- 2009:2010
+
+# # # # # # # # # # # # # #
+# other download examples #
+# # # # # # # # # # # # # #
+
+# uncomment these lines to only download the 2010 single-year file and no others
+# single.year.datasets.to.download <- 2010
+# three.year.datasets.to.download <- NULL
+# five.year.datasets.to.download <- NULL
+
+# uncomment these lines to only download the 2002 one-year file, the 2007 one- and three-year files, and all of the 2009 files
+# single.year.datasets.to.download <- c( 2002 , 2007 , 2009 )
+# three.year.datasets.to.download <- c( 2007 , 2009 )
+# five.year.datasets.to.download <- 2009
+
 
 	
 ###############################################

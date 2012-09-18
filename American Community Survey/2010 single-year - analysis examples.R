@@ -18,16 +18,16 @@
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#####################################################################################################################################################
-# prior to running this analysis script, the acs 2010 single-year file must be loaded as a database (.db) on the local machine.                     #
-# running the 2010 download and create database script will create this database file                                                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/2010%201-3-5%20year%20files%20-%20download%20and%20create%20database.R #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "acs2010_1yr.db" in C:/My Directory/ACS or wherever the working directory was set during execution of the program  #
-#####################################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################
+# prior to running this analysis script, the acs 2010 single-year file must be loaded as a database (.db) on the local machine.     #
+# running the "download all microdata" script will create this database file - only the 2010 single-year db needs to be downloaded  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/American%20Community%20Survey/2000-2011%20-%20download%20all%20microdata.R          #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "acs2010_1yr.db" in C:/My Directory/ACS or wherever the working directory was set for the program  #
+#####################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 

@@ -24,16 +24,16 @@
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#####################################################################################################################################################
-# prior to running this analysis script, the acs 2010 single-year file must be loaded as a database (.db) on the local machine.                     #
-# running the 2010 download and create database script will create this database file                                                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/2010%201-3-5%20year%20files%20-%20download%20and%20create%20database.R #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "acs2010_1yr.db" in C:/My Directory/ACS or wherever the working directory was set during execution of the program  #
-#####################################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################
+# prior to running this analysis script, the acs 2010 single-year file must be loaded as a database (.db) on the local machine.     #
+# running the 2010 download and create database script will create this database file                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/American%20Community%20Survey/2000-2011%20-%20download%20all%20microdata.R          #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "acs2010_1yr.db" in C:/My Directory/ACS or wherever the working directory was set for the program  #
+#####################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
@@ -55,7 +55,7 @@ require(RSQLite) 	# load RSQLite package (creates database files in R)
 
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
-# options( survey.lonely.psu = "adjust" )
+options( survey.lonely.psu = "adjust" )
 
 
 # if this option is set to TRUE
@@ -126,15 +126,7 @@ acs.10.m.design <- 									# name the survey object
 
 # end of low-RAM, incorrect-SE database-backed survey object creation #	
 
-	
-# exclude puerto rico to match the published tables #
 
-acs.10.51.m.design <-
-	subset( 
-		acs.10.m.design , 								# subset the survey object created above..
-		!( st %in% 72 ) 								# ..to exclude state fips code 72 (puerto rico)
-	)
-	
 #############################################################################
 # ..and immediately start printing each row matching the replication target #
 #############################################################################
@@ -147,29 +139,29 @@ acs.10.51.m.design <-
 #####################################################
 
 	
-svytotal( ~as.numeric( relp %in% 0:17 ) , acs.10.51.m.design )					# total population
-svytotal( ~as.numeric( relp %in% 0:15 ) , acs.10.51.m.design )					# housing unit population
-svytotal( ~as.numeric( relp %in% 16:17 ) , acs.10.51.m.design )					# gq population
-svytotal( ~as.numeric( relp %in% 16 ) , acs.10.51.m.design )					# gq institutional population
-svytotal( ~as.numeric( relp %in% 17 ) , acs.10.51.m.design )					# gq noninstitutional population
-svyby( ~as.numeric( relp %in% 0:17 ) , ~sex , acs.10.51.m.design , svytotal )	# total males & females
+svytotal( ~I( relp %in% 0:17 ) , acs.10.m.design )					# total population
+svytotal( ~I( relp %in% 0:15 ) , acs.10.m.design )					# housing unit population
+svytotal( ~I( relp %in% 16:17 ) , acs.10.m.design )					# gq population
+svytotal( ~I( relp %in% 16 ) , acs.10.m.design )					# gq institutional population
+svytotal( ~I( relp %in% 17 ) , acs.10.m.design )					# gq noninstitutional population
+svyby( ~I( relp %in% 0:17 ) , ~sex , acs.10.m.design , svytotal )	# total males & females
 
 
 # all age categories #
 
-svytotal( ~as.numeric( agep %in% 0:4 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 5:9 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 10:14 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 15:19 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 20:24 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 25:34 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 35:44 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 45:54 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 55:59 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 60:64 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 65:74 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 75:84 ) , acs.10.51.m.design )
-svytotal( ~as.numeric( agep %in% 85:100 ) , acs.10.51.m.design )
+svytotal( ~I( agep %in% 0:4 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 5:9 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 10:14 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 15:19 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 20:24 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 25:34 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 35:44 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 45:54 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 55:59 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 60:64 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 65:74 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 75:84 ) , acs.10.m.design )
+svytotal( ~I( agep %in% 85:100 ) , acs.10.m.design )
 
 
 # note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
@@ -182,8 +174,8 @@ svytotal( ~as.numeric( agep %in% 85:100 ) , acs.10.51.m.design )
 
 # now in order to conserve RAM..
 
-# remove both the merged design and the subset from memory
-rm( acs.10.51.m.design , acs.10.m.design )
+# remove the merged design from memory
+rm( acs.10.m.design )
 
 # ..and then clear up RAM
 gc()
@@ -242,14 +234,6 @@ acs.10.hh.design <-
 # end of low-RAM, incorrect-SE database-backed survey object creation #	
 
 
-# exclude puerto rico to match the published tables #
-
-acs.10.51.hh.design <-
-	subset( 
-		acs.10.hh.design , 								# subset the survey object created above..
-		!( st %in% 72 ) 								# ..to exclude state fips code 72 (puerto rico)
-	)
-	
 #############################################################################
 # ..and immediately start printing each row matching the replication target #
 #############################################################################
@@ -262,18 +246,18 @@ acs.10.51.hh.design <-
 ######################################################
 	
 
-svytotal( ~as.numeric( type %in% 1 ) , acs.10.51.hh.design )							# total housing units
-svytotal( ~as.numeric( ten %in% 1:4 ) , acs.10.51.hh.design )							# occupied units
-svytotal( ~as.numeric( ten %in% 1:2 ) , acs.10.51.hh.design )							# owner-occupied units
-svytotal( ~as.numeric( ten %in% 3:4 ) , acs.10.51.hh.design )							# renter-occupied units
-svytotal( ~as.numeric( ten %in% 1 ) , acs.10.51.hh.design )								# owned with mortgage
-svytotal( ~as.numeric( ten %in% 2 ) , acs.10.51.hh.design )								# owned free and clear
-svytotal( ~as.numeric( ten %in% 3 ) , acs.10.51.hh.design )								# rented for cash
-svytotal( ~as.numeric( ten %in% 4 ) , acs.10.51.hh.design )								# no cash rent
-svytotal( ~as.numeric( vacs %in% 1:7 ) , acs.10.51.hh.design )							# total vacant units
-svytotal( ~as.numeric( vacs %in% 1 ) , acs.10.51.hh.design )							# for rent
-svytotal( ~as.numeric( vacs %in% 3 ) , acs.10.51.hh.design )							# for sale only
-svytotal( ~as.numeric( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.10.51.hh.design )		# all other vacant
+svytotal( ~I( type %in% 1 ) , acs.10.hh.design )							# total housing units
+svytotal( ~I( ten %in% 1:4 ) , acs.10.hh.design )							# occupied units
+svytotal( ~I( ten %in% 1:2 ) , acs.10.hh.design )							# owner-occupied units
+svytotal( ~I( ten %in% 3:4 ) , acs.10.hh.design )							# renter-occupied units
+svytotal( ~I( ten %in% 1 ) , acs.10.hh.design )								# owned with mortgage
+svytotal( ~I( ten %in% 2 ) , acs.10.hh.design )								# owned free and clear
+svytotal( ~I( ten %in% 3 ) , acs.10.hh.design )								# rented for cash
+svytotal( ~I( ten %in% 4 ) , acs.10.hh.design )								# no cash rent
+svytotal( ~I( vacs %in% 1:7 ) , acs.10.hh.design )							# total vacant units
+svytotal( ~I( vacs %in% 1 ) , acs.10.hh.design )							# for rent
+svytotal( ~I( vacs %in% 3 ) , acs.10.hh.design )							# for sale only
+svytotal( ~I( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.10.hh.design )		# all other vacant
 
 
 # note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
