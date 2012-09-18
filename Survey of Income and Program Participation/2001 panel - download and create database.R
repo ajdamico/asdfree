@@ -200,7 +200,7 @@ if ( sipp.longitudinal.weights ){
 		# note no beginline = parameter in this read.SAScii.sql() call
 		zipped = T ,
 		tl = TRUE ,
-		tablename = "w9" ,
+		tablename = "wgtw9" ,
 		dbname = SIPP.dbname
 	)
 }

@@ -125,7 +125,7 @@ if ( sipp.longitudinal.weights ){
 		beginline = 5 ,
 		zipped = T ,
 		tl = TRUE ,
-		tablename = "w7" ,
+		tablename = "wgtw7" ,
 		dbname = SIPP.dbname
 	)
 }
