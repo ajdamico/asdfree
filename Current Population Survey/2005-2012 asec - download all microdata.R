@@ -399,69 +399,10 @@ for ( year in cps.years.to.download ){
 	dbSendQuery( db , "ALTER TABLE x ADD one" )
 	dbSendQuery( db , "UPDATE x SET one = 1" )
 
-
-	#######################################
-	# survey design for replicate weights #
-	#######################################
-
-	# create survey design object with CPS design information
-	# using existing data frame of CPS data
-	y <- 
-		svrepdesign(
-			weights = ~marsupwt, 
-			repweights = "pwwgt[1-9]", 
-			type = "Fay", 
-			rho = (1-1/sqrt(4)),
-			data = "x" ,
-			combined.weights = T ,
-			dbtype = "SQLite" ,
-			dbname = cps.dbname
-		)
-
-	# close the database connection
-	close( y )
-
-	# save the database-backed survey object (dbso)
-	# to an R data file (.rda) that can be opened quickly
-	# to re-access the dbso anytime
-	save( y , file = paste0( "CPS.mar." , year , ".rda" ) )
-
-	# remove the survey design from memory
-	rm( y )
-
-	# clear all RAM
-	gc()
+	# disconnect from the current database
+	dbDisconnect( db )
+	
 }
-
-# now at any point, the database-backed survey object can be re-opened
-# first: load the R data file (.rda) containing the survey object
-load( "CPS.mar.2011.rda" )
-
-# second: open the (y) connection into a new object that will store the database-backed survey object
-y11 <- open( y )
-
-#############################################################################################################
-# these commands replicate the results of the SAS, SUDAAN, and WesVar code presented in                     #  
-# http://smpbff2.dsd.census.gov/pub/cps/march/Use_of_the_Public_Use_Replicate_Weight_File_final_PR_2010.doc #
-#############################################################################################################
-
-# restrict the y object to..
-males.above15.inpoverty <-
-	subset( 
-		y11 ,
-		a_age > 15 &		# age 16+
-		a_sex %in% 1 &		# males
-		perlis %in% 1		# in poverty
-	)
-
-# count the weighted number of individuals
-# and also calculate the standard error,
-# using the newly-created survey design subset
-svytotal( ~one , males.above15.inpoverty )
-
-# note that this exactly matches the SAS-produced file
-# march 2011 asec replicate weight sas output.png
-
 # for more details on how to work with data in r
 # check out my two minute tutorial video site
 # http://www.twotorials.com/
