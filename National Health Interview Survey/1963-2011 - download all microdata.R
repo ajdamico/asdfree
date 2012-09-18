@@ -275,8 +275,8 @@ for ( year in nhis.years.to.download ){
 				
 				# attempt #2
 				
-				# wait for 60 seconds
-				Sys.sleep( 60 )
+				# wait for three minutes
+				Sys.sleep( 3 * 60 )
 				
 				# and try again!
 				
@@ -290,8 +290,8 @@ for ( year in nhis.years.to.download ){
 				
 				# attempt #3
 				
-				# wait for 60 more seconds
-				Sys.sleep( 60 )
+				# wait for three more minutes
+				Sys.sleep( 3 * 60 )
 				
 				# and try a third-and-final time
 				
@@ -410,8 +410,8 @@ for ( year in nhis.years.to.download ){
 			
 			# attempt #2
 			
-			# wait for 60 seconds
-			Sys.sleep( 60 )
+			# wait for three minutes
+			Sys.sleep( 3 * 60 )
 			
 			# and try again!
 			
@@ -425,8 +425,8 @@ for ( year in nhis.years.to.download ){
 			
 			# attempt #3
 			
-			# wait for 60 more seconds
-			Sys.sleep( 60 )
+			# wait for three more minutes
+			Sys.sleep( 3 * 60 )
 			
 			# and try a third-and-final time
 			
