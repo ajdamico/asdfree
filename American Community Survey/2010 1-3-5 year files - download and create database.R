@@ -130,50 +130,58 @@ for ( k in acs.datasets.to.download ){
 			# unzip the file's contents to the temporary directory
 			unzip( tf , exdir = td , overwrite = T )
 
-			# read the csv file in the temporary directory into an r data frame
-			current.df <- read.csv( paste0( td , '/ss10' , j , tolower( i ) , '.csv' ) )
-
-			# immediately convert all column names to lowercase
-			names( current.df ) <- tolower( names( current.df ) )
+				
+			# if working on the first state, initiate the table (do not append to it)
+			# otherwise, append to whatever table already exists
+			ap <- ifelse( i == stab[ 1 ] , FALSE , TRUE )
 			
-			# copy that data frame to another data frame with either h (household) or p (person) in the object name
-			assign( paste( 'current' , j , 'df' , sep = '.' ) , current.df )
+			# write the csv directly into the database,
+			# without overloading RAM
+			dbWriteTable( 
+				db , 
+				name = paste0( k , '_' , j ) , 
+				value = paste0( td , '/ss10' , j , tolower( i ) , '.csv' ) , 
+				row.names = FALSE ,
+				header = TRUE ,
+				sep = "," ,
+				append = ap
+			)
 			
-			# remove the original data frame from RAM
-			rm( current.df )
-			
-			# clear memory
-			gc()
 		}
 
-		# if working on the first state, initiate the table (do not append to it)
-		# otherwise, append to whatever table already exists
-		ap <- ifelse( i == stab[ 1 ] , FALSE , TRUE )
-		
-		# store both household- and person-level data frames into the database (.db) file
-		dbWriteTable( db , paste0( k , '_h' ) , current.h.df , append = ap )
-		dbWriteTable( db , paste0( k , '_p' ) , current.p.df , append = ap )
-		
-		# recode the filetype column as 'M' (merged)..
-		current.h.df$rt <- current.p.df$rt <- 'M'
-		
-		# then merge the household and person data frames together
-		current.m.df <- merge( current.h.df , current.p.df )
-		
-		# confirm that the merged file has the same number of records as the person file
-		stopifnot( nrow( current.m.df ) == nrow( current.p.df ) )
-		
-		# write the merged file to the database (.db) file as well
-		dbWriteTable( db , paste0( k , '_m' ) , current.m.df , append = ap )
-
-		# remove all three data frames from RAM
-		rm( current.h.df , current.p.df , current.m.df )
-		
-		# clear memory
-		gc()
-		
 	}
 
+	# once all state tables have been added completed..
+	
+	# create indexes to speed up the merge between the _p (person) and _h (household) files
+	dbSendQuery( db , paste0( "CREATE INDEX " , k , "_p_dex ON " , k , "_h ( SERIALNO )" ) )
+	dbSendQuery( db , paste0( "CREATE INDEX " , k , "_h_dex ON " , k , "_p ( SERIALNO )" ) )
+	
+	# create the merged file
+	 dbSendQuery( 
+		db , 
+		paste0( 
+			"create table " , 
+			k , 
+			"_m as select * from " ,
+			k , 
+			"_h as a inner join " , 
+			k , 
+			"_p as b on a.serialno = b.serialno"
+		)
+	)
+	
+	# now the current database contains three tables:
+		# _h (household)
+		# _p (person)
+		# _m (merged)
+	print( dbListTables( db ) )
+
+	# confirm that the merged file has the same number of records as the person file
+	stopifnot( 
+		dbGetQuery( db , paste0( "select count(*) as count from " , k , "_p" ) ) == 
+		dbGetQuery( db , paste0( "select count(*) as count from " , k , "_m" ) )
+	)
 }
 
 
