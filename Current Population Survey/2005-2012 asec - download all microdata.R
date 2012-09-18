@@ -393,7 +393,7 @@ for ( year in cps.years.to.download ){
 
 	# confirm that the number of records in the 2011 person file
 	# matches the number of records in the merged file
-	stopifnot( dbGetQuery( db , "select count(*) as count from h_f_p" ) == dbGetQuery( db , "select count(*) as count from x" ) )
+	stopifnot( dbGetQuery( db , "select count(*) as count from x" ) == dbGetQuery( db , "select count(*) as count from person" ) )
 
 	# add a new column "one" that simply contains the number 1 for every record in the data set
 	dbSendQuery( db , "ALTER TABLE x ADD one" )
@@ -412,9 +412,8 @@ for ( year in cps.years.to.download ){
 			repweights = "pwwgt[1-9]", 
 			type = "Fay", 
 			rho = (1-1/sqrt(4)),
-			data = x ,
+			data = "x" ,
 			combined.weights = T ,
-			tablename = 'x' ,
 			dbtype = "SQLite" ,
 			dbname = cps.dbname
 		)
@@ -438,7 +437,7 @@ for ( year in cps.years.to.download ){
 # first: load the R data file (.rda) containing the survey object
 load( "CPS.mar.2011.rda" )
 
-# second: open the (y) connection into a new object that will store the object
+# second: open the (y) connection into a new object that will store the database-backed survey object
 y11 <- open( y )
 
 #############################################################################################################
