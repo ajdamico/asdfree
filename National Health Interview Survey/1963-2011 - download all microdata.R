@@ -257,9 +257,56 @@ for ( year in nhis.years.to.download ){
 			# substr( fn , 1 , dp - 1 ) identifies the string up to the final '.sas' to allow the 2004 files' folder structure to work
 			sas_ri <- paste0( "ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Program_Code/NHIS/" , year , "/" , substr( fn , 1 , dp - 1 ) , ".sas" )
 
-			# read the nhis file directly into an R data frame
-			nhis.df <- read.SAScii( efl , sas_ri , zipped = T )
-
+			# save the nhis dataframe / read.SAScii download & import command into an expression
+			ndrs <- expression( nhis.df <- read.SAScii( efl , sas_ri , zipped = T ) )
+			
+			
+			# start of error-handling
+			
+			# blank out the try.error object
+			try.error <- NULL
+			
+			# attempt #1:
+			# read the nhis file directly into an R data frame.. actually run the expression constructed above
+			try.error <- try( eval( ndrs ) , silent = T )
+			
+			# if the attempt to download the file resulted in an error..
+			if ( class( try.error ) == "try-error" ){
+				
+				# attempt #2
+				
+				# wait for 60 seconds
+				Sys.sleep( 60 )
+				
+				# and try again!
+				
+				# read the nhis file directly into an R data frame.. actually run the expression constructed above
+				try.error <- try( eval( ndrs ) , silent = T )
+				
+			}
+			
+			# if the attempt to download the file resulted in a second error..
+			if ( class( try.error ) == "try-error" ){
+				
+				# attempt #3
+				
+				# wait for 60 more seconds
+				Sys.sleep( 60 )
+				
+				# and try a third-and-final time
+				
+				# read the nhis file directly into an R data frame.. actually run the expression constructed above
+				eval( ndrs )
+				# note that this third attempt no longer contains error-handling
+				# (so if the command throws an error, the program will just crash)
+				
+				# if the download / read-in was still unsuccessful after the third attempt,
+				# the program will crash
+			}
+			
+			# end of error-handling
+			
+			
 			# convert all column names to lowercase
 			names( nhis.df ) <- tolower( names( nhis.df ) )
 			
@@ -345,7 +392,53 @@ for ( year in nhis.years.to.download ){
 		
 		# download the compressed file from the nhis ftp site
 		# and save it to a temporary file on your local disk
-		download.file( efl , tf , mode = "wb" )
+		# ..but just save this download.file into an error-handling expression
+		dfeh <- expression( download.file( efl , tf , mode = "wb" ) )
+	
+		
+		# start of error-handling
+	
+		# blank out the try.error object
+		try.error <- NULL
+		
+		# attempt #1:
+		# download the file.. actually run the expression constructed above
+		try.error <- try( eval( dfeh ) , silent = T )
+		
+		# if the attempt to download the file resulted in an error..
+		if ( class( try.error ) == "try-error" ){
+			
+			# attempt #2
+			
+			# wait for 60 seconds
+			Sys.sleep( 60 )
+			
+			# and try again!
+			
+			# download the file.. actually run the expression constructed above
+			try.error <- try( eval( dfeh ) , silent = T )
+			
+		}
+		
+		# if the attempt to download the file resulted in a second error..
+		if ( class( try.error ) == "try-error" ){
+			
+			# attempt #3
+			
+			# wait for 60 more seconds
+			Sys.sleep( 60 )
+			
+			# and try a third-and-final time
+			
+			# download the file.. actually run the expression constructed above
+			eval( dfeh )
+			# note that this third attempt no longer contains error-handling
+			# (so if the command throws an error, the program will just crash)
+			
+			# if the download was still unsuccessful after the third attempt,
+			# the program will crash
+		}
+		# end of error-handling
 		
 		# unzip the file into a temporary directory.
 		# the unzipped file should contain *five* ascii files
