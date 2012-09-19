@@ -181,9 +181,9 @@ for ( year in 2050:2000 ){
 					
 					
 					# figure out the filename of the csv -
-					# 2000 - 2002 contain different filenames than other years
+					# 2000 contains different filenames than other years
 					csvname <- 
-						ifelse( year %in% 2000:2002 , 
+						ifelse( year == 2000 , 
 							paste0( 'c2ss' , j , tolower( i ) , '.csv' ) ,
 							paste0( 'ss' , substr( year , 3 , 4 ) , j , tolower( i ) , '.csv' ) 
 						)
@@ -191,8 +191,8 @@ for ( year in 2050:2000 ){
 					
 					# fix a problem with the census ftp site - 
 					# the alaska file is contained within the alabama csv and vice versa
-					if ( year == 2000 & j == 'p' & tolower( i ) == 'ak' ) csvname <- gsub( 'ak' , 'al' , csvname )
-					if ( year == 2000 & j == 'p' & tolower( i ) == 'al' ) csvname <- gsub( 'al' , 'ak' , csvname )
+					if ( year %in% 2000:2002 & j == 'p' & tolower( i ) == 'ak' ) csvname <- gsub( 'ak' , 'al' , csvname )
+					if ( year %in% 2000:2002 & j == 'p' & tolower( i ) == 'al' ) csvname <- gsub( 'al' , 'ak' , csvname )
 					
 					
 					# write the csv directly into the database,
