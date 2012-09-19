@@ -183,8 +183,19 @@ for ( year in 2050:2000 ){
 					# without overloading RAM
 					dbWriteTable( 
 						db , 
+						
 						name = paste0( k , '_' , j ) , 
-						value = paste0( td , '/ss10' , j , tolower( i ) , '.csv' ) , 
+						
+						# construct the full filepath to the just-downloaded csv file on the local disk
+						value = paste0( 
+									td , 
+									'/ss' , 
+									substr( year , 3 , 4 ) , 
+									j , 
+									tolower( i ) , 
+									'.csv' 
+								) , 
+								
 						row.names = FALSE ,
 						header = TRUE ,
 						sep = "," ,
