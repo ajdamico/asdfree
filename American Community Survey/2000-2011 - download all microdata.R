@@ -172,9 +172,9 @@ for ( year in 2050:2000 ){
 					# once the download has completed..
 					
 					# unzip the file's contents to the temporary directory
-					unzip( tf , exdir = td , overwrite = T )
+					fn <- unzip( tf , exdir = td , overwrite = T )
 
-						
+	
 					# if working on the first state, initiate the table (do not append to it)
 					# otherwise, append to whatever table already exists
 					ap <- ifelse( i == stab[ 1 ] , FALSE , TRUE )
@@ -190,7 +190,11 @@ for ( year in 2050:2000 ){
 						sep = "," ,
 						append = ap
 					)
-					
+
+					# these files require lots of temporary disk space,
+					# so delete them once they're part of the database
+					file.remove( fn , tf )
+	
 				}
 			}
 
