@@ -179,6 +179,16 @@ for ( year in 2050:2000 ){
 					# otherwise, append to whatever table already exists
 					ap <- ifelse( i == stab[ 1 ] , FALSE , TRUE )
 					
+					
+					# figure out the filename of the csv -
+					# 2000 contains different filenames than other years
+					csvname <- 
+						ifelse( year == 2000 , 
+							paste0( 'c2ss' , j , tolower( i ) , '.csv' ) ,
+							paste0( 'ss' , substr( year , 3 , 4 ) , j , tolower( i ) , '.csv' ) 
+						)
+							
+					
 					# write the csv directly into the database,
 					# without overloading RAM
 					dbWriteTable( 
@@ -189,11 +199,8 @@ for ( year in 2050:2000 ){
 						# construct the full filepath to the just-downloaded csv file on the local disk
 						value = paste0( 
 									td , 
-									'/ss' , 
-									substr( year , 3 , 4 ) , 
-									j , 
-									tolower( i ) , 
-									'.csv' 
+									'/' ,
+									csvname
 								) , 
 								
 						row.names = FALSE ,
