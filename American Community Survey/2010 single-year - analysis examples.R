@@ -325,10 +325,10 @@ acs.10.m.design <- 									# name the survey object
 # count the total (unweighted) number of records in acs #
 
 # simply use the nrow function..
-nrow( acs.10.51.m.design )
+nrow( acs.10.m.design )
 
 # ..on the survey design object
-class( acs.10.51.m.design )
+class( acs.10.m.design )
 
 
 # since the acs gets loaded as a database-backed survey object instead of a data frame,
@@ -345,7 +345,7 @@ class( db )
 # instead, perform the same unweighted count directly from the 'sqltable'
 # stored inside the database (.db) file on your hard disk (as opposed to RAM)..
 
-# ..and note that the exclusion of puerto rico means that the survey design object (acs.10.51.m.design)
+# ..and note that the exclusion of puerto rico means that the survey design object (acs.10.m.design)
 # no longer matches the original data table 'sqltable'..
 dbGetQuery( db , paste0( "select count(*) as num_records from " , sqltable ) )
 
@@ -366,7 +366,7 @@ dbGetQuery( db , paste0( "select count(*) as num_records from " , sqltable ) )
 svyby(
 	~one ,
 	~ST ,
-	acs.10.51.m.design ,
+	acs.10.m.design ,
 	unwtd.count
 )
 
@@ -385,7 +385,7 @@ dbGetQuery( db , by.state.command )
 # the population of the united states (including group quarters residents: both institionalized and non-institutionalized) #
 svytotal( 
 	~one ,
-	acs.10.51.m.design 
+	acs.10.m.design 
 )
 
 # note that this is exactly equivalent to summing up the weight variable
@@ -403,7 +403,7 @@ dbGetQuery( db , sum.weights.command )
 svyby(
 	~one ,
 	~ST ,
-	acs.10.51.m.design ,
+	acs.10.m.design ,
 	svytotal
 )
 
@@ -413,14 +413,14 @@ svyby(
 # average age - nationwide
 svymean( 
 	~AGEP , 
-	design = acs.10.51.m.design
+	design = acs.10.m.design
 )
 
 # by state
 svyby( 
 	~AGEP , 
 	~ST ,
-	design = acs.10.51.m.design ,
+	design = acs.10.m.design ,
 	svymean
 )
 
@@ -435,14 +435,14 @@ svyby(
 # percent uninsured - nationwide
 svymean( 
 	~factor( HICOV ) , 
-	design = acs.10.51.m.design
+	design = acs.10.m.design
 )
 
 # by state
 svyby( 
 	~factor( HICOV ) , 
 	~ST ,
-	design = acs.10.51.m.design ,
+	design = acs.10.m.design ,
 	svymean
 )
 
@@ -452,7 +452,7 @@ svyby(
 # ages of residents of the united states
 svyquantile( 
 	~AGEP , 
-	design = acs.10.51.m.design ,
+	design = acs.10.m.design ,
 	c( 0 , .25 , .5 , .75 , 1 )
 )
 
@@ -460,7 +460,7 @@ svyquantile(
 svyby( 
 	~AGEP , 
 	~ST ,
-	design = acs.10.51.m.design ,
+	design = acs.10.m.design ,
 	svyquantile ,
 	c( 0 , .25 , .5 , .75 , 1 ) , 
 	ci = T
@@ -470,16 +470,16 @@ svyby(
 # subsetting example #
 ######################
 
-# restrict the acs.10.51.m.design object to
+# restrict the acs.10.m.design object to
 # females only
-acs.10.51.m.design.female <-
+acs.10.m.design.female <-
 	subset(
-		acs.10.51.m.design ,
+		acs.10.m.design ,
 		SEX %in% 2
 	)
 # now any of the above commands can be re-run
-# using the acs.10.51.m.design.female object
-# instead of the acs.10.51.m.design object
+# using the acs.10.m.design.female object
+# instead of the acs.10.m.design object
 # in order to analyze females only
 	
 # calculate the mean of a linear variable #
@@ -487,7 +487,7 @@ acs.10.51.m.design.female <-
 # average age - nationwide, restricted to females
 svymean( 
 	~AGEP , 
-	design = acs.10.51.m.design.female
+	design = acs.10.m.design.female
 )
 
 
@@ -505,7 +505,7 @@ coverage.by.region <-
 	svyby( 
 		~factor( HICOV ) , 
 		~REGION ,
-		design = acs.10.51.m.design ,
+		design = acs.10.m.design ,
 		svymean
 	)
 
