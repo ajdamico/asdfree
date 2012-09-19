@@ -18,10 +18,14 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
+
+
 #############################################################################################################
 # this script matches the results of the SAS, SUDAAN, and WesVar code presented in                          #  
 # http://smpbff2.dsd.census.gov/pub/cps/march/Use_of_the_Public_Use_Replicate_Weight_File_final_PR_2010.doc #
 #############################################################################################################
+
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -36,6 +40,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
+
 # set your working directory.
 # the CPS 2011 data files should have been stored here
 # after running the program described above
@@ -45,11 +50,11 @@ setwd( "C:/My Directory/CPS/" )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "survey" )
+# install.packages( c ( "survey" , "RSQLite" ) )
 
 
 require(survey)		# load survey package (analyzes complex design surveys)
-
+require(RSQLite) 	# load RSQLite package (creates database files in R)
 
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html

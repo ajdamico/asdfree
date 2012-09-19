@@ -49,11 +49,11 @@ setwd( "C:/My Directory/CPS/" )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "survey" )
+# install.packages( c ( "survey" , "RSQLite" ) )
 
 
 require(survey)		# load survey package (analyzes complex design surveys)
-
+require(RSQLite) 	# load RSQLite package (creates database files in R)
 
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
