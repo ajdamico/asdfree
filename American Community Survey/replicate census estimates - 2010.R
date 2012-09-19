@@ -144,7 +144,7 @@ svytotal( ~I( RELP %in% 0:15 ) , acs.10.m.design )					# housing unit population
 svytotal( ~I( RELP %in% 16:17 ) , acs.10.m.design )					# gq population
 svytotal( ~I( RELP %in% 16 ) , acs.10.m.design )					# gq institutional population
 svytotal( ~I( RELP %in% 17 ) , acs.10.m.design )					# gq noninstitutional population
-svyby( ~I( RELP %in% 0:17 ) , ~sex , acs.10.m.design , svytotal )	# total males & females
+svyby( ~I( RELP %in% 0:17 ) , ~SEX , acs.10.m.design , svytotal )	# total males & females
 
 
 # all age categories #
