@@ -83,7 +83,7 @@ fn <- 'acs2010_1yr' 		# analyze the 2010 single-year acs
 # create the american community survey 2010 single-year design
 
 
-# choose between the RAM-intensive survey object (with correct standard errors)
+# choose between the RAM-inTENsive survey object (with correct standard errors)
 # or the RAM-minimizing survey object (with incorrect standard errors)
 
 #######################################################################
@@ -96,7 +96,7 @@ fn <- 'acs2010_1yr' 		# analyze the 2010 single-year acs
 
 acs.10.m.design <- 									# name the survey object
 	svrepdesign(									# svrepdesign function call.. type ?svrepdesign for more detail
-		weights = ~pwgtp, 							# person-level weights are stored in column "pwgtp"
+		weights = ~PWGTP, 							# person-level weights are stored in column "PWGTP"
 		repweights = "pwgtp[0-9]" ,					# the acs contains 80 replicate weights, pwgtp1 - pwgtp80.  this [0-9] format captures all numeric values
 		type = "Fay", 								# use a fay's adjustment of four..  
 		rho = ( 1 - 1 / sqrt( 4 ) ),				# ..note that these two lines are the SUDAAN equivalent of using adjfay = 4;
@@ -117,8 +117,8 @@ acs.10.m.design <- 									# name the survey object
 
 # acs.10.m.design <- 									# name the survey object
 	# svydesign(										# svydesign function call.. type ?svydesign for more detail
-		# ~1 ,											# specify non-existent PSUs (responsible for incorrect SE calculation)
-		# weights = ~pwgtp, 							# person-level weights are stored in column "pwgtp"
+		# ~1 ,											# specify non-exisTENt PSUs (responsible for incorrect SE calculation)
+		# weights = ~PWGTP, 							# person-level weights are stored in column "pwgtp"
 		# data = paste0( fn , '_m' ) , 					# use the person-household-merge data table
 		# dbname = paste0( './' , fn , '.db' ) , 		# stored inside the database (acs2010_1yr.db)
 		# dbtype="SQLite"								# use SQLite as the SQL engine
@@ -139,29 +139,29 @@ acs.10.m.design <- 									# name the survey object
 #####################################################
 
 	
-svytotal( ~I( relp %in% 0:17 ) , acs.10.m.design )					# total population
-svytotal( ~I( relp %in% 0:15 ) , acs.10.m.design )					# housing unit population
-svytotal( ~I( relp %in% 16:17 ) , acs.10.m.design )					# gq population
-svytotal( ~I( relp %in% 16 ) , acs.10.m.design )					# gq institutional population
-svytotal( ~I( relp %in% 17 ) , acs.10.m.design )					# gq noninstitutional population
-svyby( ~I( relp %in% 0:17 ) , ~sex , acs.10.m.design , svytotal )	# total males & females
+svytotal( ~I( RELP %in% 0:17 ) , acs.10.m.design )					# total population
+svytotal( ~I( RELP %in% 0:15 ) , acs.10.m.design )					# housing unit population
+svytotal( ~I( RELP %in% 16:17 ) , acs.10.m.design )					# gq population
+svytotal( ~I( RELP %in% 16 ) , acs.10.m.design )					# gq institutional population
+svytotal( ~I( RELP %in% 17 ) , acs.10.m.design )					# gq noninstitutional population
+svyby( ~I( RELP %in% 0:17 ) , ~sex , acs.10.m.design , svytotal )	# total males & females
 
 
 # all age categories #
 
-svytotal( ~I( agep %in% 0:4 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 5:9 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 10:14 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 15:19 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 20:24 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 25:34 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 35:44 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 45:54 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 55:59 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 60:64 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 65:74 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 75:84 ) , acs.10.m.design )
-svytotal( ~I( agep %in% 85:100 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 0:4 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 5:9 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 10:14 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 15:19 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 20:24 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 25:34 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 35:44 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 45:54 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 55:59 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 60:64 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 65:74 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 75:84 ) , acs.10.m.design )
+svytotal( ~I( AGEP %in% 85:100 ) , acs.10.m.design )
 
 
 # note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
@@ -190,7 +190,7 @@ gc()
 # once again, pick RAM-hogging or incorrect standard errors #
 
 
-# choose between the RAM-intensive survey object (with correct standard errors)
+# choose between the RAM-inTENsive survey object (with correct standard errors)
 # or the RAM-minimizing survey object (with incorrect standard errors)
 
 #######################################################################
@@ -203,7 +203,7 @@ gc()
 
 acs.10.hh.design <- 							
 	svrepdesign(									
-		weights = ~wgtp, 							# # # # this differs from the person-household-merge: use the household-weights, wgtp # # # #
+		weights = ~WGTP, 							# # # # this differs from the person-household-merge: use the household-weights, wgtp # # # #
 		repweights = "wgtp[0-9]" ,					# # # # this differs from the person-household-merge: use the household-replicate weights, wgtp1-wgtp80 # # # #
 		type = "Fay", 								
 		rho = ( 1 - 1 / sqrt( 4 ) ),				
@@ -225,7 +225,7 @@ acs.10.hh.design <-
 # acs.10.hh.design <- 								
 	# svydesign(										
 		# ~1 ,											
-		# weights = ~wgtp, 								# # # # this differs from the person-household-merge: use the household-weights, wgtp # # # #
+		# weights = ~WGTP, 								# # # # this differs from the person-household-merge: use the household-weights, wgtp # # # #
 		# data = paste0( fn , '_h' ) , 					# # # # this differs from the person-household-merge: use the household-only data table, _h not _m # # # #
 		# dbname = paste0( './' , fn , '.db' ) , 		
 		# dbtype="SQLite"								
@@ -246,18 +246,18 @@ acs.10.hh.design <-
 ######################################################
 	
 
-svytotal( ~I( type %in% 1 ) , acs.10.hh.design )							# total housing units
-svytotal( ~I( ten %in% 1:4 ) , acs.10.hh.design )							# occupied units
-svytotal( ~I( ten %in% 1:2 ) , acs.10.hh.design )							# owner-occupied units
-svytotal( ~I( ten %in% 3:4 ) , acs.10.hh.design )							# renter-occupied units
-svytotal( ~I( ten %in% 1 ) , acs.10.hh.design )								# owned with mortgage
-svytotal( ~I( ten %in% 2 ) , acs.10.hh.design )								# owned free and clear
-svytotal( ~I( ten %in% 3 ) , acs.10.hh.design )								# rented for cash
-svytotal( ~I( ten %in% 4 ) , acs.10.hh.design )								# no cash rent
-svytotal( ~I( vacs %in% 1:7 ) , acs.10.hh.design )							# total vacant units
-svytotal( ~I( vacs %in% 1 ) , acs.10.hh.design )							# for rent
-svytotal( ~I( vacs %in% 3 ) , acs.10.hh.design )							# for sale only
-svytotal( ~I( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.10.hh.design )		# all other vacant
+svytotal( ~I( TYPE %in% 1 ) , acs.10.hh.design )							# total housing units
+svytotal( ~I( TEN %in% 1:4 ) , acs.10.hh.design )							# occupied units
+svytotal( ~I( TEN %in% 1:2 ) , acs.10.hh.design )							# owner-occupied units
+svytotal( ~I( TEN %in% 3:4 ) , acs.10.hh.design )							# renter-occupied units
+svytotal( ~I( TEN %in% 1 ) , acs.10.hh.design )								# owned with mortgage
+svytotal( ~I( TEN %in% 2 ) , acs.10.hh.design )								# owned free and clear
+svytotal( ~I( TEN %in% 3 ) , acs.10.hh.design )								# rented for cash
+svytotal( ~I( TEN %in% 4 ) , acs.10.hh.design )								# no cash rent
+svytotal( ~I( VACS %in% 1:7 ) , acs.10.hh.design )							# total vacant units
+svytotal( ~I( VACS %in% 1 ) , acs.10.hh.design )							# for rent
+svytotal( ~I( VACS %in% 3 ) , acs.10.hh.design )							# for sale only
+svytotal( ~I( VACS %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.10.hh.design )		# all other vacant
 
 
 # note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #

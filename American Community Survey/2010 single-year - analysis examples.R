@@ -154,11 +154,11 @@ dbGetQuery( db , second.command )		# recode all records' column 'one' to 1
 # here are three SQLite UPDATE commands (stored as character strings)
 # that can be passed to the database (.db) to make a (permanent!) change to the table
 # the first command creates a new column called 'child'
-# the second command modifies the child column, adding zeroes for records with agep >= 19, 
-# the third command also modifies the child column, adding ones for records with agep < 19
+# the second command modifies the child column, adding zeroes for records with AGEP >= 19, 
+# the third command also modifies the child column, adding ones for records with AGEP < 19
 ( first.command <- paste0( "ALTER TABLE " , sqltable , " ADD child" ) )
-( second.command <- paste0( "UPDATE " , sqltable , " SET child = 0 WHERE agep >= 19" ) )
-( third.command <- paste0( "UPDATE " , sqltable , " SET child = 1 WHERE agep < 19" ) )
+( second.command <- paste0( "UPDATE " , sqltable , " SET child = 0 WHERE AGEP >= 19" ) )
+( third.command <- paste0( "UPDATE " , sqltable , " SET child = 1 WHERE AGEP < 19" ) )
 # running the above three lines only creates a string variable..
 # ..and prints the lines to the screen.
 # the table within the database has not yet been modified
@@ -168,12 +168,12 @@ dbGetQuery( db , second.command )		# recode all records' column 'one' to 1
 # note that since each command updates millions of records,
 # these lines run slowly.  if you're impatient, buy a solid-state hard drive.
 dbGetQuery( db , first.command )		# add the child column
-dbGetQuery( db , second.command )		# recode agep >= 19 records to child = 0
-dbGetQuery( db , third.command )		# recode agep < 19 records to child = 1
+dbGetQuery( db , second.command )		# recode AGEP >= 19 records to child = 0
+dbGetQuery( db , third.command )		# recode AGEP < 19 records to child = 1
 
 
 # check the new variable by running simple counts on the table #
-dbGetQuery( db , paste0( "SELECT child, agep , count(*) as counts FROM " , sqltable , " GROUP BY child, agep ORDER BY agep" ) )
+dbGetQuery( db , paste0( "SELECT child, AGEP , count(*) as counts FROM " , sqltable , " GROUP BY child, AGEP ORDER BY AGEP" ) )
 
 
 
@@ -184,7 +184,7 @@ dbGetQuery( db , paste0( "SELECT child, agep , count(*) as counts FROM " , sqlta
 
 # example of a linear recode with multiple categories, and a loop to perform each recode quickly
 
-original.variable.name <- 'agep'								# variable to recode from	
+original.variable.name <- 'AGEP'								# variable to recode from	
 
 cutpoints <- 
 	c( -1 , 10 , 19 , 25 , 35 , 45 , 55 , 65 , 75 , 85 , 100 )	# points to split the variable
@@ -198,7 +198,7 @@ new.variable.name <- 'agecat'									# new variable to create
 dbGetQuery( db , first.command )
 
 
-# step two: loop through each cutpoint (except the last, because no category label is needed for agep >= 100)
+# step two: loop through each cutpoint (except the last, because no category label is needed for AGEP >= 100)
 for ( i in 1:( length( cutpoints ) - 1 ) ){
 
 
@@ -239,7 +239,7 @@ for ( i in 1:( length( cutpoints ) - 1 ) ){
 	
 	# step four: send the character string command to the database
 	
-	dbGetQuery( db , second.command )		# recode agep >= cutpoints[ i ] AND agep <= ( cutpoints[ i + 1 ] - 1 ) records to agecat = i
+	dbGetQuery( db , second.command )		# recode AGEP >= cutpoints[ i ] AND AGEP <= ( cutpoints[ i + 1 ] - 1 ) records to agecat = i
 
 }
 
@@ -285,7 +285,7 @@ dbGetQuery(
 
 acs.10.m.design <- 									# name the survey object
 	svrepdesign(									# svrepdesign function call.. type ?svrepdesign for more detail
-		weights = ~pwgtp, 							# person-level weights are stored in column "pwgtp"
+		weights = ~PWGTP, 							# person-level weights are stored in column "PWGTP"
 		repweights = "pwgtp[0-9]" ,					# the acs contains 80 replicate weights, pwgtp1 - pwgtp80.  this [0-9] format captures all numeric values
 		type = "Fay", 								# use a fay's adjustment of four..  
 		rho = ( 1 - 1 / sqrt( 4 ) ),				# ..note that these two lines are the SUDAAN equivalent of using adjfay = 4;
@@ -307,7 +307,7 @@ acs.10.m.design <- 									# name the survey object
 # acs.10.m.design <- 									# name the survey object
 	# svydesign(										# svydesign function call.. type ?svydesign for more detail
 		# ~1 ,											# specify non-existent PSUs (responsible for incorrect SE calculation)
-		# weights = ~pwgtp, 							# person-level weights are stored in column "pwgtp"
+		# weights = ~PWGTP, 							# person-level weights are stored in column "PWGTP"
 		# data = paste0( fn , '_m' ) , 					# use the person-household-merge data table
 		# dbname = paste0( './' , fn , '.db' ) , 		# stored inside the database (acs2010_1yr.db)
 		# dbtype="SQLite"								# use SQLite as the SQL engine
@@ -316,19 +316,6 @@ acs.10.m.design <- 									# name the survey object
 # end of low-RAM, incorrect-SE database-backed survey object creation #	
 
 
-##################################
-# # # additional preparation # # #
-##################################
-
-	
-# exclude puerto rico to only analyze the fifty states plus dc #
-
-acs.10.51.m.design <-
-	subset( 
-		acs.10.m.design , 								# subset the survey object created above..
-		!( st %in% 72 ) 								# ..to exclude state fips code 72 (puerto rico)
-	)
-	
 	
 #####################
 # analysis examples #
@@ -364,7 +351,7 @@ dbGetQuery( db , paste0( "select count(*) as num_records from " , sqltable ) )
 
 # ..to run unweighted analyses, the 'sqltable' must be limited
 # with a WHERE statement that directly removes puerto rico records
-dbGetQuery( db , paste0( "select count(*) as num_records from " , sqltable , " WHERE st != 72" ) )
+dbGetQuery( db , paste0( "select count(*) as num_records from " , sqltable ) )
 
 	
 
@@ -373,12 +360,12 @@ dbGetQuery( db , paste0( "select count(*) as num_records from " , sqltable , " W
 
 # note the choice of 'one' field here is mostly arbitrary.
 # so long as the first field has no missings (one has the value of 1 for every record)
-# and the second field designates how to break out the table (by state: ~st)
+# and the second field designates how to break out the table (by state: ~ST)
 # the unwtd.count() option will work within the svyby()
 
 svyby(
 	~one ,
-	~st ,
+	~ST ,
 	acs.10.51.m.design ,
 	unwtd.count
 )
@@ -386,7 +373,7 @@ svyby(
 # also note that this command can be exactly replicated with a SQL query instead.
 # first save the command (as a character string) into by.state.command,
 # and also print it to the screen by putting parentheses around the whole thing..
-( by.state.command <- paste0( "select st, count(*) as num_records from " , sqltable , " WHERE st != 72 GROUP BY st" ) )
+( by.state.command <- paste0( "select ST, count(*) as num_records from " , sqltable , " GROUP BY ST" ) )
 
 # ..then actually run the command on the database (.db) file
 dbGetQuery( db , by.state.command )
@@ -405,7 +392,7 @@ svytotal(
 # from the original database (.db) file connection
 
 # prepare the command..
-( sum.weights.command <- paste0( "select sum( pwgtp ) as sum_weights from " , sqltable , " WHERE st != 72" ) )
+( sum.weights.command <- paste0( "select sum( PWGTP ) as sum_weights from " , sqltable ) )
 
 # ..and run it.
 dbGetQuery( db , sum.weights.command )
@@ -415,7 +402,7 @@ dbGetQuery( db , sum.weights.command )
 # by state
 svyby(
 	~one ,
-	~st ,
+	~ST ,
 	acs.10.51.m.design ,
 	svytotal
 )
@@ -425,14 +412,14 @@ svyby(
 
 # average age - nationwide
 svymean( 
-	~agep , 
+	~AGEP , 
 	design = acs.10.51.m.design
 )
 
 # by state
 svyby( 
-	~agep , 
-	~st ,
+	~AGEP , 
+	~ST ,
 	design = acs.10.51.m.design ,
 	svymean
 )
@@ -440,21 +427,21 @@ svyby(
 
 # calculate the distribution of a categorical variable #
 
-# hicov should be treated as a factor (categorical) variable
+# HICOV should be treated as a factor (categorical) variable
 # instead of a numeric (linear) variable,
 # even though it only contains the values 1 and 2
 # placing it inside the factor() function converts it on the fly
 
 # percent uninsured - nationwide
 svymean( 
-	~factor( hicov ) , 
+	~factor( HICOV ) , 
 	design = acs.10.51.m.design
 )
 
 # by state
 svyby( 
-	~factor( hicov ) , 
-	~st ,
+	~factor( HICOV ) , 
+	~ST ,
 	design = acs.10.51.m.design ,
 	svymean
 )
@@ -464,15 +451,15 @@ svyby(
 # minimum, 25th, 50th, 75th, maximum 
 # ages of residents of the united states
 svyquantile( 
-	~agep , 
+	~AGEP , 
 	design = acs.10.51.m.design ,
 	c( 0 , .25 , .5 , .75 , 1 )
 )
 
 # by state
 svyby( 
-	~agep , 
-	~st ,
+	~AGEP , 
+	~ST ,
 	design = acs.10.51.m.design ,
 	svyquantile ,
 	c( 0 , .25 , .5 , .75 , 1 ) , 
@@ -488,7 +475,7 @@ svyby(
 acs.10.51.m.design.female <-
 	subset(
 		acs.10.51.m.design ,
-		sex %in% 2
+		SEX %in% 2
 	)
 # now any of the above commands can be re-run
 # using the acs.10.51.m.design.female object
@@ -499,7 +486,7 @@ acs.10.51.m.design.female <-
 
 # average age - nationwide, restricted to females
 svymean( 
-	~agep , 
+	~AGEP , 
 	design = acs.10.51.m.design.female
 )
 
@@ -516,8 +503,8 @@ svymean(
 
 coverage.by.region <-
 	svyby( 
-		~factor( hicov ) , 
-		~region ,
+		~factor( HICOV ) , 
+		~REGION ,
 		design = acs.10.51.m.design ,
 		svymean
 	)
@@ -547,7 +534,7 @@ write.csv( coverage.by.region , "coverage by region.csv" )
 # here's the uninsured percentage by region, 
 # with accompanying standard errors
 uninsured.rate.by.region <-
-	coverage.by.region[ , c( "region" , "factor.hicov.2" , "se2" ) ]
+	coverage.by.region[ , c( "REGION" , "factor.HICOV.2" , "se2" ) ]
 
 
 # print the new results to the screen
