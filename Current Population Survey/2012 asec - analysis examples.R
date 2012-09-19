@@ -117,7 +117,10 @@ svytotal(
 # note that this is exactly equivalent to summing up the weight variable
 # from the original cps data frame
 
-sum( x$marsupwt )
+db <- dbConnect( SQLite() , "cps.asec.2012.db" )	# connect to the SQLite database (.db)
+dbGetQuery( db , 'select sum( marsupwt ) from x' )	# run a single query, summing the person-weight
+dbDisconnect( db )									# disconnect from the database
+
 
 # the civilian, non-institutionalized population of the united states #
 # by employment status
