@@ -181,9 +181,9 @@ for ( year in 2050:2000 ){
 					
 					
 					# figure out the filename of the csv -
-					# 2000 contains different filenames than other years
+					# 2000 - 2002 contain different filenames than other years
 					csvname <- 
-						ifelse( year == 2000 , 
+						ifelse( year %in% 2000:2002 , 
 							paste0( 'c2ss' , j , tolower( i ) , '.csv' ) ,
 							paste0( 'ss' , substr( year , 3 , 4 ) , j , tolower( i ) , '.csv' ) 
 						)
