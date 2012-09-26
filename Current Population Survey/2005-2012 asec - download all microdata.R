@@ -509,12 +509,22 @@ for ( year in cps.years.to.download ){
 
 	# drop unnecessary tables
 	dbSendUpdate( db , "drop table hfp" )
-	dbSendUpdate( db , "drop table rw" )
 	dbSendUpdate( db , "drop table person" )
 	dbSendUpdate( db , "drop table family" )
 	dbSendUpdate( db , "drop table household" )
 	dbSendUpdate( db , "drop table rw" )
 
+	
+	
+	# these two commands work
+	dbListFields( db )
+	dbGetQuery( db , 'select count(*) from x12' )
+	
+	# this breaks
+	dbGetQuery( db , 'select * from x12 limit 5' )
+	
+	
+	
 	# add a new column "one" that simply contains the number 1 for every record in the data set
 	dbSendUpdate( db , paste( "ALTER TABLE" , cps.tablename , "ADD COLUMN one" ) )
 	dbSendUpdate( db , paste( "UPDATE" , cps.tablename , "SET one = 1" ) )
