@@ -7,7 +7,7 @@
 # you need to install and configure it to work with r.
 
 
-# here's how to install everything four steps:
+# here's how to install everything on a windows computer in four steps:
 
 
 # 1) install java (not just for your browser)
@@ -22,8 +22,8 @@
 # download "MonetDB SQL server and client, 64 bit" and run it.
 # by default, monetdb will install to: C:\Program Files\MonetDB\MonetDB5\
 # that's cool, just don't forget that path.  you'll need it later.
-# jot down the filepath where you installed this (with slashes reversed):
-# "c:/program files/monetdb/monetdb5"
+# jot down the filepath where you installed this (with slashes doubled):
+# "c:\\program files\\monetdb\\monetdb5\\"
 
 
 # 3) download the latest monetdb java driver
@@ -37,7 +37,7 @@
 
 
 # 4) install two R packages that are not currently available on CRAN and install a few others..
-# open up your R console and run these commands without the # sign in front:
+# open up your R console and run these two separate installation commands without the # sign in front:
 # install.packages( c( "RMonetDB" , "sqlsurvey" ) , repos = c( "http://cran.r-project.org" , "http://R-Forge.R-project.org" ) , dep=TRUE )
 # install.packages( c( 'SAScii' , 'descr' , 'survey' ) )
 
@@ -45,7 +45,7 @@
 
 # if you've successfully installed monetdb to your machine, you should be able to initiate your first database with these commands:
 
-stop( "C:/Users/AnthonyD/Google Drive/private/usgsd/windows.monetdb.configuration.R")
+stop( "C:/Users/AnthonyD/Google Drive/private/usgsd/windows.monetdb.configuration.R" )
 
 
 # run the windows.monetdb.configuration() function to
