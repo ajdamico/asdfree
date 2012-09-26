@@ -193,13 +193,15 @@ read.SAScii.sql <-
 	}
 	
 	# eliminate gap variables.. loop through every gap
-	for ( i in seq( num.gaps ) ) {
-	
-		# create a SQL query to drop these columns
-		sql.drop <- paste0( "ALTER TABLE " , tablename , " DROP toss_" , i )
+	if ( num.gaps > 0 ){
+		for ( i in seq( num.gaps ) ) {
 		
-		# and drop them!
-		dbSendUpdate( db , sql.drop )
+			# create a SQL query to drop these columns
+			sql.drop <- paste0( "ALTER TABLE " , tablename , " DROP toss_" , i )
+			
+			# and drop them!
+			dbSendUpdate( db , sql.drop )
+		}
 	}
 	
 	# reset scientific notation length
