@@ -22,17 +22,53 @@
 # Analyze the 2005 - 2012 Current Population Survey - Annual Social and Economic Supplement file with R #
 #########################################################################################################
 
+#####################
+## # # # # # # # # ##
+## monetdb warning ##
+## # # # # # # # # ##
+#####################
 
-# set your working directory.
-# the CPS 2005 - 2012 data files will be stored here
-# after downloading and importing them.
+# before running this script, you must install monetdb on your local computer
+# follow the simple four steps outlined in this document
+stop( "look at monetdb installation instructions.R first" )
+
+
+# immediately identify the location of the monetdb driver (.jar)
+monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.5.jar"
+
+# set your monetdb directory
+# all CPS data files will be stored here
+# after downloading and importing
 # use forward slashes instead of back slashes
 
 setwd( "C:/My Directory/CPS/" )
 
 
-# remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" ) )
+# the package 'sqlsurvey' and a number of others should have been installed during the monetdb installation
+require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+
+
+# here's where the .bat file will be saved.
+# this location will be needed for analyses
+# set the name of the .bat file that will be used to launch this monetdb in the future
+( cps.bat.file <- file.path( getwd() , "cps.bat" ) )
+
+
+# set the name of the monetdb database
+dbname <- 'cps'
+
+# choose a database port
+# this port should not conflict with other monetdb databases
+# on your local computer.  two databases with the same port number
+# cannot be accessed at the same time
+dbport <- 50002
+
+
+# set the directory where the monetdb files will be stored on your local computer
+# this path does not need to be recorded for future use - it will be stored in the .bat file
+# note: this path *must* end with a slash
+( cps.database.directory <- file.path( getwd() , "MonetDB/" ) )
 
 
 # define which years to download #
@@ -70,13 +106,50 @@ source_https <- function(url, ...) {
 #######################################################
 
 # load the read.SAScii.sql function (a variant of read.SAScii that creates a database directly)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/read.SAScii.sql.R" )
+stop( 'uncomment this' )
+# source_https( "https://raw.github.com/ajdamico/usgsd/master/read.SAScii.sql.R" )
+stop( "also run windows.monetdb.configuration.R" )
+stop( "and remove these:" )
+source( "C:/Users/AnthonyD/Google Drive/private/usgsd/windows.monetdb.configuration.R" ) 
+source( "C:/Users/AnthonyD/Google Drive/private/usgsd/read.SAScii.sql.R" ) 
 
 
-require(RSQLite) 	# load RSQLite package (creates database files in R)
-require(survey)		# load survey package (analyzes complex design surveys)
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
 
+# create the monetdb .bat file
+# see the windows.monetdb.configuration.R file for more details about these parameters
+windows.monetdb.configuration( 
+		bat.file.location = cps.bat.file , 
+		monetdb.program.path = "C:\\Program Files\\MonetDB\\MonetDB5\\" ,
+		database.directory = cps.database.directory ,
+		dbname = dbname ,
+		dbport = dbport
+	)
+
+
+# immediately launch the cps .bat file
+shell.exec( cps.bat.file )
+# note that you'll need to run this line in future analyses,
+# so store it as a string..  here's the full path to the .bat file:
+print( cps.bat.file )
+# place that string inside the shell.exec( ) function
+# ..using all the program defaults, the line should look like this (without the # comment):
+# shell.exec( "C:/My Directory/CPS/cps.bat" )
+
+
+# at this point, r can create a connection to the database
+# remember step 3 of the installation instructions?
+# you stored "monetdb-jdbc-#.#.jar" somewhere.  write the full path to it here:
+drv <- MonetDB( classPath = monetdriver )
+
+# dynamically create the connection url
+monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
+
+# if the next command runs before the .bat file has finished,
+# it will break.  so give it two seconds to open the dos window
+Sys.sleep( 2 )
+
+# connect to the database
+db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
@@ -105,8 +178,9 @@ begin.lines <-
 # begin looping through every year specified
 for ( year in cps.years.to.download ){
 
-	# name the database (.db) file to be saved in the working directory
-	cps.dbname <- paste( "cps.asec" , year , "db" , sep = ".")
+	# name the final data table to be saved in the working directory
+	# this default setup will name the tables x05, x06, x07 and so on
+	cps.tablename <- paste0( "x" , substr( year , 3 , 4 ) )
 
 	# # # # # # # # # # # #
 	# load the main file  #
@@ -152,11 +226,12 @@ for ( year in cps.years.to.download ){
 	fn <- unzip( tf , exdir = td , overwrite = T )
 
 	# create three more temporary files
-	# to store household-, family-, and person-level records
+	# to store household-, family-, and person-level records ..and also the crosswalk
 	tf.household <- tempfile()
 	tf.family <- tempfile()
 	tf.person <- tempfile()
-
+	tf.xwalk <- tempfile()
+	
 	# create four file connections.
 
 	# one read-only file connection "r" - pointing to the ASCII file
@@ -166,10 +241,8 @@ for ( year in cps.years.to.download ){
 	outcon.household <- file( tf.household , "w") 
 	outcon.family <- file( tf.family , "w") 
 	outcon.person <- file( tf.person , "w") 
-
-	# build a merge file at the same time as distributing the main file into three other files
-	xwalk <- xwalk.10k <- data.frame( NULL )
-
+	outcon.xwalk <- file( tf.xwalk , "w" )
+	
 	# start line counter #
 	line.num <- 0
 
@@ -179,8 +252,16 @@ for ( year in cps.years.to.download ){
 	# ..and change it
 	options( scipen = 10 )
 		
+		
+	# figure out the ending position for each filetype
+	# take the sum of the absolute value of the width parameter of the parsed-SAScii SAS input file, for household-, family-, and person-files separately
+	end.household <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = begin.lines[ begin.lines$year == year , 'household' ] )$width ) )
+	end.family <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = begin.lines[ begin.lines$year == year , 'family' ] )$width ) )
+	end.person <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = begin.lines[ begin.lines$year == year , 'person' ] )$width ) )
+	
+		
 	# create a while-loop that continues until every line has been examined
-	# cycle through every line in the downloaded CPS ASEC 2011 file..
+	# cycle through every line in the downloaded CPS ASEC 20## file..
 
 	while( length( line <- readLines( incon , 1 ) ) > 0 ){
 
@@ -188,7 +269,7 @@ for ( year in cps.years.to.download ){
 		if ( substr( line , 1 , 1 ) == "1" ){
 			
 			# write the line to the household file
-			writeLines( line , outcon.household )
+			writeLines( substr( line , 1 , end.household ) , outcon.household )
 			
 			# store the current unique household id
 			curHH <- substr( line , 2 , 6 )
@@ -199,7 +280,7 @@ for ( year in cps.years.to.download ){
 		if ( substr( line , 1 , 1 ) == "2" ){
 		
 			# write the line to the family file
-			writeLines( line , outcon.family )
+			writeLines( substr( line , 1 , end.family )  , outcon.family )
 			
 			# store the current unique family id
 			curFM <- substr( line , 7 , 8 )
@@ -210,23 +291,12 @@ for ( year in cps.years.to.download ){
 		if ( substr( line , 1 , 1 ) == "3" ){
 			
 			# write the line to the person file
-			writeLines( line , outcon.person )
+			writeLines( substr( line , 1 , end.person )  , outcon.person )
 			
 			# store the current unique person id
 			curPN <- substr( line , 7 , 8 )
 			
-			# merge file creation #
-			
-			# ..and add the current unique household x family x person identifier values to the merge file
-			xwalk.temp <- 
-				data.frame( 
-					h_seq = as.numeric( curHH ) , 
-					ffpos = as.numeric( curFM ) , 
-					pppos = as.numeric( curPN ) 
-				)
-			
-			# ..and also stack it at the bottom of the current xwalk.10k
-			xwalk.10k <- rbind( xwalk.10k , xwalk.temp )
+			writeLines( paste0( curHH , curFM , curPN ) , outcon.xwalk )
 			
 		}
 
@@ -236,30 +306,11 @@ for ( year in cps.years.to.download ){
 		# every 10k records..
 		if ( line.num %% 10000 == 0 ) {
 			
-			# add the current xwalk.10k to the bottom of the total xwalk #
-			xwalk <- rbind( xwalk , xwalk.10k )
-			
-			# blank out xwalk.10k #
-			xwalk.10k <- NULL
-			
-			# clear up RAM
-			gc()
-			
 			# print current progress to the screen #
 			cat( "   " , prettyNum( line.num  , big.mark = "," ) , "of approximately 400,000 cps asec lines processed" , "\r" )
 			
 		}
 	}
-
-
-	# add the remaining xwalk.10k to the bottom of the total xwalk #
-	xwalk <- rbind( xwalk , xwalk.10k )
-
-	# blank out xwalk.10k #
-	xwalk.10k <- NULL
-
-	# clear up RAM
-	gc()
 
 	# restore the original scientific notation option
 	options( scipen = cur.sp )
@@ -268,19 +319,16 @@ for ( year in cps.years.to.download ){
 	close( outcon.household )
 	close( outcon.family )
 	close( outcon.person )
+	close( outcon.xwalk )
 	close( incon , add = T )
 
 
-	# open the connection to the sqlite database
-	db <- dbConnect( SQLite() , cps.dbname )
-
-
-	# the 2011 SAS file produced by the National Bureau of Economic Research (NBER)
+	# for example: the 2011 SAS file produced by the National Bureau of Economic Research (NBER)
 	# begins each INPUT block after lines 988, 1121, and 1209, 
 	# so skip SAS import instruction lines before that.
 	# NOTE that this 'beginline' parameters of 988, 1121, and 1209 will change for different years.
 
-	# store CPS ASEC march household records as a SQLite database
+	# store CPS ASEC march household records as a MonetDB database
 	read.SAScii.sql ( 
 		tf.household , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
@@ -288,14 +336,10 @@ for ( year in cps.years.to.download ){
 		zipped = F ,
 		tl = TRUE ,
 		tablename = 'household' ,
-		dbname = cps.dbname 
+		db = db
 	)
-
-	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX household_index ON household ( h_seq )" ) )
-
-		
-	# store CPS ASEC march family records as a SQLite database
+	
+	# store CPS ASEC march family records as a MonetDB database
 	read.SAScii.sql ( 
 		tf.family , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
@@ -303,14 +347,10 @@ for ( year in cps.years.to.download ){
 		zipped = F ,
 		tl = TRUE ,
 		tablename = 'family' ,
-		dbname = cps.dbname
+		db = db
 	)
 
-	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX family_index ON family ( fh_seq , ffpos )" ) )
-
-
-	# store CPS ASEC march person records as a SQLite database
+	# store CPS ASEC march person records as a MonetDB database
 	read.SAScii.sql ( 
 		tf.person , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
@@ -318,45 +358,94 @@ for ( year in cps.years.to.download ){
 		zipped = F ,
 		tl = TRUE ,
 		tablename = 'person' ,
-		dbname = cps.dbname
+		db = db
 	)
 
-	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX person_index ON person ( ph_seq , pppos )" ) )
-
-	# reset the database (.db)
-	dbBeginTransaction( db )
-	dbCommit( db )
+	# create a fake sas input script for the crosswalk..
+	xwalk.sas <-
+	"INPUT
+		@1 h_seq 5.
+		@6 ffpos 2.
+		@8 pppos 2.
+	;"
 	
-	# store CPS ASEC march 2011 xwalk records as a SQLite database	
-	dbWriteTable( db , 'xwalk' , xwalk )
-	
-	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX xwalk_index ON xwalk ( h_seq , ffpos , pppos )" ) )
+	# save it to the local disk
+	xwalk.sas.tf <- tempfile()
+	writeLines ( xwalk.sas , con = xwalk.sas.tf )
 
-	# remove the xwalk table from memory
-	rm( xwalk )
 	
-	# clear up RAM
-	gc()
-
+	# store CPS ASEC march xwalk records as a MonetDB database
+	read.SAScii.sql ( 
+		tf.xwalk , 
+		xwalk.sas.tf , 
+		zipped = F ,
+		tl = TRUE ,
+		tablename = 'xwalk' ,
+		db = db
+	)
+	
 	
 	# create the merged file
-	dbSendQuery( db , "create table h_xwalk as select * from xwalk as a inner join household as b on a.h_seq = b.h_seq" )
-	dbSendQuery( db , "create table h_f_xwalk as select * from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq AND a.ffpos = b.ffpos" )
-	dbSendQuery( db , "create table h_f_p as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
-	dbSendQuery( db , paste0( "CREATE INDEX hfp_index ON xwalk ( h_seq , ffpos , pppos )" ) )
+	dbSendUpdate( db , "create table h_xwalk as select a.ffpos , a.pppos , b.* from xwalk as a inner join household as b on a.h_seq = b.h_seq with data" )
+	
+	
+	# create the merge fields
+	h_xwalk.fields <- paste0( 'a.' , dbListFields( db , 'h_xwalk' ) )
+	family.fields <- paste0( 'b.' , dbListFields( db , 'family' ) )
+	
+	h_f_xwalk.fields <- 
+		paste( 
+			c( 
+				h_xwalk.fields , 
+				family.fields[ family.fields != 'b.ffpos' ] 
+			) ,
+			collapse = ", " 
+		)
+
+	# perform the merge (including all variables except the family table's ffpos field)
+	dbSendUpdate( 
+		db , 
+		paste( 
+			"create table h_f_xwalk as select" , 
+			h_f_xwalk.fields , 
+			"from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq and a.ffpos = b.ffpos with data" 
+		) 
+	)
+	
+	# create the merge fields
+	h_f_xwalk.fields <- paste0( 'a.' , dbListFields( db , 'h_f_xwalk' ) )
+	person.fields <- paste0( 'b.' , dbListFields( db , 'person' ) )
+	
+	hfp.fields <- 
+		paste( 
+			c( 
+				h_f_xwalk.fields , 
+				person.fields[ !( person.fields %in% c( 'b.ph_seq' , 'b.pppos' ) ) ] 
+			) ,
+			collapse = ", " 
+		)
+	
+	# perform the merge (including all variables except the person table's h_seq and pppos field)
+	dbSendUpdate( 
+		db , 
+		paste( 
+			"create table hfp as select" , 
+			hfp.fields , 
+			"from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq and a.pppos = b.pppos with data" 
+		) 
+	)
+	
 
 
 	# drop unnecessary tables
-	dbSendQuery( db , "drop table h_xwalk" )
-	dbSendQuery( db , "drop table h_f_xwalk" )
-	dbSendQuery( db , "drop table xwalk" )
+	dbSendUpdate( db , "drop table h_xwalk" )		# household xwalk
+	dbSendUpdate( db , "drop table h_f_xwalk" )		# household family xwalk
+	dbSendUpdate( db , "drop table xwalk" )			# xwalk
 
 
-	# confirm that the number of records in the 2011 cps asec merged file
+	# confirm that the number of records in the cps asec merged file
 	# matches the number of records in the person file
-	stopifnot( dbGetQuery( db , "select count(*) as count from h_f_p" ) == dbGetQuery( db , "select count(*) as count from person" ) )
+	stopifnot( dbGetQuery( db , "select count(*) as count from hfp" ) == dbGetQuery( db , "select count(*) as count from person" ) )
 
 
 	# # # # # # # # # # # # # # # # # #
@@ -364,7 +453,7 @@ for ( year in cps.years.to.download ){
 	# # # # # # # # # # # # # # # # # #
 			
 	# this process is also slow.
-	# the CPS ASEC 2011 replicate weight file has 204,983 person-records.
+	# for example, the CPS ASEC 2011 replicate weight file has 204,983 person-records.
 
 	# census.gov website containing the current population survey's replicate weights file
 	CPS.replicate.weight.file.location <- 
@@ -374,42 +463,79 @@ for ( year in cps.years.to.download ){
 	CPS.replicate.weight.SAS.read.in.instructions <- 
 		paste0( "http://smpbff2.dsd.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".SAS" )
 
-	# store the CPS ASEC march 2011 replicate weight file as an R data frame
+	# store the CPS ASEC march 20## replicate weight file as an R data frame
 	read.SAScii.sql ( 
 		CPS.replicate.weight.file.location , 
 		CPS.replicate.weight.SAS.read.in.instructions , 
 		zipped = T , 
 		tl = TRUE ,
 		tablename = 'rw' ,
-		dbname = cps.dbname
+		db = db
 	)
-
-	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX rw_index ON rw ( h_seq , pppos )" ) )
 
 
 	###################################################
 	# merge cps asec file with replicate weights file #
 	###################################################
 
-	dbSendQuery( db , "create table x as select * from h_f_p as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" )
+	# create the merge fields
+	hfp.fields <- paste0( 'a.' , dbListFields( db , 'hfp' ) )
+	rw.fields <- paste0( 'b.' , dbListFields( db , 'rw' ) )
+	
+	final.fields <- 
+		paste( 
+			c( 
+				hfp.fields , 
+				rw.fields[ !( rw.fields %in% c( 'b.h_seq' , 'b.pppos' ) ) ] 
+			) ,
+			collapse = ", " 
+		)
+	
+	dbSendUpdate( 
+		db , 
+		paste( 
+			"create table" ,
+			cps.tablename ,
+			"as select" ,
+			final.fields ,
+			"from hfp as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos with data"
+		)
+	)
+
+	
+	# confirm that the number of records in the person file
+	# matches the number of records in the merged file
+	stopifnot( dbGetQuery( db , paste( "select count(*) as count from" , cps.tablename ) ) == dbGetQuery( db , "select count(*) as count from person" ) )
 
 	# drop unnecessary tables
-	dbSendQuery( db , "drop table h_f_p" )
-	dbSendQuery( db , "drop table rw" )
-
-	# confirm that the number of records in the 2011 person file
-	# matches the number of records in the merged file
-	stopifnot( dbGetQuery( db , "select count(*) as count from x" ) == dbGetQuery( db , "select count(*) as count from person" ) )
+	dbSendUpdate( db , "drop table hfp" )
+	dbSendUpdate( db , "drop table rw" )
+	dbSendUpdate( db , "drop table person" )
+	dbSendUpdate( db , "drop table family" )
+	dbSendUpdate( db , "drop table household" )
+	dbSendUpdate( db , "drop table rw" )
 
 	# add a new column "one" that simply contains the number 1 for every record in the data set
-	dbSendQuery( db , "ALTER TABLE x ADD one" )
-	dbSendQuery( db , "UPDATE x SET one = 1" )
+	dbSendUpdate( db , paste( "ALTER TABLE" , cps.tablename , "ADD COLUMN one" ) )
+	dbSendUpdate( db , paste( "UPDATE" , cps.tablename , "SET one = 1" ) )
 
-	# disconnect from the current database
-	dbDisconnect( db )
+	# set the table read-only!
+	dbSendUpdate( db , paste( "ALTER TABLE" , cps.tablename , "SET READ ONLY" ) )
+
+
+	stop( 'add sqlsurveyrepdesign statement here' )
+	
+	stop( 'add save() commands for sqlsurveyrepdesigns' )
 	
 }
+
+# disconnect from the current database
+dbDisconnect( db )
+
+# print a reminder: set the directory you just saved everything to as read-only!
+winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
+
+
 # for more details on how to work with data in r
 # check out my two minute tutorial video site
 # http://www.twotorials.com/

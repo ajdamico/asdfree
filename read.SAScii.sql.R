@@ -1,10 +1,9 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # differences from the SAScii package's read.SAScii() --
-# 	3.5x faster
+# 	4x faster
 # 	no RAM issues
 # 	decimal division isn't flexible
 # 	must read in the entire table
-#	no gaps allows between columns
 #	requires RMonetDB and a few other packages
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -20,14 +19,9 @@ read.SAScii.sql <-
 		tl = F ,			# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,	# overwrite existing table?
-		monetdriver			# path to the "monetdb-jdbc-#.#.jar" file on your local computer
-		
+		db					# database connection object -- read.SAScii.sql requires that dbConnect()
+							# already be run before this function begins.
 	) {
-		
-	# to install MonetDB, use the line:
-	# install.packages( "RMonetDB" , repos = c( "http://cran.r-project.org" , "http://R-Forge.R-project.org" ) , dep=TRUE )
-	require(RMonetDB)
-	drv <- MonetDB( classPath = monetdriver )
 
 	
 	# scientific notation contains a decimal point when converted to a character string..
@@ -53,11 +47,26 @@ read.SAScii.sql <-
 	y <- x[ !is.na( x[ , 'varname' ] ) , ]
 	
 	
-	# if there are any gaps between columns, this version of read.SAScii.sql will not work
-	# because of the fwf2csv() function -- look at old versions of read.SAScii.sql() (prior to september 19th, 2012)
-	# for a read.SAScii.sql() version that used read.SAScii() instead of just parse.SAScii()
-	if ( nrow( y ) != nrow( x ) ) stop( "gaps not allowed in this version of read.SAScii.sql()" )
+	# deal with gaps in the data frame #
+	num.gaps <- nrow( x ) - nrow( y )
 	
+	# if there are any gaps..
+	if ( num.gaps > 0 ){
+	
+		# read them in as simple character strings
+		x[ is.na( x[ , 'varname' ] ) , 'char' ] <- TRUE
+		x[ is.na( x[ , 'varname' ] ) , 'divisor' ] <- 1
+		
+		# invert their widths
+		x[ is.na( x[ , 'varname' ] ) , 'width' ] <- abs( x[ is.na( x[ , 'varname' ] ) , 'width' ] )
+		
+		# name them toss_1 thru toss_###
+		x[ is.na( x[ , 'varname' ] ) , 'varname' ] <- paste( 'toss' , 1:num.gaps , sep = "_" )
+		
+		# and re-create y
+		y <- x
+	}
+		
 	#if the ASCII file is stored in an archive, unpack it to a temporary file and run that through read.fwf instead.
 	if ( zipped ){
 		#create a temporary file and a temporary directory..
@@ -68,11 +77,6 @@ read.SAScii.sql <-
 		fn <- unzip( tf , exdir = td , overwrite = T )
 	}
 
-	
-	# connect to the database
-	db <- dbConnect( drv , "jdbc:monetdb://localhost/demo" , user = "monetdb" , password = "monetdb" )
-	
-	
 	
 	# if the overwrite flag is TRUE, then check if the table is in the database..
 	if ( overwrite ){
@@ -115,7 +119,10 @@ read.SAScii.sql <-
 
 	# create a second temporary file
 	tf2 <- tempfile()
-
+	
+	# create a third temporary file
+	tf3 <- tempfile()
+	
 	# starts and ends
 	w <- abs ( x$width )
 	s <- 1
@@ -125,26 +132,32 @@ read.SAScii.sql <-
 		e[ i ] <- e[ i - 1 ] + w[ i ]
 	}
 	
+	# create another file connection to the temporary file to store the fwf2csv output..
+	zz <- file( tf3 , open = 'wt' )
+	sink( zz , type = 'message' )
+	
 	# convert the fwf to a csv
-	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e )
+	# verbose = TRUE prints a message, which has to be captured.
+	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = TRUE )
 
-	# quickly figure out the number of lines in the data file
-	# code thanks to 
-	# http://costaleconomist.blogspot.com/2010/02/easy-way-of-determining-number-of.html
-
-	# in speed tests, increasing this chunk_size does nothing
-	chunk_size <- 1000
-	testcon <- file( tf2 ,open = "r" )
-	nooflines <- 0
-	( while( ( linesread <- length( readLines( testcon , chunk_size ) ) ) > 0 )
-	nooflines <- nooflines + linesread )
-	close( testcon )
+	# stop storing the output
+	sink( type = "message" )
+	unlink( tf3 )
+	
+	# read the contents of that message into a character string
+	zzz <- readLines( tf3 )
+	
+	# read it up to the first space..
+	last.char <- which( strsplit( zzz , '')[[1]]==' ')
+	
+	# ..and that's the number of lines in the file
+	num.lines <- substr( zzz , 1 , last.char - 1 )
 	
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
 	
 	# pull the csv file into the database
-	dbSendUpdate( db , paste0( "copy " , nooflines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters '\t' NULL AS ''" ) )
+	dbSendUpdate( db , paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters '\t' NULL AS ''" ) )
 	
 	# delete the temporary file from the hard disk
 	file.remove( tf2 )
@@ -179,11 +192,18 @@ read.SAScii.sql <-
 	
 	}
 	
-	# close the database connection
-	dbDisconnect(db)
+	# eliminate gap variables.. loop through every gap
+	for ( i in seq( num.gaps ) ) {
+	
+		# create a SQL query to drop these columns
+		sql.drop <- paste0( "ALTER TABLE " , tablename , " DROP toss_" , i )
+		
+		# and drop them!
+		dbSendUpdate( db , sql.drop )
+	}
 	
 	# reset scientific notation length
 	options( scipen = user.defined.scipen )
-		
-	NULL
+	
+	TRUE
 }

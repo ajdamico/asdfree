@@ -30,8 +30,7 @@
 
 # before running this script, you must install monetdb on your local computer
 # follow the simple four steps outlined in this document
-stop( "link to C:/Users/AnthonyD/Google Drive/private/usgsd/monetdb installation instructions.R" )
-
+stop( "look at monetdb installation instructions.R first" )
 
 # set your monetdb directory
 # all ACS data files will be stored here
@@ -131,8 +130,12 @@ source_https <- function(url, ...) {
 # these commands need to be run once. do not run them a second time #
 
 # load the windows.monetdb.configuration function (creates a monet database in windows)
+stop( "uncomment this" )
 # source_https( "https://raw.github.com/ajdamico/usgsd/master/read.SAScii.sql.R" )
+
+stop( "and remove these:" )
 stop( "github source C:\Users\AnthonyD\Google Drive\private\usgsd\windows.monetdb.configuration.R" )
+source( "C:/Users/AnthonyD/Google Drive/private/usgsd/windows.monetdb.configuration.R" ) 
 
 
 # create the monetdb .bat file
@@ -376,8 +379,8 @@ for ( year in 2050:2000 ){
 			# once all state tables have been added..
 			
 			# create indexes to speed up the merge between the _p (person) and _h (household) files
-			dbSendUpdate( db , paste0( "CREATE INDEX " , k , "_h_dex ON " , k , "_h ( serialno )" ) )
-			dbSendUpdate( db , paste0( "CREATE INDEX " , k , "_p_dex ON " , k , "_p ( serialno )" ) )
+			# dbSendUpdate( db , paste0( "CREATE INDEX " , k , "_h_dex ON " , k , "_h ( serialno )" ) )
+			# dbSendUpdate( db , paste0( "CREATE INDEX " , k , "_p_dex ON " , k , "_p ( serialno )" ) )
 			
 			############################################
 			# create a merged (household+person) table #
@@ -428,6 +431,8 @@ for ( year in 2050:2000 ){
 			)
 			
 			
+			stop( 'get this sqlrepsurvey design working' )
+			
 			acs.10.m.design <- 									# name the survey object
 				sqlrepsurvey(									# svrepdesign function call.. type ?svrepdesign for more detail
 					weight = 'pwgtp' , 							# person-level weights are stored in column "pwgtp"
@@ -445,6 +450,8 @@ for ( year in 2050:2000 ){
 				)
 
 			
+			stop( 'add some save commands here' )
+			
 		}
 	}
 }
@@ -457,6 +464,10 @@ for ( year in 2050:2000 ){
 # once complete, this script does not need to be run again.
 # instead, use one of the american community survey analysis scripts
 # which utilize these newly-created database (.db) files
+
+
+# print a reminder: set the directory you just saved everything to as read-only!
+winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
 
 
 # for more details on how to work with data in r
