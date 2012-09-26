@@ -252,10 +252,9 @@ svytotal(
 
 
 # note that this is exactly equivalent to summing up the weight variable
-# from the original GSS data frame
-# (assuming this data frame was not cleared out of RAM above)
+# from the original GSS data frame, throwing out records with missing sampcodes
 
-sum( x$compwt )
+sum( subset( x , !is.na( sampcode ) )$compwt )
 
 # the civilian, non-institutionalized population of the united states #
 # by region of the country
