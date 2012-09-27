@@ -87,8 +87,8 @@ require(survey)  # load survey package (analyzes complex design surveys)
 # create new character variables containing the full filepath of the file on norc's website
 # that needs to be downloaded and imported into r for analysis
 GSS.2010.CS.file.location <-
-	"http://publicdata.norc.org/GSS/DOCUMENTS/OTHR/GSS_stata.zip" # - new version
-	# "http://publicdata.norc.org:41000/gss/documents//OTHR/gss7210_r1_1.zip"	# - old version
+	"http://publicdata.norc.org/GSS/DOCUMENTS/OTHR/GSS_stata.zip"
+	
 
 # create a temporary file and a temporary directory
 # for downloading file to the local drive
@@ -215,6 +215,11 @@ pvv <- as.character( unique( x$polviews ) )
 # ..and immediately throw out missing values
 pvv <- pvv[ !is.na( pvv ) ]
 
+# create a character vector containing the unique values of political views
+# this will be needed to calculate the confidence intervals later
+sv <- as.character( unique( x$sex ) )
+
+
 #################################################
 # survey design for taylor-series linearization #
 #################################################
@@ -304,12 +309,18 @@ coef( svymean( ~factor( polviews ) , y ) )
 SE( svymean( ~factor( polviews ) , y ) )
 
 
-
 # column total confidence intervals
+
 # stata uses the logit method and non-infinite degrees of freedom
+# stata also uses single-precision floating points,
+# so CI numbers only match down to approximately the fourth decimal
 # http://www.stata.com/statalist/archive/2006-10/msg01127.html
+# this discussion thread contains more detail on CI matching
+# http://r.789695.n4.nabble.com/Exactly-Replicating-Stata-s-Survey-Data-Confidence-Intervals-in-R-td4643850.html
 
 # (second numbers in each box along the right) #
+
+# loop through each political view
 for ( i in pvv ){
 
 	# dynamically create the equation to evaluate
@@ -326,7 +337,6 @@ for ( i in pvv ){
 }
 
 
-
 # percents by sex: proportions, standard errors
 
 # (first and third number in each box under male and female) #
@@ -341,22 +351,33 @@ SE( svyby( ~factor( polviews ) , ~sex , y , svymean ) )
 # confidence intervals by gender
 
 # stata uses the logit method and non-infinite degrees of freedom
+# stata also uses single-precision floating points,
+# so CI numbers only match down to approximately the fourth decimal
 # http://www.stata.com/statalist/archive/2006-10/msg01127.html
+# this discussion thread contains more detail on CI matching
+# http://r.789695.n4.nabble.com/Exactly-Replicating-Stata-s-Survey-Data-Confidence-Intervals-in-R-td4643850.html
 
 # (second numbers in each box under male and female) #
+
+# loop through each political view
 for ( i in pvv ){
 
-	# dynamically create the equation to evaluate
-	e2e <- paste0( "svyby( ~I( polviews == '" , i , "' ) , ~sex , y , svyciprop , method = 'logit' , df = degf( y ) )" )
+	# loop through both genders
+	for ( j in sv ){
 	
-	# print the current level
-	print( i )
-	
-	# print the specific command that's about to be run
-	print( e2e )
-	
-	# print the asymmetric confidence intervals
-	print(  eval( parse( text = e2e ) ) )
+		# dynamically create the equation to evaluate
+		e2e <- paste0( "svyciprop( ~I( polviews == '" , i , "' ) , subset( y , sex == '" , j , "' ) , method = 'logit' , df = degf( y ) )" )
+		
+		# print the current level
+		print( paste( i , j ) )
+		
+		# print the specific command that's about to be run
+		print( e2e )
+		
+		# print the asymmetric confidence intervals
+		print(  eval( parse( text = e2e ) ) )
+
+	}
 }
 
 
