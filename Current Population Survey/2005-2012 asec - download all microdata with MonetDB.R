@@ -105,13 +105,13 @@ source_https <- function(url, ...) {
 }
 #######################################################
 
-# load the read.SAScii.sql function (a variant of read.SAScii that creates a database directly)
+# load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
 stop( 'uncomment this' )
-# source_https( "https://raw.github.com/ajdamico/usgsd/master/read.SAScii.sql.R" )
+# source_https( "https://raw.github.com/ajdamico/usgsd/master/read.SAScii.monetdb.R" )
 stop( "also run windows.monetdb.configuration.R" )
 stop( "and remove these:" )
 source( "C:/Users/AnthonyD/Google Drive/private/usgsd/windows.monetdb.configuration.R" ) 
-source( "C:/Users/AnthonyD/Google Drive/private/usgsd/read.SAScii.sql.R" ) 
+source( "C:/Users/AnthonyD/Google Drive/private/usgsd/read.SAScii.monetdb.R" ) 
 
 
 
@@ -329,7 +329,7 @@ for ( year in cps.years.to.download ){
 	# NOTE that this 'beginline' parameters of 988, 1121, and 1209 will change for different years.
 
 	# store CPS ASEC march household records as a MonetDB database
-	read.SAScii.sql ( 
+	read.SAScii.monetdb ( 
 		tf.household , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
 		beginline = begin.lines[ begin.lines$year == year , 'household' ] , 
@@ -340,7 +340,7 @@ for ( year in cps.years.to.download ){
 	)
 	
 	# store CPS ASEC march family records as a MonetDB database
-	read.SAScii.sql ( 
+	read.SAScii.monetdb ( 
 		tf.family , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
 		beginline = begin.lines[ begin.lines$year == year , 'family' ] , 
@@ -351,7 +351,7 @@ for ( year in cps.years.to.download ){
 	)
 
 	# store CPS ASEC march person records as a MonetDB database
-	read.SAScii.sql ( 
+	read.SAScii.monetdb ( 
 		tf.person , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
 		beginline = begin.lines[ begin.lines$year == year , 'person' ] , 
@@ -375,7 +375,7 @@ for ( year in cps.years.to.download ){
 
 	
 	# store CPS ASEC march xwalk records as a MonetDB database
-	read.SAScii.sql ( 
+	read.SAScii.monetdb ( 
 		tf.xwalk , 
 		xwalk.sas.tf , 
 		zipped = F ,
@@ -464,7 +464,7 @@ for ( year in cps.years.to.download ){
 		paste0( "http://smpbff2.dsd.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".SAS" )
 
 	# store the CPS ASEC march 20## replicate weight file as an R data frame
-	read.SAScii.sql ( 
+	read.SAScii.monetdb ( 
 		CPS.replicate.weight.file.location , 
 		CPS.replicate.weight.SAS.read.in.instructions , 
 		zipped = T , 
@@ -533,6 +533,12 @@ for ( year in cps.years.to.download ){
 	dbSendUpdate( db , paste( "ALTER TABLE" , cps.tablename , "SET READ ONLY" ) )
 
 
+	# SAVE both the survey design
+	# AND show how to download the data set as an R data frame--
+	# which can then be edited and used as an in-RAM survey object
+	
+	
+	
 	stop( 'add sqlsurveyrepdesign statement here' )
 	
 	stop( 'add save() commands for sqlsurveyrepdesigns' )

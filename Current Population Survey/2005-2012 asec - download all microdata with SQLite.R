@@ -69,8 +69,8 @@ source_https <- function(url, ...) {
 }
 #######################################################
 
-# load the read.SAScii.sql function (a variant of read.SAScii that creates a database directly)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/read.SAScii.sql.R" )
+# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
+source_https( "https://raw.github.com/ajdamico/usgsd/master/read.SAScii.sqlite.R" )
 
 
 require(RSQLite) 	# load RSQLite package (creates database files in R)
@@ -281,7 +281,7 @@ for ( year in cps.years.to.download ){
 	# NOTE that this 'beginline' parameters of 988, 1121, and 1209 will change for different years.
 
 	# store CPS ASEC march household records as a SQLite database
-	read.SAScii.sql ( 
+	read.SAScii.sqlite ( 
 		tf.household , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
 		beginline = begin.lines[ begin.lines$year == year , 'household' ] , 
@@ -296,7 +296,7 @@ for ( year in cps.years.to.download ){
 
 		
 	# store CPS ASEC march family records as a SQLite database
-	read.SAScii.sql ( 
+	read.SAScii.sqlite ( 
 		tf.family , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
 		beginline = begin.lines[ begin.lines$year == year , 'family' ] , 
@@ -311,7 +311,7 @@ for ( year in cps.years.to.download ){
 
 
 	# store CPS ASEC march person records as a SQLite database
-	read.SAScii.sql ( 
+	read.SAScii.sqlite ( 
 		tf.person , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
 		beginline = begin.lines[ begin.lines$year == year , 'person' ] , 
@@ -375,7 +375,7 @@ for ( year in cps.years.to.download ){
 		paste0( "http://smpbff2.dsd.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".SAS" )
 
 	# store the CPS ASEC march 2011 replicate weight file as an R data frame
-	read.SAScii.sql ( 
+	read.SAScii.sqlite ( 
 		CPS.replicate.weight.file.location , 
 		CPS.replicate.weight.SAS.read.in.instructions , 
 		zipped = T , 
