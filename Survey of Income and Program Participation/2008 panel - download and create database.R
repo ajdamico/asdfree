@@ -226,7 +226,7 @@ dbDisconnect( db )
 
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste0( "all done.  you should set the file " , file.path( getwd() , cps.dbname ) , " read-only so you don't accidentally alter these tables." ) )
+winDialog( 'ok' , paste0( "all done.  you should set the file " , file.path( getwd() , SIPP.dbname ) , " read-only so you don't accidentally alter these tables." ) )
 
 
 # for more details on how to work with data in r
