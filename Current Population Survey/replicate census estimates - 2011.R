@@ -35,7 +35,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/usgsd/blob/master/Current%20Population%20Survey/2005-2012%20asec%20-%20download%20all%20microdata.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "cps.asec.2011.db" in C:/My Directory/ACS or wherever the working directory was set              #
+# that script will create a file "cps.asec.db" with 'asec11' in C:/My Directory/ACS or wherever the working directory was set     #
 ###################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -84,10 +84,10 @@ y <-
 		repweights = "pwwgt[1-9]", 
 		type = "Fay", 
 		rho = (1-1/sqrt(4)),
-		data = "x" ,
+		data = "asec11" ,
 		combined.weights = T ,
 		dbtype = "SQLite" ,
-		dbname = "cps.asec.2011.db"
+		dbname = "cps.asec.db"
 	)
 
 #############################################################################################################

@@ -35,7 +35,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/usgsd/blob/master/Current%20Population%20Survey/2005-2012%20asec%20-%20download%20all%20microdata.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "cps.asec.2012.db" in C:/My Directory/ACS or wherever the working directory was set              #
+# that script will create a file "cps.asec.db" with 'asec12' in C:/My Directory/ACS or wherever the working directory was set     #
 ###################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -83,10 +83,10 @@ y <-
 		repweights = "pwwgt[1-9]", 
 		type = "Fay", 
 		rho = (1-1/sqrt(4)),
-		data = "x" ,
+		data = "asec12" ,
 		combined.weights = T ,
 		dbtype = "SQLite" ,
-		dbname = "cps.asec.2012.db"
+		dbname = "cps.asec.db"
 	)
 
 	
@@ -117,8 +117,8 @@ svytotal(
 # note that this is exactly equivalent to summing up the weight variable
 # from the original cps data frame
 
-db <- dbConnect( SQLite() , "cps.asec.2012.db" )	# connect to the SQLite database (.db)
-dbGetQuery( db , 'select sum( marsupwt ) from x' )	# run a single query, summing the person-weight
+db <- dbConnect( SQLite() , "cps.asec.db" )			# connect to the SQLite database (.db)
+dbGetQuery( db , 'select sum( marsupwt ) from asec12' )	# run a single query, summing the person-weight
 dbDisconnect( db )									# disconnect from the database
 
 

@@ -7,7 +7,7 @@
 #	requires RMonetDB and a few other packages
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-read.SAScii.sql <-
+read.SAScii.monetdb <-
 	function( 
 		fn ,
 		sas_ri , 
@@ -32,7 +32,7 @@ read.SAScii.sql <-
 	options( scipen = 1000000 )
 	
 	
-	# read.SAScii.sql depends on the SAScii package and the descr package
+	# read.SAScii.monetdb depends on the SAScii package and the descr package
 	# to install these packages, use the line:
 	# install.packages( c( 'SAScii' , 'descr' ) )
 	require(SAScii)

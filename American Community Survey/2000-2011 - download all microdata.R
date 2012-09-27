@@ -69,7 +69,7 @@ dbport <- 50001
 # if you have a big hard drive, hey why not download them all?
 
 # single-year datasets are available back to 2000
-single.year.datasets.to.download <- 2000:2011
+single.year.datasets.to.download <- 2000:2010
 	
 # three-year datasets are available back to 2007
 three.year.datasets.to.download <- 2007:2010
@@ -131,11 +131,11 @@ source_https <- function(url, ...) {
 
 # load the windows.monetdb.configuration function (creates a monet database in windows)
 stop( "uncomment this" )
-# source_https( "https://raw.github.com/ajdamico/usgsd/master/read.SAScii.sql.R" )
+# source_https( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
 
 stop( "and remove these:" )
-stop( "github source C:\Users\AnthonyD\Google Drive\private\usgsd\windows.monetdb.configuration.R" )
-source( "C:/Users/AnthonyD/Google Drive/private/usgsd/windows.monetdb.configuration.R" ) 
+stop( "github source C:\Users\AnthonyD\Google Drive\private\usgsd\MonetDB\windows.monetdb.configuration.R" )
+source( "C:/Users/AnthonyD/Google Drive/private/usgsd/MonetDB/windows.monetdb.configuration.R" ) 
 
 
 # create the monetdb .bat file
@@ -412,6 +412,14 @@ for ( year in 2050:2000 ){
 			dbSendUpdate( db , i.j )
 			
 			
+			dbSendUpdate( db , paste0( 'alter table ' , k , '_p add column one int' ) )
+			dbSendUpdate( db , paste0( 'alter table ' , k , '_h add column one int' ) )
+			dbSendUpdate( db , paste0( 'alter table ' , k , '_m add column one int' ) )
+
+			dbSendUpdate( db , paste0( 'UPDATE ' , k , '_p SET one = 1' ) )
+			dbSendUpdate( db , paste0( 'UPDATE ' , k , '_h SET one = 1' ) )
+			dbSendUpdate( db , paste0( 'UPDATE ' , k , '_m SET one = 1' ) )
+						
 			dbSendUpdate( db , paste0( 'alter table ' , k , '_p add column idkey int auto_increment' ) )
 			dbSendUpdate( db , paste0( 'alter table ' , k , '_h add column idkey int auto_increment' ) )
 			dbSendUpdate( db , paste0( 'alter table ' , k , '_m add column idkey int auto_increment' ) )
@@ -430,10 +438,9 @@ for ( year in 2050:2000 ){
 				dbGetQuery( db , paste0( "select count(*) as count from " , k , "_m" ) )
 			)
 			
+			print( 'problems start here' )
 			
-			stop( 'get this sqlrepsurvey design working' )
-			
-			acs.10.m.design <- 									# name the survey object
+			acs.m.design <- 									# name the survey object
 				sqlrepsurvey(									# svrepdesign function call.. type ?svrepdesign for more detail
 					weight = 'pwgtp' , 							# person-level weights are stored in column "pwgtp"
 					repweights = paste0( 'pwgtp' , 1:80 ) ,		# the acs contains 80 replicate weights, pwgtp1 - pwgtp80.  this [0-9] format captures all numeric values
@@ -450,7 +457,12 @@ for ( year in 2050:2000 ){
 				)
 
 			
-			stop( 'add some save commands here' )
+			print( year )
+			print( svymean( ~agep , acs.m.design ) )
+			print( svytotal( ~I( sex ) , acs.m.design ) )
+
+			
+			print( 'add some save commands here' )
 			
 		}
 	}
