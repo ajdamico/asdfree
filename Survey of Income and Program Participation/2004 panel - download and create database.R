@@ -33,7 +33,7 @@ setwd( "C:/My Directory/SIPP/" )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "SAScii" ) )
+# install.packages( c( "RSQLite" , "SAScii" , "descr" ) )
 
 
 SIPP.dbname <- "SIPP04.db"											# choose the name of the database (.db) file on the local disk
