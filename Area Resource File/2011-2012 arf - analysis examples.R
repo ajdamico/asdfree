@@ -163,10 +163,11 @@ nrow( yourdata )
 # follow the code presented at http://www.thisisthegreenroom.com/2009/choropleths-in-r/
 
 # install the maps package if you don't already have it
-install.packages( "maps" )
+install.packages( c( "maps" , "mapproj" ) )
 
-# load the maps package
+# load the maps and mapproj packages - both include mapping-related functions
 require(maps)
+require(mapproj)
 
 # load county fips codes data (included with the maps package)
 data(county.fips)
