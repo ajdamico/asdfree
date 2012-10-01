@@ -97,23 +97,6 @@ for ( i in seq( ncol( mm ) ) ) mm[ grepl( "NA" , mm[ , i ] ) , i ] <- NA
 mm$events <- NULL
 
 
-# # # # # # # # # # # # #
-# event file exceptions #
-# # # # # # # # # # # # #
-
-# 2002 dental events file needs a workaround
-# mm[ mm$year %in% 2002 , 'dental' ] <- NA
-
-# 2002 other events file needs a workaround
-# mm[ mm$year %in% 2002 , 'other' ] <- NA
-
-# # # # # # # # # # # # # # # # # #
-# event file exceptions completed #
-# # # # # # # # # # # # # # # # # #
-
-
-
-
 # if you only want to download certain years of data,
 # subset the mm object here.  some examples:
 
@@ -137,6 +120,9 @@ mm <- subset( mm , year %in% 1997:2009 )
 
 # it's recommended you keep a version of the .rda files,
 # since they work with all subsequent scripts
+
+# do you want to store the sas transport (.ssp) file in the working directory?
+ssp <- FALSE
 
 # do you want to save an R data file (.rda) to the working directory?
 rda <- TRUE
@@ -164,6 +150,7 @@ zc <- unzip( tf , exdir = td )
 brr <- read.xport( zc )
 
 # save the data frame according to the conversion options specified
+if ( ssp ) file.copy( zc , "linkage - brr.ssp" )
 if ( rda ) save( brr , file = "linkage - brr.rda" )
 if ( dta ) write.dta( brr , file = "linkage - brr.dta" )
 if ( csv ) write.csv( brr , file = "linkage - brr.csv" )
@@ -188,8 +175,8 @@ for ( i in nrow( mm ):1 ) {
 		# if the current table position has something in it..
 		if ( !is.na( mm[ i , j ] ) ) {
 		
-			# wait 5 seconds before each new download..
-			Sys.sleep( 5 )
+			# wait 60 seconds before each new download..
+			Sys.sleep( 60 )
 		
 			# create a character string containing the name of the .zip file
 			fn <- paste0( "h" , mm[ i , j ] , "ssp.zip" )
@@ -199,9 +186,19 @@ for ( i in nrow( mm ):1 ) {
 			
 			# figure out if the file exists
 			err <- try( getURLContent( u ) , silent = T )
+
+			# if it can't be found once, try a second time
+			if( class( err ) == "try-error" ){
+				
+				# wait 60 more seconds
+				Sys.sleep( 60 )
+				
+				# try once more
+				err <- try( getURLContent( u ) , silent = T )
+			}
 			
-			# wait 5 seconds before each new download..
-			Sys.sleep( 5 )
+			# wait 60 seconds before each new download..
+			Sys.sleep( 60 )
 					
 			# if the file doesn't exist on its own..
 			if( class( err ) == "try-error" ){
@@ -227,7 +224,8 @@ for ( i in nrow( mm ):1 ) {
 				# read this file into RAM
 				assign( df.name , read.xport( zc ) )
 				
-				# save the file into the formats specified during the 'conversion options' section above				
+				# save the file into the formats specified during the 'conversion options' section above
+				if ( ssp ) file.copy( zc , fn )
 				if ( rda ) save( list = df.name , file = gsub( 'ssp' , 'rda' , fn ) )
 				if ( dta ) write.dta( get( df.name ) , file = gsub( 'ssp' , 'dta' , fn ) )
 				if ( csv ) write.csv( get( df.name ) , file = gsub( 'ssp' , 'csv' , fn ) )
@@ -235,6 +233,9 @@ for ( i in nrow( mm ):1 ) {
 				# immediately delete the brr data frame from memory and clear up ram
 				rm( list = df.name ) ; gc()
 			
+				# wait 60 seconds before the second download
+				Sys.sleep( 60 )
+				
 				# download the ..f2ssp.zip file to the temporary file on your local computer
 				download.file( sub( "ssp.zip" , "f2ssp.zip" , u ) , tf ) 
 				
@@ -254,7 +255,8 @@ for ( i in nrow( mm ):1 ) {
 				# read this file into RAM
 				assign( df.name , read.xport( zc ) )
 				
-				# save the file into the formats specified during the 'conversion options' section above				
+				# save the file into the formats specified during the 'conversion options' section above
+				if ( ssp ) file.copy( zc , fn )				
 				if ( rda ) save( list = df.name , file = gsub( 'ssp' , 'rda' , fn ) )
 				if ( dta ) write.dta( get( df.name ) , file = gsub( 'ssp' , 'dta' , fn ) )
 				if ( csv ) write.csv( get( df.name ) , file = gsub( 'ssp' , 'csv' , fn ) )
@@ -264,12 +266,6 @@ for ( i in nrow( mm ):1 ) {
 					
 			} else {
 				
-				# download the ..ssp.zip file to the temporary file on your local computer
-				download.file( u , tf )
-			
-				# unzip the ..ssp.zip to the temporary directory
-				zc <- unzip( tf , exdir = td )
-			
 				# determine what this datafile should be called when saved
 				# in the working directory [[the setwd() command above]]
 				# so it fits a pattern, instead of an arbitrary file number
@@ -279,11 +275,41 @@ for ( i in nrow( mm ):1 ) {
 				# files will be named type.year,
 				# so the 2005 jobs file will be accessible as a data.frame called jobs.2005
 				df.name <- paste( names( mm )[ j ] , mm[ i , 1 ] , sep = "." )
-							
-				# read this file into RAM
-				assign( df.name , read.xport( zc ) )
+
+				# try the download, unzip, read-in twice before breaking
+				attempt.one <-
+					try({
+						# download the ..ssp.zip file to the temporary file on your local computer
+						download.file( u , tf )
+					
+						# unzip the ..ssp.zip to the temporary directory
+						zc <- unzip( tf , exdir = td )
+					
+						# read this file into RAM
+						assign( df.name , read.xport( zc ) )
+					} , silent = TRUE )
+					
+				# if the first time broke..
+				if ( class( attempt.one ) == 'try-error' ){
 				
-				# save the file into the formats specified during the 'conversion options' section above				
+						# ..wait 60 seconds and try again
+						Sys.sleep( 60 )
+						
+						# download the ..ssp.zip file to the temporary file on your local computer
+						download.file( u , tf )
+					
+						# unzip the ..ssp.zip to the temporary directory
+						zc <- unzip( tf , exdir = td )
+					
+						# read this file into RAM
+						assign( df.name , read.xport( zc ) )				
+				}
+				
+				# erase the try-error object
+				attempt.one <- NULL
+				
+				# save the file into the formats specified during the 'conversion options' section above
+				if ( ssp ) file.copy( zc , fn )
 				if ( rda ) save( list = df.name , file = gsub( 'ssp' , 'rda' , fn ) )
 				if ( dta ) write.dta( get( df.name ) , file = gsub( 'ssp' , 'dta' , fn ) )
 				if ( csv ) write.csv( get( df.name ) , file = gsub( 'ssp' , 'csv' , fn ) )
