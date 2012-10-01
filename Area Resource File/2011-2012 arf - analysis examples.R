@@ -63,49 +63,49 @@ variables.to.keep <-
 	)
 
 	
-# now create a new data frame 'x' containing only those specified columns from the 'arf' data frame
-x <- arf[ , variables.to.keep ]
+# now create a new data frame 'arf.sub' containing only those specified columns from the 'arf' data frame
+arf.sub <- arf[ , variables.to.keep ]
 
 
 # finally, look at the first six records to browse what the new (manageable) data frame looks like
-head( x )
+head( arf.sub )
 
 
 # rename the variables something more user-friendly
-names( x ) <- c( "fips" , "state" , "stateab" , "county" , "ssa" , "mmsa" , "pop2010" , "md2010" )
+names( arf.sub ) <- c( "fips" , "state" , "stateab" , "county" , "ssa" , "mmsa" , "pop2010" , "md2010" )
 
 # and re-examine the first six records
-head( x )
+head( arf.sub )
 
 
 # run some simple summary statistics
 
 # in 2010, the census recorded a total us population of..
-sum( x$pop2010 )
+sum( arf.sub$pop2010 )
 
 # in 2010, the american medical association masterfile recorded this many active doctors..
-sum( x$md2010 )
+sum( arf.sub$md2010 )
 
 
 # when merging the arf to another data set,
 # be cautious about using fips vs. ssa county codes
 
 # the entire arf contains...records
-nrow( x )
+nrow( arf.sub )
 
 # there are...unique fips county codes (so one unique fips per record)
-length( unique( x$fips ) )
+length( unique( arf.sub$fips ) )
 
 # but there are fewer unique ssa county codes
-length( unique( x$ssa ) )
+length( unique( arf.sub$ssa ) )
 
 # because many counties with fips codes do not have ssa county codes
 # here's a few records where the ssa county code equals zero (missing)
-head( x[ x$ssa == 0 , ] )
+head( arf.sub[ arf.sub$ssa == 0 , ] )
 
 
 # you could print all of them to the screen
-x[ x$ssa == 0 , ]
+arf.sub[ arf.sub$ssa == 0 , ]
 # ..and find they're mostly the us territories.
 # because territories have fips but not ssa county codes
 
@@ -117,11 +117,11 @@ x[ x$ssa == 0 , ]
 # goal: look at the ten most populous counties in the united states #
 
 # order the condensed arf by population
-x <- x[ order( x$pop2010 , decreasing = TRUE ) , ]
+arf.sub <- arf.sub[ order( arf.sub$pop2010 , decreasing = TRUE ) , ]
 # view http://www.screenr.com/0a28 to learn why the above statement works
 
 # print the first ten records of the newly-ordered data frame
-x[ 1:10 , ]
+arf.sub[ 1:10 , ]
 
 
 # # # # # # # # #
@@ -138,14 +138,26 @@ x[ 1:10 , ]
 # count the number of records in yourdata
 nrow( yourdata )
 # perform the merge
-yourdata <- merge( yourdata , x , by = "fips" )
+yourdata <- merge( yourdata , arf.sub , by = "fips" )
+# confirm the number of records in yourdata hasn't changed
+nrow( yourdata )
+
+
+# if some of the records in yourdata do not include valid fips codes,
+# but you do not want them thrown out when no matching fips is found in arf.sub..
+# count the number of records in yourdata
+nrow( yourdata )
+# perform the merge - this time with all.x = TRUE - to conduct a left join
+# a left join keeps all records in the first data set ('yourdata' in this example)
+# regardless of whether a matching fips code was found in the second data frame ('arf.sub')
+yourdata <- merge( yourdata , arf.sub , by = "fips" , all.x = TRUE )
 # confirm the number of records in yourdata hasn't changed
 nrow( yourdata )
 
 
 # to merge the arf onto yourdata using the county ssa code,
 # try limiting the arf to only records with a non-zero ssa code
-arf.with.ssa <- subset( x , ssa != 0 )
+arf.with.ssa <- subset( arf.sub , ssa != 0 )
 # count the number of records in yourdata
 nrow( yourdata )
 # perform the merge
@@ -179,26 +191,26 @@ colors = c("#F1EEF6", "#D4B9DA", "#C994C7", "#DF65B0", "#DD1C77", "#980043")
 # create a new column in the arf: active doctors per person
 # if the county population is greater than zero,
 # then divide the number of active doctors by the county population
-x <- transform( x , dpp = ifelse( pop2010 > 0 , md2010 / pop2010 , NA ) )
+arf.sub <- transform( arf.sub , dpp = ifelse( pop2010 > 0 , md2010 / pop2010 , NA ) )
 # the county-level statistic 'dpp' will be mapped
 
 # calculate cutpoints for the six different color buckets
 # for more detail on the quantile() function, view: http://www.screenr.com/hP28
-cut.points <- quantile( x$dpp , seq( 0 , 1 , 1/6 ) , na.rm = TRUE )
+cut.points <- quantile( arf.sub$dpp , seq( 0 , 1 , 1/6 ) , na.rm = TRUE )
 
 # ..then use the cut function to create a 'colorBuckets' variable
 # for more detail on the cut() function, view: http://www.screenr.com/LGd8
-x$colorBuckets <- as.numeric( cut( x$dpp , cut.points , include.lowest = TRUE ) )
+arf.sub$colorBuckets <- as.numeric( cut( arf.sub$dpp , cut.points , include.lowest = TRUE ) )
 
 # align data with map definitions by matching FIPS codes
 # works much better than trying to match the state, county names
 # which also include multiple polygons for some counties
-colorsmatched <- x$colorBuckets[ match( county.fips$fips , x$fips ) ]
+colorsmatched <- arf.sub$colorBuckets[ match( county.fips$fips , arf.sub$fips ) ]
 
 # create the legend's text
 # print the number of doctors per ten thousand people to the screen
 cut.points * 10000
-leg.txt <- c( "< 3" , "3 - 5.5" , "5.5 - 8.3" , "8.3 - 12.3" , "12.3 - 20.3" , "> 2.03" )
+leg.txt <- c( "< 3" , "3 - 5.5" , "5.5 - 8.3" , "8.3 - 12.3" , "12.3 - 20.3" , "> 20.3" )
 
 #draw county chloropleth map
 map( 
