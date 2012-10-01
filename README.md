@@ -1,4 +1,4 @@
-[click here to go back to the blog](http://usgsd.blogspot.com/)
+[click here to go back to the usgsd blog](http://usgsd.blogspot.com/)
 ===========
 
 

@@ -21,11 +21,11 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #############################################################################################################################################################
 # prior to running this analysis script, the linkage brr file and 2009 consolidated file must be loaded as a sas transport (.ssp) file on the local machine.#
-# running the 1996-2009 household component - download all microdata.R script will create this database file                                                #
+# running the 1996-2009 household component - download all microdata.R script will create an R data file (.rda)                                             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw.github.com/ajdamico/usgsd/master/Medical%20Expenditure%20Panel%20Survey/1996-2009%20household%20component%20-%20download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create files "linkage - brr.ssp" and "2009 - consolidated.ssp" in C:/My Directory/MEPS (or wherever the working directory was chosen)    #
+# that script will create files "linkage - brr.rda" and "2009 - consolidated.rda" in C:/My Directory/MEPS (or wherever the working directory was chosen)    #
 #############################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -73,7 +73,6 @@ setwd( "C:/My Directory/MEPS/" )
 # install.packages( "survey" )
 
 
-require(foreign) # load foreign package (converts data files into R)
 require(survey)  # load survey package (analyzes complex design surveys)
 
 
@@ -92,14 +91,12 @@ options( survey.replicates.mse = TRUE )
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
 
 
-# load the consolidated.ssp file into an R data frame
-MEPS.09.consolidated.df <-
-	read.xport( "2009 - consolidated.ssp" )
+# load the consolidated.2009 data frame into an R data frame
+load( "2009 - consolidated.rda" )
 	
 
-# load the linkage - brr.ssp file into an R data frame
-MEPS.09.brr.df <-
-	read.xport( "linkage - brr.ssp" )
+# load the linkage - brr.rda file into an R data frame
+load( "linkage - brr.rda" )
 
 
 ####################################
@@ -139,8 +136,8 @@ MEPS.09.brr.df <-
 # restrict the consolidated data table to
 # only the columns specified above
 
-# MEPS.09.consolidated.df <-
-	# MEPS.09.consolidated.df[ , KeepVars ]
+# consolidated.2009 <-
+	# consolidated.2009[ , KeepVars ]
 
 # clear up RAM - garbage collection function
 
@@ -157,16 +154,16 @@ MEPS.09.brr.df <-
 
 # remove columns DUID and PID from the brr file
 # or they will create duplicate column names in the merged data frame
-MEPS.09.brr.df <- 
-	MEPS.09.brr.df[ , !( names( MEPS.09.brr.df ) %in% c( "DUID" , "PID" ) ) ]
+brr <- 
+	brr[ , !( names( brr ) %in% c( "DUID" , "PID" ) ) ]
 
 	
 # merge the consolidated file 
 # with the brr file
 MEPS.09.consolidated.with.brr.df <-
 	merge( 
-		MEPS.09.consolidated.df ,
-		MEPS.09.brr.df ,
+		consolidated.2009 ,
+		brr ,
 		by = c( "DUPERSID" , "PANEL" ) 
 	)
 
@@ -174,7 +171,7 @@ MEPS.09.consolidated.with.brr.df <-
 # confirm that the number of records in the 2009 consolidated file
 # matches the number of records in the merged file
 
-if ( nrow( MEPS.09.consolidated.with.brr.df ) != nrow( MEPS.09.consolidated.df ) ) 
+if ( nrow( MEPS.09.consolidated.with.brr.df ) != nrow( consolidated.2009 ) ) 
 	stop( "problem with merge - merged file should have the same number of records as the original consolidated file" )
 	
 	
@@ -201,9 +198,9 @@ meps.brr.design <-
 # if you are low on RAM, you can remove the data frame
 # by uncommenting these four lines:
 
-# rm( MEPS.09.consolidated.df )
+# rm( consolidated.2009 )
 # rm( MEPS.09.consolidated.with.brr.df )
-# rm( MEPS.09.brr.df )
+# rm( brr )
 
 # gc()
 
@@ -218,7 +215,7 @@ meps.brr.design <-
 nrow( meps.brr.design )
 
 # the nrow function which works on both data frame objects..
-class( MEPS.09.consolidated.df )
+class( consolidated.2009 )
 # ..and survey design objects
 class( meps.brr.design )
 
@@ -255,7 +252,7 @@ svytotal(
 # from the original MEPS data frame
 # (assuming this data frame was not cleared out of RAM above)
 
-sum( MEPS.09.consolidated.df$PERWT09F )
+sum( consolidated.2009$PERWT09F )
 
 # the civilian, non-institutionalized population of the united states #
 # by region of the country

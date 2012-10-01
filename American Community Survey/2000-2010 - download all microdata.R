@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # american community survey
-# 2000-2011 1-year (plus when available 3-year and 5-year files)
+# 2000-2010 1-year (plus when available 3-year and 5-year files)
 # household-level, person-level, and merged files
 
 # if you have never used the r language before,
@@ -318,6 +318,14 @@ for ( year in 2050:2000 ){
 					
 						headers <- read.csv( file.path( td , csvname ) , nrows = 500 )
 						cl <- sapply( headers , class )
+						
+						names( headers ) <- tolower( names( headers ) )
+						
+						if ( 'type' %in% tolower( names( headers ) ) ){
+							print( "warning: column name 'type' unacceptable in monetdb.  changing to 'type_'" )
+							names( headers )[ names( headers ) == 'type' ] <- 'type_'
+						}
+						
 						colTypes <- ifelse( cl == 'integer' , 'INT' , 'VARCHAR(255)' )
 						colDecl <- paste( names( headers ) , colTypes )
 
