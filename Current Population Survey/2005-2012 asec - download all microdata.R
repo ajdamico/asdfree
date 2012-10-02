@@ -101,9 +101,9 @@ options( survey.replicates.mse = TRUE )
 begin.lines <-
 	data.frame(
 		year = 2012:2005 ,
-		household = c( 988 , 988 , 953 , 994 , 981 , 994 , 989 , 992 ) ,
-		family = c( 1121 , 1121 , 1082 , 1137 , 1124 , 1143 , 1138 , 1141 ) ,
-		person = c( 1209 , 1209 , 1166 , 1221 , 1208 , 1227 , 1222 , 1225 )
+		household = c( 993 , 988 , 953 , 994 , 981 , 994 , 989 , 992 ) ,
+		family = c( 1129 , 1121 , 1082 , 1137 , 1124 , 1143 , 1138 , 1141 ) ,
+		person = c( 1218 , 1209 , 1166 , 1221 , 1208 , 1227 , 1222 , 1225 )
 	)
 
 
@@ -143,12 +143,7 @@ for ( year in cps.years.to.download ){
 
 	# national bureau of economic research website containing the current population survey's SAS import instructions
 	CPS.ASEC.mar.SAS.read.in.instructions <- 
-		ifelse( 
-			# if the year to download is 2012, the sas import script isn't available yet, so use 2011..
-			year == 2012 ,
-			"http://www.nber.org/data/progs/cps/cpsmar11.sas" ,
 			paste0( "http://www.nber.org/data/progs/cps/cpsmar" , substr( year , 3 , 4 ) , ".sas" )
-		)
 
 	# create a temporary file and a temporary directory..
 	tf <- tempfile() ; td <- tempdir()
