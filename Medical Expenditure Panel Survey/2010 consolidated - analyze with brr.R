@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # medical expenditure panel survey
-# 2009 consolidated
+# 2010 consolidated
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -20,12 +20,12 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #############################################################################################################################################################
-# prior to running this analysis script, the linkage brr file and 2009 consolidated file must be loaded as a sas transport (.ssp) file on the local machine.#
-# running the 1996-2009 household component - download all microdata.R script will create an R data file (.rda)                                             #
+# prior to running this analysis script, the linkage brr file and 2010 consolidated file must be loaded as an r data file (.rda) file on the local machine. #
+# running the 1996-2010 household component - download all microdata.R script will create an R data file (.rda)                                             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/Medical%20Expenditure%20Panel%20Survey/1996-2009%20household%20component%20-%20download%20all%20microdata.R  #
+# https://raw.github.com/ajdamico/usgsd/master/Medical%20Expenditure%20Panel%20Survey/1996-2010%20household%20component%20-%20download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create files "linkage - brr.rda" and "2009 - consolidated.rda" in C:/My Directory/MEPS (or wherever the working directory was chosen)    #
+# that script will create files "linkage - brr.rda" and "2010 - consolidated.rda" in C:/My Directory/MEPS (or wherever the working directory was chosen)    #
 #############################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -50,19 +50,19 @@
 
 
 ##############################################################################
-# Analyze the 2009 Medical Expenditure Panel Survey consolidated file with R #
+# Analyze the 2010 Medical Expenditure Panel Survey consolidated file with R #
 ##############################################################################
 
 
 # set your working directory.
-# the MEPS 2009 data file will be stored here
+# the MEPS 2010 data file will be stored here
 # after downloading and importing it.
 # use forward slashes instead of back slashes
 
 
 # set your working directory.
-# this directory must contain the MEPS 2009 consolidated (.ssp) file 
-# as well as the MEPS linkage - brr (.ssp) file
+# this directory must contain the MEPS 2010 consolidated (.rda) file 
+# as well as the MEPS linkage - brr (.rda) file
 # created by the R program specified above
 # use forward slashes instead of back slashes
 
@@ -91,8 +91,8 @@ options( survey.replicates.mse = TRUE )
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
 
 
-# load the consolidated.2009 data frame into an R data frame
-load( "2009 - consolidated.rda" )
+# load the consolidated.2010 data frame into an R data frame
+load( "2010 - consolidated.rda" )
 	
 
 # load the linkage - brr.rda file into an R data frame
@@ -104,10 +104,10 @@ load( "linkage - brr.rda" )
 # if you get a memory error        #
 ####################################
 
-# uncomment these lines to restrict the MEPS 09 file
+# uncomment these lines to restrict the MEPS 10 file
 # to only the columns you expect to use in the analysis
 
-# the MEPS 2009 consolidated file has almost 2,000 different columns
+# the MEPS 2010 consolidated file has almost 2,000 different columns
 # most analyses only use a small fraction of those
 # by removing the columns not necessary for the analysis,
 # lots of RAM gets freed up
@@ -121,14 +121,14 @@ load( "linkage - brr.rda" )
 		# "DUPERSID" , "PANEL" ,
 		# # cluster and strata variables used for complex survey design
 		# "VARPSU" , "VARSTR" , 
-		# # 2009 weight
-		# "PERWT09F" , 
+		# # 2010 weight
+		# "PERWT10F" , 
 		# # annualized insurance coverage variable
-		# "INS09X" , 
+		# "INS10X" , 
 		# # total annual medical expenditure variable
-		# "TOTEXP09" , 
+		# "TOTEXP10" , 
 		# # region of the country variable
-		# "REGION09" , 
+		# "REGION10" , 
 		# # gender variable
 		# "SEX"
 	# )
@@ -136,8 +136,8 @@ load( "linkage - brr.rda" )
 # restrict the consolidated data table to
 # only the columns specified above
 
-# consolidated.2009 <-
-	# consolidated.2009[ , KeepVars ]
+# consolidated.2010 <-
+	# consolidated.2010[ , KeepVars ]
 
 # clear up RAM - garbage collection function
 
@@ -160,18 +160,18 @@ brr <-
 	
 # merge the consolidated file 
 # with the brr file
-MEPS.09.consolidated.with.brr.df <-
+MEPS.10.consolidated.with.brr.df <-
 	merge( 
-		consolidated.2009 ,
+		consolidated.2010 ,
 		brr ,
 		by = c( "DUPERSID" , "PANEL" ) 
 	)
 
 	
-# confirm that the number of records in the 2009 consolidated file
+# confirm that the number of records in the 2010 consolidated file
 # matches the number of records in the merged file
 
-if ( nrow( MEPS.09.consolidated.with.brr.df ) != nrow( consolidated.2009 ) ) 
+if ( nrow( MEPS.10.consolidated.with.brr.df ) != nrow( consolidated.2010 ) ) 
 	stop( "problem with merge - merged file should have the same number of records as the original consolidated file" )
 	
 	
@@ -185,8 +185,8 @@ if ( nrow( MEPS.09.consolidated.with.brr.df ) != nrow( consolidated.2009 ) )
 # using existing data frame of MEPS data
 meps.brr.design <- 
 	svrepdesign(
-		data = MEPS.09.consolidated.with.brr.df ,
-		weights = ~PERWT09F ,
+		data = MEPS.10.consolidated.with.brr.df ,
+		weights = ~PERWT10F ,
 		type = "BRR" , 
 		combined.weights = F ,
 		repweights = "BRR[1-9]+"
@@ -198,8 +198,8 @@ meps.brr.design <-
 # if you are low on RAM, you can remove the data frame
 # by uncommenting these four lines:
 
-# rm( consolidated.2009 )
-# rm( MEPS.09.consolidated.with.brr.df )
+# rm( consolidated.2010 )
+# rm( MEPS.10.consolidated.with.brr.df )
 # rm( brr )
 
 # gc()
@@ -215,7 +215,7 @@ meps.brr.design <-
 nrow( meps.brr.design )
 
 # the nrow function which works on both data frame objects..
-class( consolidated.2009 )
+class( consolidated.2010 )
 # ..and survey design objects
 class( meps.brr.design )
 
@@ -223,8 +223,8 @@ class( meps.brr.design )
 # broken out by region of the country #
 
 svyby(
-	~TOTEXP09 ,
-	~REGION09 ,
+	~TOTEXP10 ,
+	~REGION10 ,
 	meps.brr.design ,
 	unwtd.count
 )
@@ -252,13 +252,13 @@ svytotal(
 # from the original MEPS data frame
 # (assuming this data frame was not cleared out of RAM above)
 
-sum( consolidated.2009$PERWT09F )
+sum( consolidated.2010$PERWT10F )
 
 # the civilian, non-institutionalized population of the united states #
 # by region of the country
 svyby(
 	~one ,
-	~REGION09 ,
+	~REGION10 ,
 	meps.brr.design ,
 	svytotal
 )
@@ -268,14 +268,14 @@ svyby(
 
 # average medical expenditure - nationwide
 svymean( 
-	~TOTEXP09 , 
+	~TOTEXP10 , 
 	design = meps.brr.design
 )
 
 # by region of the country
 svyby( 
-	~TOTEXP09 , 
-	~REGION09 ,
+	~TOTEXP10 , 
+	~REGION10 ,
 	design = meps.brr.design ,
 	svymean
 )
@@ -283,27 +283,27 @@ svyby(
 
 # calculate the distribution of a categorical variable #
 
-# INS09X should be treated as a factor (categorical) variable
+# INS10X should be treated as a factor (categorical) variable
 # instead of a numeric (linear) variable
 # this update statement converts it.
 # the svyby command below will not run without this
 meps.brr.design <-
 	update( 
-		INS09X = factor( INS09X ) ,
+		INS10X = factor( INS10X ) ,
 		meps.brr.design
 	)
 
 
 # percent uninsured - nationwide
 svymean( 
-	~INS09X , 
+	~INS10X , 
 	design = meps.brr.design
 )
 
 # by region of the country
 svyby( 
-	~INS09X , 
-	~REGION09 ,
+	~INS10X , 
+	~REGION10 ,
 	design = meps.brr.design ,
 	svymean
 )
@@ -317,15 +317,15 @@ svyby(
 # minimum, 25th, 50th, 75th, maximum 
 # medical expenditure in the united states
 svyquantile( 
-	~TOTEXP09 , 
+	~TOTEXP10 , 
 	design = meps.brr.design ,
 	c( 0 , .25 , .5 , .75 , 1 )
 )
 
 # by region of the country
 svyby( 
-	~TOTEXP09 , 
-	~REGION09 ,
+	~TOTEXP10 , 
+	~REGION10 ,
 	design = meps.brr.design ,
 	svyquantile ,
 	c( 0 , .25 , .5 , .75 , 1 ) , 
@@ -352,7 +352,7 @@ meps.brr.design.female <-
 
 # average medical expenditure - nationwide, restricted to females
 svymean( 
-	~TOTEXP09 , 
+	~TOTEXP10 , 
 	design = meps.brr.design.female
 )
 
@@ -369,8 +369,8 @@ svymean(
 
 coverage.by.region <-
 	svyby( 
-		~INS09X , 
-		~REGION09 ,
+		~INS10X , 
+		~REGION10 ,
 		design = meps.brr.design ,
 		svymean
 	)
@@ -398,7 +398,7 @@ write.csv( coverage.by.region , "coverage by region.csv" )
 # here's the uninsured percentage by region, 
 # with accompanying standard errors
 uninsured.rate.by.region <-
-	coverage.by.region[ 2:5 , c( "REGION09" , "INS09X2" , "se3" ) ]
+	coverage.by.region[ 2:5 , c( "REGION10" , "INS10X2" , "se3" ) ]
 
 # that's rows 2 through 5, and the three specified columns
 

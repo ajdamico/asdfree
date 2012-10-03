@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # medical expenditure panel survey
-# 1996 through 2009
+# 1996 through 2010
 # full-year consolidated, medical conditions, jobs, person round plan, longitudinal weight, and event files
 
 # if you have never used the r language before,
@@ -40,7 +40,7 @@ require(foreign) 	# load foreign package (converts data files into R)
 
 
 # specify the MEPS years currently available
-year <- 1996:2009
+year <- 1996:2010
 
 
 # specify the file numbers of all MEPS public use files
@@ -50,18 +50,18 @@ year <- 1996:2009
 # 2000, 2001, 2002, and 2003 jobs files need a workaround.
 # 2001 and 2002 medical conditions files need a workaround.
 # 2000, 2001, and 2002 events files need a workaround.
-consolidated <- c( 12 , 20 , 28 , 38 , 50 , 60 , 70 , 79 , 89 , 97 , 105 , 113 , 121 , 129 )
-conditions <- c( "06r" , 18 , 27 , 37 , 52 , NA , NA , 78 , 87 , 96 , 104 , 112 , 120 , 128 )
-jobs <- c( "07" , 19 , 25 , 32 , NA , NA , NA , NA , 83 , 91 , 100 , 108 , 116 , 124 )
-prpf <- c( 24 , 47 , 47 , 47 , 47 , 57 , 66 , 76 , 88 , 95 , 103 , 111 , 119 , 127 )
-longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 , 130 , NA )
-events <- c( 10 , 16 , 26 , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 )
+consolidated <- c( 12 , 20 , 28 , 38 , 50 , 60 , 70 , 79 , 89 , 97 , 105 , 113 , 121 , 129 , 138 )
+conditions <- c( "06r" , 18 , 27 , 37 , 52 , NA , NA , 78 , 87 , 96 , 104 , 112 , 120 , 128 , 137 )
+jobs <- c( "07" , 19 , 25 , 32 , NA , NA , NA , NA , 83 , 91 , 100 , 108 , 116 , 124 , 133)
+prpf <- c( 24 , 47 , 47 , 47 , 47 , 57 , 66 , 76 , 88 , 95 , 103 , 111 , 119 , 127 , 136)
+longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 , 130 , NA , NA )
+events <- c( 10 , 16 , 26 , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 , 135 )
 
 
 # specify the most current brr / link file locations
-lf <- "http://meps.ahrq.gov/mepsweb/data_files/pufs/h36b09ssp.zip"
-lf.cb <- "http://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h36brr/h36b09cb.pdf"
-lf.doc <- "http://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h36brr/h36b09doc.pdf"
+lf <- "http://meps.ahrq.gov/mepsweb/data_files/pufs/h36b10ssp.zip"
+lf.cb <- "http://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h36brr/h36b10cb.pdf"
+lf.doc <- "http://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h36brr/h36b10doc.pdf"
 
 
 # create a big table containing the file number of each meps data file available
@@ -100,8 +100,8 @@ mm$events <- NULL
 # if you only want to download certain years of data,
 # subset the mm object here.  some examples:
 
-# only download MEPS years 2006 - 2009
-# mm <- subset( mm , year %in% 2006:2009 )
+# only download MEPS years 2006 - 2010
+# mm <- subset( mm , year %in% 2006:2010 )
 
 # only download MEPS 1997
 # mm <- subset( mm , year %in% 1997 )
@@ -112,7 +112,7 @@ mm$events <- NULL
 # highly recommended: MEPS 1996 has lots of oddities compared to other years
 # this file should be skipped unless you spend lots of time reading the documentation
 # to figure out what changed where.
-mm <- subset( mm , year %in% 1997:2009 )
+mm <- subset( mm , year %in% 1997:2010 )
 
 
 
