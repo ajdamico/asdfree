@@ -49,13 +49,13 @@ year <- 1996:2009
 # 1996 files are buggy.
 # 2000, 2001, 2002, and 2003 jobs files need a workaround.
 # 2001 and 2002 medical conditions files need a workaround.
-# 2002 events files need a workaround.
+# 2000, 2001, and 2002 events files need a workaround.
 consolidated <- c( 12 , 20 , 28 , 38 , 50 , 60 , 70 , 79 , 89 , 97 , 105 , 113 , 121 , 129 )
 conditions <- c( "06r" , 18 , 27 , 37 , 52 , NA , NA , 78 , 87 , 96 , 104 , 112 , 120 , 128 )
 jobs <- c( "07" , 19 , 25 , 32 , NA , NA , NA , NA , 83 , 91 , 100 , 108 , 116 , 124 )
 prpf <- c( 24 , 47 , 47 , 47 , 47 , 57 , 66 , 76 , 88 , 95 , 103 , 111 , 119 , 127 )
 longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 , 130 , NA )
-events <- c( 10 , 16 , 26 , 33 , 51 , 59 , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 )
+events <- c( 10 , 16 , 26 , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 )
 
 
 # specify the most current brr / link file locations
