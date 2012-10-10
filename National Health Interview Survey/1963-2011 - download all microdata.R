@@ -233,7 +233,7 @@ for ( year in nhis.years.to.download ){
 		# figure out where the final '/' lies in the string
 		sl <- max( gregexpr( "\\/" , fn )[[1]] )
 		
-		# figure out where the laste '.' lies in the string
+		# figure out where the last '.' lies in the string
 		dp <- max( gregexpr( "\\." , fn )[[ 1 ]] )
 				
 		# use that to figure out the extension
