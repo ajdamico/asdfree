@@ -38,7 +38,7 @@
 
 # set your working directory.
 # the NHIS 2011 personsx data file should have been
-# stored in a year-specific directory within this file.
+# stored in a year-specific directory within this folder.
 # so if the file "personsx.rda" exists in the directory "C:/My Directory/NHIS/2011/" 
 # then the working directory should be set to "C:/My Directory/NHIS/"
 # use forward slashes instead of back slashes
