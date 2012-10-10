@@ -40,7 +40,7 @@
 
 
 # set your working directory.
-# all NHANES data files will be stored here
+# all GSS data files will be stored here
 # after downloading and importing.
 # use forward slashes instead of back slashes
 
