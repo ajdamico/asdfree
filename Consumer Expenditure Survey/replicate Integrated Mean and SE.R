@@ -512,6 +512,9 @@ dbSendQuery(
 	db , 
 	sql.line
 )
+  
+# create an index on the pubfile table to drastically speed up future queries
+dbSendQuery( db , "CREATE INDEX isu ON pubfile ( inclass , source , ucc )" )
 
 
 # notes from the "Integrated Mean and SE.sas" file about this section: 
@@ -552,6 +555,7 @@ pop <- rbind( pop.all , pop.by )
   # /*  FORMATS FOR CORRECT COLUMN CLASSIFICATIONS                             */
   # /***************************************************************************/
 
+  
 # create the right hand side of the aggregate expenditures table
 aggright <-
 	# use a sql query from the temporary database (.db) file
