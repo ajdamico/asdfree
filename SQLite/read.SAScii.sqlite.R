@@ -133,7 +133,7 @@ read.SAScii.sqlite <-
 	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = FALSE )
 
 	# pull the csv file into the database
-	dbWriteTable( db , tablename , tf2 , sep = "\t" , eol = "\r\n" , header = TRUE )
+	dbWriteTable( db , tablename , tf2 , sep = "\t" , header = TRUE )
 	
 	# delete the temporary file from the hard disk
 	file.remove( tf2 )

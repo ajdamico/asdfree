@@ -32,7 +32,7 @@ setwd( "C:/My Directory/CPS/" )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" ) )
+# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "RCurl" ) )
 
 
 # define which years to download #
@@ -73,14 +73,16 @@ source_https <- function(url, ...) {
 }
 #######################################################
 
-# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
-
 
 require(RSQLite) 	# load RSQLite package (creates database files in R)
 require(survey)		# load survey package (analyzes complex design surveys)
 require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
 require(descr) 		# load the descr package (converts fixed-width files to delimited files)
+require(RCurl)		# load RCurl package (downloads files from the web)
+
+
+# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
+source_https( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
 
 
 # set R to produce conservative standard errors instead of crashing
