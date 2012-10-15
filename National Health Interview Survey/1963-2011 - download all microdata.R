@@ -60,7 +60,7 @@ nhis.years.to.download <- 2011:1963
 # program start #
 # # # # # # # # #
 
-library(RCurl)	# load RCurl package (downloads files from the web)
+require(RCurl)	# load RCurl package (downloads files from the web)
 require(SAScii) # load the SAScii package (imports ascii data with a SAS script)
 
 
