@@ -58,6 +58,8 @@ cps.dbname <- "cps.asec.db"
 # program start #
 # # # # # # # # #
 
+# if the cps database file already exists in the current working directory, print a warning
+if file.exists( paste( getwd() , cps.dbname , sep = "/" ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the cps.dbname in the settings above." )
 
 #######################################################	
 # function to download scripts directly from github.com
