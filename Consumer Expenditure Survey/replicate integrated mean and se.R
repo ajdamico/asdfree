@@ -488,8 +488,14 @@ db <- dbConnect( SQLite() , temp.db )
 # store the family data frame in that database
 dbWriteTable( db , 'fmly' , fmly , row.names = FALSE )
 
+# create an index on the fmly table to drastically speed up future queries
+dbSendQuery( db , "CREATE INDEX nsf ON fmly ( newid , source )" )
+
 # store the expenditure data frame in that database as well
 dbWriteTable( db , 'expend' , expend , row.names = FALSE )
+
+# create an index on the expend table to drastically speed up future queries
+dbSendQuery( db , "CREATE INDEX nse ON expend ( newid , source )" )
 
 # create a character vector rcost1 - rcost45
 rcost <- paste0( "rcost" , 1:45 )
@@ -749,14 +755,36 @@ tab <- tab[ !( tab$estimate %in% 'SE' & tab$group %in% c( "CUCHARS" , "INCOME" )
 # order the entire tab file by the line, then estimate columns
 tab <- tab[ order( tab$line , tab$estimate ) , ]
 
-
 # the data frame 'tab' matches the final 'tab' table created by the "Integrated Mean and SE.sas" example program
 
 # this table can be viewed on the screen..
 head( tab , 10 )				# view the first 10 records
 
-# ..or saved to a comma separated value file on the local disk
-write.csv( tab , "tab.csv" )	# store the 'tab' data frame in a csv in the current working directory
+
+# sort the columns to match the "Integrated Mean and SE.lst" file #
+
+# make a copy of the tab data frame that will be re-sorted
+tab.out <- tabs
+
+tab.out <- tab.out[ , c( "title" , "estimate" , "inclass10" , paste0( "inclass0" , 1:9 ) ) ]
+
+# label the columns of the output file
+names( tab.out )[ 3:12 ] <- 
+	c( 
+		"all consumer units" , 
+		"less than $5,000" ,
+		"$5,000 to $9,999" ,
+		"$10,000 to $14,999" , 
+		"$15,000 to $19,999" , 
+		"$20,000 to $29,999" ,
+		"$30,000 to $39,999" ,
+		"$40,000 to $49,999" ,
+		"$50,000 to $69,999" ,
+		"$70,000 and over"
+	)
+
+# ..and save to a comma separated value file on the local disk
+write.csv( tab.out , "2011 Integrated Mean and SE.csv" , row.names = FALSE )	# store the 'tab.out' data frame in a csv in the current working directory
 
 
 # for more details on how to work with data in r
