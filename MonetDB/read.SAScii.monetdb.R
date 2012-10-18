@@ -19,9 +19,29 @@ read.SAScii.monetdb <-
 		tl = F ,			# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,	# overwrite existing table?
-		db					# database connection object -- read.SAScii.sql requires that dbConnect()
+		db ,				# database connection object -- read.SAScii.sql requires that dbConnect()
 							# already be run before this function begins.
+		tf.path = NULL		# do temporary files need to be stored in a specific folder?
+							# this option is useful for keeping protected data off of random temporary folders on your computer--
+							# specifying this option creates the temporary file inside the folder specified
 	) {
+
+	# before anything else, create the temporary files needed for this function to run
+	# if the user doesn't specify that the temporary files get stored in a temporary directory
+	# just put them anywhere..
+	if ( is.null( tf.path ) ){
+		tf <- tempfile()
+		td <- tempdir()
+		tf2 <- tempfile() 
+		tf3 <- tempfile()
+	} else {
+		# otherwise, put them in the protected folder
+		tf.path <- normalizePath( tf.path )
+		td <- tf.path
+		tf <- normalizePath( paste0( tf.path , "temp1" ) )
+		tf2 <- normalizePath( paste0( tf.path , "temp2" ) )
+		tf3 <- normalizePath( paste0( tf.path , "temp3" ) )
+	}
 
 	
 	# scientific notation contains a decimal point when converted to a character string..
@@ -69,8 +89,6 @@ read.SAScii.monetdb <-
 		
 	#if the ASCII file is stored in an archive, unpack it to a temporary file and run that through read.fwf instead.
 	if ( zipped ){
-		#create a temporary file and a temporary directory..
-		tf <- tempfile() ; td <- tempdir()
 		#download the CPS repwgts zipped file
 		download.file( fn , tf , mode = "wb" )
 		#unzip the file's contents and store the file name within the temporary directory
@@ -116,12 +134,6 @@ read.SAScii.monetdb <-
 		)
 	
 	dbSendUpdate( db , sql )
-
-	# create a second temporary file
-	tf2 <- tempfile()
-	
-	# create a third temporary file
-	tf3 <- tempfile()
 	
 	# starts and ends
 	w <- abs ( x$width )
