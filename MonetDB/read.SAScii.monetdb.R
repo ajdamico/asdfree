@@ -169,7 +169,7 @@ read.SAScii.monetdb <-
 	# than setting a very high number and letting it finish..
 	
 	# pull the csv file into the database
-	dbSendUpdate( db , paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters '\t' NULL AS ''" ) )
+	dbSendUpdate( db , paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters '\t' NULL AS '' ' '" ) )
 	
 	# delete the temporary file from the hard disk
 	file.remove( tf2 )
