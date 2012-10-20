@@ -13,17 +13,18 @@ read.SAScii.monetdb <-
 		sas_ri , 
 		beginline = 1 , 
 		zipped = F , 
-		# n = -1 , 			# no n parameter available for this - you must read in the entire table!
+		# n = -1 , 				# no n parameter available for this - you must read in the entire table!
 		lrecl = NULL , 
 		# skip.decimal.division = NULL , skipping decimal division not an option
-		tl = F ,			# convert all column names to lowercase?
+		tl = F ,				# convert all column names to lowercase?
 		tablename ,
-		overwrite = FALSE ,	# overwrite existing table?
-		db ,				# database connection object -- read.SAScii.sql requires that dbConnect()
-							# already be run before this function begins.
-		tf.path = NULL		# do temporary files need to be stored in a specific folder?
-							# this option is useful for keeping protected data off of random temporary folders on your computer--
-							# specifying this option creates the temporary file inside the folder specified
+		overwrite = FALSE ,		# overwrite existing table?
+		db ,					# database connection object -- read.SAScii.sql requires that dbConnect()
+								# already be run before this function begins.
+		tf.path = NULL ,		# do temporary files need to be stored in a specific folder?
+								# this option is useful for keeping protected data off of random temporary folders on your computer--
+								# specifying this option creates the temporary file inside the folder specified
+		delimiters = "'\t'"  	# delimiters for the monetdb COPY INTO command
 	) {
 
 	# before anything else, create the temporary files needed for this function to run
@@ -38,9 +39,9 @@ read.SAScii.monetdb <-
 		# otherwise, put them in the protected folder
 		tf.path <- normalizePath( tf.path )
 		td <- tf.path
-		tf <- normalizePath( paste0( tf.path , "temp1" ) )
-		tf2 <- normalizePath( paste0( tf.path , "temp2" ) )
-		tf3 <- normalizePath( paste0( tf.path , "temp3" ) )
+		tf <- normalizePath( paste0( tf.path , tablename , "1" ) )
+		tf2 <- normalizePath( paste0( tf.path , tablename , "2" ) )
+		tf3 <- normalizePath( paste0( tf.path , tablename , "3" ) )
 	}
 
 	
@@ -168,8 +169,19 @@ read.SAScii.monetdb <-
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
 	
-	# pull the csv file into the database
-	dbSendUpdate( db , paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters '\t' NULL AS '' ' '" ) )
+	# try the COPY INTO command twice..
+	
+	# first including the "NULL AS" parameter
+	sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , " NULL AS '' ' '" ) 
+	first.nulls <- try( dbSendUpdate( db , sql.update ) , silent = TRUE )
+		
+	# if that doesn't work, without it.
+	if ( class( first.nulls ) == "try-error" ){
+	
+		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters   ) 
+		dbSendUpdate( db , sql.update )
+	
+	}
 	
 	# delete the temporary file from the hard disk
 	file.remove( tf2 )
