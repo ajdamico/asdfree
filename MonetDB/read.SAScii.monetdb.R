@@ -19,13 +19,17 @@ read.SAScii.monetdb <-
 		tl = F ,				# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,		# overwrite existing table?
-		db ,					# database connection object -- read.SAScii.sql requires that dbConnect()
-								# already be run before this function begins.
+		connection ,
 		tf.path = NULL ,		# do temporary files need to be stored in a specific folder?
 								# this option is useful for keeping protected data off of random temporary folders on your computer--
 								# specifying this option creates the temporary file inside the folder specified
 		delimiters = "'\t'"  	# delimiters for the monetdb COPY INTO command
+		
 	) {
+
+	# check that autocommit mode isn't on
+	ac <- .jcall(connection@jc, "Z", "getAutoCommit")
+	if ( !ac ) stop( "read.SAScii.monetdb() only works in autocommit mode")
 
 	# before anything else, create the temporary files needed for this function to run
 	# if the user doesn't specify that the temporary files get stored in a temporary directory
@@ -44,7 +48,6 @@ read.SAScii.monetdb <-
 		tf3 <- normalizePath( paste0( tf.path , tablename , "3" ) )
 	}
 
-	
 	# scientific notation contains a decimal point when converted to a character string..
 	# so store the user's current value and get rid of it.
 	user.defined.scipen <- getOption( 'scipen' )
@@ -94,18 +97,21 @@ read.SAScii.monetdb <-
 		download.file( fn , tf , mode = "wb" )
 		#unzip the file's contents and store the file name within the temporary directory
 		fn <- unzip( tf , exdir = td , overwrite = T )
+		
+		on.exit( file.remove( tf ) )
 	}
 
+	
 	
 	# if the overwrite flag is TRUE, then check if the table is in the database..
 	if ( overwrite ){
 		# and if it is, remove it.
-		if ( tablename %in% dbListTables( db ) ) dbRemoveTable( db , tablename )
+		if ( tablename %in% dbListTables( connection ) ) dbRemoveTable( connection , tablename )
 		
 		# if the overwrite flag is false
 		# but the table exists in the database..
 	} else {
-		if ( tablename %in% dbListTables( db ) ) stop( "table with this name already in database" )
+		if ( tablename %in% dbListTables( connection ) ) stop( "table with this name already in database" )
 	}
 	
 	if ( sum( grepl( 'sample' , tolower( y$varname ) ) ) > 0 ){
@@ -121,7 +127,7 @@ read.SAScii.monetdb <-
 
 	colDecl <- paste( fields , colTypes )
 
-	sql <-
+	sql.create <-
 		sprintf(
 			paste(
 				"CREATE TABLE" ,
@@ -133,8 +139,6 @@ read.SAScii.monetdb <-
 				collapse = ", "
 			)
 		)
-	
-	dbSendUpdate( db , sql )
 	
 	# starts and ends
 	w <- abs ( x$width )
@@ -152,10 +156,12 @@ read.SAScii.monetdb <-
 	# convert the fwf to a csv
 	# verbose = TRUE prints a message, which has to be captured.
 	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = TRUE )
-
+	on.exit( { file.remove( tf ) ; file.remove( tf2 ) } )
+	
 	# stop storing the output
 	sink( type = "message" )
 	unlink( tf3 )
+	on.exit( { file.remove( tf ) ; file.remove( tf2 ) ; file.remove( tf3 ) } )
 	
 	# read the contents of that message into a character string
 	zzz <- readLines( tf3 )
@@ -168,23 +174,52 @@ read.SAScii.monetdb <-
 	
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
+
+	# create the table in the database
+	dbSendUpdate( connection , sql.create )
 	
-	# try the COPY INTO command twice..
-	
-	# first including the "NULL AS" parameter
+	# import the data into the database
 	sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , " NULL AS '' ' '" ) 
-	first.nulls <- try( dbSendUpdate( db , sql.update ) , silent = TRUE )
+	# capture an error (without breaking)
+	te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
+
+	# and try another delimiter statement
+	if ( class( te ) == "try-error" ){
 		
-	# if that doesn't work, without it.
-	if ( class( first.nulls ) == "try-error" ){
+		# print the error and indicate moving forward..
+		print( te )
+		print( 'attempt #1 broke, trying method #2' )
+
+		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters ) 
+		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
+	}
+
+	if ( class( te ) == "try-error" ){
+		print( te )
+		print( 'attempt #2 broke, trying method #3' )
 	
-		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters   ) 
-		dbSendUpdate( db , sql.update )
-	
+		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS '" , '""' , "'" ) 
+		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
+	}
+
+	if ( class( te ) == "try-error" ){
+		print( te )
+		print( 'attempt #3 broke, trying method #4' )
+
+		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ''" ) 
+		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
 	}
 	
-	# delete the temporary file from the hard disk
-	file.remove( tf2 )
+	if ( class( te ) == "try-error" ){
+		print( te )
+		print( 'attempt #4 broke, trying method #5' )
+	
+		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ' '" ) 
+		
+		# this one no longer includes a try() - because it's the final attempt
+		dbSendUpdate( connection , sql.update )
+	}
+
 		
 	# loop through all columns to:
 		# convert to numeric where necessary
@@ -208,7 +243,7 @@ read.SAScii.monetdb <-
 					y[ l , "divisor" ]
 				)
 				
-			dbSendUpdate( db , sql )
+			dbSendUpdate( connection , sql )
 			
 		}
 			
@@ -224,12 +259,12 @@ read.SAScii.monetdb <-
 			sql.drop <- paste0( "ALTER TABLE " , tablename , " DROP toss_" , i )
 			
 			# and drop them!
-			dbSendUpdate( db , sql.drop )
+			dbSendUpdate( connection , sql.drop )
 		}
 	}
 	
 	# reset scientific notation length
 	options( scipen = user.defined.scipen )
-	
+
 	TRUE
 }
