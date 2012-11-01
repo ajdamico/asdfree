@@ -53,6 +53,22 @@ nhis.years.to.download <- 2011:1963
 # nhis.years.to.download <- c( 2011:2009 , 2000 )
 
 
+# conversion options #
+
+# it's recommended you keep a version of the .rda files,
+# since they work with all subsequent scripts
+
+# do you want to save an R data file (.rda) to the working directory?
+rda <- TRUE
+
+# do you want to save a stata-readable file (.dta) to the working directory?
+dta <- FALSE
+
+# do you want to save a comma-separated values file (.csv) to the working directory?
+csv <- FALSE
+
+# end of conversion options #
+
 # no need to edit anything below this line #
 
 
@@ -60,9 +76,9 @@ nhis.years.to.download <- 2011:1963
 # program start #
 # # # # # # # # #
 
-require(RCurl)	# load RCurl package (downloads files from the web)
-require(SAScii) # load the SAScii package (imports ascii data with a SAS script)
-
+require(RCurl)		# load RCurl package (downloads files from the web)
+require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+require(foreign) 	# load foreign package (converts data files into R)
 
 # create a temporary file and a temporary directory
 tf <- tempfile() ; td <- tempdir()
@@ -318,7 +334,13 @@ for ( year in nhis.years.to.download ){
 			assign( df.name , nhis.df )
 				
 			# save the R data frame to a .rda file on the local computer
-			save( list = df.name , file = paste0( output.directory , "/" , fv , ".rda" ) )
+			if ( rda ) save( list = df.name , file = paste0( output.directory , "/" , fv , ".rda" ) )
+			
+			# if the csv option is flagged, also output the file as a csv
+			if ( csv ) write.csv( nhis.df , file = paste0( output.directory , "/" , fv , ".csv" ) )
+			
+			# if the dta option is flagged, also output the file as a stata file
+			if ( dta ) write.dta( nhis.df , file = paste0( output.directory , "/" , fv , ".dta" ) )
 			
 			# remove both data frame objects from memory
 			rm( list = c( "nhis.df" , df.name ) )
@@ -486,7 +508,29 @@ for ( year in nhis.years.to.download ){
 		ofn <- paste0( output.directory , gsub( '.sas' , '.rda' , sas.file ) )
 		
 		# then save ii1 - ii5 to that .rda file on the local disk
-		save( list = paste0( "ii" , 1:5 ) , file = ofn )
+		if ( rda ) save( list = paste0( "ii" , 1:5 ) , file = ofn )
+		
+		# if the csv option is flagged, then save ii1 - ii5 to five .csv files on the local disk
+		if ( csv ){
+			for ( i in 1:5 ) {
+				write.csv( 
+					get( paste0( "ii" , i ) ) , 
+					paste0( output.directory , gsub( '.sas' , paste0( i , '.csv' ) , sas.file ) ) 
+				)
+			}
+		}
+		
+		# if the dta option is flagged, then save ii1 - ii5 to five stata files on the local disk
+		if ( dta ){
+			for ( i in 1:5 ) {
+				write.dta( 
+					get( paste0( "ii" , i ) ) , 
+					paste0( output.directory , gsub( '.sas' , paste0( i , '.dta' ) , sas.file ) ) 
+				)
+			}
+		}
+		
+		
 		
 		# remove all five imputed income data tables from RAM
 		rm( list = paste0( "ii" , 1:5 ) )
