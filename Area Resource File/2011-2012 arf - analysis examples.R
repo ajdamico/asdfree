@@ -130,40 +130,55 @@ arf.sub[ 1:10 , ]
 
 # goal: merge the arf onto another R data frame #
 
-# note: you must load another R data frame (presented here as 'yourdata')
+# as an example, i'll initiate a data frame that contains fake data (presented here as 'fakedata')
+# but you'll have to load another R data frame into R
 # with either a 'fips' or 'ssa' identifier in order for this merge to work
+# the website http://twotorials.com/ has plenty of examples showing how to import your own data
 
-# to merge the arf onto yourdata using the county fips code,
+# create a fake data table containing four counties
+fakedata <-
+	data.frame( 
+		# column one will contain the four counties' fips (federal information processing standard) codes
+		fips = c( 54005 , 26113 , 31097 , 47053 ) ,
+		# column two will contain the four counties' ssa (social security adminstration) codes
+		ssa = c( 51020 , 23560 , 28480 , 44260 ) ,
+		# column three will contain how cool each county is, on a scale of 0-100
+		coolness.factor = c( 0 , 33 , 67 , 100 ) ,
+		# column four will contain how many neon signs each county has, per person
+		neon.signs.per.capita = c( 10 , 7 , 3 , 0 ) 
+	)
+
+# to merge the arf onto fakedata using the county fips code,
 # a simple merge should suffice, so long as every fips code has a match
-# count the number of records in yourdata
-nrow( yourdata )
+# count the number of records in fakedata
+nrow( fakedata )
 # perform the merge
-yourdata <- merge( yourdata , arf.sub , by = "fips" )
-# confirm the number of records in yourdata hasn't changed
-nrow( yourdata )
+fakedata <- merge( fakedata , arf.sub , by = "fips" )
+# confirm the number of records in fakedata hasn't changed
+nrow( fakedata )
 
 
-# if some of the records in yourdata do not include valid fips codes,
+# if some of the records in fakedata do not include valid fips codes,
 # but you do not want them thrown out when no matching fips is found in arf.sub..
-# count the number of records in yourdata
-nrow( yourdata )
+# count the number of records in fakedata
+nrow( fakedata )
 # perform the merge - this time with all.x = TRUE - to conduct a left join
-# a left join keeps all records in the first data set ('yourdata' in this example)
+# a left join keeps all records in the first data set ('fakedata' in this example)
 # regardless of whether a matching fips code was found in the second data frame ('arf.sub')
-yourdata <- merge( yourdata , arf.sub , by = "fips" , all.x = TRUE )
-# confirm the number of records in yourdata hasn't changed
-nrow( yourdata )
+fakedata <- merge( fakedata , arf.sub , by = "fips" , all.x = TRUE )
+# confirm the number of records in fakedata hasn't changed
+nrow( fakedata )
 
 
-# to merge the arf onto yourdata using the county ssa code,
+# to merge the arf onto fakedata using the county ssa code,
 # try limiting the arf to only records with a non-zero ssa code
 arf.with.ssa <- subset( arf.sub , ssa != 0 )
-# count the number of records in yourdata
-nrow( yourdata )
+# count the number of records in fakedata
+nrow( fakedata )
 # perform the merge
-yourdata <- merge( yourdata , arf.with.ssa , by = "ssa" )
-# confirm the number of records in yourdata hasn't changed
-nrow( yourdata )
+fakedata <- merge( fakedata , arf.with.ssa , by = "ssa" )
+# confirm the number of records in fakedata hasn't changed
+nrow( fakedata )
 
 
 # # # # # # # # # #
