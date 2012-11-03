@@ -341,6 +341,37 @@ rm( x )
 gc()
 
 
+# # # # # # # # # # # #
+# beginning of thinning to conserve RAM
+# create a character vector containing only
+# the variables in the merged file that are needed
+# for this specific analysis.  this will keep RAM usage to a minimum.
+# note: if working with more than 4 gigabytes of RAM, this step can be commented out
+variables.to.keep <-
+	c( 
+		# survey variables
+		"wtfa_sa" , "strat_p" , "psu_p" , 
+		
+		# merge variables
+		"hhx" , "fmx" , "fpx" , 
+		
+		# analysis variables
+		"aworpay" , "age_p"
+	)
+
+# now actually overwrite the personsx-samadult merged file with a 'thinned'
+# version of itself, only containing the columns specified in variables.to.keep
+x.sa <- x.sa[ , variables.to.keep ]
+
+# look at the first six records of the 'thinned' data frame
+head( x.sa )
+
+# clear up RAM
+gc()
+
+# end of thinning to conserve RAM
+# # # # # # # # # # # #
+
 # now load the imputed income data frames
 load( path.to.incmimp.file )		# this loads five data frames called ii1, ii2, ii3, ii4, and ii5
 
@@ -418,6 +449,12 @@ for ( i in 1:5 ){
 	gc()
 }
 
+# now that the five imputed income data frames have been created,
+# free up ram by removing the original data frames
+rm( x.sa )
+
+# and immediately clear up RAM
+gc()
 
 
 # build a new survey design object,
