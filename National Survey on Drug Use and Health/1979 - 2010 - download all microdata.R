@@ -35,9 +35,14 @@
 # this is to protect both yourself and the respondents of the study
 # http://www.icpsr.umich.edu/cgi-bin/bob/zipcart2?path=SAMHDA&study=32722
 # as a verification that you have actually read this document, you must uncomment
-# (meaning remove the # in front of) the next line.  by uncommenting this line, you affirm you have read and agree with the document.
+# (meaning remove the # in front of) the next line.  by uncommenting this line, you affirm you have read and agree with the document:
+
 # terms <- "http://www.icpsr.umich.edu/cgi-bin/terms"
+
 # this massive ftp download automation script will not work without the above line uncommented.
+# if the 'terms' line above is still uncommented, the script is going to break.
+# to repeat.  read the important user warning.  then uncomment that line to affirm you have read and agree with the document.
+
 
 # # # # # # # # # # # # # # # # # 
 # end of important user warning #
@@ -266,6 +271,16 @@ for ( i in rev( seq( nrow( studies.by.year ) ) ) ){
 	gc()
 
 }
+
+
+# the current working directory should now contain one folder per year of data,
+# each with an R data file (.rda) in the main directory,
+# as well as the original files downloaded from samhsa (including the survey documentation)
+
+
+# once complete, this script does not need to be run again.
+# instead, use one of the analysis scripts,
+# which utilize these newly-created R data files (.rda)
 
 
 # print a reminder: set the directory you just saved everything to as read-only!
