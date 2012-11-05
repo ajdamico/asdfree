@@ -69,7 +69,6 @@ setwd( "C:/My Directory/NSDUH/" )
 # # # # # # # # #
 
 
-require(foreign) # load foreign package (converts data files into R)
 require(survey)  # load survey package (analyzes complex design surveys)
 
 
