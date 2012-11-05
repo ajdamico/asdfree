@@ -37,7 +37,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/usgsd/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/1979-2010%20-%20download%20all%20microdata.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will save a number of .rda files in C:/My Directory/NSDUH/2010/ (or the working directory was chosen)                             #
+# that script will save a number of .rda files in C:/My Directory/NSDUH/2010/ (or the working directory chosen)                                 #
 #################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -80,15 +80,14 @@ options( survey.lonely.psu = "adjust" )
 # this setting matches the MISSUNIT option in SUDAAN
 
 
-# now the r data frame can be loaded directly
-# from your local hard drive.  this is much faster.
+# the r data frame can be loaded directly from your local hard drive
 load( "./2010/NSDUH.10.rda" )
 
 
 # display the number of rows in the 2010 data set
 nrow( NSDUH.10.df )
 
-# display the first six records in the cross-sectional cumulative data set
+# display the first six records in the 2010 data set
 head( NSDUH.10.df )
 # note that the data frame contains far too many variables to be viewed conveniently
 
@@ -173,7 +172,7 @@ nrow( y )
 
 
 # add a new variable 'one' that simply has the number 1 for each record #
-# and be used to calculation unweighted and weighted population sizes   #
+# and can be used to calculate unweighted and weighted population sizes #
 
 y <-
 	update( 

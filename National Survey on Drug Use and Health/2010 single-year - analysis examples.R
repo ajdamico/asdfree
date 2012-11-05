@@ -24,7 +24,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/usgsd/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/1979-2010%20-%20download%20all%20microdata.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will save a number of .rda files in C:/My Directory/NSDUH/2010/ (or the working directory was chosen)                             #
+# that script will save a number of .rda files in C:/My Directory/NSDUH/2010/ (or the working directory chosen)                                 #
 #################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -59,8 +59,7 @@ options( survey.lonely.psu = "adjust" )
 # this setting matches the MISSUNIT option in SUDAAN
 
 
-# now the r data frame can be loaded directly
-# from your local hard drive.  this is much faster.
+# the r data frame can be loaded directly from your local hard drive
 load( "./2010/NSDUH.10.rda" )
 
 
@@ -119,7 +118,7 @@ y <-
 	
 
 # add a new variable 'one' that simply has the number 1 for each record #
-# and be used to calculation unweighted and weighted population sizes   #
+# and can be used to calculate unweighted and weighted population sizes #
 
 y <-
 	update( 
@@ -175,7 +174,7 @@ sum( x$analwt_c )
 
 # the civilian, non-institutionalized population of the united states #
 # aged 12 or older (including civilians living on military bases)     #
-# by self-reported health status
+# by self-reported health status                                      #
 svyby(
 	~one ,
 	~health ,
@@ -186,7 +185,7 @@ svyby(
 
 # calculate the mean of a linear variable #
 
-# among individuals who have ever smoked: age when first tried a cigarette
+# among individuals who have ever smoked: time since last smoked a cigarette - nationwide distribution
 svymean( 
 	~cigtry , 
 	design = y ,
@@ -275,7 +274,7 @@ y.city <-
 	
 # calculate the mean of a linear variable #
 
-# among individuals who have ever smoked: average age when first tried a cigarette - nationwide, restricted to densely-urban populations
+# among individuals who have ever smoked: average age when first tried a cigarette - restricted to densely-urban populations
 svymean( 
 	~cigtry , 
 	design = y.city ,
@@ -345,7 +344,7 @@ barplot(
 	# title the barplot
 	main = "Among Americans Aged 12 or Older Who Have Ever Smoked:\nPercent Who Have Not Smoked For 3+ Years,\nBy Self-Reported Health Status" ,	
 	# create a character vector containing the five self-reported health status categories
-	names.arg = c("Excellent","Very Good","Good","Fair","Poor") ,															
+	names.arg = c( "Excellent" , "Very Good" , "Good" , "Fair" , "Poor" ) ,
 	# set the lower and upper bound of the y axis
 	ylim = c( 0 , .60 ) 							
 )
