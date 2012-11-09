@@ -337,7 +337,7 @@ z <-
 
 # note: these results do not match the published results exactly for two reasons:
 	# 1) census bureau publications of sipp data use a different
-	# file than the publicly-available one, which is topcoded and edited.
+	# file than the publicly-available one, which is topcoded, edited, and contains slightly different weights
 	# 2) census bureau analysts often use the generalized variance formula (gvf)
 	# to calculate the margin of error.  (i confirmed that gvf was used with the author)
 	# to read about the gvf, see pdf page 4 of
