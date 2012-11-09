@@ -225,19 +225,19 @@ y <-
 		m1 = ifelse( exmar %in% 1 , 1 , 0 ) ,
 		
 		# married once, and currently married
-		sm1 = ifelse( exmar %in% 1 & ems %in% c( 1 , 2 , 5 ) , 1 , 0 ) ,
+		sm1 = ifelse( exmar %in% 1 & ems %in% c( 1 , 2 ) , 1 , 0 ) ,
 		
 		# married twice
 		m2 = ifelse( exmar %in% 2 , 1 , 0 ) ,
 		
 		# married twice, and currently married
-		sm2 = ifelse( exmar %in% 2 & ems %in% c( 1 , 2 , 5 ) , 1 , 0 ) ,
+		sm2 = ifelse( exmar %in% 2 & ems %in% c( 1 , 2 ) , 1 , 0 ) ,
 		
 		# married three or more times
 		m3 = ifelse( exmar %in% 3:4 , 1 , 0 ) ,
 		
 		# married three or more times, and currently married
-		sm3 = ifelse( exmar %in% 3:4 & ems %in% c( 1 , 2 , 5 ) , 1 , 0 ) 
+		sm3 = ifelse( exmar %in% 3:4 & ems %in% c( 1 , 2 ) , 1 , 0 ) 
 		
 	)
 	
@@ -374,19 +374,19 @@ svyby( ~em , ~esex , z.15p , svymean )
 # married once
 svyby( ~m1 , ~esex , z.15p , svymean )
 
-# still in first marriage (includes separated)
+# still in first marriage (excludes separated)
 svyby( ~sm1 , ~esex , z.15p , svymean )
 
 # married twice
 svyby( ~m2 , ~esex , z.15p , svymean )
 
-# still in second marriage (includes separated)
+# still in second marriage (excludes separated)
 svyby( ~sm2 , ~esex , z.15p , svymean )
 
 # married three or more times
 svyby( ~m3 , ~esex , z.15p , svymean )
 
-# still in third or later marriage (includes separated)
+# still in third or later marriage (excludes separated)
 svyby( ~sm3 , ~esex , z.15p , svymean )
 
 
