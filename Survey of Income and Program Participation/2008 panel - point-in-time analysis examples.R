@@ -58,7 +58,7 @@ options( survey.replicates.mse = TRUE )
 
 # immediately connect to the SQLite database
 # this connection will be stored in the object 'db'
-db <- dbConnect( SQLite() , "SIPP08.db" ) )
+db <- dbConnect( SQLite() , "SIPP08.db" )
 
 
 #########################################
@@ -68,14 +68,14 @@ db <- dbConnect( SQLite() , "SIPP08.db" ) )
 # to see which waves correspond with what months, see http://www.census.gov/sipp/usrguide/ch2_nov20.pdf
 # pages 5, 6, 7, and 8 have sipp panels 2008, 2004, 2001, and 1996, respectively
 wave <- 2	
-# wave 2 was conducted january 2009 - april 2009 and containing data for september 2008 - march 2009.
+# wave 2 was conducted january 2009 - april 2009 and contains data for september 2008 - march 2009.
 # remember that most months occur in multiple waves (see calendar month alternative below for more detail)
 
 
 # make a character vector containing the variables that should be kept from the core file (core keep variables)
 core.kv <- 
 	c( 
-		# variables you almost certainly need for every analysis
+		# variables you almost certainly need for every point-in-time analysis
 		'ssuid' , 'epppnum' , 'wpfinwgt' , 'tage' , 
 	
 		# variables specific to this analysis
@@ -263,6 +263,22 @@ dbtt <- function( x ){ x / 10000 }
 y[ wc ] <- lapply( y[ wc ] , dbtt )
 
 
+#################################################
+# save your data frame for quick analyses later #
+
+# in order to bypass the above steps for future analyses,
+# the data frame in its current state can be saved now
+# (or, really, anytime you like).  uncomment this line:
+# save( y , file = "sipp08.point.in.time.rda" )
+# or, to save to another directory, specify the entire filepath
+# save( y , file = "C:/My Directory/sipp08.point.in.time.rda" )
+
+# at a later time, z can be re-accessed with the load() function
+# (just make sure the current working directory has been set to the same place)
+# load( "sipp08.point.in.time.rda" )
+# or, if you don't set the working directory, just specify the full filepath
+# load( "C:/My Directory/sipp08.point.in.time.rda" )
+
 
 #############################################################
 # survey design for replicate weights with fay's adjustment #
@@ -289,7 +305,32 @@ z <-
 		z
 	)
 
+
+####################################################
+# save your survey design for quick analyses later #
+
+# in order to bypass the above steps for future analyses,
+# the survey object in its current state can be saved now
+# (or, really, anytime you like).  uncomment this line:
+# save( z , file = "sipp08.point.in.time.design.rda" )
+# or, to save to another directory, specify the entire filepath
+# save( z , file = "C:/My Directory/sipp08.point.in.time.design.rda" )
+
+# at a later time, z can be re-accessed with the load() function
+# (just make sure the current working directory has been set to the same place)
+# load( "sipp08.point.in.time.design.rda" )
+# or, if you don't set the working directory, just specify the full filepath
+# load( "C:/My Directory/sipp08.point.in.time.design.rda" )
+
+
+# also note: multiple objects can be saved inside a single R data file (.rda)
+# save( y , z , file = "sipp08.point.in.time.df.and.design.rda" )
+
+# at this point, if you close R, open it again, reset the working directory,
+# load( "sipp08.point.in.time.df.and.design.rda" )
+# will bring back both y and z objects
 	
+
 #####################
 # analysis examples #
 
