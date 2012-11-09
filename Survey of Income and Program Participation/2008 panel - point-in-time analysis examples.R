@@ -260,6 +260,7 @@ wc <- names( y )[ grep( 'wgt' , names( y ) ) ]
 # create a new divide-by-ten-thousand function
 dbtt <- function( x ){ x / 10000 }
 
+# apply that new dbtt() function to every single column specified in the 'wc' character variable
 y[ wc ] <- lapply( y[ wc ] , dbtt )
 
 
