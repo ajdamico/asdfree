@@ -3,11 +3,8 @@
 # # # # # # # # # # # # # # #
 
 
-# these scripts use a superfast (completely free) database program called monetdb.
-# you need to install and configure it to work with r.
-
-
-# here's how to install everything on a windows computer in four steps:
+# some usgsd scripts use a superfast (completely free) database program called monetdb.
+# here's how to install and configure it to work with r on windows in four steps:
 
 
 # 1) install java (not just for your browser)
@@ -39,13 +36,41 @@
 # 4) install two R packages that are not currently available on CRAN and install a few others..
 # open up your R console and run these two separate installation commands without the # sign in front:
 # install.packages( c( "RMonetDB" , "sqlsurvey" ) , repos = c( "http://cran.r-project.org" , "http://R-Forge.R-project.org" ) , dep=TRUE )
-# install.packages( c( 'SAScii' , 'descr' , 'survey' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'survey' , 'RCurl' ) )
 
 
 
-# if you've successfully installed monetdb to your machine, you should be able to initiate your first database with these commands:
+# # # # # # # # # # # #
+# end of installation #
+# # # # # # # # # # # #
 
-stop( "C:/Users/AnthonyD/Google Drive/private/usgsd/windows.monetdb.configuration.R" )
+
+
+# if you've successfully installed monetdb to your machine,
+# you should be able to initiate your first database with these commands:
+
+
+require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
+
+
+#######################################################	
+# function to download scripts directly from github.com
+# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
+source_https <- function(url, ...) {
+  # load package
+  require(RCurl)
+
+  # parse and evaluate each .R script
+  sapply(c(url, ...), function(u) {
+    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
+  })
+}
+#######################################################
+
+# load the windows.monetdb.configuration() function,
+# which allows the easy creation of an executable (.bat) file
+# to run the monetdb server specific to this data
+source_https( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
 
 
 # run the windows.monetdb.configuration() function to
@@ -95,6 +120,10 @@ windows.monetdb.configuration(
 # until you have finished all monetdb-related commands
 
 shell.exec( "C:\\My Directory\\MonetDB\\test.bat" )
+
+# you'll also need the dbname and dbport settings you've used above
+dbname <- "test"
+dbport <- 50000
 
 
 # my dos window contains the text below.  leave it open until you're done.
