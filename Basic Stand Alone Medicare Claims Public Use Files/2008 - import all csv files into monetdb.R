@@ -384,8 +384,12 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 # instead, use the example monetdb analysis scripts
 
 
-# print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
+# unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
+winDialog( 'ok' , paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
+
+winDialog( 'ok' , "got that? monetdb directories should not be set read-only." )
+# don't worry, you won't update any of these tables so long as you exclusively stick with the dbGetQuery() function
+# instead of the dbSendUpdate() function (you'll see examples in the analysis scripts)
 
 
 # for more details on how to work with data in r
