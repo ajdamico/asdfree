@@ -22,6 +22,19 @@
 ############################################################################################
 
 
+# # # # # # # # # # # # # # #
+# warning: monetdb required #
+# # # # # # # # # # # # # # #
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###################################################################################################################################
+# prior to running this analysis script, monetdb must be installed on the local machine.  follow each step outlined on this page: #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/MonetDB/monetdb%20installation%20instructions.R                                   #
+###################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "RCurl" , "R.utils" ) )
 
@@ -39,7 +52,6 @@ require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 # https://raw.github.com/ajdamico/usgsd/master/Basic%20Stand%20Alone%20Medicare%20Claims%20Public%20Use%20Files/2008%20-%20download%20all%20csv%20files.R #
 ###########################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 
 
 # all 2008 BSA comma separated value (.csv) files
@@ -75,19 +87,6 @@ source_https <- function(url, ...) {
 source_https( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
 
 
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################
-# prior to running this analysis script, monetdb must be installed on the local machine.  follow each step outlined on this page: #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/MonetDB/monetdb%20installation%20instructions.R                                   #
-###################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
 # create a folder "MonetDB" in your current working directory.
 # so, for example, if you set your current working directory to C:\My Directory\BSAPUF\ above,
 # create a new folder C:\My Directory\BSAPUF\MonetDB right now.
@@ -103,7 +102,6 @@ stopifnot( file.exists( paste0( getwd() , "/MonetDB" ) ) )
 # in order to allow multi-year analyses.
 # although the csv download script changed the working directory to a single year of data,
 # this importation will include all monetdb files into a single database folder
-
 
 
 # configure a monetdb database for the bsa pufs on windows #
