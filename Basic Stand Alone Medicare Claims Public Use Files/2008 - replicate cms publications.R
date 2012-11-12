@@ -272,7 +272,7 @@ table4 <-
 				"select
 					bene_sex_ident_cd , 
 					count(*) as benes
-					from hospice
+					from hospice08
 					group by bene_sex_ident_cd
 					order by bene_sex_ident_cd"
 			)
@@ -354,7 +354,7 @@ table1
 patient.payment.dist <-
 	dbGetQuery( 
 		db , 
-		"select pde_drug_pat_pay_cd , count(*) from pde group by pde_drug_pat_pay_cd order by pde_drug_pat_pay_cd" 
+		"select pde_drug_pat_pay_cd , count(*) from pde08 group by pde_drug_pat_pay_cd order by pde_drug_pat_pay_cd" 
 	)
 	
 # print these numerators to the screen
