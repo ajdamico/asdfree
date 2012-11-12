@@ -22,11 +22,11 @@
 #################################################################################
 
 
-# all 2008 BSA data files will be stored here
-# after downloading and importing
+# all 2008 BSA data files will be stored
+# in a newly-created "2008" in this directory
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/BSAPUF/2008/" )
+setwd( "C:/My Directory/BSAPUF/" )
 
 # remove the # in order to run this install.packages line only once
 # install.packages( "httr" )
@@ -40,6 +40,19 @@ setwd( "C:/My Directory/BSAPUF/2008/" )
 
 
 require(httr)		# load httr package (downloads files from the web, with SSL and cookies)
+
+
+# create and set the working directory to a year-specific folder #
+
+# find the current working directory, and add "2008" at the end
+current.year.folder <- normalizePath( paste0( getwd() , "\\2008" ) )
+
+# create a "2008" folder inside the current working directory
+dir.create( current.year.folder )
+
+# change the current working directory to that folder
+setwd( current.year.folder )
+
 
 # set the location of the two possible ftp sites containing the public use files
 ftp.d <- "http://downloads.cms.gov/BSAPUF/"

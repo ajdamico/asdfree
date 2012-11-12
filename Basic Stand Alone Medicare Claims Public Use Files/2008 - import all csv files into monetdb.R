@@ -176,7 +176,11 @@ dbport <- 50003
 
 # if that shell window is not open, monetdb commands will not work.  period.
 
-	
+
+# give the shell window ten seconds to load.
+Sys.sleep( 10 )
+
+
 # end of monetdb database configuration #
 
 
@@ -231,6 +235,12 @@ monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
 # now put everything together and create a connection to the monetdb server.
 db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 # from now on, the 'db' object will be used for r to connect with the monetdb server
+
+
+# note: slow. slow. slow. #
+# the following monet.read.csv() functions take a while. #
+# run them all together overnight if possible. #
+# you'll never have to do this again.  hooray! #
 
 
 # store the 2008 inpatient claims table in the database as the 'inpatient08' table
