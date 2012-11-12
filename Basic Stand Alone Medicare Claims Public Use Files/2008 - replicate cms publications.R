@@ -80,7 +80,7 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 year <- 2008
 
 # create a character vector with each table
-pufs <- c( "hha" , "snf" , "hospice" , "carrier" , "partd" , "outpatient" , "dme" , "inpatient" )
+pufs <- c( "hha" , "snf" , "hospice" , "carrier" , "pde" , "outpatient" , "dme" , "inpatient" )
 
 # add the last two digits of the analysis year to each string
 pufs <- 
