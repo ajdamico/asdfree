@@ -49,20 +49,47 @@ ftp.l <- "https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Tr
 tf <- tempfile()
 
 # list all 2008 basic stand alone public use files
-# note that some file types require multiple downloads (partd, carrier, outpatient)
+# note that some file types require multiple downloads (pde, carrier, outpatient)
+
+# start of files to download #
+
+# inpatient claims
 inpatient <- "2008_BSA_Inpatient_Claims_PUF.zip"
+
+# durable medical equipment
 dme <- "2008_BSA_DME_Line_Items_PUF.zip"
-partd <- paste0( "2008_BSA_PartD_Events_PUF_" , 1:5 , ".zip" )				
+
+# prescription drug events
+pde <- paste0( "2008_BSA_PartD_Events_PUF_" , 1:5 , ".zip" )
+
+# hospice
 hospice <- "2008_BSA_Hospice_Beneficiary_PUF.zip"
+
+# physician carrier
 carrier <- paste0( "2008_BSA_Carrier_Line_Items_PUF_" , 1:7 , ".zip" )
+
+# home health agency
 hha <- "2008_BSA_HHA_Beneficiary_PUF.zip"
+
+# outpatient
 outpatient <- paste0( "2008_BSA_Outpatient_Procedures_PUF_" , 1:3 , ".zip" )
+
+# skilled nursing facility
 snf <- "2008_BSA_SNF_Beneficiary_PUF.zip"
+
+# chronic conditions
 cc <- "2008_Chronic_Conditions_PUF.zip" 
+
+# institutional provider & beneficiary summary
 ipbs <- "2008_IPBS_PUF.zip"
 
+# end of files to download #
+
 # combine all zip file names into a single character vector
-all.files <- c( inpatient , dme , partd , hospice , carrier , hha , outpatient , snf , cc , ipbs )
+all.files <- c( inpatient , dme , pde , hospice , carrier , hha , outpatient , snf , cc , ipbs )
+
+# initiate the 'resp' object (just in case the all.files order changes)
+resp <- data.frame( status_code = 1 )
 
 # loop through all zip filenames
 for ( zf in all.files ){
