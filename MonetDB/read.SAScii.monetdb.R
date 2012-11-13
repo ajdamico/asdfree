@@ -19,14 +19,19 @@ read.SAScii.monetdb <-
 		tl = F ,				# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,		# overwrite existing table?
-		connection ,
+		monet.drv ,
+		monet.url ,
 		tf.path = NULL ,		# do temporary files need to be stored in a specific folder?
 								# this option is useful for keeping protected data off of random temporary folders on your computer--
 								# specifying this option creates the temporary file inside the folder specified
-		delimiters = "'\t'"  	# delimiters for the monetdb COPY INTO command
+		delimiters = "'\t'" , 	# delimiters for the monetdb COPY INTO command
+		shell.refresh = NULL	# if the database connection isn't alive, run this command to refresh it			
 		
 	) {
 
+	# connect to the database
+	connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
+	
 	# check that autocommit mode isn't on
 	ac <- .jcall(connection@jc, "Z", "getAutoCommit")
 	if ( !ac ) stop( "read.SAScii.monetdb() only works in autocommit mode")
@@ -175,6 +180,15 @@ read.SAScii.monetdb <-
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
 
+	# if the shell.refresh parameter isn't missing
+	if ( !is.null( shell.refresh ) ){
+		# if a simple database command returns a "still alive?" error
+		if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
+			eval( shell.refresh )
+			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
+		}
+	}
+	
 	# create the table in the database
 	dbSendUpdate( connection , sql.create )
 	
@@ -190,30 +204,69 @@ read.SAScii.monetdb <-
 		print( te )
 		print( 'attempt #1 broke, trying method #2' )
 
+		# if the shell.refresh parameter isn't missing
+		if ( !is.null( shell.refresh ) ){
+			# if a simple database command returns a "still alive?" error
+			if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
+				eval( shell.refresh )
+				connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
+			}
+		}
+		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters ) 
 		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
 	}
 
 	if ( class( te ) == "try-error" ){
+	
 		print( te )
 		print( 'attempt #2 broke, trying method #3' )
-	
+		
+		# if the shell.refresh parameter isn't missing
+		if ( !is.null( shell.refresh ) ){
+			# if a simple database command returns a "still alive?" error
+			if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
+				eval( shell.refresh )
+				connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
+			}
+		}
+		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS '" , '""' , "'" ) 
 		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
 	}
 
 	if ( class( te ) == "try-error" ){
+
 		print( te )
 		print( 'attempt #3 broke, trying method #4' )
 
+		# if the shell.refresh parameter isn't missing
+		if ( !is.null( shell.refresh ) ){
+			# if a simple database command returns a "still alive?" error
+			if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
+				eval( shell.refresh )
+				connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
+			}
+		}
+		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ''" ) 
 		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
 	}
 	
 	if ( class( te ) == "try-error" ){
+		
 		print( te )
 		print( 'attempt #4 broke, trying method #5' )
 	
+		# if the shell.refresh parameter isn't missing
+		if ( !is.null( shell.refresh ) ){
+			# if a simple database command returns a "still alive?" error
+			if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
+				eval( shell.refresh )
+				connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
+			}
+		}
+		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ' '" ) 
 		
 		# this one no longer includes a try() - because it's the final attempt
@@ -266,5 +319,8 @@ read.SAScii.monetdb <-
 	# reset scientific notation length
 	options( scipen = user.defined.scipen )
 
+	# disconnect from the database
+	dbDisconnect( connection )
+	
 	TRUE
 }
