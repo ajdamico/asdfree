@@ -189,17 +189,37 @@ read.SAScii.monetdb <-
 	# create the table in the database
 	dbSendUpdate( connection , sql.create )
 	
+	
 	# import the data into the database
 	sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , " NULL AS '' ' '" ) 
 	# capture an error (without breaking)
 	te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
 
+		
 	# and try another delimiter statement
+	if ( class( te ) == "try-error" ){
+		
+		print( te )
+		print( 'attempt #1 broke, trying method #2' )
+	
+		# if the shell.refresh parameter isn't missing
+		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
+			eval( shell.refresh )
+			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
+		}
+		
+		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ' '" ) 
+		
+		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
+	}
+
+
+	
 	if ( class( te ) == "try-error" ){
 		
 		# print the error and indicate moving forward..
 		print( te )
-		print( 'attempt #1 broke, trying method #2' )
+		print( 'attempt #2 broke, trying method #3' )
 
 		# if the shell.refresh parameter isn't missing
 		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
@@ -214,7 +234,7 @@ read.SAScii.monetdb <-
 	if ( class( te ) == "try-error" ){
 	
 		print( te )
-		print( 'attempt #2 broke, trying method #3' )
+		print( 'attempt #3 broke, trying method #4' )
 		
 		# if the shell.refresh parameter isn't missing
 		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
@@ -229,7 +249,7 @@ read.SAScii.monetdb <-
 	if ( class( te ) == "try-error" ){
 
 		print( te )
-		print( 'attempt #3 broke, trying method #4' )
+		print( 'attempt #4 broke, trying method #5' )
 
 		# if the shell.refresh parameter isn't missing
 		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
@@ -238,26 +258,11 @@ read.SAScii.monetdb <-
 		}
 		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ''" ) 
-		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
-	}
-	
-	if ( class( te ) == "try-error" ){
-		
-		print( te )
-		print( 'attempt #4 broke, trying method #5' )
-	
-		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
-			eval( shell.refresh )
-			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-		}
-		
-		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ' '" ) 
-		
+				
 		# this one no longer includes a try() - because it's the final attempt
 		dbSendUpdate( connection , sql.update )
+		
 	}
-
 		
 	# loop through all columns to:
 		# convert to numeric where necessary
