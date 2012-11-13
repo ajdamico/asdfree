@@ -181,12 +181,9 @@ read.SAScii.monetdb <-
 	# than setting a very high number and letting it finish..
 
 	# if the shell.refresh parameter isn't missing
-	if ( !is.null( shell.refresh ) ){
-		# if a simple database command returns a "still alive?" error
-		if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
-			eval( shell.refresh )
-			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-		}
+	if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
+		eval( shell.refresh )
+		connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
 	}
 	
 	# create the table in the database
@@ -205,12 +202,9 @@ read.SAScii.monetdb <-
 		print( 'attempt #1 broke, trying method #2' )
 
 		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) ){
-			# if a simple database command returns a "still alive?" error
-			if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
-				eval( shell.refresh )
-				connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-			}
+		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
+			eval( shell.refresh )
+			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
 		}
 		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters ) 
@@ -223,12 +217,9 @@ read.SAScii.monetdb <-
 		print( 'attempt #2 broke, trying method #3' )
 		
 		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) ){
-			# if a simple database command returns a "still alive?" error
-			if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
-				eval( shell.refresh )
-				connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-			}
+		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
+			eval( shell.refresh )
+			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
 		}
 		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS '" , '""' , "'" ) 
@@ -241,12 +232,9 @@ read.SAScii.monetdb <-
 		print( 'attempt #3 broke, trying method #4' )
 
 		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) ){
-			# if a simple database command returns a "still alive?" error
-			if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
-				eval( shell.refresh )
-				connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-			}
+		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
+			eval( shell.refresh )
+			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
 		}
 		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ''" ) 
@@ -259,12 +247,9 @@ read.SAScii.monetdb <-
 		print( 'attempt #4 broke, trying method #5' )
 	
 		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) ){
-			# if a simple database command returns a "still alive?" error
-			if ( grepl( "still alive?" , try( dbListTables( connection ) , silent = TRUE )[1] ) ){
-				eval( shell.refresh )
-				connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-			}
+		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
+			eval( shell.refresh )
+			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
 		}
 		
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ' '" ) 
