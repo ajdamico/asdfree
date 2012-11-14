@@ -1,3 +1,16 @@
+
+# create importation function
+sql.copy.into <-
+	function( nullas ){
+		
+		# import the data into the database
+		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
+		dbSendUpdate( connection , sql.update )
+		
+		TRUE
+	}
+	
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # differences from the SAScii package's read.SAScii() --
 # 	4x faster
@@ -19,18 +32,19 @@ read.SAScii.monetdb <-
 		tl = F ,				# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,		# overwrite existing table?
-		monet.drv ,
-		monet.url ,
+		connection ,
+		# monet.drv ,
+		# monet.url ,
 		tf.path = NULL ,		# do temporary files need to be stored in a specific folder?
 								# this option is useful for keeping protected data off of random temporary folders on your computer--
 								# specifying this option creates the temporary file inside the folder specified
-		delimiters = "'\t'" , 	# delimiters for the monetdb COPY INTO command
-		shell.refresh = NULL	# if the database connection isn't alive, run this command to refresh it			
+		delimiters = "'\t'" # , 	# delimiters for the monetdb COPY INTO command
+		# shell.refresh = NULL	# if the database connection isn't alive, run this command to refresh it			
 		
 	) {
 
 	# connect to the database
-	connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
+	# connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
 	
 	# check that autocommit mode isn't on
 	ac <- .jcall(connection@jc, "Z", "getAutoCommit")
@@ -180,88 +194,34 @@ read.SAScii.monetdb <-
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
 
-	# if the shell.refresh parameter isn't missing
-	if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
-		eval( shell.refresh )
-		connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-	}
-	
 	# create the table in the database
 	dbSendUpdate( connection , sql.create )
 	
-	
-	# import the data into the database
-	sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , " NULL AS '' ' '" ) 
 	# capture an error (without breaking)
-	te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
+	te <- try( sql.copy.into( " NULL AS '' ' '" )  , silent = TRUE )
 
-		
-	# and try another delimiter statement
+	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
-		
-		print( te )
-		print( 'attempt #1 broke, trying method #2' )
-	
-		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
-			eval( shell.refresh )
-			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-		}
-		
-		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ' '" ) 
-		
-		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
+		cat( 'attempt #1 broke, trying method #2' , "\r" )
+		te <- try( sql.copy.into( " NULL AS ' '" )  , silent = TRUE )
 	}
 
-
-	
+	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
-		
-		# print the error and indicate moving forward..
-		print( te )
-		print( 'attempt #2 broke, trying method #3' )
-
-		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
-			eval( shell.refresh )
-			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-		}
-		
-		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters ) 
-		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
+		cat( 'attempt #2 broke, trying method #3' , "\r"  )
+		te <- try( sql.copy.into( "" )  , silent = TRUE )
+	}
+	
+	# try another delimiter statement
+	if ( class( te ) == "try-error" ){
+		cat( 'attempt #3 broke, trying method #4' , "\r"  )
+		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) )  , silent = TRUE )
 	}
 
 	if ( class( te ) == "try-error" ){
-	
-		print( te )
-		print( 'attempt #3 broke, trying method #4' )
-		
-		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
-			eval( shell.refresh )
-			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-		}
-		
-		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS '" , '""' , "'" ) 
-		te <- try( dbSendUpdate( connection , sql.update ) , silent = TRUE )
-	}
-
-	if ( class( te ) == "try-error" ){
-
-		print( te )
-		print( 'attempt #4 broke, trying method #5' )
-
-		# if the shell.refresh parameter isn't missing
-		if ( !is.null( shell.refresh ) & class( try( dbListTables( connection ) , silent = TRUE ) ) == 'try-error' ){
-			eval( shell.refresh )
-			connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-		}
-		
-		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " NULL AS ''" ) 
-				
-		# this one no longer includes a try() - because it's the final attempt
-		dbSendUpdate( connection , sql.update )
-		
+		cat( 'attempt #4 broke, trying method #5' , "\r" )
+		# this time without error-handling.
+		sql.copy.into( " NULL AS ''" ) 
 	}
 		
 	# loop through all columns to:
@@ -310,7 +270,7 @@ read.SAScii.monetdb <-
 	options( scipen = user.defined.scipen )
 
 	# disconnect from the database
-	dbDisconnect( connection )
+	# dbDisconnect( connection )
 	
 	TRUE
 }
