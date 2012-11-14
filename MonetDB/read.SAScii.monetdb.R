@@ -1,7 +1,7 @@
 
 # create importation function
 sql.copy.into <-
-	function( nullas ){
+	function( nullas , num.lines , tablename , tf2 ){
 		
 		# import the data into the database
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
@@ -197,33 +197,40 @@ read.SAScii.monetdb <-
 	# create the table in the database
 	dbSendUpdate( connection , sql.create )
 	
+	##############################
+	# begin importation attempts #
+	
 	# capture an error (without breaking)
-	te <- try( sql.copy.into( " NULL AS '' ' '" )  , silent = TRUE )
+	te <- try( sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2 )  , silent = TRUE )
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #1 broke, trying method #2' , "\r" )
-		te <- try( sql.copy.into( " NULL AS ' '" )  , silent = TRUE )
+		te <- try( sql.copy.into( " NULL AS ' '" , num.lines , tablename , tf2 )  , silent = TRUE )
 	}
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #2 broke, trying method #3' , "\r"  )
-		te <- try( sql.copy.into( "" )  , silent = TRUE )
+		te <- try( sql.copy.into( "" , num.lines , tablename , tf2 )  , silent = TRUE )
 	}
 	
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #3 broke, trying method #4' , "\r"  )
-		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) )  , silent = TRUE )
+		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , num.lines , tablename , tf2 )  , silent = TRUE )
 	}
 
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #4 broke, trying method #5' , "\r" )
 		# this time without error-handling.
-		sql.copy.into( " NULL AS ''" ) 
+		sql.copy.into( " NULL AS ''" , num.lines , tablename , tf2 ) 
 	}
-		
+	
+	# end importation attempts #
+	############################	
+	
+	
 	# loop through all columns to:
 		# convert to numeric where necessary
 		# divide by the divisor whenever necessary
