@@ -17,7 +17,7 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# this r script will replicate statistics found on eight different
+# this r script will replicate statistics found on nine different
 # centers for medicare and medicaid services (cms) publications
 # and match the output exactly (except where noted)
 
@@ -80,7 +80,7 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 year <- 2008
 
 # create a character vector with each table
-pufs <- c( "hha" , "snf" , "hospice" , "carrier" , "pde" , "outpatient" , "dme" , "inpatient" )
+pufs <- c( "hha" , "snf" , "hospice" , "carrier" , "pde" , "outpatient" , "dme" , "inpatient" , "ipbs" , "cc" )
 
 # add the last two digits of the analysis year to each string
 pufs <- 
@@ -363,6 +363,40 @@ patient.payment.dist
 # divide the patient payment distribution
 # by the total number of events to replicate the final statistic
 as.numeric( patient.payment.dist$L1 ) / as.numeric( table1[1] )
+
+
+# # # # # # # # # # # # # #
+# replicated statistics 9 #
+# # # # # # # # # # # # # #
+# the centers for medicare and medicaid services published a table in the chronic conditions general documentation
+# distribution of beneficiaries by gender and age categories in 2008 after suppression
+# the following code will precisely match the counts in table 5 of the chronic conditions puf general documentation (pdf page 13)
+# https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_Chronic_Conditions_PUF_GenDoc.pdf
+
+# examine the first six records of the 2008 chronic conditions (cc08) table
+dbGetQuery( db , "select * from cc08 limit 6" )
+
+# create a character vector containing each of the data columns matching the enrollee columns in table 5
+count.columns <-
+	c( 
+		"bene_count_pa_lt_12" , "bene_count_pa_eq_12" , "bene_count_pb_lt_12" , 
+		"bene_count_pb_eq_12" , "bene_count_pc_lt_12" , "bene_count_pc_eq_12" ,
+		"bene_count_pd_lt_12" , "bene_count_pd_eq_12"
+	)
+
+# start building the sql string that will be used to replicate table 5 #
+
+# create a string holding all of the sums of each column
+sum.strings <- paste( "sum(" , count.columns , ")" , collapse = "," )
+
+# run the overall enrollee counts (the bottom row of table 5)
+dbGetQuery( db , paste( "select" , sum.strings , "from cc08" ) )
+
+# run the enrollee counts, broken out by male/female
+dbGetQuery( db , paste( "select bene_sex_ident_cd, " , sum.strings , "from cc08 group by bene_sex_ident_cd" ) )
+
+# run the enrollee counts, broken out by male/female and age category
+dbGetQuery( db , paste( "select bene_sex_ident_cd, bene_age_cat_cd, " , sum.strings , "from cc08 group by bene_sex_ident_cd, bene_age_cat_cd" ) )
 
 
 # for more details on how to work with data in r
