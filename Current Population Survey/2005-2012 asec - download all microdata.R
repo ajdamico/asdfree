@@ -132,13 +132,18 @@ for ( year in cps.years.to.download ){
 	# census.gov website containing the current population survey's main file
 	CPS.ASEC.mar.file.location <- 
 		ifelse( 
-			# if the year to download is 2007, the filename doesn't match the others..
+			# if the year to download is 2012, the filename doesn't match others..
+			year == 2012 ,
+			"http://smpbff2.dsd.census.gov/pub/cps/march/asec2012early_pubuse.zip" ,
+			
+		ifelse(
+			# if the year to download is 2007, the filename also doesn't match..
 			year == 2007 ,
 			"http://smpbff2.dsd.census.gov/pub/cps/march/asec2007_pubuse_tax2.zip" ,
 			
 			# otherwise download according to a pattern -
 			paste0( "http://smpbff2.dsd.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
-		)
+		) )
 
 	# national bureau of economic research website containing the current population survey's SAS import instructions
 	CPS.ASEC.mar.SAS.read.in.instructions <- 
