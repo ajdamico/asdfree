@@ -59,7 +59,7 @@ cps.dbname <- "cps.asec.db"
 # # # # # # # # #
 
 # if the cps database file already exists in the current working directory, print a warning
-if file.exists( paste( getwd() , cps.dbname , sep = "/" ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the cps.dbname in the settings above." )
+if ( file.exists( paste( getwd() , cps.dbname , sep = "/" ) ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the cps.dbname in the settings above." )
 
 #######################################################	
 # function to download scripts directly from github.com
@@ -132,18 +132,13 @@ for ( year in cps.years.to.download ){
 	# census.gov website containing the current population survey's main file
 	CPS.ASEC.mar.file.location <- 
 		ifelse( 
-			# if the year to download is 2012, the filename doesn't match others..
-			year == 2012 ,
-			"http://smpbff2.dsd.census.gov/pub/cps/march/asec2012early_pubuse.zip" ,
-			
-		ifelse(
-			# if the year to download is 2007, the filename also doesn't match..
+			# if the year to download is 2007, the filename doesn't match the others..
 			year == 2007 ,
 			"http://smpbff2.dsd.census.gov/pub/cps/march/asec2007_pubuse_tax2.zip" ,
 			
 			# otherwise download according to a pattern -
 			paste0( "http://smpbff2.dsd.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
-		) )
+		)
 
 	# national bureau of economic research website containing the current population survey's SAS import instructions
 	CPS.ASEC.mar.SAS.read.in.instructions <- 
