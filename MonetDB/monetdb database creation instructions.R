@@ -1,3 +1,16 @@
+# # # # # # # # # # # # # # #
+# warning: monetdb required #
+# # # # # # # # # # # # # # #
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+###########################################################################################################################################
+# prior to running this database creation script, monetdb must be installed on the local machine. follow each step outlined on this page: #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/MonetDB/monetdb%20installation%20instructions.R                                           #
+###########################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 # if you've successfully installed monetdb to your machine,
 # you should be able to initiate your first database with these commands:
 
@@ -63,6 +76,18 @@ windows.monetdb.configuration(
 		dbport = 50000
 		
 	)
-	
-# now the local windows machine contains a new program at "c:\my directory\monetdb\test\test.bat"
 
+
+# now the local windows machine contains a new executable program at "c:\my directory\monetdb\test\test.bat"
+
+# you should now close r.  to access (read/write/analyze tables in) your new database,
+# open up a fresh instance of r and follow the instructions at:
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/MonetDB/monetdb%20database%20accessing%20instructions.R #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# for more details on how to work with data in r
+# check out my two minute tutorial video site
+# http://www.twotorials.com/
