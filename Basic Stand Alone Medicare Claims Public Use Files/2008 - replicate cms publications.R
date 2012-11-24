@@ -53,13 +53,13 @@ shell.exec( "C:/My Directory/BSAPUF/MonetDB/monetdb.bat" )
 # second: add a ten second system sleep in between the shell.exec() function
 # and the database connection lines.  this gives your local computer a chance
 # to get monetdb up and running.
-Sys.sleep( 10 )
+Sys.sleep( 20 )
 
 # third: your six lines to make a monet database connection.
 # just like above, mine look like this:
 dbname <- "bsapuf"
 dbport <- 50003
-monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.5.jar"
+monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
 drv <- MonetDB( classPath = monetdriver )
 monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )

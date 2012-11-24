@@ -221,7 +221,7 @@ ipbs <- paste0( "./" , year , "/" , year , "_IPBS_PUF.csv" )
 # the monetdb installation instructions asked you to note the filepath of the monetdb java (.jar) file
 # you need it now.  create a new 'monetdriver' object containing a character string
 # with the filepath of the java database connection file
-monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.5.jar"
+monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
 
 # convert the driver to a monetdb driver
 drv <- MonetDB( classPath = monetdriver )
@@ -369,7 +369,7 @@ Sys.sleep( 10 )
 # just like above, mine look like this:
 dbname <- "bsapuf"
 dbport <- 50003
-monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.5.jar"
+monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
 drv <- MonetDB( classPath = monetdriver )
 monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
