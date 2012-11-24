@@ -1,5 +1,7 @@
 
 # create importation function
+# to use different 'NULL AS <something>' options for the actual command that imports
+# lines into monetdb: COPY <stuff> INTO <tablename> ...
 sql.copy.into <-
 	function( nullas , num.lines , tablename , tf2 , connection ){
 		
@@ -7,13 +9,14 @@ sql.copy.into <-
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
 		dbSendUpdate( connection , sql.update )
 		
+		# return true when it's completed
 		TRUE
 	}
 	
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # differences from the SAScii package's read.SAScii() --
-# 	4x faster
+# 	um well a whole lot faster
 # 	no RAM issues
 # 	decimal division isn't flexible
 # 	must read in the entire table
@@ -22,6 +25,8 @@ sql.copy.into <-
 
 read.SAScii.monetdb <-
 	function( 
+		# differences between parameters for read.SAScii() (from the R SAScii package)
+		# and read.SAScii.monetdb() documented here --
 		fn ,
 		sas_ri , 
 		beginline = 1 , 
@@ -33,19 +38,13 @@ read.SAScii.monetdb <-
 		tablename ,
 		overwrite = FALSE ,		# overwrite existing table?
 		connection ,
-		# monet.drv ,
-		# monet.url ,
 		tf.path = NULL ,		# do temporary files need to be stored in a specific folder?
 								# this option is useful for keeping protected data off of random temporary folders on your computer--
 								# specifying this option creates the temporary file inside the folder specified
-		delimiters = "'\t'" # , 	# delimiters for the monetdb COPY INTO command
-		# shell.refresh = NULL	# if the database connection isn't alive, run this command to refresh it			
+		delimiters = "'\t'" 	# delimiters for the monetdb COPY INTO command
 		
 	) {
 
-	# connect to the database
-	# connection <- dbConnect( monet.drv , monet.url , user = "monetdb" , password = "monetdb" )
-	
 	# check that autocommit mode isn't on
 	ac <- .jcall(connection@jc, "Z", "getAutoCommit")
 	if ( !ac ) stop( "read.SAScii.monetdb() only works in autocommit mode")
@@ -199,6 +198,10 @@ read.SAScii.monetdb <-
 	
 	##############################
 	# begin importation attempts #
+
+	# notice the differences in the NULL AS <stuff> for the five different attempts.
+	# monetdb importation is finnicky, so attempt a bunch of different COPY INTO tries
+	# using the sql.copy.into() function defined above
 	
 	# capture an error (without breaking)
 	te <- try( sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection )  , silent = TRUE )
@@ -276,8 +279,5 @@ read.SAScii.monetdb <-
 	# reset scientific notation length
 	options( scipen = user.defined.scipen )
 
-	# disconnect from the database
-	# dbDisconnect( connection )
-	
 	TRUE
 }

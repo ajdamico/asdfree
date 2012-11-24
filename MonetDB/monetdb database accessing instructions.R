@@ -73,7 +73,7 @@ dbListFields( db , 'x' )
 
 
 ##########################################
-# make some changes to the monetdb table #
+# make a new column in the monetdb table #
 
 # create a kilometers per liter column
 dbSendUpdate( db , 'alter table x add column kpl double' )
@@ -88,13 +88,91 @@ dbSendUpdate( db , 'update x set kpl = mpg * 0.425144' )
 # end of changes to the monetdb table #
 #######################################
 
+
+############################################
+# make a new category in the monetdb table #
+
+
+# example of a linear recode with multiple categories, and a loop to perform each recode quickly
+
+original.variable.name <- 'wt'			# variable to recode from	
+
+cutpoints <- 
+	c( 0 , 2.5 , 3.3 , 3.6 , 10 )		# points to split the variable
+										# note that the lowest and highest bound should also be defined,
+										# anything outside of those numbers will be NA
+										# also: monetdb does not understand the value "Inf" or "-Inf"
+										# so just use an impossibly large or small number at the ends of your range
+
+new.variable.name <- 'wtcat'			# new variable to create
+
+
+# step one: add the column
+
+( first.command <- paste( "ALTER TABLE x ADD" , new.variable.name , "double" ) )
+dbSendUpdate( db , first.command )
+	
+
+# step two: loop through each cutpoint (except the last)
+for ( i in seq( length( cutpoints ) - 1 ) ){
+
+	# if you're working with a large data table, these commands may be slow
+	# so print a counter to the screen
+	cat( 
+		'     currently creating category' , 
+		i , 
+		'of' , 
+		new.variable.name , 
+		'from' , 
+		original.variable.name , 
+		'with' , 
+		length( cutpoints ) , 
+		'distinct categories' , 
+		'\r'
+	)
+
+	
+	# step three: create the specific category (still just a character string)
+	
+	( second.command <- 
+		paste( 
+			"UPDATE x SET" , 
+			new.variable.name , 
+			"=" , 
+			i , 
+			"WHERE" , 
+			original.variable.name , 
+			">=" , 							# depending on how you want the interval open and closed, you might want this line changed to
+											# ">" and..
+			cutpoints[ i ] , 				
+			"AND" ,
+			original.variable.name ,
+			"<" ,							# ..this line changed to "<="
+			cutpoints[ i + 1 ]
+		) 
+	)
+	# each second.command gets printed to the screen, so you can confirm if each recode has been defined appropriately
+	
+	# step four: send the character string command to the database
+	
+	dbSendUpdate( db , second.command )		# recode wt >= cutpoints[ i ] AND wt < cutpoints[ i + 1 ] to wtcat = i
+
+}
+
+# look at all thirty two records for those two columns, to confirm recodes have worked properly
+dbGetQuery( db , "select wt , wtcat from x" )
+
+# end of changes to the monetdb table #
+#######################################
+
+
 ########################
 # run some sql queries #
 
 # look at the first six records of x
 dbGetQuery( db , 'select * from x limit 6' )
 
-# look at all four gear cars in x
+# look at only cars with four gears in x
 dbGetQuery( db , 'select * from x where gear = 4' )
 
 # calculate the mean, median, max, min, and standard deviation of the
