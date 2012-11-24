@@ -56,7 +56,7 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 
 
 # see all tables currently stored in the database
-# note: if this is a newly-constructed database, these are meta-data
+# note: if this is a newly-constructed database, you are looking at meta-data
 dbListTables( db )
 
 # print the example mtcars data table to the screen
@@ -65,7 +65,7 @@ mtcars
 # write the mtcars data table to your new database as a table called x
 dbWriteTable( db , 'x' , mtcars )
 
-# look at the available tables again
+# look at the available tables again - a table 'x' should exist
 dbListTables( db )
 
 # look at the fields of the mtcars table (called x) in the monet database
@@ -89,8 +89,8 @@ dbSendUpdate( db , 'update x set kpl = mpg * 0.425144' )
 #######################################
 
 
-############################################
-# make a new category in the monetdb table #
+########################################################
+# make a new categorical variable in the monetdb table #
 
 
 # example of a linear recode with multiple categories, and a loop to perform each recode quickly
@@ -126,7 +126,7 @@ for ( i in seq( length( cutpoints ) - 1 ) ){
 		'from' , 
 		original.variable.name , 
 		'with' , 
-		length( cutpoints ) , 
+		length( cutpoints ) - 1 , 
 		'distinct categories' , 
 		'\r'
 	)
@@ -134,7 +134,7 @@ for ( i in seq( length( cutpoints ) - 1 ) ){
 	
 	# step three: create the specific category (still just a character string)
 	
-	( second.command <- 
+	second.command <- 
 		paste( 
 			"UPDATE x SET" , 
 			new.variable.name , 
@@ -150,8 +150,9 @@ for ( i in seq( length( cutpoints ) - 1 ) ){
 			"<" ,							# ..this line changed to "<="
 			cutpoints[ i + 1 ]
 		) 
-	)
-	# each second.command gets printed to the screen, so you can confirm if each recode has been defined appropriately
+
+	# print each second.command to the screen, so you can confirm if each recode has been defined appropriately
+	print( second.command )
 	
 	# step four: send the character string command to the database
 	
@@ -159,7 +160,7 @@ for ( i in seq( length( cutpoints ) - 1 ) ){
 
 }
 
-# look at all thirty two records for those two columns, to confirm recodes have worked properly
+# look at all thirty two records for those two columns to confirm recodes have worked properly
 dbGetQuery( db , "select wt , wtcat from x" )
 
 # end of changes to the monetdb table #
@@ -180,8 +181,7 @@ dbGetQuery( db , 'select * from x where gear = 4' )
 # also count the number of cars available in each category
 dbGetQuery( db , 'select cyl, avg( kpl ) , median( kpl ) , max( kpl ) , min( kpl ) , stddev( kpl ) , count(*) from x group by cyl' )
 
-# in sum: use dbGetQuery() to examine
-# a table within a database
+# in sum: use dbGetQuery() to examine a table within a database
 
 # if you've never used sql before, you are so missing out
 # check out w3schools for an intro: http://www.w3schools.com/sql/default.asp
@@ -194,7 +194,7 @@ dbGetQuery( db , 'select cyl, avg( kpl ) , median( kpl ) , max( kpl ) , min( kpl
 # note: if your table is too large for your ram,
 # this will overload your computer.
 # at least save your work before you try it,
-# just in case it requires you to restart.
+# just in case it requires you to restart r.
 x <- dbReadTable( db , 'x' )
 
 

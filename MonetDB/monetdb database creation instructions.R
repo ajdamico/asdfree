@@ -78,7 +78,7 @@ windows.monetdb.configuration(
 	)
 
 
-# now the local windows machine contains a new executable program at "c:\my directory\monetdb\test\test.bat"
+# now the local windows machine contains a new executable program at "c:\my directory\monetdb\test.bat"
 
 # you should now close r.  to access (read/write/analyze tables in) your new database,
 # open up a fresh instance of r and follow the instructions at:
