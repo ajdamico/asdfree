@@ -26,7 +26,7 @@ shell.exec( "C:/My Directory/MonetDB/test.bat" )
 Sys.sleep( 10 )
 
 # third: your six lines to make a monet database connection.
-# mine look like this:
+# mine looks like this:
 dbname <- "test"
 dbport <- 50000
 monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
@@ -38,7 +38,7 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 #########################################################################################
 
 
-# my dos window contains the text below.  leave it open until you're done.
+# my shell window contains the text below.  leave it open until you're done.
 
 # MonetDB 5 server v11.13.5 "Oct2012-SP1"
 # Serving database 'test', using 8 threads
@@ -70,6 +70,15 @@ dbListTables( db )
 
 # look at the fields of the mtcars table (called x) in the monet database
 dbListFields( db , 'x' )
+
+
+# note to self: revise this block to fit the structure of a haiku -
+
+# yes.  of course it's silly to use monetdb 
+# on tables small enough to load into ram
+# that's not the point of this exercise, though.
+# this code shows you how everything works, so
+# you feel comfortable working with your own big data
 
 
 ##########################################
@@ -204,7 +213,7 @@ head( x )
 
 # when you're finished, close the database connection..
 dbDisconnect( db )
-# ..and close the dos shell window by hand
+# ..and close the shell window by hand
 
 
 # for more details on how to work with data in r
