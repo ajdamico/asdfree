@@ -162,7 +162,7 @@ dbport <- 50003
 # hey try running it now!  a shell window should pop up.
 # when it runs, my computer shows:
 
-# MonetDB 5 server v11.11.11 "Jul2012-SP2"
+# MonetDB 5 server v11.13.5 "Oct2012-SP1"
 # Serving database 'bsapuf', using 2 threads
 # Compiled for x86_64-pc-winnt/64bit with 64bit OIDs dynamically linked
 # Found 15.873 GiB available main-memory.
@@ -170,7 +170,9 @@ dbport <- 50003
 # Copyright (c) August 2008-2012 MonetDB B.V., all rights reserved
 # Visit http://www.monetdb.org/ for further information
 # Listening for connection requests on mapi:monetdb://127.0.0.1:50003/
+# MonetDB/JAQL module loaded
 # MonetDB/SQL module loaded
+
 
 # if that shell window is not open, monetdb commands will not work.  period.
 

@@ -50,7 +50,7 @@ require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 # first: your shell.exec() function.  again, mine looks like this:
 shell.exec( "C:/My Directory/BSAPUF/MonetDB/monetdb.bat" )
 
-# second: add a ten second system sleep in between the shell.exec() function
+# second: add a twenty second system sleep in between the shell.exec() function
 # and the database connection lines.  this gives your local computer a chance
 # to get monetdb up and running.
 Sys.sleep( 20 )
