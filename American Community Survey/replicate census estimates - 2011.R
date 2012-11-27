@@ -1,0 +1,196 @@
+# analyze us government survey data with the r language
+# american community survey
+# 2011 person and household files
+
+# if you have never used the r language before,
+# watch this two minute video i made outlining
+# how to run this script from start to finish
+# http://www.screenr.com/Zpd8
+
+# anthony joseph damico
+# ajdamico@gmail.com
+
+# if you use this script for a project, please send me a note
+# it's always nice to hear about how people are using this stuff
+
+# for further reading on cross-package comparisons, see:
+# http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
+
+
+#####################################################
+# this script matches the nationwide statistics at  ###############################################
+# http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #
+###################################################################################################
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################
+# prior to running this analysis script, the acs 2011 single-year file must be loaded as a monet database-backed sqlsurvey object   #
+# on the local machine. running the 2005-2011 download and create database script will create a monet database containing this file #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/American%20Community%20Survey/2005-2011%20-%20download%20all%20microdata.R          #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "acs2011_1yr.rda" in C:/My Directory/ACS or wherever the working directory was set for the program #
+#####################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# # # # # # # # # # # # # # #
+# warning: monetdb required #
+# # # # # # # # # # # # # # #
+
+
+require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+
+
+# after running the r script above, users should have handy a few lines
+# to initiate and connect to the monet database containing all american community survey tables
+# run them now.  mine look like this:
+
+
+##################################################################
+# lines of code to hold on to for all other acs monetdb analyses #
+
+# first: your shell.exec() function.  again, mine looks like this:
+shell.exec( "C:/My Directory/ACS/MonetDB/monetdb.bat" )
+
+# second: add a twenty second system sleep in between the shell.exec() function
+# and the database connection lines.  this gives your local computer a chance
+# to get monetdb up and running.
+Sys.sleep( 20 )
+
+# third: your six lines to make a monet database connection.
+# just like above, mine look like this:
+dbname <- "acs"
+dbport <- 50001
+monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
+drv <- MonetDB( classPath = monetdriver )
+monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
+
+# end of lines of code to hold on to for all other acs monetdb analyses #
+#########################################################################
+
+
+# the american community survey download and importation script
+# has already created a monet database-backed survey design object
+# connected to the 2011 single-year table
+
+# sqlite database-backed survey objects are described here: 
+# http://faculty.washington.edu/tlumley/survey/svy-dbi.html
+# monet database-backed survey objects are similar, but:
+# the database engine is, well, blazingly faster
+# the setup is kinda more complicated (but all done for you)
+
+# since this script only loads one file off of the local drive,
+# there's no need to set the working directory.
+# instead, simply use the full filepath to the r data file (.rda)
+# as shown in the load() examples below.
+
+# choose which file in your ACS directory to analyze:
+# one-year, three-year, or five-year file from any of the available years.
+# this script replicates the 2011 single-year estimates,
+# so leave that line uncommented and the other three choices commented out.
+
+# load the desired american community survey monet database-backed complex sample design objects
+
+load( 'C:/My Directory/ACS/acs2011_1yr.rda' )	# analyze the 2011 single-year acs
+# load( 'C:/My Directory/ACS/acs2010_1yr.rda' )	# analyze the 2010 single-year acs
+# load( 'C:/My Directory/ACS/acs2010_3yr.rda' )	# analyze the 2008-2010 three-year acs
+# load( 'C:/My Directory/ACS/acs2010_5yr.rda' )	# analyze the 2006-2010 five-year acs
+
+# note: this r data file should already contain both the merged (person + household) and household-only designs
+
+
+# connect the complex sample designs to the monet database #
+acs.m <- open( acs.m.design , driver = drv , user = "monetdb" , password = "monetdb" )	# merged design
+acs.h <- open( acs.h.design , driver = drv , user = "monetdb" , password = "monetdb" )	# household-only design
+
+
+
+#############################################################################
+# ..and immediately start printing each row matching the replication target #
+#############################################################################
+
+# http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #
+
+
+#####################################################
+# census code replication of person-level estimates #
+#####################################################
+
+	
+svytotal( ~I( relp %in% 0:17 ) , acs.m )				# total population
+svytotal( ~I( relp %in% 0:15 ) , acs.m )				# housing unit population
+svytotal( ~I( relp %in% 16:17 ) , acs.m )				# gq population
+svytotal( ~I( relp == 16 ) , acs.m )					# gq institutional population
+svytotal( ~I( relp == 17 ) , acs.m )					# gq noninstitutional population
+svytotal( ~I( relp %in% 0:17 ) , acs.m , byvar = ~sex )	# total males & females
+
+
+# all age categories at once #
+
+svytotal( 
+	~I( agep %in% 0:4 ) +
+	I( agep %in% 5:9 )   +
+	I( agep %in% 10:14 ) +
+	I( agep %in% 15:19 ) +
+	I( agep %in% 20:24 ) +
+	I( agep %in% 25:34 ) +
+	I( agep %in% 35:44 ) +
+	I( agep %in% 45:54 ) +
+	I( agep %in% 55:59 ) +
+	I( agep %in% 60:64 ) +
+	I( agep %in% 65:74 ) +
+	I( agep %in% 75:84 ) +
+	I( agep %in% 85:100 ) , 
+	acs.m 
+)
+
+
+# note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
+
+
+###############################################
+# end of person-level census code replication #
+###############################################
+
+
+######################################################
+# census code replication of housing-level estimates #
+######################################################
+	
+
+svytotal( ~I( type_ == 1 ) , acs.h )							# total housing units
+svytotal( ~I( ten %in% 1:4 ) , acs.h )						# occupied units
+svytotal( ~I( ten %in% 1:2 ) , acs.h )						# owner-occupied units
+svytotal( ~I( ten %in% 3:4 ) , acs.h )						# renter-occupied units
+svytotal( ~I( ten == 1 ) , acs.h )							# owned with mortgage
+svytotal( ~I( ten == 2 ) , acs.h )							# owned free and clear
+svytotal( ~I( ten == 3 ) , acs.h )							# rented for cash
+svytotal( ~I( ten == 4 ) , acs.h )							# no cash rent
+svytotal( ~I( vacs %in% 1:7 ) , acs.h )						# total vacant units
+svytotal( ~I( vacs == 1 ) , acs.h )							# for rent
+svytotal( ~I( vacs == 3 ) , acs.h )							# for sale only
+svytotal( ~I( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.h )	# all other vacant
+
+
+# note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
+
+
+################################################
+# end of housing-level census code replication #
+################################################
+
+
+# close the connection to the two sqlrepsurvey design objects
+close( acs.m )
+close( acs.h )
+
+# close the connection to the monet database
+dbDisconnect( db )
+
+
+# for more details on how to work with data in r
+# check out my two minute tutorial video site
+# http://www.twotorials.com/
