@@ -238,6 +238,8 @@ save( acs.m.recoded.design , file = "C:/My Directory/ACS/recoded_acs2011_1yr.rda
 
 # open r back up
 
+require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+
 # run your..
 # lines of code to hold on to for all other acs monetdb analyses #
 # (the same block of code i told you to hold onto at the end of the download script)
