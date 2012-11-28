@@ -507,9 +507,10 @@ for ( year in 2050:2005 ){
 			# figure out the fields to keep
 			
 			# pull all fields from the person..
-			pfields <- dbListFields( db , paste0( k , '_p' ) )
+			pfields <- names( dbGetQuery( db , paste0( "select * from " , k , "_p limit 1") ) )
 			# ..and household tables
-			hfields <- dbListFields( db , paste0( k , '_h' ) )
+			hfields <- names( dbGetQuery( db , paste0( "select * from " , k , "_h limit 1") ) )
+			
 			# then throw fields out of the person file that match fields in the household table
 			pfields <- pfields[ !( pfields %in% hfields ) ]
 			# and also throw out the 'rt' field from the household table

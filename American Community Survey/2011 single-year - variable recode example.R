@@ -34,7 +34,12 @@
 # # # # # # # # # # # # # # #
 
 
+# remove the # in order to run this install.packages line only once
+# install.packages( "stringr" )
+
+
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(stringr) 		# load stringr package (manipulates character strings easily)
 
 
 # after running the r script above, users should have handy a few lines
@@ -112,29 +117,29 @@ dbSendUpdate( db , "CREATE TABLE recoded_acs2011_1yr_m AS SELECT * FROM acs2011_
 # since it's actually a categorical variable, make it VARCHAR( 255 )
 dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat VARCHAR( 255 )" )
 
-# if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION
-# dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat VARCHAR( 255 )" )
+# if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION like this:
+# dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecatx DOUBLE PRECISION" )
+# ..but then agecat would have to be be numbers (1 - 13) instead of the strings shown below ('01' - '13')
 
 
-
-# by hand, you could set the values of the agecat column anywhere between 1 and 13
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 1 WHERE agep >= 0 AND agep < 5' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 2 WHERE agep >= 5 AND agep < 10' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 3 WHERE agep >= 9 AND agep < 15' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 4 WHERE agep >= 15 AND agep < 20' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 5 WHERE agep >= 20 AND agep < 25' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 6 WHERE agep >= 25 AND agep < 35' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 7 WHERE agep >= 35 AND agep < 45' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 8 WHERE agep >= 45 AND agep < 55' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 9 WHERE agep >= 55 AND agep < 60' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 10 WHERE agep >= 60 AND agep < 65' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 11 WHERE agep >= 65 AND agep < 75' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 12 WHERE agep >= 75 AND agep < 85' )
-dbSendUpdate( db , 'UPDATE recoded_acs2011_1yr_m SET agecat = 13 WHERE agep >= 85 AND agep < 101' )
+# by hand, you could set the values of the agecat column anywhere between '01' and '13'
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '01' WHERE agep >= 0 AND agep < 5" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '02' WHERE agep >= 5 AND agep < 10" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '03' WHERE agep >= 10 AND agep < 15" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '04' WHERE agep >= 15 AND agep < 20" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '05' WHERE agep >= 20 AND agep < 25" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '06' WHERE agep >= 25 AND agep < 35" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '07' WHERE agep >= 35 AND agep < 45" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '08' WHERE agep >= 45 AND agep < 55" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '09' WHERE agep >= 55 AND agep < 60" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '10' WHERE agep >= 60 AND agep < 65" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '11' WHERE agep >= 65 AND agep < 75" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '12' WHERE agep >= 75 AND agep < 85" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '13' WHERE agep >= 85 AND agep < 101" )
 
 
 # quickly check your work by running a simple SELECT COUNT(*) command with sql
-dbGetQuery( db , "SELECT agecat , agep , COUNT(*) as number_of_records from recoded_acs2011_1yr_m GROUP BY agecat , agep" )
+dbGetQuery( db , "SELECT agecat , agep , COUNT(*) as number_of_records from recoded_acs2011_1yr_m GROUP BY agecat , agep ORDER BY agep" )
 # and notice that each value of agep has been deposited in the appropriate age category
 
 
@@ -150,14 +155,14 @@ dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat2 VARCHAR
 
 
 # to automate things, just create a vector of each age bound
-agebounds <- c( 0 , 5 , 9 , 15 , 20 , 25 , 35 , 45 , 55 , 60 , 65 , 75 , 85 , 101 )
+agebounds <- c( 0 , 5 , 10 , 15 , 20 , 25 , 35 , 45 , 55 , 60 , 65 , 75 , 85 , 101 )
 # and loop through each interval, plugging in a new agecat for each value
 
 # start at the value '0' and end at the value '85' -- as opposed to the ceiling of 101.
 for ( i in 1:( length( agebounds ) - 1 ) ){
 
 	# build the sql string to pass to monetdb
-	update.sql.string <- paste( "UPDATE recoded_acs2011_1yr_m SET agecat2 =" , i , "WHERE agep >=" , agebounds[ i ] , "AND agep <" , agebounds[ i + 1 ] )
+	update.sql.string <- paste0( "UPDATE recoded_acs2011_1yr_m SET agecat2 = '" , str_pad( i , 2 , pad = '0' ) , "' WHERE agep >= " , agebounds[ i ] , " AND agep < " , agebounds[ i + 1 ] )
 		
 	# take a look at the update.sql.string you've just built.  familiar?  ;)
 	print( update.sql.string )
@@ -168,7 +173,7 @@ for ( i in 1:( length( agebounds ) - 1 ) ){
 
 
 # check your work by running a simple SELECT COUNT(*) command with sql
-dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from recoded_acs2011_1yr_m GROUP BY agecat , agecat2" )
+dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from recoded_acs2011_1yr_m GROUP BY agecat , agecat2 ORDER BY agecat" )
 # and notice that there aren't any records where agecat does not equal agecat2
 
 
@@ -249,10 +254,10 @@ acs.r <- open( acs.m.recoded.design , driver = drv , user = "monetdb" , password
 # http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #
 # with one measly command:
 
-svytotal( ~agecat , acs.r )
+svytotal( ~one , acs.r , byvar = ~agecat )
 
 
-# are we done here?  yes, we're done.
+# are we done here?  yep, we're done.
 
 # close the connection to the recoded sqlrepsurvey design object
 close( acs.r )
