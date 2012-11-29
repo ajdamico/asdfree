@@ -8,6 +8,19 @@ brfss <-
 		id = ~xpsu , 
 		strata = ~xststr ,
 		nest = TRUE ,
+		weights = ~xllcpwt ,
+		data = 'b11' ,
+		dbtype = "SQLite" , 
+		dbname = "s:/temp/temp.db"
+	)
+	
+	
+
+brfss <- 
+	svydesign(
+		id = ~xpsu , 
+		strata = ~xststr ,
+		nest = TRUE ,
 		weights = ~xfinalwt ,
 		data = 'b10' ,
 		dbtype = "SQLite" , 
