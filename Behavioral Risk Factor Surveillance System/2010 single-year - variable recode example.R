@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # behavioral risk factor surveillance system
-# 2010 file
+# 2010
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -17,16 +17,16 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#####################################################################################################################################
-# prior to running this analysis script, the brfss 2010 single-year file must be loaded as a monet database-backed sqlsurvey object #
-# on the local machine. running the 1984-2011 download and create database script will create a monet database containing this file #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/American%20Community%20Survey/2005-2011%20-%20download%20all%20microdata.R          #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "acs2011_1yr.rda" in C:/My Directory/ACS or wherever the working directory was set for the program #
-#####################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###################################################################################################################################################
+# prior to running this analysis script, the brfss 2010 single-year file must be loaded as a monet database-backed sqlsurvey object               #
+# on the local machine. running the 1984-2011 download and create database script will create a monet database containing this file               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/1984%20-%202011%20download%20all%20microdata.R #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "b2010 design.rda" in C:/My Directory/BRFSS or wherever the working directory was set for the program            #
+###################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # # # # # # # # # # # # # # #
@@ -43,15 +43,15 @@ require(stringr) 		# load stringr package (manipulates character strings easily)
 
 
 # after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all american community survey tables
+# to initiate and connect to the monet database containing all behavioral risk factor surveillance system tables
 # run them now.  mine look like this:
 
 
-##################################################################
-# lines of code to hold on to for all other acs monetdb analyses #
+####################################################################
+# lines of code to hold on to for all other brfss monetdb analyses #
 
 # first: your shell.exec() function.  again, mine looks like this:
-shell.exec( "C:/My Directory/ACS/MonetDB/monetdb.bat" )
+shell.exec( "C:/My Directory/BRFSS/MonetDB/monetdb.bat" )
 
 # second: add a twenty second system sleep in between the shell.exec() function
 # and the database connection lines.  this gives your local computer a chance
@@ -60,20 +60,20 @@ Sys.sleep( 20 )
 
 # third: your six lines to make a monet database connection.
 # just like above, mine look like this:
-dbname <- "acs"
-dbport <- 50001
+dbname <- "brfss"
+dbport <- 50003
 monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
 drv <- MonetDB( classPath = monetdriver )
 monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 
-# end of lines of code to hold on to for all other acs monetdb analyses #
-#########################################################################
+# end of lines of code to hold on to for all other brfss monetdb analyses #
+###########################################################################
 
 
-# the american community survey download and importation script
+# the behavioral risk factor surveillance system download and importation script
 # has already created a monet database-backed survey design object
-# connected to the 2011 single-year table
+# connected to the 2010 single-year table
 
 # however, making any changes to the data table downloaded directly from the census bureau
 # currently requires directly accessing the table using dbSendUpdate() to run sql commands
@@ -90,20 +90,20 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 
 
 
-##############################################################
-# step 1: connect to the acs data table you'd like to recode # 
-# then make a copy so you don't lose the pristine original.  #
+################################################################
+# step 1: connect to the brfss data table you'd like to recode # 
+# then make a copy so you don't lose the pristine original.    #
 
 # the command above
 # db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 # has already connected the current instance of r to the monet database
 
 # now simply copy you'd like to recode into a new table
-dbSendUpdate( db , "CREATE TABLE recoded_acs2011_1yr_m AS SELECT * FROM acs2011_1yr_m WITH DATA" )
-# this action protects the original 'acs2011_1yr_m' table from any accidental errors.
+dbSendUpdate( db , "CREATE TABLE recoded_b2010 AS SELECT * FROM b2010 WITH DATA" )
+# this action protects the original 'b2010' table from any accidental errors.
 # at any point, we can delete this recoded copy of the data table using the command..
-# dbRemoveTable( db , "recoded_acs2011_1yr_m" )
-# ..and start fresh by re-copying the pristine file from acs2011_1yr_m
+# dbRemoveTable( db , "recoded_b2010" )
+# ..and start fresh by re-copying the pristine file from b2010
 
 
 
@@ -111,70 +111,33 @@ dbSendUpdate( db , "CREATE TABLE recoded_acs2011_1yr_m AS SELECT * FROM acs2011_
 # step 2: make all of your recodes at once #
 
 # from this point forward, all commands will only touch the
-# 'recoded_acs2011_1yr_m' table.  the 'acs2011_1yr_m' is now off-limits.
+# 'recoded_b2010' table.  the 'b2010' is now off-limits.
 
-# add a new column.  call it, oh i don't know, agecat?
+# add a new column.  call it, oh i don't know, drinks_per_month
 # since it's actually a categorical variable, make it VARCHAR( 255 )
-dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat VARCHAR( 255 )" )
+dbSendUpdate( db , "ALTER TABLE recoded_b2010 ADD COLUMN drinks_per_month VARCHAR( 255 )" )
 
 # if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION like this:
-# dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecatx DOUBLE PRECISION" )
-# ..but then agecat would have to be be numbers (1 - 13) instead of the strings shown below ('01' - '13')
+# dbSendUpdate( db , "ALTER TABLE recoded_b2010 ADD COLUMN drinks_per_monthx DOUBLE PRECISION" )
+# ..but then drinks_per_month would have to be be numbers (1 - 5) instead of the strings shown below ('01' - '05')
 
 
-# by hand, you could set the values of the agecat column anywhere between '01' and '13'
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '01' WHERE agep >= 0 AND agep < 5" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '02' WHERE agep >= 5 AND agep < 10" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '03' WHERE agep >= 10 AND agep < 15" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '04' WHERE agep >= 15 AND agep < 20" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '05' WHERE agep >= 20 AND agep < 25" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '06' WHERE agep >= 25 AND agep < 35" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '07' WHERE agep >= 35 AND agep < 45" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '08' WHERE agep >= 45 AND agep < 55" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '09' WHERE agep >= 55 AND agep < 60" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '10' WHERE agep >= 60 AND agep < 65" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '11' WHERE agep >= 65 AND agep < 75" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '12' WHERE agep >= 75 AND agep < 85" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '13' WHERE agep >= 85 AND agep < 101" )
+# by hand, you could set the values of the drinks_per_month column anywhere between '01' and '05'
+# notice that the xdrnkmo3 column contains missing values for individuals who average zero drinks per month -
+# therefore, this first command will identify these individuals using the WHERE <varname> IS NULL clause
+
+
+dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '01' WHERE xdrnkmo3 = 0" )
+dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '02' WHERE xdrnkmo3 >= 1 AND xdrnkmo3 < 11" )
+dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '03' WHERE xdrnkmo3 >= 11 AND xdrnkmo3 < 26" )
+dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '04' WHERE xdrnkmo3 >= 26 AND xdrnkmo3 < 51" )
+dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '05' WHERE xdrnkmo3 >= 51" )
+
 
 
 # quickly check your work by running a simple SELECT COUNT(*) command with sql
-dbGetQuery( db , "SELECT agecat , agep , COUNT(*) as number_of_records from recoded_acs2011_1yr_m GROUP BY agecat , agep ORDER BY agep" )
-# and notice that each value of agep has been deposited in the appropriate age category
-
-
-# but all of that takes a while to write out.
-
-
-# since there's so much repeated text in the commands above, 
-# let's create the same agecat variable (agecat2 this time)
-# with code you'll be able to modify a lot faster
-
-# remember, since it's actually a categorical variable, make the column type VARCHAR( 255 )
-dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat2 VARCHAR( 255 )" )
-
-
-# to automate things, just create a vector of each age bound
-agebounds <- c( 0 , 5 , 10 , 15 , 20 , 25 , 35 , 45 , 55 , 60 , 65 , 75 , 85 , 101 )
-# and loop through each interval, plugging in a new agecat for each value
-
-# start at the value '0' and end at the value '85' -- as opposed to the ceiling of 101.
-for ( i in 1:( length( agebounds ) - 1 ) ){
-
-	# build the sql string to pass to monetdb
-	update.sql.string <- paste0( "UPDATE recoded_acs2011_1yr_m SET agecat2 = '" , str_pad( i , 2 , pad = '0' ) , "' WHERE agep >= " , agebounds[ i ] , " AND agep < " , agebounds[ i + 1 ] )
-		
-	# take a look at the update.sql.string you've just built.  familiar?  ;)
-	print( update.sql.string )
-	
-	# now actually run the sql string
-	dbSendUpdate( db , update.sql.string )
-}
-
-
-# check your work by running a simple SELECT COUNT(*) command with sql
-dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from recoded_acs2011_1yr_m GROUP BY agecat , agecat2 ORDER BY agecat" )
-# and notice that there aren't any records where agecat does not equal agecat2
+dbGetQuery( db , "SELECT drinks_per_month , xdrnkmo3 , COUNT(*) as number_of_records from recoded_b2010 GROUP BY drinks_per_month , xdrnkmo3 ORDER BY xdrnkmo3" )
+# and notice that each value of xdrnkmo3 has been deposited in the appropriate number of drinks category
 
 
 
@@ -182,31 +145,33 @@ dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from r
 # step 3: create a new survey design object connecting to the recoded table #
 
 # to initiate a new complex sample survey design on the data table
-# that's been recoded to include 'agecat"
-# simply re-run the sqlrepsurvey() function and update the table.name =
+# that's been recoded to include 'drinks_per_month"
+# simply re-run the sqlsurvey() function and update the table.name =
 # argument so it now points to the recoded_ table in the monet database
 
 # note: this takes a while.  depending on how slowly the dots move across your screen, 
 # you may want to leave it running overnight.  i did warn you to run all of your recodes at once, didn't i?
 
-# create a sqlrepsurvey complex sample design object
-# using the *recoded* merged (household+person) table
+# create a sqlsurvey complex sample design object
+# using the *recoded* table
 
-acs.m.recoded.design <-
-	sqlrepsurvey(
-		weight = 'pwgtp' ,
-		repweights = paste0( 'pwgtp' , 1:80 ) ,
-		scale = 4 / 80 ,
-		rscales = rep( 1 , 80 ) ,
-		mse = TRUE ,
-		table.name = "recoded_acs2011_1yr_m" ,		# note the solitary change here
+brfss.recoded.design <-
+	sqlsurvey(
+		weight = 'xfinalwt' ,
+		nest = TRUE ,
+		strata = 'xststr' ,
+		id = 'xpsu' ,
+		table.name = 'recoded_b2010' ,				# note: this is the solitary change
+													# the weight, strata, and id variables are hard-coded in this sqlsurvey() function call,
+													# but their values haven't changed from the original 1984 - 2011 download all microdata.R script
 		key = "idkey" ,
-		# check.factors = 10 ,
+		# check.factors = 10 ,						# defaults to ten
 		database = monet.url ,
 		driver = drv ,
 		user = "monetdb" ,
 		password = "monetdb" 
 	)
+
 
 
 # sqlite database-backed survey objects are described here: 
@@ -223,7 +188,7 @@ acs.m.recoded.design <-
 # unless you've set your working directory elsewhere, 
 # spell out the entire filepath to the .rda file
 # use forward slashes instead of backslashes
-save( acs.m.recoded.design , file = "C:/My Directory/ACS/recoded_acs2011_1yr.rda" )
+save( brfss.recoded.design , file = "C:/My Directory/BRFSS/recoded b2010 design.rda" )
 
 
 # # # # # # # # # # # # # # # # #
@@ -241,28 +206,141 @@ save( acs.m.recoded.design , file = "C:/My Directory/ACS/recoded_acs2011_1yr.rda
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 
 # run your..
-# lines of code to hold on to for all other acs monetdb analyses #
+# lines of code to hold on to for all other brfss monetdb analyses #
 # (the same block of code i told you to hold onto at the end of the download script)
 
 # load your new the survey object
 
-load( "C:/My Directory/ACS/recoded_acs2011_1yr.rda" )
+load( "C:/My Directory/BRFSS/recoded b2010 design.rda" )
+
+
+# the current sqlsurvey package contains a minor bug.
+# this line manually fixes of the open() method
+# for the sqlsurvey() function
+open.sqlsurvey<-function(con, driver, ...){  
+  con$conn<-dbConnect(driver, url=con$dbname,...)
+  if (!is.null(con$subset)){
+    con$subset$conn<-con$conn
+  }
+  con
+}
+# this bug has been reported to the sqlsurvey package author
 
 
 # connect the recoded complex sample design to the monet database #
-acs.r <- open( acs.m.recoded.design , driver = drv , user = "monetdb" , password = "monetdb" )	# recoded
+brfss.r <- open( brfss.recoded.design , driver = drv , user = "monetdb" , password = "monetdb" )	# recoded
 
-# ..and now you can exactly match the age categories provided by the census bureau at..
-# http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #
-# with one measly command:
+# ..and now you can exactly match the monthly alcohol consumption categories provided by the cdc's web-enabled analysis tool at..
+# https://github.com/ajdamico/usgsd/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/WEAT%202010%20Alcohol%20Consumption%20by%20Gender%20-%20Crosstab%20Analysis%20Results.pdf?raw=true #
 
-svytotal( ~one , acs.r , byvar = ~agecat )
+
+# replicate the row total column #
+
+# calculate unweighted sample sizes
+dbGetQuery( 
+	db , 
+	'select 
+		drinks_per_month , count(*) as sample_size 
+	from 
+		recoded_b2010 
+	group by 
+		drinks_per_month
+	order by
+		drinks_per_month'
+)
+
+
+# run the column % and S.E. of column %
+# print the column percent to the screen
+( column.pct <- svymean( ~drinks_per_month , brfss.r , se = TRUE ) )
+
+# extract the covariance matrix attribute from the svymean() output
+# take only the values of the diagonal (which contain the variances of each value)
+# square root them all to calculate the standard error
+# save the result into the se.column.pct object and at the same time
+# print the standard errors of the column percent to the screen
+# ( by surrounding the assignment command with parentheses )
+( se.column.pct <- sqrt( diag( attr( column.pct , 'var' ) ) ) )
+
+# confidence interval lower bounds for column percents
+column.pct - qnorm( 0.975 ) * se.column.pct 
+
+# confidence interval upper bounds for column percents
+column.pct + qnorm( 0.975 ) * se.column.pct
+
+
+# run the sample size (weighted) and S.E. of weighted size rows
+
+# run the sample size and S.E. of weighted size columns
+# print the sample size (weighted) column to the screen
+( sample.size <- svytotal( ~drinks_per_month , brfss.r , se = TRUE ) )
+
+
+# extract the covariance matrix attribute from the svymean() output
+# take only the values of the diagonal (which contain the variances of each value)
+# square root them all to calculate the standard error
+# save the result into the se.sample.size object and at the same time
+# print the standard errors of the weighted size column to the screen
+# ( by surrounding the assignment command with parentheses )
+( se.sample.size <- sqrt( diag( attr( sample.size , 'var' ) ) ) )
+
+# confidence interval lower bounds for weighted size
+sample.size - qnorm( 0.975 ) * se.sample.size 
+
+# confidence interval upper bounds for weighted size
+sample.size + qnorm( 0.975 ) * se.sample.size
+
+
+
+# replicate the male and female columns #
+
+# calculate unweighted sample sizes
+dbGetQuery( 
+	db , 
+	'select 
+		drinks_per_month , sex , count(*) as sample_size 
+	from 
+		recoded_b2010 
+	group by 
+		drinks_per_month, sex
+	order by
+		drinks_per_month, sex'
+)
+
+
+# run the column % and S.E. of column %
+# print the column percent to the screen
+( column.pct <- svymean( ~drinks_per_month , brfss.r , byvar = ~sex , se = TRUE ) )
+
+# extract the covariance matrix attribute from the svymean() output
+# take only the values of the diagonal (which contain the variances of each value)
+# square root them all to calculate the standard error
+# save the result into the se.column.pct object and at the same time
+# print the standard errors of the column percent to the screen
+# ( by surrounding the assignment command with parentheses )
+( se.column.pct <- sqrt( diag( attr( column.pct , 'var' ) ) ) )
+
+# since se.column.pct is exported with a 'byvar' parameter as a simple numeric vector
+class( se.column.pct )
+# reshape this numeric vector into a data frame that matches the 'column.pct' object
+se.column.pct <- data.frame( rbind( se.column.pct[ 1:5 ] , se.column.pct[ 6:10 ] ) )
+# and don't forget to tack on the sex column
+se.column.pct$sex <- c( 1 , 2 )
+# now the same commands can be run as before to quickly calculate the confidence intervals
+
+
+# confidence interval lower bounds for column percents
+column.pct - qnorm( 0.975 ) * se.column.pct 
+
+# confidence interval upper bounds for column percents
+column.pct + qnorm( 0.975 ) * se.column.pct
+
 
 
 # are we done here?  yep, we're done.
 
-# close the connection to the recoded sqlrepsurvey design object
-close( acs.r )
+# close the connection to the recoded sqlsurvey design object
+close( brfss.r )
 
 # close the connection to the monet database
 dbDisconnect( db )
