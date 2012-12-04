@@ -200,7 +200,7 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 # if you have a big hard drive, hey why not download them all?
 
 # single-year datasets are available back to 1984
-years.to.download <- 2005:2011
+years.to.download <- 1984:2011
 # pretty orwellian, huh?	
 
 # # # # # # # # # # # # # #
