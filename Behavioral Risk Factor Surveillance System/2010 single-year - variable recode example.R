@@ -1,0 +1,273 @@
+# analyze us government survey data with the r language
+# behavioral risk factor surveillance system
+# 2010 file
+
+# if you have never used the r language before,
+# watch this two minute video i made outlining
+# how to run this script from start to finish
+# http://www.screenr.com/Zpd8
+
+# anthony joseph damico
+# ajdamico@gmail.com
+
+# if you use this script for a project, please send me a note
+# it's always nice to hear about how people are using this stuff
+
+# for further reading on cross-package comparisons, see:
+# http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################
+# prior to running this analysis script, the brfss 2010 single-year file must be loaded as a monet database-backed sqlsurvey object #
+# on the local machine. running the 1984-2011 download and create database script will create a monet database containing this file #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/American%20Community%20Survey/2005-2011%20-%20download%20all%20microdata.R          #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "acs2011_1yr.rda" in C:/My Directory/ACS or wherever the working directory was set for the program #
+#####################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# # # # # # # # # # # # # # #
+# warning: monetdb required #
+# # # # # # # # # # # # # # #
+
+
+# remove the # in order to run this install.packages line only once
+# install.packages( "stringr" )
+
+
+require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(stringr) 		# load stringr package (manipulates character strings easily)
+
+
+# after running the r script above, users should have handy a few lines
+# to initiate and connect to the monet database containing all american community survey tables
+# run them now.  mine look like this:
+
+
+##################################################################
+# lines of code to hold on to for all other acs monetdb analyses #
+
+# first: your shell.exec() function.  again, mine looks like this:
+shell.exec( "C:/My Directory/ACS/MonetDB/monetdb.bat" )
+
+# second: add a twenty second system sleep in between the shell.exec() function
+# and the database connection lines.  this gives your local computer a chance
+# to get monetdb up and running.
+Sys.sleep( 20 )
+
+# third: your six lines to make a monet database connection.
+# just like above, mine look like this:
+dbname <- "acs"
+dbport <- 50001
+monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
+drv <- MonetDB( classPath = monetdriver )
+monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
+
+# end of lines of code to hold on to for all other acs monetdb analyses #
+#########################################################################
+
+
+# the american community survey download and importation script
+# has already created a monet database-backed survey design object
+# connected to the 2011 single-year table
+
+# however, making any changes to the data table downloaded directly from the census bureau
+# currently requires directly accessing the table using dbSendUpdate() to run sql commands
+
+
+# note: recoding (writing) variables in monetdb often takes much longer
+# than querying (reading) variables in monetdb.  therefore, it might be wise to
+# run all recodes at once, and leave your computer running overnight.
+
+
+# variable recodes on monet database-backed survey objects might be
+# more complicated than you'd expect, but it's far from impossible
+# three steps:
+
+
+
+##############################################################
+# step 1: connect to the acs data table you'd like to recode # 
+# then make a copy so you don't lose the pristine original.  #
+
+# the command above
+# db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
+# has already connected the current instance of r to the monet database
+
+# now simply copy you'd like to recode into a new table
+dbSendUpdate( db , "CREATE TABLE recoded_acs2011_1yr_m AS SELECT * FROM acs2011_1yr_m WITH DATA" )
+# this action protects the original 'acs2011_1yr_m' table from any accidental errors.
+# at any point, we can delete this recoded copy of the data table using the command..
+# dbRemoveTable( db , "recoded_acs2011_1yr_m" )
+# ..and start fresh by re-copying the pristine file from acs2011_1yr_m
+
+
+
+############################################
+# step 2: make all of your recodes at once #
+
+# from this point forward, all commands will only touch the
+# 'recoded_acs2011_1yr_m' table.  the 'acs2011_1yr_m' is now off-limits.
+
+# add a new column.  call it, oh i don't know, agecat?
+# since it's actually a categorical variable, make it VARCHAR( 255 )
+dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat VARCHAR( 255 )" )
+
+# if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION like this:
+# dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecatx DOUBLE PRECISION" )
+# ..but then agecat would have to be be numbers (1 - 13) instead of the strings shown below ('01' - '13')
+
+
+# by hand, you could set the values of the agecat column anywhere between '01' and '13'
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '01' WHERE agep >= 0 AND agep < 5" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '02' WHERE agep >= 5 AND agep < 10" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '03' WHERE agep >= 10 AND agep < 15" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '04' WHERE agep >= 15 AND agep < 20" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '05' WHERE agep >= 20 AND agep < 25" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '06' WHERE agep >= 25 AND agep < 35" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '07' WHERE agep >= 35 AND agep < 45" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '08' WHERE agep >= 45 AND agep < 55" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '09' WHERE agep >= 55 AND agep < 60" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '10' WHERE agep >= 60 AND agep < 65" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '11' WHERE agep >= 65 AND agep < 75" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '12' WHERE agep >= 75 AND agep < 85" )
+dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '13' WHERE agep >= 85 AND agep < 101" )
+
+
+# quickly check your work by running a simple SELECT COUNT(*) command with sql
+dbGetQuery( db , "SELECT agecat , agep , COUNT(*) as number_of_records from recoded_acs2011_1yr_m GROUP BY agecat , agep ORDER BY agep" )
+# and notice that each value of agep has been deposited in the appropriate age category
+
+
+# but all of that takes a while to write out.
+
+
+# since there's so much repeated text in the commands above, 
+# let's create the same agecat variable (agecat2 this time)
+# with code you'll be able to modify a lot faster
+
+# remember, since it's actually a categorical variable, make the column type VARCHAR( 255 )
+dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat2 VARCHAR( 255 )" )
+
+
+# to automate things, just create a vector of each age bound
+agebounds <- c( 0 , 5 , 10 , 15 , 20 , 25 , 35 , 45 , 55 , 60 , 65 , 75 , 85 , 101 )
+# and loop through each interval, plugging in a new agecat for each value
+
+# start at the value '0' and end at the value '85' -- as opposed to the ceiling of 101.
+for ( i in 1:( length( agebounds ) - 1 ) ){
+
+	# build the sql string to pass to monetdb
+	update.sql.string <- paste0( "UPDATE recoded_acs2011_1yr_m SET agecat2 = '" , str_pad( i , 2 , pad = '0' ) , "' WHERE agep >= " , agebounds[ i ] , " AND agep < " , agebounds[ i + 1 ] )
+		
+	# take a look at the update.sql.string you've just built.  familiar?  ;)
+	print( update.sql.string )
+	
+	# now actually run the sql string
+	dbSendUpdate( db , update.sql.string )
+}
+
+
+# check your work by running a simple SELECT COUNT(*) command with sql
+dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from recoded_acs2011_1yr_m GROUP BY agecat , agecat2 ORDER BY agecat" )
+# and notice that there aren't any records where agecat does not equal agecat2
+
+
+
+#############################################################################
+# step 3: create a new survey design object connecting to the recoded table #
+
+# to initiate a new complex sample survey design on the data table
+# that's been recoded to include 'agecat"
+# simply re-run the sqlrepsurvey() function and update the table.name =
+# argument so it now points to the recoded_ table in the monet database
+
+# note: this takes a while.  depending on how slowly the dots move across your screen, 
+# you may want to leave it running overnight.  i did warn you to run all of your recodes at once, didn't i?
+
+# create a sqlrepsurvey complex sample design object
+# using the *recoded* merged (household+person) table
+
+acs.m.recoded.design <-
+	sqlrepsurvey(
+		weight = 'pwgtp' ,
+		repweights = paste0( 'pwgtp' , 1:80 ) ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		table.name = "recoded_acs2011_1yr_m" ,		# note the solitary change here
+		key = "idkey" ,
+		# check.factors = 10 ,
+		database = monet.url ,
+		driver = drv ,
+		user = "monetdb" ,
+		password = "monetdb" 
+	)
+
+
+# sqlite database-backed survey objects are described here: 
+# http://faculty.washington.edu/tlumley/survey/svy-dbi.html
+# monet database-backed survey objects are similar, but:
+# the database engine is, well, blazingly faster
+# the setup is kinda more complicated (but all done for you)
+
+
+
+# save this new complex sample survey design
+# into an r data file (.rda) that can now be
+# analyzed quicker than anything else.
+# unless you've set your working directory elsewhere, 
+# spell out the entire filepath to the .rda file
+# use forward slashes instead of backslashes
+save( acs.m.recoded.design , file = "C:/My Directory/ACS/recoded_acs2011_1yr.rda" )
+
+
+# # # # # # # # # # # # # # # # #
+# you've completed your recodes #
+# # # # # # # # # # # # # # # # #
+
+# everything's peaches and cream from here on in.
+
+# to analyze your newly-recoded year of data:
+
+# close r
+
+# open r back up
+
+require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+
+# run your..
+# lines of code to hold on to for all other acs monetdb analyses #
+# (the same block of code i told you to hold onto at the end of the download script)
+
+# load your new the survey object
+
+load( "C:/My Directory/ACS/recoded_acs2011_1yr.rda" )
+
+
+# connect the recoded complex sample design to the monet database #
+acs.r <- open( acs.m.recoded.design , driver = drv , user = "monetdb" , password = "monetdb" )	# recoded
+
+# ..and now you can exactly match the age categories provided by the census bureau at..
+# http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #
+# with one measly command:
+
+svytotal( ~one , acs.r , byvar = ~agecat )
+
+
+# are we done here?  yep, we're done.
+
+# close the connection to the recoded sqlrepsurvey design object
+close( acs.r )
+
+# close the connection to the monet database
+dbDisconnect( db )
+
+
+# for more details on how to work with data in r
+# check out my two minute tutorial video site
+# http://www.twotorials.com/
