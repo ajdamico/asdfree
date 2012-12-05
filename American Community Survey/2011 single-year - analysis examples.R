@@ -236,7 +236,7 @@ coverage.by.region <- svymean( ~hicov , acs.m , byvar = ~region )
 # print the results to the screen 
 coverage.by.region
 
-# now you have the results saved into a new object of type "svyrepstat"
+# now you have the results saved into a new svyrepstat object..
 class( coverage.by.region )
 
 # print only the statistics (coefficients) to the screen 
@@ -247,6 +247,7 @@ SE( coverage.by.region )
 
 # this object can be coerced (converted) to a data frame.. 
 coverage.by.region <- data.frame( coverage.by.region )
+
 
 # ..and then immediately exported as a comma-separated value file 
 # into your current working directory 
