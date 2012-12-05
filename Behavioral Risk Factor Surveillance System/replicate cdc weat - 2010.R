@@ -106,7 +106,7 @@ open.sqlsurvey<-function(con, driver, ...){
 
 
 # connect the complex sample designs to the monet database #
-brfss.r <- open( brfss.design , driver = drv , user = "monetdb" , password = "monetdb" )	# single-year design
+brfss.d <- open( brfss.design , driver = drv , user = "monetdb" , password = "monetdb" )	# single-year design
 
 
 
