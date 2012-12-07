@@ -1,8 +1,8 @@
 # analyze us government survey data with the r language
 # survey of income and program participation
-# 2008 panel
-# 10 core waves, 9 wave-specific replicate weights, 9 topical modules, 
-# 2 panel year replicate weights, 2 calendar year replicate weights, 1 longitudinal weights
+# 1996 panel
+# 12 core waves, 12 wave-specific replicate weights, 12 topical modules, 
+# 1 panel year replicate weights, 4 calendar year replicate weights, 1 longitudinal weights
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -20,7 +20,7 @@
 
 
 #####################################################################################################################
-# Download and Create a Database with the 2008 Panel of the Survey of Income and Program Participation files with R #
+# Download and Create a Database with the 1996 Panel of the Survey of Income and Program Participation files with R #
 #####################################################################################################################
 
 
@@ -36,14 +36,14 @@ setwd( "C:/My Directory/SIPP/" )
 # install.packages( c( "RSQLite" , "SAScii" , "descr" ) )
 
 
-SIPP.dbname <- "SIPP08.db"														# choose the name of the database (.db) file on the local disk
+SIPP.dbname <- "SIPP96.db"											# choose the name of the database (.db) file on the local disk
 
-sipp.core.waves <- 1:10															# either choose which core survey waves to download, or set to null
-sipp.replicate.waves <- 1:10													# either choose which replicate weight waves to download, or set to null
-sipp.topical.modules <- 1:9														# either choose which topical modules to download, or set to NULL
-sipp.longitudinal.weights <- TRUE												# set to FALSE to prevent download
-sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , c( "09" , "10" ) )		# reads in 2009-2010
-sipp.pnl.longitudinal.replicate.weights <- paste0( 'pnl' , c( "09" , "10" ) )	# reads in 2009-2010
+sipp.core.waves <- 1:12												# either choose which core survey waves to download, or set to NULL
+sipp.replicate.waves <- 1:12										# either choose which replicate weight waves to download, or set to NULL
+sipp.topical.modules <- 1:12										# either choose which topical modules to download, or set to NULL
+sipp.longitudinal.weights <- TRUE									# set to FALSE to prevent download
+sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:4 )		# 1-3 reads in 1996-1999
+sipp.pnl.longitudinal.replicate.weights <- 'pnl'					# set to NULL to prevent download
 
 ############################################
 # no need to edit anything below this line #
@@ -151,7 +151,6 @@ fix.repwgt <-
 	}
 ##################################################################################
 
-
 #######################################################	
 # function to download scripts directly from github.com
 # http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
@@ -171,28 +170,51 @@ source_https( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.s
 
 # set the locations of the data files on the ftp site
 SIPP.core.sas <-
-	"http://smpbff2.dsd.census.gov/pub/sipp/2008/l08puw1.sas"
+	"http://smpbff2.dsd.census.gov/pub/sipp/1996/sip96lgt.sas"
 	
 SIPP.replicate.sas <-
-	"http://smpbff2.dsd.census.gov/pub/sipp/2008/rw08wx.sas"
+	"http://smpbff2.dsd.census.gov/pub/sipp/1996/rw96wx.sas"
 	
-SIPP.longitudinal.sas <-
-	"http://smpbff2.dsd.census.gov/pub/sipp/2008/lgtwgt2008w7.sas"
-
 SIPP.longitudinal.replicate.sas <-
-	"http://smpbff2.dsd.census.gov/pub/sipp/2008/lrw08_xx.sas"
+	"http://smpbff2.dsd.census.gov/pub/sipp/1996/lrw96_xx.sas"
+
 
 # if the longitudinal weights flag has been set to TRUE above..
 if ( sipp.longitudinal.weights ){
 
+	# the census SIPP FTP site does not have a SAS input script,
+	# so create one using the dictionary at
+	# http://smpbff2.dsd.census.gov/pub/sipp/1996/ctl_ferd.asc
+
+	# write an example SAS import script using the dash method
+	sas.import.with.at.signs <-
+		"INPUT
+			@1 	   LGTKEY      8.
+			@9      SPANEL       4.
+			@13      SSUID      12.
+			@25      EPPPNUM      4.
+			@29      LGTPNLWT   10.
+			@39      LGTPNWT1   10.
+			@49      LGTPNWT2   10.
+			@59      LGTPNWT3   10.
+			@69      LGTPNWT4   10.
+		;"
+		
+	# create a temporary file
+	sas.import.with.at.signs.tf <- tempfile()
+	# write the sas code above to that temporary file
+	writeLines ( sas.import.with.at.signs , con = sas.import.with.at.signs.tf )
+
+	# end of fake SAS input script creation #
+	
 	# add the longitudinal weights to the database in a table 'w12'
 	read.SAScii.sqlite(
-		"http://smpbff2.dsd.census.gov/pub/sipp/2008/lgtwgt2008w7.zip" ,
-		fix.ct( "http://smpbff2.dsd.census.gov/pub/sipp/2008/lgtwgt2008w7.sas" ) ,
-		beginline = 5 ,
+		"http://smpbff2.dsd.census.gov/pub/sipp/1996/ctl_fer.zip" ,
+		fix.ct( sas.import.with.at.signs.tf ) ,
+		# note no beginline = parameter in this read.SAScii.sqlite() call
 		zipped = T ,
 		tl = TRUE ,
-		tablename = "wgtw7" ,
+		tablename = "wgtw12" ,
 		db = db
 	)
 }
@@ -202,7 +224,7 @@ for ( i in sipp.core.waves ){
 
 	# figure out the exact ftp path of the .zip file
 	SIPP.core <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2008/l08puw" , i , ".zip" )
+		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/l96puw" , i , ".zip" )
 
 	# add the core wave to the database in a table w#
 	read.SAScii.sqlite (
@@ -221,13 +243,13 @@ for ( i in sipp.replicate.waves ){
 
 	# figure out the exact ftp path of the .zip file
 	SIPP.rw <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2008/rw08w" , i , ".zip" )
+		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/rw96w" , i , ".zip" )
 
 	# add the wave-specific replicate weight to the database in a table rw#
 	read.SAScii.sqlite (
 			SIPP.rw ,
-			fix.ct( SIPP.replicate.sas ) ,
-			beginline = 5 ,
+			fix.ct( fix.repwgt( SIPP.replicate.sas ) ) ,
+			beginline = 7 ,
 			zipped = T ,
 			tl = TRUE ,
 			tablename = paste0( "rw" , i ) ,
@@ -239,12 +261,16 @@ for ( i in sipp.replicate.waves ){
 for ( i in sipp.topical.modules ){
 
 	# figure out the exact ftp path of the .zip file
-	SIPP.tm <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2008/p08putm" , i , ".zip" )
-
+	if ( i == 10 ) {
+		SIPP.tm <- "http://smpbff2.dsd.census.gov/pub/sipp/1996/p96putm10.zip" 
+	} else {
+		SIPP.tm <-
+			paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/tm96puw" , i , ".zip" )
+	}
+		
 	# figure out the exact ftp path of the .sas file
 	SIPP.tm.sas <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2008/p08putm" , i , ".sas" )
+		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/p96putm" , i , ".sas" )
 		
 	# add each topical module to the database in a table tm#
 	read.SAScii.sqlite (
@@ -263,9 +289,9 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 
 	# figure out the exact ftp path of the .zip file
 	SIPP.lrw <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2008/repwgt120_" , i , ".zip" )
+		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/lrw96" , i , ".zip" )
 		
-	# add each longitudinal replicate weight file to the database in a table cy1-4 or pnl1-4
+	# add each longitudinal replicate weight file to the database in a table cy1-4 or pnl
 	read.SAScii.sqlite (
 			SIPP.lrw ,
 			fix.repwgt( SIPP.longitudinal.replicate.sas ) ,
