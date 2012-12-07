@@ -198,7 +198,7 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 single.year.datasets.to.download <- 2005:2011
 	
 # three-year datasets are available back to 2007
-three.year.datasets.to.download <- 2007:2010
+three.year.datasets.to.download <- 2007:2011
 
 # five-year datasets are available back to 2009
 five.year.datasets.to.download <- 2009:2010

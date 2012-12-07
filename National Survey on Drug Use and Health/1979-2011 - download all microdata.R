@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # national survey on drug use and health
-# 1979 through 2010
+# 1979 through 2011
 # all available files (including documentation)
 
 # if you have never used the r language before,
@@ -93,7 +93,7 @@ studies.by.year <-
 	
 		# the first column in this new data frame contains each available year
 		# (notice some years are not available)
-		year = c( 1979 , 1982 , 1985 , 1988, 1990:2010 ) ,
+		year = c( 1979 , 1982 , 1985 , 1988, 1990:2011 ) ,
 		
 		# the second column contains the samhda id
 		id = c( 
@@ -103,8 +103,8 @@ studies.by.year <-
 			6852 , 6949 , 6950 , 2391 , 2755 , 2934 , 3239 ,
 			# 2000 - 2006
 			3262 , 3580 , 3903 , 4138 , 4373 , 4596 , 21240 ,
-			# 2007 - 2010
-			23782 , 26701 , 29621 , 32722
+			# 2007 - 2011
+			23782 , 26701 , 29621 , 32722 , 34481
 		)
 	)
 
