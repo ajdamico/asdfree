@@ -125,7 +125,7 @@ windows.monetdb.configuration(
 		dbname = "brfss" ,
 		
 		# choose which port 
-		dbport = 50003
+		dbport = 50004
 	)
 
 
@@ -151,7 +151,7 @@ shell.exec( "C:/My Directory/BRFSS/MonetDB/monetdb.bat" )
 # two other things you need: the database name and the database port.
 # store them now for later in this script, but hold on to them for other scripts as well
 dbname <- "brfss"
-dbport <- 50003
+dbport <- 50004
 
 
 # hey try running it now!  a shell window should pop up.
@@ -164,7 +164,7 @@ dbport <- 50003
 # Copyright (c) 1993-July 2008 CWI.
 # Copyright (c) August 2008-2012 MonetDB B.V., all rights reserved
 # Visit http://www.monetdb.org/ for further information
-# Listening for connection requests on mapi:monetdb://127.0.0.1:50003/
+# Listening for connection requests on mapi:monetdb://127.0.0.1:50004/
 # MonetDB/JAQL module loaded
 # MonetDB/SQL module loaded
 
@@ -528,7 +528,7 @@ Sys.sleep( 20 )
 # third: your six lines to make a monet database connection.
 # just like above, mine look like this:
 dbname <- "brfss"
-dbport <- 50003
+dbport <- 50004
 monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
 drv <- MonetDB( classPath = monetdriver )
 monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )

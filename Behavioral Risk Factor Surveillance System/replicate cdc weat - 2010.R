@@ -57,7 +57,7 @@ Sys.sleep( 20 )
 # third: your six lines to make a monet database connection.
 # just like above, mine look like this:
 dbname <- "brfss"
-dbport <- 50003
+dbport <- 50004
 monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
 drv <- MonetDB( classPath = monetdriver )
 monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
