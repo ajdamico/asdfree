@@ -1,4 +1,4 @@
-[click here to go back to the asdfree blog](http://usgsd.blogspot.com/)
+[click here to go back to the asdfree blog](http://asdfree.com/)
 ===========
 
 
