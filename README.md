@@ -1,12 +1,12 @@
-[click here to go back to the usgsd blog](http://usgsd.blogspot.com/)
+[click here to go back to the asdfree blog](http://usgsd.blogspot.com/)
 ===========
 
 
 
-Analyze US Government Survey Data with the R Language
+Analyze Survey Data for Free
 ---------
 
-free, open-source, reproducible software to analyze us government survey data.
+free, open-source, reproducible software to analyze survey data.
 
 Current Analysis Examples
 

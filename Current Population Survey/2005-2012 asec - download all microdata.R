@@ -111,7 +111,7 @@ begin.lines <-
 	)
 
 
-# begin looping through every year specified
+# begin looping through every cps year specified
 for ( year in cps.years.to.download ){
 
 
@@ -272,7 +272,7 @@ for ( year in cps.years.to.download ){
 	)
 	
 	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX household_index ON household ( h_seq )" ) )
+	dbSendQuery( db , "CREATE INDEX household_index ON household ( h_seq )" )
 
 
 	# store CPS ASEC march family records as a SQLite database
@@ -287,7 +287,7 @@ for ( year in cps.years.to.download ){
 	)
 
 	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX family_index ON family ( fh_seq , ffpos )" ) )
+	dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
 
 
 	# store CPS ASEC march person records as a SQLite database
@@ -302,7 +302,7 @@ for ( year in cps.years.to.download ){
 	)
 
 	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX person_index ON person ( ph_seq , pppos )" ) )
+	dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
 
 
 	# create a fake sas input script for the crosswalk..
@@ -329,7 +329,7 @@ for ( year in cps.years.to.download ){
 	)
 
 	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX xwalk_index ON xwalk ( h_seq , ffpos , pppos )" ) )
+	dbSendQuery( db , "CREATE INDEX xwalk_index ON xwalk ( h_seq , ffpos , pppos )" )
 
 		
 	# reset the database (.db)
@@ -344,7 +344,7 @@ for ( year in cps.years.to.download ){
 	dbSendQuery( db , "create table h_xwalk as select * from xwalk as a inner join household as b on a.h_seq = b.h_seq" )
 	dbSendQuery( db , "create table h_f_xwalk as select * from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq AND a.ffpos = b.ffpos" )
 	dbSendQuery( db , "create table hfp as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
-	dbSendQuery( db , paste0( "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" ) )
+	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
 
 
 	# drop unnecessary tables
@@ -384,7 +384,7 @@ for ( year in cps.years.to.download ){
 	)
 
 	# create an index to speed up the merge
-	dbSendQuery( db , paste0( "CREATE INDEX rw_index ON rw ( h_seq , pppos )" ) )
+	dbSendQuery( db , "CREATE INDEX rw_index ON rw ( h_seq , pppos )" )
 
 
 	###################################################
@@ -416,6 +416,7 @@ for ( year in cps.years.to.download ){
 	dbDisconnect( db )
 	
 }
+
 
 # print a reminder: set the directory you just saved everything to as read-only!
 winDialog( 'ok' , paste0( "all done.  you should set the file " , file.path( getwd() , cps.dbname ) , " read-only so you don't accidentally alter these tables." ) )
