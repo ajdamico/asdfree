@@ -54,14 +54,14 @@ consolidated <- c( 12 , 20 , 28 , 38 , 50 , 60 , 70 , 79 , 89 , 97 , 105 , 113 ,
 conditions <- c( "06r" , 18 , 27 , 37 , 52 , NA , NA , 78 , 87 , 96 , 104 , 112 , 120 , 128 , 137 )
 jobs <- c( "07" , 19 , 25 , 32 , NA , NA , NA , NA , 83 , 91 , 100 , 108 , 116 , 124 , 133)
 prpf <- c( 24 , 47 , 47 , 47 , 47 , 57 , 66 , 76 , 88 , 95 , 103 , 111 , 119 , 127 , 136)
-longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 , 130 , NA , NA )
+longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 , 130 , 139 , NA )
 events <- c( 10 , 16 , 26 , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 , 135 )
 
 
 # specify the most current brr / link file locations
-lf <- "http://meps.ahrq.gov/mepsweb/data_files/pufs/h36b10ssp.zip"
-lf.cb <- "http://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h36brr/h36b10cb.pdf"
-lf.doc <- "http://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h36brr/h36b10doc.pdf"
+lf <- "http://meps.ahrq.gov/data_files/pufs/h36brr10ssp.zip"
+lf.cb <- "http://meps.ahrq.gov/data_stats/download_data/pufs/h36brr/h36brr10cb.pdf"
+lf.doc <- "http://meps.ahrq.gov/data_stats/download_data/pufs/h36brr/h36brr10doc.pdf"
 
 
 # create a big table containing the file number of each meps data file available
@@ -182,7 +182,7 @@ for ( i in nrow( mm ):1 ) {
 			fn <- paste0( "h" , mm[ i , j ] , "ssp.zip" )
 			
 			# create the full url path to the zipped file on the web
-			u <- paste0( "http://meps.ahrq.gov/mepsweb/data_files/pufs/h" , mm[ i , j ] , "ssp.zip" )
+			u <- paste0( "http://meps.ahrq.gov/data_files/pufs/h" , mm[ i , j ] , "ssp.zip" )
 			
 			# figure out if the file exists
 			err <- try( getURLContent( u ) , silent = T )
@@ -329,11 +329,14 @@ for ( i in nrow( mm ):1 ) {
 			cbname <- paste0( mm[ i , 1 ] , " - " , names( mm )[ j ] , " cb.pdf" )
 			
 			# specify the url where the codebook should be
-			cbsite <- paste0( "http://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h" , mm[ i , j ] , "/h" , mm[ i , j ] , "cb.pdf" )
+			cbsite <- paste0( "http://meps.ahrq.gov/data_stats/download_data/pufs/h" , mm[ i , j ] , "/h" , mm[ i , j ] , "cb.pdf" )
 			
 			# determine whether the codebooks exists
 			# (note: many early codebooks do not exist, because they are included in the documentation file)
 			err <- try( getURLContent( cbsite ) , silent = T )
+			
+			# give the ahrq website five seconds before the actual download
+			Sys.sleep( 5 )
 			
 			# if it does, download it
 			if (! class(err) == "try-error" ) download.file(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" )
@@ -348,10 +351,13 @@ for ( i in nrow( mm ):1 ) {
 			docname <- paste0( mm[i,1] , " - " , names(mm)[j] , " doc.pdf" )
 			
 			# specify the url where the documentation should be
-			docsite <- paste0( "http://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h" , mm[ i , j ] , "/h" , mm[ i , j ] , "doc.pdf" )
+			docsite <- paste0( "http://meps.ahrq.gov/data_stats/download_data/pufs/h" , mm[ i , j ] , "/h" , mm[ i , j ] , "doc.pdf" )
 			
 			# determine whether the documentation exists
 			err <- try( getURLContent( docsite ) , silent = T )
+			
+			# give the ahrq website five seconds before the actual download
+			Sys.sleep( 5 )
 			
 			# if it does, download it
 			if (! class(err) == "try-error" ) download.file(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
