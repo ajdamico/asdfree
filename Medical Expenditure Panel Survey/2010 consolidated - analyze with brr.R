@@ -104,7 +104,7 @@ load( "linkage - brr.rda" )
 # if you get a memory error        #
 ####################################
 
-# uncomment these lines to restrict the MEPS 10 file
+# comment out these lines if you'd rather not restrict the MEPS 10 file
 # to only the columns you expect to use in the analysis
 
 # the MEPS 2010 consolidated file has almost 2,000 different columns
@@ -115,33 +115,33 @@ load( "linkage - brr.rda" )
 # create a character vector containing 
 # the variables you need for the analysis
 
-# KeepVars <-
-	# c( 
-		# # unique identifiers
-		# "DUPERSID" , "PANEL" ,
-		# # cluster and strata variables used for complex survey design
-		# "VARPSU" , "VARSTR" , 
-		# # 2010 weight
-		# "PERWT10F" , 
-		# # annualized insurance coverage variable
-		# "INS10X" , 
-		# # total annual medical expenditure variable
-		# "TOTEXP10" , 
-		# # region of the country variable
-		# "REGION10" , 
-		# # gender variable
-		# "SEX"
-	# )
+KeepVars <-
+	c( 
+		# unique identifiers
+		"DUPERSID" , "PANEL" ,
+		# cluster and strata variables used for complex survey design
+		"VARPSU" , "VARSTR" , 
+		# 2010 weight
+		"PERWT10F" , 
+		# annualized insurance coverage variable
+		"INS10X" , 
+		# total annual medical expenditure variable
+		"TOTEXP10" , 
+		# region of the country variable
+		"REGION10" , 
+		# gender variable
+		"SEX"
+	)
 
 # restrict the consolidated data table to
 # only the columns specified above
 
-# consolidated.2010 <-
-	# consolidated.2010[ , KeepVars ]
+consolidated.2010 <-
+	consolidated.2010[ , KeepVars ]
 
 # clear up RAM - garbage collection function
 
-# gc()
+gc()
 
 ############################
 # end of RAM-clearing code #
@@ -195,16 +195,15 @@ meps.brr.design <-
 # notice the 'meps.brr.design' object used in all subsequent analysis commands
 
 
-# if you are low on RAM, you can remove the data frame
-# by uncommenting these four lines:
+# remove two of the original data frames from RAM
+# since they're no longer of value
+rm( MEPS.10.consolidated.with.brr.df )
+rm( brr )
 
-# rm( consolidated.2010 )
-# rm( MEPS.10.consolidated.with.brr.df )
-# rm( brr )
+# clear up RAM
+gc()
 
-# gc()
 
-	
 #####################
 # analysis examples #
 #####################
