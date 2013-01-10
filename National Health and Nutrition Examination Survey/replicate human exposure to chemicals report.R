@@ -11,6 +11,9 @@
 # -
 # Ralph.Pirow@bfr.bund.de
 
+# ..send an e-mail and tell 'em thank you!
+
+
 # **********************************************************************
 # Analyse the NHANES 2007-2008 data on urinary Bisphenol A (BPA)
 #
