@@ -764,7 +764,7 @@ head( tab , 10 )				# view the first 10 records
 # sort the columns to match the "Integrated Mean and SE.lst" file #
 
 # make a copy of the tab data frame that will be re-sorted
-tab.out <- tabs
+tab.out <- tab
 
 tab.out <- tab.out[ , c( "title" , "estimate" , "inclass10" , paste0( "inclass0" , 1:9 ) ) ]
 
