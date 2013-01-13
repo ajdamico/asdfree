@@ -71,16 +71,14 @@ require(RSQLite) 	# load RSQLite package (creates database files in R)
 
 db <- dbConnect( SQLite() , dbname )			# connect to the SQLite database (.db)
 
+
 # create a new table called 'temp' which throws out all missing values of the weight column
 dbSendQuery( db , "CREATE TABLE temp AS SELECT * FROM hrsL WHERE r6wthh >= 0" )
 
-# add a new column "one" that simply contains the number 1 for every record in the data set
-dbSendQuery( db , "ALTER TABLE temp ADD COLUMN one REAL" )
-dbSendQuery( db , "UPDATE temp SET one = 1" )
 
 # create survey design object with HRS design information
 # using the table stored in the SQLite database
-r6 <- 
+hh6 <- 
 	svydesign(
 		~raehsamp ,
 		strata = ~raestrat ,
@@ -92,10 +90,10 @@ r6 <-
 	)
 
 # sum up the weighted number of observations
-svytotal( ~one , r6 )
+svytotal( ~one , hh6 )
 
 # perform a weighted regression and store the summary statistics into a new variable
-( regression <- summary( svyglm( h6icap ~ h6ahous + h6amort , r6 ) ) )
+( regression <- summary( svyglm( h6icap ~ h6ahous + h6amort , hh6 ) ) )
 # since the above line is contained in parentheses, the contents of the 'regression' object
 # are also printed to the screen
 

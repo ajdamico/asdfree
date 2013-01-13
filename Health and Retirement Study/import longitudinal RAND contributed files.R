@@ -109,6 +109,10 @@ for ( j in tn ){
 		dbWriteTable( db , j , x[ rows.to.add , ] , append = TRUE )
 	}
 
+	# add a new column "one" that simply contains the number 1 for every record in the data set
+	dbSendQuery( db , paste( "ALTER TABLE" , j , "ADD COLUMN one REAL" ) )
+	dbSendQuery( db , paste( "UPDATE" , j , "SET one = 1" ) )
+	
 	# delete the current file..
 	rm( x )
 	
