@@ -69,7 +69,7 @@ require(survey)		# load survey package (analyzes complex design surveys)
 require(RSQLite) 	# load RSQLite package (creates database files in R)
 
 
-db <- dbConnect( SQLite() , dbname )			# connect to the SQLite database (.db)
+db <- dbConnect( SQLite() , db.name )			# connect to the SQLite database (.db)
 
 
 # create a new table called 'temp' which throws out all missing values of the weight column
