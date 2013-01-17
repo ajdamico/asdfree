@@ -39,6 +39,7 @@
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 require(stringr) 		# load stringr package (manipulates character strings easily)
 
 
@@ -212,19 +213,6 @@ require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surv
 # load your new the survey object
 
 load( "C:/My Directory/BRFSS/recoded b2010 design.rda" )
-
-
-# the current sqlsurvey package contains a minor bug.
-# this line manually fixes of the open() method
-# for the sqlsurvey() function
-open.sqlsurvey<-function(con, driver, ...){  
-  con$conn<-dbConnect(driver, url=con$dbname,...)
-  if (!is.null(con$subset)){
-    con$subset$conn<-con$conn
-  }
-  con
-}
-# this bug has been reported to the sqlsurvey package author
 
 
 # connect the recoded complex sample design to the monet database #

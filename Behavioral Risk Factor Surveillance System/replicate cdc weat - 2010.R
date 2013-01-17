@@ -36,7 +36,7 @@
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-
+require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 
 # after running the r script above, users should have handy a few lines
 # to initiate and connect to the monet database containing all behavioral risk factor surveillance system tables
@@ -89,19 +89,6 @@ load( 'C:/My Directory/BRFSS/b2010 design.rda' )	# analyze the 2010 single-year 
 
 # note: this r data file should already contain the 2010 single-year design
 
-
-
-# the current sqlsurvey package contains a minor bug.
-# this line manually fixes of the open() method
-# for the sqlsurvey() function
-open.sqlsurvey<-function(con, driver, ...){  
-  con$conn<-dbConnect(driver, url=con$dbname,...)
-  if (!is.null(con$subset)){
-    con$subset$conn<-con$conn
-  }
-  con
-}
-# this bug has been reported to the sqlsurvey package author
 
 
 
