@@ -39,6 +39,7 @@
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 require(stringr) 		# load stringr package (manipulates character strings easily)
 
 
@@ -239,6 +240,7 @@ save( acs.m.recoded.design , file = "C:/My Directory/ACS/recoded_acs2011_1yr.rda
 # open r back up
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(RMonetDB)		# load the RMonetDB package (connects r to a monet database)
 
 # run your..
 # lines of code to hold on to for all other acs monetdb analyses #

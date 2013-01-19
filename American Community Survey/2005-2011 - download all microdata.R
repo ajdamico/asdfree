@@ -52,6 +52,7 @@
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 
 
 # set your ACS data directory

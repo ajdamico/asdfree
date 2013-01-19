@@ -35,6 +35,7 @@
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 
 
 # after running the r script above, users should have handy a few lines
@@ -272,7 +273,7 @@ barplot(
 	uninsured.rate.by.region[ , 1 ] ,
 	main = "Uninsured Rate by Region of the Country" ,
 	names.arg = c( "Northeast" , "Midwest" , "South" , "West" ) ,
-	ylim = c( 0 , .25 )
+	ylim = c( 0 , .40 )
 )
 
 

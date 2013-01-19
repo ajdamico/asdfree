@@ -39,7 +39,7 @@
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
+require(RMonetDB)		# load the RMonetDB package (connects r to a monet database)
 require(stringr) 		# load stringr package (manipulates character strings easily)
 
 
@@ -205,6 +205,7 @@ save( brfss.recoded.design , file = "C:/My Directory/BRFSS/recoded b2010 design.
 # open r back up
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+require(RMonetDB)		# load the RMonetDB package (connects r to a monet database)
 
 # run your..
 # lines of code to hold on to for all other brfss monetdb analyses #
