@@ -18,7 +18,7 @@ Massive FTP Download Automation
 
 Replication Scripts
 
-* match published numbers exactly to show that R produces the same results as other statistical languages.
+* match published numbers exactly to show that R produces the same results as other statistical languages.  these are your rosetta stones, so you know the syntax has been translated into r properly.
 
 ------
 
