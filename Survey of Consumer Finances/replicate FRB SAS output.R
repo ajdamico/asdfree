@@ -1,12 +1,106 @@
+# analyze us government survey data with the r language
+# survey of consumer finances
+# replication of the statistics and standard errors on pdf page 33 of "SCF PUF Net Worth SAS output from FRB.pdf"
+# as outlined in the e-mail correspondence "SCF PUF Net Worth Statistics and Standard Errors from FRB.pdf"
+# using 2010 public use microdata
+
+
+# note that these statistics come very close to the statistics and standard errors
+# calculated using the federal reserve's 2010 internal data set,
+# shown in the upper right corner of pdf page 17, table 4 of
+# http://www.federalreserve.gov/pubs/bulletin/2012/pdf/scf12.pdf
+# however, because those published tables use a restricted access file, the statistics generated below do not match exactly.
+
+
+# to confirm that the methodology below is correct,
+# analysts at the federal reserve provided me with statistics and standard errors generated using the public use file (puf)
+# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Consumer%20Finances/SCF%20PUF%20Net%20Worth%20Statistics%20and%20Standard%20Errors%20from%20FRB.pdf?raw=true
+# and
+# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Consumer%20Finances/SCF%20PUF%20Net%20Worth%20SAS%20output%20from%20FRB.pdf?raw=true
+# this r script will replicate each of the statistics from that custom run of the survey of consumer finances (scf) exactly
+
+
+# if you have never used the r language before,
+# watch this two minute video i made outlining
+# how to run this script from start to finish
+# http://www.screenr.com/Zpd8
+
+# anthony joseph damico
+# ajdamico@gmail.com
+
+# if you use this script for a project, please send me a note
+# it's always nice to hear about how people are using this stuff
+
+# for further reading on cross-package comparisons, see:
+# http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#############################################################################################################################
+# prior to running this replication script, the 2010 scf public use microdata files must be loaded as R data files (.rda)   #
+# on the local machine. running the "1989-2010 download all microdata.R" script will create this file for you.              #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Consumer%20Finances/1989-2010%20download%20all%20microdata.R  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will save a number of .rda files in C:/My Directory/SCF/ (or the working directory was chosen)                #
+#############################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+###############################################################################################################
+# replicate the 2010 Survey of Consumer Finances multiply-imputed mean, median and all standard errors with R #
+###############################################################################################################
+
+
+# set your working directory.
+# the SCF 2010 R data file (scf2010.rda) should have been stored in this folder.
+
 setwd( "C:/My Directory/SCF/" )
 
-require(mitools)
-require(survey)
-require(foreign)
-require(Hmisc)
-require(RCurl)
 
+# remove the # in order to run this install.packages line only once
+# install.packages( c( 'mitools' , 'survey' , 'Hmisc' , 'RCurl' ) )
+
+
+require(mitools)	# allows analysis of multiply-imputed survey data
+require(survey)		# load survey package (analyzes complex design surveys)
+require(RCurl)		# load RCurl package (downloads files from the web)
+require(foreign) 	# load foreign package (converts data files into R)
+require(Hmisc) 		# load Hmisc package (loads a simple wtd.quantile function)
+
+
+# load the 2010 survey of consumer finances into memory
 load( "scf2010.rda" )
+
+
+
+# memory conservation step #
+
+# for machines with 4gb or less, it's necessary to subset the five implicate data frames to contain only
+# the columns necessary for your particular analysis.  if running the code below generates a memory-related error,
+# simply uncomment these lines and re-run the program:
+
+
+# define which variables from the five imputed iterations to keep
+vars.to.keep <- c( 'y1' , 'yy1' , 'networth' , 'wgt' )
+# note: this throws out all other variables (except the replicate weights)
+# so if you need additional columns for your analysis,
+# add them to the `vars.to.keep` vector above
+
+
+# restrict each `imp#` data frame to only those variables
+imp1 <- imp1[ , vars.to.keep ]
+imp2 <- imp2[ , vars.to.keep ]
+imp3 <- imp3[ , vars.to.keep ]
+imp4 <- imp4[ , vars.to.keep ]
+imp5 <- imp5[ , vars.to.keep ]
+
+
+# clear up RAM
+gc()
+
+# end of memory conservation step #
 
 
 #######################################################
@@ -25,10 +119,10 @@ source_https <- function(url, ...) {
 
 
 # load two svyttest functions (one to conduct a df-adjusted t-test and one to conduct a multiply-imputed t-test)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/scf.MIcombine.R" )
+source_https( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/scf.survey.R" )
 # now that this function has been loaded into r, you can view its source code by uncommenting the line below
 # scf.MIcombine
-
+# scf.svyttest
 
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -39,19 +133,8 @@ source_https( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consum
 # # # # # # # # # # # # # # # # # # # # # #
 
 
-stacked.networths <- c( imp1$networth , imp2$networth , imp3$networth , imp4$networth , imp5$networth )
-
-stacked.weights <- c( imp1$wgt , imp2$wgt , imp3$wgt , imp4$wgt , imp5$wgt )
-
 # replicate the mean and median #
 
-# reproduced number: #
-# mean net worth
-wm.nw <- weighted.mean( stacked.networths , stacked.weights )
-
-# reproduced number: #
-# median net worth
-wq.nw <- wtd.quantile( stacked.networths , stacked.weights , 0.5 )
 
 # calculate five weighted mean net worths,
 # one for each implicate number
@@ -64,7 +147,29 @@ wm <-
 		weighted.mean( imp5$networth , imp5$wgt )
 	)
 
+# reproduced number: #
+# mean net worth
+( wm.nw <- mean( wm ) )
 
+
+# calculate five weighted mean net worths,
+# one for each implicate number
+wq <- 
+	c( 
+		wtd.quantile( imp1$networth , imp1$wgt , 0.5 ) ,
+		wtd.quantile( imp2$networth , imp2$wgt , 0.5 ) ,
+		wtd.quantile( imp3$networth , imp3$wgt , 0.5 ) ,
+		wtd.quantile( imp4$networth , imp4$wgt , 0.5 ) ,
+		wtd.quantile( imp5$networth , imp5$wgt , 0.5 )
+	)
+
+
+# reproduced number: #
+# median net worth
+( wq.nw <- mean( wq ) )
+
+	
+	
 # reproduced number: #
 # imputation-based standard error of the mean #
 ( i.m <- sqrt( sum( ( mean( wm ) - wm )^2 ) / 4 ) )
@@ -174,8 +279,11 @@ scf.design <-
 # run a svymean() command on just the first design..
 m.nw.justone <- svymean( ~networth , scf.design$designs[[1]] )
 
-# the coefficient is wrong..
+# the coefficient is for only the first of five implicates..
 coef( m.nw.justone )
+# ..and so matches this..
+weighted.mean( imp1$networth , imp1$wgt )
+
 # ..but the SE due to sampling matches..
 SE( m.nw.justone )
 # ..the standard error due to sampling
@@ -188,10 +296,13 @@ all.equal( SE( m.nw.justone ) , s.m )
 # for quantiles #
 
 # run a svyquantile() command on just the first design..
-q.nw.justone <- svyquantile( ~networth , scf.design$designs[[1]] , 0.5 )
+q.nw.justone <- svyquantile( ~networth , scf.design$designs[[1]] , 0.5 , method = 'constant' )
 
-# the coefficient is wrong..
+# the coefficient is for only the first of five implicates..
 coef( q.nw.justone )
+# ..and so matches this..
+wtd.quantile( imp1$networth , imp1$wgt , 0.5 )
+
 # ..but the SE due to sampling is still just a dollar off..
 SE( q.nw.justone )
 # ..the standard error due to sampling
@@ -227,7 +338,7 @@ all.equal( as.numeric( SE( m.nw ) ) , cse.m )
 # are equally valid results.  except the r methods are reproducible and free ;)
 
 # run a svyquantile() command on the entire five implicates..
-q.nw <- scf.MIcombine( with( scf.design , svyquantile( ~networth , 0.5 ) ) )
+q.nw <- scf.MIcombine( with( scf.design , svyquantile( ~networth , 0.5 , method = 'constant' ) ) )
 
 # the main statistic (the coefficient)
 coef( q.nw )

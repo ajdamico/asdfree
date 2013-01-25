@@ -1,3 +1,33 @@
+# svyttest() variant (code from the `survey` package)
+# that works on multiply-imputed data
+scf.svyttest<-function(formula, design ,...){
+
+	# the MIcombine function runs differently than a normal svyglm() call
+	m <- eval(bquote(MIcombine( with( design , svyglm(formula,family=gaussian()))) ) )
+
+	rval<-list(statistic=coef(m)[2]/SE(m)[2],
+			   parameter=m$df[2],		
+			   estimate=coef(m)[2],
+			   null.value=0,
+			   alternative="two.sided",
+			   method="Design-based t-test",
+			   data.name=deparse(formula))
+			   
+	rval$p.value <- ( 1 - pf( ( rval$statistic )^2 , 1 , m$df[2] ) )
+
+	names(rval$statistic)<-"t"
+	names(rval$parameter)<-"df"
+	names(rval$estimate)<-"difference in mean"
+	names(rval$null.value)<-"difference in mean"
+	class(rval)<-"htest"
+
+	return(rval)
+  
+}
+
+
+# MIcombine() variant (code from the `mitools` package) that only uses
+# the sampling variance from the *first* imputation instead of averaging all five
 scf.MIcombine <-
 	function (results, variances, call = sys.call(), df.complete = Inf, ...) {
 		m <- length(results)
