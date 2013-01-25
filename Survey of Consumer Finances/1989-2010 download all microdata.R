@@ -27,7 +27,7 @@
 # define which years to download #
 
 # this line will download every year of data available
-years.to.download <- c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2010 )
+years.to.download <- c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 2010 )
 
 # uncomment this line to only download the most current year
 # years.to.download <- 2010
@@ -44,10 +44,6 @@ years.to.download <- c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2010 )
 setwd( "C:/My Directory/SCF/" )
 
 
-# remove the # in order to run this install.packages line only once
-# install.packages( "SQLite" )
-
-
 # no need to edit anything below this line #
 
 
@@ -56,7 +52,6 @@ setwd( "C:/My Directory/SCF/" )
 # # # # # # # # #
 
 require(foreign) 	# load foreign package (converts data files into R)
-require(RSQLite) 	# load RSQLite package (creates database files in R)
 
 
 # create a data frame containing one row per year of scf data,
@@ -64,13 +59,13 @@ require(RSQLite) 	# load RSQLite package (creates database files in R)
 downloads <-
 	data.frame(
 		year = 
-			c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2010 ) ,
+			c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 2010 ) ,
 		main = 
-			c( 'scf89s' , 'scf92s' , 'scf95s' , 'scf98s' , 'scf01s' , 'scf2004s' , 'scf2007s' , 'scf2010s' ) ,
+			c( 'scf89s' , 'scf92s' , 'scf95s' , 'scf98s' , 'scf01s' , 'scf2004s' , 'scf2007s' , 'scf2009ps' , 'scf2010s' ) ,
 		extract = 
-			c( 'scfp1989s' , 'scfp1992s' , 'scfp1995s' , 'scfp1998s' , 'scfp2001s' , 'scfp2004s' , 'scfp2007s' , 'scfp2010s' ) ,
+			c( 'scfp1989s' , 'scfp1992s' , 'scfp1995s' , 'scfp1998s' , 'scfp2001s' , 'scfp2004s' , 'scfp2007s' , 'rscfp2009panels' , 'scfp2010s' ) ,
 		rw = 
-			c( 'scf89rw1s' , '1992_scf92rw1s' , '1995_scf95rw1s' , '1998_scf98rw1s' , 'scf2001rw1s' , '2004_scf2004rw1s' , '2007_scfrw1s' , 'scf2010rw1s' )
+			c( 'scf89rw1s' , '1992_scf92rw1s' , '1995_scf95rw1s' , '1998_scf98rw1s' , 'scf2001rw1s' , '2004_scf2004rw1s' , '2007_scfrw1s' , 'scf2009prw1s' , 'scf2010rw1s' )
 	)
 
 	
@@ -128,7 +123,7 @@ for ( i in seq( nrow( downloads ) ) ){
 	if ( downloads[ i , 'year' ] == 2001 ){
 	
 		# read in the replicate weights file using the modified path
-		scf.rw <- 
+		rw <- 
 			read.scf(
 				downloads[ i , 'rw' ] ,
 				http.path = "http://www.federalreserve.gov/pubs/oss/oss2/2001/"
@@ -139,24 +134,35 @@ for ( i in seq( nrow( downloads ) ) ){
 	
 		# read in the replicate weights file using the default path
 		# (specified in the `read.scf` function initiation above)
-		scf.rw <- read.scf( downloads[ i , 'rw' ] ) 
+		rw <- read.scf( downloads[ i , 'rw' ] ) 
 		
 	}
 	
 	
 	names( scf.m ) <- tolower( names( scf.m ) )
 	names( scf.e ) <- tolower( names( scf.e ) )
-	names( scf.rw ) <- tolower( names( scf.rw ) )
+	names( rw ) <- tolower( names( rw ) )
 	
 	# the number of rows in the main file should exactly equal
 	# the number of rows in the extract file
 	stopifnot( nrow( scf.m ) == nrow( scf.e ) )
 	
+	
+	# the 2007 replicate weights file has a goofy extra record for some reason..
+	# ..so delete it manually.
+	# if the current year being downloaded is 2007,
+	# then overwrite the replicate weights table (rw)
+	# with the same table, but missing unique id 1817
+	# (which is the non-matching record)
+	if ( downloads[ i , 'year' ] == 2007 ) rw <- rw[ !( rw$yy1 == 1817 ) , ]
+	
+	
 	# the number of rows in the main file should exactly equal
 	# the number of rows in the replicate weights file, times five
-	if( nrow( scf.m ) != ( nrow( scf.rw ) * 5 ) ){
+	if( nrow( scf.m ) != ( nrow( rw ) * 5 ) ){
 		print( "the number of records in the main file doesn't equal five times the number in the rw file" )
-		print( paste( 'scf.m rows:' , nrow( scf.m ) , " / scf.rw rows:" , nrow( scf.rw ) ) )
+		print( paste( 'scf.m rows:' , nrow( scf.m ) , " / rw rows:" , nrow( rw ) ) )
+		stop( "this must be fixed before continuing." )
 	}
 	
 	# the 1989 files contain unique identifiers `x1` and `xx1`
@@ -164,104 +170,104 @@ for ( i in seq( nrow( downloads ) ) ){
 	if ( downloads[ i , 'year' ] == 1989 ){
 		names( scf.m )[ names( scf.m ) == 'x1' ] <- 'y1' ; names( scf.m )[ names( scf.m ) == 'xx1' ] <- 'yy1' ;
 		names( scf.e )[ names( scf.e ) == 'x1' ] <- 'y1' ; names( scf.e )[ names( scf.e ) == 'xx1' ] <- 'yy1'
-		names( scf.rw )[ names( scf.rw ) == 'x1' ] <- 'y1' ; names( scf.rw )[ names( scf.rw ) == 'xx1' ] <- 'yy1'
+		names( rw )[ names( rw ) == 'x1' ] <- 'y1' ; names( rw )[ names( rw ) == 'xx1' ] <- 'yy1'
 	}
-		
+
 	# confirm that the only overlapping columns
 	# between the three data sets are `y1`
 	# (the unique primary economic unit id - peu)
 	# and `yy1` (the five records of the peu)
 	stopifnot( all.equal( sort( intersect( names( scf.m ) , names( scf.e ) ) ) , c( 'y1' , 'yy1' ) ) )
-	stopifnot( all.equal( sort( intersect( names( scf.m ) , names( scf.rw ) ) ) , c( 'y1' , 'yy1' ) ) )
-	stopifnot( all.equal( sort( intersect( names( scf.e ) , names( scf.rw ) ) ) , c( 'y1' , 'yy1' ) ) )
+	stopifnot( all.equal( sort( intersect( names( scf.m ) , names( rw ) ) ) , c( 'y1' , 'yy1' ) ) )
+	stopifnot( all.equal( sort( intersect( names( scf.e ) , names( rw ) ) ) , c( 'y1' , 'yy1' ) ) )
 
 	# throw out the unique identifiers ending with `1`
 	# because they only match one-fifth of the records in the survey data
-	scf.rw$y1 <- NULL
+	rw$y1 <- NULL
 
-	# store the number of records in the main data table
+	# `scf.m` currently contains
+	# five records per household -- all five of the implicates.
+
+	# break `scf.m` into five different data sets
+	# based on the final character of the column 'y1'
+	# which separates the five implicates
+	scf.1 <- scf.m[ substr( scf.m$y1 , nchar( scf.m$y1 ) , nchar( scf.m$y1 ) ) == 1 , ]
+	scf.2 <- scf.m[ substr( scf.m$y1 , nchar( scf.m$y1 ) , nchar( scf.m$y1 ) ) == 2 , ]
+	scf.3 <- scf.m[ substr( scf.m$y1 , nchar( scf.m$y1 ) , nchar( scf.m$y1 ) ) == 3 , ]
+	scf.4 <- scf.m[ substr( scf.m$y1 , nchar( scf.m$y1 ) , nchar( scf.m$y1 ) ) == 4 , ]
+	scf.5 <- scf.m[ substr( scf.m$y1 , nchar( scf.m$y1 ) , nchar( scf.m$y1 ) ) == 5 , ]
+
+	# count the total number of records in `scf.m`
 	m.rows <- nrow( scf.m )
 	
-	# create a new temporary file
-	tf <- tempfile()
+	# remove the main file from memory
+	rm( scf.m )
 	
-	# connect to a new SQLite database,
-	# stored in the temporary file on your local disk
-	db <- dbConnect( SQLite() , tf )
+	# clear up RAM
+	gc()
 	
-	# write all three tables into that SQLite database,
-	# so as not to overload RAM on smaller machines
-	dbWriteTable( db, 'main'  , scf.m , row.names = FALSE )
-	dbWriteTable( db , 'extract' , scf.e , row.names = FALSE )
-	dbWriteTable( db , 'rw' , scf.rw , row.names = FALSE )
-
-	# remove those three tables from RAM
-	rm( scf.m , scf.e , scf.rw )
+	
+	# merge the contents of the extract data frames
+	# to each of the five implicates
+	imp1 <- merge( scf.1 , scf.e )
+	imp2 <- merge( scf.2 , scf.e )
+	imp3 <- merge( scf.3 , scf.e )
+	imp4 <- merge( scf.4 , scf.e )
+	imp5 <- merge( scf.5 , scf.e )
+	
+	# remove the unmerged implicates from memory
+	rm( scf.1 , scf.2 , scf.3 , scf.4 , scf.5 )
+	
+	# clear up RAM
+	gc()
+	
+	# confirm that the number of records did not change
+	stopifnot( 
+		sum( nrow( imp1 ) , nrow( imp2 ) , nrow( imp3 ) , nrow( imp4 ) , nrow( imp5 ) ) == m.rows 
+	)
+	
+	# throw out the `scf.e` data frame to free up RAM
+	# for the next iteration of this loop
+	rm( scf.e )
 	
 	# free up RAM
 	gc()
-	
-	# conduct the merges between the three tables 
-	# with the SQLite database (without using RAM)
-	
-	# merge the main table to the extract,
-	# creating a new table called `m_e`
-	
-	# this merge will use both 'y1' and 'yy1'
-	dbSendQuery( db , "CREATE TABLE m_e AS SELECT * FROM main INNER JOIN extract ON main.y1 == extract.y1 AND main.yy1 == extract.yy1" )
-	
-	# merge the `m_e` table to the replicate weights file,
-	# creating a new table called `x`
-	
-	# this merge will only use 'yy1'
-	dbSendQuery( db , "CREATE TABLE x AS SELECT * FROM m_e INNER JOIN rw ON m_e.yy1 == rw.yy1" )
-	
-	# read the SQLite data table back from the SQLite database into RAM
-	x <- dbReadTable( db , 'x' )
 
+	# sort all five implicates by the unique identifier
+	imp1 <- imp1[ order( imp1$yy1 ) , ]
+	imp2 <- imp2[ order( imp2$yy1 ) , ]
+	imp3 <- imp3[ order( imp3$yy1 ) , ]
+	imp4 <- imp4[ order( imp4$yy1 ) , ]
+	imp5 <- imp5[ order( imp5$yy1 ) , ]
 	
-	# clean up messy variable names from the SQLite merge #
 	
-	# fields that end with `.2` should be deleted
-	# (they are duplicates resulting from the merge above)
-	
-	# this identifies them..
-	drop.vars <- names( x )[ substr( names( x ) , nchar( names( x ) ) - 1 , nchar( names( x ) ) ) == ".2" ]
-	
-	# ..and this removes them.
-	x <- x[ , !( names( x ) %in% drop.vars ) ]
+	# replace all missing values in the replicate weights table with zeroes..
+	rw[ is.na( rw ) ] <- 0
 
-	# fields that end with `.1` should have the `.1` removed
-	# (they were given the `.1` from the merge above)
-	
-	# this identifies them..
-	clip.vars <- substr( names( x ) , nchar( names( x ) ) - 1 , nchar( names( x ) ) ) == ".1"
-	
-	# ..and this renames them
-	names( x )[ clip.vars ] <- gsub( ".1" , "" , names( x )[ clip.vars ] , fixed = TRUE )
+	# ..then multiply the replicate weights by the multiplication factor
+	rw[ , paste0( 'wgt' , 1:999 ) ] <- rw[ , paste0( 'wt1b' , 1:999 ) ] * rw[ , paste0( 'mm' , 1:999 ) ]
 
-	# end of variable name cleanup #
+	# only keep the unique identifier and the final (combined) replicate weights
+	rw <- rw[ , c( 'yy1' , paste0( 'wgt' , 1:999 ) ) ]
 	
+	# sort the replicate weights data frame by the unique identifier as well
+	rw <- rw[ order( rw$yy1 ) , ]
 	
-	# disconnect from the SQLite database..
-	dbDisconnect( db )
-	
-	# ..and delete it from your local disk
-	file.remove( tf )
-	
-	# confirm that the number of records did not change
-	stopifnot( nrow( x ) == m.rows )
 	
 	# pick an R data file (.rda) filename to save 
 	# the final merged data frame `x` onto your local disk
 	file.to.save <- paste0( 'scf' , downloads[ i , 'year' ] , '.rda' )
 	
-	# save `x` as that file name
-	save( x , file = file.to.save )
+	# if this is the 2009 file, it's actually a 2007-2009 panel,
+	# so note that in the R data file (.rda) filename
+	if ( grepl( '2009' , file.to.save ) ) file.to.save <- gsub( '2009' , '2009_panel' , file.to.save )
 	
-	# throw out the `x` data frame to free up RAM
+	# save the five implicates and the replicate weight file as that file name
+	save( imp1 , imp2 , imp3 , imp4 , imp5 , rw , file = file.to.save )
+	
+	# throw out all data frames to free up RAM
 	# for the next iteration of this loop
-	rm( x )
+	rm( imp1 , imp2 , imp3 , imp4 , imp5 , rw )
 	
 	# free up RAM
 	gc()
