@@ -188,6 +188,9 @@ for ( i in seq( nrow( downloads ) ) ){
 	# `scf.m` currently contains
 	# five records per household -- all five of the implicates.
 
+	# add a column `one` to every record, containing just the number one
+	scf.m$one <- 1
+	
 	# break `scf.m` into five different data sets
 	# based on the final character of the column 'y1'
 	# which separates the five implicates
@@ -272,6 +275,10 @@ for ( i in seq( nrow( downloads ) ) ){
 	# free up RAM
 	gc()
 }
+
+
+# print a reminder: set the directory you just saved everything to as read-only!
+winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
 
 
 # for more details on how to work with data in r

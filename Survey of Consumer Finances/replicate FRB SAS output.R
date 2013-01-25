@@ -83,7 +83,7 @@ load( "scf2010.rda" )
 
 
 # define which variables from the five imputed iterations to keep
-vars.to.keep <- c( 'y1' , 'yy1' , 'networth' , 'wgt' )
+vars.to.keep <- c( 'y1' , 'yy1' , 'wgt' , 'one' , 'networth' )
 # note: this throws out all other variables (except the replicate weights)
 # so if you need additional columns for your analysis,
 # add them to the `vars.to.keep` vector above
@@ -102,6 +102,9 @@ gc()
 
 # end of memory conservation step #
 
+
+# turn off scientific notation in most output
+options( scipen = 20 )
 
 #######################################################
 # function to download scripts directly from github.com
@@ -313,6 +316,9 @@ s.q
 
 # run a svymean() command on the entire five implicates..
 m.nw <- scf.MIcombine( with( scf.design , svymean( ~networth ) ) )
+# note that the scf.MIcombine() function above does not come with dr. lumley's mitools package
+# this function was specifically written for the survey of consumer finances and downloaded near the top of this here script
+# for more detail about the regular MIcombine function, load the mitools package and type ?MIcombine into the console
 
 # the main statistic (the coefficient)..
 coef( m.nw )
