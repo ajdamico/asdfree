@@ -1,7 +1,7 @@
 # analyze us government survey data with the r language
 # health services and resources administration (hrsa)
 # health professional shortage areas (hpsa) file
-# most currently available data (the file on the website constantly changes)
+# identify (currently- or previously-designated) point-in-time geographic hpsas
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -18,10 +18,38 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###############################################################################################################################
+# prior to running this analysis script, the most current primary care physician health professional shortage area file must  #
+# be loaded on the local machine. running the download current hpsa table script will create an r data file (.rda) with this. #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/Health%20Professional%20Shortage%20Areas/download%20current%20hpsa%20table.R  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create "HPSA_PC.rda" in C:/My Directory/HPSA or wherever the working directory was set for the program     #
+###############################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
 ############################################################################
 # isolate the currently- or previously-designated primary care physician   #
 # Health Professional Shortage Area (HPSA), then save all geographic files #
 ############################################################################
+
+
+# x # x # x # x #
+# critical note: 
+# the starting table `x` and then the final tables `county` `ctract` and `mcd` all contain one-record-per-geography
+# as opposed to one-record-per-hpsa.  these tables actually contain multiple records per hpsa.
+
+# in order to match the nationwide published statistics, use the one-record-per-hpsa tables constructed
+# inside the `replicate hrsa nationwide statistics.R` script.
+
+# however, to merge hpsa data up with specific geographies and locations, you'll need to use the one-record-per-geography tables
+# because, for example, a single hpsa designation might span multiple counties or contain multiple census tracts
+# thanks for playing
+# end of critical note, really hope ya read it.
+# x # x # x # x #
 
 
 # set your working directory.
@@ -76,185 +104,7 @@ if ( just.currently.designated.hpsas.please ){
 	x <- x[ x$status.description %in% c( 'Designated' , 'Proposed Withdrawal' , 'No Data Provided' ) , ]
 	# as stated on page four, footone (1) of
 	# http://ersrs.hrsa.gov/ReportServer/Pages/ReportViewer.aspx?/HGDW_Reports/BCD_HPSA/BCD_HPSA_SCR50_Smry&rs:Format=HTML4.0
-	
-	
-	# x # x # x # x #
-	# critical note: 
-	# the `unique.designations` and `y` objects below are data tables with one-record-per-hpsa
-	# as opposed to the table `x` - which contains one-record-per-geography
-	# in order to match the nationwide published statistics, simply use these one-record-per-hpsa tables
-	# however, to merge hpsa data up with specific geographies and locations, you'll need to use the one-record-per-geography tables
-	# because, for example, a single hpsa designation might span multiple counties or contain multiple census tracts
-	# thanks for playing
-	# end of critical note, really hope ya read it.
-	# x # x # x # x #
-	
-	
-	# # # # # # # # # #
-	# # replication # #
-	
-	
-	# the number of currently-designated hpsas should exactly match this page:
-	# http://ersrs.hrsa.gov/ReportServer/Pages/ReportViewer.aspx?/HGDW_Reports/BCD_HPSA/BCD_HPSA_SCR50_Smry&rs:Format=HTML4.0
-	
-	# find the unique source id x type description combos
-	unique.designations <- unique( x[ , c( 'source.id' , 'type.description' , 'designation.population' , 'fte' , 'shortage' ) ] )
-	
-	
-	# total the number of hpsas
-	nrow( unique.designations )
-	
-	# print a table containing counts of the different hpsa types:
-	table( unique.designations$type.description )
-	
-	# the single county + geographical area categories from the table
-	# should sum to the 'service area' total on the web page
-	
-	# the population group total should match on its own
-	
-	# the unknown category should match on its own
-	
-	# the remaining categories from the table
-	# should sum to the facility total
-	
-	
-	# the total designation population does not match table 1..
-	sum( unique.designations$designation.population , na.rm = T )
-	
-	# ..because non-institutional facilities must be excluded.
-	# in other words, only geographic areas and facilities where people live contribute to that total count.
-	# community health centers that simply serve a local population
-	# do not contribute to the total
-	
-	y <- 
-		subset( 
-			unique.designations ,
-			type.description %in% 
-				c(
-					"Single County" ,
-					"Geographical Area" ,
-					"Population Group" ,
-					"Correctional Facility" ,
-					"Other Facility"
-				)
-		)
-	
-	# ..and now the total matches table 1..
-	sum( y$designation.population , na.rm = T )
-	
-	# ..and the components do as well.
-	tapply( 
-		# run the function stated below..
-		y$designation.population ,
 		
-		# ..but broken down by this column
-		y$type.description ,
-		
-		# here's the function:
-		sum ,
-		
-		# and also pass in this argument
-		na.rm = TRUE
-	)
-	# for more details about the tapply function,
-	# watch the two-minute video
-	# http://www.screenr.com/JQS8
-	
-	# NOTE: the populations shown in the hpsa data often overlap or contain outdated statistics.
-	# i recommend that you merge populations on from another source
-	# (like the missouri census data center's census 2010 geomapper)
-	# http://mcdc.missouri.edu/websas/geocorr12.html
-
-
-	# match the hrsa-published 'practitioners needed to remove designations' column
-	
-	# the quants at the health services and resources administration threw a curveball here:
-	# every hpsa with a shortage ending with 0.5 should round *up*
-	# r does not round up by default, it rounds to the nearest even number.
-	# if you'd like a nerdlaugh, check out this discussion:
-	# https://stat.ethz.ch/pipermail/r-help/2009-March/190119.html
-	# best line: "IEC 60559 is an international standard: Excel is not."
-	
-	# initiate a rounding function that always rounds *up* when the number ends with 0.5
-	excel_round <- function( x , digits ) round( x * ( 1 + 1e-15 ) , digits )
-	# just like microsoft excel.
-	
-	# round the `shortage` column to the nearest integer..
-	y$rnd_shortage <- excel_round( y$shortage )
-
-	# the number of practitioners needed to remove the designation
-	# exactly matches table 1
-	sum( y$rnd_shortage , na.rm = TRUE )
-	
-	# ..and the components almost match as well.
-	tapply( 
-		# run the function stated below..
-		y$rnd_shortage ,
-		
-		# ..but broken down by this column
-		y$type.description ,
-		
-		# here's the function:
-		sum ,
-		
-		# and also pass in this argument
-		na.rm = TRUE
-	)
-	# for more details about the tapply function,
-	# watch the two-minute video
-	# http://www.screenr.com/JQS8
-	
-	
-	# match the hrsa-published 'estimated underserved population' column
-	
-	# if the full time equivalents column (FTE) is missing, set it to zero
-	y[ is.na( y$fte ) , 'fte' ] <- 0
-
-	# calculate the number of underserved individuals in each hpsa
-	# modify the current `y` data table
-	y <- 
-		transform( 
-			y , 
-			
-			# add a new column `underserved`
-			underserved = 
-				# if the number of full time equivalents x 2000 is greater than the population..
-				ifelse( 
-					fte * 2000 > designation.population , 
-					# ..then nobody is underserved
-					0 , 
-					# ..otherwise set it to the total population minus
-					# the `floor` of the number of full time equivalents x 2000,
-					# where `floor` is the largest integer below the number given (essentially lopping off any decimals)
-					designation.population - floor( fte * 2000 ) 
-				) 
-		)
-
-	# estimated underserved population
-	# exactly matches table 1
-	sum( y$underserved , na.rm = TRUE )
-	
-	
-	# match the hrsa-published 'practitioners needed to achieve target ratios' column
-	
-	# calculate the number of practitioners needed in each hpsa
-	# modify the current `y` data table
-	y <- 
-		transform( 
-			y , 
-			# add a new column `practitioners.needed`
-			# that simply contains the `floor` of the number underserved divided by 2000
-			practitioners.needed = floor( underserved / 2000 )
-		)
-	
-	# practitioners needed to achieve target ratios
-	# exactly matches table 1
-	sum( y$practitioners.needed , na.rm=TRUE )
-	
-	# # replication completed # #
-	# # # # # # # # # # # # # # #
-	
-	
 # ..otherwise, it's a bit more work.  and also imperfect.
 } else {
 
@@ -289,9 +139,9 @@ if ( just.currently.designated.hpsas.please ){
 # print the current count of records by state
 table( x$state.abbreviation )
 
-# remove puerto rico and other territories
+# remove puerto rico, other territories, and all records missing state fips codes
 x <- x[ as.numeric( x$state.fips.code ) %in% 1:56 , ]
-# comment this line out to leave territories in the data.
+# comment this line out to leave those records in the data.
 
 # re-print the current count of records by state
 table( x$state.abbreviation )
