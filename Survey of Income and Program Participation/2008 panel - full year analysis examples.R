@@ -82,7 +82,7 @@ db <- dbConnect( SQLite() , "SIPP08.db" )
 # and comment all other "waves <-" lines
 waves <- 5:8 ; year <- 2010 ; mainwgt <- 'lgtcy2wt'
 
-# note: 2011 is not yet available!
+# note: the 2011 single-year weight is not yet available!
 # uncomment this line to pull waves necessary for 2011 calendar year:
 # and comment all other "waves <-" lines
 # waves <- 8:11 ; year <- 2011 ; mainwgt <- 'lgtcy3wt'
@@ -247,7 +247,7 @@ head( x )
 # or, to save to another directory, specify the entire filepath
 # save( y , file = "C:/My Directory/sipp08.cy.rda" )
 
-# at a later time, z can be re-accessed with the load() function
+# at a later time, y can be re-accessed with the load() function
 # (just make sure the current working directory has been set to the same place)
 # load( "sipp08.cy.rda" )
 # or, if you don't set the working directory, just specify the full filepath
@@ -654,7 +654,7 @@ confint( sipp.median.by( ~q1earn , ~one , z.15p.wearn ) , level = 0.9 )
 # once the replicate-weighted survey design object has been created,
 # any of the features described on http://faculty.washington.edu/tlumley/survey/ can be used.
 # all of the analysis examples shown for other survey data sets can be used on a sipp survey design too,
-# so be sure to check out other data sets on http://usgsd.blogspot.com/ for more thorough examples
+# so be sure to check out other data sets on http://asdfree.com/ for more thorough examples
 
 # for more details on how to work with data in r
 # check out my two minute tutorial video site

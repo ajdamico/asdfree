@@ -87,7 +87,7 @@ fix.ct <-
 
 ###################################################################################
 # function to fix sas input scripts where repwgt values are collapsed into one line
-# (the SAScii function cannot currently handle this SAS configuration on its own
+# (the SAScii function cannot currently handle this SAS configuration on its own)
 fix.repwgt <-
 	function( sasfile ){
 		sas_lines <- readLines( sasfile )

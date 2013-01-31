@@ -274,7 +274,7 @@ y[ wc ] <- lapply( y[ wc ] , dbtt )
 # or, to save to another directory, specify the entire filepath
 # save( y , file = "C:/My Directory/sipp08.point.in.time.rda" )
 
-# at a later time, z can be re-accessed with the load() function
+# at a later time, y can be re-accessed with the load() function
 # (just make sure the current working directory has been set to the same place)
 # load( "sipp08.point.in.time.rda" )
 # or, if you don't set the working directory, just specify the full filepath
@@ -401,7 +401,7 @@ confint( svyby( ~nm , ~esex , z.15p , svymean ) , level = .9 )
 # once the replicate-weighted survey design object has been created,
 # any of the features described on http://faculty.washington.edu/tlumley/survey/ can be used.
 # all of the analysis examples shown for other survey data sets can be used on a sipp survey design too,
-# so be sure to check out other data sets on http://usgsd.blogspot.com/ for more thorough examples
+# so be sure to check out other data sets on http://asdfree.com/ for more thorough examples
 
 # for more details on how to work with data in r
 # check out my two minute tutorial video site
