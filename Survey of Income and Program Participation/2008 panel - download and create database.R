@@ -1,7 +1,7 @@
 # analyze us government survey data with the r language
 # survey of income and program participation
 # 2008 panel
-# 10 core waves, 9 wave-specific replicate weights, 9 topical modules, 
+# 11 core waves, 10 wave-specific replicate weights, 9 topical modules, 
 # 2 panel year replicate weights, 2 calendar year replicate weights, 1 longitudinal weights
 
 # if you have never used the r language before,
@@ -38,7 +38,7 @@ setwd( "C:/My Directory/SIPP/" )
 
 SIPP.dbname <- "SIPP08.db"														# choose the name of the database (.db) file on the local disk
 
-sipp.core.waves <- 1:10															# either choose which core survey waves to download, or set to null
+sipp.core.waves <- 1:11															# either choose which core survey waves to download, or set to null
 sipp.replicate.waves <- 1:10													# either choose which replicate weight waves to download, or set to null
 sipp.topical.modules <- 1:9														# either choose which topical modules to download, or set to NULL
 sipp.longitudinal.weights <- TRUE												# set to FALSE to prevent download
