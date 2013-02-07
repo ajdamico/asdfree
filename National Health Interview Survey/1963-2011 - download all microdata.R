@@ -34,7 +34,10 @@ download.documentation <- TRUE
 # after downloading and importing it.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/NHIS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/NHIS/" )
+# ..in order to set your current working directory
+
 
 
 # remove the # in order to run this install.packages line only once
@@ -184,6 +187,8 @@ for ( year in nhis.years.to.download ){
 	# data files to skip completely #
 	#################################
 	
+	message( "user note: depending on what you're analyzing, you might need some of these files." )
+	
 	# skip these 1963 files with irregular SAS importation scripts
 	if ( year == 1963 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( 'condition.exe' , 'family.exe' , 'hospital.exe' , 'health_exp.exe' ) ) ]
 	
@@ -232,6 +237,9 @@ for ( year in nhis.years.to.download ){
 	# skip the 1999 and 2000 injury verbatim file
 	if ( year %in% c( 1998:2000 , 2008 , 2009 ) ) ftp.files <- ftp.files[ ! ( ftp.files %in% "injverbt.exe" ) ]
 
+	# skip the 2010 sad_wgts.dat and sc_bwt10.dat files (although you may need them, depending what you're doing!)
+	if ( year == 2010 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( "sad_wgts.dat" , "sc_bwt10.dat" ) ) ]
+	
 	# # # # # # # # # # # # # # # # # # #
 	# finished with download exceptions #
 	# # # # # # # # # # # # # # # # # # #
@@ -542,7 +550,7 @@ for ( year in nhis.years.to.download ){
 }
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
+message( paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
 
 
 # for more details on how to work with data in r
