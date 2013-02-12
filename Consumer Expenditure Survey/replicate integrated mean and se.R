@@ -48,7 +48,9 @@
 # then the working directory should be set to "C:/My Directory/CES/"
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/CES/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/CES/" )
+# ..in order to set your current working directory
 
 
 # turn off scientific notation in most output

@@ -52,8 +52,9 @@
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
+require(RMonetDB)		# load the RMonetDB package (connects r to a monet database)
 require(foreign) 		# load foreign package (converts data files into R)
+require(downloader)		# downloads and then runs the source() function on scripts from github
 
 # set your BRFSS data directory
 # after downloading and importing
@@ -65,29 +66,15 @@ setwd( "C:/My Directory/BRFSS/" )
 
 
 
-#######################################################	
-# function to download scripts directly from github.com
-# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
-source_https <- function(url, ...) {
-  # load package
-  require(RCurl)
-
-  # parse and evaluate each .R script
-  sapply(c(url, ...), function(u) {
-    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
-  })
-}
-#######################################################
-
 # load the windows.monetdb.configuration() function,
 # which allows the easy creation of an executable (.bat) file
 # to run the monetdb server specific to this data
-source_https( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
 
 # load the read.SAScii.monetdb() function,
 # which imports ASCII (fixed-width) data files directly into a monet database
 # using only a SAS importation script
-source_https( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" )
 
 
 # create a folder "MonetDB" in your current working directory.
@@ -540,9 +527,9 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 
 
 # unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
-winDialog( 'ok' , paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
+message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
 
-winDialog( 'ok' , "got that? monetdb directories should not be set read-only." )
+message( "got that? monetdb directories should not be set read-only." )
 
 
 # for more details on how to work with data in r

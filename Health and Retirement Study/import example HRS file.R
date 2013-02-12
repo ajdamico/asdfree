@@ -38,12 +38,15 @@
 # import a single HRS file into R, then save that file as an R data file (.rda) for faster loading later #
 ##########################################################################################################
 
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/HRS/" )
+# ..in order to set your current working directory
 
 # filepath to a fixed-width file produced by the university of michigan
-fn <- "C:/My Directory/HRS/download/1992/h92core/h92da/HOUSEHLD.DA"
+fn <- "./download/1992/h92core/h92da/HOUSEHLD.DA"
 
 # filepath to the SAS importation instructions for that fixed-width file
-sas.input <- "C:/My Directory/HRS/download/1992/h92core/h92sas/HOUSEHLD.SAS"
+sas.input <- "./download/1992/h92core/h92sas/HOUSEHLD.SAS"
 
 
 
@@ -126,7 +129,7 @@ head( x )
 tail( x )
 
 # finally, save the data frame as a '.rda' file for ultra-fast loading in the future.
-save( x , file = 'C:/My Directory/HRS/household.rda' )
+save( x , file = 'household.rda' )
 
 
 ######################################################
@@ -134,7 +137,7 @@ save( x , file = 'C:/My Directory/HRS/household.rda' )
 ######################################################
 
 
-load( 'C:/My Directory/HRS/household.rda' )
+load( 'household.rda' )
 
 # count the number of records in x
 nrow( x )

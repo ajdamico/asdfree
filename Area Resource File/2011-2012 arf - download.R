@@ -28,11 +28,13 @@
 # after downloading and importing it.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/ARF/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/ARF/" )
+# ..in order to set your current working directory
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' , 'downloader' ) )
 
 
 
@@ -44,29 +46,16 @@ setwd( "C:/My Directory/ARF/" )
 # # # # # # # # #
 
 
-#######################################################	
-# function to download scripts directly from github.com
-# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
-source_https <- function(url, ...) {
-  # load package
-  require(RCurl)
-
-  # parse and evaluate each .R script
-  sapply(c(url, ...), function(u) {
-    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
-  })
-}
-#######################################################
-
-# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
-
-
 # load necessary libraries
 require(RSQLite) 	# load RSQLite package (creates database files in R)
 require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
 require(descr) 		# load the descr package (converts fixed-width files to delimited files)
 require(foreign) 	# load foreign package (converts data files into R)
+require(downloader)	# downloads and then runs the source() function on scripts from github
+
+
+# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
+source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
 
 
 # create a temporary database file and another temporary file
@@ -140,7 +129,7 @@ gc()
 
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
+message( paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
 
 # for more details on how to work with data in r
 # check out my two minute tutorial video site

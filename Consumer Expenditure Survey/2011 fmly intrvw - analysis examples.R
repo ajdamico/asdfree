@@ -46,7 +46,10 @@
 # then the working directory should be set to "C:/My Directory/CES/"
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/CES/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/CES/" )
+# ..in order to set your current working directory
+
 
 
 # turn off scientific notation in most output
@@ -55,7 +58,7 @@ options( scipen = 20 )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "mitools" , "stringr" , "plyr" , "survey" , "RCurl" ) )
+# install.packages( c( "RSQLite" , "mitools" , "stringr" , "plyr" , "survey" , "downloader" ) )
 
 
 require(RSQLite) 	# load RSQLite package (creates database files in R)
@@ -63,26 +66,11 @@ require(mitools)	# allows analysis of multiply-imputed survey data
 require(stringr) 	# load stringr package (manipulates character strings easily)
 require(plyr)		# contains the rbind.fill() function, which stacks two data frames even if they don't contain the same columns.  the rbind() function does not do this
 require(survey)		# load survey package (analyzes complex design surveys)
-require(RCurl)		# load RCurl package (downloads files from the web)
-
-
-#######################################################
-# function to download scripts directly from github.com
-# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
-source_https <- function(url, ...) {
-  # load package
-  require(RCurl)
-
-  # parse and evaluate each .R script
-  sapply(c(url, ...), function(u) {
-    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
-  })
-}
-#######################################################
+require(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # load two svyttest functions (one to conduct a df-adjusted t-test and one to conduct a multiply-imputed t-test)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/Consumer%20Expenditure%20Survey/ces.svyttest.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/Consumer%20Expenditure%20Survey/ces.svyttest.R" )
 # now that these two functions have been loaded into r, you can view their source code by uncommenting the two lines below
 # svyttest.df
 # svyttest.mi

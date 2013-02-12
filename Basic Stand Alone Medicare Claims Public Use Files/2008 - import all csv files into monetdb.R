@@ -36,10 +36,10 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RCurl" , "R.utils" ) )
+# install.packages( c( "downloader" , "R.utils" ) )
 
 
-require(RCurl)		# load RCurl package (downloads files from the web)
+require(downloader)	# downloads and then runs the source() function on scripts from github
 require(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
 require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 
@@ -67,24 +67,10 @@ setwd( "C:/My Directory/BSAPUF/" )
 year <- 2008
 
 
-#######################################################	
-# function to download scripts directly from github.com
-# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
-source_https <- function(url, ...) {
-  # load package
-  require(RCurl)
-
-  # parse and evaluate each .R script
-  sapply(c(url, ...), function(u) {
-    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
-  })
-}
-#######################################################
-
 # load the windows.monetdb.configuration() function,
 # which allows the easy creation of an executable (.bat) file
 # to run the monetdb server specific to this data
-source_https( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
 
 
 # create a folder "MonetDB" in your current working directory.
@@ -385,9 +371,9 @@ db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 
 
 # unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
-winDialog( 'ok' , paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
+message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
 
-winDialog( 'ok' , "got that? monetdb directories should not be set read-only." )
+message( "got that? monetdb directories should not be set read-only." )
 # don't worry, you won't update any of these tables so long as you exclusively stick with the dbGetQuery() function
 # instead of the dbSendUpdate() function (you'll see examples in the analysis scripts)
 

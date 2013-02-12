@@ -1,7 +1,7 @@
 # analyze us government survey data with the r language
 # survey of income and program participation
 # 2008 panel
-# 11 core waves, 10 wave-specific replicate weights, 9 topical modules, 
+# 11 core waves, 11 wave-specific replicate weights, 9 topical modules, 
 # 2 panel year replicate weights, 2 calendar year replicate weights, 1 longitudinal weights
 
 # if you have never used the r language before,
@@ -29,17 +29,20 @@
 # after downloading and importing.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/SIPP/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/SIPP/" )
+# ..in order to set your current working directory
+
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "SAScii" , "descr" ) )
+# install.packages( c( "RSQLite" , "SAScii" , "descr" , "downloader" ) )
 
 
 SIPP.dbname <- "SIPP08.db"														# choose the name of the database (.db) file on the local disk
 
-sipp.core.waves <- 1:11															# either choose which core survey waves to download, or set to null
-sipp.replicate.waves <- 1:10													# either choose which replicate weight waves to download, or set to null
+sipp.core.waves <- 1:11															# either choose which core survey waves to download, or set to NULL
+sipp.replicate.waves <- 1:11													# either choose which replicate weight waves to download, or set to NULL
 sipp.topical.modules <- 1:9														# either choose which topical modules to download, or set to NULL
 sipp.longitudinal.weights <- TRUE												# set to FALSE to prevent download
 sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , c( "09" , "10" ) )		# reads in 2009-2010
@@ -55,6 +58,7 @@ sipp.pnl.longitudinal.replicate.weights <- paste0( 'pnl' , c( "09" , "10" ) )	# 
 
 require(RSQLite) 	# load RSQLite package (creates database files in R)
 require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+require(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # open the connection to the sqlite database
@@ -152,22 +156,8 @@ fix.repwgt <-
 ##################################################################################
 
 
-#######################################################	
-# function to download scripts directly from github.com
-# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
-source_https <- function(url, ...) {
-  # load package
-  require(RCurl)
-
-  # parse and evaluate each .R script
-  sapply(c(url, ...), function(u) {
-    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
-  })
-}
-#######################################################
-
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
 
 # set the locations of the data files on the ftp site
 SIPP.core.sas <-
@@ -290,7 +280,7 @@ dbDisconnect( db )
 
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste0( "all done.  you should set the file " , file.path( getwd() , SIPP.dbname ) , " read-only so you don't accidentally alter these tables." ) )
+message( paste0( "all done.  you should set the file " , file.path( getwd() , SIPP.dbname ) , " read-only so you don't accidentally alter these tables." ) )
 
 
 # for more details on how to work with data in r

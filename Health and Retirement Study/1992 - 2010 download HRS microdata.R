@@ -59,7 +59,10 @@ your.password <- "password"
 # after downloading.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/HRS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/HRS/" )
+# ..in order to set your current working directory
+
 
 
 # remove the # in order to run this install.packages line only once

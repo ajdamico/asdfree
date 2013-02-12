@@ -35,7 +35,9 @@
 # after running the program described above
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/ARF/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/ARF/" )
+# ..in order to set your current working directory
 
 
 # load the 2011-2012 ARF data file

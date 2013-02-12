@@ -28,11 +28,14 @@
 # after downloading and importing them.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/CPS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/CPS/" )
+# ..in order to set your current working directory
+
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "RCurl" ) )
+# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" ) )
 
 
 # define which years to download #
@@ -61,30 +64,16 @@ cps.dbname <- "cps.asec.db"
 # if the cps database file already exists in the current working directory, print a warning
 if ( file.exists( paste( getwd() , cps.dbname , sep = "/" ) ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the cps.dbname in the settings above." )
 
-#######################################################	
-# function to download scripts directly from github.com
-# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
-source_https <- function(url, ...) {
-  # load package
-  require(RCurl)
-
-  # parse and evaluate each .R script
-  sapply(c(url, ...), function(u) {
-    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
-  })
-}
-#######################################################
-
 
 require(RSQLite) 	# load RSQLite package (creates database files in R)
 require(survey)		# load survey package (analyzes complex design surveys)
 require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
 require(descr) 		# load the descr package (converts fixed-width files to delimited files)
-require(RCurl)		# load RCurl package (downloads files from the web)
+require(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
 
 
 # set R to produce conservative standard errors instead of crashing
@@ -419,7 +408,7 @@ for ( year in cps.years.to.download ){
 
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste0( "all done.  you should set the file " , file.path( getwd() , cps.dbname ) , " read-only so you don't accidentally alter these tables." ) )
+message( paste0( "all done.  you should set the file " , file.path( getwd() , cps.dbname ) , " read-only so you don't accidentally alter these tables." ) )
 
 
 # for more details on how to work with data in r

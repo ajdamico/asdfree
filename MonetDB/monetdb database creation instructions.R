@@ -14,28 +14,14 @@
 # if you've successfully installed monetdb to your machine,
 # you should be able to initiate your first database with these commands:
 
-
+require(downloader)	# downloads and then runs the source() function on scripts from github
 require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 
-
-#######################################################	
-# function to download scripts directly from github.com
-# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
-source_https <- function(url, ...) {
-  # load package
-  require(RCurl)
-
-  # parse and evaluate each .R script
-  sapply(c(url, ...), function(u) {
-    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
-  })
-}
-#######################################################
 
 # load the windows.monetdb.configuration() function,
 # which allows the easy creation of an executable (.bat) file
 # to run the monetdb server specific to this data
-source_https( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
 
 
 # run the windows.monetdb.configuration() function to

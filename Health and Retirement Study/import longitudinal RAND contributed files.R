@@ -39,7 +39,10 @@
 # all HRS data files should have been stored within a download/ folder here
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/HRS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/HRS/" )
+# ..in order to set your current working directory
+
 
 # choose the name of the database
 db.name <- 'RAND.db'

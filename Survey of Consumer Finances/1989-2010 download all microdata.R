@@ -41,7 +41,10 @@ years.to.download <- c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 
 # after downloading.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/SCF/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/SCF/" )
+# ..in order to set your current working directory
+
 
 
 # no need to edit anything below this line #

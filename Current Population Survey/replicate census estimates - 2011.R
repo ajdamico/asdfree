@@ -46,7 +46,10 @@
 # after running the program described above
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/CPS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/CPS/" )
+# ..in order to set your current working directory
+
 
 
 # remove the # in order to run this install.packages line only once

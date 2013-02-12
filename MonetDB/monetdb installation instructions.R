@@ -32,4 +32,4 @@
 # open up your R console and run these two separate installation commands without the # sign in front:
 # install.packages("RMonetDB" , repos = c( "http://cran.r-project.org" , "http://R-Forge.R-project.org" ) , dep=TRUE )
 # install.packages("sqlsurvey" , repos = c( "http://cran.r-project.org" , "http://R-Forge.R-project.org" ) , dep=TRUE )
-# install.packages( c( 'SAScii' , 'descr' , 'survey' , 'RCurl' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'survey' , 'downloader' ) )

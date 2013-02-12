@@ -28,7 +28,10 @@
 # after downloading and importing it.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/CES/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/CES/" )
+# ..in order to set your current working directory
+
 
 
 require(foreign) 	# load foreign package (converts data files into R)
@@ -166,7 +169,7 @@ for ( year in years.to.download ){
 
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
+message( paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
 
 # for more details on how to work with data in r
 # check out my two minute tutorial video site

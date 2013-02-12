@@ -41,7 +41,10 @@
 # then the working directory should be set to "C:/My Directory/NSDUH/"
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/NSDUH/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/NSDUH/" )
+# ..in order to set your current working directory
+
 
 
 # remove the # in order to run this install.packages line only once

@@ -56,16 +56,19 @@
 # set your working directory.
 # the SCF 2010 R data file (scf2010.rda) should have been stored in this folder.
 
-setwd( "C:/My Directory/SCF/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/SCF/" )
+# ..in order to set your current working directory
+
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'mitools' , 'survey' , 'Hmisc' , 'RCurl' ) )
+# install.packages( c( 'mitools' , 'survey' , 'Hmisc' , 'downloader' ) )
 
 
 require(mitools)	# allows analysis of multiply-imputed survey data
 require(survey)		# load survey package (analyzes complex design surveys)
-require(RCurl)		# load RCurl package (downloads files from the web)
+require(downloader)	# downloads and then runs the source() function on scripts from github
 require(foreign) 	# load foreign package (converts data files into R)
 require(Hmisc) 		# load Hmisc package (loads a simple wtd.quantile function)
 
@@ -106,23 +109,9 @@ gc()
 # turn off scientific notation in most output
 options( scipen = 20 )
 
-#######################################################
-# function to download scripts directly from github.com
-# http://tonybreyal.wordpress.com/2011/11/24/source_https-sourcing-an-r-script-from-github/
-source_https <- function(url, ...) {
-  # load package
-  require(RCurl)
-
-  # parse and evaluate each .R script
-  sapply(c(url, ...), function(u) {
-    eval(parse(text = getURL(u, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))), envir = .GlobalEnv)
-  })
-}
-#######################################################
-
 
 # load two svyttest functions (one to conduct a df-adjusted t-test and one to conduct a multiply-imputed t-test)
-source_https( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/scf.survey.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/scf.survey.R" )
 # now that this function has been loaded into r, you can view its source code by uncommenting the line below
 # scf.MIcombine
 # scf.svyttest

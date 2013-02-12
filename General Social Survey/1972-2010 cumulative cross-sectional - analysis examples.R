@@ -27,7 +27,10 @@
 # after downloading and importing.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/GSS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/GSS/" )
+# ..in order to set your current working directory
+
 
 
 # set the number of digits shown in all output

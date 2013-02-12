@@ -151,7 +151,7 @@ for ( zf in all.files ){
 
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
+message( paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
 
 
 # for more details on how to work with data in r

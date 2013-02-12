@@ -28,7 +28,10 @@
 # after downloading.
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/MEPS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/MEPS/" )
+# ..in order to set your current working directory
+
 
 
 # remove the # in order to run this install.packages line only once
@@ -370,7 +373,7 @@ for ( i in nrow( mm ):1 ) {
 }
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
+message( paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
 
 
 # for more details on how to work with data in r
