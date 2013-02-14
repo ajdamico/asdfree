@@ -121,7 +121,13 @@ for ( year in nhis.years.to.download ){
 		doc.files <- tolower( strsplit( doc.files , "\r*\n" )[[1]] )
 		
 		# loop through each file and save it to the year-specific docs directory
-		for ( fn in doc.files ) download.file( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
+		for ( fn in doc.files ) {
+		
+			download.file( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
+			
+			# wait ten seconds between each download
+			Sys.sleep( 10 )
+		}
 		
 	}
 	
