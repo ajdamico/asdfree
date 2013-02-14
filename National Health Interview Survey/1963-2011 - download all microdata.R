@@ -125,8 +125,8 @@ for ( year in nhis.years.to.download ){
 		
 			download.file( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
 			
-			# wait ten seconds between each download
-			Sys.sleep( 10 )
+			# wait fifteen seconds between each download
+			Sys.sleep( 15 )
 		}
 		
 	}
