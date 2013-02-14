@@ -31,17 +31,18 @@ read.SAScii.monetdb <-
 		sas_ri , 
 		beginline = 1 , 
 		zipped = F , 
-		# n = -1 , 				# no n parameter available for this - you must read in the entire table!
+		# n = -1 , 						# no n parameter available for this - you must read in the entire table!
 		lrecl = NULL , 
 		# skip.decimal.division = NULL , skipping decimal division not an option
-		tl = F ,				# convert all column names to lowercase?
+		tl = F ,						# convert all column names to lowercase?
 		tablename ,
-		overwrite = FALSE ,		# overwrite existing table?
+		overwrite = FALSE ,				# overwrite existing table?
 		connection ,
-		tf.path = NULL ,		# do temporary files need to be stored in a specific folder?
-								# this option is useful for keeping protected data off of random temporary folders on your computer--
-								# specifying this option creates the temporary file inside the folder specified
-		delimiters = "'\t'" 	# delimiters for the monetdb COPY INTO command
+		tf.path = NULL ,				# do temporary files need to be stored in a specific folder?
+										# this option is useful for keeping protected data off of random temporary folders on your computer--
+										# specifying this option creates the temporary file inside the folder specified
+		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
+		sleep.between.col.updates = 0
 		
 	) {
 
@@ -258,10 +259,14 @@ read.SAScii.monetdb <-
 				
 			dbSendUpdate( connection , sql )
 			
+			# give the MonetDB mserver.exe a certain number of seconds to process each column
+			Sys.sleep( sleep.between.col.updates )
+		
 		}
 			
 		cat( "  current progress: " , l , "of" , nrow( y ) , "columns processed.                    " , "\r" )
 	
+
 	}
 	
 	# eliminate gap variables.. loop through every gap
