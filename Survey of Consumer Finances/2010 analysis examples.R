@@ -233,7 +233,8 @@ scf.MIcombine(
 			svyquantile , 
 			c( 0 , .25 , .5 , .75 , 1 ) , 
 			ci = TRUE , 
-			method = 'constant' 
+			method = 'constant' ,
+			interval.type = 'quantile' 
 		) 
 	) 
 )
@@ -248,7 +249,8 @@ scf.MIcombine(
 			svyquantile , 
 			c( 0 , .25 , .5 , .75 , 1 ) , 
 			ci = TRUE , 
-			method = 'constant' 
+			method = 'constant' , 
+			interval.type = 'quantile' 
 		) 
 	) 
 )

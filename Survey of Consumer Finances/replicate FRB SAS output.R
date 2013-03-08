@@ -288,7 +288,7 @@ all.equal( SE( m.nw.justone ) , s.m )
 # for quantiles #
 
 # run a svyquantile() command on just the first design..
-q.nw.justone <- svyquantile( ~networth , scf.design$designs[[1]] , 0.5 , method = 'constant' )
+q.nw.justone <- svyquantile( ~networth , scf.design$designs[[1]] , 0.5 , method = 'constant' , interval.type = 'quantile' )
 
 # the coefficient is for only the first of five implicates..
 coef( q.nw.justone )
@@ -333,7 +333,7 @@ all.equal( as.numeric( SE( m.nw ) ) , cse.m )
 # are equally valid results.  except the r methods are reproducible and free ;)
 
 # run a svyquantile() command on the entire five implicates..
-q.nw <- scf.MIcombine( with( scf.design , svyquantile( ~networth , 0.5 , method = 'constant' ) ) )
+q.nw <- scf.MIcombine( with( scf.design , svyquantile( ~networth , 0.5 , method = 'constant' , interval.type = 'quantile' ) ) )
 
 # the main statistic (the coefficient)
 coef( q.nw )
