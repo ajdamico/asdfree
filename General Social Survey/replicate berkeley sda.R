@@ -67,11 +67,12 @@ options( digits = 8 )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "survey" )
+# install.packages( "survey" , "downloader" )
 
 
 require(foreign) # load foreign package (converts data files into R)
 require(survey)  # load survey package (analyzes complex design surveys)
+require(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # by default, R will crash if a primary sampling unit (psu) has a single observation
@@ -90,7 +91,7 @@ require(survey)  # load survey package (analyzes complex design surveys)
 # create new character variables containing the full filepath of the file on norc's website
 # that needs to be downloaded and imported into r for analysis
 GSS.2010.CS.file.location <-
-	"http://publicdata.norc.org:41000/gss/documents/OTHR/gss7210_r2b_stata.zip"
+	"https://github.com/ajdamico/usgsd/blob/master/General%20Social%20Survey/gss7210_r2b_stata.zip?raw=TRUE"
 	
 
 # create a temporary file and a temporary directory
@@ -99,7 +100,7 @@ tf <- tempfile() ; td <- tempdir()
 
 
 # download the file using the filepath specified
-download.file( 
+download( 
 	# download the file stored in the location designated above
 	GSS.2010.CS.file.location ,
 	# save the file as the temporary file assigned above
