@@ -129,6 +129,9 @@ if ( just.currently.designated.hpsas.please ){
 	# if the hpsa was updated to 'withdrawn' *before* the user-defined time point, throw it out
 	x <- x[ !( no.na( x$ud < designated.time.point ) & x$status.description == 'Withdrawn' ) , ]
 
+	# if the hpsa was immediately designated as 'withdrawn' before the designation date *and* has not been updated, throw it out
+	x <- x[ !( no.na( x$dd < designated.time.point ) & is.na( x$ud ) & ( x$status.description == 'Withdrawn' ) ) , ]
+	
 	# remove the fields added to `x`
 	x$ud <- x$dd <- NULL
 	
