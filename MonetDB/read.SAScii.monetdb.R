@@ -46,10 +46,6 @@ read.SAScii.monetdb <-
 		
 	) {
 
-	# check that autocommit mode isn't on
-	ac <- .jcall(connection@jc, "Z", "getAutoCommit")
-	if ( !ac ) stop( "read.SAScii.monetdb() only works in autocommit mode")
-
 	# before anything else, create the temporary files needed for this function to run
 	# if the user doesn't specify that the temporary files get stored in a temporary directory
 	# just put them anywhere..

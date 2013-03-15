@@ -39,7 +39,7 @@
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
+require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 require(stringr) 		# load stringr package (manipulates character strings easily)
 
 
@@ -48,28 +48,31 @@ require(stringr) 		# load stringr package (manipulates character strings easily)
 # run them now.  mine look like this:
 
 
-##################################################################
-# lines of code to hold on to for all other acs monetdb analyses #
+####################################################################
+# lines of code to hold on to for all other `acs` monetdb analyses #
 
-# first: your shell.exec() function.  again, mine looks like this:
-shell.exec( "C:/My Directory/ACS/MonetDB/monetdb.bat" )
+# first: specify your batfile.  again, mine looks like this:
+batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
 
-# second: add a twenty second system sleep in between the shell.exec() function
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: add a ten second system sleep in between the shell.exec() function
 # and the database connection lines.  this gives your local computer a chance
 # to get monetdb up and running.
-Sys.sleep( 20 )
+Sys.sleep( 10 )
 
-# third: your six lines to make a monet database connection.
+# fourth: your six lines to make a monet database connection.
 # just like above, mine look like this:
 dbname <- "acs"
 dbport <- 50001
-monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
-drv <- MonetDB( classPath = monetdriver )
-monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 
-# end of lines of code to hold on to for all other acs monetdb analyses #
-#########################################################################
+drv <- dbDriver("MonetDB")
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+
+
+# # # # run your analysis commands # # # #
 
 
 # the american community survey download and importation script
@@ -240,7 +243,7 @@ save( acs.m.recoded.design , file = "C:/My Directory/ACS/recoded_acs2011_1yr.rda
 # open r back up
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(RMonetDB)		# load the RMonetDB package (connects r to a monet database)
+require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 
 # run your..
 # lines of code to hold on to for all other acs monetdb analyses #
@@ -266,8 +269,15 @@ svytotal( ~one , acs.r , byvar = ~agecat )
 # close the connection to the recoded sqlrepsurvey design object
 close( acs.r )
 
-# close the connection to the monet database
+
+# disconnect from the current monet database
 dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `acs` monetdb analyses #
+###########################################################################
 
 
 # for more details on how to work with data in r

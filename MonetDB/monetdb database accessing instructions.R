@@ -11,43 +11,49 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
+require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 
-##################################################################################
-# lines of code to keep handy for all analyses using the 'test' monetdb database #
 
-# first: your shell.exec() function.  again, mine looks like this:
-shell.exec( "C:/My Directory/MonetDB/test.bat" )
 
-# second: add a ten second system sleep in between the shell.exec() function
+######################################################################
+# lines of code to hold on to for all other `test` monetdb analyses #
+
+# first: specify your batfile.  again, mine looks like this:
+batfile <- "C:/My Directory/MonetDB/test.bat"
+
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: add a ten second system sleep in between the shell.exec() function
 # and the database connection lines.  this gives your local computer a chance
 # to get monetdb up and running.
 Sys.sleep( 10 )
 
-# third: your six lines to make a monet database connection.
-# mine looks like this:
+# fourth: your six lines to make a monet database connection.
+# just like above, mine look like this:
 dbname <- "test"
 dbport <- 50000
-monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
-drv <- MonetDB( classPath = monetdriver )
-monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
 
-# end of lines of code to hold on to for all analyses using the 'test' monetdb database #
-#########################################################################################
+drv <- dbDriver("MonetDB")
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+
+# # # # run your analysis commands # # # #
+
 
 
 # my shell window contains the text below.  leave it open until you're done.
 
-# MonetDB 5 server v11.13.5 "Oct2012-SP1"
-# Serving database 'test', using 8 threads
+# when the monetdb server runs, my computer shows:
+# MonetDB 5 server v11.15.1 "Feb2013"
+# Serving database 'bsapuf', using 8 threads
 # Compiled for x86_64-pc-winnt/64bit with 64bit OIDs dynamically linked
 # Found 7.860 GiB available main-memory.
 # Copyright (c) 1993-July 2008 CWI.
-# Copyright (c) August 2008-2012 MonetDB B.V., all rights reserved
+# Copyright (c) August 2008-2013 MonetDB B.V., all rights reserved
 # Visit http://www.monetdb.org/ for further information
-# Listening for connection requests on mapi:monetdb://127.0.0.1:50000/
+# Listening for connection requests on mapi:monetdb://127.0.0.1:50003/
 # MonetDB/JAQL module loaded
 # MonetDB/SQL module loaded
 
@@ -188,7 +194,7 @@ dbGetQuery( db , 'select * from x where gear = 4' )
 # calculate the mean, median, max, min, and standard deviation of the
 # kilometers per liter for each cylinder category.
 # also count the number of cars available in each category
-dbGetQuery( db , 'select cyl, avg( kpl ) , median( kpl ) , max( kpl ) , min( kpl ) , stddev( kpl ) , count(*) from x group by cyl' )
+dbGetQuery( db , 'select cyl, avg( kpl ) , median( kpl ) , max( kpl ) , min( kpl ) , stddev_pop( kpl ) , count(*) from x group by cyl' )
 
 # in sum: use dbGetQuery() to examine a table within a database
 
@@ -213,8 +219,12 @@ head( x )
 
 # when you're finished, close the database connection..
 dbDisconnect( db )
-# ..and close the shell window by hand
 
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `test` monetdb analyses #
+#############################################################################
 
 # for more details on how to work with data in r
 # check out my two minute tutorial video site

@@ -36,7 +36,7 @@
 # # # # # # # # # # # # # # #
 
 
-require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
+require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 
 # after running the r script above, users should have handy a few lines
@@ -44,25 +44,29 @@ require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
 # basic stand alone public use files.  run them now.  mine look like this:
 
 
-######################################################################
-# lines of code to hold on to for all other bsa puf monetdb analyses #
 
-# first: your shell.exec() function.  again, mine looks like this:
-shell.exec( "C:/My Directory/BSAPUF/MonetDB/monetdb.bat" )
+###################################################################################
+# lines of code to hold on to for the start of all other bsa puf monetdb analyses #
 
-# second: add a twenty second system sleep in between the shell.exec() function
+# first: specify your batfile.  again, mine looks like this:
+batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
+
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: add a ten second system sleep in between the shell.exec() function
 # and the database connection lines.  this gives your local computer a chance
 # to get monetdb up and running.
-Sys.sleep( 20 )
+Sys.sleep( 10 )
 
-# third: your six lines to make a monet database connection.
+# fourth: your six lines to make a monet database connection.
 # just like above, mine look like this:
 dbname <- "bsapuf"
 dbport <- 50003
-monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
-drv <- MonetDB( classPath = monetdriver )
-monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
+
+drv <- dbDriver("MonetDB")
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
 
 # end of lines of code to hold on to for all other bsa puf monetdb analyses #
 #############################################################################
@@ -94,12 +98,27 @@ for ( i in pufs ){
 
 	# print the name of the current table
 	print( i )
+	
+	
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	# create a monet.frame object (experimental, but designed to behave like an R data frame) #
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	assign( i , monet.frame( db , i ) )
 
 	# print the number of records stored in that table
-	print( dbGetQuery( db , paste( "select count(*) from" , i ) ) )
+	print( 
+		paste( 
+			"table" , 
+			i , 
+			"contains" , 
+			nrow( get( i ) ) , 
+			"rows" 
+		) 
+	)
 }
 
-
+# and now you can access each of those objects as if they were an R data frame #
 
 
 # # # # # # # # # # # # # #
@@ -126,8 +145,10 @@ benes <-
 # print this matrix to the screen
 benes
 
-# examine the first six records of the home health agency (hha) table
-dbGetQuery( db , "select * from hha08 limit 6" )
+# examine the first and last six records of the home health agency (hha) table
+head( hha08 )
+
+tail( hha08 )
 
 # create an 'hhusers' data frame, constructed by querying the monet database
 hhusers <-
@@ -183,8 +204,12 @@ round( hhusers / benes , 4 )
 # the following code will precisely match the 'total' (bottom) row in tables 5 and 6 of the inpatient documentation (pdf page 20)
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_Inpatient_Claims_PUF_GenDoc.pdf
 
-# examine the first six records of the 2008 inpatient claims (inpatient08) table
+# examine the first six records of the 2008 inpatient claims (inpatient08) table using SQL..
 dbGetQuery( db , "select * from inpatient08 limit 6" )
+
+# ..or access the monet.frame object
+head( inpatient08 )
+
 
 # run a simple sql query on the inpatient claims table in the 2008 monet database
 dbGetQuery( 
@@ -213,8 +238,11 @@ dbGetQuery(
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_Inpatient_Claims_PUF_GenDoc.pdf
 
 
-# count the total number of claims in the monet data table
-total.claims <- dbGetQuery( db , "select count(*) from inpatient08" )
+# count the total number of claims in the monet data table using SQL..
+( total.claims <- dbGetQuery( db , "select count(*) from inpatient08" ) )
+
+# ..or as a monet.frame
+nrow( inpatient08 )
 
 # print the distinct values of the 'ip_clm_days_cd' column to the screen
 dbGetQuery( db , "select distinct ip_clm_days_cd from inpatient08" )
@@ -258,11 +286,18 @@ table12
 # the following code will precisely match the puf (rightmost) column in table 4 of the hospice documentation (pdf page 7)
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_Hospice_Bene_PUF_GenDoc.pdf
 
-# examine the first six records of the 2008 hospice enrollee (hospice08) table
+# examine the first six records of the 2008 hospice enrollee (hospice08) table using SQL..
 dbGetQuery( db , "select * from hospice08 limit 6" )
 
+# ..or access it as a monet.frame
+head( hospice08 )
+
+
 # store the number of beneficiaries in hospice (remember this is about 5% of the total population)
-total.benes <- dbGetQuery( db , "select count(*) from hospice08" )
+( total.benes <- dbGetQuery( db , "select count(*) from hospice08" ) )
+
+# same old same old
+nrow( hospice08 )
 
 # store the number of beneficiaries in hospice - in each sex category - into a data frame called 'table4'
 table4 <- 
@@ -322,8 +357,11 @@ snf.users.by.admissions$count / sum( snf.users.by.admissions$count )
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_Carrier_Line_Items_PUF_GenDoc.pdf
 
 
-# examine the first six records of the 2008 carrier line item (carrier08) table
+# examine the first six records of the 2008 carrier line item (carrier08) table using SQL..
 dbGetQuery( db , "select *  from carrier08 limit 6" )
+
+# ..or as a monet.frame
+head( carrier08 )
 
 # count the total number of line items
 # note: the 'medicare payments' also comes close to the 'medicare payments' column
@@ -340,8 +378,11 @@ dbGetQuery( db , "select count(*) as number_of_line_items , sum( car_hcpcs_pmt_a
 # the following code will precisely match the distribution in table 10 of the prescription drug events documentation (pdf page 9)
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_PD_Events_PUF_GenDoc.pdf
 
-# examine the first six records of the 2008 prescription drug events (pde08) table
+# examine the first six records of the 2008 prescription drug events (pde08) table with SQL..
 dbGetQuery( db , "select * from pde08 limit 6" )
+
+# ..or with monet.frame
+head( pde08 )
 
 # count the number of events shown in table 1 (on pdf page 2) and get close (but not perfect) to the total drug cost, due to rounding
 table1 <- dbGetQuery( db , "select count(*) as num_events , sum( pde_drug_cost ) as drug_cost_sum from pde08" )
@@ -373,8 +414,11 @@ as.numeric( patient.payment.dist$L1 ) / as.numeric( table1[1] )
 # the following code will precisely match the counts in table 5 of the chronic conditions puf general documentation (pdf page 13)
 # https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_Chronic_Conditions_PUF_GenDoc.pdf
 
-# examine the first six records of the 2008 chronic conditions (cc08) table
+# examine the first six records of the 2008 chronic conditions (cc08) table using SQL..
 dbGetQuery( db , "select * from cc08 limit 6" )
+
+# ..or with monet.frame
+head( cc08 )
 
 # create a character vector containing each of the data columns matching the enrollee columns in table 5
 count.columns <-
@@ -398,6 +442,18 @@ dbGetQuery( db , paste( "select bene_sex_ident_cd, " , sum.strings , "from cc08 
 # run the enrollee counts, broken out by male/female and age category
 dbGetQuery( db , paste( "select bene_sex_ident_cd, bene_age_cat_cd, " , sum.strings , "from cc08 group by bene_sex_ident_cd, bene_age_cat_cd" ) )
 
+
+#################################################################################
+# lines of code to hold on to for the end of all other bsa puf monetdb analyses #
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other bsa puf monetdb analyses #
+#############################################################################
 
 # for more details on how to work with data in r
 # check out my two minute tutorial video site

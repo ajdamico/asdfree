@@ -36,12 +36,11 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "downloader" , "R.utils" ) )
+# install.packages( "R.utils" )
 
 
-require(downloader)	# downloads and then runs the source() function on scripts from github
 require(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
-require(RMonetDB)	# load the RMonetDB package (connects r to a monet database)
+require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -67,22 +66,6 @@ setwd( "C:/My Directory/BSAPUF/" )
 year <- 2008
 
 
-# load the windows.monetdb.configuration() function,
-# which allows the easy creation of an executable (.bat) file
-# to run the monetdb server specific to this data
-source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/windows.monetdb.configuration.R" )
-
-
-# create a folder "MonetDB" in your current working directory.
-# so, for example, if you set your current working directory to C:\My Directory\BSAPUF\ above,
-# create a new folder C:\My Directory\BSAPUF\MonetDB right now.
-
-
-# if the MonetDB folder doesn't exist in your current working directory,
-# this line will create an error.
-stopifnot( file.exists( paste0( getwd() , "/MonetDB" ) ) )
-
-
 # note: the MonetDB folder should *not* be within a year-specific directory.
 # multiple bsa puf years will all be stored into the same monet database,
 # in order to allow multi-year analyses.
@@ -97,42 +80,43 @@ stopifnot( file.exists( paste0( getwd() , "/MonetDB" ) ) )
 # when adding new files or adding a new year of data, this script does not need to be re-run.
 
 # create a monetdb executable (.bat) file for the medicare basic stand alone public use file
-windows.monetdb.configuration( 
-
-		# choose a location to store the file that will run the monetdb server on your local computer
-		# this can be stored anywhere, but why not put it in the monetdb directory
-		bat.file.location = paste0( getwd() , "\\MonetDB\\monetdb.bat" ) , 
-		
-		# figure out the file path of the MonetDB software on your local machine.
-		# on my windows machine, monetdb version 5.0 defaulted to this directory, but double-check yours:
-		monetdb.program.path = "C:\\Program Files\\MonetDB\\MonetDB5\\" ,
-		
-		# assign the directory where the database will be stored.
-		# this setting will store the database within the MonetDB folder of the current working directory
-		database.directory = paste0( getwd() , "\\MonetDB\\" ) ,
-		
-		# create a server name for the dataset you want to save into monetdb.
-		# this will change for different datasets -- for the basic stand alone public use file, just use bsapuf
-		dbname = "bsapuf" ,
-		
-		# choose which port 
-		dbport = 50003
+batfile <-
+	monetdb.server.setup(
+					
+					# set the path to the directory where the initialization batch file and all data will be stored
+					database.directory = "C:/My Directory/BSAPUF/MonetDB" ,
+					# must be empty or not exist
+					
+					# find the main path to the monetdb installation program
+					monetdb.program.path = "C:/Program Files/MonetDB/MonetDB5" ,
+					
+					# choose a database name
+					dbname = "bsapuf" ,
+					
+					# choose a database port
+					# this port should not conflict with other monetdb databases
+					# on your local computer.  two databases with the same port number
+					# cannot be accessed at the same time
+					dbport = 50003
 	)
 
-
+	
 # this next step is so very important.
 
 # store a line of code that will make it easy to open up the monetdb server in the future.
-# this should contain the same file path as the "bat.file.location" parameter above,
-# but don't simply copy the "paste0( getwd() , "\\MonetDB\\monetdb.bat" )" here,
-# because if your current working directory changes at other points, you don't want this line to change.
+# this should contain the same file path as the batfile created above,
 # you're best bet is to actually look at your local disk to find the full filepath of the executable (.bat) file.
-# if it's stored in C:\My Directory\BSAPUF\MonetDB\monetdb.bat
-# then your shell.exec line should be:
+# if you ran this script without changes, the batfile will get stored in C:\My Directory\BSAPUF\MonetDB\bsapuf.bat
 
+# here's the batfile location:
+batfile
 
-shell.exec( "C:/My Directory/BSAPUF/MonetDB/monetdb.bat" )
+# note that since you only run the `monetdb.server.setup()` function the first time this script is run,
+# you will need to note the location of the batfile for future MonetDB analyses!
 
+# in future R sessions, you can create the batfile variable with a line like..
+# batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
+# obviously, without the `#` comment character
 
 # hold on to that line for future scripts.
 # you need to run this line *every time* you access
@@ -146,14 +130,17 @@ dbport <- 50003
 
 
 # hey try running it now!  a shell window should pop up.
-# when it runs, my computer shows:
+pid <- monetdb.server.start( batfile )
+# store the result into another variable, which stands for process id
+# this `pid` variable will allow the MonetDB server to be terminated from within R automagically.
 
-# MonetDB 5 server v11.13.5 "Oct2012-SP1"
-# Serving database 'bsapuf', using 2 threads
+# when the monetdb server runs, my computer shows:
+# MonetDB 5 server v11.15.1 "Feb2013"
+# Serving database 'bsapuf', using 8 threads
 # Compiled for x86_64-pc-winnt/64bit with 64bit OIDs dynamically linked
-# Found 15.873 GiB available main-memory.
+# Found 7.860 GiB available main-memory.
 # Copyright (c) 1993-July 2008 CWI.
-# Copyright (c) August 2008-2012 MonetDB B.V., all rights reserved
+# Copyright (c) August 2008-2013 MonetDB B.V., all rights reserved
 # Visit http://www.monetdb.org/ for further information
 # Listening for connection requests on mapi:monetdb://127.0.0.1:50003/
 # MonetDB/JAQL module loaded
@@ -206,20 +193,16 @@ ipbs <- paste0( "./" , year , "/" , year , "_IPBS_PUF.csv" )
 # end of files to download #
 
 
-# the monetdb installation instructions asked you to note the filepath of the monetdb java (.jar) file
-# you need it now.  create a new 'monetdriver' object containing a character string
-# with the filepath of the java database connection file
-monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
 
 # convert the driver to a monetdb driver
-drv <- MonetDB( classPath = monetdriver )
+drv <- dbDriver("MonetDB")
 
 # notice the dbname and dbport (assigned above during the monetdb configuration)
 # get used in this line
-monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 
 # now put everything together and create a connection to the monetdb server.
-db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
+db <- dbConnect( drv , monet.url , "monetdb", "monetdb")
 # from now on, the 'db' object will be used for r to connect with the monetdb server
 
 
@@ -341,26 +324,42 @@ dbGetQuery( db , "select * from pde08 limit 6" )
 # disconnect from the current monet database
 dbDisconnect( db )
 
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
 
 ######################################################################
 # lines of code to hold on to for all other bsa puf monetdb analyses #
 
-# first: your shell.exec() function.  again, mine looks like this:
-shell.exec( "C:/My Directory/BSAPUF/MonetDB/monetdb.bat" )
+# first: specify your batfile.  again, mine looks like this:
+batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
 
-# second: add a ten second system sleep in between the shell.exec() function
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: add a ten second system sleep in between the shell.exec() function
 # and the database connection lines.  this gives your local computer a chance
 # to get monetdb up and running.
 Sys.sleep( 10 )
 
-# third: your six lines to make a monet database connection.
+# fourth: your six lines to make a monet database connection.
 # just like above, mine look like this:
 dbname <- "bsapuf"
 dbport <- 50003
-monetdriver <- "c:/program files/monetdb/monetdb5/monetdb-jdbc-2.7.jar"
-drv <- MonetDB( classPath = monetdriver )
-monet.url <- paste0( "jdbc:monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
+
+drv <- dbDriver("MonetDB")
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+
+
+# # # # run your analysis commands # # # #
+
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
 
 # end of lines of code to hold on to for all other bsa puf monetdb analyses #
 #############################################################################
