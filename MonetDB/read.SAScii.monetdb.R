@@ -201,7 +201,7 @@ read.SAScii.monetdb <-
 	# using the sql.copy.into() function defined above
 	
 	# capture an error (without breaking)
-	te <- try( sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+	te <- try( sql.copy.into( " NULL AS ''" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
@@ -224,7 +224,7 @@ read.SAScii.monetdb <-
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #4 broke, trying method #5' , "\r" )
 		# this time without error-handling.
-		sql.copy.into( " NULL AS ''" , num.lines , tablename , tf2  , connection , delimiters ) 
+		sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) 
 	}
 	
 	# end importation attempts #
