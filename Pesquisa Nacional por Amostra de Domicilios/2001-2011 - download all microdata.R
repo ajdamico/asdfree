@@ -102,8 +102,8 @@ for ( year in years.to.download ){
 		db = db
 	)
 
-	dbSendQuery( db , paste0( "CREATE INDEX pes_index ON pes" , year , " ( v0101 , v0102 , v0103 )" ) )
-	dbSendQuery( db , paste0( "CREATE INDEX dom_index ON dom" , year , " ( v0101 , v0102 , v0103 )" ) )
+	dbSendQuery( db , paste0( "CREATE INDEX pes_index" , year , " ON pes" , year , " ( v0101 , v0102 , v0103 )" ) )
+	dbSendQuery( db , paste0( "CREATE INDEX dom_index" , year , " ON dom" , year , " ( v0101 , v0102 , v0103 )" ) )
 
 	dbSendQuery( db , paste0( "create table pnad" , year , " as select * from pes" , year , " as a inner join dom" , year , " as b on a.v0101 = b.v0101 AND a.v0102 = b.v0102 AND a.v0103 = b.v0103" ) )
 
