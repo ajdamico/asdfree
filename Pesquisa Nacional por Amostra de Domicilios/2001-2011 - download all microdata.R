@@ -3,8 +3,18 @@ remove.uf <-
 
 		sas_lines <- readLines( sasfile )
 
-		sas_lines <- sas_lines[ !grepl( "@00005  UF" , sas_lines ) ]
+		sas_lines <- gsub( "\t" , "  " , sas_lines )
+		
+		sas_lines <- sas_lines[ !grepl( "@00005[ ]+UF[ ]" , sas_lines ) ]
 
+		sas_lines <- 
+			gsub(
+				"@00840  V2913  $1 ./* LOCAL ÚLTIMO FURTO    */" ,
+				"@00840  V2913  $1. /* LOCAL ÚLTIMO FURTO    */" ,
+				sas_lines ,
+				fixed = TRUE
+			)
+		
 		# create a temporary file
 		tf <- tempfile()
 
