@@ -19,7 +19,6 @@ setwd( "C:/My Directory/PNAD" )
 
 
 require(RSQLite) 	# load RSQLite package (creates database files in R)
-require(survey)		# load survey package (analyzes complex design surveys)
 require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
 require(descr) 		# load the descr package (converts fixed-width files to delimited files)
 require(downloader)	# downloads and then runs the source() function on scripts from github
@@ -77,8 +76,8 @@ for ( year in years.to.download ){
 
 	files <- tolower( files )
 	
-	dom.sas <- remove.uf( files[ grepl( paste0( 'input dom' , year , '.txt' ) , files ) ] )
-	pes.sas <- remove.uf( files[ grepl( paste0( 'input pes' , year , '.txt' ) , files ) ] )
+	dom.sas <- remove.uf( files[ grepl( paste0( 'input[^?]dom' , year , '.txt' ) , files ) ] )
+	pes.sas <- remove.uf( files[ grepl( paste0( 'input[^?]pes' , year , '.txt' ) , files ) ] )
 	
 	dom.fn <- files[ grepl( paste0( 'dados/dom' , year ) , files ) ]
 	pes.fn <- files[ grepl( paste0( 'dados/pes' , year ) , files ) ]
