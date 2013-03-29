@@ -1,0 +1,115 @@
+# analyze brazilian government survey data with the r language
+# pesquisa nacional por amostra de domicilios
+# 2011
+
+# if you have never used the r language before,
+# watch this two minute video i made outlining
+# how to run this script from start to finish
+# http://www.screenr.com/Zpd8
+
+# anthony joseph damico
+# ajdamico@gmail.com
+
+# if you use this script for a project, please send me a note
+# it's always nice to hear about how people are using this stuff
+
+# for further reading on cross-package comparisons, see:
+# http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
+
+
+##################################################################################################################################################################
+# this script matches the results of the SAS-SUDAAN code sent to me by Marcos Paulo Soares de Freitas at IBGE.  IBGE is the brazilian census bureau/stats agency #
+# email: https://github.com/ajdamico/usgsd/blob/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/2011%20PNAD%20SAS-SUDAAN%20e-mail%20from%20IBGE.pdf #
+# excel: https://github.com/ajdamico/usgsd/blob/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/ESTIMATES%20from%20IBGE.XLS                         #
+#  code: https://github.com/ajdamico/usgsd/blob/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/SAS-SUDAAN%20code%20from%20IBGE.sas                 #
+##################################################################################################################################################################
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################################
+# prior to running this analysis script, the pnad 2011 file must be loaded as a database (.db) on the local machine.                                #
+# running the 2011 download all microdata script will create this database file                                                                     #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/2001-2011%20-%20download%20all%20microdata.R  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "pnad.db" with 'pnad2011' in C:/My Directory/PNAD or wherever the working directory was set                        #
+#####################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+# set your working directory.
+# the PNAD 2001 - 2011 data files will be stored here
+# after downloading and importing them.
+# use forward slashes instead of back slashes
+
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/PNAD/" )
+# ..in order to set your current working directory
+
+
+# name the database (.db) file to be saved in the working directory
+pnad.dbname <- "pnad.db"
+
+require(downloader)	# downloads and then runs the source() function on scripts from github
+require(survey)		# load survey package (analyzes complex design surveys)
+require(RSQLite) 	# load RSQLite package (creates database files in R)
+
+# set R to produce conservative standard errors instead of crashing
+# http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
+options( survey.lonely.psu = "adjust" )
+# this setting matches the MISSUNIT option in SUDAAN
+
+# load pnad-specific functions (to remove invalid SAS input script fields and postStratify a database-backed survey object)
+source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa Nacional por Amostra de Domicilios/pnad.survey.R" )
+
+
+##############################################
+# survey design for a database-backed object #
+##############################################
+
+# create survey design object with PNAD design information
+# using existing data frame of PNAD data
+unstratified.pnad <-
+	svydesign(
+		id = ~v4618 ,
+		strata = ~v4617 ,
+		data = "p2011" ,
+		weights = ~v4610 ,
+		nest = TRUE ,
+		dbtype = "SQLite" ,
+		dbname = "pnad.db"
+	)
+# note that the above object has been given the unwieldy name of `unstratified.pnad`
+# so that it's not accidentally used in analysis commands.
+# this object has not yet been appropriately post-stratified, as necessitated by IBGE
+# in order to accurately match the brazilian 2010 census
+	
+# this block conducts a post-stratification on the un-post-stratified design
+# and since the R `survey` package's ?postStratify currently does not work on database-backed survey objects,
+# this uses a function custom-built for the PNAD.
+y <- 
+	pnad.postStratify( 
+		design = unstratified.pnad ,
+		strata.col = 'v4609' ,
+		oldwgt = 'v4610'
+	)
+
+# count the weighted number of individuals, then broken down by gender,
+# and also calculate the standard error and coefficient of variation
+# using the newly-created post-stratified survey design object
+svytotal( ~one , y )
+svytotal( ~factor( v0302 ) , y )
+cv( svytotal( ~factor( v0302 ) , y ) )
+
+# note that this exactly matches the SAS-SUDAAN-produced file
+# ESTIMATES from IBGE.XLS
+
+##################################
+# end of IBGE code replication #
+##################################
+
+# for more details on how to work with data in r
+# check out my two minute tutorial video site
+# http://www.twotorials.com/
