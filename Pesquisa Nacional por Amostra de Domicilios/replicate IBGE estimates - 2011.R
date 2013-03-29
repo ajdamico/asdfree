@@ -75,7 +75,7 @@ unstratified.pnad <-
 	svydesign(
 		id = ~v4618 ,
 		strata = ~v4617 ,
-		data = "p2011" ,
+		data = "pnad2011" ,
 		weights = ~v4610 ,
 		nest = TRUE ,
 		dbtype = "SQLite" ,
@@ -106,9 +106,9 @@ cv( svytotal( ~factor( v0302 ) , y ) )
 # note that this exactly matches the SAS-SUDAAN-produced file
 # ESTIMATES from IBGE.XLS
 
-##################################
+################################
 # end of IBGE code replication #
-##################################
+################################
 
 # for more details on how to work with data in r
 # check out my two minute tutorial video site

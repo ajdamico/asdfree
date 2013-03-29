@@ -17,16 +17,15 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# important note about why these statistics and standard errors do not precisely match the table packages #
-stop( "fix this link" )
-# the brazilian institute of statistics recently modified their methodology to use post-stratification    #
-# so the final results from this script will be very close but not precisely exact. however, you can view #
-# the replication script in this directory which explains how these statistics *do* precisely match some  #
-# statistics, standard errors, and coefficients of variation provided to me by the friendly folks at IBGE #
-# in other words, the analysis methods described in this script are methodologically justified and can    #
-# safely be viewed as the correct way of doing things.  these analysis examples are right.  IBGE said so. #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# important note about why these statistics and standard errors do not precisely match the table packages available at:   #
+# ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/2011/Sintese_Indicadores/ #
+# the brazilian institute of statistics recently modified their methodology to use post-stratification so these final     #
+# results from this script will be very close but not precisely exact. however, you can view the replication script in    #
+# this directory which explains how these statistics *do* precisely match some statistics, standard errors, and           #
+# coefficients of variation provided to me by the friendly folks at IBGE in other words, the analysis methods described   #
+# in this script are methodologically justified and can safely be viewed as the correct way of doing things.              #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
@@ -78,7 +77,7 @@ unstratified.pnad <-
 	svydesign(
 		id = ~v4618 ,
 		strata = ~v4617 ,
-		data = "p2011" ,
+		data = "pnad2011" ,
 		weights = ~v4610 ,
 		nest = TRUE ,
 		dbtype = "SQLite" ,
@@ -105,39 +104,31 @@ y <-
 # analysis examples #
 #####################
 
-# count the total (unweighted) number of records in cps #
-# broken out by employment status #
+# count the total (unweighted) number of records in pnad #
+# broken out by region #
 
 svyby(
-	~moop ,
-	~workyn ,
+	~one ,
+	~region ,
 	y ,
 	unwtd.count
 )
 
 
 
-# count the weighted number of individuals in cps #
+# count the weighted number of individuals in pnad #
 
-# the civilian, non-institutionalized population of the united states #
+# the population of brazil #
 svytotal(
 	~one ,
 	y
 )
 
-# note that this is exactly equivalent to summing up the weight variable
-# from the original cps data frame
-
-db <- dbConnect( SQLite() , "cps.asec.db" )			# connect to the SQLite database (.db)
-dbGetQuery( db , 'select sum( marsupwt ) from asec12' )	# run a single query, summing the person-weight
-dbDisconnect( db )									# disconnect from the database
-
-
-# the civilian, non-institutionalized population of the united states #
-# by employment status
+# the population of brazil #
+# by region
 svyby(
 	~one ,
-	~workyn ,
+	~region ,
 	y ,
 	svytotal
 )
@@ -145,16 +136,16 @@ svyby(
 
 # calculate the mean of a linear variable #
 
-# average out-of-pocket medical expenditure - nationwide (includes over-the-counter)
+# average age
 svymean(
-	~moop ,
+	~v8005 ,
 	design = y
 )
 
-# by employment status
+# by region
 svyby(
-	~moop ,
-	~workyn ,
+	~v8005 ,
+	~region ,
 	design = y ,
 	svymean
 )
@@ -162,49 +153,37 @@ svyby(
 
 # calculate the distribution of a categorical variable #
 
-# A-MARITL should be treated as a factor (categorical) variable
-# instead of a numeric (linear) variable
-# this update statement converts it.
-# the svyby command below will not run without this
-y <-
-	update(
-		a_maritl = factor( a_maritl ) ,
-		y
-	)
-
-
-# percent married - nationwide
+# percent male vs. female - nationwide
 svymean(
-	~a_maritl ,
+	~factor( v0302 ) ,
 	design = y
 )
 
-# by employment status
+# by region
 svyby(
-	~a_maritl ,
-	~workyn ,
+	~factor( v0302 ) ,
+	~region ,
 	design = y ,
 	svymean
 )
 
 # calculate the median and other percentiles #
 
-# minimum, 25th, 50th, 75th, maximum
-# out-of-pocket medical expenditure in the united states (includes over-the-counter)
+# minimum, 25th, 50th, 75th, maximum ages
 svyquantile(
-	~moop ,
+	~v8005 ,
 	design = y ,
 	c( 0 , .25 , .5 , .75 , 1 )
 )
 
-# by employment status
+# by region
 svyby(
-	~moop ,
-	~workyn ,
+	~v8005 ,
+	~region ,
 	design = y ,
 	svyquantile ,
 	c( 0 , .25 , .5 , .75 , 1 ) ,
-	ci = T
+	ci = TRUE
 )
 
 ######################
@@ -213,11 +192,7 @@ svyby(
 
 # restrict the y object to
 # females only
-y.female <-
-	subset(
-		y ,
-		a_sex %in% 2
-	)
+y.female <-	subset( y , v0302 == 4 )
 # now any of the above commands can be re-run
 # using y.female object
 # instead of the y object
@@ -225,10 +200,10 @@ y.female <-
 
 # calculate the mean of a linear variable #
 
-# average out-of-pocket medical expenditure - nationwide, restricted to females
+# average age
 svymean(
-	~moop ,
-	design = y
+	~v8005 ,
+	design = y.female
 )
 
 
@@ -238,58 +213,60 @@ svymean(
 ###################
 
 # calculate the distribution of a categorical variable #
-# by employment status
+# by region
 
 # store the results into a new object
 
-marital.status.by.employment <-
+gender.by.region <-
 	svyby(
-		~a_maritl ,
-		~workyn ,
+		~factor( v0302 ) ,
+		~region ,
 		design = y ,
 		svymean
 	)
 
 # print the results to the screen
-marital.status.by.employment
+gender.by.region
 
 # now you have the results saved into a new object of type "svyby"
-class( marital.status.by.employment )
+class( gender.by.region )
 
 # print only the statistics (coefficients) to the screen
-coef( marital.status.by.employment )
+coef( gender.by.region )
 
 # print only the standard errors to the screen
-SE( marital.status.by.employment )
+SE( gender.by.region )
+
+# print only the coefficients of variation to the screen
+cv( gender.by.region )
 
 # this object can be coerced (converted) to a data frame..
-marital.status.by.employment <- data.frame( marital.status.by.employment )
+gender.by.region <- data.frame( gender.by.region )
 
 # ..and then immediately exported as a comma-separated value file
 # into your current working directory
-write.csv( marital.status.by.employment , "marital status by employment.csv" )
+write.csv( gender.by.region , "gender by region.csv" )
 
 # ..or trimmed to only contain the values you need.
-# here's the "married - spouse present" rate by employment status,
+# here's the "percent female" by region,
 # with accompanying standard errors
-# keeping only the second and third rows (since the first row contains minors)
-married.sp.by.employment <-
-	marital.status.by.employment[ 2:3 , c( "workyn" , "a_maritl1" , "se1" ) ]
+female.by.region <-
+	gender.by.region[ , c( "region" , "factor.v0302.4" , "se.factor.v0302.4" ) ]
 
 
 # print the new results to the screen
-married.sp.by.employment
+female.by.region
 
 # this can also be exported as a comma-separated value file
 # into your current working directory
-write.csv( married.sp.by.employment , "married sp by employment.csv" )
+write.csv( female.by.region , "female by region.csv" )
 
 # ..or directly made into a bar plot
 barplot(
-	married.sp.by.employment[ , 2 ] ,
-	main = "Married (SP) by Employment Status" ,
-	names.arg = c( "Employed" , "Not Employed" ) ,
-	ylim = c( 0 , .6 )
+	female.by.region[ , 2 ] ,
+	main = "Female by Region" ,
+	names.arg = c( "North" , "Northeast" , "Southeast" , "South" , "Center-West" ) ,
+	ylim = c( 0.49 , .52 )
 )
 
 # for more details on how to work with data in r

@@ -34,7 +34,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" ) )
+# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" , "stringr" ) )
 
 
 # define which years to download #
@@ -198,7 +198,10 @@ for ( year in years.to.download ){
 			"create table pnad" , 
 			year , 
 			# also add a new column "one" that simply contains the number 1 for every record in the data set
-			" as select * , 1 as one from pes" , 
+			# also add a new column "uf" that contains the state code, since these were thrown out of the SAS script
+			# also add a new column "region" that contains the larger region, since these are shown in the tables
+			# NOTE: the substr() function luckily works in SQLite() databases, but may not work if you change SQL database engines to something else.
+			" as select * , 1 as one , substr( a.v0102 , 1 , 2 ) as uf , substr( a.v0102 , 1 , 1 ) as region from pes" , 
 			year , 
 			" as a inner join dom" , 
 			year , 
