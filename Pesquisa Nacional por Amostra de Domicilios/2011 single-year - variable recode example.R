@@ -41,17 +41,11 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-# set your working directory.
-# the PNAD 2001 - 2011 data files will be stored here
-# after downloading and importing them.
-# use forward slashes instead of back slashes
-
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/PNAD/" )
 # ..in order to set your current working directory
 
-
-# name the database (.db) file to be saved in the working directory
+# name the database (.db) file that should have been saved in the working directory
 pnad.dbname <- "pnad.db"
 
 require(downloader)	# downloads and then runs the source() function on scripts from github
