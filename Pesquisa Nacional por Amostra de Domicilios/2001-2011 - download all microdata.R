@@ -84,6 +84,8 @@ db <- dbConnect( SQLite() , pnad.dbname )
 # begin looping through every pnad year specified
 for ( year in years.to.download ){
 
+	cat( 'currently working on' , year )
+
 	# # # # # # # # # # # #
 	# load the main file  #
 	# # # # # # # # # # # #
@@ -195,6 +197,7 @@ for ( year in years.to.download ){
 			# this default table naming setup will name the final merged tables pes2001, pes2002, pes2003 and so on
 			"create table pnad" , 
 			year , 
+			# also add a new column "one" that simply contains the number 1 for every record in the data set
 			" as select * , 1 as one from pes" , 
 			year , 
 			" as a inner join dom" , 
@@ -210,9 +213,6 @@ for ( year in years.to.download ){
 		dbGetQuery( db , paste0( "select count(*) as count from pnad" , year ) ) 
 	)
 
-	# add a new column "one" that simply contains the number 1 for every record in the data set
-	dbSendQuery( db , paste0( "ALTER TABLE pnad" , year , " ADD one REAL" ) )
-	dbSendQuery( db , paste0( "UPDATE pnad" , year , " SET one = 1" ) )
 	
 }
 
