@@ -190,7 +190,11 @@ cc <- paste0( "./" , year , "/" , year , "_Chronic_Conditions_PUF.csv" )
 # institutional provider & beneficiary summary
 ipbs <- paste0( "./" , year , "/" , year , "_IPBS_PUF.csv" )
 
-# end of files to download #
+# prescription drug profiles
+rxp <- paste0( "./" , year , "/" , year , "_PD_Profiles_PUF.csv" )
+
+
+# end of files to import #
 
 
 
@@ -305,6 +309,14 @@ monet.read.csv(
 	paste0( 'ipbs' , substr( year , 3 , 4 ) ) , 
 	nrows = ipbs.rows , 
 	nrow.check = ipbs.rows 
+)
+
+# store the 2008 prescription drug profile table in the database as the 'rxp08' table
+monet.read.csv( 
+	db , 
+	rxp , 
+	paste0( 'rxp' , substr( year , 3 , 4 ) ) , 
+	nrows = sapply( rxp , countLines ) 
 )
 
 

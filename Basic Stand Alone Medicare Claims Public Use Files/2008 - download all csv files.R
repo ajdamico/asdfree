@@ -96,10 +96,13 @@ cc <- "2008_Chronic_Conditions_PUF.zip"
 # institutional provider & beneficiary summary
 ipbs <- "2008_IPBS_PUF.zip"
 
+# prescription drug profiles
+rxp <- "2008_PD_Profiles_PUF.zip"
+
 # end of files to download #
 
 # combine all zip file names into a single character vector
-all.files <- c( inpatient , dme , pde , hospice , carrier , hha , outpatient , snf , cc , ipbs )
+all.files <- c( inpatient , dme , pde , hospice , carrier , hha , outpatient , snf , cc , ipbs , rxp )
 
 # initiate the 'resp' object (just in case the all.files order changes)
 resp <- data.frame( status_code = 1 )
