@@ -220,7 +220,7 @@ y.female <-
 # average out-of-pocket medical expenditure - nationwide, restricted to females
 svymean(
 	~moop ,
-	design = y
+	design = y.female
 )
 
 
