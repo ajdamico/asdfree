@@ -67,10 +67,15 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa Nacional por 
 # this is necessary for computers with limited resources, since none of the data requires ram #
 # if you'd prefer to read the entire dataset into ram instead, use the command                #
 # x <- dbReadTable( db , 'pnad2011' )                                                         #
+# or, to not overload RAM and get a subset of the columns in pnad2011, with survey variables  #
+# x <- dbGetQuery( db , 'select v4618 , v4617 , pre_wgt , v4609 , ... from pnad2011' )        #
 # at which point, the `?transform` function can be used to make recodes on the `x` data.frame #
 # finally, the survey object declaration `svydesign` should not include the parameters        #
 # `dbtype = "SQLite"` or `dbname = "pnad.db"`, and the data parameter should be `data = x`    #
+# and then, once the svydesign has been created, since this won't be a database-backed object #
+# simply use postStratify() instead of pnad.postStratify() to post-stratify the final design  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 
 
