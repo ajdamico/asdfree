@@ -65,17 +65,17 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa Nacional por 
 
 # create survey design object with PNAD design information
 # using existing data frame of PNAD data
-unstratified.pnad <-
+sample.pnad <-
 	svydesign(
 		id = ~v4618 ,
 		strata = ~v4617 ,
 		data = "pnad2011" ,
-		weights = ~v4610 ,
+		weights = ~pre_wgt ,
 		nest = TRUE ,
 		dbtype = "SQLite" ,
 		dbname = "pnad.db"
 	)
-# note that the above object has been given the unwieldy name of `unstratified.pnad`
+# note that the above object has been given the unwieldy name of `sample.pnad`
 # so that it's not accidentally used in analysis commands.
 # this object has not yet been appropriately post-stratified, as necessitated by IBGE
 # in order to accurately match the brazilian 2010 census
@@ -85,9 +85,9 @@ unstratified.pnad <-
 # this uses a function custom-built for the PNAD.
 y <- 
 	pnad.postStratify( 
-		design = unstratified.pnad ,
+		design = sample.pnad ,
 		strata.col = 'v4609' ,
-		oldwgt = 'v4610'
+		oldwgt = 'pre_wgt'
 	)
 
 # count the weighted number of individuals, then broken down by gender,

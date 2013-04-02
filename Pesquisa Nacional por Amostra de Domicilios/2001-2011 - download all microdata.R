@@ -209,6 +209,24 @@ for ( year in years.to.download ){
 		)
 	)
 
+	# determine if the table contains a `v4619` variable.
+	# v4619 is the factor of subsampling used to compensate the loss of units in some states
+	# for 2011, the variable v4619 is one and so it is not needed.
+	# if it does not, create it.
+	any.v4619 <- 'v4619' %in% dbListFields( db , paste0( 'pnad' , year ) )
+
+	# if it's not in there, copy it over
+	if ( !any.v4619 ) {
+		dbSendQuery( db , paste0( 'alter table pnad' , year , ' add column v4619 real' ) )
+		dbSendQuery( db , paste0( 'update pnad' , year , ' set v4619 = 1' ) )
+	}
+	
+	# now create the pre-stratified weight to be used in all of the survey designs
+	# if it's not in there, copy it over
+	dbSendQuery( db , paste0( 'alter table pnad' , year , ' add column pre_wgt real' ) )
+	dbSendQuery( db , paste0( 'update pnad' , year , ' set pre_wgt = v4619 * v4610' ) )
+	
+	
 	# confirm that the number of records in the pnad merged file
 	# matches the number of records in the person file
 	stopifnot( 

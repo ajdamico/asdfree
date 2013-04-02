@@ -20,7 +20,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # important note about why these statistics and standard errors do not precisely match the table packages available at:   #
 # ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/2011/Sintese_Indicadores/ #
-# the brazilian institute of statistics recently modified their methodology to use post-stratification so these final     #
+# the brazilian institute of statistics round the post-stratifed weights, which has no theoretical effect. so these final #
 # results from this script will be very close but not precisely exact. however, you can view the replication script in    #
 # this directory which explains how these statistics *do* precisely match some statistics, standard errors, and           #
 # coefficients of variation provided to me by the friendly folks at IBGE in other words, the analysis methods described   #
@@ -60,6 +60,17 @@ options( survey.lonely.psu = "adjust" )
 
 # load pnad-specific functions (to remove invalid SAS input script fields and postStratify a database-backed survey object)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa Nacional por Amostra de Domicilios/pnad.survey.R" )
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# note regarding sql commands and alternatives: the recodes below use basic commands from sql #
+# this is necessary for computers with limited resources, since none of the data requires ram #
+# if you'd prefer to read the entire dataset into ram instead, use the command                #
+# x <- dbReadTable( db , 'pnad2011' )                                                         #
+# at which point, the `?transform` function can be used to make recodes on the `x` data.frame #
+# finally, the survey object declaration `svydesign` should not include the parameters        #
+# `dbtype = "SQLite"` or `dbname = "pnad.db"`, and the data parameter should be `data = x`    #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
@@ -160,17 +171,17 @@ dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from r
 
 # create survey design object with PNAD design information
 # using existing data frame of PNAD data
-unstratified.pnad <-
+sample.pnad <-
 	svydesign(
 		id = ~v4618 ,
 		strata = ~v4617 ,
 		data = "recoded_pnad2011" ,		# notice that this line now points to the recoded_pnad2011
-		weights = ~v4610 ,
+		weights = ~pre_wgt ,
 		nest = TRUE ,
 		dbtype = "SQLite" ,
 		dbname = "pnad.db"
 	)
-# note that the above object has been given the unwieldy name of `unstratified.pnad`
+# note that the above object has been given the unwieldy name of `sample.pnad`
 # so that it's not accidentally used in analysis commands.
 # this object has not yet been appropriately post-stratified, as necessitated by IBGE
 # in order to accurately match the brazilian 2010 census
@@ -180,9 +191,9 @@ unstratified.pnad <-
 # this uses a function custom-built for the PNAD.
 y <- 
 	pnad.postStratify( 
-		design = unstratified.pnad ,
+		design = sample.pnad ,
 		strata.col = 'v4609' ,
-		oldwgt = 'v4610'
+		oldwgt = 'pre_wgt'
 	)
 
 	
