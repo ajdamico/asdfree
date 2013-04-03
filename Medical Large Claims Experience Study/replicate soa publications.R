@@ -188,3 +188,7 @@ rev( cumsum( rev( tapply( x$totpdchg , x$charge.category , sum ) / sum( x$totpdc
 # create another on-the-fly table of proportions that cumulatively sums the share of paid charges,
 # subtracting the deductibles (just the min.category values)
 unlist( lapply( min.charges , afun , x ) ) / sum( x$totpdchg )
+
+# for more details on how to work with data in r
+# check out my two minute tutorial video site
+# http://www.twotorials.com/
