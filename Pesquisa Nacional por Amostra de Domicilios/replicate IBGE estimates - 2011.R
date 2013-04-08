@@ -64,7 +64,7 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa Nacional por 
 ##############################################
 
 # create survey design object with PNAD design information
-# using existing data frame of PNAD data
+# using existing table of PNAD data
 sample.pnad <-
 	svydesign(
 		id = ~v4618 ,
@@ -78,7 +78,7 @@ sample.pnad <-
 # note that the above object has been given the unwieldy name of `sample.pnad`
 # so that it's not accidentally used in analysis commands.
 # this object has not yet been appropriately post-stratified, as necessitated by IBGE
-# in order to accurately match the brazilian 2010 census
+# in order to accurately match the brazilian 2010 census projections
 	
 # this block conducts a post-stratification on the un-post-stratified design
 # and since the R `survey` package's ?postStratify currently does not work on database-backed survey objects,

@@ -145,7 +145,7 @@ agebounds <- c( 0 , 5 , 10 , 15 , 20 , 25 , 40 , 60 , 200 )
 # start at the value '0' and end at the value '200'.
 for ( i in 1:( length( agebounds ) - 1 ) ){
 
-	# build the sql string to pass to monetdb
+	# build the sql string to pass to sqlite
 	update.sql.string <- paste0( "UPDATE recoded_pnad2011 SET agecat2 = '" , str_pad( i , 2 , pad = '0' ) , "' WHERE v8005 >= " , agebounds[ i ] , " AND v8005 < " , agebounds[ i + 1 ] )
 		
 	# take a look at the update.sql.string you've just built.  familiar?  ;)
@@ -175,7 +175,7 @@ dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from r
 ##############################################
 
 # create survey design object with PNAD design information
-# using existing data frame of PNAD data
+# using existing table of PNAD data
 sample.pnad <-
 	svydesign(
 		id = ~v4618 ,
@@ -189,7 +189,7 @@ sample.pnad <-
 # note that the above object has been given the unwieldy name of `sample.pnad`
 # so that it's not accidentally used in analysis commands.
 # this object has not yet been appropriately post-stratified, as necessitated by IBGE
-# in order to accurately match the brazilian 2010 census
+# in order to accurately match the brazilian 2010 census projections
 	
 # this block conducts a post-stratification on the un-post-stratified design
 # and since the R `survey` package's ?postStratify currently does not work on database-backed survey objects,
