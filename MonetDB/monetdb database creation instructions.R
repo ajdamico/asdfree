@@ -90,12 +90,7 @@ batfile <- "C:/My Directory/MonetDB/test.bat"
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
 
-# third: add a ten second system sleep in between the shell.exec() function
-# and the database connection lines.  this gives your local computer a chance
-# to get monetdb up and running.
-Sys.sleep( 10 )
-
-# fourth: your six lines to make a monet database connection.
+# third: your five lines to make a monet database connection.
 # just like above, mine look like this:
 dbname <- "test"
 dbport <- 50000

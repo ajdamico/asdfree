@@ -147,13 +147,6 @@ pid <- monetdb.server.start( batfile )
 # MonetDB/SQL module loaded
 
 
-# if that shell window is not open, monetdb commands will not work.  period.
-
-
-# give the shell window ten seconds to load.
-Sys.sleep( 10 )
-
-
 # end of monetdb database configuration #
 
 
@@ -349,12 +342,7 @@ batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
 
-# third: add a ten second system sleep in between the shell.exec() function
-# and the database connection lines.  this gives your local computer a chance
-# to get monetdb up and running.
-Sys.sleep( 10 )
-
-# fourth: your six lines to make a monet database connection.
+# third: your five lines to make a monet database connection.
 # just like above, mine look like this:
 dbname <- "bsapuf"
 dbport <- 50003
