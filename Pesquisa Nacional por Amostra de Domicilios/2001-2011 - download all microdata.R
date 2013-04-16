@@ -81,6 +81,27 @@ tf <- tempfile() ; td <- tempdir()
 # open the connection to the sqlite database
 db <- dbConnect( SQLite() , pnad.dbname )
 
+
+# download and import the tables containing missing codes
+download( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/household_nr.csv" , tf )
+household.nr <- read.csv( tf , colClasses = 'character' )
+
+download( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/person_nr.csv" , tf )
+person.nr <- read.csv( tf , colClasses = 'character' )
+
+# convert these tables to lowercase
+names( household.nr ) <- tolower( names( household.nr ) )
+names( person.nr ) <- tolower( names( person.nr ) )
+
+# remove all spaces between missing codes
+household.nr$code <- gsub( " " , "" , household.nr$code )
+person.nr$code <- gsub( " " , "" , person.nr$code )
+
+# convert all code column names to lowercase
+household.nr$variable <- tolower( household.nr$variable )
+person.nr$variable <- tolower( person.nr$variable )
+
+
 # begin looping through every pnad year specified
 for ( year in years.to.download ){
 
@@ -183,6 +204,71 @@ for ( year in years.to.download ){
 	# on the local disk are no longer necessary, so delete them.
 	file.remove( files )
 
+	
+	# missing level blank-outs #
+	# this section loops through the non-response values & variables for all years
+	# and sets those variables to NULL.
+	cat( 'non-response variable blanking-out only occurs on numeric variables\n' )
+	cat( 'categorical variable blanks are usually 9 in the psid\n' )
+	cat( 'thanks for listening\n' )
+	
+	# loop through each row in the missing household-level  codes table
+	for ( curRow in seq( nrow( household.nr ) ) ){
+
+		# if the variable is in the current table..
+		if( household.nr[ curRow , 'variable' ] %in% dbListFields( db , paste0( 'dom' , year ) ) ){
+
+			# ..and the variable should be recoded for that year
+			if( year %in% eval( parse( text = household.nr[ curRow , 'year' ] ) ) ){
+		
+				# update all variables where that code equals the `missing` code to NA (NULL in SQLite)
+				dbSendQuery( 
+					db , 
+					paste0( 
+						'update dom' , 
+						year , 
+						' set ' , 
+						household.nr[ curRow , 'variable' ] , 
+						" = NULL where " ,
+						household.nr[ curRow , 'variable' ] ,
+						' = ' ,
+						household.nr[ curRow , 'code' ]
+					)
+				)
+			
+			}
+		}
+	}
+
+	# loop through each row in the missing person-level codes table
+	for ( curRow in seq( nrow( person.nr ) ) ){
+
+		# if the variable is in the current table..
+		if( person.nr[ curRow , 'variable' ] %in% dbListFields( db , paste0( 'pes' , year ) ) ){
+		
+			# ..and the variable should be recoded for that year
+			if( year %in% eval( parse( text = person.nr[ curRow , 'year' ] ) ) ){
+		
+				# update all variables where that code equals the `missing` code to NA (NULL in SQLite)
+				dbSendQuery( 
+					db , 
+					paste0( 
+						'update pes' , 
+						year , 
+						' set ' , 
+						person.nr[ curRow , 'variable' ] , 
+						" = NULL where " ,
+						person.nr[ curRow , 'variable' ] ,
+						' = ' ,
+						person.nr[ curRow , 'code' ]
+					)
+				)
+			
+			}
+		}
+	}
+
+	
 	# create indexes to speed up the merge of the household- and person-level files.
 	dbSendQuery( db , paste0( "CREATE INDEX pes_index" , year , " ON pes" , year , " ( v0101 , v0102 , v0103 )" ) )
 	dbSendQuery( db , paste0( "CREATE INDEX dom_index" , year , " ON dom" , year , " ( v0101 , v0102 , v0103 )" ) )
