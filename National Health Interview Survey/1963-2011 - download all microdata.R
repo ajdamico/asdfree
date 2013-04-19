@@ -195,6 +195,9 @@ for ( year in nhis.years.to.download ){
 	
 	message( "user note: depending on what you're analyzing, you might need some of these files." )
 	
+	# skip the new sc_bwt files entirely
+	ftp.files <- ftp.files[ !grepl( 'sc_bwt' , ftp.files ) ]
+	
 	# skip these 1963 files with irregular SAS importation scripts
 	if ( year == 1963 ) ftp.files <- ftp.files[ ! ( ftp.files %in% c( 'condition.exe' , 'family.exe' , 'hospital.exe' , 'health_exp.exe' ) ) ]
 	
