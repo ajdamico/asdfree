@@ -52,7 +52,8 @@ require(stringr) 		# load stringr package (manipulates character strings easily)
 # lines of code to hold on to for all other `acs` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -62,9 +63,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "acs"
 dbport <- 50001
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 # # # # run your analysis commands # # # #
@@ -202,9 +202,7 @@ acs.m.recoded.design <-
 		key = "idkey" ,
 		# check.factors = 10 ,
 		database = monet.url ,
-		driver = drv ,
-		user = "monetdb" ,
-		password = "monetdb" 
+		driver = MonetDB.R()
 	)
 
 
@@ -222,7 +220,8 @@ acs.m.recoded.design <-
 # unless you've set your working directory elsewhere, 
 # spell out the entire filepath to the .rda file
 # use forward slashes instead of backslashes
-save( acs.m.recoded.design , file = "C:/My Directory/ACS/recoded_acs2011_1yr.rda" )
+# uncomment this line by removing the `#` at the front..
+# save( acs.m.recoded.design , file = "C:/My Directory/ACS/recoded_acs2011_1yr.rda" )
 
 
 # # # # # # # # # # # # # # # # #
@@ -246,11 +245,12 @@ require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 
 # load your new the survey object
 
-load( "C:/My Directory/ACS/recoded_acs2011_1yr.rda" )
+# uncomment this line by removing the `#` at the front..
+# load( "C:/My Directory/ACS/recoded_acs2011_1yr.rda" )
 
 
 # connect the recoded complex sample design to the monet database #
-acs.r <- open( acs.m.recoded.design , driver = drv , user = "monetdb" , password = "monetdb" )	# recoded
+acs.r <- open( acs.m.recoded.design , driver = MonetDB.R() )	# recoded
 
 # ..and now you can exactly match the age categories provided by the census bureau at..
 # http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #

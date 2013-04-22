@@ -62,7 +62,8 @@ require(downloader)		# downloads and then runs the source() function on scripts 
 # and the monet database will be stored in the MonetDB folder within
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/BRFSS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/BRFSS/" )
 
 
 # load the read.SAScii.monetdb() function,
@@ -137,7 +138,8 @@ dbport <- 50004
 # lines of code to hold on to for all other `brfss` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -147,9 +149,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "brfss"
 dbport <- 50004
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 # # # # run your analysis commands # # # #
@@ -336,7 +337,7 @@ for ( year in intersect( years.to.download , 2002:2011 ) ){
 	
 		# the zipped filename and sas importation script are here:
 		fn <- "ftp://ftp.cdc.gov/pub/data/brfss/LLCP2011ASC.ZIP"
-		sas_ri <- "http://www.cdc.gov/brfss/technical_infodata/surveydata/2011/SASOUT11_LLCP.SAS"
+		sas_ri <- "http://www.cdc.gov/brfss/annual_data/2011/SASOUT11_LLCP.SAS"
 		
 	# otherwise, if the file to download is 2002..
 	} else if ( year == 2002 ){
@@ -440,9 +441,7 @@ for ( year in years.to.download ){
 			key = "idkey" ,				# sql primary key column (created with the auto_increment line above)
 			# check.factors = 10 ,		# defaults to ten
 			database = monet.url ,		# monet database location on localhost
-			driver = drv ,				# monet driver location on the local disk
-			user = "monetdb" ,			# username
-			password = "monetdb" 		# password
+			driver = MonetDB.R()
 		)
 
 	# save the complex sample survey design
@@ -482,7 +481,8 @@ monetdb.server.stop( pid )
 # lines of code to hold on to for all other `brfss` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -492,9 +492,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "brfss"
 dbport <- 50004
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 # # # # run your analysis commands # # # #

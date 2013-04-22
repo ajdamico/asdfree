@@ -59,7 +59,8 @@ require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 # set this directory to C:/My Directory/BSAPUF/
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/BSAPUF/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/BSAPUF/" )
 
 
 # set the current year of data to import
@@ -84,7 +85,7 @@ batfile <-
 	monetdb.server.setup(
 					
 					# set the path to the directory where the initialization batch file and all data will be stored
-					database.directory = "C:/My Directory/BSAPUF/MonetDB" ,
+					database.directory = paste0( getwd() , "/MonetDB" ) ,
 					# must be empty or not exist
 					
 					# find the main path to the monetdb installation program
@@ -191,15 +192,12 @@ rxp <- paste0( "./" , year , "/" , year , "_PD_Profiles_PUF.csv" )
 
 
 
-# convert the driver to a monetdb driver
-drv <- dbDriver("MonetDB")
-
 # notice the dbname and dbport (assigned above during the monetdb configuration)
 # get used in this line
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 
 # now put everything together and create a connection to the monetdb server.
-db <- dbConnect( drv , monet.url , "monetdb", "monetdb")
+db <- dbConnect( MonetDB.R() , monet.url )
 # from now on, the 'db' object will be used for r to connect with the monetdb server
 
 
@@ -309,7 +307,8 @@ monet.read.csv(
 	db , 
 	rxp , 
 	paste0( 'rxp' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( rxp , countLines ) 
+	nrows = sapply( rxp , countLines ) ,
+	nrow.check = 10000
 )
 
 
@@ -337,7 +336,8 @@ monetdb.server.stop( pid )
 # lines of code to hold on to for all other bsa puf monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -347,10 +347,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "bsapuf"
 dbport <- 50003
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
-
+db <- dbConnect( MonetDB.R() , monet.url )
 
 # # # # run your analysis commands # # # #
 

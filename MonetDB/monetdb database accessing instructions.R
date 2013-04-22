@@ -30,9 +30,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "test"
 dbport <- 50000
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 # # # # run your analysis commands # # # #
 

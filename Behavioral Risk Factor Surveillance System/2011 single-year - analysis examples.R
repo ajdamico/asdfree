@@ -52,7 +52,8 @@ require(stringr) 		# load stringr package (manipulates character strings easily)
 # lines of code to hold on to for all other `brfss` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -62,9 +63,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "brfss"
 dbport <- 50004
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 # # # # run your analysis commands # # # #
@@ -92,14 +92,15 @@ db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
 
 # load the desired behavioral risk factor surveillance system monet database-backed complex sample design objects
 
-load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year acs
+# uncomment this line by removing the `#` at the front..
+# load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year acs
 
 # note: this r data file should already contain the 2011 single-year design
 
 
 
 # connect the complex sample designs to the monet database #
-brfss.d <- open( brfss.design , driver = drv , user = "monetdb" , password = "monetdb" )	# single-year design
+brfss.d <- open( brfss.design , driver = MonetDB.R() )	# single-year design
 
 
 

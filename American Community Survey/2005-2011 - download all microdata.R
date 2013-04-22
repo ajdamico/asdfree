@@ -60,7 +60,8 @@ require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 # and the monet database will be stored in the MonetDB folder within
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/ACS/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/ACS/" )
 
 
 # configure a monetdb database for the acs on windows #
@@ -131,7 +132,8 @@ dbport <- 50001
 # lines of code to hold on to for all other `acs` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -141,9 +143,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "acs"
 dbport <- 50001
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 
@@ -534,9 +535,7 @@ for ( year in 2050:2005 ){
 					key = "idkey" ,
 					# check.factors = 10 ,						# defaults to ten
 					database = monet.url ,
-					driver = drv ,
-					user = "monetdb" ,
-					password = "monetdb" 
+					driver = MonetDB.R()
 				)
 
 			# create a sqlrepsurvey complex sample design object
@@ -553,9 +552,7 @@ for ( year in 2050:2005 ){
 					key = "idkey" ,
 					# check.factors = 10 ,						# defaults to ten
 					database = monet.url ,
-					driver = drv ,
-					user = "monetdb" ,
-					password = "monetdb" 
+					driver = MonetDB.R()
 				)
 
 			# save both complex sample survey designs
@@ -603,7 +600,8 @@ monetdb.server.stop( pid )
 # lines of code to hold on to for all other `acs` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -613,9 +611,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "acs"
 dbport <- 50001
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 # # # # run your analysis commands # # # #

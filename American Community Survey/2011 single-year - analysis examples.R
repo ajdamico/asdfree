@@ -47,7 +47,8 @@ require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 # lines of code to hold on to for all other `acs` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -57,9 +58,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "acs"
 dbport <- 50001
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 # # # # run your analysis commands # # # #
@@ -87,7 +87,8 @@ db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
 
 # load the desired american community survey monet database-backed complex sample design objects
 
-load( 'C:/My Directory/ACS/acs2011_1yr.rda' )	# analyze the 2011 single-year acs
+# uncomment one of these lines by removing the `#` at the front..
+# load( 'C:/My Directory/ACS/acs2011_1yr.rda' )	# analyze the 2011 single-year acs
 # load( 'C:/My Directory/ACS/acs2010_1yr.rda' )	# analyze the 2010 single-year acs
 # load( 'C:/My Directory/ACS/acs2010_3yr.rda' )	# analyze the 2008-2010 three-year acs
 # load( 'C:/My Directory/ACS/acs2010_5yr.rda' )	# analyze the 2006-2010 five-year acs
@@ -96,8 +97,8 @@ load( 'C:/My Directory/ACS/acs2011_1yr.rda' )	# analyze the 2011 single-year acs
 
 
 # connect the complex sample designs to the monet database #
-acs.m <- open( acs.m.design , driver = drv , user = "monetdb" , password = "monetdb" )	# merged design
-acs.h <- open( acs.h.design , driver = drv , user = "monetdb" , password = "monetdb" )	# household-only design
+acs.m <- open( acs.m.design , driver = MonetDB.R() )	# merged design
+acs.h <- open( acs.h.design , driver = MonetDB.R() )	# household-only design
 
 
 

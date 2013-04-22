@@ -52,7 +52,8 @@ require(stringr) 		# load stringr package (manipulates character strings easily)
 # lines of code to hold on to for all other `brfss` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -62,9 +63,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "brfss"
 dbport <- 50004
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 # # # # run your analysis commands # # # #
@@ -94,7 +94,7 @@ db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
 # then make a copy so you don't lose the pristine original.    #
 
 # the command above
-# db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
+# db <- dbConnect( MonetDB.R() , monet.url )
 # has already connected the current instance of r to the monet database
 
 # now simply copy you'd like to recode into a new table
@@ -166,9 +166,7 @@ brfss.recoded.design <-
 		key = "idkey" ,
 		# check.factors = 10 ,						# defaults to ten
 		database = monet.url ,
-		driver = drv ,
-		user = "monetdb" ,
-		password = "monetdb" 
+		driver = MonetDB.R()
 	)
 
 
@@ -187,7 +185,9 @@ brfss.recoded.design <-
 # unless you've set your working directory elsewhere, 
 # spell out the entire filepath to the .rda file
 # use forward slashes instead of backslashes
-save( brfss.recoded.design , file = "C:/My Directory/BRFSS/recoded b2010 design.rda" )
+
+# uncomment this line by removing the `#` at the front..
+# save( brfss.recoded.design , file = "C:/My Directory/BRFSS/recoded b2010 design.rda" )
 
 
 
@@ -220,14 +220,16 @@ require(MonetDB.R)			# load the MonetDB.R package (connects r to a monet databas
 
 # load your new the survey object
 
-load( "C:/My Directory/BRFSS/recoded b2010 design.rda" )
+# uncomment this line by removing the `#` at the front..
+# load( "C:/My Directory/BRFSS/recoded b2010 design.rda" )
 
 
 ######################################################################
 # lines of code to hold on to for all other `brfss` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -237,15 +239,14 @@ pid <- monetdb.server.start( batfile )
 dbname <- "brfss"
 dbport <- 50004
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 
 # # # # run your analysis commands # # # #
 
 # connect the recoded complex sample design to the monet database #
-brfss.r <- open( brfss.recoded.design , driver = drv , user = "monetdb" , password = "monetdb" )	# recoded
+brfss.r <- open( brfss.recoded.design , driver = MonetDB.R() )	# recoded
 
 # ..and now you can exactly match the monthly alcohol consumption categories provided by the cdc's web-enabled analysis tool at..
 # https://github.com/ajdamico/usgsd/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/WEAT%202010%20Alcohol%20Consumption%20by%20Gender%20-%20Crosstab%20Analysis%20Results.pdf?raw=true #

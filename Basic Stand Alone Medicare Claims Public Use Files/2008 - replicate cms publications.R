@@ -49,7 +49,8 @@ require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 # lines of code to hold on to for the start of all other bsa puf monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -59,9 +60,8 @@ pid <- monetdb.server.start( batfile )
 dbname <- "bsapuf"
 dbport <- 50003
 
-drv <- dbDriver("MonetDB")
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( drv , monet.url , "monetdb" , "monetdb" )
+db <- dbConnect( MonetDB.R() , monet.url )
 
 # end of lines of code to hold on to for all other bsa puf monetdb analyses #
 #############################################################################

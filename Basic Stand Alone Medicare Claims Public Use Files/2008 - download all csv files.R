@@ -26,7 +26,8 @@
 # in a newly-created "2008" in this directory
 # use forward slashes instead of back slashes
 
-setwd( "C:/My Directory/BSAPUF/" )
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/BSAPUF/" )
 
 # remove the # in order to run this install.packages line only once
 # install.packages( "httr" )
@@ -45,7 +46,7 @@ require(httr)		# load httr package (downloads files from the web, with SSL and c
 # create and set the working directory to a year-specific folder #
 
 # find the current working directory, and add "2008" at the end
-current.year.folder <- normalizePath( paste0( getwd() , "\\2008" ) )
+current.year.folder <- normalizePath( paste0( getwd() , "/2008" ) )
 
 # create a "2008" folder inside the current working directory
 dir.create( current.year.folder )
