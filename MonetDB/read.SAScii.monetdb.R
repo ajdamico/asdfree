@@ -18,7 +18,7 @@ sql.copy.into <-
 # differences from the SAScii package's read.SAScii() --
 # 	um well a whole lot faster
 # 	no RAM issues
-# 	decimal division isn't flexible
+# 	decimal division must be TRUE/FALSE (as opposed to NULL - the user must decide)
 # 	must read in the entire table
 #	requires RMonetDB and a few other packages
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -33,7 +33,7 @@ read.SAScii.monetdb <-
 		zipped = F , 
 		# n = -1 , 						# no n parameter available for this - you must read in the entire table!
 		lrecl = NULL , 
-		# skip.decimal.division = NULL , skipping decimal division not an option
+		skip.decimal.division = FALSE , # skipping decimal division defaults to FALSE for this function!
 		tl = F ,						# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,				# overwrite existing table?
@@ -234,7 +234,7 @@ read.SAScii.monetdb <-
 	# loop through all columns to:
 		# convert to numeric where necessary
 		# divide by the divisor whenever necessary
-	for ( l in 1:nrow(y) ){
+	for ( l in seq( nrow(y) ) ){
 	
 		if ( 
 			( y[ l , "divisor" ] != 1 ) & 
@@ -253,10 +253,12 @@ read.SAScii.monetdb <-
 					y[ l , "divisor" ]
 				)
 				
-			dbSendUpdate( connection , sql )
+			if ( !skip.decimal.division ){
+				dbSendUpdate( connection , sql )
 			
-			# give the MonetDB mserver.exe a certain number of seconds to process each column
-			Sys.sleep( sleep.between.col.updates )
+				# give the MonetDB mserver.exe a certain number of seconds to process each column
+				Sys.sleep( sleep.between.col.updates )
+			}
 		
 		}
 			
