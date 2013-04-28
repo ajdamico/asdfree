@@ -10,11 +10,11 @@ Region 2
 Assets 10  
 Other_Lender_Code 1  
 Respondent_Name_Panel $ 30 
-Filler $ 40 
+Filler1 $ 40 
 Respondent_City_Panel $ 25 
 Respondent_State_Panel $ 2 
-Filler $ 10 
-Filler 10  
+Filler2 $ 10 
+Filler3 10  
 Top_Holder_RSSD_ID 10  
 Top_Holder_Name $ 30 
 Top_Holder_City $ 25 
@@ -22,5 +22,5 @@ Top_Holder_State $ 2
 Top_Holder_Country $ 40 
 Respondent_RSSD_ID 10  
 Parent_RSSD_ID 10  
-Respondent_FIPSStateNumber 2 
+Respondent_FIPS_State_Number 2 
  ;
