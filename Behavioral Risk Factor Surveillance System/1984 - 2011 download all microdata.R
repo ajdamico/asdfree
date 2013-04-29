@@ -119,7 +119,7 @@ batfile
 
 # hold on to that line for future scripts.
 # you need to run this line *every time* you access
-# the american community survey files with monetdb.
+# the behavioral risk factor surveillance system files with monetdb.
 # this is the monetdb server.
 
 # two other things you need: the database name and the database port.
