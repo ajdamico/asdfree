@@ -335,6 +335,60 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 file.remove( tf , tf2 , tf3 , tf4 , tf5 , z , csv.file )
 
 
+
+# the current working directory should now contain a MonetDB folder
+# with all of the hmda contents of each year downloaded
+
+
+# once complete, this script does not need to be run again.
+
+
+# the current monet database should now contain
+# all of the newly-added tables (in addition to meta-data tables)
+dbListTables( db )		# print the tables stored in the current monet database to the screen
+
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+
+
+
+#####################################################################
+# lines of code to hold on to for all other `hmda` monetdb analyses #
+
+# first: specify your batfile.  again, mine looks like this:
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/HMDA/MonetDB/brfss.bat"
+
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: your five lines to make a monet database connection.
+# just like above, mine look like this:
+dbname <- "hmda"
+dbport <- 50005
+
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( MonetDB.R() , monet.url )
+
+
+# # # # run your analysis commands # # # #
+
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `hmda` monetdb analyses #
+############################################################################
+
+
 # unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
 message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
 
