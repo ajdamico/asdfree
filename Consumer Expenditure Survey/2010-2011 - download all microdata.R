@@ -37,8 +37,9 @@
 require(foreign) 	# load foreign package (converts data files into R)
 
 
-# download all available years
-years.to.download <- 2011:2010
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# years.to.download <- 2011:2010
 
 # uncomment to only download the most current available year
 # years.to.download <- 2011

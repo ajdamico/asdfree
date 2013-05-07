@@ -39,8 +39,9 @@
 
 # define which years to download #
 
-# this line will download every year of data available
-years.to.download <- c( 2001:2009 , 2011 )
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# years.to.download <- c( 2001:2009 , 2011 )
 
 # uncomment this line to only download the most current year
 # years.to.download <- 2011

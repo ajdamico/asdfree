@@ -37,8 +37,9 @@
 # install.packages( c( "SAScii" , "downloader" ) )
 
 
-# download all available years
-years.to.download <- c( 2002 , 2005 , 2008 , 2011 )
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# years.to.download <- c( 2002 , 2005 , 2008 , 2011 )
 
 # uncomment to only download the most current available year
 # years.to.download <- 2011

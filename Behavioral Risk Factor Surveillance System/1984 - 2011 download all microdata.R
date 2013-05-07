@@ -160,7 +160,11 @@ db <- dbConnect( MonetDB.R() , monet.url )
 # if you have a big hard drive, hey why not download them all?
 
 # single-year datasets are available back to 1984
-years.to.download <- 1984:2011
+
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# years.to.download <- 1984:2011
+
 # pretty orwellian, huh?	
 
 # # # # # # # # # # # # # #

@@ -49,7 +49,9 @@
 
 
 # choose which hmda data sets to download
-years.to.download <- 2006:2011
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# years.to.download <- 2006:2011
 # if you have a big hard drive, hey why not download them all?
 
 # remove the `#` in order to just download 2011

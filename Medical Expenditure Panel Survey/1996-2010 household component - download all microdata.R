@@ -42,7 +42,8 @@ library(RCurl)		# load RCurl package (downloads files from the web)
 require(foreign) 	# load foreign package (converts data files into R)
 
 
-# specify the MEPS years currently available
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
 year <- 1996:2010
 
 
@@ -115,7 +116,8 @@ mm$events <- NULL
 # highly recommended: MEPS 1996 has lots of oddities compared to other years
 # this file should be skipped unless you spend lots of time reading the documentation
 # to figure out what changed where.
-mm <- subset( mm , year %in% 1997:2010 )
+# uncomment this line by removing the `#` at the front
+# mm <- subset( mm , year %in% 1997:2010 )
 
 
 

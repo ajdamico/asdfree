@@ -46,8 +46,9 @@ download.documentation <- TRUE
 
 # define which years to download #
 
-# this line will download every year of data available
-nhis.years.to.download <- 2011:1963
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# nhis.years.to.download <- 2011:1963
 
 # uncomment this line to only download the most current year
 # nhis.years.to.download <- 2011

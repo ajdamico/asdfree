@@ -45,8 +45,9 @@
 # create a temporary file and temporary directory
 tf <- tempfile() ; td <- tempdir()
 
-# designate which years are available to download
-years.to.download <- 1997:1999
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# years.to.download <- 1997:1999
 
 # loop through each of the years to download and..
 for ( year in years.to.download ){

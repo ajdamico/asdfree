@@ -40,8 +40,9 @@
 
 # define which years to download #
 
-# this line will download every year of data available
-cps.years.to.download <- 2012:2005
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# cps.years.to.download <- 2012:2005
 
 # uncomment this line to only download the most current year
 # cps.years.to.download <- 2011
