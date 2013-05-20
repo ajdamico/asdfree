@@ -87,7 +87,7 @@ options( scipen = 20 )
 
 
 # load two svyttest functions (one to conduct a df-adjusted t-test and one to conduct a multiply-imputed t-test)
-source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/scf.survey.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/scf.survey.R" , prompt = FALSE )
 # now that this function has been loaded into r, you can view its source code by uncommenting the line below
 # scf.MIcombine
 # scf.svyttest

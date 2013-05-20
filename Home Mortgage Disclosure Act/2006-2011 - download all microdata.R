@@ -75,7 +75,7 @@ require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script
 # load the read.SAScii.monetdb() function,
 # which imports ASCII (fixed-width) data files directly into a monet database
 # using only a SAS importation script
-source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 # create five temporary files and also a temporary directory on the local disk
 tf <- tempfile() ; tf2 <- tempfile() ; tf3 <- tempfile() ; tf4 <- tempfile() ; tf5 <- tempfile() ; td <- tempdir()

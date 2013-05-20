@@ -94,7 +94,7 @@ fix.ct <-
 
 
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
 
 # set the locations of the data files on the ftp site
 SIPP.core.sas <-

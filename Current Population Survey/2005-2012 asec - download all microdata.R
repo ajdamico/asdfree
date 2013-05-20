@@ -74,7 +74,7 @@ require(downloader)	# downloads and then runs the source() function on scripts f
 
 
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
 
 
 # set R to produce conservative standard errors instead of crashing
