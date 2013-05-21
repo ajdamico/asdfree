@@ -195,6 +195,10 @@ for ( i in seq( nrow( downloads ) ) ){
 	# add a column `one` to every record, containing just the number one
 	scf.m$one <- 1
 	
+	# add a column `five` to every record, containing just the number five
+	scf.m$five <- 5
+	# note: this column should be used to calculate weighted totals.
+	
 	# break `scf.m` into five different data sets
 	# based on the final character of the column 'y1'
 	# which separates the five implicates
@@ -282,7 +286,7 @@ for ( i in seq( nrow( downloads ) ) ){
 
 
 # print a reminder: set the directory you just saved everything to as read-only!
-winDialog( 'ok' , paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
+message( paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
 
 
 # for more details on how to work with data in r

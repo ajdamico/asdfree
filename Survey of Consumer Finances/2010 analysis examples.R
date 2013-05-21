@@ -62,7 +62,7 @@ load( "scf2010.rda" )
 
 
 # define which variables from the five imputed iterations to keep
-vars.to.keep <- c( 'y1' , 'yy1' , 'wgt' , 'one' , 'networth' , 'checking' , 'hdebt' , 'agecl' , 'hhsex' )
+vars.to.keep <- c( 'y1' , 'yy1' , 'wgt' , 'one' , 'five' , 'networth' , 'checking' , 'hdebt' , 'agecl' , 'hhsex' , 'race' )
 # note: this throws out all other variables (except the replicate weights)
 # so if you need additional columns for your analysis,
 # add them to the `vars.to.keep` vector above
@@ -174,6 +174,25 @@ scf.MIcombine( with( scf.design , svyby( ~one , ~agecl , unwtd.count ) ) )
 # according to http://www.federalreserve.gov/econresdata/scf/files/bulletin.macro.txt
 # (search for the text 'agecl') age categories are:
 # under 35; 35-44; 45-54; 55-64; 65-74; 75+
+
+
+# count the weighted number of households in scf.design #
+scf.MIcombine( with( scf.design , svytotal( ~five ) ) )
+# note that due to the imputation-based structure of this data set,
+# this command should use the `five` column.
+# each record counts for five households x the main weight.
+# the result of the above command almost precisely matches
+# the official census bureau summary file 1's
+# 2010 household count of 116.7 million, as seen on pdf page 1 of this report:
+# http://www.census.gov/prod/cen2010/briefs/c2010br-14.pdf
+
+
+# count the weighted number of households broken out by race #
+scf.MIcombine( with( scf.design , svyby( ~five , ~race , svytotal ) ) )
+# note that these four weighted counts come very close to
+# the official census bureau's household count columns
+# white non-hispanic, black, and hispanic (plus all others, not shown)
+# http://www.census.gov/prod/cen2010/briefs/c2010br-14.pdf#page=8
 
 
 # calculate the mean of a linear variable #
