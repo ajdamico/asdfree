@@ -124,7 +124,7 @@ csv.file <- z[ grepl( 'csv' , z ) & !grepl( 'FileHeader' , z ) ]
 
 
 
-# create a monetdb executable (.bat) file for the medicare basic stand alone public use file
+# create a monetdb executable (.bat) file for the national plan and provider enumeration system
 batfile <-
 	monetdb.server.setup(
 					
@@ -165,7 +165,7 @@ batfile
 
 # hold on to that line for future scripts.
 # you need to run this line *every time* you access
-# the basic stand alone public use files with monetdb.
+# the national plan and provider enumeration system with monetdb.
 # this is the monetdb server.
 
 # two other things you need: the database name and the database port.
@@ -346,7 +346,7 @@ monetdb.server.stop( pid )
 ###########################################################################
 
 
-# once complete, this script does not need to be run again for this year of data.
+# once complete, this script does not need to be run again for this data.
 # instead, use the example monetdb analysis scripts
 
 

@@ -25,7 +25,7 @@
 # prior to running this analysis script, the national plan and provider enumeration system must be imported into a monet database #
 # on the local machine. you must run this:                                                                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/download%20and%20import.R  #                                        #
+# https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/download%20and%20import.R  #
 ###################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
