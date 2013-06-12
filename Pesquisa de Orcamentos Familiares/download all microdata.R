@@ -172,8 +172,10 @@ for ( year in years.to.download ){
 		
 		
 		# componentes table has a footnote, so throw it out
-		# by removing all records with a missing `nivel.1` field
+		# by removing all records with a missing
+		# or empty `nivel.1` field
 		componentes <- componentes[ !is.na( componentes$nivel.1 ) , ]
+		componentes <- componentes[ componentes$nivel.1 != "" , ]
 		
 		
 		# save both of these data frames to the local disk
@@ -192,6 +194,9 @@ for ( year in years.to.download ){
 		# from the excel file
 		poststr <- read.xls( pos , sheet = 1 )
 		# imported!  cool?  cool.
+		
+		# convert all column names to lowercase
+		names( poststr ) <- tolower( names( poststr ) )
 		
 		# save this data frame to the local disk
 		save( 
@@ -346,6 +351,9 @@ for ( year in years.to.download ){
 				tf2 , 
 				beginline = all.beginlines[ cur.beginline ] 
 			)
+		
+		# convert all column names to lowercase
+		names( x ) <- tolower( names( x ) )
 		
 		# rename the data table appropriately
 		assign( dfn , x )
