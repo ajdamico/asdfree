@@ -136,6 +136,14 @@ family.level.income <-
 	)
 	
 	
+# at this point, you've finished with the `t_morador_s` table
+# so remove that from working memory
+rm( t_morador_s )
+
+# and clear up RAM
+gc()
+	
+	
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # custom function to calculate food expenditures within the household #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

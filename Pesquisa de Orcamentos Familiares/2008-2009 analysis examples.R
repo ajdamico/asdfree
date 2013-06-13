@@ -263,6 +263,16 @@ svymean(
 )
 
 
+# calculate a ratio estimator to determine the prevalence among this population
+svyratio( ~underweight , ~one , pof.design.pos.npadults )
+# note that the underweight individuals are only ones in the numerator,
+# while everyone defined by the `subset` line above will be included in the denominator
+
+# although estimating the ratio with `svyratio` might be easier for certain cases,
+# in order to reproduce table 15 below, running simple `svymean` and `svyby` commands
+# will provide us with a complete table with far less work ;)
+
+
 # define a formula that will be used in multiple subsequent survey commands
 formulas <- ~underweight + overweight + obese
 
