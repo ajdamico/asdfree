@@ -46,7 +46,7 @@
 # use forward slashes instead of back slashes
 
 # uncomment this line by removing the `#` at the front..
- setwd( "C:/My Directory/ATUS/2007/" )
+# setwd( "C:/My Directory/ATUS/2007/" )
 # ..in order to set your current working directory
 
 
