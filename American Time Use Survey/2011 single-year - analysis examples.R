@@ -18,7 +18,7 @@
 
 
 #######################################################
-# this script matches a few of the bls statistics and # 
+# this script matches a few of the bls statistics     # 
 # shown at http://www.bls.gov/tus/tables/a1_2011.pdf  #
 #######################################################
 
