@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # area resource file
-# 2011-2012
+# 2012-2013
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -18,20 +18,20 @@
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#########################################################################################################
-# prior to running this analysis script, the arf 2011-2012 file must be loaded as an R data file (.rda) #
-# on the local machine.  running the 2011-2012 arf - download script will create this R data file       #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Area%20Resource%20File/2011-2012%20arf%20-%20download.R #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "arf2011.rda" with 'arf' in C:/My Directory/ARF                        #
-#########################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###################################################################################
+# prior to running this analysis script, the arf must be loaded as an R data file #
+# on the local machine.  running the download script will create this .rda        #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/Area%20Resource%20File/download.R #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "arf2012.rda" with 'arf' in C:/My Directory/ARF  #
+###################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # set your working directory.
-# the ARF 2011-2012 data files should have been stored here
+# the ARF 2012-2013 data files should have been stored here
 # after running the program described above
 # use forward slashes instead of back slashes
 
@@ -40,8 +40,8 @@
 # ..in order to set your current working directory
 
 
-# load the 2011-2012 ARF data file
-load( "arf2011.rda" )
+# load the 2012-2013 ARF data file
+load( "arf2012.rda" )
 
 
 # now the 'arf' data frame is available in memory..
@@ -49,7 +49,7 @@ load( "arf2011.rda" )
 ncol( arf )
 
 
-# the "ARF 2011 Tech Doc.xls" file in the current working directory contains field labels
+# the "AHRF 2012-2013 Technical Documentation.xls" file in the current working directory contains field labels
 # so create a smaller data table with only a few columns of interest
 # first, create a character vector containing only the columns you'll need:
 variables.to.keep <-
