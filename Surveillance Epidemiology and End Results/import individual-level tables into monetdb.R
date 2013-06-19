@@ -164,7 +164,7 @@ db <- dbConnect( MonetDB.R() , monet.url )
 # first, look in the downloaded zipped file's main directory,
 # and store a character vector `all.files` containing the filepaths
 # to each of the files inside that directory
-all.files <- list.files( "./SEER_1973_2010_TEXTDATA/" , full.names = TRUE , recursive = TRUE )
+all.files <- list.files( "./SEER_1973_2010_TEXTDATA" , full.names = TRUE , recursive = TRUE )
 
 # create a character vector matching the different cancer file name identifiers
 words.to.match <- c( "BREAST" , "COLRECT" , "DIGOTHR" , "FEMGEN" , "LYMYLEUK" , "MALEGEN" , "RESPIR" , "URINARY" , "OTHER" )
