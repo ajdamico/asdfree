@@ -1,0 +1,103 @@
+# analyze us government survey data with the r language
+# surveillance epidemiology and end results
+# 1973 through 2010
+
+# if you have never used the r language before,
+# watch this two minute video i made outlining
+# how to run this script from start to finish
+# http://www.screenr.com/Zpd8
+
+# anthony joseph damico
+# ajdamico@gmail.com
+
+# if you use this script for a project, please send me a note
+# it's always nice to hear about how people are using this stuff
+
+# for further reading on cross-package comparisons, see:
+# http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
+
+
+###########################################################
+# download the main seer zipped file onto your local disk #
+###########################################################
+
+
+# # # # # # # # # # # # # #
+# important user warning! #
+# # # # # # # # # # # # # #
+
+
+# it is free.  no money.  public data.  zero cost. #
+
+# you *must* visit this national cancer institute website and agree to their terms
+# in order to receive a username and password (a few days later)
+# https://seer.cancer.gov/seertrack/data/request/
+
+# once they've e-mailed you a login and password,
+# fill them in below, and the download script will work
+
+your.username <- "username"
+your.password <- "password"
+
+# this download automation script will not work without the above lines filled in.
+# if the your.username and your.password lines above are not filled in,
+# the script is going to break.  to repeat.  you must fill in a form to access seer data.
+
+
+# # # # # # # # # # # # # # # # # 
+# end of important user warning #
+# # # # # # # # # # # # # # # # #
+
+
+# set your working directory.
+# all SEER data files will be stored here
+# after downloading.
+# use forward slashes instead of back slashes
+
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/SEER/" )
+# ..in order to set your current working directory
+
+
+
+# remove the # in order to run this install.packages line only once
+# install.packages( "downloader" )
+
+# no need to edit anything below this line #
+
+
+# # # # # # # # #
+# program start #
+# # # # # # # # #
+
+
+require(downloader)		# downloads and then runs the source() function on scripts from github
+
+
+# create a temporary file on your local disk
+tf <- tempfile()
+
+# build the https:// path to the seer ascii data file,
+# which includes the login information you should have entered above
+seer.url <- 
+	paste0(
+		"https://" ,
+		your.username ,
+		":" ,
+		your.password ,
+		"@seerstat.imsweb.com/.cd_images/SEER_1973_2010_TEXTDATA.d04242013.zip"
+	)
+
+# download the zipped file to the temporary file
+download( seer.url , tf )
+
+# unzip it into your current working directory
+unzip( tf )
+
+# remove the temporary file from your local disk
+file.remove( tf )
+
+
+# for more details on how to work with data in r
+# check out my two minute tutorial video site
+# http://www.twotorials.com/
