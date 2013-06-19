@@ -173,11 +173,6 @@ words.to.match <- c( "BREAST" , "COLRECT" , "DIGOTHR" , "FEMGEN" , "LYMYLEUK" , 
 ( ind.file.matches <- all.files[ grep( paste0( words.to.match , collapse = "|" ) , all.files ) ] )
 # by encasing the above statement in parentheses, the `ind.file.matches` object will also be printed to the screen
 
-# subset the `all.files` character vector to only retain files containing *either* the string '19agegroups' or the string 'singleages'
-( pop.file.matches <- all.files[ grep( "19agegroups|singleages" , all.files ) ] )
-# by encasing the above statement in parentheses, the `pop.file.matches` object will also be printed to the screen
-
-
 # end of file identification  #
 # # # # # # # # # # # # # # # #
 
@@ -238,7 +233,7 @@ table.names <- tolower( table.names )
 for ( i in seq( length( table.names ) ) ){
 
 	# print current progress to the screen
-	print( paste( "currently working on" , fp ) )
+	print( paste( "currently working on" , ind.file.matches[ i ] ) )
 	print( "" )
 
 	read.SAScii.monetdb ( 
