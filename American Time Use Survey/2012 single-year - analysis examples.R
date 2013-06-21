@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # american time use survey
-# 2011
+# 2012
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -19,13 +19,13 @@
 
 #######################################################
 # this script matches a few of the bls statistics     # 
-# shown at http://www.bls.gov/tus/tables/a1_2011.pdf  #
+# shown at http://www.bls.gov/tus/tables/a1_2012.pdf  #
 #######################################################
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #############################################################################################################
-# prior to running this analysis script, the atus 2011 file must be loaded onto the local machine.  running #
+# prior to running this analysis script, the atus 2012 file must be loaded onto the local machine.  running #
 # the download all microdata script below will import the respondent- and activity-level files needed.      #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw.github.com/ajdamico/usgsd/master/American%20Time%20Use%20Survey/download%20all%20microdata.R  #
@@ -37,12 +37,12 @@
 
 
 # set your working directory.
-# the ATUS 2011 data files should have been stored here
+# the ATUS 2012 data files should have been stored here
 # after running the program described above
 # use forward slashes instead of back slashes
 
 # uncomment this line by removing the `#` at the front..
-# setwd( "C:/My Directory/ATUS/2011/" )
+# setwd( "C:/My Directory/ATUS/2012/" )
 # ..in order to set your current working directory
 
 
@@ -107,9 +107,9 @@ atuswgts <- atuswgts[ , c( 1 , grep( 'finlwgt' , names( atuswgts ) ) ) ]
 
 # recode and reshape the activity-level file #
 
-# looking at the 2011 lexicon, travel-related activities
+# looking at the 2012 lexicon, travel-related activities
 # have a tier 1 code of 18 --
-# http://www.bls.gov/tus/lexiconnoex2011.pdf#page=22
+# http://www.bls.gov/tus/lexiconnoex2012.pdf#page=22
 
 # for all records where the tier 1 code is 18 (travel)
 # replace that tier 1 of 18 with whatever's stored in tier 2
@@ -117,8 +117,8 @@ atusact[ atusact$tutier1code == 18 , 'tutier1code' ] <-
 	atusact[ atusact$tutier1code == 18 , 'tutier2code' ]
 # this will distribute all travel-related activities
 # to the appropriate tier 1 category, which matches
-# the structure of the 2011 bls table available at
-# http://www.bls.gov/tus/tables/a1_2011.pdf
+# the structure of the 2012 bls table available at
+# http://www.bls.gov/tus/tables/a1_2012.pdf
 
 
 # sum up activity duration at the respondent-level
@@ -214,7 +214,7 @@ stopifnot( nrow( z ) == nrow( atusresp ) )
 z$any.care <- ifelse( z$tuactdur24.3 > 0 , 1 , 0 )
 # caring for and helping household members row
 # which we know is top level 03 from
-# http://www.bls.gov/tus/lexiconnoex2011.pdf
+# http://www.bls.gov/tus/lexiconnoex2012.pdf
 
 
 
@@ -288,7 +288,7 @@ svymean(
 )
 # note that this matches the "personal care activities" row
 # "average hours per day, civilian population" column of
-# http://www.bls.gov/tus/tables/a1_2011.pdf
+# http://www.bls.gov/tus/tables/a1_2012.pdf
 
 # ..and here's the same calculation, but broken down by sex
 svyby(
@@ -320,7 +320,7 @@ svymean(
 
 # note that this matches the "caring for and helping household members" row
 # "average percent engaged in the activity per day" columns of
-# http://www.bls.gov/tus/tables/a1_2011.pdf
+# http://www.bls.gov/tus/tables/a1_2012.pdf
 
 # ..and here's the same calculation, but broken down by sex
 svyby(
@@ -377,7 +377,7 @@ svymean(
 
 # note that this matches the "caring for and helping household members" row
 # "average hours per day for persons who engaged in the activity" columns of
-# http://www.bls.gov/tus/tables/a1_2011.pdf
+# http://www.bls.gov/tus/tables/a1_2012.pdf
 
 # ..and here's the same calculation, but broken down by sex
 svyby(

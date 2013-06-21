@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # american time use survey
-# 2003 - 2011
+# 2003 - 2012
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -18,12 +18,12 @@
 
 
 ################################################################
-# Analyze the 2003 - 2011 American Time Use Survey file with R #
+# Analyze the 2003 - 2012 American Time Use Survey file with R #
 ################################################################
 
 
 # set your working directory.
-# the ATUS 2003 - 2011 data files will be stored here
+# the ATUS 2003 - 2012 data files will be stored here
 # after downloading and importing them.
 # use forward slashes instead of back slashes
 
@@ -37,10 +37,10 @@
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- c( 2003:2011 , "0307" , "0309" , "0310" , "0311" )
+# years.to.download <- c( 2003:2012 , "0307" , "0309" , "0310" , "0311" )
 
-# uncomment this line to only download the most current year
-# years.to.download <- 2011
+# uncomment this line to only download 2010
+# years.to.download <- 2010
 
 # uncomment this line to download, for example,
 # 2005 and 2009-2011 and the '03-'11 multi-year file
