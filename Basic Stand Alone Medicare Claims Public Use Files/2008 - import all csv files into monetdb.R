@@ -182,7 +182,7 @@ snf <- paste0( "./" , year , "/" , year , "_BSA_SNF_Beneficiary_PUF.csv" )
 cc <- paste0( "./" , year , "/" , year , "_Chronic_Conditions_PUF.csv" )
 
 # institutional provider & beneficiary summary
-ipbs <- paste0( "./" , year , "/" , year , "_IPBS_PUF.csv" )
+ipbs <- paste0( "./" , year , "/" , year , " IPBS PUF.csv" )
 
 # prescription drug profiles
 rxp <- paste0( "./" , year , "/" , year , "_PD_Profiles_PUF.csv" )
