@@ -41,9 +41,7 @@
 library(RCurl)		# load RCurl package (downloads files from the web)
 require(foreign) 	# load foreign package (converts data files into R)
 
-
-# uncomment this line to download all available data sets
-# uncomment this line by removing the `#` at the front
+# all available meps years
 year <- 1996:2010
 
 
@@ -116,8 +114,8 @@ mm$events <- NULL
 # highly recommended: MEPS 1996 has lots of oddities compared to other years
 # this file should be skipped unless you spend lots of time reading the documentation
 # to figure out what changed where.
-# uncomment this line by removing the `#` at the front
-# mm <- subset( mm , year %in% 1997:2010 )
+# comment this line by adding a `#` at the front
+mm <- subset( mm , year %in% 1997:2010 )
 
 
 
@@ -343,8 +341,16 @@ for ( i in nrow( mm ):1 ) {
 			# give the ahrq website five seconds before the actual download
 			Sys.sleep( 5 )
 			
+			attempt1 <- NULL
+			
 			# if it does, download it
-			if (! class(err) == "try-error" ) download.file(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" )
+			if (! class(err) == "try-error" ) attempt1 <- try( download.file(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" ) , silent = TRUE )
+			
+			# if the first documentation download broke, wait 60 seconds and try again
+			if ( class(attempt1) == "try-error" ){
+				Sys.sleep( 60 )
+				download.file(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
+			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
 			err <- NULL
@@ -364,8 +370,18 @@ for ( i in nrow( mm ):1 ) {
 			# give the ahrq website five seconds before the actual download
 			Sys.sleep( 5 )
 			
+			attempt1 <- NULL
+			
 			# if it does, download it
-			if (! class(err) == "try-error" ) download.file(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
+			if (! class(err) == "try-error" ){
+				attempt1 <- try( download.file(  docsite , docname , mode="wb" , cacheOK=F , method="internal" ) , silent = TRUE )
+			}
+			
+			# if the first documentation download broke, wait 60 seconds and try again
+			if ( class(attempt1) == "try-error" ){
+				Sys.sleep( 60 )
+				download.file(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
+			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
 			err <- NULL
