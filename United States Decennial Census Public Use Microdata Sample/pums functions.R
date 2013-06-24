@@ -192,9 +192,10 @@ get.tsv <-
 
 # construct a function that..
 # takes a character vector full of tab-separated files stored on the local disk
-# and imports them all into monetdb, then merges (rectangulates) them into a merged (_m) table
-pums.import.and.merge <-
-	function( db , fn , merged.tn , hh.tn , person.tn ){
+# imports them all into monetdb, merges (rectangulates) them into a merged (_m) table,
+# and finally creates a sqlsurvey design object
+pums.import.merge.design <-
+	function( db , monet.url , fn , merged.tn , hh.tn , person.tn ){
 		
 		# extract the household tsv file locations
 		hh.tfs <- as.character( fn[ 1 , ] )
@@ -289,4 +290,26 @@ pums.import.and.merge <-
 		)
 
 		print( paste( merged.tn , "created!" ) )
+		
+
+		# add a column containing all ones to the current table
+		dbSendUpdate( db , paste0( 'alter table ' , merged.tn , ' add column one int' ) )
+		dbSendUpdate( db , paste0( 'UPDATE ' , merged.tn , ' SET one = 1' ) )
+		
+		# add a column containing the record (row) number
+		dbSendUpdate( db , paste0( 'alter table ' , merged.tn , ' add column idkey int auto_increment' ) )
+
+		# create a sqlsurvey complex sample design object
+		pums.design <-
+			sqlsurvey(
+				weight = 'pweight' ,		# weight variable column
+				id = 1 ,					# sampling unit column (defined in the character string above)
+				table.name = merged.tn ,	# table name within the monet database (defined in the character string above)
+				key = "idkey" ,				# sql primary key column (created with the auto_increment line above)
+				database = monet.url ,		# monet database location on localhost
+				driver = MonetDB.R()
+			)
+
+		# ..and return that at the end of the function.
+		pums.design
 	}

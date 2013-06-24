@@ -192,6 +192,19 @@ monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url )
 
 
+# # # # but the lines of code below will re-start the server
+# # # # so let's close down the connection and the server for the moment.
+
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `pums` monetdb analyses #
+############################################################################
+
 
 
 # # # # # # # # # # # # # # #
@@ -382,15 +395,29 @@ if ( 1990 %in% one.percent.files.to.download ){
 				)
 		)
 
+	# run the MonetDB server, determine the server path, connect to the server
+	pid <- monetdb.server.start( batfile )
+	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+	db <- dbConnect( MonetDB.R() , monet.url )
+
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
-	pums.import.and.merge(
-		db = db ,
-		fn = tsv.90.1 , 
-		merged.tn = "pums_1990_1_m" , 
-		hh.tn = "pums_1990_1_h" , 
-		person.tn = "pums_1990_1_p"
-	)
+	pums.1990.1.m.design <-
+		pums.import.merge.design(
+			db = db , monet.url = monet.url ,
+			fn = tsv.90.1 , 
+			merged.tn = "pums_1990_1_m" , 
+			hh.tn = "pums_1990_1_h" , 
+			person.tn = "pums_1990_1_p"
+		)
+
+	# save the monetdb-backed complex sample survey design object to the local disk
+	save( pums.1990.1.m.design , file = "pums_1990_1_m.rda" )
+
+	# disconnect from the current monet database..
+	dbDisconnect( db )
+	# and close it using the `pid`
+	monetdb.server.stop( pid )
 
 }
 
@@ -427,15 +454,29 @@ if ( 1990 %in% five.percent.files.to.download ){
 				)
 		)
 
+	# run the MonetDB server, determine the server path, connect to the server
+	pid <- monetdb.server.start( batfile )
+	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+	db <- dbConnect( MonetDB.R() , monet.url )
+
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
-	pums.import.and.merge(
-		db = db ,
-		fn = tsv.90.5 , 
-		merged.tn = "pums_1990_5_m" , 
-		hh.tn = "pums_1990_5_h" , 
-		person.tn = "pums_1990_5_p"
-	)
+	pums.1990.5.m.design <-
+		pums.import.merge.design(
+			db = db , monet.url = monet.url ,
+			fn = tsv.90.5 , 
+			merged.tn = "pums_1990_5_m" , 
+			hh.tn = "pums_1990_5_h" , 
+			person.tn = "pums_1990_5_p"
+		)
+
+	# save the monetdb-backed complex sample survey design object to the local disk
+	save( pums.1990.5.m.design , file = "pums_1990_5_m.rda" )
+	
+	# disconnect from the current monet database..
+	dbDisconnect( db )
+	# and close it using the `pid`
+	monetdb.server.stop( pid )
 
 }
 
@@ -468,15 +509,29 @@ if ( 2000 %in% one.percent.files.to.download ){
 				)
 		)
 
+	# run the MonetDB server, determine the server path, connect to the server
+	pid <- monetdb.server.start( batfile )
+	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+	db <- dbConnect( MonetDB.R() , monet.url )
+
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
-	pums.import.and.merge(
-		db = db ,
-		fn = tsv.00.1 , 
-		merged.tn = "pums_2000_1_m" , 
-		hh.tn = "pums_2000_1_h" , 
-		person.tn = "pums_2000_1_p"
-	)
+	pums.2000.1.m.design <-
+		pums.import.merge.design(
+			db = db , monet.url = monet.url ,
+			fn = tsv.00.1 , 
+			merged.tn = "pums_2000_1_m" , 
+			hh.tn = "pums_2000_1_h" , 
+			person.tn = "pums_2000_1_p"
+		)
+
+	# save the monetdb-backed complex sample survey design object to the local disk
+	save( pums.2000.1.m.design , file = "pums_2000_1_m.rda" )
+
+	# disconnect from the current monet database..
+	dbDisconnect( db )
+	# and close it using the `pid`
+	monetdb.server.stop( pid )
 
 }
 
@@ -509,27 +564,31 @@ if ( 2000 %in% five.percent.files.to.download ){
 				)
 		)
 
+	# run the MonetDB server, determine the server path, connect to the server
+	pid <- monetdb.server.start( batfile )
+	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+	db <- dbConnect( MonetDB.R() , monet.url )
+
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
-	pums.import.and.merge(
-		db = db ,
-		fn = tsv.00.5 , 
-		merged.tn = "pums_2000_5_m" , 
-		hh.tn = "pums_2000_5_h" , 
-		person.tn = "pums_2000_5_p"
-	)
+	pums.2000.5.m.design <-
+		pums.import.merge.design(
+			db = db , monet.url = monet.url ,
+			fn = tsv.00.5 , 
+			merged.tn = "pums_2000_5_m" , 
+			hh.tn = "pums_2000_5_h" , 
+			person.tn = "pums_2000_5_p"
+		)
 
+	# save the monetdb-backed complex sample survey design object to the local disk
+	save( pums.2000.5.m.design , file = "pums_2000_5_m.rda" )
+	
+	# disconnect from the current monet database..
+	dbDisconnect( db )
+	# and close it using the `pid`
+	monetdb.server.stop( pid )
+		
 }
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `pums` monetdb analyses #
-############################################################################
 
 
 
