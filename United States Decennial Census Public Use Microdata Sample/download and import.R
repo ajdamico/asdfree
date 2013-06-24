@@ -88,7 +88,7 @@ require(gdata) 			# load the gdata package (imports excel [.xls] files into R)
 require(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 require(stringr)		# load stringr package (manipulates character strings easily)
 require(descr) 			# load the descr package (converts fixed-width files to delimited files)
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 require(downloader)		# downloads and then runs the source() function on scripts from github
 
 
