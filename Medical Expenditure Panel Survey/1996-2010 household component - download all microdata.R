@@ -309,7 +309,7 @@ for ( i in nrow( mm ):1 ) {
 							assign( df.name , read.xport( zc ) )
 						} , silent = TRUE )
 						
-				}
+				} else attempt.two <- NA
 				
 				
 				if ( class( attempt.two ) == 'try-error' ) {
