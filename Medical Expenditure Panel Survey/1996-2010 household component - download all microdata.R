@@ -294,32 +294,45 @@ for ( i in nrow( mm ):1 ) {
 					
 				# if the first time broke..
 				if ( class( attempt.one ) == 'try-error' ){
-				
-						# ..wait 60 seconds and try again
-						Sys.sleep( 60 )
+					attempt.two <-
+						try({
+							# ..wait 60 seconds and try again
+							Sys.sleep( 60 )
+							
+							# download the ..ssp.zip file to the temporary file on your local computer
+							download.file( u , tf )
 						
-						# download the ..ssp.zip file to the temporary file on your local computer
-						download.file( u , tf )
-					
-						# unzip the ..ssp.zip to the temporary directory
-						zc <- unzip( tf , exdir = td )
-					
-						# read this file into RAM
-						assign( df.name , read.xport( zc ) )				
+							# unzip the ..ssp.zip to the temporary directory
+							zc <- unzip( tf , exdir = td )
+						
+							# read this file into RAM
+							assign( df.name , read.xport( zc ) )
+						} , silent = TRUE )
+						
 				}
 				
-				# erase the try-error object
-				attempt.one <- NULL
 				
-				# save the file into the formats specified during the 'conversion options' section above
-				if ( ssp ) file.copy( zc , fn )
-				if ( rda ) save( list = df.name , file = gsub( 'ssp' , 'rda' , fn ) )
-				if ( dta ) write.dta( get( df.name ) , file = gsub( 'ssp' , 'dta' , fn ) )
-				if ( csv ) write.csv( get( df.name ) , file = gsub( 'ssp' , 'csv' , fn ) )
-			
-				# immediately delete the brr data frame from memory and clear up ram
-				rm( list = df.name ) ; gc()
-			
+				if ( class( attempt.two ) == 'try-error' ) {
+				
+					warning( u , ' did not download properly!' )
+				
+				} else{
+
+					
+					# save the file into the formats specified during the 'conversion options' section above
+					if ( ssp ) file.copy( zc , fn )
+					if ( rda ) save( list = df.name , file = gsub( 'ssp' , 'rda' , fn ) )
+					if ( dta ) write.dta( get( df.name ) , file = gsub( 'ssp' , 'dta' , fn ) )
+					if ( csv ) write.csv( get( df.name ) , file = gsub( 'ssp' , 'csv' , fn ) )
+				
+					# immediately delete the brr data frame from memory and clear up ram
+					rm( list = df.name ) ; gc()
+
+				}
+				
+				# erase the try-error objects
+				attempt.one <- attempt.two <- NULL
+				
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
