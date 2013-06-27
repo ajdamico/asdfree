@@ -115,7 +115,7 @@ db <- dbConnect( MonetDB.R() , monet.url )
 # load( 'C:/My Directory/PUMS/pums_1990_1_m.rda' )	# analyze the 1990 1% pums file
 # load( 'C:/My Directory/PUMS/pums_1990_5_m.rda' )	# analyze the 1990 5% pums file
 # load( 'C:/My Directory/PUMS/pums_2000_1_m.rda' )	# analyze the 2000 1% pums file
-load( 'C:/My Directory/PUMS/pums_2000_5_m.rda' )	# analyze the 2000 5% pums file
+# load( 'C:/My Directory/PUMS/pums_2000_5_m.rda' )	# analyze the 2000 5% pums file
 
 # note: this r data file should already contain the 2000 5% design
 
@@ -126,7 +126,7 @@ load( 'C:/My Directory/PUMS/pums_2000_5_m.rda' )	# analyze the 2000 5% pums file
 # pums.design <- open( pums.1990.1.m.design , driver = MonetDB.R() )	# 1990 1% design
 # pums.design <- open( pums.1990.5.m.design , driver = MonetDB.R() )	# 1990 5% design
 # pums.design <- open( pums.2000.1.m.design , driver = MonetDB.R() )	# 2000 1% design
-pums.design <- open( pums.2000.5.m.design , driver = MonetDB.R() )	# 2000 5% design
+# pums.design <- open( pums.2000.5.m.design , driver = MonetDB.R() )	# 2000 5% design
 
 
 
@@ -165,7 +165,7 @@ dbGetQuery( db , "SELECT COUNT(*) AS num_records FROM pums_2000_5_m" )
 # broken out by state #
 
 # note: this is easiest by simply running a sql query on the monet database directly
-dbGetQuery( db , "SELECT state , COUNT(*) as num_records FROM pums_2000__m GROUP BY state ORDER BY state" )
+dbGetQuery( db , "SELECT state , COUNT(*) as num_records FROM pums_2000_5_m GROUP BY state ORDER BY state" )
 
 
 
@@ -206,7 +206,7 @@ svymean( ~age , pums.design , byvar = ~state )
 svymean( ~marstat , pums.design )
 
 # by state
-svymean( ~marstat , pums.design , byvar = ~state )
+data.frame( svymean( ~marstat , pums.design , byvar = ~state ) )
 
 
 # calculate the median and other percentiles #

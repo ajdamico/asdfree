@@ -73,6 +73,8 @@ dbGetQuery(
 	from
 		pums_2000_1_h
 	group by
+		state
+	order by
 		state'
 )
 
@@ -86,6 +88,8 @@ dbGetQuery(
 	from
 		pums_2000_1_m
 	group by
+		state
+	order by
 		state'
 
 )
@@ -100,6 +104,8 @@ dbGetQuery(
 	from
 		pums_2000_5_h
 	group by
+		state
+	order by
 		state'
 
 )
@@ -114,6 +120,8 @@ dbGetQuery(
 	from
 		pums_2000_5_m
 	group by
+		state
+	order by
 		state'
 )
 
