@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # national health interview survey
-# 1963 through 2011
+# 1963 through 2012
 # all available files (including documentation)
 
 # if you have never used the r language before,
@@ -48,10 +48,10 @@ download.documentation <- TRUE
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# nhis.years.to.download <- 2011:1963
+# nhis.years.to.download <- 2012:1963
 
 # uncomment this line to only download the most current year
-# nhis.years.to.download <- 2011
+# nhis.years.to.download <- 2012
 
 # uncomment this line to download, for example, 2000 and 2009-2011
 # nhis.years.to.download <- c( 2011:2009 , 2000 )
@@ -75,6 +75,8 @@ csv <- FALSE
 
 # no need to edit anything below this line #
 
+
+if ( 2012 %in% nhis.years.to.download ) message( "2012 imputed income not yet available" )
 
 # # # # # # # # #
 # program start #
@@ -119,15 +121,33 @@ for ( year in nhis.years.to.download ){
 		
 		# extract all the file names in the current nhis ftp directory
 		doc.files <- getURL( doc.nhis.ftp , dirlistonly = TRUE )
+		
+		
 		doc.files <- tolower( strsplit( doc.files , "\r*\n" )[[1]] )
 		
-		# loop through each file and save it to the year-specific docs directory
-		for ( fn in doc.files ) {
+		for ( fn in doc.files ){
 		
-			download.file( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
+			try.error <- NULL
 			
-			# wait fifteen seconds between each download
-			Sys.sleep( 15 )
+			# attempt #1:
+			# simply download the file into the local directory
+			try.error <- try( download.file( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' ) , silent = T )
+			
+			# if the attempt to download the file resulted in an error..
+			if ( class( try.error ) == "try-error" ){
+				
+				# attempt #2
+				
+				# wait for three minutes
+				Sys.sleep( 3 * 60 )
+				
+				# and try again!
+				
+				# simply download the file into the local directory
+				download.file( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
+				
+			}
+
 		}
 		
 	}
@@ -276,9 +296,31 @@ for ( year in nhis.years.to.download ){
 		# if the file is a (.pdf) or a (.txt)..
 		if ( ext %in% c( 'pdf' , 'txt' ) ){
 		
-			# simply download the file into the local directory
-			download.file( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' )
+		
+			# start of error-handling
 			
+			# blank out the try.error object
+			try.error <- NULL
+			
+			# attempt #1:
+			# simply download the file into the local directory
+			try.error <- try( download.file( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' ) , silent = T )
+			
+			# if the attempt to download the file resulted in an error..
+			if ( class( try.error ) == "try-error" ){
+				
+				# attempt #2
+				
+				# wait for three minutes
+				Sys.sleep( 3 * 60 )
+				
+				# and try again!
+				
+				# simply download the file into the local directory
+				download.file( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' )
+				
+			}
+						
 		# otherwise, treat the file as a data file
 		# that needs to be imported as an R data frame
 		} else {
@@ -374,7 +416,8 @@ for ( year in nhis.years.to.download ){
 	###########################
 	
 	# if the year is after 1996, then download the imputed income files
-	if ( year > 1996 ){
+	# if ( year > 1996 ){
+	if ( year %in% 1996:2011 ){
 		
 		# imputed income files must be downloaded using a different method #
 	
