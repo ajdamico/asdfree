@@ -417,7 +417,7 @@ for ( year in nhis.years.to.download ){
 	
 	# if the year is after 1996, then download the imputed income files
 	# if ( year > 1996 ){
-	if ( year %in% 1996:2011 ){
+	if ( year %in% 1997:2011 ){
 		
 		# imputed income files must be downloaded using a different method #
 	
