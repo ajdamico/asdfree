@@ -1,6 +1,6 @@
 # analyze us government survey data with the r language
 # consumer expenditure survey
-# 2009-2011
+# 2008-2011
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -39,7 +39,7 @@ require(foreign) 	# load foreign package (converts data files into R)
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- 2011:2009
+# years.to.download <- 2011:2008
 
 # uncomment to only download the most current available year
 # years.to.download <- 2011
