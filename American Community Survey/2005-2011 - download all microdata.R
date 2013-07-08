@@ -147,6 +147,15 @@ monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url )
 
 
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `acs` monetdb analyses #
+###########################################################################
+
 
 
 # choose which acs data sets to download: single-, three-, or five-year
@@ -198,7 +207,6 @@ db <- dbConnect( MonetDB.R() , monet.url )
 #create a temporary file and a temporary directory..
 tf <- tempfile() ; td <- tempdir()
 
-
 # loop through each possible acs year
 for ( year in 2050:2005 ){
 
@@ -214,7 +222,16 @@ for ( year in 2050:2005 ){
 		# ..and if the current year is in the 'years.for.this.size vector, start the download
 		# all download commands are contained within this loop
 		if ( year %in% years.for.this.size ){
+
+			# just wait ten seconds
+			Sys.sleep(10)
+
+			# launch the current monet database
+			pid <- monetdb.server.start( batfile )
 			
+			# immediately connect to it
+			db <- dbConnect( MonetDB.R() , monet.url )
+		
 			# construct the database name
 			k <- paste0( "acs" , year , "_" , size , "yr" )
 			
@@ -328,7 +345,7 @@ for ( year in 2050:2005 ){
 			
 				# read in the first five hundred records of the csv file
 				headers <- read.csv( csvpath , nrows = 500 )
-				
+
 				# figure out the column type (class) of each column
 				cl <- sapply( headers , class )
 				
@@ -341,7 +358,9 @@ for ( year in 2050:2005 ){
 					print( "warning: column name 'type' unacceptable in monetdb.  changing to 'type_'" )
 					names( headers )[ names( headers ) == 'type' ] <- 'type_'
 				}
-				
+
+				if ( j == 'h' ) headers.h <- headers else headers.p <- headers
+								
 				# the american community survey data only contains integers and character strings..
 				# so store integer columns as numbers and all others as characters
 				# note: this won't work on other data sets, since they might have columns with non-integers (decimals)
@@ -493,6 +512,11 @@ for ( year in 2050:2005 ){
 					"on a.serialno = b.serialno with data" 
 				)
 			
+			# create the three `headers` structure files to make the check.factors=
+			# component of the sqlrepsurvey() functions below run much much faster.
+			headers.p$one <- headers.h$one <- 1
+			headers.p$idkey <- headers.h$idkey <- 1
+			headers.m <- merge( headers.h , headers.p )
 			
 			# create the merged table
 			dbSendUpdate( db , i.j )
@@ -518,7 +542,12 @@ for ( year in 2050:2005 ){
 				# _p (person)
 				# _m (merged)
 			print( paste( "the database now contains tables for" , k ) )
-			print( dbListTables( db ) )
+			# the current monet database should now contain
+			# all of the newly-added tables (in addition to meta-data tables)
+			print( dbListTables( db ) )		# print the tables stored in the current monet database to the screen
+
+
+
 
 			# confirm that the merged file has the same number of records as the person file
 			stopifnot( 
@@ -539,7 +568,7 @@ for ( year in 2050:2005 ){
 					mse = TRUE ,
 					table.name = paste0( k , '_m' ) , 			# use the person-household-merge data table
 					key = "idkey" ,
-					# check.factors = 10 ,						# defaults to ten
+					check.factors = headers.m[ NULL , ] ,		# use `headers.m` to determine the column types
 					database = monet.url ,
 					driver = MonetDB.R()
 				)
@@ -556,7 +585,7 @@ for ( year in 2050:2005 ){
 					mse = TRUE ,
 					table.name = paste0( k , '_h' ) , 			# use the household-level data table
 					key = "idkey" ,
-					# check.factors = 10 ,						# defaults to ten
+					check.factors = headers.h[ NULL , ] ,		# use `headers.h` to determine the column types
 					database = monet.url ,
 					driver = MonetDB.R()
 				)
@@ -565,7 +594,13 @@ for ( year in 2050:2005 ){
 			# into a single r data file (.rda) that can now be
 			# analyzed quicker than anything else.
 			save( acs.m.design , acs.h.design , file = paste0( k , '.rda' ) )
-						
+
+			# disconnect from the current monet database
+			dbDisconnect( db )
+
+			# and close it using the `pid`
+			monetdb.server.stop( pid )
+			
 		}
 	}
 }
@@ -579,27 +614,6 @@ for ( year in 2050:2005 ){
 # once complete, this script does not need to be run again.
 # instead, use one of the american community survey analysis scripts
 # which utilize these newly-created survey objects
-
-
-# the current monet database should now contain
-# all of the newly-added tables (in addition to meta-data tables)
-dbListTables( db )		# print the tables stored in the current monet database to the screen
-
-
-
-
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `acs` monetdb analyses #
-###########################################################################
-
-
 
 
 ####################################################################
