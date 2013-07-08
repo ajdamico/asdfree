@@ -242,6 +242,10 @@ for ( year in 2050:2005 ){
 			# loop through both household- and person-level files
 			for ( j in c( 'h' , 'p' ) ){			
 
+				# wait ten seconds, just to make sure any previous servers closed
+				# and you don't get a gdk-lock error from opening two-at-once
+				Sys.sleep( 10 )
+			
 				# launch the current monet database
 				pid <- monetdb.server.start( batfile )
 				
@@ -488,8 +492,11 @@ for ( year in 2050:2005 ){
 			
 				
 			}
-			
-			
+		
+			# wait ten seconds, just to make sure any previous servers closed
+			# and you don't get a gdk-lock error from opening two-at-once
+			Sys.sleep( 10 )
+
 			# launch the current monet database
 			pid <- monetdb.server.start( batfile )
 			
@@ -638,6 +645,10 @@ for ( year in 2050:2005 ){
 # instead, use one of the american community survey analysis scripts
 # which utilize these newly-created survey objects
 
+
+# wait ten seconds, just to make sure any previous servers closed
+# and you don't get a gdk-lock error from opening two-at-once
+Sys.sleep( 10 )
 
 ####################################################################
 # lines of code to hold on to for all other `acs` monetdb analyses #
