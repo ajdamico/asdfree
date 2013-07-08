@@ -608,6 +608,16 @@ for ( year in 2050:2005 ){
 			# analyzed quicker than anything else.
 			save( acs.m.design , acs.h.design , file = paste0( k , '.rda' ) )
 
+			# close the connection to the two sqlrepsurvey design objects
+			close( acs.m.design )
+			close( acs.h.design )
+
+			# remove these two objects from memory
+			rm( acs.m.design , acs.h.design )
+			
+			# clear up RAM
+			gc()
+			
 			# disconnect from the current monet database
 			dbDisconnect( db )
 
