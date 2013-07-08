@@ -223,15 +223,6 @@ for ( year in 2050:2005 ){
 		# all download commands are contained within this loop
 		if ( year %in% years.for.this.size ){
 
-			# just wait ten seconds
-			Sys.sleep(10)
-
-			# launch the current monet database
-			pid <- monetdb.server.start( batfile )
-			
-			# immediately connect to it
-			db <- dbConnect( MonetDB.R() , monet.url )
-		
 			# construct the database name
 			k <- paste0( "acs" , year , "_" , size , "yr" )
 			
@@ -250,7 +241,13 @@ for ( year in 2050:2005 ){
 
 			# loop through both household- and person-level files
 			for ( j in c( 'h' , 'p' ) ){			
+
+				# launch the current monet database
+				pid <- monetdb.server.start( batfile )
 				
+				# immediately connect to it
+				db <- dbConnect( MonetDB.R() , monet.url )
+			
 				# create a character string containing the http location of the zipped csv file to be downloaded
 				ACS.file.location <-
 					paste0( 
@@ -479,10 +476,25 @@ for ( year in 2050:2005 ){
 					# these files require lots of temporary disk space,
 					# so delete them once they're part of the database
 					file.remove( csvpath )
+					
+					
+					# disconnect from the current monet database
+					dbDisconnect( db )
+
+					# and close it using the `pid`
+					monetdb.server.stop( pid )
+					
 				}
 				
 			}
 			
+			
+			# launch the current monet database
+			pid <- monetdb.server.start( batfile )
+			
+			# immediately connect to it
+			db <- dbConnect( MonetDB.R() , monet.url )
+
 			
 			############################################
 			# create a merged (household+person) table #
