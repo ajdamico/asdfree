@@ -476,15 +476,16 @@ for ( year in 2050:2005 ){
 					# these files require lots of temporary disk space,
 					# so delete them once they're part of the database
 					file.remove( csvpath )
-					
-					
-					# disconnect from the current monet database
-					dbDisconnect( db )
-
-					# and close it using the `pid`
-					monetdb.server.stop( pid )
-					
+						
 				}
+				
+				
+				# disconnect from the current monet database
+				dbDisconnect( db )
+
+				# and close it using the `pid`
+				monetdb.server.stop( pid )
+			
 				
 			}
 			
