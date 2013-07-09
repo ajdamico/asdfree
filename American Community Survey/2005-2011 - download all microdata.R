@@ -405,8 +405,6 @@ for ( year in 2050:2005 ){
 					nooflines <- nooflines + linesread )
 					close( testcon )
 				
-					
-					
 					# now try to copy the current csv file into the database
 					first.attempt <-
 						try( {
@@ -424,13 +422,59 @@ for ( year in 2050:2005 ){
 							) 
 						} , silent = TRUE )
 					
+					# if the first.attempt did not work..
+					if ( class( first.attempt ) == 'try-error' ){
+
+						# try rebooting the server #
+						
+						# disconnect from the current monet database
+						dbDisconnect( db )
+
+						# and close it using the `pid`
+						monetdb.server.stop( pid )
+						
+						# wait ten seconds, just to make sure any previous servers closed
+						# and you don't get a gdk-lock error from opening two-at-once
+						Sys.sleep( 10 )
+					
+						# launch the current monet database
+						pid <- monetdb.server.start( batfile )
+						
+						# immediately connect to it
+						db <- dbConnect( MonetDB.R() , monet.url )
+					
+						# and run the exact same command again.
+						second.attempt <-
+							try( {
+								dbSendUpdate( 
+									db , 
+									paste0( 
+										"copy " , 
+										nooflines , 
+										" offset 2 records into " , 
+										tablename , 
+										" from '" , 
+										normalizePath( csvpath ) , 
+										"' using delimiters ',','\\n','\"'  NULL AS ''" 
+									) 
+								) 
+							} , silent = TRUE )
+							
+					} else {
+					
+						# if the first attempt worked,
+						# the second attempt should also not be a `try-error`
+						second.attempt <- NULL
+						
+					}
 					
 					# some of the acs files have multiple values that should be treated as NULL, (like acs2010_3yr_p)
-					# so if the above copy-into attempt failed, scan through the entire file and remove every instance of "N.A."
+					# so if the above copy-into attempts fail twice,
+					# scan through the entire file and remove every instance of "N.A."
 					# then re-run the copy-into line.
 					
 					# if the first attempt doesn't work..
-					if ( class( first.attempt ) == 'try-error' ){
+					if ( class( second.attempt ) == 'try-error' ){
 						
 						# create a temporary output file
 						fpo <- tempfile()
