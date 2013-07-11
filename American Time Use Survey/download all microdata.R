@@ -37,7 +37,7 @@
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- c( 2003:2012 , "0307" , "0309" , "0310" , "0311" )
+# years.to.download <- c( 2003:2012 , "0307" , "0309" , "0310" , "0311" , "0312" )
 
 # uncomment this line to only download 2010
 # years.to.download <- 2010
