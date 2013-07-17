@@ -1,4 +1,4 @@
-# analyze us government survey data with the r language
+# analyze survey data for free (http://asdfree.com) with the r language
 # national health interview survey
 # 2000 personsx and incmimp
 

@@ -59,6 +59,8 @@ sas.is.evil <-
 		tf
 	}
 
+# yet another silly specific hardcoded recode
+# because sas is a trainwreck of a language
 sas.is.quite.evil <-
 	function( sas_ri ){
 		
@@ -72,9 +74,6 @@ sas.is.quite.evil <-
 		tf
 	}
 
-
-
-	
 		
 # remove tabs and other illegal things
 remove.tabs <-

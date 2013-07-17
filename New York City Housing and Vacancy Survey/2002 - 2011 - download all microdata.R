@@ -1,4 +1,4 @@
-# analyze us government survey data with the r language
+# analyze survey data for free (http://asdfree.com) with the r language
 # new york city housing and vacancy survey
 # 2002-2011
 
@@ -193,3 +193,13 @@ message( paste( "all done.  you should set" , getwd() , "read-only so you don't 
 # for more details on how to work with data in r
 # check out my two minute tutorial video site
 # http://www.twotorials.com/
+
+# dear everyone: please contribute your script.
+# have you written syntax that precisely matches an official publication?
+message( "if others might benefit, send your code to ajdamico@gmail.com" )
+# http://asdfree.com needs more user contributions
+
+# let's play the which one of these things doesn't belong game:
+# "only you can prevent forest fires" -smokey bear
+# "take a bite out of crime" -mcgruff the crime pooch
+# "plz gimme your statistical programming" -anthony damico

@@ -1,4 +1,7 @@
-
+# take a character string separated by spaces,
+# remove all return characters (\n)
+# and remove all empty strings
+# then return the resultant character vector
 split.n.clean <-
 	function( txt ){
 		x <- strsplit( txt , " " )[[1]]
@@ -7,7 +10,11 @@ split.n.clean <-
 		x
 	}
 	
-
+# take a monetdb connection,
+# a table's name within the monet database
+# a character string full of variables
+# and a numeric vector to search for -
+# in order to replace each of these values with NULL
 missing.updates <-
 	function( 
 		db , 
@@ -16,7 +23,12 @@ missing.updates <-
 		missing.values
 	){
 		
+		# loop through the character vector
 		for ( i in missing.variables ){
+		
+			# wherever the current variable `i` is one of the possible
+			# `missing.values` (passed in at the start of this function)
+			# replace it with NULL
 			dbSendUpdate( 
 				db , 
 				paste(
@@ -35,6 +47,15 @@ missing.updates <-
 	
 		TRUE
 	}
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # the remaining functions in this script are    # #
+# # used for overwriting specific tables, using   # #
+# # all the helper functions constructed above    # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 intscho.missings <- 
 	function( db ){
@@ -65,9 +86,6 @@ intscho.missings <-
 		missing.updates( db , 'intscho' , 'schlsize' , 99997:99999 )
 	
 	}
-	
-	
-	
 	
 
 intstud.missings <- 
@@ -700,4 +718,3 @@ int_stui_2003_v2.missings <-
 		}
 
 	}
-	
