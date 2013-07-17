@@ -1,7 +1,7 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # survey of income and program participation
 # 2008 panel
-# 11 core waves, 11 wave-specific replicate weights, 9 topical modules, 
+# 12 core waves, 12 wave-specific replicate weights, 11 topical modules, 
 # 2 panel year replicate weights, 2 calendar year replicate weights, 1 longitudinal weights
 
 # if you have never used the r language before,
