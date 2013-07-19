@@ -633,7 +633,7 @@ for ( year in 2050:2005 ){
 					table.name = paste0( k , '_m' ) , 			# use the person-household-merge data table
 					key = "idkey" ,
 					# check.factors = 10 by default.. uncommenting this next line would compute column classes based on `headers.m` instead
-					# check.factors = headers.m[ NULL , ] ,		# use `headers.m` to determine the column types
+					check.factors = headers.m[ NULL , ] ,		# use `headers.m` to determine the column types
 					database = monet.url ,
 					driver = MonetDB.R()
 				)
@@ -651,7 +651,7 @@ for ( year in 2050:2005 ){
 					table.name = paste0( k , '_h' ) , 			# use the household-level data table
 					key = "idkey" ,
 					# check.factors = 10 by default.. uncommenting this next line would compute column classes based on `headers.m` instead
-					# check.factors = headers.h[ NULL , ] ,		# use `headers.h` to determine the column types
+					check.factors = headers.h[ NULL , ] ,		# use `headers.h` to determine the column types
 					database = monet.url ,
 					driver = MonetDB.R()
 				)
