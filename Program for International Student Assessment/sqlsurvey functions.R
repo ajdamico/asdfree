@@ -65,8 +65,14 @@ pisa.svyttest <-
 
 
 construct.pisa.sqlsurvey.designs <-
-	function( monet.url , year , table.name , pv.vars ){
+	function( monet.url , year , table.name , pv.vars , sas_ri ){
 
+		# step one - find all character columns #
+		sascii <- parse.SAScii( sas_ri )
+		
+		factor.vars <- tolower( sascii[ sascii$char , 'varname' ] )
+		# end of finding all character columns #
+		
 		conn <- dbConnect( MonetDB.R() , monet.url )
 
 		# identify all variables that are multiply-imputed
@@ -163,6 +169,7 @@ construct.pisa.sqlsurvey.designs <-
 					scale = 4 / 80 ,
 					rscales = rep( 1 , 80 ) ,
 					driver = MonetDB.R() , 
+					check.factors = factor.vars ,
 					database = monet.url ,
 					mse = TRUE ,
 					table.name = implicate.name
