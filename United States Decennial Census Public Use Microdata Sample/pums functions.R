@@ -238,9 +238,7 @@ pums.import.merge.design <-
 			nrows = person.lines ,
 			structure = person.h
 		)
-
-
-
+		
 		# remove blank_# fields in the monetdb household table
 		lf <- dbListFields( db , hh.tn )
 		hh.blanks <- lf[ grep( 'blank_' , lf ) ]
@@ -299,6 +297,28 @@ pums.import.merge.design <-
 		# add a column containing the record (row) number
 		dbSendUpdate( db , paste0( 'alter table ' , merged.tn , ' add column idkey int auto_increment' ) )
 
+		
+		
+		# store the names of factor/character variables #
+		hh.types <- sapply( hh.h , class )
+		hh.char <- names( hh.types[ !( hh.types %in% c( 'integer' , 'numeric' ) ) ]
+		person.types <- sapply( person.h , class )
+		person.char <- names( person.types[ !( person.types %in% c( 'integer' , 'numeric' ) ) ]
+		
+		# throw in rectype, of course
+		mergefile.factor.variables <- unique( c( hh.char , person.char , 'rectype' ) )
+
+		# finally, restrict the character vector to only columns that are actually in the merged table..
+		mffv <- 
+			intersect( 
+				dbListFields( db , merged.tn ) , 
+				mergefile.factor.variables 
+			)
+		# ..some of the blank_ columns may have been thrown out
+		
+		# end of names of factor/character variable storage #
+
+		
 		# create a sqlsurvey complex sample design object
 		pums.design <-
 			sqlsurvey(
@@ -306,6 +326,7 @@ pums.import.merge.design <-
 				id = 1 ,					# sampling unit column (defined in the character string above)
 				table.name = merged.tn ,	# table name within the monet database (defined in the character string above)
 				key = "idkey" ,				# sql primary key column (created with the auto_increment line above)
+				check.factors = mffv ,		# designate all of the mergefile factor variables, in one convenient character vector
 				database = monet.url ,		# monet database location on localhost
 				driver = MonetDB.R()
 			)
