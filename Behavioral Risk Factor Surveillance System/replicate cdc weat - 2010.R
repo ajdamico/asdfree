@@ -88,11 +88,52 @@ db <- dbConnect( MonetDB.R() , monet.url )
 
 # note: this r data file should already contain the 2010 single-year design
 
+# if you wnated to use an unedited version of this, you could simply #
+# connect the complex sample designs to the monet database like this: #
+# brfss.d <- open( brfss.design , driver = MonetDB.R() )	# single-year design
+
+# # # # # # # # # # # # # # # # #
+# numeric-to-factor conversion  #
+
+# however, the 'asthma' column is coded as numeric 
+# in the importation sas script for the 2010 brfss
+# http://www.cdc.gov/brfss/annual_data/2010/sasout10.sas
+# so that needs to be converted over to a factor.
+
+# the variable `asthmst` was imported as a numeric variable
+# the sqlsurvey package cannot convert numeric variables to factors
+# on-the-fly, so instead just re-run the survey design object line
+
+# the one object that needs to be modified is the check.factors table
+# it's stored here
+brfss.design$zdata
+
+# extract only the non-numeric columns
+all.cols <- sapply( brfss.design$zdata , 'class' )
+fac.cols <- names( all.cols[ !( all.cols %in% c( 'numeric' , 'integer' ) ) ] )
+# now you have a character string..
+fac.cols
+# containing all of the columns that are non-numeric already.
+
+# now simply add the asthma column to it.
+fac.cols <- c( fac.cols , 'xasthmst' )
 
 
+# and re-run the brfss.design object.
+# take a look at the old design to get most of your variables..
 
-# connect the complex sample designs to the monet database #
-brfss.d <- open( brfss.design , driver = MonetDB.R() )	# single-year design
+brfss.d <-
+	sqlsurvey(
+		weight = brfss.design$weights ,		# weight variable column (defined in the character string above)
+		nest = TRUE ,						# whether or not psus are nested within strata
+		strata = brfss.design$strata ,		# stratification variable column (defined in the character string above)
+		id = brfss.design$id ,				# sampling unit column (defined in the character string above)
+		table.name = brfss.design$table ,	# table name within the monet database (defined in the character string above)
+		key = brfss.design$key ,			# sql primary key column (created with the auto_increment line above)
+		check.factors = fac.cols ,			# character vector containing all factor columns for this year
+		database = monet.url ,				# monet database location on localhost
+		driver = MonetDB.R()
+	)
 
 
 

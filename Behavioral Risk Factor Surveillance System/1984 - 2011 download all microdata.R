@@ -237,6 +237,13 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 	# rows to check then read
 	rtctr <- nrow( x )
 	
+	# store the names of factor/character variables #
+	ctypes <- sapply( x , class )
+	charx <- names( x )[ !( ctypes %in% c( 'numeric' , 'integer' ) ) ]
+	# create a new object `cYYYY` containing the non-numeric columns
+	assign( paste0( 'c' , year ) , charx )
+	# end of factor/character variable storage #
+	
 	# prepare to handle errors if they occur (and they do occur)
 	# reset all try-error objects
 	first.attempt <- second.attempt <- NULL
@@ -393,7 +400,14 @@ for ( year in intersect( years.to.download , 2002:2011 ) ){
 		tablename = paste0( 'b' , year ) ,	# the table will be stored in the monet database as bYYYY.. for example, 2010 will be stored as the 'b2010' table
 		connection = db
 	)
-
+	
+	# store the names of factor/character variables #
+	psas <- parse.SAScii( tf )
+	charx <- tolower( psas[ psas$char %in% T , 'varname' ] )
+	# create a new object `cYYYY` containing the non-numeric columns
+	assign( paste0( 'c' , year ) , charx )
+	# end of factor/character variable storage #
+	
 	# repeat.
 }
 
@@ -437,14 +451,14 @@ for ( year in years.to.download ){
 	# create a sqlsurvey complex sample design object
 	brfss.design <-
 		sqlsurvey(
-			weight = weight ,			# weight variable column (defined in the character string above)
-			nest = TRUE ,				# whether or not psus are nested within strata
-			strata = strata ,			# stratification variable column (defined in the character string above)
-			id = psu ,					# sampling unit column (defined in the character string above)
-			table.name = tablename ,	# table name within the monet database (defined in the character string above)
-			key = "idkey" ,				# sql primary key column (created with the auto_increment line above)
-			# check.factors = 10 ,		# defaults to ten
-			database = monet.url ,		# monet database location on localhost
+			weight = weight ,									# weight variable column (defined in the character string above)
+			nest = TRUE ,										# whether or not psus are nested within strata
+			strata = strata ,									# stratification variable column (defined in the character string above)
+			id = psu ,											# sampling unit column (defined in the character string above)
+			table.name = tablename ,							# table name within the monet database (defined in the character string above)
+			key = "idkey" ,										# sql primary key column (created with the auto_increment line above)
+			check.factors = get( paste0( 'c' , year ) ) ,		# character vector containing all factor columns for this year
+			database = monet.url ,								# monet database location on localhost
 			driver = MonetDB.R()
 		)
 

@@ -92,16 +92,54 @@ db <- dbConnect( MonetDB.R() , monet.url )
 
 # load the desired behavioral risk factor surveillance system monet database-backed complex sample design objects
 
-# uncomment this line by removing the `#` at the front..
-# load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year acs
-
 # note: this r data file should already contain the 2011 single-year design
 
 
+# if the column classes are already correct, you could use this line -
 
 # connect the complex sample designs to the monet database #
-brfss.d <- open( brfss.design , driver = MonetDB.R() )	# single-year design
+# brfss.d <- open( brfss.design , driver = MonetDB.R() )	# single-year design
 
+# - but they're not (at least for these analysis examples),
+# so you have to run three quick recodes
+
+
+################################################################################################
+# create a new survey design object with the variables you're going to use as character/factor #
+
+# this process runs much faster if you create a character vector containing all non-numeric columns
+# otherwise, just set `check.factors = 10` within the sqlsurvey function and it take a guess at which columns
+# are character strings or factor variables and which columns should be treated as numbers
+
+# step 1: load the pre-recoded (previous) design 
+
+# uncomment this line by removing the `#` at the front..
+# load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year brfss
+
+# step 2: extract the character columns
+all.classes <- sapply( brfss.design$zdata , class )
+factor.columns <- names( all.classes[ !( all.classes %in% c( 'integer' , 'numeric' ) ) ] )
+
+# since we're going to use the uninsured, medical cost, and sex variables in this analysis
+# and the cdc's sas code has these variables listed as numeric not character strings..
+# http://www.cdc.gov/brfss/annual_data/2011/SASOUT11_LLCP.SAS
+# ..they need to be converted over to character
+factor.columns <- c( factor.columns , 'hlthpln1' , 'sex' , 'medcost' )
+
+# step 3: re-create a sqlsurvey complex sample design object
+
+brfss.d <-
+	sqlsurvey(
+		weight = brfss.design$weight ,
+		nest = TRUE ,
+		strata = brfss.design$strata ,
+		id = brfss.design$id ,
+		table.name = brfss.design$table ,						
+		key = brfss.design$key ,
+		check.factors = factor.columns ,			# specify which columns are non-numeric.. or remove this parameter and sqlsurvey() will guess for you.
+		database = monet.url ,
+		driver = MonetDB.R()
+	)
 
 
 
@@ -227,41 +265,41 @@ svymean( ~hlthpln1 , brfss.d.female )
 ###################
 
 # calculate the distribution of a categorical variable #
-# broken out by ever having trouble accessing medical care due to cost
+# broken out by health insurance status
 
 # store the results into a new object
 
-coverage.by.cost.problems <- svymean( ~hlthpln1 , brfss.d , byvar = ~medcost )
+cost.problems.by.coverage <- svymean( ~medcost , brfss.d , byvar = ~hlthpln1 )
 
 # print the results to the screen 
-coverage.by.cost.problems
+cost.problems.by.coverage
 
 # now you have the results saved into a new data.frame..
-class( coverage.by.cost.problems )
+class( cost.problems.by.coverage )
 
 # ..and then immediately exported as a comma-separated value file 
 # into your current working directory 
-write.csv( coverage.by.cost.problems , "coverage by cost problems.csv" )
+write.csv( cost.problems.by.coverage , "cost problems by coverage.csv" )
 
 # ..or trimmed to only contain the values you need.
-# here's the uninsured percentage broken out by cost problems, 
+# here's the cost problem percentage broken out by insurance status, 
 # with accompanying standard errors
-uninsured.rate.by.cost.problems <-
-	coverage.by.cost.problems[ , 2 ]
+cost.problems.by.insurance.status <-
+	data.frame( cost.problems.by.coverage )[ 1:2 , 1 ]
 
 
 # print the new results to the screen
-uninsured.rate.by.cost.problems
+cost.problems.by.insurance.status
 
 # this can also be exported as a comma-separated value file 
 # into your current working directory 
-write.csv( uninsured.rate.by.cost.problems , "uninsured rate by cost problems.csv" )
+write.csv( cost.problems.by.insurance.status , "cost problems by insurance status.csv" )
 
 # ..or directly made into a bar plot
 barplot(
-	uninsured.rate.by.cost.problems ,
-	main = "Uninsured Rate by Cost-Related Access Problems" ,
-	names.arg = c( "Yes" , "No" , "Don't Know" , "Refused" ) ,
+	cost.problems.by.insurance.status ,
+	main = "Any Cost-Related Access Problems By Insurance Status" ,
+	names.arg = c( "Insured" , "Uninsured" ) ,
 	ylim = c( 0 , .60 )
 )
 

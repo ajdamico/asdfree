@@ -148,10 +148,24 @@ dbGetQuery( db , "SELECT drinks_per_month , xdrnkmo3 , COUNT(*) as number_of_rec
 # simply re-run the sqlsurvey() function and update the table.name =
 # argument so it now points to the recoded_ table in the monet database
 
-# note: this takes a while.  depending on how slowly the dots move across your screen, 
-# you may want to leave it running overnight.  i did warn you to run all of your recodes at once, didn't i?
+# this process runs much faster if you create a character vector containing all non-numeric columns
+# otherwise, just set `check.factors = 10` within the sqlsurvey function and it take a guess at which columns
+# are character strings or factor variables and which columns should be treated as numbers
 
-# create a sqlsurvey complex sample design object
+# step 3a: load the pre-recoded (previous) design 
+
+# load( 'C:/My Directory/BRFSS/b2010 design.rda' )	# analyze the 2010 single-year brfss
+# uncomment the line above by removing the `#`
+
+# step 3b: extract the character columns
+all.classes <- sapply( brfss.design$zdata , class )
+factor.columns <- names( all.classes[ !( all.classes %in% c( 'integer' , 'numeric' ) ) ] )
+
+# *if and only if* the column you added is also a character/factor, non-numeric column
+# then add it to this character vector as i've done here:
+factor.columns <- c( factor.columns , 'drinks_per_month' )
+
+# step 3c: re-create a sqlsurvey complex sample design object
 # using the *recoded* table
 
 brfss.recoded.design <-
@@ -164,7 +178,7 @@ brfss.recoded.design <-
 													# the weight, strata, and id variables are hard-coded in this sqlsurvey() function call,
 													# but their values haven't changed from the original 1984 - 2011 download all microdata.R script
 		key = "idkey" ,
-		# check.factors = 10 ,						# defaults to ten
+		check.factors = factor.columns ,			# specify which columns are non-numeric.. or remove this parameter and sqlsurvey() will guess for you.
 		database = monet.url ,
 		driver = MonetDB.R()
 	)
