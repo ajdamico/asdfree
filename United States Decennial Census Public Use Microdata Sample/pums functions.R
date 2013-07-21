@@ -301,9 +301,9 @@ pums.import.merge.design <-
 		
 		# store the names of factor/character variables #
 		hh.types <- sapply( hh.h , class )
-		hh.char <- names( hh.types[ !( hh.types %in% c( 'integer' , 'numeric' ) ) ]
+		hh.char <- names( hh.types[ !( hh.types %in% c( 'integer' , 'numeric' ) ) ] )
 		person.types <- sapply( person.h , class )
-		person.char <- names( person.types[ !( person.types %in% c( 'integer' , 'numeric' ) ) ]
+		person.char <- names( person.types[ !( person.types %in% c( 'integer' , 'numeric' ) ) ] )
 		
 		# throw in rectype, of course
 		mergefile.factor.variables <- unique( c( hh.char , person.char , 'rectype' ) )
