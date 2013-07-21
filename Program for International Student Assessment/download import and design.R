@@ -16,7 +16,7 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20Intern
 source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 
-setwd( "C:/My Directory/PISA/" )
+# setwd( "C:/My Directory/PISA/" )
 
 batfile <-
 	monetdb.server.setup(
@@ -26,7 +26,7 @@ batfile <-
 					dbport = 50007
 	)
 
-( batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat" )
+# ( batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat" )
 dbname <- "pisa"
 dbport <- 50007
 
