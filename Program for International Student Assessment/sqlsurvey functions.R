@@ -71,6 +71,8 @@ construct.pisa.sqlsurvey.designs <-
 		sascii <- parse.SAScii( sas_ri )
 		
 		factor.vars <- tolower( sascii[ sascii$char %in% TRUE , 'varname' ] )
+
+		factor.vars <- factor.vars[ !( factor.vars %in% 'toss_0' ) ]
 		# end of finding all character columns #
 		
 		conn <- dbConnect( MonetDB.R() , monet.url )
