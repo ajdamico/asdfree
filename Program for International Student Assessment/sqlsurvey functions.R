@@ -70,7 +70,7 @@ construct.pisa.sqlsurvey.designs <-
 		# step one - find all character columns #
 		sascii <- parse.SAScii( sas_ri )
 		
-		factor.vars <- tolower( sascii[ sascii$char , 'varname' ] )
+		factor.vars <- tolower( sascii[ sascii$char %in% TRUE , 'varname' ] )
 		# end of finding all character columns #
 		
 		conn <- dbConnect( MonetDB.R() , monet.url )
