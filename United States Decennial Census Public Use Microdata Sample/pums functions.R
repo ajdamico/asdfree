@@ -195,7 +195,7 @@ get.tsv <-
 # imports them all into monetdb, merges (rectangulates) them into a merged (_m) table,
 # and finally creates a sqlsurvey design object
 pums.import.merge.design <-
-	function( db , monet.url , fn , merged.tn , hh.tn , person.tn ){
+	function( db , monet.url , fn , merged.tn , hh.tn , person.tn , hh.stru , person.stru ){
 		
 		# extract the household tsv file locations
 		hh.tfs <- as.character( fn[ 1 , ] )
@@ -296,14 +296,10 @@ pums.import.merge.design <-
 		
 		# add a column containing the record (row) number
 		dbSendUpdate( db , paste0( 'alter table ' , merged.tn , ' add column idkey int auto_increment' ) )
-
-		
 		
 		# store the names of factor/character variables #
-		hh.types <- sapply( hh.h , class )
-		hh.char <- names( hh.types[ !( hh.types %in% c( 'integer' , 'numeric' ) ) ] )
-		person.types <- sapply( person.h , class )
-		person.char <- names( person.types[ !( person.types %in% c( 'integer' , 'numeric' ) ) ] )
+		hh.char <- hh.stru[ hh.stru$char %in% TRUE , 'varname' ]
+		person.char <- person.stru[ person.stru$char %in% TRUE , 'varname' ]
 		
 		# throw in rectype, of course
 		mergefile.factor.variables <- unique( c( hh.char , person.char , 'rectype' ) )

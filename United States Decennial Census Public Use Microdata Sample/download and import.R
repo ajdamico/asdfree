@@ -308,7 +308,7 @@ if ( 1990 %in% c( one.percent.files.to.download , five.percent.files.to.download
 
 # # # # # # 2000 # # # # # #
 
-# if 1990 was requested in either the 1% or 5% files..
+# if 2000 was requested in either the 1% or 5% files..
 if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download ) ){
 
 	# create a temporary file on the local disk
@@ -348,7 +348,13 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 			
 			# remove fields that are invalid in monetdb
 			stru[ stru$variable == "sample" , 'variable' ] <- 'sample_'
-			
+	
+			hardcoded.numeric.columns <-
+				c( "serialno" , "hweight" , "persons" , "elec" , "gas" , "water" , "oil" , "rent" , "mrt1amt" , "mrt2amt" , "taxamt" , "insamt" , "condfee" , "mhcost" , "smoc" , "smocapi" , "grent" , "grapi" , "hinc" , "finc" , "pweight" , "age" , "ancfrst5" , "ancscnd5" , "yr2us" , "trvtime" , "weeks" , "hours" , "incws" , "incse" , "incint" , "incss" , "incssi" , "incpa" , "incret" , "incoth" , "inctot" , "earns" , "poverty" )
+	
+			# add a logical `char` field to both of these data.frames
+			stru$char <- ( stru$a.n %in% 'A' & !( stru$varname %in% hardcoded.numeric.columns ) )
+						
 			# since this is the last line of the function `code.str`
 			# whatever this object `stru` is at the end of the function
 			# will be _returned_ by the function
@@ -360,7 +366,7 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 
 	# read in the person file structure from excel sheet 2
 	person.00.structure <- code.str( pums.layout , 2 )
-
+	
 }
 
 
@@ -408,7 +414,9 @@ if ( 1990 %in% one.percent.files.to.download ){
 			fn = tsv.90.1 , 
 			merged.tn = "pums_1990_1_m" , 
 			hh.tn = "pums_1990_1_h" , 
-			person.tn = "pums_1990_1_p"
+			person.tn = "pums_1990_1_p" ,
+			hh.stru = hh.90.structure ,
+			person.stru = person.90.structure
 		)
 
 	# save the monetdb-backed complex sample survey design object to the local disk
@@ -467,7 +475,9 @@ if ( 1990 %in% five.percent.files.to.download ){
 			fn = tsv.90.5 , 
 			merged.tn = "pums_1990_5_m" , 
 			hh.tn = "pums_1990_5_h" , 
-			person.tn = "pums_1990_5_p"
+			person.tn = "pums_1990_5_p" ,
+			hh.stru = hh.90.structure ,
+			person.stru = person.90.structure
 		)
 
 	# save the monetdb-backed complex sample survey design object to the local disk
@@ -522,7 +532,9 @@ if ( 2000 %in% one.percent.files.to.download ){
 			fn = tsv.00.1 , 
 			merged.tn = "pums_2000_1_m" , 
 			hh.tn = "pums_2000_1_h" , 
-			person.tn = "pums_2000_1_p"
+			person.tn = "pums_2000_1_p" ,
+			hh.stru = hh.00.structure ,
+			person.stru = person.00.structure
 		)
 
 	# save the monetdb-backed complex sample survey design object to the local disk
@@ -577,7 +589,9 @@ if ( 2000 %in% five.percent.files.to.download ){
 			fn = tsv.00.5 , 
 			merged.tn = "pums_2000_5_m" , 
 			hh.tn = "pums_2000_5_h" , 
-			person.tn = "pums_2000_5_p"
+			person.tn = "pums_2000_5_p" ,
+			hh.stru = hh.00.structure ,
+			person.stru = person.00.structure
 		)
 
 	# save the monetdb-backed complex sample survey design object to the local disk
