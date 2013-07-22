@@ -171,12 +171,12 @@ read.SAScii.monetdb <-
 	# convert the fwf to a csv
 	# verbose = TRUE prints a message, which has to be captured.
 	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = TRUE )
-	on.exit( { file.remove( tf ) ; file.remove( tf2 ) } )
+	on.exit( { file.remove( tf2 ) } )
 	
 	# stop storing the output
 	sink( type = "message" )
 	# unlink( tf3 )
-	on.exit( { file.remove( tf ) ; file.remove( tf2 ) ; file.remove( tf3 ) } )
+	on.exit( { file.remove( tf3 ) } )
 	
 	# read the contents of that message into a character string
 	zzz <- readLines( tf3 )
