@@ -353,7 +353,7 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 				c( "serialno" , "hweight" , "persons" , "elec" , "gas" , "water" , "oil" , "rent" , "mrt1amt" , "mrt2amt" , "taxamt" , "insamt" , "condfee" , "mhcost" , "smoc" , "smocapi" , "grent" , "grapi" , "hinc" , "finc" , "pweight" , "age" , "ancfrst5" , "ancscnd5" , "yr2us" , "trvtime" , "weeks" , "hours" , "incws" , "incse" , "incint" , "incss" , "incssi" , "incpa" , "incret" , "incoth" , "inctot" , "earns" , "poverty" )
 	
 			# add a logical `char` field to both of these data.frames
-			stru$char <- ( stru$a.n %in% 'A' & !( stru$varname %in% hardcoded.numeric.columns ) )
+			stru$char <- ( stru$a.n %in% 'A' & !( stru$variable %in% hardcoded.numeric.columns ) )
 						
 			# since this is the last line of the function `code.str`
 			# whatever this object `stru` is at the end of the function
