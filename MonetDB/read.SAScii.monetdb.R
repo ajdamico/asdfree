@@ -175,7 +175,7 @@ read.SAScii.monetdb <-
 	
 	# stop storing the output
 	sink( type = "message" )
-	unlink( tf3 )
+	# unlink( tf3 )
 	on.exit( { file.remove( tf ) ; file.remove( tf2 ) ; file.remove( tf3 ) } )
 	
 	# read the contents of that message into a character string
