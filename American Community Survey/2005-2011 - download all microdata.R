@@ -50,8 +50,13 @@
 # it's running.  don't believe me?  check the working directory (set below) for a new r data file (.rda) every few hours.
 
 
+# remove the # in order to run this install.packages line only once
+# install.packages( "sas7bdat" )
+
+
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+require(sas7bdat)		# loads files ending in .sas7bdat directly into r as data.frame objects
 
 
 # set your ACS data directory
@@ -242,6 +247,49 @@ for ( year in 2050:2005 ){
 			# loop through both household- and person-level files
 			for ( j in c( 'h' , 'p' ) ){			
 
+			
+				# determine column types #
+				
+				# figure out the column types by reading in the wyoming (smallest) sas7bdat file
+				sas.file.location <-
+					paste0( 
+						ftp.path ,
+						"unix_" ,
+						j ,
+						"wy.zip"
+					)
+				
+							
+				# store a command: "download the sas zipped file to the temporary file location"
+				download.command <- download.file( sas.file.location , tf , mode = "wb" )
+
+				# unzip to a local directory
+				wy <- unzip( tf , exdir = td )
+				
+				wyoming.table <- read.sas7bdat( wy[ grep( 'sas7bdat' , wy ) ] )
+				
+				# identify all factor/character columns
+				facchar <- 
+					tolower(
+						names( wyoming.table )[ !( sapply( wyoming.table , class ) %in% c( 'numeric' , 'integer' ) ) ]
+					)
+
+				# now you've got a character vector containing all of the character/factor fields
+				
+				# save it in `headers.h` or `headers.p`
+				if ( j == 'h' ) headers.h <- facchar else headers.p <- facchar
+								
+				
+				# you don't need the `wyoming.table` for anything else, so scrap it..
+				rm( wyoming.table )
+				 
+				# ..and clear up RAM
+				gc()
+				
+				# end of column type determination #
+				
+							
+			
 				# wait ten seconds, just to make sure any previous servers closed
 				# and you don't get a gdk-lock error from opening two-at-once
 				Sys.sleep( 10 )
@@ -360,8 +408,6 @@ for ( year in 2050:2005 ){
 					names( headers )[ names( headers ) == 'type' ] <- 'type_'
 				}
 
-				if ( j == 'h' ) headers.h <- headers else headers.p <- headers
-								
 				# the american community survey data only contains integers and character strings..
 				# so store integer columns as numbers and all others as characters
 				# note: this won't work on other data sets, since they might have columns with non-integers (decimals)
@@ -576,11 +622,9 @@ for ( year in 2050:2005 ){
 					"on a.serialno = b.serialno with data" 
 				)
 			
-			# create the three `headers` structure files to make the check.factors=
+			# create the merged `headers` structure files to make the check.factors=
 			# component of the sqlrepsurvey() functions below run much much faster.
-			headers.p$one <- headers.h$one <- 1
-			headers.p$idkey <- headers.h$idkey <- 1
-			headers.m <- merge( headers.h , headers.p )
+			headers.m <- unique( headers.h , headers.p )
 			
 			# create the merged table
 			dbSendUpdate( db , i.j )
@@ -633,7 +677,7 @@ for ( year in 2050:2005 ){
 					table.name = paste0( k , '_m' ) , 			# use the person-household-merge data table
 					key = "idkey" ,
 					# check.factors = 10 by default.. uncommenting this next line would compute column classes based on `headers.m` instead
-					check.factors = headers.m[ NULL , ] ,		# use `headers.m` to determine the column types
+					check.factors = headers.m ,					# use `headers.m` to determine the column types
 					database = monet.url ,
 					driver = MonetDB.R()
 				)
@@ -651,7 +695,7 @@ for ( year in 2050:2005 ){
 					table.name = paste0( k , '_h' ) , 			# use the household-level data table
 					key = "idkey" ,
 					# check.factors = 10 by default.. uncommenting this next line would compute column classes based on `headers.m` instead
-					check.factors = headers.h[ NULL , ] ,		# use `headers.h` to determine the column types
+					check.factors = headers.h ,					# use `headers.h` to determine the column types
 					database = monet.url ,
 					driver = MonetDB.R()
 				)
