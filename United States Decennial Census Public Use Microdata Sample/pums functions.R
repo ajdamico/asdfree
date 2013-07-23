@@ -298,8 +298,8 @@ pums.import.merge.design <-
 		dbSendUpdate( db , paste0( 'alter table ' , merged.tn , ' add column idkey int auto_increment' ) )
 		
 		# store the names of factor/character variables #
-		hh.char <- hh.stru[ hh.stru$char %in% TRUE , 'varname' ]
-		person.char <- person.stru[ person.stru$char %in% TRUE , 'varname' ]
+		hh.char <- hh.stru[ hh.stru$char %in% TRUE , 'variable' ]
+		person.char <- person.stru[ person.stru$char %in% TRUE , 'variable' ]
 		
 		# throw in rectype, of course
 		mergefile.factor.variables <- unique( c( hh.char , person.char , 'rectype' ) )
