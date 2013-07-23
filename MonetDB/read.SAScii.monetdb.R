@@ -58,11 +58,14 @@ read.SAScii.monetdb <-
 		# otherwise, put them in the protected folder
 		tf.path <- normalizePath( tf.path )
 		td <- tf.path
-		tf <- normalizePath( paste0( tf.path , tablename , "1" ) )
-		tf2 <- normalizePath( paste0( tf.path , tablename , "2" ) )
-		tf3 <- normalizePath( paste0( tf.path , tablename , "3" ) )
+		tf <- paste0( tf.path , "/" , tablename , "1" )
+		tf2 <- paste0( tf.path , "/" , tablename , "2" )
+		tf3 <- paste0( tf.path , "/" , tablename , "3" )
 	}
-
+	
+	file.create( tf , tf2 , tf3 )
+	
+	
 	# scientific notation contains a decimal point when converted to a character string..
 	# so store the user's current value and get rid of it.
 	user.defined.scipen <- getOption( 'scipen' )
