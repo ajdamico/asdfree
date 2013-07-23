@@ -406,6 +406,8 @@ for ( year in 2050:2005 ){
 				if ( 'type' %in% tolower( names( headers ) ) ){
 					print( "warning: column name 'type' unacceptable in monetdb.  changing to 'type_'" )
 					names( headers )[ names( headers ) == 'type' ] <- 'type_'
+					
+					headers.h[ headers.h == 'type' ] <- 'type_'
 				}
 
 				# the american community survey data only contains integers and character strings..
