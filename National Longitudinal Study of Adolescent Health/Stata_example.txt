@@ -1,0 +1,66 @@
+***********
+*** replicate regression example in Add health Guidelines
+*** using public-use data instead of the restricted data:
+** 1. mean number of hours watching TV
+/* 2. Research Question:
+
+Is performance on the Add Health Vocabulary test (PVT_PT1C) influenced
+by an adolescent's age(AGE_W1), sex (BOY) or time
+spent watching TV (HR_WATCH)? 
+
+date: 6/28/2013-7/1/2013
+*/
+
+*********************************************************************
+*** mean
+
+svyset cluster2 [pweight=gswgt1]
+svy: mean w1hrtv
+
+/*
+
+Survey: Mean estimation
+
+Number of strata =       1        Number of obs    =      6477
+Number of PSUs   =     132        Population size  =  22159516
+                                  Design df        =       131
+
+--------------------------------------------------------------
+             |             Linearized
+             |       Mean   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+      w1hrtv |   15.64193   .3902066         14.87    16.41385
+--------------------------------------------------------------
+*/
+
+************************************
+** OLS regression
+
+svyset cluster2 [pweight=gswgt1]
+svy: regress ah_pvt w1age boy w1hrtv
+
+/*
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =      6200
+Number of PSUs     =       132                  Population size    =  21107111
+                                                Design df          =       131
+                                                F(   3,    129)    =     12.32
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0122
+
+------------------------------------------------------------------------------
+             |             Linearized
+      ah_pvt |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       w1age |  -.3265114   .3030707    -1.08   0.283    -.9260576    .2730348
+         boy |   1.564436   .4545732     3.44   0.001     .6651813     2.46369
+      w1hrtv |  -.0986668   .0183789    -5.37   0.000    -.1350247   -.0623089
+       _cons |   106.6383   4.677868    22.80   0.000     97.38432    115.8922
+------------------------------------------------------------------------------
+
+*/
+
+
+
