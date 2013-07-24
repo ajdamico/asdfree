@@ -149,7 +149,7 @@ x <-
 # by subtracting the interview date from the birth date,
 # dividing by 365.25 (don't forget your leap years)
 # and then converting the column type to an integer.
-cons$w1age <- as.integer( ( cons$w1intdate - cons$birthdate ) / 365.25 )
+x$w1age <- as.integer( ( x$w1intdate - x$birthdate ) / 365.25 )
 
 # at this point, we've got all the variables we need to replicate unc's example stata output	
 	
