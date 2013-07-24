@@ -18,25 +18,25 @@
 
 # note that the university of north carolina's carolina population center only publishes standard error examples
 # using the restricted access data files (shown here):
-stop( 'pdf page 18 of wt_guidelines.pdf' )
+# http://www.cpc.unc.edu/projects/addhealth/data/guides/wt-guidelines.pdf#page=18
 # so to confirm that the methodology below is correct, i asked the folks at unc..
-stop( 'my e-mail to unc on my github' )
+# https://github.com/ajdamico/usgsd/blob/master/National%20Longitudinal%20Study%20of%20Adolescent%20Health/Gmail%20-%20precisely%20replicating%20a%20SE%20statistic%20with%20AddHealth.pdf?raw=true
 # ..to provided me some example stata output run on the public use file (puf).  they did.  radical.
-stop( 'stata output on my github' )
+# https://github.com/ajdamico/usgsd/blob/master/National%20Longitudinal%20Study%20of%20Adolescent%20Health/Stata_example.txt
 # this r script will replicate the statistics from that custom run of the national longitudinal study of adolescent health (addhealth) exactly
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#################################################################################################################################################
-# prior to running this replication script, at least wave 1 of the addhealth public use microdata files must be loaded as R data      #
-# files (.rda) on the local machine. running the "download and consolidate.R" script will create these files.                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-stop( 'fix this' )
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will save a number of .rda files in C:/My Directory/AddHealth/ (or the working directory chosen)                        #
-#################################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###########################################################################################################################################
+# prior to running this replication script, at least wave 1 of the addhealth public use microdata files must be loaded as R data          #
+# files (.rda) on the local machine. running the "download and consolidate.R" script will create these files.                             #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://raw.github.com/ajdamico/usgsd/master/National%20Longitudinal%20Study%20of%20Adolescent%20Health/download%20and%20consolidate.R  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will save a number of .rda files in C:/My Directory/AddHealth/ (or the working directory chosen)                            #
+###########################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 #######################################################################
@@ -196,12 +196,15 @@ y <-
 	)
 
 
-#################################################################
-# print the exact contents of the samhsa document to the screen #
-#################################################################
+################################################################
+# print the exact contents of the stata document to the screen #
+################################################################
 
-stop( 'replace this with the stata example.txt link!' )
-# https://github.com/ajdamico/usgsd/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/NSDUH%20PUF_Table_1.19B_D%20from%20SAMHSA.pdf?raw=true #
+# email from unc carolina population center
+# https://github.com/ajdamico/usgsd/blob/master/National%20Longitudinal%20Study%20of%20Adolescent%20Health/Gmail%20-%20precisely%20replicating%20a%20SE%20statistic%20with%20AddHealth.pdf?raw=true
+
+# stata code (and output) from unc carolina population center
+# https://github.com/ajdamico/usgsd/blob/master/National%20Longitudinal%20Study%20of%20Adolescent%20Health/Stata_example.txt
 
 
 # time spent watching tv #
