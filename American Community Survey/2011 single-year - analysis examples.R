@@ -22,7 +22,7 @@
 # prior to running this analysis script, the acs 2011 single-year file must be loaded as a monet database-backed sqlsurvey object   #
 # on the local machine. running the 2005-2011 download and create database script will create a monet database containing this file #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/American%20Community%20Survey/2005-2011%20-%20download%20all%20microdata.R          #
+# https://github.com/ajdamico/usgsd/blob/master/American%20Community%20Survey/download%20all%20microdata.R                          #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "acs2011_1yr.rda" in C:/My Directory/ACS or wherever the working directory was set for the program #
 #####################################################################################################################################

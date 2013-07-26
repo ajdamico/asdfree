@@ -17,16 +17,16 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################################
-# prior to running this analysis script, the brfss 2011 single-year file must be loaded as a monet database-backed sqlsurvey object               #
-# on the local machine. running the 1984-2011 download and create database script will create a monet database containing this file               #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/1984%20-%202011%20download%20all%20microdata.R #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "b2011 design.rda" in C:/My Directory/BRFSS or wherever the working directory was set for the program            #
-###################################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#########################################################################################################################################
+# prior to running this analysis script, the brfss 2011 single-year file must be loaded as a monet database-backed sqlsurvey object     #
+# on the local machine. running the 1984-2011 download and create database script will create a monet database containing this file     #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/download%20all%20microdata.R         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "b2011 design.rda" in C:/My Directory/BRFSS or wherever the working directory was set for the program  #
+#########################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # # # # # # # # # # # # # # #
