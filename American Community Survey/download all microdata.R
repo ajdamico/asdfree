@@ -643,7 +643,7 @@ for ( year in 2050:2005 ){
 			
 			# create the merged `headers` structure files to make the check.factors=
 			# component of the sqlrepsurvey() functions below run much much faster.
-			headers.m <- unique( headers.h , headers.p )
+			headers.m <- unique( c( headers.h , headers.p ) )
 			
 			# create the merged table
 			dbSendUpdate( db , i.j )
