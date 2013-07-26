@@ -250,15 +250,31 @@ for ( year in 2050:2005 ){
 			
 				# determine column types #
 				
-				# figure out the column types by reading in the wyoming (smallest) sas7bdat file
-				sas.file.location <-
-					paste0( 
-						ftp.path ,
-						"unix_" ,
-						j ,
-						"wy.zip"
-					)
+				if ( year == 2007 & size == 1 ){
 				
+					# the 2007 single-year wyoming file does not read in with read.sas7bdat correctly,
+					# so manually download the 2006 wyoming file..
+					sas.file.location <-
+						paste0( 
+							'http://www2.census.gov/acs/downloads/pums/2006/unix_' ,
+							j ,
+							"wy.zip"
+						)
+					# ..because (and i confirmed this):
+					# the 2007 and 2006 single-year files have the exact same columns.
+				
+				} else {
+				
+					# figure out the column types by reading in the wyoming (smallest) sas7bdat file
+					sas.file.location <-
+						paste0( 
+							ftp.path ,
+							"unix_" ,
+							j ,
+							"wy.zip"
+						)
+						
+				}
 							
 				# store a command: "download the sas zipped file to the temporary file location"
 				download.command <- download.file( sas.file.location , tf , mode = "wb" )
@@ -273,7 +289,8 @@ for ( year in 2050:2005 ){
 					tolower(
 						names( wyoming.table )[ !( sapply( wyoming.table , class ) %in% c( 'numeric' , 'integer' ) ) ]
 					)
-
+			
+				
 				# now you've got a character vector containing all of the character/factor fields
 				
 				# save it in `headers.h` or `headers.p`
