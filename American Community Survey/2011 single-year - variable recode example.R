@@ -94,7 +94,7 @@ db <- dbConnect( MonetDB.R() , monet.url )
 # then make a copy so you don't lose the pristine original.  #
 
 # the command above
-# db <- dbConnect( drv , monet.url , user = "monetdb" , password = "monetdb" )
+# db <- dbConnect( MonetDB.R() , monet.url )
 # has already connected the current instance of r to the monet database
 
 # now simply copy you'd like to recode into a new table
