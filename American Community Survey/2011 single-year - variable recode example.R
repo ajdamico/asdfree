@@ -184,10 +184,26 @@ dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from r
 # that's been recoded to include 'agecat"
 # simply re-run the sqlrepsurvey() function and update the table.name =
 # argument so it now points to the recoded_ table in the monet database
+# and includes the character vector designating all character/factor (non-numeric) columns
 
-# note: this takes a while.  depending on how slowly the dots move across your screen, 
-# you may want to leave it running overnight.  i did warn you to run all of your recodes at once, didn't i?
+# extract the character/factor variables from the previous design #
 
+# load the desired american community survey monet database-backed complex sample design objects
+
+# uncomment this line by removing the `#` at the front..
+# load( 'C:/My Directory/ACS/acs2011_1yr.rda' )	# analyze the 2011 single-year acs
+
+# figure out which columns in the metadata are not numeric or integer
+factor.variables.in.acs.m <- 
+	names( acs.m.design$zdata )[ !( sapply( acs.m.design$zdata , class ) %in% c( 'numeric' , 'integer' ) ) ]
+
+# toss in your two age category variables,
+# which should also be treated as character variables instead of numeric
+factor.variables.in.acs.m <-
+	c( factor.variables.in.acs.m , 'agecat' , 'agecat2' )
+
+# end of extraction of character/factor variables #
+	
 # create a sqlrepsurvey complex sample design object
 # using the *recoded* merged (household+person) table
 
@@ -200,7 +216,10 @@ acs.m.recoded.design <-
 		mse = TRUE ,
 		table.name = "recoded_acs2011_1yr_m" ,		# note the solitary change here
 		key = "idkey" ,
-		# check.factors = 10 ,
+		
+		# note that this line specifies the new character/factor variables in the monetdb table:
+		check.factors = factor.variables.in.acs.m ,
+		
 		database = monet.url ,
 		driver = MonetDB.R()
 	)
