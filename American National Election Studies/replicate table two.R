@@ -214,6 +214,9 @@ summary( svy.logit )
 
 # note that a few numbers do not match precisely precisely precisely,
 # notice, for example, the "appeared informed" coefficient should round down to 1.0
+# and "female" should round down to 0.0 instead of up to 0.1 - 
+# even though the standard errors are correct in both cases.
+
 # so i ran the stata code included in this document here myself:
 # http://www.electionstudies.org/resources/papers/nes012492.pdf#page=28
 # and stata produced this output for me:
