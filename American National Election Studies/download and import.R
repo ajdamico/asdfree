@@ -184,8 +184,14 @@ if( any( sapply( files.to.download , function( z ) "" %in% z ) ) ) stop( "empty 
 # loop through each available study to download
 for ( curStudy in seq( length( files.to.download ) ) ){
 
-	# create a directory that's appropriately named
-	dir.create( names( files.to.download )[[ curStudy ]] )
+	# prepare a directory that's appropriately named
+	dfn <- names( files.to.download )[[ curStudy ]]
+	
+	# remove the text 'anes' from the folder name
+	dfn <- gsub( "ANES " , "" , dfn )
+	
+	# create the directory on the local disk
+	dir.create( dfn )
 
 	# loop through each file that needs to be downloaded..
 	for ( i in files.to.download[[ curStudy ]] ){
@@ -254,17 +260,20 @@ for ( curStudy in seq( length( files.to.download ) ) ){
 			
 		# convert all column names in the data.frame to lowercase
 		names( x ) <- tolower( names( x ) )
+
+		# construct the save filename
+		sfn <-
+			paste( 
+				names( files.to.download )[[ curStudy ]] ,
+				bn ,
+				sep = "/"
+			)
+
+		# remove the text 'anes' from the filename
+		sfn <- gsub( "ANES " , "" , sfn )
 		
 		# save the data.frame to an `.rda` file on the local disk
-		save( 
-			x , 
-			file = 
-				paste( 
-					names( files.to.download )[[ curStudy ]] ,
-					bn ,
-					sep = "/"
-				)
-		)
+		save( x , file = sfn )
 		
 		# remove both objects from memory
 		rm( x , z )
