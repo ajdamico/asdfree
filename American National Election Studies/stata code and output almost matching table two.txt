@@ -1,0 +1,292 @@
+use "s:\temp\anes08.dta" 
+(Written by R.              )
+
+. 
+. *set missing values 
+
+. 
+. recode v083097 v083098a v083098b v083037a v083037b v081101 v085044a v083184 v083217 v083216x v083184 v083217 v083103 v083303 v083212x v081102 (-9/-1=.) 
+(v083097: 35 changes made)
+(v083098a: 919 changes made)
+(v083098b: 1443 changes made)
+(v083037a: 29 changes made)
+(v083037b: 39 changes made)
+(v081101: 0 changes made)
+(v085044a: 758 changes made)
+(v083184: 43 changes made)
+(v083217: 10 changes made)
+(v083216x: 14 changes made)
+(v083184: 43 changes made)
+(v083217: 10 changes made)
+(v083103: 71 changes made)
+(v083303: 16 changes made)
+(v083212x: 94 changes made)
+(v081102: 11 changes made)
+
+. 
+. 
+. 
+. * variable setup; set missing values and generate variables 
+
+. 
+. 
+. 
+. gen voteobama=. 
+(2322 missing values generated)
+
+. 
+. replace voteobama=1 if v085044a==1 
+(1025 real changes made)
+
+. 
+. replace voteobama=0 if (v085044a==3 | v085044a==7) 
+(539 real changes made)
+
+. 
+. * generate the subpopulation identifier variable 
+
+. 
+. gen subp=0 
+
+. 
+. 
+. 
+. replace subp=1 if (voteobama==0 | voteobama==1) 
+(1564 real changes made)
+
+. 
+. 
+. 
+. gen married =0 
+
+. 
+. replace married =1 if v083216x==1 
+(975 real changes made)
+
+. 
+. 
+. 
+. gen pid=. 
+(2322 missing values generated)
+
+. 
+. replace pid=1 if (v083097==1 & v083098a==1) 
+(580 real changes made)
+
+. 
+. replace pid=2 if (v083097==1 & v083098a==5) 
+(393 real changes made)
+
+. 
+. replace pid=3 if v083098b==5 
+(392 real changes made)
+
+. 
+. replace pid=4 if v083098b==3 
+(264 real changes made)
+
+. 
+. replace pid=5 if v083098b==1 
+(223 real changes made)
+
+. 
+. replace pid=6 if (v083097==2 & v083098a==5) 
+(200 real changes made)
+
+. 
+. replace pid=7 if (v083097==2 & v083098a==1) 
+(230 real changes made)
+
+. 
+. gen black=. 
+(2322 missing values generated)
+
+. 
+. replace black=1 if (v081102==2 | v081102==6 | v081102==7) 
+(591 real changes made)
+
+. 
+. replace black=0 if (v081102==1 | v081102==4 | v081102==5) 
+(1720 real changes made)
+
+. 
+. replace v083184 =. if v083184 ==7 
+(15 real changes made, 15 to missing)
+
+. 
+. * create intelligible variable names 
+
+. 
+. rename v083037a obamaft 
+
+. 
+. rename v083037b mccainft 
+
+. 
+. rename v081101 sex 
+
+. 
+. rename v083184 biblewog 
+
+. 
+. rename v083217 edu 
+
+. 
+. rename v083103 iraqworth 
+
+. 
+. rename v083303 obsinfo 
+
+. 
+. rename v083212x gaymil 
+
+. 
+. * scale all the variables 0 - 1 
+
+. 
+. replace pid = (pid - 1)/6 
+(2282 real changes made)
+
+. 
+. replace obamaft = obamaft/100 
+(2166 real changes made)
+
+. 
+. replace mccainft = mccainft/100 
+(2077 real changes made)
+
+. 
+. generate female = sex - 1 
+
+. 
+. recode biblewog (1=1) (2=.5) (3=0) 
+(biblewog: 1249 changes made)
+
+. 
+. replace edu = edu/17 
+(2310 real changes made)
+
+. 
+. recode iraqworth (1=1) (5=0) 
+(iraqworth: 1776 changes made)
+
+. 
+. recode gaymil (1=1) (2=.667) (4=.333) (5=0) 
+(gaymil: 963 changes made)
+
+. 
+. recode obsinfo (1=1) (2=.75) (3=.5) (4=.25) (5=0) 
+(obsinfo: 1835 changes made)
+
+. 
+. *set up the survey procedures 
+
+. 
+. svyset [pweight=v080102], strata(v081206) psu(v081205) 
+
+      pweight: v080102
+          VCE: linearized
+  Single unit: missing
+     Strata 1: v081206
+         SU 1: v081205
+        FPC 1: <zero>
+
+. 
+. * regressions: unweighted SRS, weighted with SRS SEs, and weighted with Taylor Series SEs 
+
+. 
+. 
+. 
+. logit voteobama pid obamaft mccainft female biblewog edu iraqworth black gaymil obsinfo 
+
+Iteration 0:   log likelihood = -917.93882  
+Iteration 1:   log likelihood = -271.54741  
+Iteration 2:   log likelihood = -222.78424  
+Iteration 3:   log likelihood = -219.22486  
+Iteration 4:   log likelihood = -219.19026  
+Iteration 5:   log likelihood = -219.19022  
+Iteration 6:   log likelihood = -219.19022  
+
+Logistic regression                               Number of obs   =       1424
+                                                  LR chi2(10)     =    1397.50
+                                                  Prob > chi2     =     0.0000
+Log likelihood = -219.19022                       Pseudo R2       =     0.7612
+
+------------------------------------------------------------------------------
+   voteobama |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         pid |  -3.404626   .4673651    -7.28   0.000    -4.320645   -2.488607
+     obamaft |   7.750976   .7209674    10.75   0.000     6.337905    9.164046
+    mccainft |  -5.361259    .734109    -7.30   0.000    -6.800086   -3.922432
+      female |    .233679   .2671852     0.87   0.382    -.2899944    .7573523
+    biblewog |   -1.08775    .399634    -2.72   0.006    -1.871018   -.3044816
+         edu |   -3.67824   1.052226    -3.50   0.000    -5.740566   -1.615914
+   iraqworth |  -.7884126   .3128983    -2.52   0.012    -1.401682   -.1751431
+       black |   2.459985   .6292177     3.91   0.000     1.226741    3.693229
+      gaymil |   .6142161   .4026859     1.53   0.127    -.1750337    1.403466
+     obsinfo |   1.087064   .5173484     2.10   0.036     .0730801    2.101049
+       _cons |   2.704161   1.045827     2.59   0.010     .6543783    4.753943
+------------------------------------------------------------------------------
+
+. 
+. logit voteobama pid obamaft mccainft female biblewog edu iraqworth black gaymil obsinfo [pweight=v080102] 
+
+Iteration 0:   log pseudolikelihood = -1009.9893  
+Iteration 1:   log pseudolikelihood = -262.31893  
+Iteration 2:   log pseudolikelihood = -250.15113  
+Iteration 3:   log pseudolikelihood = -249.66344  
+Iteration 4:   log pseudolikelihood = -249.65897  
+Iteration 5:   log pseudolikelihood = -249.65897  
+
+Logistic regression                               Number of obs   =       1424
+                                                  Wald chi2(10)   =     223.01
+                                                  Prob > chi2     =     0.0000
+Log pseudolikelihood = -249.65897                 Pseudo R2       =     0.7528
+
+------------------------------------------------------------------------------
+             |               Robust
+   voteobama |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         pid |  -3.679856   .5454206    -6.75   0.000    -4.748861   -2.610851
+     obamaft |   8.226276   .9990501     8.23   0.000     6.268174    10.18438
+    mccainft |  -5.352353   .9585027    -5.58   0.000    -7.230984   -3.473722
+      female |   .0142554   .3237514     0.04   0.965    -.6202857    .6487964
+    biblewog |  -1.194492   .4599125    -2.60   0.009    -2.095904   -.2930804
+         edu |  -4.239279   1.319932    -3.21   0.001    -6.826299   -1.652259
+   iraqworth |  -.7052859   .3762858    -1.87   0.061    -1.442793    .0322207
+       black |   2.635305    .755089     3.49   0.000     1.155358    4.115252
+      gaymil |   .8651314   .5059132     1.71   0.087    -.1264402    1.856703
+     obsinfo |   1.033456    .715387     1.44   0.149    -.3686768    2.435589
+       _cons |   2.932714   1.341398     2.19   0.029     .3036219    5.561805
+------------------------------------------------------------------------------
+
+. 
+. svy, subpop(subp): logit voteobama pid obamaft mccainft female biblewog edu iraqworth black gaymil obsinfo
+(running logit on estimation sample)
+
+Survey: Logistic regression
+
+Number of strata   =         9                  Number of obs      =      2182
+Number of PSUs     =        94                  Population size    = 1974.5504
+                                                Subpop. no. of obs =      1424
+                                                Subpop. size       = 1462.9686
+                                                Design df          =        85
+                                                F(  10,     76)    =     23.64
+                                                Prob > F           =    0.0000
+
+------------------------------------------------------------------------------
+             |             Linearized
+   voteobama |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         pid |  -3.679856   .3892411    -9.45   0.000    -4.453772   -2.905941
+     obamaft |   8.226276   1.312318     6.27   0.000     5.617037    10.83551
+    mccainft |  -5.352353   .7729222    -6.92   0.000    -6.889129   -3.815577
+      female |   .0142554   .2524267     0.06   0.955    -.4876365    .5161473
+    biblewog |  -1.194492    .546729    -2.18   0.032    -2.281536   -.1074486
+         edu |  -4.239279   1.189411    -3.56   0.001    -6.604146   -1.874412
+   iraqworth |  -.7052859   .3645434    -1.93   0.056    -1.430096     .019524
+       black |   2.635305   .6767807     3.89   0.000     1.289684    3.980926
+      gaymil |   .8651314   .3676626     2.35   0.021     .1341195    1.596143
+     obsinfo |   1.033456   .6568545     1.57   0.119    -.2725467    2.339459
+       _cons |   2.932714    1.00858     2.91   0.005     .9273871     4.93804
+------------------------------------------------------------------------------
