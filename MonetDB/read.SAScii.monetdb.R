@@ -3,13 +3,10 @@
 # to use different 'NULL AS <something>' options for the actual command that imports
 # lines into monetdb: COPY <stuff> INTO <tablename> ...
 sql.copy.into <-
-	function( nullas , num.lines , tablename , tf2 , connection , delimiters , oset = oset ){
-		
-		# check for an offset
-		if ( oset > 0 ) oset.line <- paste( " offset" , oset ) else oset.line <- ""
+	function( nullas , num.lines , tablename , tf2 , connection , delimiters ){
 		
 		# import the data into the database
-		sql.update <- paste0( "copy " , num.lines , oset.line , " records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
+		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
 		dbSendUpdate( connection , sql.update )
 		
 		# return true when it's completed
@@ -45,9 +42,7 @@ read.SAScii.monetdb <-
 										# this option is useful for keeping protected data off of random temporary folders on your computer--
 										# specifying this option creates the temporary file inside the folder specified
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
-		sleep.between.col.updates = 0 ,
-		
-		oset = 2						# by default, offset two records (this simply skips the header)
+		sleep.between.col.updates = 0
 		
 	) {
 
@@ -209,30 +204,30 @@ read.SAScii.monetdb <-
 	# using the sql.copy.into() function defined above
 	
 	# capture an error (without breaking)
-	te <- try( sql.copy.into( " NULL AS ''" , num.lines , tablename , tf2  , connection , delimiters , oset =  oset )  , silent = TRUE )
+	te <- try( sql.copy.into( " NULL AS ''" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #1 broke, trying method #2' , "\r" )
-		te <- try( sql.copy.into( " NULL AS ' '" , num.lines , tablename , tf2  , connection , delimiters , oset =  oset )  , silent = TRUE )
+		te <- try( sql.copy.into( " NULL AS ' '" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #2 broke, trying method #3' , "\r"  )
-		te <- try( sql.copy.into( "" , num.lines , tablename , tf2  , connection , delimiters , oset =  oset )  , silent = TRUE )
+		te <- try( sql.copy.into( "" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 	
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #3 broke, trying method #4' , "\r"  )
-		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , num.lines , tablename , tf2  , connection , delimiters , oset =  oset )  , silent = TRUE )
+		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #4 broke, trying method #5' , "\r" )
 		# this time without error-handling.
-		sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters , oset =  oset ) 
+		sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) 
 	}
 	
 	# end importation attempts #
