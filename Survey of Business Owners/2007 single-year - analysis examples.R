@@ -77,6 +77,9 @@ options( survey.lonely.psu = "adjust" )
 db <- dbConnect( SQLite() , sbo.dbname )
 # connects the current instance of r to the sqlite database
 
+# load the mathematical functions in the r package RSQLite.extfuns
+init_extensions(db)
+
 # now simply copy you'd like to recode into a new table
 dbSendQuery( db , "CREATE TABLE x AS SELECT * FROM y" )
 # this action protects the original 'y' table from any accidental errors.
