@@ -207,7 +207,7 @@ class( sbo.svy ) <- 'sbosvyimputationList'
 # the `sbo.svy` object.
 
 # overall unweighted number of records
-nrow( ~one , sbo.svy$coef )
+nrow( sbo.svy$coef )
 
 # by state
 svyby( ~one , ~fipst , sbo.svy$coef , unwtd.count )
