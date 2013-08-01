@@ -34,7 +34,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "RSQLite.extfuns" , "mitools" ) )
+# install.packages( c( "survey" , "RSQLite" , "RSQLite.extfuns" , "mitools" , "downloader" ) )
 
 
 # name the database (.db) file to be saved in the working directory
@@ -56,6 +56,7 @@ require(RSQLite) 			# load RSQLite package (creates database files in R)
 require(RSQLite.extfuns) 	# load RSQLite package (allows mathematical functions, like SQRT)
 require(mitools) 			# load mitools package (analyzes multiply-imputed data)
 require(survey) 			# load survey package (analyzes complex design surveys)
+require(downloader)			# downloads and then runs the source() function on scripts from github
 
 
 # load pnad-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)

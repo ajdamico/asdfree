@@ -50,6 +50,7 @@ require(RSQLite) 			# load RSQLite package (creates database files in R)
 require(RSQLite.extfuns) 	# load RSQLite package (allows mathematical functions, like SQRT)
 require(mitools) 			# load mitools package (analyzes multiply-imputed data)
 require(survey) 			# load survey package (analyzes complex design surveys)
+require(downloader)			# downloads and then runs the source() function on scripts from github
 
 
 # load pnad-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)
@@ -275,18 +276,36 @@ b
 # extract the statistics..
 coef( b )
 
-# ..or the standard errors
+# ..or the standard errors..
 SE( b )
+
+# ..or even the relative standard errors
+cv( b )
 
 # ..or hey, merge 'em all together into a single data.frame
 out <-
 	data.frame(
 		TABWGT = coef( b ) ,
 		UNADJ_VAR = diag( vcov( b ) ) / 1.992065 ,
-		ADJ_VAR = diag( vcov( b ) )
+		ADJ_VAR = diag( vcov( b ) ) ,
+		RSE = round( cv( b ) * 100 )
 	)
+
+# extract the state code, and instantly convert it to a number
+out$fipst <- as.numeric( lapply( strsplit( rownames( out ) , ':' ) , "[[" , 1 ) )
+
+# extract the `tab` variable
+out$tab <- lapply( strsplit( rownames( out ) , ':' ) , "[[" , 2 )
+
+# delete the rownames, since they're annoying and no longer helpful
+rownames( out ) <- NULL
+
+# sort the tabs by state
+out <- out[ order( out$fipst ) , ]
+	
 # that matches the `PUMS_MIN_FINAL.CSV` file precisely.
 
+# and that is a beautiful thing.
 
 	
 # for more details on how to work with data in r

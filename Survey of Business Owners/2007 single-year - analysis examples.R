@@ -42,6 +42,8 @@ require(RSQLite) 			# load RSQLite package (creates database files in R)
 require(RSQLite.extfuns) 	# load RSQLite package (allows mathematical functions, like SQRT)
 require(mitools) 			# load mitools package (analyzes multiply-imputed data)
 require(survey) 			# load survey package (analyzes complex design surveys)
+require(downloader)			# downloads and then runs the source() function on scripts from github
+
 
 
 # load pnad-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)
@@ -201,9 +203,15 @@ class( sbo.svy ) <- 'sbosvyimputationList'
 
 # note big note-
 # when using the `unwtd.count` function,
-# simply use the `sbo.coef` object
-# instead of the `sbo.svy` object.
-svyby( ~one , ~fipst , sbo.coef , unwtd.count )
+# simply use the `coef` object *within*
+# the `sbo.svy` object.
+
+# overall unweighted number of records
+nrow( ~one , sbo.svy$coef )
+
+# by state
+svyby( ~one , ~fipst , sbo.svy$coef , unwtd.count )
+
 # there's no need to run variances or standard errors
 # on your unweighted counts of the data set.
 
@@ -212,52 +220,58 @@ svyby( ~one , ~fipst , sbo.coef , unwtd.count )
 # count the weighted number of businesses in sbo #
 
 # the total number of non-publicly-owned establishments x industries x geographies
-
 MIcombine( with( sbo.svy , svytotal( ~one ) ) )
+# this matches "firms (number)" in the "all classifiable firms" row of
+# http://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#15
+
+# by employer/non-employer
+MIcombine( with( sbo.svy , svyby( ~one , ~n07_employer , svytotal ) ) )
 
 
-# by state
-MIcombine( with( sbo.svy , svyby( ~one , ~fipst , svytotal ) ) )
+# calculate the total of a linear variable #
 
+# receipts
+MIcombine( with( sbo.svy , svytotal( ~receipts_noisy ) ) )
 
-# calculate the mean of a linear variable #
-
-# payroll
-MIcombine( with( sbo.svy , svymean( ~payroll_noisy ) ) )
-
-
-# by state
-MIcombine( with( sbo.svy , svyby( ~payroll_noisy , ~fipst , svymean ) ) )
+# by employer/non-employer
+MIcombine( with( sbo.svy , svyby( ~receipts_noisy , ~n07_employer , svytotal ) ) )
 
 
 # calculate the distribution of a categorical variable #
 
-# number of business owners
-MIcombine( with( sbo.svy , svymean( ~factor( numowners ) ) ) )
+# offer health insurance
+MIcombine( with( sbo.svy , svymean( ~factor( healthins ) ) ) )
 
 # by state
-MIcombine( with( sbo.svy , svyby( ~factor( numowners ) , ~fipst , svymean ) ) )
+MIcombine( with( sbo.svy , svyby( ~factor( healthins ) , ~fipst , svymean ) ) )
+
 
 # calculate the median and other percentiles #
 
-# minimum, 25th, 50th, 75th, maximum payroll
-MIcombine( 
-	with( 
-		sbo.svy , 
-		svyquantile( 
-			~payroll_noisy , 
-			c( 0 , .25 , .5 , .75 , 1 ) 
-		)
-	)
-)
+# note for `svyquantile` calls within `MIcombine`
+# you gotta use `svyby` with a `one` variable instead.
 
-# by state
+# minimum, 25th, 50th, 75th, maximum receipts
 MIcombine( 
 	with( 
 		sbo.svy , 
 		svyby( 
-			~payroll_noisy , 
-			~fipst ,
+			~receipts_noisy , 
+			~one ,
+			svyquantile ,
+			c( 0 , .25 , .5 , .75 , 1 ) ,
+			ci = TRUE
+		)
+	)
+)
+
+# by number of business owners
+MIcombine( 
+	with( 
+		sbo.svy , 
+		svyby( 
+			~receipts_noisy , 
+			~numowners ,
 			svyquantile ,
 			c( 0 , .25 , .5 , .75 , 1 ) ,
 			ci = TRUE
@@ -270,10 +284,10 @@ MIcombine(
 ######################
 
 # restrict the y object to
-# businesses with less than 50 employees
-sbo.under.50 <- subset( sbo.svy , employment_noisy < 50 )
+# businesses established before the year 2000
+sbo.pre.y2k <- subset( sbo.svy , established %in% c( 1 , 2 , 3 ) )
 # now any of the above commands can be re-run
-# using sbo.under.50 object
+# using sbo.pre.y2k object
 # instead of the sbo.svy object
 # in order to analyze establishments x industries x geographies
 # with less than fifty employees
@@ -281,77 +295,62 @@ sbo.under.50 <- subset( sbo.svy , employment_noisy < 50 )
 # calculate the mean of a linear variable #
 
 # average payroll
-MIcombine( with( sbo.under.50 , svymean( ~payroll_noisy ) ) )
+MIcombine( with( sbo.pre.y2k , svymean( ~payroll_noisy ) ) )
 
 
 ###################
 # export examples #
 ###################
 
-# calculate the distribution of a categorical variable #
-# by state
+# calculate the mean of a linear variable #
+# by husband/wife operation
 
 # store the results into a new object
 
-health.by.state <-
+receipts.by.husbwife <-
 	MIcombine( 
 		with( 
 			sbo.svy , 
 			svyby( 
-				~factor( healthins ) , 
-				~fipst , 
+				~receipts_noisy , 
+				~husbwife , 
 				svymean 
 			) 
 		) 
 	)
 	
 # print the results to the screen
-health.by.state
+receipts.by.husbwife
 
 # now you have the results saved into a new object of type "MIresult"
-class( health.by.state )
+class( receipts.by.husbwife )
 
 # print only the statistics (coefficients) to the screen
-coef( health.by.state )
+coef( receipts.by.husbwife )
 
 # print only the standard errors to the screen
-SE( health.by.state )
+SE( receipts.by.husbwife )
 
 # print only the coefficients of variation to the screen
-cv( health.by.state )
+cv( receipts.by.husbwife )
 
 # this object can be coerced (converted) to a data frame..
-health.by.state <- 
+receipts.by.husbwife <- 
 	data.frame( 
-		coef = coef( health.by.state ) , 
-		SE = SE( health.by.state ) 
+		coef = coef( receipts.by.husbwife ) , 
+		SE = SE( receipts.by.husbwife ) 
 	)
 # ..and then immediately exported as a comma-separated value file
 # into your current working directory
-write.csv( health.by.state , "health insurance offers by state.csv" )
-
-stop( 'fix this' )
-
-# ..or trimmed to only contain the values you need.
-# here's the "percent female" by region,
-# with accompanying standard errors
-female.by.region <-
-	gender.by.region[ , c( "region" , "factor.v0302.4" , "se.factor.v0302.4" ) ]
+write.csv( receipts.by.husbwife , "receipts by husband-wife run businesses.csv" )
 
 
-# print the new results to the screen
-female.by.region
-
-# this can also be exported as a comma-separated value file
-# into your current working directory
-write.csv( female.by.region , "female by region.csv" )
-
-# ..or directly made into a bar plot
+# make 'em directly into a barplot
 barplot(
-	female.by.region[ , 2 ] ,
-	main = "Female by Region" ,
-	names.arg = c( "North" , "Northeast" , "Southeast" , "South" , "Center-West" ) ,
-	ylim = c( 0 , .52 )
+	receipts.by.husbwife[ , 1 ] ,
+	main = "Business Receipts by Husband-Wife Operation" ,
+	names.arg = c( "Not Reported" , "Joint Husband-Wife" , "Primarily Husband" , "Primarily Wife" , "Not Husband-Wife" ) ,
+	ylim = c( 0 , 700 )
 )
 
 
