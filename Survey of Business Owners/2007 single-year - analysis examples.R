@@ -45,6 +45,10 @@ require(survey) 			# load survey package (analyzes complex design surveys)
 require(downloader)			# downloads and then runs the source() function on scripts from github
 
 
+# unhappy with all the scientific notation in your output?
+# uncomment this line to increase the scientific notation threshold
+# options( scipen = 15 )
+
 
 # load pnad-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/sbosvy%20functions.R" , prompt = FALSE )
@@ -290,7 +294,7 @@ sbo.pre.y2k <- subset( sbo.svy , established %in% c( 1 , 2 , 3 ) )
 # using sbo.pre.y2k object
 # instead of the sbo.svy object
 # in order to analyze establishments x industries x geographies
-# with less than fifty employees
+# that were founded before 2000 AD
 
 # calculate the mean of a linear variable #
 
