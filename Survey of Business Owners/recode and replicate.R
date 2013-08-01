@@ -53,7 +53,7 @@ require(survey) 			# load survey package (analyzes complex design surveys)
 require(downloader)			# downloads and then runs the source() function on scripts from github
 
 
-# load pnad-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)
+# load sbo-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/sbosvy%20functions.R" , prompt = FALSE )
 
 
@@ -78,9 +78,9 @@ options( survey.lonely.psu = "adjust" )
 
 
 
-###############################################################
-# step 1: connect to the pnad data table you'd like to recode # 
-# then make a copy so you don't lose the pristine original.   #
+##############################################################
+# step 1: connect to the sbo data table you'd like to recode # 
+# then make a copy so you don't lose the pristine original.  #
 
 # the command 
 db <- dbConnect( SQLite() , sbo.dbname )
