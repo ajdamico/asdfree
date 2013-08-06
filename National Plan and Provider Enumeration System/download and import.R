@@ -69,48 +69,22 @@ require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 # on the local disk
 tf <- tempfile() ; tf2 <- tempfile() ; td <- tempdir()
 
+# read in the whole NPI files page
+npi.datapage <- readLines( "http://nppes.viva-it.com/NPI_Files.html" )
 
-# create an `attempt` object
-# that will cause the `while` loop below
-# to execute _at least_ once
-# but possibly more
-attempt <- try( stop( ) , silent = TRUE )
+# find the first line containing the data dissemination link
+npi.dataline <- npi.datapage[ grep( "http://nppes.viva-it.com/NPPES_Data_Dissemination_" , npi.datapage ) ][1]
 
-# the full filepath changes every month,
-# so attempt the current Month_Year combo
-# but then go back in time until you get it right.
-date.to.try <- Sys.Date() + 28
+# pull out the zipped file's name from that line
+fn <- 
+	gsub(
+		"(.*a href=\\\")(http://nppes.viva-it.com/NPPES_Data_Dissemination_.*\\.zip)(.*)$" , 
+		"\\2" , 
+		npi.dataline
+	)
 
-while( class( attempt ) == 'try-error' ){
-	
-	# subtract 28 days and try again
-	date.to.try <- date.to.try - 28
-	
-	# isolate the current month
-	curMonth <- 
-		format( date.to.try , "%b" )
-	
-	# isolate the current year
-	curYear <- 
-		format( date.to.try , "%Y" )
-	
-	# build the entire http:// filepath
-	# to the latest data set
-	fn <- 
-		paste0(
-			'http://nppes.viva-it.com/NPPES_Data_Dissemination_' ,
-			curMonth , 
-			'_' ,
-			curYear , 
-			'.zip'
-		)
-	
-	# try to download the file to
-	# the temporary file on the local disk
-	attempt <- try( download.file( fn , tf , mode = 'wb' ) , silent = TRUE )
-
-}
-
+# download the file to the temporary file on the local disk
+download.file( fn , tf , mode = 'wb' )
 
 # after downloading the file successfully,
 # unzip the temporary file to the temporary folder..
