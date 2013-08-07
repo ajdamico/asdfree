@@ -168,6 +168,9 @@ save.psid <-
 		# convert all column names to lowercase
 		names( x ) <- tolower( names( x ) )
 		
+		# add a `one` column
+		x$one <- 1
+		
 		# remove the files you'd downloaded from the local disk
 		file.remove( tf , z )
 	
