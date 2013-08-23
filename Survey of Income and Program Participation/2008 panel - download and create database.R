@@ -1,8 +1,8 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # survey of income and program participation
 # 2008 panel
-# 12 core waves, 12 wave-specific replicate weights, 11 topical modules, 
-# 2 panel year replicate weights, 2 calendar year replicate weights, 1 longitudinal weights
+# 13 core waves, 12 wave-specific replicate weights, 11 topical modules, 
+# 3 panel year replicate weights, 3 calendar year replicate weights, 1 longitudinal weights
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -39,14 +39,14 @@
 # install.packages( c( "RSQLite" , "SAScii" , "descr" , "downloader" ) )
 
 
-SIPP.dbname <- "SIPP08.db"														# choose the name of the database (.db) file on the local disk
+SIPP.dbname <- "SIPP08.db"																# choose the name of the database (.db) file on the local disk
 
-sipp.core.waves <- 1:12															# either choose which core survey waves to download, or set to NULL
-sipp.replicate.waves <- 1:12													# either choose which replicate weight waves to download, or set to NULL
-sipp.topical.modules <- 1:11													# either choose which topical modules to download, or set to NULL
-sipp.longitudinal.weights <- TRUE												# set to FALSE to prevent download
-sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , c( "09" , "10" ) )		# reads in 2009-2010
-sipp.pnl.longitudinal.replicate.weights <- paste0( 'pnl' , c( "09" , "10" ) )	# reads in 2009-2010
+sipp.core.waves <- 1:13																	# either choose which core survey waves to download, or set to NULL
+sipp.replicate.waves <- 1:12															# either choose which replicate weight waves to download, or set to NULL
+sipp.topical.modules <- 1:11															# either choose which topical modules to download, or set to NULL
+sipp.longitudinal.weights <- TRUE														# set to FALSE to prevent download
+sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , c( "09" , "10" , "11" ) )		# reads in 2009-2011
+sipp.pnl.longitudinal.replicate.weights <- paste0( 'pnl' , c( "09" , "10" , "11" ) )	# reads in 2009-2011
 
 ############################################
 # no need to edit anything below this line #
@@ -177,8 +177,8 @@ if ( sipp.longitudinal.weights ){
 
 	# add the longitudinal weights to the database in a table 'w12'
 	read.SAScii.sqlite(
-		"http://smpbff2.dsd.census.gov/pub/sipp/2008/lgtwgt2008w7.zip" ,
-		fix.ct( "http://smpbff2.dsd.census.gov/pub/sipp/2008/lgtwgt2008w7.sas" ) ,
+		"http://smpbff2.dsd.census.gov/pub/sipp/2008/lgtwgt2008w11.zip" ,
+		fix.ct( "http://smpbff2.dsd.census.gov/pub/sipp/2008/lgtwgt2008w11.sas" ) ,
 		beginline = 5 ,
 		zipped = T ,
 		tl = TRUE ,
