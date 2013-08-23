@@ -45,8 +45,8 @@ sipp.core.waves <- 1:13																	# either choose which core survey waves 
 sipp.replicate.waves <- 1:12															# either choose which replicate weight waves to download, or set to NULL
 sipp.topical.modules <- 1:11															# either choose which topical modules to download, or set to NULL
 sipp.longitudinal.weights <- TRUE														# set to FALSE to prevent download
-sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , c( "09" , "10" , "11" ) )		# reads in 2009-2011
-sipp.pnl.longitudinal.replicate.weights <- paste0( 'pnl' , c( "09" , "10" , "11" ) )	# reads in 2009-2011
+sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:3 )							# reads in 2009-2011
+sipp.pnl.longitudinal.replicate.weights <- paste0( 'pnl' , 1:3 )						# reads in 2009-2011
 
 ############################################
 # no need to edit anything below this line #
@@ -253,8 +253,8 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 
 	# figure out the exact ftp path of the .zip file
 	SIPP.lrw <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2008/repwgt120_" , i , ".zip" )
-		
+		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/2008/lrw08" , i , ".zip" )
+
 	# add each longitudinal replicate weight file to the database in a table cy1-4 or pnl1-4
 	read.SAScii.sqlite (
 			SIPP.lrw ,
