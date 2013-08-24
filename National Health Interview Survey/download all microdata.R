@@ -39,6 +39,16 @@ download.documentation <- TRUE
 # ..in order to set your current working directory
 
 
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
+
 
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "SAScii" , "RCurl" ) )
