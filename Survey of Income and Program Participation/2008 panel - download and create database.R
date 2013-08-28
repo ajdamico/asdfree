@@ -46,7 +46,7 @@ sipp.replicate.waves <- 1:12															# either choose which replicate weigh
 sipp.topical.modules <- 1:11															# either choose which topical modules to download, or set to NULL
 sipp.longitudinal.weights <- TRUE														# set to FALSE to prevent download
 sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:3 )							# reads in 2009-2011
-sipp.pnl.longitudinal.replicate.weights <- paste0( 'pn' , 1:3 )						# reads in 2009-2011
+sipp.pnl.longitudinal.replicate.weights <- paste0( 'pn' , 1:3 )							# reads in 2009-2011
 
 ############################################
 # no need to edit anything below this line #

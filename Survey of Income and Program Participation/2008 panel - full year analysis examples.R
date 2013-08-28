@@ -79,16 +79,15 @@ db <- dbConnect( SQLite() , "SIPP08.db" )
 
 # uncomment this line to pull waves necessary for 2009 calendar year
 # and comment all other "waves <-" lines
-# waves <- 2:5 ; year <- 2009 ; mainwgt <- 'lgtcy1wt'
+# waves <- 2:5 ; year <- 2009 ; mainwgt <- 'lgtcy1wt' ; yrnum <- 1
 
 # uncomment this line to pull waves necessary for 2010 calendar year:
 # and comment all other "waves <-" lines
-waves <- 5:8 ; year <- 2010 ; mainwgt <- 'lgtcy2wt'
+waves <- 5:8 ; year <- 2010 ; mainwgt <- 'lgtcy2wt' ; yrnum <- 2
 
-# note: the 2011 single-year weight is not yet available!
 # uncomment this line to pull waves necessary for 2011 calendar year:
 # and comment all other "waves <-" lines
-# waves <- 8:11 ; year <- 2011 ; mainwgt <- 'lgtcy3wt'
+# waves <- 8:11 ; year <- 2011 ; mainwgt <- 'lgtcy3wt' ; yrnum <- 3
 
 
 
@@ -285,7 +284,7 @@ gc()
 # access the appropriate replicate weight data #
 
 # create a sql string containing the select command used to pull the calendar year replicate weights data file
-sql.string <- paste0( "select * from cy" , substr( year , 3 , 4 ) )
+sql.string <- paste0( "select * from cy" , yrnum )
 
 # run the sql query constructed above, save the resulting table in a new data frame called 'rw' that will now be stored in RAM
 rw <- dbGetQuery( db , sql.string )
