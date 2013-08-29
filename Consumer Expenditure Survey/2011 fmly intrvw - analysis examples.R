@@ -3,6 +3,15 @@
 # replication of the output of various macros stored in the "CE macros.sas" example program
 # using 2011 public use microdata
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/CES/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Consumer%20Expenditure%20Survey/2011%20fmly%20intrvw%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
 
 # this r script will review the example analyses of both imputed and non-imputed variables
 # described in the "CE macros program documentation.doc" document

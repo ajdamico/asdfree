@@ -2,6 +2,16 @@
 # national health interview survey
 # 2000 personsx and incmimp
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/NHIS/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Health%20Interview%20Survey/replicate%20cdc%20tecdoc%20-%202000%20multiple%20imputation.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

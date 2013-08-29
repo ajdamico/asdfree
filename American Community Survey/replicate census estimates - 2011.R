@@ -2,6 +2,16 @@
 # american community survey
 # 2011 person and household files
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/replicate%20census%20estimates%20-%202011.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

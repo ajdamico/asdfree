@@ -14,6 +14,16 @@
 # ..send an e-mail and tell 'em thank you!
 
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/NHANES/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Health%20and%20Nutrition%20Examination%20Survey/replicate%20human%20exposure%20to%20chemicals%20report.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # **********************************************************************
 # Analyse the NHANES 2007-2008 data on urinary Bisphenol A (BPA)
 #

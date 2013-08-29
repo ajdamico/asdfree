@@ -2,6 +2,17 @@
 # behavioral risk factor surveillance system
 # 2010
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
+# load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year brfss
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Behavioral%20Risk%20Factor%20Surveillance%20System/replicate%20cdc%20weat%20-%202010.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

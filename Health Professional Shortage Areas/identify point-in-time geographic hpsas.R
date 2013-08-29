@@ -3,6 +3,16 @@
 # health professional shortage areas (hpsa) file
 # identify (currently- or previously-designated) point-in-time geographic hpsas
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/HPSA/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Health%20Professional%20Shortage%20Areas/identify%20point-in-time%20geographic%20hpsas.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

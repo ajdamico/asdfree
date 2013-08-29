@@ -3,6 +3,16 @@
 # replication of tables published by the substance abuse and mental health services administration (samhsa)
 # using the 2010 public use file
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/NSDUH/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Survey%20on%20Drug%20Use%20and%20Health/replicate%20samhsa%20puf.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # note that these statistics come very close to the quick table results on shown in samhsa table 1.19B (pdf page two of this document):
 # http://oas.samhsa.gov/NSDUH/2k10NSDUH/tabs/Sect1peTabs19to23.pdf
 # and table 1.19D (pdf page two of this document):

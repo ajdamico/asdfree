@@ -4,6 +4,15 @@
 # as outlined in the e-mail correspondence "SCF PUF Net Worth Statistics and Standard Errors from FRB.pdf"
 # using 2010 public use microdata
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/SCF/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/replicate%20FRB%20SAS%20output.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
 
 # note that these statistics come very close to the statistics and standard errors
 # calculated using the federal reserve's 2010 internal data set,

@@ -3,6 +3,16 @@
 # 2004 + 2006
 # time series + pilot
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/ANES/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20National%20Election%20Studies/replicate%20table%20one.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # this r script will replicate each of the statistics from the anes publication
 # http://www.electionstudies.org/resources/papers/nes012492.pdf#page=25
 # column labeled "design-consistent with published strata"

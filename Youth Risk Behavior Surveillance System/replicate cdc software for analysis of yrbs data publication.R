@@ -2,6 +2,16 @@
 # youth risk behavior surveillance system
 # 2009
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# load( "C:/My Directory/YRBSS/yrbs2009.rda" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Youth%20Risk%20Behavior%20Surveillance%20System/replicate%20cdc%20software%20for%20analysis%20of%20yrbs%20data%20publication.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

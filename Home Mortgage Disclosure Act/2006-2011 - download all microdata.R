@@ -2,6 +2,17 @@
 # home mortgage disclosure act
 # 2006 - 2011 files
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/HMDA/" )
+# years.to.download <- 2006:2011
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/2006-2011%20-%20download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish
@@ -66,10 +77,10 @@
 
 
 
-require(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
-require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
+require(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 require(downloader)		# downloads and then runs the source() function on scripts from github
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 
 
 # load the read.SAScii.monetdb() function,

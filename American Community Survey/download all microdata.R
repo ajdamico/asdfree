@@ -3,6 +3,19 @@
 # 2005-2011 1-year (plus when available 3-year and 5-year files)
 # household-level, person-level, and merged files
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/ACS/" )
+# single.year.datasets.to.download <- 2005:2011
+# three.year.datasets.to.download <- 2007:2011
+# five.year.datasets.to.download <- 2009:2011
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

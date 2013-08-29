@@ -3,6 +3,16 @@
 # replication of tables published by the centers for disease control & prevention
 # using 1999-2000 and 2001-2002 demographics, laboratory, and examination files
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/NHANES/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Health%20and%20Nutrition%20Examination%20Survey/replicate%20cdc%20publications.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # the centers for disease control & prevention have published sample sas, sudaan, and stata code at:
 # http://www.cdc.gov/nchs/tutorials/Nhanes/Downloads/intro_original.htm
 

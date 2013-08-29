@@ -3,6 +3,16 @@
 # replication of tables published by the society of actuaries
 # using 1997, 1998, and 1998 claims files
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/MLCES/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Medical%20Large%20Claims%20Experience%20Study/replicate%20soa%20publications.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

@@ -2,6 +2,16 @@
 # social security administration public-use microdata files
 # 2001, 2004, and 2006 benefits, earnings, oasdi, and ssi files
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/SSAPUMF/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Social%20Security%20Administration%20Public-Use%20Microdata%20Files/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

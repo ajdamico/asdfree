@@ -3,6 +3,16 @@
 # RAND contributed files
 # HRS, CAMS, and Family K and F files
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/HRS/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Health%20and%20Retirement%20Study/import%20longitudinal%20RAND%20contributed%20files.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

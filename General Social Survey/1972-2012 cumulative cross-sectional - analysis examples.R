@@ -2,6 +2,16 @@
 # general social survey
 # 1972-2012 cross-sectional cumulative data (release 1, march 2013)
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/GSS/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/General%20Social%20Survey/1972-2012%20cumulative%20cross-sectional%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish

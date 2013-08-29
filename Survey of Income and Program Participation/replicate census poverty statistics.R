@@ -2,6 +2,15 @@
 # survey of income and program participation
 # 2008 panel single calendar month august 2008
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/SIPP/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Income%20and%20Program%20Participation/replicate%20census%20poverty%20statistics.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
 
 # note that these statistics do not match the census bureau's published statistics
 # because their table packages - available from http://www.census.gov/sipp/tables/index.html -

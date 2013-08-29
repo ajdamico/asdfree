@@ -3,6 +3,16 @@
 # replication of one figure published by the centers for disease control & prevention
 # using 2005-2006 and 2007-2008 demographics and examination files
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# setwd( "C:/My Directory/NHANES/" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Health%20and%20Nutrition%20Examination%20Survey/replicate%202005-2008%20pooled%20cdc%20oral%20examination%20figure.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # the centers for disease control & prevention have published a brief on oral health at:
 # http://www.cdc.gov/nchs/data/databriefs/db96.pdf
 

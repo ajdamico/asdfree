@@ -3,6 +3,17 @@
 # public use microdata sample
 # 1990 , 2000
 
+# # # # # # # # # # # # # # # # #
+# # block of code to run this # #
+# # # # # # # # # # # # # # # # #
+# library(downloader)
+# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"
+# load( 'C:/My Directory/PUMS/pums_2000_5_m.rda' )	# analyze the 2000 5% pums file
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/2000%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# # # # # # # # # # # # # # #
+# # end of auto-run block # #
+# # # # # # # # # # # # # # #
+
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish
