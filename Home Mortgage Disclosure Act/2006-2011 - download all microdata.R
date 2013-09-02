@@ -339,6 +339,39 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			# actually execute the COPY INTO command
 			dbSendUpdate( db , sql.copy )
 		
+			# conversion of numeric columns incorrectly stored as character strings #
+		
+			# initiate a character vector containing all columns that should be numeric types
+			revision.variables <- c( "sequencenumber" , "population" , "minoritypopulationpct" , "hudmedianfamilyincome" , "tracttomsa_mdincomepct" , "numberofowneroccupiedunits" , "numberof1to4familyunits" )
+
+			# determine whether any of those variables are in the current table
+			field.revisions <- dbListFields( db , tablename )[ tolower( dbListFields( db , tablename ) ) %in% revision.variables ]
+
+			# loop through each of those variables
+			for ( col.rev in field.revisions ){
+
+				# add a new `temp_double` column in the data table
+				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "ADD COLUMN temp_double DOUBLE" ) )
+
+				# copy over the contents of the character-typed column so long as the column isn't a textual missing
+				dbSendUpdate( db , paste( "UPDATE" , tablename , "SET temp_double = CAST(" , col.rev , " AS DOUBLE ) WHERE NOT ( " , col.rev , "='NA    ') " ) )
+				
+				# remove the character-typed column from the data table
+				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "DROP COLUMN" , col.rev ) )
+				
+				# re-initiate the same column name, but as a numeric type
+				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "ADD COLUMN" , col.rev , "DOUBLE" ) )
+				
+				# copy the corrected contents back to the original column name
+				dbSendUpdate( db , paste( "UPDATE" , tablename , "SET" , col.rev , "= temp_double" ) )
+				
+				# remove the temporary column from the data table
+				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "DROP COLUMN temp_double" ) )
+
+			}
+
+			# end of conversion of numeric columns incorrectly stored as character strings #
+
 		}	
 	}
 	
