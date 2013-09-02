@@ -354,7 +354,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "ADD COLUMN temp_double DOUBLE" ) )
 
 				# copy over the contents of the character-typed column so long as the column isn't a textual missing
-				dbSendUpdate( db , paste( "UPDATE" , tablename , "SET temp_double = CAST(" , col.rev , " AS DOUBLE ) WHERE NOT ( " , col.rev , "='NA    ') " ) )
+				dbSendUpdate( db , paste( "UPDATE" , tablename , "SET temp_double = CAST(" , col.rev , " AS DOUBLE ) WHERE NOT ( " , col.rev , " = 'NA    ' ) AND NOT ( " , col.rev , " = 'NA      ' )" ) )
 				
 				# remove the character-typed column from the data table
 				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "DROP COLUMN" , col.rev ) )
