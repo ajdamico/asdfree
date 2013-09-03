@@ -220,6 +220,32 @@ out
 # those rows match exactly!  2006 and 2007 don't match at all.
 
 
+# # # # # # # # # # # # # # # # # # #
+# race/ethnicity replication counts #
+
+# nearly replicate table 14's race and ethnicity breakdowns of loan numbers
+# (along the righthand side of the 2011 table on pdf page 28 of the latest report)
+# http://www.federalreserve.gov/pubs/bulletin/2012/pdf/2011_HMDA.pdf#page=28
+
+# for the _race other than white only_ category,
+# produce the aian, asian, black, and naopi values.
+# note that a few of these are off by less than ten records.  who cares.
+dbGetQuery( db , 'select race , count(*) from hmda_11 where actiontype = 1 AND loanpurpose = 1 AND occupancy = 1 AND lienstatus = 1 AND propertytype IN ( 1 , 2 ) group by race order by race' )
+
+# for the _white, by ethnicity_ category,
+# produce the white non-hispanic number on its own
+# and then joint plus hispanic misses the published number by two.
+dbGetQuery( db , 'select ethnicity , count(*) from hmda_11 where actiontype = 1 AND loanpurpose = 1 AND occupancy = 1 AND lienstatus = 1 AND propertytype IN ( 1 , 2 ) AND race = 5 group by ethnicity order by ethnicity' )
+
+
+# if you really really care why it's off by a few records, here's the sas script from the ffiec.  have fun!
+# https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/bulletin_macros_postbob.sas
+
+
+# race/ethnicity replication counts #
+# # # # # # # # # # # # # # # # # # #
+
+
 ##############################################################################
 # lines of code to hold on to for the end of all other hmda monetdb analyses #
 
