@@ -81,8 +81,8 @@ db <- dbConnect( MonetDB.R() , monet.url )
 # list all tables available in the current monet database
 dbListTables( db )
 
-# list all fields in the `hmda_lar_11` table in the current monet database
-dbListFields( db , 'hmda_lar_11' )
+# list all fields in the `hmda_11` table in the current monet database
+dbListFields( db , 'hmda_11' )
 
 # construct a sql command that shows the number of records broken down by each of three columns
 sql <-
@@ -92,7 +92,7 @@ sql <-
 		loanpurpose, 
 		count(*) as num_records 
 	from 
-		hmda_lar_11 
+		hmda_11 
 	group by 
 		actiontype , 
 		propertytype, 
@@ -118,7 +118,7 @@ for ( i in c( '06' , '07' , '08' , '09' , '10' , '11' ) ){
 	# construct the same sql query as above, but for all years stated above
 	sql <- 
 		paste0( 
-			'select actiontype , propertytype , loanpurpose , count(*) as num_records from hmda_lar_' , 
+			'select actiontype , propertytype , loanpurpose , count(*) as num_records from hmda_' , 
 			i , 
 			' group by actiontype , propertytype , loanpurpose order by actiontype , propertytype , loanpurpose' 
 		)
@@ -177,7 +177,7 @@ sql <-
 		sum( ( propertytype = 3 ) ) as multifamily ,
 		count( * ) as total
 	from 
-		hmda_lar_11 
+		hmda_11 
 	where 
 		actiontype = 1'
 
@@ -194,7 +194,7 @@ sql <-
 			sum( ( propertytype = 3 ) ) as multifamily ,
 			count( * ) as total
 		from 
-			hmda_lar_' ,
+			hmda_' ,
 		c( '06' , '07' , '08' , '09' , '10' , '11' )
 		,
 		' where 

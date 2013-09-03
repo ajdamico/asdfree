@@ -372,7 +372,83 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 
 			# end of conversion of numeric columns incorrectly stored as character strings #
 
-		}	
+		}
+		
+		# now that all files have been imported for this hmda/pmic combination,
+		# merge the lar and institution records for quicker access to lender information
+		
+		lar.tablename <- paste( pubpriv , 'lar' , year , sep = "_" )
+		ins.tablename <- paste( pubpriv , 'ins' , year , sep = "_" )
+		new.tablename <- paste( pubpriv , year , sep = "_" )
+		
+		# three easy steps #
+		
+		# step one: confirm the only intersecting fields are "respondentid" and "agencycode"
+		# these are the merge fields, so nothing else can overlap
+		
+		stopifnot( 
+			identical( 
+				intersect( 
+					dbListFields( db , lar.tablename ) , 
+					dbListFields( db , ins.tablename ) 
+				) , 
+				c( 'respondentid' , 'agencycode' ) 
+			) 
+		)
+		
+		# step two: merge the two tables
+		
+		# extract the column names from the institution table
+		ins.fields <- dbListFields( db , ins.tablename )
+		
+		# throw out the two merge fields
+		ins.nomatch <- ins.fields[ !( ins.fields %in% c( 'respondentid' , 'agencycode' ) ) ]
+		
+		# add a "b." in front of every field name
+		ins.b <- paste0( "b." , ins.nomatch )
+		
+		# separate all of them by commas into a single character string
+		ins.string <- paste( ins.b , collapse = ", " )
+		
+		# construct the merge command
+		sql.merge.command <-
+			paste(
+				"CREATE TABLE" , 
+				new.tablename ,
+				"AS SELECT a.* ," ,
+				ins.string ,
+				"FROM" ,
+				lar.tablename ,
+				"AS a INNER JOIN" ,
+				ins.tablename ,
+				"AS b ON a.respondentid = b.respondentid AND a.agencycode = b.agencycode WITH DATA"
+			)
+		
+		# with your sql string built, execute the command
+		dbSendUpdate( db , sql.merge.command )
+		
+		# step three: confirm that the merged table contains the same record count
+		stopifnot( 
+			dbGetQuery( 
+				db , 
+				paste(
+					'select count(*) from' ,
+					new.tablename
+				)
+			) ==
+			dbGetQuery( 
+				db , 
+				paste(
+					'select count(*) from' ,
+					lar.tablename
+				)
+			)
+		)
+		
+		# in general, use this new tablename for all your analyses,
+		# since it's got institutional information already merged
+		print( paste( new.tablename , "finito!" ) )
+		
 	}
 	
 }
