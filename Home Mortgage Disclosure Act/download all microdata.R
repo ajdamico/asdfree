@@ -8,7 +8,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/HMDA/" )
 # years.to.download <- 2006:2011
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/2006-2011%20-%20download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
