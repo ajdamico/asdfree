@@ -444,6 +444,128 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 				)
 			)
 		)
+
+		# # # # # # # # # # # # # # # # # #
+		# # race and ethnicity recoding # #
+		# # # # # # # # # # # # # # # # # #
+		
+		# number of minority races of applicant and co-applicant
+		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN app_min_cnt INTEGER' ) )
+		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN co_min_cnt INTEGER' ) )
+
+		# sum up all four possibilities
+		dbSendUpdate( 
+			db , 
+			paste(
+				'UPDATE' ,
+				new.tablename ,
+				'SET 
+					app_min_cnt = 
+					(
+						( applicantrace1 IN ( 1 , 2 , 3 , 4 ) )*1 +
+						( applicantrace2 IN ( 1 , 2 , 3 , 4 ) )*1 +
+						( applicantrace3 IN ( 1 , 2 , 3 , 4 ) )*1 +
+						( applicantrace4 IN ( 1 , 2 , 3 , 4 ) )*1 +
+						( applicantrace5 IN ( 1 , 2 , 3 , 4 ) )*1
+					)' 
+			)
+		)
+
+		# same for the co-applicant
+		dbSendUpdate( 
+			db , 
+			paste(
+				'UPDATE' ,
+				new.tablename , 
+				'SET 
+					co_min_cnt = 
+					(
+						( coapplicantrace1 IN ( 1 , 2 , 3 , 4 ) )*1 +
+						( coapplicantrace2 IN ( 1 , 2 , 3 , 4 ) )*1 +
+						( coapplicantrace3 IN ( 1 , 2 , 3 , 4 ) )*1 +
+						( coapplicantrace4 IN ( 1 , 2 , 3 , 4 ) )*1 +
+						( coapplicantrace5 IN ( 1 , 2 , 3 , 4 ) )*1
+					)' 
+			)
+		)
+
+		# zero-one test of whether the applicant or co-applicant indicated white
+		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN appwhite INTEGER' ) )
+		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN cowhite INTEGER' ) )
+
+		# check all five race categories for the answer
+		dbSendUpdate( 
+			db , 
+			paste(
+				'UPDATE' ,
+				new.tablename , 
+				'SET 
+					appwhite = 
+					( 
+						( ( applicantrace1 ) IN ( 5 ) )*1 + 
+						( ( applicantrace2 ) IN ( 5 ) )*1 + 
+						( ( applicantrace3 ) IN ( 5 ) )*1 + 
+						( ( applicantrace4 ) IN ( 5 ) )*1 + 
+						( ( applicantrace5 ) IN ( 5 ) )*1 
+					)' 
+			)
+		)
+
+		# same for the co-applicant
+		dbSendUpdate( 
+			db , 
+			paste(
+				'UPDATE' ,
+				new.tablename ,
+				'SET 
+					cowhite = 
+					( 
+						( ( coapplicantrace1 ) IN ( 5 ) )*1 + 
+						( ( coapplicantrace2 ) IN ( 5 ) )*1 + 
+						( ( coapplicantrace3 ) IN ( 5 ) )*1 + 
+						( ( coapplicantrace4 ) IN ( 5 ) )*1 + 
+						( ( coapplicantrace5 ) IN ( 5 ) )*1 
+					)' 
+			)
+		)
+
+		# if the applicant or co-applicant has a missing first race, set the above variables to missing as well
+		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET app_min_cnt = NULL WHERE applicantrace1 IN ( 6 , 7 )' ) )
+		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET appwhite = NULL WHERE applicantrace1 IN ( 6 , 7 )' ) )
+		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET co_min_cnt = NULL WHERE coapplicantrace1 IN ( 6 , 7 , 8 )' ) )
+		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET cowhite = NULL WHERE coapplicantrace1 IN ( 6 , 7 , 8 )' ) )
+
+		# main race variable
+		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN race INTEGER' ) )
+
+		# 7 indicates a loan by a white applicant and non-white co-applicant or vice-versa
+		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET race = 7 WHERE ( appwhite = 1 AND app_min_cnt = 0 AND co_min_cnt > 0 ) OR ( cowhite = 1 AND co_min_cnt = 0 AND app_min_cnt > 0 )' ) )
+
+		# 6 indicates the main applicant listed multiple non-white races
+		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET race = 6 WHERE ( app_min_cnt > 1 ) AND ( race IS NULL )' ) )
+
+		# for everybody else: if the first race listed by the applicant isn't white, use that.
+		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET race = applicantrace1 WHERE ( applicantrace1 IN ( '1' , '2' , '3' , '4' ) ) AND ( app_min_cnt = 1 ) AND ( race IS NULL )" ) )
+		# otherwise look to the second listed race
+		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET race = applicantrace2 WHERE ( applicantrace2 IN ( '1' , '2' , '3' , '4' ) ) AND ( app_min_cnt = 1 ) AND ( race IS NULL )" ) )
+		# otherwise confirm the applicant indicated he or she was white
+		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , "SET race = 5 WHERE ( appwhite = 1 ) AND ( race IS NULL )" ) )
+
+		# main ethnicity variable
+		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN ethnicity VARCHAR (255)' ) )
+
+		# simple.  check the applicant's ethnicity
+		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Not Hispanic' WHERE applicantethnicity IN ( 2 )" ) )
+		
+		# simple.  check the applicant's ethnicity again
+		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Hispanic' WHERE applicantethnicity IN ( 1 )" ) )
+		
+		# overwrite the ethnicity variable if the main applicant indicates hispanic but the co-applicant does not.  or vice versa.
+		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Joint' WHERE ( applicantethnicity IN ( 1 ) AND coapplicantethnicity IN ( 2 ) ) OR ( applicantethnicity IN ( 2 ) AND coapplicantethnicity IN ( 1 ) )" ) )
+
+		# # # # # # # # # # # # # # # # # # # # # # # # #
+		# # finished with race and ethnicity recoding # #
+		# # # # # # # # # # # # # # # # # # # # # # # # #
 		
 		# in general, use this new tablename for all your analyses,
 		# since it's got institutional information already merged
