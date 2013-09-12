@@ -6,6 +6,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# your.username <- "username"
+# your.password <- "password"
 # library(downloader)
 # setwd( "C:/My Directory/HRS/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Health%20and%20Retirement%20Study/1992%20-%202010%20download%20HRS%20microdata.R" , prompt = FALSE , echo = TRUE )
@@ -50,9 +52,10 @@
 
 # once you have registered, place your username and password in the script below.
 # this script will not run until a valid username and password are included in the two lines below.
+# also, you'll have to uncomment them by removing the `#` in order for R to work ;)
 
-your.username <- "username"
-your.password <- "password"
+# your.username <- "username"
+# your.password <- "password"
 
 # this massive ftp download automation script will not work without the above lines filled in.
 # if the your.username and your.password lines above are not filled in with the details you provided at registration, 
