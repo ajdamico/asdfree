@@ -292,15 +292,14 @@ download.nchs <-
 			
 		}	
 		
-		dir.create( paste( y$name , "docs" , sep = "/" ) )
 		
 		for ( i in y$pdfs ){
-			attempt.one <- try( download.file( i , paste( "." , y$name , "docs" , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
+			attempt.one <- try( download.file( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
 			
 			if ( class( attempt.one ) == 'try-error' ) {
 				Sys.sleep( 60 )
 				
-				download.file( i , paste( "." , y$name , "docs" , basename( i ) , sep = "/" ) , mode = 'wb' )
+				download.file( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' )
 			}
 		}
 			
