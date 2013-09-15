@@ -101,6 +101,35 @@ extract.files <-
 	
 
 ##############################################################################
+# add starting blanks
+add.blanks <-
+	function( sasfile ){
+		sas_lines <- tolower( readLines( sasfile ) )
+
+		if( any( grepl( "@19   rectype        1." , sas_lines ) ) ){
+		
+			sas_lines <- gsub( "@19   rectype        1." , "@1 blank 18 @19   rectype        1." , sas_lines )
+		
+		} else if ( any( grepl( "@20   restatus       1." , sas_lines ) ) ) {
+		
+			sas_lines <- gsub( "@20   restatus       1." , "@1 blank 19 @20   restatus       1." , sas_lines )
+		
+		}
+		
+		
+		
+		# create a temporary file
+		tf <- tempfile()
+
+		# write the updated sas input file to the temporary file
+		writeLines( sas_lines , tf )
+
+		# return the filepath to the temporary file containing the updated sas input script
+		tf
+	}
+##############################################################################
+
+##############################################################################
 # function to remove overlapping columns
 remove.overlap <-
 	function( sasfile ){
@@ -225,12 +254,12 @@ download.nchs <-
 		dir.create( paste( y$name , "docs" , sep = "/" ) )
 		
 		for ( i in y$pdfs ){
-			attempt.one <- try( download.file( i , paste( "." , y$name , "docs" , basename( i ) , sep = "/" ) ) , silent = TRUE )
+			attempt.one <- try( download.file( i , paste( "." , y$name , "docs" , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
 			
 			if ( class( attempt.one ) == 'try-error' ) {
 				Sys.sleep( 60 )
 				
-				download.file( i , paste( "." , y$name , "docs" , basename( i ) , sep = "/" ) )
+				download.file( i , paste( "." , y$name , "docs" , basename( i ) , sep = "/" ) , mode = 'wb' )
 			}
 		}
 			
