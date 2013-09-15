@@ -133,6 +133,29 @@ add.blanks <-
 ##############################################################################
 
 ##############################################################################
+# extend missing blank after frace
+extend.frace <-
+	function( sasfile ){
+		sas_lines <- tolower( readLines( sasfile ) )
+
+		
+		sas_lines <- gsub( "@1443 frace8e       $3." , "@1443 frace8e       $3. @1446 endblank $ 55." , sas_lines )
+				
+		# create a temporary file
+		tf <- tempfile()
+
+		# write the updated sas input file to the temporary file
+		writeLines( sas_lines , tf )
+
+		# return the filepath to the temporary file containing the updated sas input script
+		tf
+	}
+##############################################################################
+
+
+
+
+##############################################################################
 # order fields
 order.at.signs <-
 	function( sasfile , add.blank = FALSE ){
