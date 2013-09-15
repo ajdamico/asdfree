@@ -117,6 +117,9 @@ add.blanks <-
 		}
 		
 		
+		# the column name `year` is illegal.
+		sas_lines <- gsub( " year " , " yearz " , sas_lines )
+		
 		
 		# create a temporary file
 		tf <- tempfile()
