@@ -186,7 +186,7 @@ remove.overlap <-
 		}
 		
 		overlap.fields <- 
-			c( 'rdscresb' , 'regnresb' , 'divresb' , 'estatrsb' , 'cntyresb' , 'statersb' , 'rdsscocd' , 'regnoccd' , 
+			c( 'rdscresb' , 'regnresb' , 'divresb' , 'estatrsb' , 'cntyresb' , 'statersb' , 'rdsscocd' , 'regnoccd' , "regnocc" , "regnres" ,
 				'divoccd' , 'estatocd' , 'cntyocd' , 'stateocd' , 'rdscresd' , 'regnresd' , 'divresd' , 'estatrsd' , 
 				'cntyresd' , 'statersd' , 'cityresd' , 'cityresb' , 'rdsscocb' , 'regnoccb' , 'divoccb' , 'estatocb' , 'cntyocb' , 
 				'stateocb' , 'stateoc' , 'staters' , paste0( "rnifla_" , 1:14 ) , paste0( 'entity' , 1:14 ) , 'divocc' , 
