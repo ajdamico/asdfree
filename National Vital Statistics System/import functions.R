@@ -108,11 +108,11 @@ add.blanks <-
 
 		if( any( grepl( "@19   rectype        1." , sas_lines ) ) ){
 		
-			sas_lines <- gsub( "@19   rectype        1." , "@1 blank 18 @19   rectype        1." , sas_lines )
+			sas_lines <- gsub( "@19   rectype        1." , "@1 blank $ 18 @19   rectype        1." , sas_lines )
 		
 		} else if ( any( grepl( "@20   restatus       1." , sas_lines ) ) ) {
 		
-			sas_lines <- gsub( "@20   restatus       1." , "@1 blank 19 @20   restatus       1." , sas_lines )
+			sas_lines <- gsub( "@20   restatus       1." , "@1 blank $ 19 @20   restatus       1." , sas_lines )
 		
 		}
 		
