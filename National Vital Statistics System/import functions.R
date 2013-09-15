@@ -174,7 +174,7 @@ remove.overlap <-
 	function( sasfile ){
 		sas_lines <- tolower( readLines( sasfile ) )
 
-		sas_lines <- gsub( "@214 ucr130 3." , "@214 ucr130 $ 3." )
+		sas_lines <- gsub( "@214 ucr130 3." , "@214 ucr130 $ 3." , sas_lines )
 		
 		sas_lines <- gsub( "@7    revision" , "@1    BLANK $6 @7    revision" , sas_lines )
 		sas_lines <- gsub( "@4    reparea        1." , "@4    reparea        $1" , sas_lines )
