@@ -133,6 +133,40 @@ add.blanks <-
 ##############################################################################
 
 ##############################################################################
+# order fields
+order.at.signs <-
+	function( sasfile ){
+		sas_lines <- tolower( readLines( sasfile ) )
+
+		ats <- sas_lines[ substr( sas_lines , 1 , 1 ) == "@" ]
+
+		positions <- as.numeric( substr( ats , 2 , 5 ) )
+
+		sas_lines <- ats[ order( positions ) ]
+
+		# if the first position is missing..
+		if ( sort( positions )[ 1 ] != 1 ){
+		
+			# ..add a blank column
+			new.line <- paste( "@1 blank" , sort( positions )[ 1 ] - 1 )
+			
+			sas_lines <- c( new.line , sas_lines )
+		}
+				
+		sas_lines <- c( "INPUT" , sas_lines , ";" )
+		
+		# create a temporary file
+		tf <- tempfile()
+
+		# write the updated sas input file to the temporary file
+		writeLines( sas_lines , tf )
+
+		# return the filepath to the temporary file containing the updated sas input script
+		tf
+	}
+##############################################################################
+
+##############################################################################
 # function to remove overlapping columns
 remove.overlap <-
 	function( sasfile ){
