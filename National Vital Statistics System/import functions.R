@@ -135,7 +135,7 @@ add.blanks <-
 ##############################################################################
 # order fields
 order.at.signs <-
-	function( sasfile ){
+	function( sasfile , add.blank = FALSE ){
 		sas_lines <- tolower( readLines( sasfile ) )
 
 		ats <- sas_lines[ substr( sas_lines , 1 , 1 ) == "@" ]
@@ -145,7 +145,7 @@ order.at.signs <-
 		sas_lines <- ats[ order( positions ) ]
 
 		# if the first position is missing..
-		if ( sort( positions )[ 1 ] != 1 ){
+		if ( ( sort( positions )[ 1 ] != 1 ) & add.blank ){
 		
 			# ..add a blank column
 			new.line <- paste( "@1 blank" , sort( positions )[ 1 ] - 1 )
@@ -165,6 +165,8 @@ order.at.signs <-
 		tf
 	}
 ##############################################################################
+
+
 
 ##############################################################################
 # function to remove overlapping columns
