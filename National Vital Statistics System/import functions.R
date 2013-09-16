@@ -139,7 +139,7 @@ extend.frace <-
 		sas_lines <- tolower( readLines( sasfile ) )
 
 		
-		sas_lines <- gsub( "@1443 frace8e       $3." , "@1443 frace8e       $3. @1446 endblank $ 55." , sas_lines )
+		sas_lines <- gsub( "@1443 frace8e       $3. " , "@1443 frace8e       $3. @1446 endblank $ 55." , sas_lines , fixed = TRUE )
 				
 		# create a temporary file
 		tf <- tempfile()
