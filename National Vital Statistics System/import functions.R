@@ -1,7 +1,7 @@
 
 
 clear.goofy.characters <-
-	function( fn ){
+	function( fn , fl ){
 	
 		tf <- tempfile()
 		
@@ -16,7 +16,15 @@ clear.goofy.characters <-
 			# remove goofy special characters (that will break monetdb)
 			line <- iconv( line , "" , "ASCII" , " " )
 		
-			writeLines( line , outcon )
+			# if there's an enforced line length..
+			if( fl ){
+				# ..then confirm the current line matches that length before writing
+				if( nchar( line ) == fl ) writeLines( line , outcon )
+				
+			} else {
+				# otherwise just write it.
+				writeLines( line , outcon )
+			}
 		}
 		
 		# close all file connections
@@ -31,7 +39,8 @@ import.nchs <-
 	function(
 		files.to.import ,
 		sas.scripts ,
-		db
+		db ,
+		force.length = FALSE
 	){
 
 		# figure out tablename from the files.to.import
@@ -52,7 +61,7 @@ import.nchs <-
 	
 			cat( 'currently working on' , tablenames[ i ] , '\r' )
 			
-			fti <- clear.goofy.characters( files.to.import[ i ] )
+			fti <- clear.goofy.characters( files.to.import[ i ] , fl = force.length )
 			
 			on.exit( file.remove( fti ) )
 			
