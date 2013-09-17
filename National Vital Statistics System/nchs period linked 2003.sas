@@ -1,5 +1,5 @@
 input	
-blank	1-6
+blank $ 1-6
 REVISION	7
 LATEREC	9
 DOB_YY	15-18
