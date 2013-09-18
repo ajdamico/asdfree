@@ -249,6 +249,8 @@ for ( year in years.to.download ){
 	# remove lines containing solely `input`
 	z <- z[ !( tolower( z ) == 'input' ) ]
 	
+	# remove the (SAScii-breaking) overlapping `controle` columns
+	z <- z[ !grepl( "@3 controle 6." , z , fixed = TRUE ) ]
 	
 	# write the file back to your second temporary file
 	writeLines( z , tf2 )
