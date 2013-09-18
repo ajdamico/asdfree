@@ -8,6 +8,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/POF/" )
 # years.to.download <- c( 2009 , 2003 )
+# path.to.7z <- normalizePath( "C:/Program Files/7-zip/7z.exe" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20de%20Orcamentos%20Familiares/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
