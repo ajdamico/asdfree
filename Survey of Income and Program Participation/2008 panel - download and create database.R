@@ -1,7 +1,7 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # survey of income and program participation
 # 2008 panel
-# 13 core waves, 12 wave-specific replicate weights, 11 topical modules, 
+# 13 core waves, 13 wave-specific replicate weights, 11 topical modules, 
 # 3 panel year replicate weights, 3 calendar year replicate weights, 1 longitudinal weights
 
 # # # # # # # # # # # # # # # # #
@@ -52,7 +52,7 @@
 SIPP.dbname <- "SIPP08.db"																# choose the name of the database (.db) file on the local disk
 
 sipp.core.waves <- 1:13																	# either choose which core survey waves to download, or set to NULL
-sipp.replicate.waves <- 1:12															# either choose which replicate weight waves to download, or set to NULL
+sipp.replicate.waves <- 1:13															# either choose which replicate weight waves to download, or set to NULL
 sipp.topical.modules <- 1:11															# either choose which topical modules to download, or set to NULL
 sipp.longitudinal.weights <- TRUE														# set to FALSE to prevent download
 sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:3 )							# reads in 2009-2011
