@@ -363,7 +363,8 @@ for ( year in years.to.download ){
 			read.SAScii( 
 				curfile , 
 				tf2 , 
-				beginline = all.beginlines[ cur.beginline ] 
+				beginline = all.beginlines[ cur.beginline ] ,
+				skip.decimal.division = TRUE
 			)
 		
 		# convert all column names to lowercase
