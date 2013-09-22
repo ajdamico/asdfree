@@ -1,5 +1,7 @@
 
-
+# this function reads through every line in a .dat file
+# and converts unknown character types to ASCII,
+# so monetdb will not break during data importation
 clear.goofy.characters <-
 	function( fn , fl ){
 	
@@ -35,6 +37,7 @@ clear.goofy.characters <-
 	}
 
 
+# this function prepares and then executes a read.SAScii.monetdb call
 import.nchs <-
 	function(
 		files.to.import ,
@@ -84,8 +87,8 @@ import.nchs <-
 	}
 
 
-
-
+# this function figures out the filepaths of all zipped and pdf files
+# from the cdc's website that store mortality, cohort-linked, period-linked, natality, and fetal death files
 extract.files <-
 	function( y , name ){
 	
@@ -109,8 +112,8 @@ extract.files <-
 	}
 	
 
-##############################################################################
-# add starting blanks
+# this function adds starting blanks to sas importation scripts
+# that are not already available
 add.blanks <-
 	function( sasfile ){
 		sas_lines <- tolower( readLines( sasfile ) )
@@ -139,10 +142,9 @@ add.blanks <-
 		# return the filepath to the temporary file containing the updated sas input script
 		tf
 	}
-##############################################################################
 
-##############################################################################
-# extend missing blank after frace
+
+# this function extend missing blank field positions after frace
 extend.frace <-
 	function( sasfile ){
 		sas_lines <- tolower( readLines( sasfile ) )
@@ -159,13 +161,10 @@ extend.frace <-
 		# return the filepath to the temporary file containing the updated sas input script
 		tf
 	}
-##############################################################################
 
-
-
-
-##############################################################################
-# order fields
+	
+# this function re-orders lines in sas importion
+# scripts, based on the @ sign positions
 order.at.signs <-
 	function( sasfile , add.blank = FALSE ){
 		sas_lines <- tolower( readLines( sasfile ) )
@@ -196,12 +195,9 @@ order.at.signs <-
 		# return the filepath to the temporary file containing the updated sas input script
 		tf
 	}
-##############################################################################
 
-
-
-##############################################################################
-# function to remove overlapping columns
+	
+# this function to removes hard-coded overlapping columns
 remove.overlap <-
 	function( sasfile ){
 		sas_lines <- tolower( readLines( sasfile ) )
@@ -244,9 +240,10 @@ remove.overlap <-
 		# return the filepath to the temporary file containing the updated sas input script
 		tf
 	}
-##############################################################################
+	
 
-
+# this function downloads a specified zipped file to the local disk
+# and unzips everything according to a straightforward pattern
 download.nchs <-
 	function( y ){
 		
@@ -342,7 +339,3 @@ download.nchs <-
 			
 		TRUE
 	}
-	
-	
-	
-	
