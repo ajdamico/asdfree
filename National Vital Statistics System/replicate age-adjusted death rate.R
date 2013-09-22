@@ -51,7 +51,7 @@
 # install.packages( "sqldf" )
 
 require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
-library(sqldf)		# load the sqldf package (enables sql queries on data frames)
+require(sqldf)		# load the sqldf package (enables sql queries on data frames)
 
 # after running the r script above, users should have handy a few lines
 # to initiate and connect to the monet database containing the
