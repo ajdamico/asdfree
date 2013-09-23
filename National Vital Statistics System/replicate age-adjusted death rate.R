@@ -161,7 +161,7 @@ dbGetQuery( db , 'select count(*) as count from mortality_us_2010 where not ( re
 dbGetQuery( db , 'select count(*) as count from mortality_us_2010 where not ( restatus = 4 ) and ucr39 >= 5 and ucr39 <= 15 ' )
 
 # and here's your crude death rate
-deaths.from.all.causes / sum( pbac$pop2010 )
+deaths.from.all.causes / sum( pbac$pop )
 
 
 # # # # # # # # # # # # #
