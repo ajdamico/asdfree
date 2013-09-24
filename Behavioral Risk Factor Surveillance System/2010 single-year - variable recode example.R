@@ -75,7 +75,7 @@ dbname <- "brfss"
 dbport <- 50004
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # # # # run your analysis commands # # # #
@@ -105,7 +105,7 @@ db <- dbConnect( MonetDB.R() , monet.url )
 # then make a copy so you don't lose the pristine original.    #
 
 # the command above
-# db <- dbConnect( MonetDB.R() , monet.url )
+# db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # has already connected the current instance of r to the monet database
 
 # now simply copy you'd like to recode into a new table
@@ -265,7 +265,7 @@ dbname <- "brfss"
 dbport <- 50004
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # # # # run your analysis commands # # # #

@@ -193,7 +193,7 @@ dbname <- "nppes"
 dbport <- 50006
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 # end of lines of code to hold on to for all other nppes monetdb analyses #
 ###########################################################################

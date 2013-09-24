@@ -183,7 +183,7 @@ pid <- monetdb.server.start( batfile )
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 
 # now put everything together and create a connection to the monetdb server.
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # from now on, the 'db' object will be used for r to connect with the monetdb server
 
 
@@ -315,7 +315,7 @@ dbname <- "nppes"
 dbport <- 50006
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 # # # # run your analysis commands # # # #
 

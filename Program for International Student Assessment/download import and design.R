@@ -52,7 +52,7 @@ http.mid <- ".acer.edu.au/downloads/"
 if ( 2009 %in% years.to.download ){
 
 	pid <- monetdb.server.start( batfile )
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	files.to.import <- c( "int_stq09_dec11" , "int_scq09_dec11" , "int_par09_dec11" , "int_cog09_td_dec11" , "int_cog09_s_dec11" )
 	
@@ -126,7 +126,7 @@ if ( 2009 %in% years.to.download ){
 if ( 2006 %in% years.to.download ){
 
 	pid <- monetdb.server.start( batfile )
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	files.to.import <- c( "int_stu06_dec07" , "int_sch06_dec07" , "int_par06_dec07" , "int_cogn06_t_dec07" , "int_cogn06_s_dec07" )
 
@@ -183,7 +183,7 @@ if ( 2006 %in% years.to.download ){
 if ( 2003 %in% years.to.download ){
 
 	pid <- monetdb.server.start( batfile )
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	files.to.import <- c( "int_cogn_2003" , "int_stui_2003_v2" , "int_schi_2003" )
 	
@@ -268,7 +268,7 @@ if ( 2003 %in% years.to.download ){
 if ( 2000 %in% years.to.download ){
 
 	pid <- monetdb.server.start( batfile )
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	files.to.import <- c( "intcogn_v3" , "intscho" , "intstud_math" , "intstud_read" , "intstud_scie" )
 

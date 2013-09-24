@@ -166,7 +166,7 @@ dbname <- "censo_demografico"
 dbport <- 50011
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # disconnect from the current monet database
@@ -217,7 +217,7 @@ files.to.download <- all.files[ !( all.files %in% c( 'Atualizacoes.txt' , 'Docum
 pid <- monetdb.server.start( batfile )
 
 # immediately connect to it
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # loop through each of the files to be downloaded..
@@ -273,7 +273,7 @@ monetdb.server.stop( pid )
 pid <- monetdb.server.start( batfile )
 
 # immediately connect to it
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 
@@ -537,7 +537,7 @@ dbname <- "censo_demografico"
 dbport <- 50011
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # # # # run your analysis commands # # # #

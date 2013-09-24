@@ -172,7 +172,7 @@ dbname <- "nvss"
 dbport <- 50012
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # disconnect from the current monet database
@@ -293,7 +293,7 @@ pid <- monetdb.server.start( batfile )
 for ( year in natality.sets.to.download ){
 
 	# connect to the now-initialized monetdb server
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current natality file you're workin' on.
@@ -446,7 +446,7 @@ pid <- monetdb.server.start( batfile )
 for ( year in periodlinked.sets.to.download ){
 
 	# connect to the now-initialized monetdb server
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 	# for the current year, use a custom-built `extract.files` function
@@ -635,7 +635,7 @@ pid <- monetdb.server.start( batfile )
 for ( year in cohortlinked.sets.to.download ){
 
 	# connect to the now-initialized monetdb server
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current cohort-linked file you're workin' on.
@@ -779,7 +779,7 @@ pid <- monetdb.server.start( batfile )
 for ( year in mortality.sets.to.download ){
 
 	# connect to the now-initialized monetdb server
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current mortality file you're workin' on.
@@ -972,7 +972,7 @@ dbname <- "nvss"
 dbport <- 50012
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # # # # run your analysis commands # # # #

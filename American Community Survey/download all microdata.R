@@ -162,7 +162,7 @@ dbname <- "acs"
 dbport <- 50001
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # disconnect from the current monet database
@@ -328,7 +328,7 @@ for ( year in 2050:2005 ){
 				pid <- monetdb.server.start( batfile )
 				
 				# immediately connect to it
-				db <- dbConnect( MonetDB.R() , monet.url )
+				db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 			
 				# create a character string containing the http location of the zipped csv file to be downloaded
 				ACS.file.location <-
@@ -519,7 +519,7 @@ for ( year in 2050:2005 ){
 						pid <- monetdb.server.start( batfile )
 						
 						# immediately connect to it
-						db <- dbConnect( MonetDB.R() , monet.url )
+						db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 					
 						# and run the exact same command again.
 						second.attempt <-
@@ -623,7 +623,7 @@ for ( year in 2050:2005 ){
 			pid <- monetdb.server.start( batfile )
 			
 			# immediately connect to it
-			db <- dbConnect( MonetDB.R() , monet.url )
+			db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 			
 			############################################
@@ -788,7 +788,7 @@ dbname <- "acs"
 dbport <- 50001
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # # # # run your analysis commands # # # #

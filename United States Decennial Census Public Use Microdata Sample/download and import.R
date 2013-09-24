@@ -202,7 +202,7 @@ dbname <- "pums"
 dbport <- 50010
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # # # # but the lines of code below will re-start the server
@@ -417,7 +417,7 @@ if ( 1990 %in% one.percent.files.to.download ){
 	# run the MonetDB server, determine the server path, connect to the server
 	pid <- monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -478,7 +478,7 @@ if ( 1990 %in% five.percent.files.to.download ){
 	# run the MonetDB server, determine the server path, connect to the server
 	pid <- monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -535,7 +535,7 @@ if ( 2000 %in% one.percent.files.to.download ){
 	# run the MonetDB server, determine the server path, connect to the server
 	pid <- monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -592,7 +592,7 @@ if ( 2000 %in% five.percent.files.to.download ){
 	# run the MonetDB server, determine the server path, connect to the server
 	pid <- monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-	db <- dbConnect( MonetDB.R() , monet.url )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -635,7 +635,7 @@ dbname <- "pums"
 dbport <- 50010
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # # # # run your analysis commands # # # #
