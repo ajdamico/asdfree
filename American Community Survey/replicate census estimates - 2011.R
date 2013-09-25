@@ -7,6 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
+# load( 'C:/My Directory/ACS/acs2011_1yr.rda' )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/replicate%20census%20estimates%20-%202011.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
