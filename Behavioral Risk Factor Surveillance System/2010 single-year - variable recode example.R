@@ -271,7 +271,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # # # # run your analysis commands # # # #
 
 # connect the recoded complex sample design to the monet database #
-brfss.r <- open( brfss.recoded.design , driver = MonetDB.R() )	# recoded
+brfss.r <- open( brfss.recoded.design , driver = MonetDB.R() , wait = TRUE )	# recoded
 
 # ..and now you can exactly match the monthly alcohol consumption categories provided by the cdc's web-enabled analysis tool at..
 # https://github.com/ajdamico/usgsd/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/WEAT%202010%20Alcohol%20Consumption%20by%20Gender%20-%20Crosstab%20Analysis%20Results.pdf?raw=true #

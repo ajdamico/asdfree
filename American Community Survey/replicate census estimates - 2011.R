@@ -113,8 +113,8 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # connect the complex sample designs to the monet database #
-acs.m <- open( acs.m.design , driver = MonetDB.R() )	# merged design
-acs.h <- open( acs.h.design , driver = MonetDB.R() )	# household-only design
+acs.m <- open( acs.m.design , driver = MonetDB.R() , wait = TRUE )	# merged design
+acs.h <- open( acs.h.design , driver = MonetDB.R() , wait = TRUE )	# household-only design
 
 
 

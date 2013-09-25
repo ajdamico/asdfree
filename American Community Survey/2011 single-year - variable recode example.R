@@ -280,7 +280,7 @@ require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 
 
 # connect the recoded complex sample design to the monet database #
-acs.r <- open( acs.m.recoded.design , driver = MonetDB.R() )	# recoded
+acs.r <- open( acs.m.recoded.design , driver = MonetDB.R() , wait = TRUE )	# recoded
 
 # ..and now you can exactly match the age categories provided by the census bureau at..
 # http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #

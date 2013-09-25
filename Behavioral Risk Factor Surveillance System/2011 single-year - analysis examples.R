@@ -109,7 +109,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # if the column classes are already correct, you could use this line -
 
 # connect the complex sample designs to the monet database #
-# brfss.d <- open( brfss.design , driver = MonetDB.R() )	# single-year design
+# brfss.d <- open( brfss.design , driver = MonetDB.R() , wait = TRUE )	# single-year design
 
 # - but they're not (at least for these analysis examples),
 # so you have to run three quick recodes

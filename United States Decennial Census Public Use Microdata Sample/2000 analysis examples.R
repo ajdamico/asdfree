@@ -134,10 +134,10 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # uncomment the correct line by removing the `#` at the front..
 
 # connect the complex sample designs to the monet database #
-# pums.design <- open( pums.1990.1.m.design , driver = MonetDB.R() )	# 1990 1% design
-# pums.design <- open( pums.1990.5.m.design , driver = MonetDB.R() )	# 1990 5% design
-# pums.design <- open( pums.2000.1.m.design , driver = MonetDB.R() )	# 2000 1% design
-# pums.design <- open( pums.2000.5.m.design , driver = MonetDB.R() )	# 2000 5% design
+# pums.design <- open( pums.1990.1.m.design , driver = MonetDB.R() , wait = TRUE )	# 1990 1% design
+# pums.design <- open( pums.1990.5.m.design , driver = MonetDB.R() , wait = TRUE )	# 1990 5% design
+# pums.design <- open( pums.2000.1.m.design , driver = MonetDB.R() , wait = TRUE )	# 2000 1% design
+# pums.design <- open( pums.2000.5.m.design , driver = MonetDB.R() , wait = TRUE )	# 2000 5% design
 
 
 
