@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
-# load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year brfss
+# load( 'C:/My Directory/BRFSS/b2010 design.rda' )	# analyze the 2011 single-year brfss
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Behavioral%20Risk%20Factor%20Surveillance%20System/replicate%20cdc%20weat%20-%202010.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
