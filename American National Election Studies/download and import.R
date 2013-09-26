@@ -6,6 +6,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# your.username <- "username"
+# your.password <- "password"
 # library(downloader)
 # setwd( "C:/My Directory/ANES/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20National%20Election%20Studies/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
