@@ -421,7 +421,7 @@ if ( 1990 %in% one.percent.files.to.download ){
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
-	pums.1990.1.m.design <-
+	pums.m.design <-
 		pums.import.merge.design(
 			db = db , monet.url = monet.url ,
 			fn = tsv.90.1 , 
@@ -433,7 +433,7 @@ if ( 1990 %in% one.percent.files.to.download ){
 		)
 
 	# save the monetdb-backed complex sample survey design object to the local disk
-	save( pums.1990.1.m.design , file = "pums_1990_1_m.rda" )
+	save( pums.m.design , file = "pums_1990_1_m.rda" )
 
 	# disconnect from the current monet database..
 	dbDisconnect( db )
@@ -482,7 +482,7 @@ if ( 1990 %in% five.percent.files.to.download ){
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
-	pums.1990.5.m.design <-
+	pums.m.design <-
 		pums.import.merge.design(
 			db = db , monet.url = monet.url ,
 			fn = tsv.90.5 , 
@@ -494,7 +494,7 @@ if ( 1990 %in% five.percent.files.to.download ){
 		)
 
 	# save the monetdb-backed complex sample survey design object to the local disk
-	save( pums.1990.5.m.design , file = "pums_1990_5_m.rda" )
+	save( pums.m.design , file = "pums_1990_5_m.rda" )
 	
 	# disconnect from the current monet database..
 	dbDisconnect( db )
@@ -539,7 +539,7 @@ if ( 2000 %in% one.percent.files.to.download ){
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
-	pums.2000.1.m.design <-
+	pums.m.design <-
 		pums.import.merge.design(
 			db = db , monet.url = monet.url ,
 			fn = tsv.00.1 , 
@@ -551,7 +551,7 @@ if ( 2000 %in% one.percent.files.to.download ){
 		)
 
 	# save the monetdb-backed complex sample survey design object to the local disk
-	save( pums.2000.1.m.design , file = "pums_2000_1_m.rda" )
+	save( pums.m.design , file = "pums_2000_1_m.rda" )
 
 	# disconnect from the current monet database..
 	dbDisconnect( db )
@@ -596,7 +596,7 @@ if ( 2000 %in% five.percent.files.to.download ){
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
-	pums.2000.5.m.design <-
+	pums.m.design <-
 		pums.import.merge.design(
 			db = db , monet.url = monet.url ,
 			fn = tsv.00.5 , 
@@ -608,7 +608,7 @@ if ( 2000 %in% five.percent.files.to.download ){
 		)
 
 	# save the monetdb-backed complex sample survey design object to the local disk
-	save( pums.2000.5.m.design , file = "pums_2000_5_m.rda" )
+	save( pums.m.design , file = "pums_2000_5_m.rda" )
 	
 	# disconnect from the current monet database..
 	dbDisconnect( db )

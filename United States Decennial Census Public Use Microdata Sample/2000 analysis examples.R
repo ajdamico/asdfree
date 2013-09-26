@@ -131,13 +131,8 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # note: this r data file should already contain the 2000 5% design
 
 
-# uncomment the correct line by removing the `#` at the front..
-
-# connect the complex sample designs to the monet database #
-# pums.design <- open( pums.1990.1.m.design , driver = MonetDB.R() , wait = TRUE )	# 1990 1% design
-# pums.design <- open( pums.1990.5.m.design , driver = MonetDB.R() , wait = TRUE )	# 1990 5% design
-# pums.design <- open( pums.2000.1.m.design , driver = MonetDB.R() , wait = TRUE )	# 2000 1% design
-# pums.design <- open( pums.2000.5.m.design , driver = MonetDB.R() , wait = TRUE )	# 2000 5% design
+# connect the complex sample design to the monet database #
+pums.design <- open( pums.m.design , driver = MonetDB.R() , wait = TRUE )	# merged design
 
 
 
