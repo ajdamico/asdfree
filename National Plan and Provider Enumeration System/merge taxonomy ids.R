@@ -246,7 +246,7 @@ ftcbs <-
 	)
 
 # remove records missing their first taxonomy code
-ftcbs <- ftcbs[ ftcbs$healthcare_provider_taxonomy_code_1 != '' , ]
+ftcbs <- ftcbs[ !( ftcbs$healthcare_provider_taxonomy_code_1 %in% '' ) & !is.na( ftcbs$healthcare_provider_taxonomy_code_1 ) , ]
 
 # merge this first taxonomy code by state table
 # with the `w` taxonomy code table
