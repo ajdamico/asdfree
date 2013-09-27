@@ -328,6 +328,10 @@ download.nchs <-
 		
 		
 		for ( i in y$pdfs ){
+		
+			# wait one minute before each download
+			Sys.sleep( 60 )
+				
 			attempt.one <- try( download.file( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
 			
 			if ( class( attempt.one ) == 'try-error' ) {
