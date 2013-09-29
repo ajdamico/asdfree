@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # pesquisa nacional por amostra de domicilios
-# 2001 - 2011
+# 2001 - 2012
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -8,7 +8,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/PNAD/" )
 # years.to.download <- c( 2001:2009 , 2011:2012 )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/2001-2011%20-%20download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -29,12 +29,12 @@
 
 
 ###################################################################################
-# Analyze the 2001 - 2011 Pesquisa Nacional por Amostra de Domicilios file with R #
+# Analyze the 2001 - 2012 Pesquisa Nacional por Amostra de Domicilios file with R #
 ###################################################################################
 
 
 # set your working directory.
-# the PNAD 2001 - 2011 data files will be stored here
+# the PNAD 2001 - 2012 data files will be stored here
 # after downloading and importing them.
 # use forward slashes instead of back slashes
 
@@ -52,9 +52,9 @@
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- c( 2001:2009 , 2011 )
+# years.to.download <- c( 2001:2009 , 2011:2012 )
 
-# uncomment this line to only download the most current year
+# uncomment this line to download only a single year
 # years.to.download <- 2011
 
 # uncomment this line to download, for example, 2005 and 2007-2009
@@ -312,7 +312,7 @@ for ( year in years.to.download ){
 
 	# determine if the table contains a `v4619` variable.
 	# v4619 is the factor of subsampling used to compensate the loss of units in some states
-	# for 2011, the variable v4619 is one and so it is not needed.
+	# for 2012, the variable v4619 is one and so it is not needed.
 	# if it does not, create it.
 	any.v4619 <- 'v4619' %in% dbListFields( db , paste0( 'pnad' , year ) )
 
