@@ -1,13 +1,13 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # consumer expenditure survey
-# 2006-2012
+# 2005-2012
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CES/" )
-# years.to.download <- 2012:2006
+# years.to.download <- 2012:2005
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Consumer%20Expenditure%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -50,7 +50,7 @@ require(foreign) 	# load foreign package (converts data files into R)
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- 2012:2006
+# years.to.download <- 2012:2005
 
 # uncomment to only download the most current available year
 # years.to.download <- 2012
