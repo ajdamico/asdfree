@@ -59,7 +59,7 @@ db.name <- 'RAND.db'
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "SQLite" )
+# install.packages( "RSQLite" )
 
 # no need to edit anything below this line #
 
