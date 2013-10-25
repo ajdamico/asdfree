@@ -235,7 +235,7 @@ for ( year in years.to.download ){
 			# loop through each text file
 			for ( i in txt ){
 				
-				# find the .lsc filepath with the same name as the .txt
+				# find the .lst filepath with the same name as the .txt
 				lst.filepath <- gsub( '.txt' , '.lst' , i , fixed = TRUE )
 			
 				# read in the lsc file
@@ -245,7 +245,8 @@ for ( year in years.to.download ){
 				first.field <- min( grep( 'field' , lst.file ) )
 			
 				# use these hardcoded file widths
-				w <- c( 5 , 20 , 9 , 12 , 12 , 3 , 9 )
+				# w <- c( 5 , 20 , 9 , 12 , 12 , 3 , 9 )
+				w <- c( 5 , 14 , 16 , 11 , 12 , 3 , 9 )
 				
 				# import the structure
 				stru <- 
@@ -256,10 +257,10 @@ for ( year in years.to.download ){
 					)
 			
 				# remove any blank fields at the end
-				stru <- stru[ !is.na( stru[ , 1 ] ) , ]
+				stru <- stru[ !is.na( as.numeric( stru[ , 1 ] ) ) , ]
 			
 				# extract the field structure
-				txt.field <- str_trim( stru[ , 2 ] )
+				txt.field <- tolower( str_trim( stru[ , 2 ] ) )
 				txt.type <- str_trim( stru[ , 3 ] )
 				txt.w <- str_trim( stru[ , 4 ] )
 
@@ -269,6 +270,9 @@ for ( year in years.to.download ){
 				# make the tablename the first three letters of the filename,
 				# remove any numbers, also any underscores
 				tablename <- paste0( gsub( "_" , "" , gsub( "[0-9]+" , "" , fn.before.dot ) , fixed = TRUE ) , year )
+				
+				# the column name `where` is not allowed
+				txt.field <- gsub( 'where' , 'where_' , txt.field )
 				
 				# print the current import progress to the screen
 				cat( "currently importing" , basename( i ) , '\n\r' )
@@ -450,7 +454,7 @@ for ( year in years.to.download ){
 
 		new.tablename <- gsub( year , paste0( '_' , year ) , i )
 
-		prefix <- strsplit( new.tablename , '_' )[[1]]
+		prefix <- strsplit( new.tablename , '_' )[[1]][1]
 		
 		sql.process( db , i , new.tablename )
 
