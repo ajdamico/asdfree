@@ -71,9 +71,9 @@ events <- c( 10 , 16 , NA , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 ,
 
 
 # specify the most current brr / link file locations
-lf <- "http://meps.ahrq.gov/data_files/pufs/h36brr10ssp.zip"
-lf.cb <- "http://meps.ahrq.gov/data_stats/download_data/pufs/h36brr/h36brr10cb.pdf"
-lf.doc <- "http://meps.ahrq.gov/data_stats/download_data/pufs/h36brr/h36brr10doc.pdf"
+lf <- "http://meps.ahrq.gov/data_files/pufs/h36brr11ssp.zip"
+lf.cb <- "http://meps.ahrq.gov/data_stats/download_data/pufs/h36brr/h36brr11cb.pdf"
+lf.doc <- "http://meps.ahrq.gov/data_stats/download_data/pufs/h36brr/h36brr11doc.pdf"
 
 
 # create a big table containing the file number of each meps data file available
