@@ -9,8 +9,7 @@
 # library(downloader)
 # years.to.download <- c( 2003 , 2007 , 2012 )
 # setwd( "C:/My Directory/NSCH/" )
-stop( 'change this' )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/1989-2010%20download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Survey%20of%20Children%27s%20Health/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
