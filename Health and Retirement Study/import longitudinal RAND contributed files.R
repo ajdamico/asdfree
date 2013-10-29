@@ -78,14 +78,14 @@ db <- dbConnect( SQLite() , paste( getwd() , db.name , sep = "/" ) )
 
 
 # figure out the locations of the four RAND longitudinal enhanced files
-hrsL.file <- paste( getwd() , "download/randLstataSE/statase/rndhrs_l.dta" , sep = "/" )
+hrsM.file <- paste( getwd() , "download/randmstataSE/rndhrs_m.dta" , sep = "/" )
 famR.file <- paste( getwd() , "download/rndfamB_stata/StateSE/rndfamr_b.dta" , sep = "/" )
 famK.file <- paste( getwd() , "download/rndfamB_stata/StateSE/rndfamk_b.dta" , sep = "/" )
 cams.file <- paste( getwd() , "download/randcams_b/randcams_b.dta" , sep = "/" )
 
 
 # create a character vector with the four table names
-tn <- c( 'hrsL' , 'famR' , 'famK' , 'cams' )
+tn <- c( 'hrsM' , 'famR' , 'famK' , 'cams' )
 
 
 # all of these files are large enough to be read into RAM on a 4GB computer

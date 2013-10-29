@@ -1,7 +1,7 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # health and retirement study
 # replication of regression statistics published by RAND
-# using the 1992 - 2010 public use file (version L)
+# using the 1992 - 2010 public use file (version M)
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -86,7 +86,7 @@ db <- dbConnect( SQLite() , db.name )			# connect to the SQLite database (.db)
 
 
 # create a new table called 'temp' which throws out all missing values of the weight column
-dbSendQuery( db , "CREATE TABLE temp AS SELECT * FROM hrsL WHERE r6wthh >= 0" )
+dbSendQuery( db , "CREATE TABLE temp AS SELECT * FROM hrsM WHERE r6wthh >= 0" )
 
 
 # create survey design object with HRS design information
