@@ -360,8 +360,9 @@ write.csv( ocbs , "only children by state.csv" )
 barplot(
 	ocbs[ , 2 ] ,
 	main = "Percent Only Children by State" ,
-	# manually label the the two highest numbers
-	names.arg = c( rep( NA , 7 ) , "DC" , rep( NA , 41 ) , 'WV' , NA ) ,
+	# manually label the the two highest numbers..
+	names.arg = c( rep( NA , 7 ) , "DC" , rep( NA , 12 ) , 'MD' , rep( NA , 10 ) , 'NJ' , rep( NA , 17 ) , 'WV' , NA ) ,
+	# ..and a few others, but really just for inside joking
 	ylim = c( 0 , 0.4 )
 )
 # so, dc has the most only children.
