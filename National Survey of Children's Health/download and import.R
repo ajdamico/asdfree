@@ -62,7 +62,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'mitools' , 'survey' , 'sas7bdat' ) )
+# install.packages( 'sas7bdat' )
 
 
 # no need to edit anything below this line #
@@ -74,8 +74,6 @@
 
 require(foreign) 	# load foreign package (converts data files into R)
 require(sas7bdat)	# loads files ending in .sas7bdat directly into r as data.frame objects
-require(mitools)	# allows analysis of multiply-imputed survey data
-require(survey)		# load survey package (analyzes complex design surveys)
 
 
 # create a temporary file and a temporary directory
