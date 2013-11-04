@@ -99,7 +99,7 @@ require(memisc)		# load memisc package (loads spss portable table import functio
 # construct a list containing the pre-specified login information
 values <- 
     list(
-        "email" = your.email , 
+        "email" = your.username , 
         "pass" = your.password
     )
 
