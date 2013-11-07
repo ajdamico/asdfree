@@ -4,6 +4,30 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+
+# combine five sqlrepsurvey designs
+# into a single monetdb-backed multiply-imputed replicate-weighted list
+svyMDBdesign <-
+	function( five.designs ){
+	
+		# start with an empty object
+		rval <- NULL
+		# load in the five designs
+		rval$designs <- five.designs
+		
+		# store the call where it all began
+		rval$call <- sys.call()
+
+		# open each of those design connections with MonetDB hooray
+		rval$designs <- lapply( rval$designs , open , MonetDB.R() )
+
+		# class it.  that way other functions below will recognize this object as very very special.
+		class( rval ) <- "svyMDBimputationList"
+
+		rval
+	}
+
+	
 # svyquantile functions run on a multiply-imputed sqlrepsurvey design
 # do not include a variance-covariance matrix.
 # therefore, the standard errors need to be extracted manually
