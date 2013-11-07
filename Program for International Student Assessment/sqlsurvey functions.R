@@ -4,6 +4,22 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+# svyquantile functions run on a multiply-imputed sqlrepsurvey design
+# do not include a variance-covariance matrix.
+# therefore, the standard errors need to be extracted manually
+# and passed in as a separate variance object for `MIcombine` to work its magic.
+sqlquantile.MIcombine <-
+	function( x ){
+		
+		# extract the standard errors from the multiply-imputed svyquantile call
+		se <- lapply( lapply( x , attr , 'ci' ) , '[' , 3 )
+		
+		# square the standard errors to get the variances
+		var <- lapply( se , function( y ) y^2 )
+	
+		# call `MIcombine` and return those results.
+		MIcombine( x , var )
+	}
 
 # need to copy over the `with` method
 with.svyMDBimputationList <- survey:::with.svyimputationList
