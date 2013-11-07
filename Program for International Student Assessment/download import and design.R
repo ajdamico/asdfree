@@ -1,4 +1,9 @@
 
+# library(downloader)
+# setwd( "C:/My Directory/PISA" )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" , prompt = FALSE , echo = TRUE )
+
+
 
 require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 require(descr) 			# load the descr package (converts fixed-width files to delimited files)

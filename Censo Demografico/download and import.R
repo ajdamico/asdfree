@@ -223,40 +223,58 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # loop through each of the files to be downloaded..
 for ( curFile in files.to.download ){
 
-	data.file <- paste0( ftp.path , curFile )
-	download.file( data.file , tf , mode = "wb" )
-	unzipped.files <- unzip( tf , exdir = td )
+	# set a counter to see how many times the download had to be attempted
+	# before importing properly.
+	i <- 0
 	
-	dom.file <- unzipped.files[ grep( 'Domicilios' , unzipped.files ) ]
-	pes.file <- unzipped.files[ grep( 'Pessoas' , unzipped.files ) ]
-	
-	dom.curTable <- gsub( '.zip' , '_dom' , curFile )
-	pes.curTable <- gsub( '.zip' , '_pes' , curFile )
-	
-	dom.curTable <- gsub( '-' , '_' , dom.curTable )
-	pes.curTable <- gsub( '-' , '_' , pes.curTable )
-	
-	
-	read.SAScii.monetdb (
-		dom.file ,
-		sas_ri = tf2 ,
-		zipped = F ,						# the ascii file is stored in a zipped file
-		tl = TRUE ,							# convert all column names to lowercase
-		tablename = dom.curTable ,			# the table will be stored in the monet database
-		connection = db
-	)
-	
-	read.SAScii.monetdb (
-		pes.file ,
-		sas_ri = tf3 ,
-		zipped = F ,						# the ascii file is stored in a zipped file
-		tl = TRUE ,							# convert all column names to lowercase
-		tablename = pes.curTable ,			# the table will be stored in the monet database
-		connection = db
-	)
-	
-	file.remove( unzipped.files )
+	# continue trying until you successfully import the tables
+	while( i >= 0 ){
 
+		# add one to the counter
+		i <- i + 1
+	
+		data.file <- paste0( ftp.path , curFile )
+		download.file( data.file , tf , mode = "wb" )
+		unzipped.files <- unzip( tf , exdir = td )
+		
+		dom.file <- unzipped.files[ grep( 'Domicilios' , unzipped.files ) ]
+		pes.file <- unzipped.files[ grep( 'Pessoas' , unzipped.files ) ]
+		
+		dom.curTable <- gsub( '.zip' , '_dom' , curFile )
+		pes.curTable <- gsub( '.zip' , '_pes' , curFile )
+		
+		dom.curTable <- gsub( '-' , '_' , dom.curTable )
+		pes.curTable <- gsub( '-' , '_' , pes.curTable )
+		
+		
+		read.SAScii.monetdb (
+			dom.file ,
+			sas_ri = tf2 ,
+			zipped = F ,						# the ascii file is stored in a zipped file
+			tl = TRUE ,							# convert all column names to lowercase
+			tablename = dom.curTable ,			# the table will be stored in the monet database
+			connection = db
+		)
+		
+		read.SAScii.monetdb (
+			pes.file ,
+			sas_ri = tf3 ,
+			zipped = F ,						# the ascii file is stored in a zipped file
+			tl = TRUE ,							# convert all column names to lowercase
+			tablename = pes.curTable ,			# the table will be stored in the monet database
+			connection = db
+		)
+		
+		file.remove( unzipped.files )
+
+		# if the tables were successfully imported, set the counter to break out of the loop
+		if( dom.curTable %in% dbListTables( db ) & pes.curTable %in% dbListTables( db ) ) i <- -1
+		
+		# if you've tried five times with no success, give up.
+		if( i >= 5 ) stop( "internet too slow to download files successfully, sorry" )
+		
+	}
+		
 }
 	
 
