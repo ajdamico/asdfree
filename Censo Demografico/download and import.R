@@ -243,8 +243,8 @@ for ( curFile in files.to.download ){
 		dom.curTable <- gsub( '.zip' , '_dom' , curFile )
 		pes.curTable <- gsub( '.zip' , '_pes' , curFile )
 		
-		dom.curTable <- gsub( '-' , '_' , dom.curTable )
-		pes.curTable <- gsub( '-' , '_' , pes.curTable )
+		dom.curTable <- tolower( gsub( '-' , '_' , dom.curTable ) )
+		pes.curTable <- tolower( gsub( '-' , '_' , pes.curTable ) )
 		
 		
 		read.SAScii.monetdb (
