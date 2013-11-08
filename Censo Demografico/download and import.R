@@ -36,16 +36,6 @@
 #######################################################################################
 
 
-
-# warning: this might behave differently on non-windows systems
-# warning: this command must be run before any other
-# internet-accessing lines in the session
-setInternet2(TRUE)
-# you also might need administrative rights
-# on your computer to run `setInternet2`
-
-
-
 # # # # # # # # # # # # # # #
 # warning: monetdb required #
 # # # # # # # # # # # # # # #
@@ -234,8 +224,29 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 for ( curFile in files.to.download ){
 
 	data.file <- paste0( ftp.path , curFile )
-	download.file( data.file , tf , mode = "wb" )
-	unzipped.files <- unzip( tf , exdir = td )
+	
+	# blank out the filepaths to the previous unzipped files
+	unzipped.files <- NULL
+	
+	# initiate a download-counter
+	i <- 1
+	
+	# attempt the download until the files are downloaded
+	# and unzip properly.
+	while( length( unzipped.files ) == 0 ){
+	
+		# download the current brazilian census file
+		download.file( data.file , tf , mode = "wb" )
+		
+		# unzip that pup
+		unzipped.files <- unzip( tf , exdir = td )
+		
+		# increase the counter..
+		i <- i + 1
+		
+		# ..and when it's tried five times, break.
+		if( i > 5 ) stop( "after five download attempts, i give up." )
+	}
 
 	dom.file <- unzipped.files[ grep( 'Domicilios' , unzipped.files ) ]
 	pes.file <- unzipped.files[ grep( 'Pessoas' , unzipped.files ) ]
