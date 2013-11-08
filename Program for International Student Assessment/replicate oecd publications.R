@@ -289,6 +289,12 @@ svycontrast( alb.jr , list( diff = c( 0 , 1 , -1 , 0 ) ) )
 svycontrast( alb.jr , list( diff = c( 0 , 1 , 0 , -1 ) ) )
 svycontrast( alb.jr , list( diff = c( 0 , 0 , 1 , -1 ) ) )
 
+# but really, why not make it a survey design-adjusted t-test?
+# subset your design to only the groups you're comparing,
+# then run the custom-built `pisa-svyttest` function.
+pisa.svyttest( joyread ~ immig , subset( albania , immig %in% c( 2 , 3 ) ) )
+# same result, but you get the statistical testing output done for ya.
+
 
 # # # # argentina # # # #
 
@@ -334,11 +340,6 @@ bra.read <- MIcombine( with( brazil , svymean( ~readz , byvar = ~immig ) ) )
 
 svycontrast( bra.read , list( diff = c( 0 , 1 , -1 , 0 ) ) )
 
-
-
-# but really, why not make it a survey design-adjusted t-test?
-pisa.svyttest( joyread ~ immig , subset( albania , immig %in% c( 2 , 3 ) ) )
-# same result, but you get the statistical testing output done for ya.
 
 
 ################################################
