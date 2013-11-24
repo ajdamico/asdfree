@@ -103,7 +103,7 @@ read.SAScii.sqlite(
 		sas_ri = sas_ri ,
 		tl = TRUE ,			# convert all column names to lowercase?
 		tablename = 'arf' ,
-		db = db
+		conn = db
 	)
 
 

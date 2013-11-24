@@ -277,7 +277,7 @@ for ( year in cps.years.to.download ){
 		zipped = F ,
 		tl = TRUE ,
 		tablename = 'household' ,
-		db = db
+		conn = db
 	)
 	
 	# create an index to speed up the merge
@@ -292,7 +292,7 @@ for ( year in cps.years.to.download ){
 		zipped = F ,
 		tl = TRUE ,
 		tablename = 'family' ,
-		db = db
+		conn = db
 	)
 
 	# create an index to speed up the merge
@@ -307,7 +307,7 @@ for ( year in cps.years.to.download ){
 		zipped = F ,
 		tl = TRUE ,
 		tablename = 'person' ,
-		db = db
+		conn = db
 	)
 
 	# create an index to speed up the merge
@@ -334,7 +334,7 @@ for ( year in cps.years.to.download ){
 		zipped = F ,
 		tl = TRUE ,
 		tablename = 'xwalk' ,
-		db = db
+		conn = db
 	)
 
 	# create an index to speed up the merge
@@ -389,7 +389,7 @@ for ( year in cps.years.to.download ){
 		zipped = T , 
 		tl = TRUE ,
 		tablename = 'rw' ,
-		db = db
+		conn = db
 	)
 
 	# create an index to speed up the merge

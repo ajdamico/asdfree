@@ -193,7 +193,7 @@ if ( sipp.longitudinal.weights ){
 		zipped = T ,
 		tl = TRUE ,
 		tablename = "wgtw7" ,
-		db = db
+		conn = db
 	)
 }
 	
@@ -212,7 +212,7 @@ for ( i in sipp.core.waves ){
 			zipped = T ,
 			tl = TRUE ,
 			tablename = paste0( "w" , i ) ,
-			db = db
+			conn = db
 		)
 }
 
@@ -231,7 +231,7 @@ for ( i in sipp.replicate.waves ){
 			zipped = T ,
 			tl = TRUE ,
 			tablename = paste0( "rw" , i ) ,
-			db = db
+			conn = db
 		)
 }
 
@@ -254,7 +254,7 @@ for ( i in sipp.topical.modules ){
 			zipped = T ,
 			tl = TRUE ,
 			tablename = paste0( "tm" , i ) ,
-			db = db
+			conn = db
 		)
 }
 
@@ -273,7 +273,7 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 			zipped = T ,
 			tl = TRUE ,
 			tablename = i ,
-			db = db
+			conn = db
 		)
 }
 # the current working directory should now contain one database (.db) file

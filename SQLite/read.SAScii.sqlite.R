@@ -18,7 +18,7 @@ read.SAScii.sqlite <-
 		tl = F ,			# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,	# overwrite existing table?
-		db					# database connection object -- read.SAScii.sql requires that dbConnect()
+		conn				# database connection object -- read.SAScii.sql requires that dbConnect()
 							# already be run before this function begins.
 	) {
 
@@ -78,12 +78,12 @@ read.SAScii.sqlite <-
 	# if the overwrite flag is TRUE, then check if the table is in the database..
 	if ( overwrite ){
 		# and if it is, remove it.
-		if ( tablename %in% dbListTables( db ) ) dbRemoveTable( db , tablename )
+		if ( tablename %in% dbListTables( conn ) ) dbRemoveTable( conn , tablename )
 		
 		# if the overwrite flag is false
 		# but the table exists in the database..
 	} else {
-		if ( tablename %in% dbListTables( db ) ) stop( "table with this name already in database" )
+		if ( tablename %in% dbListTables( conn ) ) stop( "table with this name already in database" )
 	}
 	
 	# if ( sum( grepl( 'sample' , tolower( y$varname ) ) ) > 0 ){
@@ -112,7 +112,7 @@ read.SAScii.sqlite <-
 			# )
 		# )
 	
-	# dbSendUpdate( db , sql )
+	# dbSendUpdate( conn , sql )
 
 	# create a second temporary file
 	tf2 <- tempfile()
@@ -133,7 +133,7 @@ read.SAScii.sqlite <-
 	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = FALSE )
 
 	# pull the csv file into the database
-	dbWriteTable( db , tablename , tf2 , sep = "\t" , header = TRUE )
+	dbWriteTable( conn , tablename , tf2 , sep = "\t" , header = TRUE )
 	
 	# delete the temporary file from the hard disk
 	file.remove( tf2 )
@@ -160,33 +160,33 @@ read.SAScii.sqlite <-
 		)
 
 	# rename the current table to a backup table..
-	dbSendQuery( db , paste0( "ALTER TABLE " , tablename , " RENAME TO temp_backup" ) )
+	dbSendQuery( conn , paste0( "ALTER TABLE " , tablename , " RENAME TO temp_backup" ) )
 
 	# run the divisor query
-	dbSendQuery( db , sql.divisor )
+	dbSendQuery( conn , sql.divisor )
 	
 	# remove the backup table
-	dbRemoveTable( db , "temp_backup" )
+	dbRemoveTable( conn , "temp_backup" )
 
 	
 	# eliminate gap variables.. loop through every gap
 	if ( num.gaps > 0 ){
 
 		# store all columns
-		All.Cols <- dbListFields( db , tablename )
+		All.Cols <- dbListFields( conn , tablename )
 
 		# throw out toss_### columns
 		Keep.Cols <- All.Cols[ !( All.Cols %in% paste0( 'toss_' , 1:num.gaps ) ) ]
 				
 		# rename the current table to a backup table..
-		dbSendQuery( db , paste0( "ALTER TABLE " , tablename , " RENAME TO temp_backup" ) )
+		dbSendQuery( conn , paste0( "ALTER TABLE " , tablename , " RENAME TO temp_backup" ) )
 		
 		# select only the non-toss columns from that backup table into the original tablename
 		sql <- paste0( "create table " , tablename , " as select " , paste( Keep.Cols , collapse = ", " ) , " from temp_backup" )
-		dbSendQuery( db , sql )
+		dbSendQuery( conn , sql )
 		
 		# throw out the backup table
-		dbRemoveTable( db , "temp_backup" )
+		dbRemoveTable( conn , "temp_backup" )
 
 	}
 	
