@@ -34,11 +34,17 @@ for ( year in nis.years.to.download ){
 			".dat"
 		)
 		
-	sdat <- try( download.file( straight.dat , tf , mode = 'wb' ) , silent = TRUE )
-
-
-	if( class( sdat ) == 'try-error' ){
+	if ( year %in% c( 1998 , 2006 ) ){
 		
+		sdat <- try( stop( 'get the zip instead of the dat these two years' ) , silent = TRUE )
+
+	} else {
+	
+		sdat <- try( download.file( straight.dat , tf , mode = 'wb' ) , silent = TRUE )
+
+	}
+		
+	if( class( sdat ) == 'try-error' ){
 		
 		zip.dat <-
 			paste0(
