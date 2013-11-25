@@ -142,12 +142,18 @@ for ( year in nis.years.to.download ){
 		script.r <- gsub( "path-to-data" , "." , script.r )
 		
 		script.r <- gsub( "path-to-file" , "./puf" , script.r )
+	
+		# everything after `Step 4:   ASSIGN VARIABLE LABELS` is unnecessary
+		# converting these variables to factors blanks out many values that should not be blanked out
+		# for a prime example, see what happens to the `seqnumhh` column.  whoops.
 		
+		cutoff <- max( grep( "Step 4:   ASSIGN VARIABLE LABELS" , script.r , fixed = TRUE ) )
+	
+		script.r <- script.r[ seq( cutoff ) ]
+	
 		writeLines( script.r , tf )
 		
 		source( tf , echo = TRUE )
-		
-		file.remove( paste0( './NISPUF' , substr( year , 3 , 4 ) , '.RData' ) )
 		
 		nis.df <- paste0( 'NISPUF' , substr( year , 3 , 4 ) )
 		
@@ -225,11 +231,17 @@ for ( year in nis.teen.years.to.download ){
 	
 	script.r <- gsub( "=c(," , "=c(NA," , script.r , fixed = TRUE )
 
+	# everything after `Step 4:   ASSIGN VARIABLE LABELS` is unnecessary
+	# converting these variables to factors blanks out many values that should not be blanked out
+	# for a prime example, see what happens to the `seqnumhh` column.  whoops.
+	
+	cutoff <- max( grep( "Step 4:   ASSIGN VARIABLE LABELS" , script.r , fixed = TRUE ) )
+
+	script.r <- script.r[ seq( cutoff ) ]
+
 	writeLines( script.r , tf )
 	
 	source( tf , echo = TRUE )
-	
-	file.remove( paste0( './NISTEENPUF' , substr( year , 3 , 4 ) , '.RData' ) )
 	
 	nis.df <- paste0( 'NISTEENPUF' , substr( year , 3 , 4 ) )
 	
@@ -296,12 +308,18 @@ if ( nhfs.download ){
 	script.r <- gsub( "path-to-data" , "." , script.r )
 	
 	script.r <- gsub( "path-to-file" , "./puf" , script.r )
+
+	# everything after `Step 4:   ASSIGN VARIABLE LABELS` is unnecessary
+	# converting these variables to factors blanks out many values that should not be blanked out
+	# for a prime example, see what happens to the `seqnumhh` column.  whoops.
+	
+	cutoff <- max( grep( "Step 4:   ASSIGN VARIABLE LABELS" , script.r , fixed = TRUE ) )
+
+	script.r <- script.r[ seq( cutoff ) ]
 		
 	writeLines( script.r , tf )
 	
 	source( tf , echo = TRUE )
-	
-	file.remove( './NHFSPUF.RData' )
 	
 	x <- NHFSPUF
 	
