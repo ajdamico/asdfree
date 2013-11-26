@@ -299,6 +299,9 @@ sql.string <- paste0( "select * from cy" , yrnum )
 # run the sql query constructed above, save the resulting table in a new data frame called 'rw' that will now be stored in RAM
 rw <- dbGetQuery( db , sql.string )
 
+# dump the `spanel` variable, which might otherwise sour up your merge
+rw$spanel <- NULL
+
 # look at the first six records of rw
 head( rw )
 
