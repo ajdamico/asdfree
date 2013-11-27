@@ -31,7 +31,7 @@
 
 
 # replicate entire top row of table g.8 of the data user's guide found on pdf pages 180 and 181
-# "estimated vaccination coverage with individual caccines and selected vaccination series"
+# "estimated vaccination coverage with individual vaccines and selected vaccination series"
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NIS/NISPUF11_DUG.PDF#page=180
 
 
