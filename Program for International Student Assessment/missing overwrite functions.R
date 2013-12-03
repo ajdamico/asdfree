@@ -1,3 +1,61 @@
+
+# pull the missing values from the spss importation script
+# and loop through the table within the monetdb,
+# blanking out those values.
+spss.based.missing.blankouts <-
+	function(
+		conn ,
+		tablename ,
+		spss_script
+	){
+	
+		# load the spss script directly into working memory
+		z <- readLines( spss_script )
+
+		# limit the lines to those indicating missing values
+		z <- z[ grep( 'Missing values' , z ) ]
+
+		# remove that text
+		z <- gsub( 'Missing values ' , '' , z )
+
+		# remove the final period
+		z <- gsub( '.' , '' , z , fixed = TRUE )
+
+		# break the line at the space
+		split <- strsplit( z , ' ' )
+
+		# capture all variable names into one object..
+		vars <- unlist( lapply( split , '[[' , 1 ) )
+		
+		# ..and all values to be blanked out in a second
+		vals <- unlist( lapply( split , '[[' , 2 ) )
+
+		# loop through all variables that have any official missing values
+		for ( i in seq( length( vars ) ) ){
+
+			# write out the UPDATE line that will set certain values to null
+			update.sql <-
+				paste(
+					"UPDATE" , 
+					tablename ,
+					"SET" , 
+					vars[ i ] , 
+					"= NULL WHERE" ,
+					vars[ i ] ,
+					"IN" ,
+					vals[ i ]
+				)
+			
+			# execute the update line
+			dbSendUpdate( conn , update.sql )
+			
+		}
+
+		TRUE
+	}
+
+
+
 # take a character string separated by spaces,
 # remove all return characters (\n)
 # and remove all empty strings
