@@ -90,8 +90,9 @@ remove.tabs <-
 	}
 
 
+
 add.decimals <-
-	function( sas_ri ){
+	function( sas_ri , precise = FALSE ){
 	
 		tf <- tempfile()
 		
@@ -119,14 +120,34 @@ add.decimals <-
 		# decimals to paste
 		dtp <- unlist( lapply( lnd , "[[" , 2 ) )
 
-		# loop through every variable needing decimals
-		# and replace the variable text with the variable plus the number dot number
-		for ( i in seq( length( vnd ) ) ) z[ grep( vnd[ i ] , z ) ] <- paste( z[ grep( vnd[ i ] , z ) ] , dtp[ i ] )
+		# if the precision flag is marked..
+		if ( precise ){
+		
+			# loop through every variable needing decimals
+			for ( i in seq( length( vnd ) ) ){
 
+				# search for strings beginning with the *exact* string
+				begins.with.length <- nchar( vnd[ i ] )
+				
+				lines.to.replace <- substr( z , 1 , begins.with.length ) == vnd[ i ]
+		
+				z[ lines.to.replace ] <- paste( z[ lines.to.replace ] , dtp[ i ] )
+		
+			}
+		
+		} else {
+		
+			# loop through every variable needing decimals
+			# and replace the variable text with the variable plus the number dot number
+			for ( i in seq( length( vnd ) ) ) z[ grep( vnd[ i ] , z ) ] <- paste( z[ grep( vnd[ i ] , z ) ] , dtp[ i ] )
+			
+		}
+			
 		writeLines( z , tf )
 		
 		tf
 	}
+
 
 	
 find.chars <-
