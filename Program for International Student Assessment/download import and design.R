@@ -237,78 +237,48 @@ if ( 2012 %in% years.to.download ){
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
-	# files.to.import <- c( "int_stq09_dec11" , "int_scq09_dec11" , "int_par09_dec11" , "int_cog09_td_dec11" , "int_cog09_s_dec11" )
+	files.to.import <- c( "int_stu12_dec03" , "int_scq12_dec03" ,  "int_paq12_dec03" , "int_cog12_dec03" , "int_cog12_s_dec03" )
 	
 	# loop through them all
-	# for ( curFile in files.to.import ){
+	for ( curFile in files.to.import ){
 
 		# construct the full path to the file..
-		# fp <- paste0( http.pre , 2009 , http.mid , curFile , ".zip" )
+		fp <- paste0( http.pre , 2012 , http.mid , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		# sri <- paste0( http.pre , 2009 , http.mid , gsub( "_d" , "_sas_d" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , 2012 , http.mid , gsub( "dec03" , "sas" , curFile ) , ".sas" )
 
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
-		# read.SAScii.monetdb ( 
-			# fp ,
-			# sas_ri = find.chars( add.decimals( remove.tabs( sri ) ) ) , 
-			# zipped = TRUE ,
-			# tl = TRUE ,
-			# tablename = curFile ,
-			# connection = db
-		# )
-		
-	# }
+		read.SAScii.monetdb ( 
+			fp ,
+			sas_ri = find.chars( add.decimals( sri , precise = TRUE ) ) , 
+			zipped = TRUE ,
+			tl = TRUE ,
+			tablename = curFile ,
+			connection = db
+		)
 	
+		# missing recodes #
 	
-	# missing recodes #
+		spss.script <- paste0( http.pre , 2012 , http.mid , gsub( "dec03" , "spss" , curFile ) , ".sps" )
 	
-	# int_stq09_dec11
-	# int_stq09_dec11.missings( db )
+		spss.based.missing.blankouts( db , curFile , spss.script )
 	
-	# int_scq09_dec11
-	# int_scq09_dec11.missings( db )
+		# end of missing recodes #
 	
-	# int_par09_dec11
-	# miss1.txt <- 
-		# "PA01Q01 PA01Q02 PA01Q03 PA02Q01 PA03Q01 PA03Q02 PA03Q03 PA03Q04 PA03Q05 PA03Q06 PA03Q07 PA03Q08 PA03Q09 PA04Q01 
-		# PA05Q01 PA06Q01 PA06Q02 PA06Q03 PA06Q04 PA07Q01 PA07Q02 PA07Q03 PA07Q04 PA07Q05 PA07Q06 PA08Q01 PA08Q02 PA08Q03 
-		# PA08Q04 PA08Q05 PA08Q06 PA08Q07 PA08Q08 PA09Q01 PA09Q02 PA09Q03 PA09Q04 PA10Q01 PA10Q02 PA10Q03 PA10Q04 PA11Q01 
-		# PA12Q01 PA13Q01 PA14Q01 PA14Q02 PA14Q03 PA14Q04 PA14Q05 PA14Q06 PA14Q07 PA15Q01 PA15Q02 PA15Q03 PA15Q04 PA15Q05 
-		# PA15Q06 PA15Q07 PA15Q08 PA16Q01 PA17Q01 PA17Q02 PA17Q03 PA17Q04 PA17Q05 PA17Q06 PA17Q07 PA17Q08 PA17Q09 PA17Q10 
-		# PA17Q11  PQMISCED PQFISCED PQHISCED"
-
-	# in this table..these columns..with these values..should be converted to NA
-	# missing.updates( 
-		# db , 
-		# 'INT_PAR09_DEC11' , 
-		# split.n.clean( miss1.txt ) ,
-		# 7:9 
-	# )
-
-	# in this table..these columns..with these values..should be converted to NA
-	# missing.updates( 
-		# db , 
-		# 'INT_PAR09_DEC11' , 
-		# c( "PRESUPP" , "MOTREAD" , "READRES" , "CURSUPP" , "PQSCHOOL" , "PARINVOL" ) ,
-		# 9997:9999 
-	# )
-	
-	# note: no missing recodes for `int_cog09_s_dec11` or `int_cog09_td_dec11`
-	
-	# end of missing recodes #
+	}
 	
 	
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
-	# construct.pisa.sqlsurvey.designs(
-		# monet.url , 
-		# year = 2009 ,
-		# table.name = 'int_stq09_dec11' ,
-		# pv.vars = c( 'math' , 'read' , 'scie' , 'read1' , 'read2' , 'read3' , 'read4' , 'read5' ) ,
-		# sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2009.acer.edu.au/downloads/int_stq09_sas_dec11.sas" ) ) )
-	# )
+	construct.pisa.sqlsurvey.designs(
+		monet.url , 
+		year = 2012 ,
+		table.name = 'int_stu12_dec03' ,
+		pv.vars = c( 'math' , 'macc' , 'macq' , 'macs' , 'macu' , 'mape' , 'mapf' , 'mapi' , 'read' , 'scie' ) ,
+		sas_ri = find.chars( add.decimals( "http://pisa2012.acer.edu.au/downloads/INT_STU12_SAS.sas" , precise = TRUE ) )
+	)
 	
 	# disconnect from the monetdb server..
 	dbDisconnect( db )
