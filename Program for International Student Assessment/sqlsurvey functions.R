@@ -105,7 +105,7 @@ pisa.svyttest <-
 
 
 construct.pisa.sqlsurvey.designs <-
-	function( monet.url , year , table.name , pv.vars , sas_ri ){
+	function( monet.url , year , table.name , pv.vars , sas_ri , additional.factors = NULL ){
 
 		# step one - find all character columns #
 		sascii <- parse.SAScii( sas_ri )
@@ -113,6 +113,8 @@ construct.pisa.sqlsurvey.designs <-
 		factor.vars <- tolower( sascii[ sascii$char %in% TRUE , 'varname' ] )
 
 		factor.vars <- factor.vars[ !( factor.vars %in% 'toss_0' ) ]
+		
+		factor.vars <- c( factor.vars , additional.factors )
 		# end of finding all character columns #
 		
 		conn <- dbConnect( MonetDB.R() , monet.url )
