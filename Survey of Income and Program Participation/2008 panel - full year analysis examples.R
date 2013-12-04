@@ -272,6 +272,9 @@ head( x )
 # run the sql query constructed above, save the resulting table in a new data frame called 'mw' that will now be stored in RAM
 mw <- dbGetQuery( db , "select * from wgtw7" )
 
+# dump the `spanel` variable, which might otherwise sour up your merge
+mw$spanel <- NULL
+
 # look at the first six records of mw
 head( mw )
 
