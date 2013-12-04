@@ -256,6 +256,7 @@ if ( 2012 %in% years.to.download ){
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
+			skip.decimal.division = TRUE ,
 			connection = db
 		)
 	
@@ -316,6 +317,7 @@ if ( 2009 %in% years.to.download ){
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
+			skip.decimal.division = TRUE ,
 			connection = db
 		)
 		
@@ -406,6 +408,7 @@ if ( 2006 %in% years.to.download ){
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
+			skip.decimal.division = TRUE ,
 			connection = db
 		)
 		
@@ -512,6 +515,7 @@ if ( 2003 %in% years.to.download ){
 			zipped = zipped ,
 			tl = TRUE ,
 			tablename = curFile ,
+			skip.decimal.division = TRUE ,
 			connection = db
 		)
 			
@@ -620,6 +624,7 @@ if ( 2000 %in% years.to.download ){
 				zipped = TRUE ,
 				tl = TRUE ,
 				tablename = curFile ,
+				skip.decimal.division = TRUE ,
 				connection = db
 			)
 		
