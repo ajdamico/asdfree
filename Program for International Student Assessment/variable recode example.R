@@ -277,6 +277,7 @@ monetdb.server.stop( pid )
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 require(downloader)		# downloads and then runs the source() function on scripts from github
+require(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
