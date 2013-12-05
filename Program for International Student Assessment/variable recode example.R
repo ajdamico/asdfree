@@ -283,6 +283,10 @@ require(downloader)		# downloads and then runs the source() function on scripts 
 source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
 
 
+# set your working directory on your local disk.
+# setwd( "C:/My Directory/PISA/" )
+
+
 # run your..
 # lines of code to hold on to for all other acs monetdb analyses #
 # (the same block of code i told you to hold onto at the end of the download script)
