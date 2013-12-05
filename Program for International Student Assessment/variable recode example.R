@@ -8,7 +8,7 @@
 # library(downloader)
 # batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
 # setwd( "C:/My Directory/PISA/" )
-# load( 'C:/My Directory/PISA/2012 int_stu12_dec03.rda' )
+# load( '2012 int_stu12_dec03.rda' )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -149,7 +149,7 @@ for ( i in 1:5 ){
 	# this action protects the original 'int_stu12_dec03_imp[1-5]' tables from any accidental errors.
 	
 	# at any point, we can delete these recoded copies of the data tables using the command..
-	# for ( i in 1:5 ) dbRemoveTable( db , paste0( "int_stu12_dec03_imp" , i ) )
+	# for ( i in 1:5 ) dbRemoveTable( db , paste0( "recoded_int_stu12_dec03_imp" , i ) )
 	# ..and start fresh by re-copying the pristine files from int_stu12_dec03_imp[1-5]
 }
 
@@ -231,7 +231,7 @@ dbDisconnect( db )
 
 
 # load the file containing the designs you want to update
-# load( 'C:/My Directory/PISA/2012 int_stu12_dec03.rda' )
+load( '2012 int_stu12_dec03.rda' )
 
 # now use `mget` to take a character vector,
 # look for objects with the same names,
@@ -317,7 +317,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # load the desired programme for international student assessment monet database-backed complex sample design objects
 
 # uncomment one this line by removing the `#` at the front..
-# load( 'C:/My Directory/PISA/2012 recoded_int_stu12_dec03.rda' )	# analyze the recoded 2012 student questionnaire
+load( '2012 recoded_int_stu12_dec03.rda' )	# analyze the recoded 2012 student questionnaire
 
 
 # note: this r data file should contain five sqlrepdesign objects ending with `imp1` - `imp5`
