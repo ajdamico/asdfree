@@ -8,6 +8,7 @@
 # library(downloader)
 # batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
 # setwd( "C:/My Directory/PISA/" )
+# load( 'C:/My Directory/PISA/2012 int_stu12_dec03.rda' )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -45,13 +46,24 @@
 # # # # # # # # # # # # # # #
 
 
+# remove the # in order to run this install.packages line only once
+# install.packages( "mitools" )
+
+
+require(mitools) 		# load mitools package (analyzes multiply-imputed data)
+require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+require(descr) 			# load the descr package (converts fixed-width files to delimited files)
 require(downloader)		# downloads and then runs the source() function on scripts from github
+require(stringr)		# load stringr package (manipulates character strings easily)
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+require(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
 source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
+
+# load a couple of functions that will ease the importation process
+source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/download%20and%20importation%20functions.R" , prompt = FALSE )
 
 
 # set your working directory on your local disk.
@@ -196,6 +208,9 @@ dbGetQuery( db , "SELECT progcat , st49q07 , COUNT(*) as number_of_records from 
 # notice that each value of progcat has been deposited in the appropriate programming category
 
 
+# disconnect from the database for a quick second.
+dbDisconnect( db )
+
 
 #############################################################################
 # step 3: create a new survey design object connecting to the recoded table #
@@ -215,14 +230,21 @@ dbGetQuery( db , "SELECT progcat , st49q07 , COUNT(*) as number_of_records from 
 # so make sure you set it first.  ;)
 
 
+# load the file containing the designs you want to update
+# load( 'C:/My Directory/PISA/2012 int_stu12_dec03.rda' )
+
+# now use `mget` to take a character vector,
+# look for objects with the same names,
+# and smush 'em all together into a list
+imp.list <- mget( paste0( 'int_stu12_dec03_imp' , 1:5 ) )
+
 # use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
-# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
-construct.pisa.sqlsurvey.designs(
+# then _re_-construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
+reconstruct.pisa.sqlsurvey.designs(
 	monet.url , 
 	year = 2012 ,
 	table.name = 'recoded_int_stu12_dec03' ,
-	pv.vars = c( 'math' , 'macc' , 'macq' , 'macs' , 'macu' , 'mape' , 'mapf' , 'mapi' , 'read' , 'scie' ) ,
-	sas_ri = find.chars( add.decimals( "http://pisa2012.acer.edu.au/downloads/INT_STU12_SAS.sas" , precise = TRUE ) ) ,
+	previous.list = imp.list ,
 	# here's a new parameter.
 	additional.factors = "progcat"
 	# if you only added numeric columns, `#` comment out the line above
@@ -244,12 +266,22 @@ construct.pisa.sqlsurvey.designs(
 
 # to analyze your newly-recoded data:
 
-# close r
+# close r and monetdb
+monetdb.server.stop( pid )
+
+# q()
+
 
 # open r back up
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+require(downloader)		# downloads and then runs the source() function on scripts from github
+
+
+# load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
+source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
+
 
 # run your..
 # lines of code to hold on to for all other acs monetdb analyses #
@@ -293,12 +325,12 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 ls()
 # see them?
 # they should be named something like this..
-paste0( 'recoded_int_stu12_dec03' , 1:5 )
+paste0( 'recoded_int_stu12_dec03_imp' , 1:5 )
 
 # now use `mget` to take a character vector,
 # look for objects with the same names,
 # and smush 'em all together into a list
-imp.list <- mget( paste0( 'recoded_int_stu12_dec03' , 1:5 ) )
+imp.list <- mget( paste0( 'recoded_int_stu12_dec03_imp' , 1:5 ) )
 
 # now take a deep breath because this next part might scare you.
 
