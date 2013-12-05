@@ -250,6 +250,8 @@ reconstruct.pisa.sqlsurvey.designs <-
 
 		conn <- dbConnect( MonetDB.R() , monet.url )
 	
+		all.implicates <- NULL
+	
 		# loop through each of the five variables..
 		for ( i in 1:5 ){
 		
