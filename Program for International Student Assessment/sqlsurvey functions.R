@@ -246,7 +246,7 @@ construct.pisa.sqlsurvey.designs <-
 	
 	
 reconstruct.pisa.sqlsurvey.designs <-
-	function( monet.url , year , table.name , previous.design , additional.factors = NULL ){
+	function( monet.url , year , table.name , previous.list , additional.factors = NULL ){
 
 		conn <- dbConnect( MonetDB.R() , monet.url )
 	
@@ -257,7 +257,7 @@ reconstruct.pisa.sqlsurvey.designs <-
 
 				
 			# step one - find all character columns #
-			factor.vars <- sapply( pisa.imp$designs[[ i ]]$zdata , class )[ !( sapply( pisa.imp$designs[[ i ]]$zdata , class ) %in% c( 'numeric' , 'integer' ) ) ]
+			factor.vars <- sapply( previous.list[[ i ]]$zdata , class )[ !( sapply( previous.list$designs[[ i ]]$zdata , class ) %in% c( 'numeric' , 'integer' ) ) ]
 			
 			factor.vars <- c( factor.vars , additional.factors )
 			# end of finding all character columns #
