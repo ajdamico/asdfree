@@ -242,3 +242,67 @@ construct.pisa.sqlsurvey.designs <-
 		ofn
 	}
 
+
+	
+	
+reconstruct.pisa.sqlsurvey.designs <-
+	function( monet.url , year , table.name , previous.design , additional.factors = NULL ){
+
+		conn <- dbConnect( MonetDB.R() , monet.url )
+	
+		# loop through each of the five variables..
+		for ( i in 1:5 ){
+		
+			print( paste( 'currently working on implicate' , i , 'from table' , table.name ) )
+
+				
+			# step one - find all character columns #
+			factor.vars <- sapply( pisa.imp$designs[[ i ]]$zdata , class )[ !( sapply( pisa.imp$designs[[ i ]]$zdata , class ) %in% c( 'numeric' , 'integer' ) ) ]
+			
+			factor.vars <- c( factor.vars , additional.factors )
+			# end of finding all character columns #
+			
+			
+			implicate.name <- paste0( table.name , "_imp" , i )
+			
+			all.implicates <- c( all.implicates , implicate.name )
+			
+			# construct the actual monetdb-backed,
+			# replicate-weighted survey design.
+			assign(
+				implicate.name ,
+				sqlrepsurvey( 	
+					weights = "w_fstuwt" , 
+					repweights = "w_fstr[1-9]" , 
+					scale = 4 / 80 ,
+					rscales = rep( 1 , 80 ) ,
+					driver = MonetDB.R() , 
+					check.factors = factor.vars ,
+					database = monet.url ,
+					mse = TRUE ,
+					table.name = implicate.name
+				)
+			)
+			
+		}
+
+		# output file name
+		ofn <- paste0( year , " " , table.name , ".rda" )
+		
+		# save all of the database design objects as r data files
+		save( list = all.implicates , file = ofn )
+
+		# remove them from RAM
+		rm( list = all.implicates )
+
+		# clear up RAM
+		gc()
+
+		# disconnect from the monet database
+		dbDisconnect( conn )
+		
+		# return the name of the file that has already been saved to the disk,
+		# just for fun.
+		ofn
+	}
+
