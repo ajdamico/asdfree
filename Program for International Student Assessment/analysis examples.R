@@ -162,7 +162,7 @@ dbGetQuery( db , "SELECT cnt , COUNT(*) as num_records FROM int_stu12_dec03_imp1
 
 
 
-# count the weighted number of individuals in pisa #
+# count the weighted number of students *worldwide* that pisa data represents #
 MIcombine( with( pisa.imp , svytotal( ~one ) ) )
 
 # note that this is exactly equivalent to summing up the weight variable
