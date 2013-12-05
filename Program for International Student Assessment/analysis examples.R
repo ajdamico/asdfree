@@ -209,6 +209,31 @@ MIcombine( with( pisa.imp , svymean( ~ic01q04 ) ) )
 # by country
 MIcombine( with( pisa.imp , svymean( ~ic01q04 , byvar = ~cnt ) ) )
 
+# oh!  and fun fact.  do you know why..
+# in compendium file..
+	# http://pisa2012.acer.edu.au/downloads/M_comp_ICT_DEC03.zip
+# in excel file
+	# IC01Q04.xls
+# on excel tab
+	# Perc
+# cells E4, G4, and I4 do not match the first three rows in the output you've just produced?
+
+# because!  and this is real.  because!  oecd includes missings in their sums to 100%
+
+# check this out:
+# they say cells:
+# E4 = 93.9614367187289
+# G4 = 1.70799077487675
+# I4 = 2.41842206642846
+
+# well try this on for size
+
+# E4 + G4 + I4 = 98.0878495600341
+
+# divide each of those three numbers by their sum,
+# new E4 = ( 93.9614367187289 / 98.0878495600341 ) = 
+# the very very first number that you've just beauuutifully created with R.
+
 
 # calculate the median and other percentiles #
 
