@@ -187,7 +187,7 @@ for ( i in 1:5 ){
 for ( i in 1:5 ) dbSendUpdate( db , paste0( "ALTER TABLE recoded_int_stu12_dec03_imp" , i , " ADD COLUMN progcat VARCHAR( 255 )" ) )
 
 # if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION like this:
-# for ( i in 1:5 ) dbSendUpdate( db , paste0( "ALTER TABLE recoded_int_stu12_dec03_imp" , i , " ADD COLUMN progcatx DOUBLE PRECISION" ) )
+# for ( i in 1:5 ) dbSendUpdate( db , paste0( "ALTER TABLE recoded_int_stu12_dec03_imp" , i , " ADD COLUMN progcat DOUBLE PRECISION" ) )
 # ..but then progcat would have to be be numbers (maybe zero and one) instead of the strings shown below ('always, almost always, or often' - 'sometimes, rarely, or never')
 
 
@@ -216,13 +216,7 @@ dbDisconnect( db )
 # step 3: create a new survey design object connecting to the recoded table #
 
 # to initiate a new complex sample survey design on the data table
-# that's been recoded to include 'progcat'
-# simply re-run the `construct.pisa.sqlsurvey.designs` function and
-	# 1) update the table.name =
-	# argument so it now points to the recoded_ table in the monet database
-	# 2) add a parameter `additional.factors` containing any newly-added
-	# "character" or "factor" variables.  numeric, integer, double variables do not need to be mentioned.
-
+# that's been recoded to include `progcat`, run the `reconstruct.pisa.sqlsurvey.designs` function
 	
 # note note note #
 # the function below will automatically save its result
