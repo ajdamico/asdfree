@@ -1,5 +1,5 @@
 # analyze survey data for free (http://asdfree.com) with the r language
-# programme for international student assessment
+# program for international student assessment
 # 2012 student questionnaire
 
 # # # # # # # # # # # # # # # # #
@@ -74,7 +74,7 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20Intern
 
 
 # after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all programme for international student assessment tables
+# to initiate and connect to the monet database containing all program for international student assessment tables
 # run them now.  mine look like this:
 
 
@@ -100,7 +100,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # # # # run your analysis commands # # # #
 
 
-# the programme for international student assessment download and importation script
+# the program for international student assessment download and importation script
 # has already created a monet database-backed survey design object
 # connected to the 2012 student questionnaire tables
 
@@ -319,7 +319,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # instead, simply use the full filepath to the r data file (.rda)
 # as shown in the load() examples below.
 
-# load the desired programme for international student assessment monet database-backed complex sample design objects
+# load the desired program for international student assessment monet database-backed complex sample design objects
 
 # uncomment one this line by removing the `#` at the front..
 load( '2012 recoded_int_stu12_dec03.rda' )	# analyze the recoded 2012 student questionnaire

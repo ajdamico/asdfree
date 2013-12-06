@@ -1,5 +1,5 @@
 # analyze survey data for free (http://asdfree.com) with the r language
-# programme for international student assessment
+# program for international student assessment
 # 2000, 2003, 2006, 2009, 2012
 # each and every available file hooray
 
@@ -31,7 +31,7 @@
 
 
 #####################################################################################
-# download all available programme for international student assessment files from  #
+# download all available program for international student assessment files from  #
 # the organisation for economic co-operation and development's website, then import #
 # each file into a monet database, make corrections so the files are beeeeeeautiful #
 # create a multiply-imputed, monetdb-backed complex sample sqlsurvey design with r! #
@@ -103,7 +103,7 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.mo
 # in the appropriate directory on your local disk.
 # when adding new files or adding a new year of data, this script does not need to be re-run.
 
-# create a monetdb executable (.bat) file for the programme for international student assessment
+# create a monetdb executable (.bat) file for the program for international student assessment
 batfile <-
 	monetdb.server.setup(
 					
@@ -144,7 +144,7 @@ batfile
 
 # hold on to that line for future scripts.
 # you need to run this line *every time* you access
-# the programme for international student assessment files with monetdb.
+# the program for international student assessment files with monetdb.
 # this is the monetdb server.
 
 # two other things you need: the database name and the database port.
@@ -720,7 +720,7 @@ if ( 2000 %in% years.to.download ){
 
 
 # once complete, this script does not need to be run again.
-# instead, use one of the programme for international student assessment
+# instead, use one of the program for international student assessment
 # analysis scripts, which utilize these newly-created survey objects
 
 
