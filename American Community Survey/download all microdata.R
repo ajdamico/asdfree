@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # american community survey
-# 2005-2011 1-year (plus when available 3-year and 5-year files)
+# 2005-2012 1-year (plus when available 3-year and 5-year files)
 # household-level, person-level, and merged files
 
 # # # # # # # # # # # # # # # # #
@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/ACS/" )
-# single.year.datasets.to.download <- 2005:2011
+# single.year.datasets.to.download <- 2005:2012
 # three.year.datasets.to.download <- 2007:2011
 # five.year.datasets.to.download <- 2009:2011
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
@@ -182,7 +182,7 @@ monetdb.server.stop( pid )
 # single-year datasets are available back to 2005
 # uncomment this line to download all available single-year data sets
 # uncomment this line by removing the `#` at the front
-# single.year.datasets.to.download <- 2005:2011
+# single.year.datasets.to.download <- 2005:2012
 	
 # three-year datasets are available back to 2007
 # uncomment this line to download all available three-year data sets
