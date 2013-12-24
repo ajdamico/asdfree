@@ -59,6 +59,19 @@ sas.is.evil <-
 		tf
 	}
 
+remove.fakecnt.lines <-
+	function( sas_ri ){
+		
+		tf <- tempfile()
+		z <- readLines( sas_ri )
+		
+		z <- z[ !grepl( "fakecnt" , tolower( z ) ) ]
+	
+		writeLines( z , tf )
+		
+		tf
+	}
+
 # yet another silly specific hardcoded recode
 # because sas is a trainwreck of a language
 sas.is.quite.evil <-

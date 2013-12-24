@@ -252,7 +252,7 @@ if ( 2012 %in% years.to.download ){
 		# then immediately import it into the monetdb server
 		read.SAScii.monetdb ( 
 			fp ,
-			sas_ri = find.chars( add.decimals( sri , precise = TRUE ) ) , 
+			sas_ri = remove.fakecnt.lines( find.chars( add.decimals( sri , precise = TRUE ) ) ) , 
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
