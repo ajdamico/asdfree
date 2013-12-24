@@ -278,7 +278,7 @@ if ( 2012 %in% years.to.download ){
 		year = 2012 ,
 		table.name = 'int_stu12_dec03' ,
 		pv.vars = c( 'math' , 'macc' , 'macq' , 'macs' , 'macu' , 'mape' , 'mapf' , 'mapi' , 'read' , 'scie' ) ,
-		sas_ri = find.chars( add.decimals( "http://pisa2012.acer.edu.au/downloads/INT_STU12_SAS.sas" , precise = TRUE ) )
+		sas_ri = remove.fakecnt.lines( find.chars( add.decimals( "http://pisa2012.acer.edu.au/downloads/INT_STU12_SAS.sas" , precise = TRUE ) ) )
 	)
 	
 	# disconnect from the monetdb server..
