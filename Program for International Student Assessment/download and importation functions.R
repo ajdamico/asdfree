@@ -195,7 +195,7 @@ find.chars <-
 			
 			# and add dollar signs to the appropriate lines..
 			# (note - add a space in the search to assure right-hand-side whole-word-only
-			for ( i in char.fields ) z <- gsub( paste0( i , " " ) , paste( i , "$" ) , z , fixed = TRUE )
+			for ( i in char.fields ) z <- gsub( paste0( i , " \\$*" ) , paste( i , "$" ) , z )
 			
 			# ..then write them to the temporary file
 			writeLines( z , tf )
