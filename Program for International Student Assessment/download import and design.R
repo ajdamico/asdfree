@@ -237,7 +237,7 @@ if ( 2012 %in% years.to.download ){
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
-	files.to.import <- c( "int_stu12_dec03" , "int_scq12_dec03" ,  "int_paq12_dec03" , "int_cog12_dec03" , "int_cog12_s_dec03" )
+	files.to.import <- c( "INT_STU12_DEC03", "INT_SCQ12_DEC03" ,  "INT_PAQ12_DEC03" , "INT_COG12_DEC03" , "INT_COG12_S_DEC03" )
 	
 	# loop through them all
 	for ( curFile in files.to.import ){
@@ -246,7 +246,7 @@ if ( 2012 %in% years.to.download ){
 		fp <- paste0( http.pre , 2012 , http.mid , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2012 , http.mid , gsub( "dec03" , "sas" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , 2012 , http.mid , gsub( "DEC03" , "SAS" , curFile ) , ".sas" )
 
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -262,7 +262,7 @@ if ( 2012 %in% years.to.download ){
 	
 		# missing recodes #
 	
-		spss.script <- paste0( http.pre , 2012 , http.mid , gsub( "dec03" , "spss" , curFile ) , ".sps" )
+		spss.script <- paste0( http.pre , 2012 , http.mid , gsub( "DEC03" , "SPSS" , curFile ) , ".sps" )
 	
 		spss.based.missing.blankouts( db , curFile , spss.script )
 	
@@ -298,7 +298,7 @@ if ( 2009 %in% years.to.download ){
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
-	files.to.import <- c( "int_stq09_dec11" , "int_scq09_dec11" , "int_par09_dec11" , "int_cog09_td_dec11" , "int_cog09_s_dec11" )
+	files.to.import <- c( "INT_STQ09_DEC11" , "INT_SCQ09_Dec11" , "INT_PAR09_DEC11" , "INT_COG09_TD_DEC11" , "INT_COG09_S_DEC11" )
 	
 	# loop through them all
 	for ( curFile in files.to.import ){
@@ -307,7 +307,7 @@ if ( 2009 %in% years.to.download ){
 		fp <- paste0( http.pre , 2009 , http.mid , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2009 , http.mid , gsub( "_d" , "_sas_d" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , 2009 , http.mid , gsub( "_D(ec|EC)" , "_SAS_DEC" , curFile ) , ".sas" )
 
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -369,7 +369,7 @@ if ( 2009 %in% years.to.download ){
 		year = 2009 ,
 		table.name = 'int_stq09_dec11' ,
 		pv.vars = c( 'math' , 'read' , 'scie' , 'read1' , 'read2' , 'read3' , 'read4' , 'read5' ) ,
-		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2009.acer.edu.au/downloads/int_stq09_sas_dec11.sas" ) ) )
+		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2009.acer.edu.au/downloads/INT_STQ09_SAS_DEC11.sas" ) ) )
 	)
 	
 	# disconnect from the monetdb server..
@@ -389,7 +389,7 @@ if ( 2006 %in% years.to.download ){
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
-	files.to.import <- c( "int_stu06_dec07" , "int_sch06_dec07" , "int_par06_dec07" , "int_cogn06_t_dec07" , "int_cogn06_s_dec07" )
+	files.to.import <- c( "INT_Stu06_Dec07" , "INT_Sch06_Dec07" , "INT_Par06_Dec07" , "INT_Cogn06_T_Dec07" , "INT_Cogn06_S_Dec07" )
 
 	# loop through them all
 	for ( curFile in files.to.import ){
@@ -398,7 +398,7 @@ if ( 2006 %in% years.to.download ){
 		fp <- paste0( http.pre , 2006 , http.mid , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2006 , http.mid , gsub( "_d" , "_sas_d" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , 2006 , http.mid , gsub( "_D" , "_SAS_D" , curFile ) , ".sas" )
 	
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -441,7 +441,7 @@ if ( 2006 %in% years.to.download ){
 		year = 2006 ,
 		table.name = 'int_stu06_dec07' ,
 		pv.vars = c( 'math' , 'read' , 'scie' , 'intr' , 'supp' , 'eps' , 'isi' , 'use' ) ,
-		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2006.acer.edu.au/downloads/int_stu06_sas_dec07.sas" ) ) )
+		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2006.acer.edu.au/downloads/INT_Stu06_SAS_Dec07.sas" ) ) )
 	)
 	
 	# disconnect from the monetdb server..
@@ -461,7 +461,7 @@ if ( 2003 %in% years.to.download ){
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
-	files.to.import <- c( "int_cogn_2003" , "int_stui_2003_v2" , "int_schi_2003" )
+	files.to.import <- c( "INT_cogn_2003" , "INT_stui_2003_v2" , "INT_schi_2003" )
 	
 	# loop through them all
 	for ( curFile in files.to.import ){
@@ -472,10 +472,11 @@ if ( 2003 %in% years.to.download ){
 		fp <- paste0( http.pre , 2003 , http.mid , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2003 , http.mid , gsub( "int" , "read" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , 2003 , http.mid , gsub( "INT" , "Read" , curFile ) , ".sas" )
+		sri <- gsub( "i_2003", "I_2003", sri )
 	
 		# get rid of some goofy `n` values in this ascii data
-		if ( curFile == "int_cogn_2003" ){
+		if ( curFile == "INT_cogn_2003" ){
 		
 			zipped <- FALSE
 			
@@ -542,7 +543,7 @@ if ( 2003 %in% years.to.download ){
 		year = 2003 ,
 		table.name = 'int_stui_2003_v2' ,
 		pv.vars = c( 'math' , 'math1' , 'math2' , 'math3' , 'math4' , 'read' , 'scie' , 'prob' ) ,
-		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2003.acer.edu.au/downloads/read_stui_2003_v2.sas" ) ) )
+		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2003.acer.edu.au/downloads/Read_stuI_2003_v2.sas" ) ) )
 	)
 	
 	# disconnect from the monetdb server..
