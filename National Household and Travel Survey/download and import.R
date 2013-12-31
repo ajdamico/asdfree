@@ -31,9 +31,19 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-#####################################################################
-# Analyze the 2009 National Household and Travel Survey file with R #
-#####################################################################
+# # # # # # # # # # # # # # #
+# warning: monetdb required #
+# # # # # # # # # # # # # # #
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###################################################################################################################################
+# prior to running this analysis script, monetdb must be installed on the local machine. follow each step outlined on this page: #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/MonetDB/monetdb%20installation%20instructions.R #
+###################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 
 
 # set your working directory.
@@ -48,7 +58,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "stringr" , "sas7bdat" , "RSQLite" , "downloader" ) )
+# install.packages( c( "stringr" , "sas7bdat" , "MonetDB.R" , "downloader" , "R.utils" ) )
 
 
 # define which years to download #
@@ -64,9 +74,6 @@
 # years.to.download <- c( 2009 , 1995 )
 
 
-# name the database (.db) file to be saved in the working directory
-nhts.dbname <- "nhts.db"
-
 
 ############################################
 # no need to edit anything below this line #
@@ -74,7 +81,7 @@ nhts.dbname <- "nhts.db"
 
 
 # initiate a function
-# that takes a sqlite database
+# that takes a monet database
 # and a pre- and post- table name
 # in order to copy the table over with
 # a) all lowercase column names
@@ -86,9 +93,40 @@ sql.process <-
 		if ( identical( pre , post ) ) stop( "`pre` and `post` cannot be the same." )
 
 		
+		# figure out which columns are not stored as strings
+		all.tables <- dbReadTable( db , 'tables' )
+		
+		# pull the current table's monetdb id
+		this.table.id <- all.tables[ all.tables$name == pre , 'id' ]
+		
+		# pull all fields in this table
+		all.columns <- 
+			dbGetQuery( 
+				db , 
+				paste(
+					'select * from columns where table_id = ' ,
+					this.table.id
+				)
+			)
+		
+		# blank only columns that are not varchar
+		cols.to.blank <- all.columns[ !( all.columns$type %in% 'varchar' ) , 'name' ]
+		
+		
 		# loop through every field in the data set
 		# and blank out all negative numbers
-		for ( j in dbListFields( db , pre ) ) dbSendQuery( db , paste( 'UPDATE' , pre , 'SET' , j , '= NULL WHERE' , j , '< 0' ) )
+		for ( j in cols.to.blank ) dbSendUpdate( db , paste( 'UPDATE' , pre , 'SET' , j , '= NULL WHERE' , j , '< 0' ) )
+		
+		# get rid of `id9` field #
+		lowered.edited.fields <- tolower( dbListFields( db , pre ) )
+		
+		if ( lowered.edited.fields[ 1 ] == 'id9' ) lowered.edited.fields[ 1 ] <- 'houseid'
+		
+		casting.chars <- dbListFields( db , pre )
+		casting.chars <- gsub( "houseid" , "CAST( houseid AS DOUBLE PRECISION )" , casting.chars )
+		casting.chars <- gsub( "personid" , "CAST( personid AS DOUBLE PRECISION )" , casting.chars )
+		casting.chars <- gsub( "id9" , "CAST( id9 AS DOUBLE PRECISION )" , casting.chars )
+		
 		
 		
 		# build the 'create table' sql command
@@ -100,9 +138,9 @@ sql.process <-
 
 				paste(
 					# select all fields in the data set..
-					dbListFields( db , pre ) ,
+					casting.chars ,
 					# re-select them, but convert them to lowercase
-					tolower( dbListFields( db , pre ) ) , 
+					lowered.edited.fields , 
 					# separate them by `as` statements
 					sep = ' as ' ,
 					# and mush 'em all together with commas
@@ -111,15 +149,35 @@ sql.process <-
 				
 				# tack on a column of all ones
 				', 1 as one from' ,
-				pre
+				 
+				pre ,
+				
+				' WITH DATA'
 			)
 
 		# actually execute the create table command
-		dbSendQuery( db , sql.create.table )
+		dbSendUpdate( db , sql.create.table )
 
 		# remove the source data table
 		dbRemoveTable( db , pre )
 	}
+# function end
+
+
+# initiate a function
+# that takes two tables (named by a _year pattern)
+# and returns the non-intersecting field names of the b.table
+# this will be used for monetdb sql joins
+nmf <- 
+			function( conn , b.table , a.table , yr ){
+				dbListFields( 
+					conn , 
+					paste0( b.table , '_' , yr ) )[ 
+						!( 
+							dbListFields( conn , paste0( b.table , '_' , yr ) ) %in% dbListFields( conn , paste0( a.table , '_' , yr ) ) 
+						) 
+					]
+			}
 # function end
 
 
@@ -129,22 +187,116 @@ sql.process <-
 # program start #
 # # # # # # # # #
 
-# if the nhts database file already exists in the current working directory, print a warning
-if ( file.exists( paste( getwd() , nhts.dbname , sep = "/" ) ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the nhts.dbname in the settings above." )
-
-
 require(stringr) 			# load stringr package (manipulates character strings easily)
-require(RSQLite) 			# load RSQLite package (creates database files in R)
+require(sqlsurvey)			# load sqlsurvey package (analyzes large complex design surveys)
+require(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
 require(downloader)			# downloads and then runs the source() function on scripts from github
 require(sas7bdat)			# loads files ending in .sas7bdat directly into r as data.frame objects
 require(foreign) 			# load foreign package (converts data files into R)
+require(R.utils)			# load the R.utils package (counts the number of lines in a file quickly)
 
 
 # create a temporary file and a temporary directory..
 tf <- tempfile() ; td <- tempdir()
 
-# connect to an rsqlite database on the local disk
-db <- dbConnect( SQLite() , nhts.dbname )
+
+
+
+# configure a monetdb database for the nhts on windows #
+
+# note: only run this command once.  this creates an executable (.bat) file
+# in the appropriate directory on your local disk.
+# when adding new files or adding a new year of data, this script does not need to be re-run.
+
+# create a monetdb executable (.bat) file for the national household and travel survey
+batfile <-
+	monetdb.server.setup(
+					
+					# set the path to the directory where the initialization batch file and all data will be stored
+					database.directory = paste0( getwd() , "/MonetDB" ) ,
+					# must be empty or not exist
+					
+					# find the main path to the monetdb installation program
+					monetdb.program.path = "C:/Program Files/MonetDB/MonetDB5" ,
+					
+					# choose a database name
+					dbname = "nhts" ,
+					
+					# choose a database port
+					# this port should not conflict with other monetdb databases
+					# on your local computer.  two databases with the same port number
+					# cannot be accessed at the same time
+					dbport = 50013
+	)
+
+	
+# this next step is so very important.
+
+# store a line of code that will make it easy to open up the monetdb server in the future.
+# this should contain the same file path as the batfile created above,
+# you're best bet is to actually look at your local disk to find the full filepath of the executable (.bat) file.
+# if you ran this script without changes, the batfile will get stored in C:\My Directory\NHTS\MonetDB\nhts.bat
+
+# here's the batfile location:
+batfile
+
+# note that since you only run the `monetdb.server.setup()` function the first time this script is run,
+# you will need to note the location of the batfile for future MonetDB analyses!
+
+# in future R sessions, you can create the batfile variable with a line like..
+# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"
+# obviously, without the `#` comment character
+
+# hold on to that line for future scripts.
+# you need to run this line *every time* you access
+# the national household and travel survey files with monetdb.
+# this is the monetdb server.
+
+# two other things you need: the database name and the database port.
+# store them now for later in this script, but hold on to them for other scripts as well
+dbname <- "nhts"
+dbport <- 50013
+
+# now the local windows machine contains a new executable program at "c:\my directory\NHTS\monetdb\nhts.bat"
+
+
+
+
+# it's recommended that after you've _created_ the monetdb server,
+# you create a block of code like the one below to _access_ the monetdb server
+
+
+#####################################################################
+# lines of code to hold on to for all other `nhts` monetdb analyses #
+
+# first: specify your batfile.  again, mine looks like this:
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"
+
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: your five lines to make a monet database connection.
+# just like above, mine look like this:
+dbname <- "nhts"
+dbport <- 50013
+
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `nhts` monetdb analyses #
+############################################################################
+
+
+# define which column names are used in nhts tables but illegal in monetdb-sql
+illegal.names <- c( 'serial' , 'month' , 'day' , 'date' , 'work' , 'public' , 'where' , 'chain' )
 
 
 # loop through and download each year specified by the user
@@ -153,6 +305,17 @@ for ( year in years.to.download ){
 
 	# tell us where you're at!
 	cat( "now loading" , year , "..." , '\n\r' )
+
+
+	# wait ten seconds, just to make sure any previous servers closed
+	# and you don't get a gdk-lock error from opening two-at-once
+	Sys.sleep( 10 )
+
+	# launch the current monet database
+	pid <- monetdb.server.start( batfile )
+	
+	# immediately connect to it
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 	
 	# 1983 is just sas transport files, so import them independently.
@@ -185,6 +348,9 @@ for ( year in years.to.download ){
 			# import the current `xpt` file into working memory
 			x <- read.xport( i )
 
+			# there are a couple of illegal names.  change them.
+			for ( j in toupper( illegal.names ) ) names( x )[ names( x ) == j ] <- paste0( j , '_' )
+						
 			# read the data.frame `x`
 			# directly into the rsqlite database you just created.
 			dbWriteTable( db , tablename , x , header = TRUE , row.names = FALSE )
@@ -271,8 +437,9 @@ for ( year in years.to.download ){
 				# remove any numbers, also any underscores
 				tablename <- paste0( gsub( "_" , "" , gsub( "[0-9]+" , "" , fn.before.dot ) , fixed = TRUE ) , year )
 				
-				# the column name `where` is not allowed
-				txt.field <- gsub( 'where' , 'where_' , txt.field )
+				# there are a couple of illegal names.  change them.
+				for ( j in illegal.names ) txt.field <- gsub( j , paste0( j , "_" ) , txt.field )
+
 				
 				# print the current import progress to the screen
 				cat( "currently importing" , basename( i ) , '\n\r' )
@@ -339,8 +506,8 @@ for ( year in years.to.download ){
 				cat( "currently importing" , basename( i ) , '\n\r' )
 
 				# read the comma separated value (csv) file you just downloaded
-				# directly into the rsqlite database you just created.
-				dbWriteTable( db , tablename , i , sep = "," , header = TRUE , row.names = FALSE )
+				# directly into the monet database you just created.
+				monet.read.csv( db , i , tablename , nrows = countLines( i ) , header = TRUE , nrow.check = 250000 )
 				# yes.  you did all that.  nice work.
 
 				# delete the csv file from your local disk,
@@ -351,10 +518,10 @@ for ( year in years.to.download ){
 
 			# end of datasets #
 
-			
-			# replicate weights are only available in an importable format
-			# for the 2009 file..the 2001 file is stuck in the sas7bdat time warp
-			# the years before that don't have replicate weights at all.
+
+			# the roster file is only available in an importable format
+			# for the 2009 files..
+			# the years before that don't have roster files at all.
 			if ( year > 2001 ){
 			
 				# roster file import #
@@ -398,13 +565,23 @@ for ( year in years.to.download ){
 					
 				}
 
+			}
+			
+			# replicate weights are only available in an importable format
+			# for the 2001 and 2009 files..
+			# the years before that don't have replicate weights at all.
+			if ( year > 1995 ){
 			
 				# replicate weights import #
 
 				# download the person and household replicate weights
 				# zipped file to the temporary file on your local disk
-				download.file( paste0( "http://nhts.ornl.gov/" , year , "/download/ReplicatesASCII.zip" ) , tf , mode = 'wb' )
-
+				if ( year == 2001 ){
+					download.file( "http://nhts.ornl.gov/2001/download/replicates_ascii.zip" , tf , mode = 'wb' )
+				} else {
+					download.file( paste0( "http://nhts.ornl.gov/" , year , "/download/ReplicatesASCII.zip" ) , tf , mode = 'wb' )
+				}
+					
 				# unzip the temporary (zipped) file into the temporary directory
 				# and store the filepath of the unzipped file(s) into a character vector `z`
 				z <- unzip( tf , exdir = td )
@@ -426,8 +603,8 @@ for ( year in years.to.download ){
 					cat( "currently importing" , basename( i ) , '\n\r' )
 
 					# read the comma separated value (csv) file you just downloaded
-					# directly into the rsqlite database you just created.
-					dbWriteTable( db , tablename , i , sep = "," , header = TRUE , row.names = FALSE )
+					# directly into the monet database you just created.
+					monet.read.csv( db , i , tablename , nrows = countLines( i ) , header = TRUE , nrow.check = 250000 )
 					# yes.  you did all that.  nice work.
 
 					# delete the csv file from your local disk,
@@ -464,7 +641,7 @@ for ( year in years.to.download ){
 		if ( 'personid' %in% dbListFields( db , new.tablename ) ){
 			
 			# ..use both `houseid` and `personid` for the sort columns..
-			dbSendQuery( db , paste0( 'create index ' , prefix , '_index ON ' , prefix , '_' , year , ' ( houseid , personid )' ) )
+			dbSendUpdate( db , paste0( 'create index ' , prefix , '_' , year , '_index ON ' , prefix , '_' , year , ' ( houseid , personid )' ) )
 			
 		# otherwise,
 		} else {
@@ -473,7 +650,7 @@ for ( year in years.to.download ){
 			if ( 'houseid' %in% dbListFields( db , new.tablename ) ){
 			
 				# ..just use `houseid`
-				dbSendQuery( db , paste0( 'create index ' , prefix , '_index ON ' , prefix , '_' , year , ' ( houseid )' ) )
+				dbSendUpdate( db , paste0( 'create index ' , prefix , '_' , year , '_index ON ' , prefix , '_' , year , ' ( houseid )' ) )
 			
 			}
 		
@@ -484,61 +661,135 @@ for ( year in years.to.download ){
 	
 	# more stuff that's only available in the years where replicate weights
 	# are freely available as csv files.
-	if ( year > 2001 ){
+	if ( year > 1995 ){
 
+		if ( year == 2001 ){
+			day.table <- 'daypub'
+			wt.table <- 'pr50wt'
+			per.table <- 'perpub'
+			hh.table <- 'hhpub'
+		} else {
+			day.table <- 'dayvpub'
+			wt.table <- 'per50wt'
+			per.table <- 'pervpub'
+			hh.table <- 'hhvpub'
+		}
+	
+
+		if ( year == 2001 ){
+		
+			# merge the `ldt` table with the ldt weights
+			nonmatching.fields <- nmf( db , 'ldt50wt' , 'ldtpub' , year )
+			
+			dbSendUpdate( 
+				db , 
+				paste0(
+					'create table ldt_m_' , 
+					year , 
+					' as select a.* , ' ,
+					paste( "b." , nonmatching.fields , collapse = ", " , sep = "" ) , 
+					' from ' ,
+					'ldtpub' ,
+					'_' ,
+					year ,
+					' as a inner join ' ,
+					'ldt50wt' ,
+					'_' ,
+					year ,
+					' as b on a.houseid = b.houseid AND a.personid = b.personid WITH DATA' 
+				)
+			)
+			# table `ldt_m_YYYY` now available for analysis!
+		
+		}
+		
+	
 		# merge the `day` table with the person-level weights
-		dbSendQuery( 
+		nonmatching.fields <- nmf( db , wt.table , day.table , year )
+		
+		dbSendUpdate( 
 			db , 
 			paste0(
 				'create table day_m_' , 
 				year , 
-				' as select * from dayvpub_' ,
+				' as select a.* , ' ,
+				paste( "b." , nonmatching.fields , collapse = ", " , sep = "" ) , 
+				' from ' ,
+				day.table ,
+				'_' ,
 				year ,
-				' as a inner join per50wt_' ,
+				' as a inner join ' ,
+				wt.table ,
+				'_' ,
 				year ,
-				' as b on a.houseid = b.houseid AND a.personid = b.personid' 
+				' as b on a.houseid = b.houseid AND a.personid = b.personid WITH DATA' 
 			)
 		)
 		# table `day_m_YYYY` now available for analysis!
 
 
 		# merge the person table with the person-level weights
-		dbSendQuery( 
+		nonmatching.fields <- nmf( db , wt.table , per.table , year )
+		
+		dbSendUpdate( 
 			db , 
 			paste0(
 				'create table per_m_' ,
 				year ,
-				' as select * from pervpub_' ,
+				' as select a.* , ' ,
+				paste( "b." , nonmatching.fields , collapse = ", " , sep = "" ) , 
+				' from ' ,
+				per.table , 
+				'_' ,
 				year , 
-				' as a inner join per50wt_' ,
+				' as a inner join ' ,
+				wt.table ,
+				'_' ,
 				year ,
-				' as b on a.houseid = b.houseid AND a.personid = b.personid' 
+				' as b on a.houseid = b.houseid AND a.personid = b.personid WITH DATA' 
 			)
 		)
 		# table `per_m_YYYY` now available for analysis!
 
 
 		# merge the household table with the household-level weights
-		dbSendQuery( 
+		nonmatching.fields <- nmf( db , 'hh50wt' , hh.table , year )
+		
+		dbSendUpdate( 
 			db , 
 			paste0(
 				'create table hh_m_' ,
 				year ,
-				' as select * from hhvpub_' ,
+				' as select a.* , ' ,
+				paste( "b." , nonmatching.fields , collapse = ", " , sep = "" ) , 
+				' from ' ,
+				hh.table ,
+				'_' ,
 				year ,
 				' as a inner join hh50wt_' ,
 				year ,
-				' as b on a.houseid = b.houseid' 
+				' as b on a.houseid = b.houseid WITH DATA' 
 			)
 		)
 		# table `hh_m_YYYY` now available for analysis!
 
 	}
+	
+	# disconnect from the current monet database
+	dbDisconnect( db )
+
+	# and close it using the `pid`
+	monetdb.server.stop( pid )
 
 }
 	
 # take a look at all the new data tables that have been added to your RAM-free SQLite database
 dbListTables( db )
+
+# double-check the tables for correct sizes
+for ( i in dbListTables( db ) ){ print( i ) ; print( dbGetQuery( db , paste( 'select count(*) from' , i ) ) ) }
+
+stop( 'create survey objects' )
 
 # disconnect from the current database
 dbDisconnect( db )
@@ -549,8 +800,52 @@ file.remove( tf )
 # delete the whole temporary directory
 unlink( td , recursive = TRUE )
 
-# print a reminder: set the directory you just saved everything to as read-only!
-message( paste0( "all done.  you should set the file " , file.path( getwd() , nhts.dbname ) , " read-only so you don't accidentally alter these tables." ) )
+
+# once complete, this script does not need to be run again.
+# instead, use one of the national household and travel survey analysis scripts
+# which utilize these newly-created survey objects
+
+
+# wait ten seconds, just to make sure any previous servers closed
+# and you don't get a gdk-lock error from opening two-at-once
+Sys.sleep( 10 )
+
+#####################################################################
+# lines of code to hold on to for all other `nhts` monetdb analyses #
+
+# first: specify your batfile.  again, mine looks like this:
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"
+
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: your five lines to make a monet database connection.
+# just like above, mine look like this:
+dbname <- "nhts"
+dbport <- 50013
+
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+
+# # # # run your analysis commands # # # #
+
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `nhts` monetdb analyses #
+############################################################################
+
+
+# unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
+message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
+
+message( "got that? monetdb directories should not be set read-only." )
 
 
 # for more details on how to work with data in r
