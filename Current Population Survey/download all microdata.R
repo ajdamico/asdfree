@@ -143,8 +143,8 @@ for ( year in cps.years.to.download ){
 		ifelse( 
 			# if the year to download is 2007, the filename doesn't match the others..
 			year == 2007 ,
-			"http://smpbff2.dsd.census.gov/pub/cps/march/asec2007_pubuse_tax2.zip" ,
-			paste0( "http://smpbff2.dsd.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+			"http://thedataweb.rm.census.gov/pub/cps/march/asec2007_pubuse_tax2.zip" ,
+			paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
 		)
 
 	# national bureau of economic research website containing the current population survey's SAS import instructions
