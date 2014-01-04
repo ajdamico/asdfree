@@ -72,6 +72,15 @@ require(downloader)		# downloads and then runs the source() function on scripts 
 
 
 
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
+
 # load the read.SAScii.monetdb() function,
 # which imports ASCII (fixed-width) data files directly into a monet database
 # using only a SAS importation script

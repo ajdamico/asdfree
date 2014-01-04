@@ -265,7 +265,7 @@ download.nchs <-
 			if ( curYear < 50 ) curYear <- curYear + 2000
 			if ( curYear > 50 & curYear < 100 ) curYear <- curYear + 1900
 			
-			download.file( i , tf , mode = 'wb' )
+			download.cache( i , tf , mode = 'wb' )
 			
 			z <- tolower( unzip( tf , exdir = td ) )
 			
@@ -332,12 +332,12 @@ download.nchs <-
 			# wait one minute before each download
 			Sys.sleep( 60 )
 				
-			attempt.one <- try( download.file( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
+			attempt.one <- try( download.cache( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
 			
 			if ( class( attempt.one ) == 'try-error' ) {
 				Sys.sleep( 60 )
 				
-				download.file( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' )
+				download.cache( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' )
 			}
 		}
 			
