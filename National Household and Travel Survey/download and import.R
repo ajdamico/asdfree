@@ -123,9 +123,9 @@ sql.process <-
 		if ( lowered.edited.fields[ 1 ] == 'id9' ) lowered.edited.fields[ 1 ] <- 'houseid'
 		
 		casting.chars <- dbListFields( db , pre )
-		casting.chars <- gsub( "houseid" , "CAST( houseid AS DOUBLE PRECISION )" , casting.chars )
-		casting.chars <- gsub( "personid" , "CAST( personid AS DOUBLE PRECISION )" , casting.chars )
-		casting.chars <- gsub( "id9" , "CAST( id9 AS DOUBLE PRECISION )" , casting.chars )
+		casting.chars <- gsub( "houseid" , "CAST( houseid AS INTEGER )" , casting.chars )
+		casting.chars <- gsub( "personid" , "CAST( personid AS INTEGER )" , casting.chars )
+		casting.chars <- gsub( "id9" , "CAST( id9 AS INTEGER )" , casting.chars )
 		
 		
 		
@@ -198,6 +198,14 @@ require(R.utils)			# load the R.utils package (counts the number of lines in a f
 
 # create a temporary file and a temporary directory..
 tf <- tempfile() ; td <- tempdir()
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
 
 
 
@@ -325,7 +333,11 @@ for ( year in years.to.download ){
 
 		# download the main four data sets
 		# zipped file to the temporary file on your local disk
-		download.file( paste0( "http://nhts.ornl.gov/" , year , "/download/Xpt.zip" ) , tf , mode = 'wb' )
+		download.cache( 
+			url = paste0( "http://nhts.ornl.gov/" , year , "/download/Xpt.zip" ) , 
+			destfile = tf , 
+			mode = 'wb' 
+		)
 
 		# unzip the temporary (zipped) file into the temporary directory
 		# and store the filepath of the unzipped file(s) into a character vector `z`
@@ -375,7 +387,11 @@ for ( year in years.to.download ){
 
 		# download the main four data sets
 		# zipped file to the temporary file on your local disk
-		download.file( paste0( "http://nhts.ornl.gov/" , year , "/download/Ascii.zip" ) , tf , mode = 'wb' )
+		download.cache( 
+			url = paste0( "http://nhts.ornl.gov/" , year , "/download/Ascii.zip" ) , 
+			destfile = tf , 
+			mode = 'wb' 
+		)
 
 		# unzip the temporary (zipped) file into the temporary directory
 		# and store the filepath of the unzipped file(s) into a character vector `z`
@@ -525,7 +541,11 @@ for ( year in years.to.download ){
 			if ( year > 2001 ){
 			
 				# roster file import #
-				download.file( paste0( 'http://nhts.ornl.gov/' , year , '/download/roster.zip' ) , tf , mode = 'wb' )
+				download.cache( 
+					url = paste0( 'http://nhts.ornl.gov/' , year , '/download/roster.zip' ) , 
+					destfile = tf , 
+					mode = 'wb' 
+				)
 						
 				# unzip the temporary (zipped) file into the temporary directory
 				# and store the filepath of the unzipped file(s) into a character vector `z`
@@ -577,9 +597,17 @@ for ( year in years.to.download ){
 				# download the person and household replicate weights
 				# zipped file to the temporary file on your local disk
 				if ( year == 2001 ){
-					download.file( "http://nhts.ornl.gov/2001/download/replicates_ascii.zip" , tf , mode = 'wb' )
+					download.cache( 
+						url = "http://nhts.ornl.gov/2001/download/replicates_ascii.zip" , 
+						destfile = tf , 
+						mode = 'wb' 
+					)
 				} else {
-					download.file( paste0( "http://nhts.ornl.gov/" , year , "/download/ReplicatesASCII.zip" ) , tf , mode = 'wb' )
+					download.cache( 
+						url = paste0( "http://nhts.ornl.gov/" , year , "/download/ReplicatesASCII.zip" ) , 
+						destfile = tf , 
+						mode = 'wb' 
+					)
 				}
 					
 				# unzip the temporary (zipped) file into the temporary directory
@@ -784,15 +812,15 @@ for ( year in years.to.download ){
 }
 	
 # take a look at all the new data tables that have been added to your RAM-free SQLite database
-dbListTables( db )
+# dbListTables( db )
 
 # double-check the tables for correct sizes
-for ( i in dbListTables( db ) ){ print( i ) ; print( dbGetQuery( db , paste( 'select count(*) from' , i ) ) ) }
+# for ( i in dbListTables( db ) ){ print( i ) ; print( dbGetQuery( db , paste( 'select count(*) from' , i ) ) ) }
 
 stop( 'create survey objects' )
 
 # disconnect from the current database
-dbDisconnect( db )
+# dbDisconnect( db )
 
 # remove the temporary file from the local disk
 file.remove( tf )
