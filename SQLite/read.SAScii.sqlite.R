@@ -31,10 +31,22 @@ read.SAScii.sqlite <-
 	
 	# read.SAScii.sqlite depends on three packages
 	# to install these packages, use the line:
-	# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' ) )
-	require(SAScii)
-	require(descr)
-	require(RSQLite)
+	# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' , 'downloader' ) )
+	library(SAScii)
+	library(descr)
+	library(RSQLite)
+	library(downloader)
+	
+	
+	# load the download.cache and related functions
+	# to prevent re-downloading of files once they've been downloaded.
+	source_url( 
+		"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+		prompt = FALSE , 
+		echo = FALSE 
+	)
+
+
 	
 	x <- parse.SAScii( sas_ri , beginline , lrecl )
 	
@@ -69,7 +81,7 @@ read.SAScii.sqlite <-
 		#create a temporary file and a temporary directory..
 		tf <- tempfile() ; td <- tempdir()
 		#download the CPS repwgts zipped file
-		download.file( fn , tf , mode = "wb" )
+		download.cache( fn , tf , mode = "wb" )
 		#unzip the file's contents and store the file name within the temporary directory
 		fn <- unzip( tf , exdir = td , overwrite = T )
 	}

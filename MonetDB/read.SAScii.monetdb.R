@@ -76,9 +76,21 @@ read.SAScii.monetdb <-
 	
 	# read.SAScii.monetdb depends on the SAScii package and the descr package
 	# to install these packages, use the line:
-	# install.packages( c( 'SAScii' , 'descr' ) )
-	require(SAScii)
-	require(descr)
+	# install.packages( c( 'SAScii' , 'descr' , 'downloader' ) )
+	library(SAScii)
+	library(descr)
+	library(downloader)
+	
+		
+	# load the download.cache and related functions
+	# to prevent re-downloading of files once they've been downloaded.
+	source_url( 
+		"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+		prompt = FALSE , 
+		echo = FALSE 
+	)
+
+
 	
 	
 	x <- parse.SAScii( sas_ri , beginline , lrecl )
@@ -112,7 +124,7 @@ read.SAScii.monetdb <-
 	#if the ASCII file is stored in an archive, unpack it to a temporary file and run that through read.fwf instead.
 	if ( zipped ){
 		#download the CPS repwgts zipped file
-		download.file( fn , tf , mode = "wb" )
+		download.cache( fn , tf , mode = "wb" )
 		#unzip the file's contents and store the file name within the temporary directory
 		fn <- unzip( tf , exdir = td , overwrite = T )
 		
