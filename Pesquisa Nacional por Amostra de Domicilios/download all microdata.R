@@ -81,11 +81,23 @@ require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script
 require(descr) 		# load the descr package (converts fixed-width files to delimited files)
 require(downloader)	# downloads and then runs the source() function on scripts from github
 
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
+
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
 
 # load pnad-specific functions (to remove invalid SAS input script fields and postStratify a database-backed survey object)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa Nacional por Amostra de Domicilios/pnad.survey.R" , prompt = FALSE )
+
+
 
 # create a temporary file and a temporary directory..
 tf <- tempfile() ; td <- tempdir()
@@ -95,10 +107,10 @@ db <- dbConnect( SQLite() , pnad.dbname )
 
 
 # download and import the tables containing missing codes
-download( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/household_nr.csv" , tf )
+download.cache( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/household_nr.csv" , tf , FUN = download )
 household.nr <- read.csv( tf , colClasses = 'character' )
 
-download( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/person_nr.csv" , tf )
+download.cache( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/person_nr.csv" , tf , FUN = download )
 person.nr <- read.csv( tf , colClasses = 'character' )
 
 # convert these tables to lowercase
@@ -149,13 +161,13 @@ for ( year in years.to.download ){
 		sas.input.instructions <- paste0( ftp.path , dict.name )
 
 		# download the household and person ascii data files to the local computer..
-		download.file( data.file , tf , mode = "wb" )
+		download.cache( data.file , tf , mode = "wb" )
 
 		# ..then unzip them into the temporary directory
 		files <- unzip( tf , exdir = td )
 
 		# download the sas importation instructions inside the same FTP directory..
-		download.file( sas.input.instructions , tf , mode = "wb" )
+		download.cache( sas.input.instructions , tf , mode = "wb" )
 
 		# ..then also unzip them into the temporary directory
 		files <- c( files , unzip( tf , exdir = td ) )
@@ -173,7 +185,7 @@ for ( year in years.to.download ){
 			)
 	
 		# download the data and sas importation instructions all at once..
-		download.file( ftp.path , tf , mode = "wb" )
+		download.cache( ftp.path , tf , mode = "wb" )
 		
 		# ..then also unzip them into the temporary directory
 		files <- unzip( tf , exdir = td )
