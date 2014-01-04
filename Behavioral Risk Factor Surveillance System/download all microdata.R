@@ -77,6 +77,14 @@ require(downloader)		# downloads and then runs the source() function on scripts 
 # setwd( "C:/My Directory/BRFSS/" )
 
 
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
 # load the read.SAScii.monetdb() function,
 # which imports ASCII (fixed-width) data files directly into a monet database
 # using only a SAS importation script
@@ -228,7 +236,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		) 
 		
 	# download the file from the cdc's ftp site
-	download.file( fn , tf , mode = 'wb' )
+	download.cache( fn , tf , mode = 'wb' )
 	
 	# unzip it within the temporary directory on your local hard drive and
 	# store the location it's been unzipped into a new character string variable called local.fn
