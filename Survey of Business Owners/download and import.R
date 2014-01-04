@@ -69,6 +69,15 @@ require(survey) 			# load survey package (analyzes complex design surveys)
 require(downloader)			# downloads and then runs the source() function on scripts from github
 
 
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
+
 # load sbo-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/sbosvy%20functions.R" , prompt = FALSE )
 
@@ -78,7 +87,7 @@ tf <- tempfile() ; td <- tempdir()
 
 # download the 2007 public use microdata sample (pums)
 # zipped file to the temporary file on your local disk
-download.file( "http://www2.census.gov/econ/sbo/07/pums/pums_csv.zip" , tf , mode = 'wb' )
+download.cache( "http://www2.census.gov/econ/sbo/07/pums/pums_csv.zip" , tf , mode = 'wb' )
 
 # unzip the temporary (zipped) file into the temporary directory
 # and store the filepath of the unzipped file(s) into a character vector `z`
