@@ -46,8 +46,11 @@ almostbase64encode <-
 
 download.cache <- 
   function (
+	url ,
 	
-	# pass in all arguments needed for the download function
+	destfile ,
+	
+	# pass in any other arguments needed for the FUn
 	... ,
 
 	# specify which download function to use.
@@ -65,15 +68,13 @@ download.cache <-
 	usecache = TRUE
 	
   ) {
-    
-		params <- list( ... )
-		
+    		
 		cat(
 			paste0(
 				"Downloading from URL '" ,
-				params$url , 
+				url , 
 				"' to file '" , 
-				params$destfile , 
+				destfile , 
 				"'... "
 			)
 		)
@@ -89,7 +90,7 @@ download.cache <-
 		cachefile <- 
 			paste0(
 				gettmpdir() , 
-				almostbase64encode( params$url ) , 
+				almostbase64encode( url ) , 
 				".Rdownloadercache"
 			)
 		
@@ -111,9 +112,13 @@ download.cache <-
 		  
 		}
 		
-		success <- do.call( FUN , list( ... ) ) == 0
+		success <- 
+			do.call( 
+				FUN , 
+				list( url , destfile , ... ) 
+			) == 0
 		
-		if (success && usecache) file.copy( params$destfile , cachefile )
+		if (success && usecache) file.copy( destfile , cachefile )
 		
 		return( invisible( success ) )
 		
