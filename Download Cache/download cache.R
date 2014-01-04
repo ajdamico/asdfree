@@ -50,7 +50,7 @@ download.cache <-
 	
 	destfile ,
 	
-	# pass in any other arguments needed for the FUn
+	# pass in any other arguments needed for the FUN
 	... ,
 
 	# specify which download function to use.
