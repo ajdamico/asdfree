@@ -107,7 +107,7 @@ download.cache <-
 				  )
 				)
 				
-				return (invisible(ifelse(file.copy(cachefile,destfile),0,1)))
+				return( invisible( ifelse( file.copy( cachefile , destfile , overwrite = TRUE ) , 0 , 1 ) ) )
 				
 		  }
 		  
@@ -119,7 +119,7 @@ download.cache <-
 				list( url , destfile , ... ) 
 			) == 0
 		
-		if (success && usecache) file.copy( destfile , cachefile )
+		if (success && usecache) file.copy( destfile , cachefile , overwrite = TRUE )
 		
 		return( invisible( success ) )
 		
