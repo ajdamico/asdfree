@@ -62,7 +62,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( 'sas7bdat' )
+# install.packages( c( 'sas7bdat' , "downloader" ) )
 
 
 # no need to edit anything below this line #
@@ -74,7 +74,16 @@
 
 require(foreign) 	# load foreign package (converts data files into R)
 require(sas7bdat)	# loads files ending in .sas7bdat directly into r as data.frame objects
+require(downloader)	# downloads and then runs the source() function on scripts from github
 
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
 
 # create a temporary file and a temporary directory
 tf <- tempfile() ; td <- tempdir()
@@ -104,7 +113,7 @@ for ( year in years.to.download ){
 	}
 		
 	# download the main file
-	download.file( puf.fp , tf , mode = 'wb' )
+	download.cache( puf.fp , tf , mode = 'wb' )
 
 	# unzip the main file to the temporary directory
 	z <- unzip( tf , exdir = td )
@@ -132,7 +141,7 @@ for ( year in years.to.download ){
 	x$one <- 1
 
 	# download the multiply-imputed poverty data.frame
-	download.file( mi.fp , tf , mode = 'wb' )
+	download.cache( mi.fp , tf , mode = 'wb' )
 
 	# unzip yet another file
 	z <- unzip( tf , exdir = td )
