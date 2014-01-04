@@ -81,15 +81,15 @@ read.SAScii.monetdb <-
 	library(descr)
 	library(downloader)
 	
-		
-	# load the download.cache and related functions
-	# to prevent re-downloading of files once they've been downloaded.
-	source_url( 
-		"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
-		prompt = FALSE , 
-		echo = FALSE 
-	)
-
+	if ( !exists( "download.cache" ) ){
+		# load the download.cache and related functions
+		# to prevent re-downloading of files once they've been downloaded.
+		source_url( 
+			"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+			prompt = FALSE , 
+			echo = FALSE 
+		)
+	}
 
 	
 	
