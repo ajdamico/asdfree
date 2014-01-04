@@ -58,6 +58,9 @@
 # years.to.download <- c( 2005 , 2009:2011 , "0311" )
 
 
+# remove the # in order to run this install.packages line only once
+# install.packages( "downloader" )
+
 
 ############################################
 # no need to edit anything below this line #
@@ -65,6 +68,8 @@
 # # # # # # # # #
 # program start #
 # # # # # # # # #
+
+require(downloader)			# downloads and then runs the source() function on scripts from github
 
 # specify the ftp path to the american time use survey on
 # the bureau of labor statistics' website
@@ -80,9 +85,19 @@ setInternet2(TRUE)
 # you also might need administrative rights
 # on your computer to run `setInternet2`
 
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
+
 # download the contents of the ftp directory
 # to the temporary file
-download.file( ftp.dir , tf )
+download.cache( ftp.dir , tf )
 
 # read the contents of that temporary file
 # into working memory (a character object called `txt`)
@@ -135,7 +150,7 @@ for ( year in years.to.download ){
 		fn <- paste0( ftp.dir , curFile , ".zip" )
 		
 		# download the file
-		download.file( fn , tf , mode = 'wb' )
+		download.cache( fn , tf , mode = 'wb' )
 		
 		# extract the contents of the zipped file
 		# into the current year-specific directory
