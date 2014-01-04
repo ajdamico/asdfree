@@ -84,6 +84,14 @@ require(descr) 		# load the descr package (converts fixed-width files to delimit
 require(downloader)	# downloads and then runs the source() function on scripts from github
 
 
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
 
@@ -151,7 +159,7 @@ for ( year in cps.years.to.download ){
 	tf <- tempfile() ; td <- tempdir()
 
 	# download the CPS repwgts zipped file to the local computer
-	download.file( CPS.ASEC.mar.file.location , tf , mode = "wb" )
+	download.cache( CPS.ASEC.mar.file.location , tf , mode = "wb" )
 
 	# unzip the file's contents and store the file name within the temporary directory
 	fn <- unzip( tf , exdir = td , overwrite = T )
