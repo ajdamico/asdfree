@@ -83,6 +83,16 @@ require(downloader)		# downloads and then runs the source() function on scripts 
 require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 
 
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
+
 # load the read.SAScii.monetdb() function,
 # which imports ASCII (fixed-width) data files directly into a monet database
 # using only a SAS importation script
@@ -93,8 +103,8 @@ tf <- tempfile() ; tf2 <- tempfile() ; tf3 <- tempfile() ; tf4 <- tempfile() ; t
 
 
 # download the layout files for the loan applications received (lar) and institutional records (ins) data tables
-download( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/lar_str.csv" , tf )
-download( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/ins_str.csv" , tf2 )
+download.cache( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/lar_str.csv" , tf , FUN = download )
+download.cache( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/ins_str.csv" , tf2 , FUN = download )
 
 
 # configure a monetdb database for the hmda on windows #
@@ -235,7 +245,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			}
 		
 			# download the sas importation instructions to a temporary file on the local disk
-			download( sas_ri , tf3 )
+			download.cache( sas_ri , tf3 , FUN = download )
 
 
 			# construct the url of the current `ReporterPanel.zip` to download
@@ -257,7 +267,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			fn <- paste0( "http://www.ffiec.gov/" , pubpriv , "rawdata/OTHER/20" , year , pubpriv , "MSAOffice.zip" )
 			
 			# download that file..
-			download.file( fn , tf5 , mode = 'wb' )
+			download.cache( fn , tf5 , mode = 'wb' )
 			
 			# ..and extract it to the temporary directory
 			z <- unzip( tf5 , exdir = td )
@@ -319,7 +329,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			fn <- paste0( "http://www.ffiec.gov/" , pubpriv , "rawdata/" , folder , "/20" , year , pubpriv , rectype , ".zip" )
 
 			# download the url into a temporary file on your local disk
-			download.file( fn , tf , mode = 'wb' )
+			download.cache( fn , tf , mode = 'wb' )
 
 			# unzip the csv file
 			csv.file <- unzip( tf , exdir = td )
