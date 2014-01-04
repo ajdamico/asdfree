@@ -57,7 +57,7 @@ download.cache <-
 	# if usedest is TRUE, then 
 	# the program checks whether the destination file is present and contains at least one byte
 	# and if so, doesn't do anything.
-    usedest = TRUE , 
+    usedest = FALSE , 
 	
     # if usecache is TRUE, then
 	# it checks the temporary directory for a file that has already been downloaded,
