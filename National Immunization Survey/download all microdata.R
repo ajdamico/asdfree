@@ -49,7 +49,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "SAScii" )
+# install.packages( c( "SAScii" , "downloader" ) )
 
 
 # choose which files to download and import #
@@ -74,7 +74,16 @@ nhfs.download <- TRUE										# reads in the 2009 h1n1 file
 # # # # # # # # #
 
 
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+require(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
+require(downloader)			# downloads and then runs the source() function on scripts from github
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
 
 
 # create a temporary file and a temporary directory
@@ -115,7 +124,7 @@ for ( year in nis.years.to.download ){
 	} else {
 	
 		# try to download the `dat` file from the cdc's website directly
-		sdat <- try( download.file( straight.dat , tf , mode = 'wb' ) , silent = TRUE )
+		sdat <- try( download.cache( straight.dat , tf , mode = 'wb' ) , silent = TRUE )
 
 	}
 		
@@ -131,7 +140,7 @@ for ( year in nis.years.to.download ){
 			)
 		
 		# try downloading the zipped file
-		zdat <- try( download.file( zip.dat , tf , mode = 'wb' ) , silent = TRUE )
+		zdat <- try( download.cache( zip.dat , tf , mode = 'wb' ) , silent = TRUE )
 
 		# if the download failed..
 		if( class( zdat ) == 'try-error' ){
@@ -145,7 +154,7 @@ for ( year in nis.years.to.download ){
 				)
 			
 			# try downloading the zipped file again
-			zdat <- try( download.file( zip.dat , tf , mode = 'wb' ) , silent = TRUE )
+			zdat <- try( download.cache( zip.dat , tf , mode = 'wb' ) , silent = TRUE )
 
 			# if the download failed..
 			if( class( zdat ) == 'try-error' ){
@@ -159,7 +168,7 @@ for ( year in nis.years.to.download ){
 					)
 				
 				# try downloading the zipped file a final time
-				download.file( zip.dat , tf , mode = 'wb' )
+				download.cache( zip.dat , tf , mode = 'wb' )
 			
 			}
 
@@ -198,7 +207,7 @@ for ( year in nis.years.to.download ){
 	
 	
 	# try downloading the script directly
-	rs <- try( download.file( script.r , tf , mode = 'wb' ) , silent = TRUE )
+	rs <- try( download.cache( script.r , tf , mode = 'wb' ) , silent = TRUE )
 
 	# if the r script does not exist..
 	if( class( rs ) == 'try-error' ){	
@@ -212,7 +221,7 @@ for ( year in nis.years.to.download ){
 			)
 		
 		# save it to the local disk
-		download.file( script.sas , tf , mode = 'wb' )
+		download.cache( script.sas , tf , mode = 'wb' )
 
 		# load it into a character vector
 		script.txt <- readLines( tf )
@@ -317,7 +326,7 @@ for ( year in nis.teen.years.to.download ){
 		)
 
 	# download the `dat` file from the cdc's website directly
-	download.file( straight.dat , tf , mode = 'wb' )
+	download.cache( straight.dat , tf , mode = 'wb' )
 
 	# move the downloaded file to the appropriately-saved place
 	file.rename( tf , puf.savename )
@@ -338,7 +347,7 @@ for ( year in nis.teen.years.to.download ){
 	
 	
 	# download the r script directly
-	download.file( script.r , tf , mode = 'wb' )
+	download.cache( script.r , tf , mode = 'wb' )
 
 	# load the r script into a character vector
 	script.r <- readLines( tf )
@@ -423,7 +432,7 @@ if ( nhfs.download ){
 		"ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/nis/nhfs/nhfspuf.dat"
 		
 	# download that pup
-	download.file( straight.dat , tf , mode = 'wb' )
+	download.cache( straight.dat , tf , mode = 'wb' )
 
 	# copy the downloaded file over to the save location
 	file.rename( tf , puf.savename )
@@ -437,7 +446,7 @@ if ( nhfs.download ){
 	
 	
 	# download the r script to the local disk
-	download.file( script.r , tf , mode = 'wb' )
+	download.cache( script.r , tf , mode = 'wb' )
 
 	
 	# load the r script into a character vector
