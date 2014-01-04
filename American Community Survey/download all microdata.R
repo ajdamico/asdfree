@@ -63,13 +63,56 @@
 # it's running.  don't believe me?  check the working directory (set below) for a new r data file (.rda) every few hours.
 
 
+# # # # # # # grab sas7bdat from github # # # # # # # # # # #
+# warning: the 2012 american community survey's sas7bdat file
+# cannot be read into R with the `read.sas7bdat` function currently on CRAN (v 0.3)
+# however, it works just fine with (v 0.4), which is currently only available on github.
+# therefore, this little block of fun will download the sas7bdat function from github instead.
+
+# # # # # #
+# but first, you must download and install R tools
+# http://cran.r-project.org/bin/windows/Rtools/
+# # # # # #
+
+# and then uncomment and run these three lines of code:
+
+# # # # # #
+# install.packages( 'devtools' )
+# require(devtools)
+# install_github( 'sas7bdat' , 'biostatmatt' )
+# # # # # #
+
+# once you've done that, you should have `sas7bdat` version 0.4 instead of 0.3
+# you can check what version of the package you have by loading it..
+
+# require(sas7bdat)
+
+# ..and then typing..
+
+# sessionInfo()
+
+# capice?
+
+# # # # # # # end of sas7bdat github grab # # # # # # # # # #
+
+
+
 # remove the # in order to run this install.packages line only once
-# install.packages( "sas7bdat" )
+# install.packages( "downloader" )
 
 
 require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 require(sas7bdat)		# loads files ending in .sas7bdat directly into r as data.frame objects
+require(downloader)		# downloads and then runs the source() function on scripts from github
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
 
 
 # set your ACS data directory
@@ -290,7 +333,7 @@ for ( year in 2050:2005 ){
 				}
 							
 				# store a command: "download the sas zipped file to the temporary file location"
-				download.command <- download.file( sas.file.location , tf , mode = "wb" )
+				download.command <- download.cache( sas.file.location , tf , mode = "wb" )
 
 				# unzip to a local directory
 				wy <- unzip( tf , exdir = td )
@@ -342,7 +385,7 @@ for ( year in 2050:2005 ){
 				# try downloading the file three times before breaking
 				
 				# store a command: "download the ACS zipped file to the temporary file location"
-				download.command <- expression( download.file( ACS.file.location , tf , mode = "wb" ) )
+				download.command <- expression( download.cache( ACS.file.location , tf , mode = "wb" ) )
 
 				# try the download immediately.
 				# run the above command, using error-handling.
