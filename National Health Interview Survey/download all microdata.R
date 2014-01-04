@@ -62,7 +62,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "RCurl" ) )
+# install.packages( c( "SAScii" , "RCurl" , "downloader" ) )
 
 
 # define which years to download #
@@ -104,15 +104,25 @@ if ( 2013 %in% nhis.years.to.download ) message( "2013 imputed income not yet av
 # program start #
 # # # # # # # # #
 
-require(RCurl)		# load RCurl package (downloads files from the web)
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-require(foreign) 	# load foreign package (converts data files into R)
+require(RCurl)				# load RCurl package (downloads files from the web)
+require(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
+require(foreign) 			# load foreign package (converts data files into R)
+require(downloader)			# downloads and then runs the source() function on scripts from github
 
 # create a temporary file and a temporary directory
 tf <- tempfile() ; td <- tempdir()
 
 # main NHIS ftp site
 main.nhis.ftp <- "ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/"
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
 
 
 # begin looping through every year specified
@@ -153,7 +163,7 @@ for ( year in nhis.years.to.download ){
 			
 			# attempt #1:
 			# simply download the file into the local directory
-			try.error <- try( download.file( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' ) , silent = T )
+			try.error <- try( download.cache( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' ) , silent = T )
 			
 			# if the attempt to download the file resulted in an error..
 			if ( class( try.error ) == "try-error" ){
@@ -166,7 +176,7 @@ for ( year in nhis.years.to.download ){
 				# and try again!
 				
 				# simply download the file into the local directory
-				download.file( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
+				download.cache( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
 				
 			}
 
@@ -326,7 +336,7 @@ for ( year in nhis.years.to.download ){
 			
 			# attempt #1:
 			# simply download the file into the local directory
-			try.error <- try( download.file( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' ) , silent = T )
+			try.error <- try( download.cache( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' ) , silent = T )
 			
 			# if the attempt to download the file resulted in an error..
 			if ( class( try.error ) == "try-error" ){
@@ -339,7 +349,7 @@ for ( year in nhis.years.to.download ){
 				# and try again!
 				
 				# simply download the file into the local directory
-				download.file( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' )
+				download.cache( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' )
 				
 			}
 						
@@ -460,7 +470,7 @@ for ( year in nhis.years.to.download ){
 			efl <- paste0( year.nhis.ftp , i )
 	
 			# ..and simply download the file into the local directory
-			download.file( efl , destfile = paste0( output.directory , i ) , mode = 'wb' )
+			download.cache( efl , destfile = paste0( output.directory , i ) , mode = 'wb' )
 			
 		}
 		
@@ -497,8 +507,8 @@ for ( year in nhis.years.to.download ){
 		
 		# download the compressed file from the nhis ftp site
 		# and save it to a temporary file on your local disk
-		# ..but just save this download.file into an error-handling expression
-		dfeh <- expression( download.file( efl , tf , mode = "wb" ) )
+		# ..but just save this download.cache into an error-handling expression
+		dfeh <- expression( download.cache( efl , tf , mode = "wb" ) )
 	
 		
 		# start of error-handling
