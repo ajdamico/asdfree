@@ -65,11 +65,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages('gdata')
-
-
-# remove the `#` in order to run this install.packages line only once
-# install.packages( "SAScii" )
+# install.packages( c( 'gdata' , "SAScii" , "downloader" ) )
 
 
 # remove the `#` in order to specify which years to download
@@ -88,9 +84,18 @@
 
 
 
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-require(gdata) 		# load the gdata package (imports excel [.xls] files into R)
+require(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
+require(gdata) 				# load the gdata package (imports excel [.xls] files into R)
+require(downloader)			# downloads and then runs the source() function on scripts from github
 
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
 
 # create two temporary files and a temporary directory..
 tf <- tempfile() ; tf2 <- tempfile() ; td <- tempdir()
@@ -133,13 +138,13 @@ for ( year in years.to.download ){
 	}
 	
 	# download the household and person ascii data files to the local computer..
-	download.file( data.file , tf , mode = "wb" )
+	download.cache( data.file , tf , mode = "wb" )
 
 	# ..then unzip them into the temporary directory
 	files <- unzip( tf , exdir = td )
 
 	# download the sas importation instructions inside the same FTP directory..
-	download.file( sas.input.instructions , tf , mode = "wb" )
+	download.cache( sas.input.instructions , tf , mode = "wb" )
 
 	# ..then also unzip them into the temporary directory
 	files <- c( files , unzip( tf , exdir = td ) )
@@ -150,7 +155,7 @@ for ( year in years.to.download ){
 		alimentacao.file <- paste0( ftp.path , "tradutores.zip" )
 		
 		# download the alimentacao file inside the same FTP directory..
-		download.file( alimentacao.file , tf , mode = 'wb' )
+		download.cache( alimentacao.file , tf , mode = 'wb' )
 		
 		# ..then also unzip them into the temporary directory
 		files <- c( files , unzip( tf , exdir = td ) )
