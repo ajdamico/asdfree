@@ -131,10 +131,6 @@ table( x$hlmhosp , useNA = 'always' )
 table( x$hlmnh , useNA = 'always' )
 # matchs the "survey responses" column
 
-# sum up the main weight 
-sum( x$pswgt )
-# matches the "grand total" of the "weighted count" column
-
 # create the fay's adjusted brr design object
 y <- 
 	svrepdesign( 
