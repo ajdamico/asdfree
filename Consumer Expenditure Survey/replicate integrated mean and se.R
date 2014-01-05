@@ -75,7 +75,7 @@ options( scipen = 20 )
 library(stringr) 	# load stringr package (manipulates character strings easily)
 library(reshape2)	# load reshape2 package (transposes data frames quickly)
 library(sqldf)		# load the sqldf package (enables sql queries on data frames)
-require(RSQLite) 	# load RSQLite package (creates database files in R)
+library(RSQLite) 	# load RSQLite package (creates database files in R)
 
 
 # # # # # # # # # # # # # # # # # # # #

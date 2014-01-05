@@ -11,7 +11,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
+library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 
 

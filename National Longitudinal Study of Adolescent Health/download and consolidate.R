@@ -86,8 +86,8 @@
 # # # # # # # # #
 
 
-require(foreign) 		# load foreign package (converts data files into R)
-require(RCurl)			# load RCurl package (downloads https files)
+library(foreign) 		# load foreign package (converts data files into R)
+library(RCurl)			# load RCurl package (downloads https files)
 
 # create a few vectors (one numeric, one list, one character) containing all of the data set information
 # on the icpsr website.  each of these numbers correspond to a certain data set on the university of michigan's page.

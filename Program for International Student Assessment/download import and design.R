@@ -66,12 +66,12 @@
 # install.packages( c( "SAScii" , "descr" , "downloader" , "stringr" , "R.utils" ) )
 
 
-require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-require(descr) 			# load the descr package (converts fixed-width files to delimited files)
-require(downloader)		# downloads and then runs the source() function on scripts from github
-require(stringr)		# load stringr package (manipulates character strings easily)
-require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(descr) 			# load the descr package (converts fixed-width files to delimited files)
+library(downloader)		# downloads and then runs the source() function on scripts from github
+library(stringr)		# load stringr package (manipulates character strings easily)
+library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth

@@ -50,7 +50,7 @@
 # # # # # # # # #
 
 
-require(httr)		# load httr package (downloads files from the web, with SSL and cookies)
+library(httr)		# load httr package (downloads files from the web, with SSL and cookies)
 
 
 # create and set the working directory to a year-specific folder #

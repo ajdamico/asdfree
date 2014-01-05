@@ -57,11 +57,11 @@
 
 
 # load necessary libraries
-require(RSQLite) 	# load RSQLite package (creates database files in R)
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-require(descr) 		# load the descr package (converts fixed-width files to delimited files)
-require(foreign) 	# load foreign package (converts data files into R)
-require(downloader)	# downloads and then runs the source() function on scripts from github
+library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+library(descr) 		# load the descr package (converts fixed-width files to delimited files)
+library(foreign) 	# load foreign package (converts data files into R)
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)

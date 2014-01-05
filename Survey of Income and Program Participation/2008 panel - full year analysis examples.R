@@ -55,8 +55,8 @@
 # install.packages( c( "survey" , "RSQLite" ) )
 
 
-require(survey)		# load survey package (analyzes complex design surveys)
-require(RSQLite) 	# load RSQLite package (creates database files in R)
+library(survey)		# load survey package (analyzes complex design surveys)
+library(RSQLite) 	# load RSQLite package (creates database files in R)
 
 
 # increase size at which numbers are presented in scientific notation

@@ -48,9 +48,9 @@
 # install.packages( c( "R.utils" , "downloader" ) )
 
 
-require(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
-require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
-require(downloader)	# downloads and then runs the source() function on scripts from github
+library(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
+library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # load the download.cache and related functions

@@ -60,8 +60,8 @@
 # install.packages( c( "survey" , "reshape2" ) )
 
 
-require(survey)		# load survey package (analyzes complex design surveys)
-require(reshape2)	# load reshape2 package (transposes data frames quickly)
+library(survey)		# load survey package (analyzes complex design surveys)
+library(reshape2)	# load reshape2 package (transposes data frames quickly)
 
 
 # set R to produce conservative standard errors instead of crashing

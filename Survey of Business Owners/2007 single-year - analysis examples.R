@@ -48,11 +48,11 @@
 # name the database (.db) file that should have been saved in the working directory
 sbo.dbname <- "sbo07.db"
 
-require(RSQLite) 			# load RSQLite package (creates database files in R)
-require(RSQLite.extfuns) 	# load RSQLite package (allows mathematical functions, like SQRT)
-require(mitools) 			# load mitools package (analyzes multiply-imputed data)
-require(survey) 			# load survey package (analyzes complex design surveys)
-require(downloader)			# downloads and then runs the source() function on scripts from github
+library(RSQLite) 			# load RSQLite package (creates database files in R)
+library(RSQLite.extfuns) 	# load RSQLite package (allows mathematical functions, like SQRT)
+library(mitools) 			# load mitools package (analyzes multiply-imputed data)
+library(survey) 			# load survey package (analyzes complex design surveys)
+library(downloader)			# downloads and then runs the source() function on scripts from github
 
 
 # unhappy with all the scientific notation in your output?

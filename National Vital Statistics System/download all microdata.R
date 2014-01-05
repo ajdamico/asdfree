@@ -66,9 +66,9 @@
 # install.packages( c( "MonetDB.R" , "SAScii" , "downloader" ) )
 
 
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
-require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-require(downloader)		# downloads and then runs the source() function on scripts from github
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
 

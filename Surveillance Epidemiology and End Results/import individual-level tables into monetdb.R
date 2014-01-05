@@ -72,10 +72,10 @@
 # install.packages( c( "SAScii" , "descr" , "MonetDB.R" ) )
 
 
-require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-require(descr) 			# load the descr package (converts fixed-width files to delimited files)
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
-require(downloader)		# downloads and then runs the source() function on scripts from github
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(descr) 			# load the descr package (converts fixed-width files to delimited files)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
 # load the `read.SAScii.monetdb` function from my github account.

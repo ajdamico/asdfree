@@ -96,13 +96,13 @@
 # # # # # # # # #
 
 
-require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-require(gdata) 			# load the gdata package (imports excel [.xls] files into R)
-require(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
-require(stringr)		# load stringr package (manipulates character strings easily)
-require(descr) 			# load the descr package (converts fixed-width files to delimited files)
-require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(downloader)		# downloads and then runs the source() function on scripts from github
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(gdata) 			# load the gdata package (imports excel [.xls] files into R)
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(stringr)		# load stringr package (manipulates character strings easily)
+library(descr) 			# load the descr package (converts fixed-width files to delimited files)
+library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
 # load the `get.tsv` and `pums.import.and.merge` functions from my github account.

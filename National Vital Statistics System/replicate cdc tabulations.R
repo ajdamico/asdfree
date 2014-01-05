@@ -48,7 +48,7 @@
 # # # # # # # # # # # # # # #
 
 
-require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
+library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 
 # in most monetdb scripts, specifying the .bat file (to launch the server) suffices

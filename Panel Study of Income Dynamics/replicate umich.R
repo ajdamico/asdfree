@@ -76,7 +76,7 @@
 # program start #
 # # # # # # # # #
 
-require(survey)		# load survey package (analyzes complex design surveys)
+library(survey)		# load survey package (analyzes complex design surveys)
 
 
 # load the individual cross-year file

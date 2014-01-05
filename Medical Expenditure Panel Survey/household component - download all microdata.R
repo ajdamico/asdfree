@@ -49,8 +49,8 @@
 
 
 library(RCurl)				# load RCurl package (downloads files from the web)
-require(foreign) 			# load foreign package (converts data files into R)
-require(downloader)			# downloads and then runs the source() function on scripts from github
+library(foreign) 			# load foreign package (converts data files into R)
+library(downloader)			# downloads and then runs the source() function on scripts from github
 
 # load the download.cache and related functions
 # to prevent re-downloading of files once they've been downloaded.

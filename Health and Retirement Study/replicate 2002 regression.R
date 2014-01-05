@@ -78,8 +78,8 @@ db.name <- 'RAND.db'
 # program start #
 # # # # # # # # #
 
-require(survey)		# load survey package (analyzes complex design surveys)
-require(RSQLite) 	# load RSQLite package (creates database files in R)
+library(survey)		# load survey package (analyzes complex design surveys)
+library(RSQLite) 	# load RSQLite package (creates database files in R)
 
 
 db <- dbConnect( SQLite() , db.name )			# connect to the SQLite database (.db)

@@ -89,11 +89,11 @@
 # # # # # # # # #
 
 
-require(foreign) 	# load foreign package (converts data files into R)
-require(stringr)	# load stringr package (manipulates character strings easily)
-require(httr)		# load httr package (downloads files from the web, with SSL and cookies)
-require(Hmisc) 		# load Hmisc package (loads spss.get function)
-require(memisc)		# load memisc package (loads spss portable table import functions)
+library(foreign) 	# load foreign package (converts data files into R)
+library(stringr)	# load stringr package (manipulates character strings easily)
+library(httr)		# load httr package (downloads files from the web, with SSL and cookies)
+library(Hmisc) 		# load Hmisc package (loads spss.get function)
+library(memisc)		# load memisc package (loads spss portable table import functions)
 
 
 # construct a list containing the pre-specified login information

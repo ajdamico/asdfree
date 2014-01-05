@@ -14,7 +14,7 @@
 # if you've successfully installed monetdb to your machine,
 # you should be able to initiate your first database with these commands:
 
-require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
+library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 
 

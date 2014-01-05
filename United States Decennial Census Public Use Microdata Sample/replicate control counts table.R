@@ -45,7 +45,7 @@
 #############################################################################
 
 
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 
 # after running the r script above, users should have handy a few lines
 # to initiate and connect to the monet database containing all public use microdata sample tables

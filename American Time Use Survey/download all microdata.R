@@ -69,7 +69,7 @@
 # program start #
 # # # # # # # # #
 
-require(downloader)			# downloads and then runs the source() function on scripts from github
+library(downloader)			# downloads and then runs the source() function on scripts from github
 
 # specify the ftp path to the american time use survey on
 # the bureau of labor statistics' website

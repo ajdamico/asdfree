@@ -59,7 +59,7 @@
 
 
 # load necessary libraries
-require(gdata) 		# load the gdata package (imports excel [.xls] files into R)
+library(gdata) 		# load the gdata package (imports excel [.xls] files into R)
 
 
 # create a temporary file on your local disk

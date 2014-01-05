@@ -86,7 +86,7 @@
 # install.packages( "survey" )
 
 
-require(survey)  # load survey package (analyzes complex design surveys)
+library(survey)  # load survey package (analyzes complex design surveys)
 
 
 # set R to produce conservative standard errors instead of crashing

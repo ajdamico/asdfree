@@ -81,7 +81,7 @@ your.password <- "password"
 # # # # # # # # #
 
 
-require(downloader)		# downloads and then runs the source() function on scripts from github
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
 # create a temporary file on your local disk

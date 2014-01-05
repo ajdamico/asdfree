@@ -69,8 +69,8 @@ db.name <- 'RAND.db'
 # # # # # # # # #
 
 
-require(foreign) 	# load foreign package (converts data files into R)
-require(RSQLite) 	# load RSQLite package (creates database files in R)
+library(foreign) 	# load foreign package (converts data files into R)
+library(RSQLite) 	# load RSQLite package (creates database files in R)
 
 
 # create a new RAND database in the main working folder

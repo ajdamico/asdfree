@@ -57,8 +57,8 @@
 # install.packages( c( 'mitools' , 'survey' ) )
 
 
-require(mitools)	# allows analysis of multiply-imputed survey data
-require(survey)		# load survey package (analyzes complex design surveys)
+library(mitools)	# allows analysis of multiply-imputed survey data
+library(survey)		# load survey package (analyzes complex design surveys)
 
 
 # load the 2011-2012 national survey of children's health into memory

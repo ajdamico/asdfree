@@ -87,8 +87,8 @@
 # # # # # # # # #
 
 
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-require(RCurl)		# load RCurl package (downloads https files)
+library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+library(RCurl)		# load RCurl package (downloads https files)
 
 
 # follow the authentication technique described on this stackoverflow post

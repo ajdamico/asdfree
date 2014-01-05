@@ -84,9 +84,9 @@
 
 
 
-require(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
-require(gdata) 				# load the gdata package (imports excel [.xls] files into R)
-require(downloader)			# downloads and then runs the source() function on scripts from github
+library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
+library(gdata) 				# load the gdata package (imports excel [.xls] files into R)
+library(downloader)			# downloads and then runs the source() function on scripts from github
 
 
 # load the download.cache and related functions

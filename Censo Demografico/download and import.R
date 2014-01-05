@@ -64,10 +64,10 @@
 # depending on your internet and processor speeds, the entire script should take between two and ten days.
 # it's running.  don't believe me?  check the working directory (set below) for a new r data file (.rda) every few hours.
 
-require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
-require(RCurl)			# load RCurl package (downloads https files)
-require(downloader)		# downloads and then runs the source() function on scripts from github
+library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(RCurl)			# load RCurl package (downloads https files)
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
 # set your censo demografico data directory

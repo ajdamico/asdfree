@@ -49,8 +49,8 @@
 # install.packages( "R.utils" )
 
 
-require(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
-require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
+library(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
+library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

@@ -76,10 +76,10 @@ pnad.dbname <- "pnad.db"
 if ( file.exists( paste( getwd() , pnad.dbname , sep = "/" ) ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the pnad.dbname in the settings above." )
 
 
-require(RSQLite) 	# load RSQLite package (creates database files in R)
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-require(descr) 		# load the descr package (converts fixed-width files to delimited files)
-require(downloader)	# downloads and then runs the source() function on scripts from github
+library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+library(descr) 		# load the descr package (converts fixed-width files to delimited files)
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # load the download.cache and related functions

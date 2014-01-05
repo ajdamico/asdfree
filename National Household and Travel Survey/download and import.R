@@ -187,13 +187,13 @@ nmf <-
 # program start #
 # # # # # # # # #
 
-require(stringr) 			# load stringr package (manipulates character strings easily)
-require(sqlsurvey)			# load sqlsurvey package (analyzes large complex design surveys)
-require(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
-require(downloader)			# downloads and then runs the source() function on scripts from github
-require(sas7bdat)			# loads files ending in .sas7bdat directly into r as data.frame objects
-require(foreign) 			# load foreign package (converts data files into R)
-require(R.utils)			# load the R.utils package (counts the number of lines in a file quickly)
+library(stringr) 			# load stringr package (manipulates character strings easily)
+library(sqlsurvey)			# load sqlsurvey package (analyzes large complex design surveys)
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(downloader)			# downloads and then runs the source() function on scripts from github
+library(sas7bdat)			# loads files ending in .sas7bdat directly into r as data.frame objects
+library(foreign) 			# load foreign package (converts data files into R)
+library(R.utils)			# load the R.utils package (counts the number of lines in a file quickly)
 
 
 # create a temporary file and a temporary directory..

@@ -62,8 +62,8 @@
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "survey" , "mitools" ) )
 	
-require(survey) 	# load survey package (analyzes complex design surveys)
-require(mitools)	# allows analysis of multiply-imputed survey data
+library(survey) 	# load survey package (analyzes complex design surveys)
+library(mitools)	# allows analysis of multiply-imputed survey data
 
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html

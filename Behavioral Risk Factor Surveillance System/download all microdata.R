@@ -62,10 +62,10 @@
 
 
 
-require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
-require(foreign) 		# load foreign package (converts data files into R)
-require(downloader)		# downloads and then runs the source() function on scripts from github
+library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(foreign) 		# load foreign package (converts data files into R)
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 # set your BRFSS data directory
 # after downloading and importing

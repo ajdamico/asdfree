@@ -78,7 +78,7 @@
 # install.packages( "stringr" )
 
 
-require(stringr) # load stringr package (manipulates character strings easily)
+library(stringr) # load stringr package (manipulates character strings easily)
 
 
 # load the primary care physician HPSA file

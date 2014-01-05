@@ -60,7 +60,7 @@ sas.input <- "./download/1992/h92core/h92sas/HOUSEHLD.SAS"
 
 
 
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
 
 
 # load the ascii file directly into R using only a SAS script

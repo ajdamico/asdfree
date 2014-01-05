@@ -78,14 +78,14 @@
 
 # # # # # #
 # install.packages( 'devtools' )
-# require(devtools)
+# library(devtools)
 # install_github( 'sas7bdat' , 'biostatmatt' )
 # # # # # #
 
 # once you've done that, you should have `sas7bdat` version 0.4 instead of 0.3
 # you can check what version of the package you have by loading it..
 
-# require(sas7bdat)
+# library(sas7bdat)
 
 # ..and then typing..
 
@@ -101,10 +101,10 @@
 # install.packages( "downloader" )
 
 
-require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
-require(sas7bdat)		# loads files ending in .sas7bdat directly into r as data.frame objects
-require(downloader)		# downloads and then runs the source() function on scripts from github
+library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(sas7bdat)		# loads files ending in .sas7bdat directly into r as data.frame objects
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 # load the download.cache and related functions
 # to prevent re-downloading of files once they've been downloaded.

@@ -50,13 +50,13 @@
 # install.packages( "mitools" )
 
 
-require(mitools) 		# load mitools package (analyzes multiply-imputed data)
-require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-require(descr) 			# load the descr package (converts fixed-width files to delimited files)
-require(downloader)		# downloads and then runs the source() function on scripts from github
-require(stringr)		# load stringr package (manipulates character strings easily)
-require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(mitools) 		# load mitools package (analyzes multiply-imputed data)
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(descr) 			# load the descr package (converts fixed-width files to delimited files)
+library(downloader)		# downloads and then runs the source() function on scripts from github
+library(stringr)		# load stringr package (manipulates character strings easily)
+library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
@@ -268,10 +268,10 @@ monetdb.server.stop( pid )
 
 # open r back up
 
-require(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-require(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
-require(downloader)		# downloads and then runs the source() function on scripts from github
-require(mitools) 		# load mitools package (analyzes multiply-imputed data)
+library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(downloader)		# downloads and then runs the source() function on scripts from github
+library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth

@@ -67,7 +67,7 @@
 # # # # # # # # #
 
 
-require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

@@ -82,10 +82,10 @@
 # # # # # # # # #
 
 
-require(httr)		# load httr package (downloads files from the web, with SSL and cookies)
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-require(foreign) 	# load foreign package (converts data files into R)
-require(stringr) 	# load stringr package (manipulates character strings easily)
+library(httr)		# load httr package (downloads files from the web, with SSL and cookies)
+library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+library(foreign) 	# load foreign package (converts data files into R)
+library(stringr) 	# load stringr package (manipulates character strings easily)
 
 
 # create a temporary file

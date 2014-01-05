@@ -54,10 +54,10 @@
 # install.packages( c( 'mitools' , 'survey' , 'downloader' ) )
 
 
-require(mitools)	# allows analysis of multiply-imputed survey data
-require(survey)		# load survey package (analyzes complex design surveys)
-require(downloader)	# downloads and then runs the source() function on scripts from github
-require(foreign) 	# load foreign package (converts data files into R)
+library(mitools)	# allows analysis of multiply-imputed survey data
+library(survey)		# load survey package (analyzes complex design surveys)
+library(downloader)	# downloads and then runs the source() function on scripts from github
+library(foreign) 	# load foreign package (converts data files into R)
 
 
 # load the 2010 survey of consumer finances into memory

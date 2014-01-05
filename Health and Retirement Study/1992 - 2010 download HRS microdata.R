@@ -89,10 +89,10 @@
 # # # # # # # # #
 
 
-require(httr)		# load httr package (downloads files from the web, with SSL and cookies)
-require(XML)		# load XML (parses through html code to extract links)
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-require(foreign) 	# load foreign package (converts data files into R)
+library(httr)		# load httr package (downloads files from the web, with SSL and cookies)
+library(XML)		# load XML (parses through html code to extract links)
+library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+library(foreign) 	# load foreign package (converts data files into R)
 
 
 # create a `download` directory inside the current working directory

@@ -52,8 +52,8 @@ options( digits = 8 )
 # install.packages( "survey" )
 
 
-require(foreign) # load foreign package (converts data files into R)
-require(survey)  # load survey package (analyzes complex design surveys)
+library(foreign) # load foreign package (converts data files into R)
+library(survey)  # load survey package (analyzes complex design surveys)
 
 
 # by default, R will crash if a primary sampling unit (psu) has a single observation

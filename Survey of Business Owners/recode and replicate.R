@@ -56,11 +56,11 @@
 # name the database (.db) file that should have been saved in the working directory
 sbo.dbname <- "sbo07.db"
 
-require(RSQLite) 			# load RSQLite package (creates database files in R)
-require(RSQLite.extfuns) 	# load RSQLite package (allows mathematical functions, like SQRT)
-require(mitools) 			# load mitools package (analyzes multiply-imputed data)
-require(survey) 			# load survey package (analyzes complex design surveys)
-require(downloader)			# downloads and then runs the source() function on scripts from github
+library(RSQLite) 			# load RSQLite package (creates database files in R)
+library(RSQLite.extfuns) 	# load RSQLite package (allows mathematical functions, like SQRT)
+library(mitools) 			# load mitools package (analyzes multiply-imputed data)
+library(survey) 			# load survey package (analyzes complex design surveys)
+library(downloader)			# downloads and then runs the source() function on scripts from github
 
 
 # load sbo-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)

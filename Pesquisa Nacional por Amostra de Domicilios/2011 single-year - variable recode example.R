@@ -58,10 +58,10 @@
 # name the database (.db) file that should have been saved in the working directory
 pnad.dbname <- "pnad.db"
 
-require(downloader)	# downloads and then runs the source() function on scripts from github
-require(survey)		# load survey package (analyzes complex design surveys)
-require(RSQLite) 	# load RSQLite package (creates database files in R)
-require(stringr) 	# load stringr package (manipulates character strings easily)
+library(downloader)	# downloads and then runs the source() function on scripts from github
+library(survey)		# load survey package (analyzes complex design surveys)
+library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(stringr) 	# load stringr package (manipulates character strings easily)
 
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html

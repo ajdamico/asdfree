@@ -72,9 +72,9 @@
 # program start #
 # # # # # # # # #
 
-require(foreign) 	# load foreign package (converts data files into R)
-require(sas7bdat)	# loads files ending in .sas7bdat directly into r as data.frame objects
-require(downloader)	# downloads and then runs the source() function on scripts from github
+library(foreign) 	# load foreign package (converts data files into R)
+library(sas7bdat)	# loads files ending in .sas7bdat directly into r as data.frame objects
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # load the download.cache and related functions

@@ -49,9 +49,9 @@
 # install.packages( c( "stringr" , "downloader" ) )
 
 
-require(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
-require(stringr)	# load stringr package (manipulates character strings easily)
-require(downloader)	# downloads and then runs the source() function on scripts from github
+library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
+library(stringr)	# load stringr package (manipulates character strings easily)
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # create a temporary file on the local disk

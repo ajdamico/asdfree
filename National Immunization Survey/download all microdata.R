@@ -74,8 +74,8 @@ nhfs.download <- TRUE										# reads in the 2009 h1n1 file
 # # # # # # # # #
 
 
-require(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
-require(downloader)			# downloads and then runs the source() function on scripts from github
+library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
+library(downloader)			# downloads and then runs the source() function on scripts from github
 
 # load the download.cache and related functions
 # to prevent re-downloading of files once they've been downloaded.

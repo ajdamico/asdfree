@@ -66,9 +66,9 @@ sipp.pnl.longitudinal.replicate.weights <- 'pnl'					# set to NULL to prevent do
 # # # # # # # # #
 
 
-require(RSQLite) 	# load RSQLite package (creates database files in R)
-require(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-require(downloader)	# downloads and then runs the source() function on scripts from github
+library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # open the connection to the sqlite database

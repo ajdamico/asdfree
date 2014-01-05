@@ -65,7 +65,7 @@
 # # # # # # # # #
 
 
-require(survey)  # load survey package (analyzes complex design surveys)
+library(survey)  # load survey package (analyzes complex design surveys)
 
 
 # by default, R will crash if a primary sampling unit (psu) has a single observation

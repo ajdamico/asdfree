@@ -70,12 +70,12 @@ options( scipen = 20 )
 # install.packages( c( "RSQLite" , "mitools" , "stringr" , "plyr" , "survey" , "downloader" ) )
 
 
-require(RSQLite) 	# load RSQLite package (creates database files in R)
-require(mitools)	# allows analysis of multiply-imputed survey data
-require(stringr) 	# load stringr package (manipulates character strings easily)
-require(plyr)		# contains the rbind.fill() function, which stacks two data frames even if they don't contain the same columns.  the rbind() function does not do this
-require(survey)		# load survey package (analyzes complex design surveys)
-require(downloader)	# downloads and then runs the source() function on scripts from github
+library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(mitools)	# allows analysis of multiply-imputed survey data
+library(stringr) 	# load stringr package (manipulates character strings easily)
+library(plyr)		# contains the rbind.fill() function, which stacks two data frames even if they don't contain the same columns.  the rbind() function does not do this
+library(survey)		# load survey package (analyzes complex design surveys)
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # load two svyttest functions (one to conduct a df-adjusted t-test and one to conduct a multiply-imputed t-test)

@@ -104,10 +104,10 @@ if ( 2013 %in% nhis.years.to.download ) message( "2013 imputed income not yet av
 # program start #
 # # # # # # # # #
 
-require(RCurl)				# load RCurl package (downloads files from the web)
-require(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
-require(foreign) 			# load foreign package (converts data files into R)
-require(downloader)			# downloads and then runs the source() function on scripts from github
+library(RCurl)				# load RCurl package (downloads files from the web)
+library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
+library(foreign) 			# load foreign package (converts data files into R)
+library(downloader)			# downloads and then runs the source() function on scripts from github
 
 # create a temporary file and a temporary directory
 tf <- tempfile() ; td <- tempdir()

@@ -57,8 +57,8 @@
 # but why not just download them all?  ;)
 
 
-require(downloader)		# downloads and then runs the source() function on scripts from github
-require(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(downloader)		# downloads and then runs the source() function on scripts from github
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 
 
 ############################################

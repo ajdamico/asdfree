@@ -45,7 +45,7 @@
 
 
 
-require(foreign) 	# load foreign package (converts data files into R)
+library(foreign) 	# load foreign package (converts data files into R)
 
 
 # uncomment this line to download all available data sets

@@ -66,7 +66,7 @@
 # program start #
 # # # # # # # # #
 
-require(foreign) 	# load foreign package (converts data files into R)
+library(foreign) 	# load foreign package (converts data files into R)
 
 
 # create a data frame containing one row per year of scf data,

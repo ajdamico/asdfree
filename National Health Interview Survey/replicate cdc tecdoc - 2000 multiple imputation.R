@@ -53,10 +53,10 @@
 # install.packages( c( "survey" , "SAScii" , "mitools" , "RCurl" ) )
 
 
-require(survey)		# load survey package (analyzes complex design surveys)
-require(SAScii)		# load the SAScii package (imports ascii data with a SAS script)
-require(mitools)	# load mitools package (analyzes multiply-imputed data)
-require(RCurl)		# load RCurl package (downloads https files)
+library(survey)		# load survey package (analyzes complex design surveys)
+library(SAScii)		# load the SAScii package (imports ascii data with a SAS script)
+library(mitools)	# load mitools package (analyzes multiply-imputed data)
+library(RCurl)		# load RCurl package (downloads https files)
 
 # set R to produce conservative standard errors instead of crashing
 # http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
