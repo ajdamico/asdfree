@@ -89,8 +89,8 @@ download.cache <-
 		
 		cachefile <- 
 			paste0(
-				gettmpdir() , 
-				"\\" ,
+				gsub( "\\" , "/" , gettmpdir() , fixed = TRUE ) , 
+				"/" ,
 				almostbase64encode( url ) , 
 				".Rdownloadercache"
 			)
