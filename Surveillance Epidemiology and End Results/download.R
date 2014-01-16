@@ -5,6 +5,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# your.username <- "username"
+# your.password <- "password"
 # library(downloader)
 # setwd( "C:/My Directory/SEER/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Surveillance%20Epidemiology%20and%20End%20Results/download.R" , prompt = FALSE , echo = TRUE )
@@ -46,8 +48,8 @@
 # once they've e-mailed you a login and password,
 # fill them in below, and the download script will work
 
-your.username <- "username"
-your.password <- "password"
+# your.username <- "username"
+# your.password <- "password"
 
 # this download automation script will not work without the above lines filled in.
 # if the your.username and your.password lines above are not filled in,
