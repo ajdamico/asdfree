@@ -57,6 +57,7 @@ sipp.topical.modules <- 1:8											# either choose which topical modules to d
 sipp.longitudinal.weights <- TRUE									# set to FALSE to prevent download
 sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:4 )		# 1-4 reads in 2004-2007
 sipp.pnl.longitudinal.replicate.weights <- paste0( 'pnl' , 1:4 )	# 1-4 reads in 2004-2007
+sipp.assets.extracts <- TRUE										# set to FALSE to prevent download
 
 ############################################
 # no need to edit anything below this line #
@@ -189,6 +190,77 @@ for ( i in sipp.topical.modules ){
 			tablename = paste0( "tm" , i ) ,
 			conn = db
 		)
+}
+
+# add the two sipp assets extracts to the database
+if( sipp.assets.extracts ){
+
+	read.SAScii.sqlite (
+			"http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm3_aoa.zip" ,
+			"http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm3_aoa.sas" ,
+			beginline = 5 ,
+			zipped = T ,
+			tl = TRUE ,
+			tablename = "aoa3" ,
+			conn = db
+		)
+
+	read.SAScii.sqlite (
+			"http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm6_aoa.zip" ,
+			"http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm6_aoa.sas" ,
+			beginline = 9 ,
+			zipped = T ,
+			tl = TRUE ,
+			tablename = "aoa6" ,
+			conn = db
+		)
+
+	# remove the overlapping variable names
+	# from the tm3 and tm6 data tables,
+	# since they should now be pulled from aoa3 and aoa6
+		
+	# pull all field names from the wave 6 assets extract
+	aoa6.fields <- dbListFields( db , 'aoa6' )
+	
+	# remove ssuid and epppnum
+	aoa6.fields <- aoa6.fields[ !( aoa6.fields %in% c( 'ssuid' , 'epppnum' ) ) ]
+	
+	# find non-intersecting fields in both of those topical modules
+	tm3.nis <- dbListFields( db , 'tm3' )[ !( dbListFields( db , 'tm3' ) %in% aoa6.fields ) ]
+	tm6.nis <- dbListFields( db , 'tm6' )[ !( dbListFields( db , 'tm6' ) %in% aoa6.fields ) ]
+
+	# create temporary tables, without the intersection columns
+	tm3.ct <- 
+		paste( 
+			'create table temp_tm3 as select' ,
+			paste( tm3.nis , collapse = " , " ) ,
+			'from tm3'
+		)
+	
+	tm6.ct <- 
+		paste( 
+			'create table temp_tm6 as select' ,
+			paste( tm6.nis , collapse = " , " ) ,
+			'from tm6'
+		)
+	
+	# send those create table commands to the database
+	dbSendQuery( db , tm3.ct )
+	dbSendQuery( db , tm6.ct )
+	
+	# remove the `tm3` and `tm6` tables completely
+	dbRemoveTable( db , 'tm3' )
+	dbRemoveTable( db , 'tm6' )
+	
+	# copy over the newly-reduced `tm3` and `tm6` tables
+	# to their prior name
+	dbSendQuery( db , 'create table tm3 as select * from temp_tm3' )
+	dbSendQuery( db , 'create table tm6 as select * from temp_tm6' )
+		
+	# remove the `temp_tm3` and `temp_tm6` tables completely
+	dbRemoveTable( db , 'temp_tm3' )
+	dbRemoveTable( db , 'temp_tm6' )
+	
 }
 
 # loop through each longitudinal replicate weight file..
