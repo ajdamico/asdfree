@@ -171,13 +171,13 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sql
 
 # set the locations of the data files on the ftp site
 SIPP.core.sas <-
-	"http://smpbff2.dsd.census.gov/pub/sipp/1996/sip96lgt.sas"
+	"http://thedataweb.rm.census.gov/pub/sipp/1996/sip96lgt.sas"
 	
 SIPP.replicate.sas <-
-	"http://smpbff2.dsd.census.gov/pub/sipp/1996/rw96wx.sas"
+	"http://thedataweb.rm.census.gov/pub/sipp/1996/rw96wx.sas"
 	
 SIPP.longitudinal.replicate.sas <-
-	"http://smpbff2.dsd.census.gov/pub/sipp/1996/lrw96_xx.sas"
+	"http://thedataweb.rm.census.gov/pub/sipp/1996/lrw96_xx.sas"
 
 
 # if the longitudinal weights flag has been set to TRUE above..
@@ -185,7 +185,7 @@ if ( sipp.longitudinal.weights ){
 
 	# the census SIPP FTP site does not have a SAS input script,
 	# so create one using the dictionary at
-	# http://smpbff2.dsd.census.gov/pub/sipp/1996/ctl_ferd.asc
+	# http://thedataweb.rm.census.gov/pub/sipp/1996/ctl_ferd.asc
 
 	# write an example SAS import script using the dash method
 	sas.import.with.at.signs <-
@@ -210,7 +210,7 @@ if ( sipp.longitudinal.weights ){
 	
 	# add the longitudinal weights to the database in a table 'w12'
 	read.SAScii.sqlite(
-		"http://smpbff2.dsd.census.gov/pub/sipp/1996/ctl_fer.zip" ,
+		"http://thedataweb.rm.census.gov/pub/sipp/1996/ctl_fer.zip" ,
 		fix.ct( sas.import.with.at.signs.tf ) ,
 		# note no beginline = parameter in this read.SAScii.sqlite() call
 		zipped = T ,
@@ -225,7 +225,7 @@ for ( i in sipp.core.waves ){
 
 	# figure out the exact ftp path of the .zip file
 	SIPP.core <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/l96puw" , i , ".zip" )
+		paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/l96puw" , i , ".zip" )
 
 	# add the core wave to the database in a table w#
 	read.SAScii.sqlite (
@@ -244,7 +244,7 @@ for ( i in sipp.replicate.waves ){
 
 	# figure out the exact ftp path of the .zip file
 	SIPP.rw <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/rw96w" , i , ".zip" )
+		paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/rw96w" , i , ".zip" )
 
 	# add the wave-specific replicate weight to the database in a table rw#
 	read.SAScii.sqlite (
@@ -263,15 +263,15 @@ for ( i in sipp.topical.modules ){
 
 	# figure out the exact ftp path of the .zip file
 	if ( i == 10 ) {
-		SIPP.tm <- "http://smpbff2.dsd.census.gov/pub/sipp/1996/p96putm10.zip" 
+		SIPP.tm <- "http://thedataweb.rm.census.gov/pub/sipp/1996/p96putm10.zip" 
 	} else {
 		SIPP.tm <-
-			paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/tm96puw" , i , ".zip" )
+			paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/tm96puw" , i , ".zip" )
 	}
 		
 	# figure out the exact ftp path of the .sas file
 	SIPP.tm.sas <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/p96putm" , i , ".sas" )
+		paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/p96putm" , i , ".sas" )
 		
 	# add each topical module to the database in a table tm#
 	read.SAScii.sqlite (
@@ -290,7 +290,7 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 
 	# figure out the exact ftp path of the .zip file
 	SIPP.lrw <-
-		paste0( "http://smpbff2.dsd.census.gov/pub/sipp/1996/lrw96" , i , ".zip" )
+		paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/lrw96" , i , ".zip" )
 		
 	# add each longitudinal replicate weight file to the database in a table cy1-4 or pnl
 	read.SAScii.sqlite (
