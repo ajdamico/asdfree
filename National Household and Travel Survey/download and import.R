@@ -123,9 +123,9 @@ sql.process <-
 		if ( lowered.edited.fields[ 1 ] == 'id9' ) lowered.edited.fields[ 1 ] <- 'houseid'
 		
 		casting.chars <- dbListFields( db , pre )
-		casting.chars <- gsub( "houseid" , "CAST( houseid AS INTEGER )" , casting.chars )
+		casting.chars <- gsub( "houseid" , "LTRIM( RTRIM( CAST( houseid AS STRING ) ) )" , casting.chars )
 		casting.chars <- gsub( "personid" , "CAST( personid AS INTEGER )" , casting.chars )
-		casting.chars <- gsub( "id9" , "CAST( id9 AS INTEGER )" , casting.chars )
+		casting.chars <- gsub( "id9" , "LTRIM( RTRIM( CAST( id9 AS STRING ) ) )" , casting.chars )
 		
 		
 		
@@ -815,7 +815,7 @@ for ( year in years.to.download ){
 # dbListTables( db )
 
 # double-check the tables for correct sizes
-# for ( i in dbListTables( db ) ){ print( i ) ; print( dbGetQuery( db , paste( 'select count(*) from' , i ) ) ) }
+for ( i in dbListTables( db ) ){ print( i ) ; print( dbGetQuery( db , paste( 'select count(*) from' , i ) ) ) }
 
 stop( 'create survey objects' )
 
