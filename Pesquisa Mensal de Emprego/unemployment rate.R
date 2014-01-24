@@ -47,7 +47,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "survey" )
+# install.packages( c( "survey" , "reshape2" , "ggplot2" ) )
 
 
 # uncomment this line by removing the `#` at the front..
@@ -55,6 +55,8 @@
 # ..in order to set your current working directory
 
 library(survey)		# load survey package (analyzes complex design surveys)
+library(reshape2)	# load reshape2 package (transposes data frames quickly)
+library(ggplot2)	# load ggplot2 package (plots data according to the grammar of graphics)
 
 
 # set R to produce conservative standard errors instead of crashing
@@ -230,6 +232,47 @@ coefs
 
 # print the cv table to the screen
 cvs
+
+
+
+# # # # #
+# bonus #
+# # # # #
+
+
+# plot the overall and regional unemployment rate for the last 12 months #
+
+# compress the `coefs` table down to
+# a new table with four columns: year, month, region of the country, and the data point
+unemp.rate.long <-
+	melt( 
+		coefs ,
+		id = c( "year" , "month" ) , 
+		variable.name = "region" , 
+		value.name = "unemp.rate"
+	)
+
+# compress the year and month columns into a single variable
+unemp.rate.long$year.month <-
+	paste(
+		substr( unemp.rate.long$year , 3 , 4 ) , 
+		unemp.rate.long$month ,
+		sep = "/"
+	)
+
+# construct a plot with this newly-rehshaped ata
+unemployment.plot <- 
+	ggplot(
+		unemp.rate.long , 
+		aes( year.month , unemp.rate , group = region , colour = region ) 
+	) +
+	geom_line() + 
+	labs( title = "rate of unemployment over the last 12 months" )
+
+# print the plot to the screen
+unemployment.plot
+
+# happy?
 
 
 # for more details on how to work with data in r
