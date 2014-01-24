@@ -128,8 +128,21 @@ for ( i in all.pme.files ){
 
 	# throw out records missing their cluster variable
 	z <- subset( x , !is.na( v113 ) )
-	# these are simply discarded.  hooray!
+	# these are simply discarded.  hooray!  more detail:
 
+	# those are the people that for any reason did not answer
+	# the questions about education characteristics and/or
+	# working characteristics of the survey.
+	# they are excluded both in the process of editing and imputation
+	# and in the computation of expansion weights.
+	# in other words, any person with age greater than 10 years,
+	# not having information in sections 3 and 4 of the questionnaire
+	# is not treated in the survey processing,
+	# but the information on general characteristics is kept in the microdata
+	# these people are identified by the code 0 in the variables V301 and V401
+
+
+	
 	# the `v035` and `v114` columns contain the six numbers
 	# (and merge variables) needed for population post-stratification
 	pop.totals <- unique( z[ , c( 'v035' , 'v114' ) ] )
