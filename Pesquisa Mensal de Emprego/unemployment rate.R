@@ -244,33 +244,34 @@ cvs
 
 # compress the `coefs` table down to
 # a new table with four columns: year, month, region of the country, and the data point
-unemp.rate.long <-
+desocup.rate.long <-
 	melt( 
 		coefs ,
 		id = c( "year" , "month" ) , 
 		variable.name = "region" , 
-		value.name = "unemp.rate"
+		value.name = "desocup.rate"
 	)
 
 # compress the year and month columns into a single variable
-unemp.rate.long$year.month <-
+desocup.rate.long$year.month <-
 	paste(
-		substr( unemp.rate.long$year , 3 , 4 ) , 
-		unemp.rate.long$month ,
+		substr( desocup.rate.long$year , 3 , 4 ) , 
+		desocup.rate.long$month ,
 		sep = "/"
 	)
 
 # construct a plot with this newly-rehshaped ata
-unemployment.plot <- 
+desocup.plot <- 
 	ggplot(
-		unemp.rate.long , 
-		aes( year.month , unemp.rate , group = region , colour = region ) 
-	) +
+		desocup.rate.long , 
+		aes( year.month , desocup.rate , group = region , colour = region ) 
+	) + 
+	ylim( 0 , max( desocup.rate.long$desocup.rate ) ) +
 	geom_line() + 
-	labs( title = "rate of unemployment over the last 12 months" )
+	labs( title = "out of work rate over the last 12 months" )
 
 # print the plot to the screen
-unemployment.plot
+desocup.plot
 
 # happy?
 
