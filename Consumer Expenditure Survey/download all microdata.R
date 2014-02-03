@@ -99,10 +99,10 @@ for ( year in years.to.download ){
 
 	# determine the exact path to the current year of microdata on the bureau of labor statistics ftp site
 	# for each of the four main consumer expenditure public use microdata files
-	intrvw.ftp <- paste0( "ftp://ftp.bls.gov/pub/special.requests/ce/pumd/data/stata/intrvw" , substr( year , 3 , 4 ) , ".zip" )
-	expn.ftp <- paste0( "ftp://ftp.bls.gov/pub/special.requests/ce/pumd/data/stata/expn" , substr( year , 3 , 4 ) , ".zip" )
-	diary.ftp <- paste0( "ftp://ftp.bls.gov/pub/special.requests/ce/pumd/data/stata/diary" , substr( year , 3 , 4 ) , ".zip" )
-	docs.ftp <- paste0( "ftp://ftp.bls.gov/pub/special.requests/ce/pumd/documentation/documentation" , substr( year , 3 , 4 ) , ".zip" )
+	intrvw.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/intrvw" , substr( year , 3 , 4 ) , ".zip" )
+	expn.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/expn" , substr( year , 3 , 4 ) , ".zip" )
+	diary.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/diary" , substr( year , 3 , 4 ) , ".zip" )
+	docs.ftp <- paste0( "http://www.bls.gov/cex/pumd/documentation/documentation" , substr( year , 3 , 4 ) , ".zip" )
 	
 	# loop through the interview, expenditure, diary, and documentation files and..
 	# download each to a temporary file
