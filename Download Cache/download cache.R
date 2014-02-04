@@ -60,15 +60,29 @@ download.cache <-
 	# if usedest is TRUE, then 
 	# the program checks whether the destination file is present and contains at least one byte
 	# and if so, doesn't do anything.
-    usedest = FALSE , 
+    usedest = getOption( "download.cache.usedest" ) , 
 	
     # if usecache is TRUE, then
 	# it checks the temporary directory for a file that has already been downloaded,
 	# and if so, copies the cached file to the destination file *instead* of downloading.
-	usecache = TRUE
+	usecache = getOption( "download.cache.usecache" ) ,
+	
+	# how many attempts should be made with FUN?
+	attempts = 3
+	# just in case of a server timeout or smthn equally annoying
 	
   ) {
+  
+		# users can set the option to override usedest and usecache globally.
+		# however, if they're not set, they will default to FALSE and TRUE, respectively
+		if( is.null( usedest ) ) usedest <- FALSE
+		if( is.null( usecache ) ) usecache <- TRUE
+		# you could set these *outside* of this function
+		# with lines like
+		# options( "download.cache.usedest" = FALSE )
+		# options( "download.cache.usecache" = TRUE )
     		
+			
 		cat(
 			paste0(
 				"Downloading from URL '" ,
@@ -113,12 +127,38 @@ download.cache <-
 		  
 		}
 		
-		success <- 
-			do.call( 
-				FUN , 
-				list( url , destfile , ... ) 
-			) == 0
+		# start out with a failed attempt, so the while loop below commences
+		failed.attempt <- try( stop() , silent = TRUE )
 		
+		# keep trying the download until you run out of attempts
+		# and all previous attempts have failed
+		while( attempts > 0 & class( failed.attempt ) == 'try-error' ){
+		
+			# only run this loop a few times..
+			attempts <- attempts - 1
+			
+			failed.attempt <-
+				try( {
+					
+					# did the download work?
+					success <- 
+						do.call( 
+							FUN , 
+							list( url , destfile , ... ) 
+						) == 0
+						
+					} , 
+					silent = TRUE 
+				)
+			
+			# if the download did not work, wait 60 seconds and try again.
+			if( class( failed.attempt ) == 'try-error' ){
+				cat( paste0( "download issue with" , url ) )
+				Sys.sleep( 60 )
+			}
+			
+		}
+				
 		if (success && usecache) file.copy( destfile , cachefile , overwrite = TRUE )
 		
 		return( invisible( success ) )
