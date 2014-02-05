@@ -673,23 +673,23 @@ for ( year in years.to.download ){
 		# add indexes for faster joins #
 
 		# if `personid` is available in the table..
-		if ( 'personid' %in% dbListFields( db , new.tablename ) ){
+		# if ( 'personid' %in% dbListFields( db , new.tablename ) ){
 			
 			# ..use both `houseid` and `personid` for the sort columns..
-			dbSendUpdate( db , paste0( 'create index ' , prefix , '_' , year , '_index ON ' , prefix , '_' , year , ' ( houseid , personid )' ) )
+			# dbSendUpdate( db , paste0( 'create index ' , prefix , '_' , year , '_index ON ' , prefix , '_' , year , ' ( houseid , personid )' ) )
 			
 		# otherwise,
-		} else {
+		# } else {
 			
 			# if `houseid` is available in the table..
-			if ( 'houseid' %in% dbListFields( db , new.tablename ) ){
+			# if ( 'houseid' %in% dbListFields( db , new.tablename ) ){
 			
 				# ..just use `houseid`
-				dbSendUpdate( db , paste0( 'create index ' , prefix , '_' , year , '_index ON ' , prefix , '_' , year , ' ( houseid )' ) )
+				# dbSendUpdate( db , paste0( 'create index ' , prefix , '_' , year , '_index ON ' , prefix , '_' , year , ' ( houseid )' ) )
 			
-			}
+			# }
 		
-		}
+		# }
 		
 	}
 
@@ -731,7 +731,7 @@ for ( year in years.to.download ){
 					'ldt50wt' ,
 					'_' ,
 					year ,
-					' as b on a.houseid = b.houseid AND a.personid = b.personid WITH DATA' 
+					' as b on a.houseid = b.houseid AND CAST( a.personid AS INTEGER ) = CAST( b.personid AS INTEGER ) WITH DATA' 
 				)
 			)
 			# table `ldt_m_YYYY` now available for analysis!
@@ -757,7 +757,7 @@ for ( year in years.to.download ){
 				wt.table ,
 				'_' ,
 				year ,
-				' as b on a.houseid = b.houseid AND a.personid = b.personid WITH DATA' 
+				' as b on a.houseid = b.houseid AND CAST( a.personid AS INTEGER ) = CAST( b.personid AS INTEGER ) WITH DATA' 
 			)
 		)
 		# table `day_m_YYYY` now available for analysis!
@@ -781,7 +781,7 @@ for ( year in years.to.download ){
 				wt.table ,
 				'_' ,
 				year ,
-				' as b on a.houseid = b.houseid AND a.personid = b.personid WITH DATA' 
+				' as b on a.houseid = b.houseid AND CAST( a.personid AS INTEGER ) = CAST( b.personid AS INTEGER ) WITH DATA' 
 			)
 		)
 		# table `per_m_YYYY` now available for analysis!
