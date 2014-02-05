@@ -122,8 +122,15 @@ batfile <-
 					# must be empty or not exist
 					
 					# find the main path to the monetdb installation program
-					monetdb.program.path = "C:/Program Files/MonetDB/MonetDB5" ,
-					
+					monetdb.program.path = 
+						ifelse( 
+							.Platform$OS.type == "windows" , 
+							"C:/Program Files/MonetDB/MonetDB5" , 
+							"" 
+						) ,
+					# note: for windows, monetdb usually gets stored in the program files directory
+					# for other operating systems, it's usually part of the PATH and therefore can simply be left blank.
+										
 					# choose a database name
 					dbname = "hmda" ,
 					

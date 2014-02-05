@@ -110,7 +110,7 @@ sql.process <-
 			)
 		
 		# blank only columns that are not varchar
-		cols.to.blank <- all.columns[ !( all.columns$type %in% 'varchar' ) , 'name' ]
+		cols.to.blank <- all.columns[ !( all.columns$type %in% c( 'clob' , 'varchar' ) ) , 'name' ]
 		
 		
 		# loop through every field in the data set
@@ -123,9 +123,9 @@ sql.process <-
 		if ( lowered.edited.fields[ 1 ] == 'id9' ) lowered.edited.fields[ 1 ] <- 'houseid'
 		
 		casting.chars <- dbListFields( db , pre )
-		casting.chars <- gsub( "houseid" , "LTRIM( RTRIM( CAST( houseid AS STRING ) ) )" , casting.chars )
+		casting.chars <- gsub( "houseid" , "CAST( LTRIM( RTRIM( CAST( houseid AS STRING ) ) ) AS STRING )" , casting.chars )
 		casting.chars <- gsub( "personid" , "CAST( personid AS INTEGER )" , casting.chars )
-		casting.chars <- gsub( "id9" , "LTRIM( RTRIM( CAST( id9 AS STRING ) ) )" , casting.chars )
+		casting.chars <- gsub( "id9" , "CAST( LTRIM( RTRIM( CAST( id9 AS STRING ) ) ) AS STRING )" , casting.chars )
 		
 		
 		
@@ -225,7 +225,14 @@ batfile <-
 					# must be empty or not exist
 					
 					# find the main path to the monetdb installation program
-					monetdb.program.path = "C:/Program Files/MonetDB/MonetDB5" ,
+					monetdb.program.path = 
+						ifelse( 
+							.Platform$OS.type == "windows" , 
+							"C:/Program Files/MonetDB/MonetDB5" , 
+							"" 
+						) ,
+					# note: for windows, monetdb usually gets stored in the program files directory
+					# for other operating systems, it's usually part of the PATH and therefore can simply be left blank.
 					
 					# choose a database name
 					dbname = "nhts" ,
