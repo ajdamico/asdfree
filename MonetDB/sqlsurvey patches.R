@@ -85,8 +85,10 @@ sqlvar.patch <-
 		rval
 	}
 
-# load the sqlsurvey package here
-library(sqlsurvey)
+
+# make sure the sqlsurvey package has been loaded
+library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+
 
 # overwrite sqlsurvey:::sqlvar with sqlvar.patch (constructed above)
 assignInNamespace( "sqlvar" , sqlvar.patch , ns = "sqlsurvey" )
