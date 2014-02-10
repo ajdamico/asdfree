@@ -52,10 +52,6 @@
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(stringr) 		# load stringr package (manipulates character strings easily)
-library(downloader)		# downloads and then runs the source() function on scripts from github
-
-# fix a bug in sqlsurvey's `sqlvar` function
-source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/sqlsurvey%20patches.R" , prompt = FALSE )
 
 
 # after running the r script above, users should have handy a few lines
