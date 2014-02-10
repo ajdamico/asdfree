@@ -15,5 +15,5 @@
 
 # 2) install two R packages that are not currently available on CRAN and install a few others..
 # open up your R console and run these two separate installation commands without the # sign in front:
-# install.packages( c( 'SAScii' , 'descr' , 'survey' , 'MonetDB.R' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'survey' , 'MonetDB.R' , 'downloader' ) )
 # install.packages( "sqlsurvey" , repos = c( "http://cran.r-project.org" , "http://R-Forge.R-project.org" ) , dep=TRUE )
