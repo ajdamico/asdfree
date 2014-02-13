@@ -170,7 +170,10 @@ library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 library(survey)			# load survey package (analyzes complex design surveys)
 
 
+# uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/PISA/" )
+# ..in order to set your current working directory
+
 
 # load the multiply-imputed survey design object you'd created with monetdb
 load( "brazil pisa 2009.rda" )
