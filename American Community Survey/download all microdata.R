@@ -9,7 +9,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/ACS/" )
 # single.year.datasets.to.download <- 2005:2012
-# three.year.datasets.to.download <- 2007:2011
+# three.year.datasets.to.download <- 2007:2012
 # five.year.datasets.to.download <- 2009:2011
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -237,7 +237,7 @@ monetdb.server.stop( pid )
 # three-year datasets are available back to 2007
 # uncomment this line to download all available three-year data sets
 # uncomment this line by removing the `#` at the front
-# three.year.datasets.to.download <- 2007:2011
+# three.year.datasets.to.download <- 2007:2012
 
 # five-year datasets are available back to 2009
 # uncomment this line to download all available five-year data sets
