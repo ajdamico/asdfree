@@ -165,6 +165,48 @@ fix.repwgt <-
 	}
 ##################################################################################
 
+##################################################################################
+# sas importation scripts with an `SUID` column near the end
+# are incorrect.  the census bureau just left them in,
+# and the SAScii package won't just throw 'em out for ya.
+# so throw out the non-public lines manually.
+chop.suid <-
+	function( sf ){
+
+		# create a temporary file
+		tf <- tempfile()
+		
+		# read the sas lines into memory
+		sl <- readLines( sf )
+
+		# figure out the position of the `suid` variable..
+		where.to.chop <- which( grepl( 'suid' , tolower( sl ) ) & !grepl( 'ssuid' , tolower( sl ) ) )
+
+		# if it exists..
+		if( length( where.to.chop ) > 0 ){
+
+			# find all semicolons in the document..
+			semicolons <- grep( ';' , sl )
+
+			# ..now, more precisely, find the first semicolon after the chop-line
+			end.of.chop <- min( semicolons[ semicolons > where.to.chop ] ) - 1
+			
+			# remove non-public lines
+			sl <- sl[ -where.to.chop:-end.of.chop ]
+
+		}
+
+		# write the sas import script to the text file..
+		writeLines( sl , tf )
+
+		# ..and return the position of the text file on the local disk.
+		tf
+
+	}
+##################################################################################
+
+
+
 
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
@@ -211,7 +253,7 @@ if ( sipp.longitudinal.weights ){
 	# add the longitudinal weights to the database in a table 'w12'
 	read.SAScii.sqlite(
 		"http://thedataweb.rm.census.gov/pub/sipp/1996/ctl_fer.zip" ,
-		fix.ct( sas.import.with.at.signs.tf ) ,
+		chop.suid( fix.ct( sas.import.with.at.signs.tf ) ) ,
 		# note no beginline = parameter in this read.SAScii.sqlite() call
 		zipped = T ,
 		tl = TRUE ,
@@ -230,7 +272,7 @@ for ( i in sipp.core.waves ){
 	# add the core wave to the database in a table w#
 	read.SAScii.sqlite (
 			SIPP.core ,
-			fix.ct( SIPP.core.sas ) ,
+			chop.suid( fix.ct( SIPP.core.sas ) ) ,
 			beginline = 5 ,
 			zipped = T ,
 			tl = TRUE ,
@@ -249,7 +291,7 @@ for ( i in sipp.replicate.waves ){
 	# add the wave-specific replicate weight to the database in a table rw#
 	read.SAScii.sqlite (
 			SIPP.rw ,
-			fix.ct( fix.repwgt( SIPP.replicate.sas ) ) ,
+			chop.suid( fix.ct( fix.repwgt( SIPP.replicate.sas ) ) ) ,
 			beginline = 7 ,
 			zipped = T ,
 			tl = TRUE ,
@@ -276,7 +318,7 @@ for ( i in sipp.topical.modules ){
 	# add each topical module to the database in a table tm#
 	read.SAScii.sqlite (
 			SIPP.tm ,
-			fix.ct( SIPP.tm.sas ) ,
+			chop.suid( fix.ct( SIPP.tm.sas ) ) ,
 			beginline = 5 ,
 			zipped = T ,
 			tl = TRUE ,
@@ -295,7 +337,7 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 	# add each longitudinal replicate weight file to the database in a table cy1-4 or pnl
 	read.SAScii.sqlite (
 			SIPP.lrw ,
-			fix.repwgt( SIPP.longitudinal.replicate.sas ) ,
+			chop.suid( fix.repwgt( SIPP.longitudinal.replicate.sas ) ) ,
 			beginline = 7 ,
 			zipped = T ,
 			tl = TRUE ,
@@ -305,6 +347,13 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 }
 # the current working directory should now contain one database (.db) file
 
+
+# database goodwill check!
+# does every table in this sqlite database have *at least* one record?
+for ( tablename in dbListTables( db ) ){
+	stopifnot( dbGetQuery( db , paste( 'select count(*) from' , tablename ) ) > 0 )
+}
+# end of checking that every imported table has at least one record.
 
 # disconnect from the database
 dbDisconnect( db )
