@@ -98,13 +98,15 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "downloader" )
+# install.packages( c( "R.utils" , "downloader" ) )
 
 
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(sas7bdat)		# loads files ending in .sas7bdat directly into r as data.frame objects
 library(downloader)		# downloads and then runs the source() function on scripts from github
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+
 
 # load the download.cache and related functions
 # to prevent re-downloading of files once they've been downloaded.
@@ -520,19 +522,9 @@ for ( year in 2050:2005 ){
 				# loop through each csv file
 				for ( csvpath in fn ){
 				
-					
 					# quickly figure out the number of lines in the data file
-					# code thanks to 
-					# http://costaleconomist.blogspot.com/2010/02/easy-way-of-determining-number-of.html
-
-					# in speed tests, increasing this chunk_size does nothing
-					chunk_size <- 1000
-					testcon <- file( csvpath ,open = "r" )
-					nooflines <- 0
-					( while( ( linesread <- length( readLines( testcon , chunk_size ) ) ) > 0 )
-					nooflines <- nooflines + linesread )
-					close( testcon )
-				
+					nooflines <- countLines( csvpath )
+					
 					# now try to copy the current csv file into the database
 					first.attempt <-
 						try( {
