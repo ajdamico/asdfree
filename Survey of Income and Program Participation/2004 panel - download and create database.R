@@ -249,7 +249,7 @@ if( sipp.assets.extracts ){
 	read.SAScii.sqlite (
 			"http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm6_aoa.zip" ,
 			chop.suid( "http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm6_aoa.sas" ) ,
-			beginline = 9 ,
+			beginline = 4 ,
 			zipped = T ,
 			tl = TRUE ,
 			tablename = "aoa6" ,
