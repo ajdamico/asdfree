@@ -533,6 +533,30 @@ for ( year in years.to.download ){
 				monet.read.csv( db , i , tablename , nrows = countLines( i ) , header = TRUE , nrow.check = 250000 )
 				# yes.  you did all that.  nice work.
 
+				
+				# clear up RAM
+				gc()
+				
+				# re-read the same file into memory so you can figure out what columns are factor or character
+				this.table <- read.csv( i , nrow = 250000 )
+				
+				# store all factor and character column names into an external object
+				this.header <-
+					names( this.table )[ sapply( this.table , function( z ) class( z ) %in% c( 'factor' , 'character' ) ) ]
+
+				# and name that object the current tablename dot header for future use.
+				assign( 
+					paste0( tablename , '.header' ) , 
+					this.header
+				)
+				
+				# remove the stuff you no longer need
+				rm( this.table , this.header )
+				
+				# clear up RAM once again
+				gc()
+				
+				
 				# delete the csv file from your local disk,
 				# you're not going to use it again, so why not?
 				file.remove( i )
@@ -699,15 +723,39 @@ for ( year in years.to.download ){
 	if ( year > 1995 ){
 
 		if ( year == 2001 ){
+		
 			day.table <- 'daypub'
 			wt.table <- 'pr50wt'
 			per.table <- 'perpub'
 			hh.table <- 'hhpub'
+			
+			# replicate weight scaling factors
+			sca <- 98 / 99
+			rsc <- rep( 1 , 99 )
+			
+			# weights and replicate weights
+			ldt.wt <- 'wtptpfin' ; ldt.repwt <- 'fptpwt[0-9]'
+			hh.wt <- 'wthhntl' ; hh.repwt <- 'fhhwt[0-9]'
+			per.wt <- 'wtprntl' ; per.repwt <- 'fperwt[0-9]'
+			day.wt <- 'wttrdntl' ; day.repwt <- 'ftrdwt[0-9]'
+			
 		} else {
+		
 			day.table <- 'dayvpub'
 			wt.table <- 'per50wt'
 			per.table <- 'pervpub'
 			hh.table <- 'hhvpub'
+
+			# replicate weight scaling factors
+			sca <- 99 / 100
+			rsc <- rep( 1 , 100 )
+			
+			# weights and replicate weights
+			ldt.wt <- NULL ; ldt.repwt <- NULL
+			hh.wt <- 'wthhfin' ; hh.repwt <- 'hhwgt[0-9]' 
+			per.wt <- 'wttrdfin' ; per.repwt <- 'wtperfin[1-9]' 
+			day.wt <- 'wttrdfin' ; day.repwt <- 'daywgt[1-9]'
+						
 		}
 	
 
@@ -736,6 +784,25 @@ for ( year in years.to.download ){
 			)
 			# table `ldt_m_YYYY` now available for analysis!
 		
+			# add the `idkey` column to the merged ldt-level table
+			dbSendUpdate( db , paste0( 'alter table ldt_m_' , year , ' add column idkey int auto_increment' ) )
+			
+			# immediately make the person-ldt-level sqlrepsurvey object.
+			nhts.ldt.design <- 									# name the survey object
+				sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+					weight = ldt.wt , 
+					repweights = ldt.repwt ,
+					scale = sca ,
+					rscales = rsc ,
+					mse = TRUE ,
+					table.name = paste0( 'ldt_m_' , year ) , 	# use the person-ldt-merge data table
+					key = "idkey" ,
+					# use the `.header` object to determine which columns are character or factor types
+					check.factors = get( paste0( ldt.table , '_' , year , '.header' ) ) ,
+					database = monet.url ,
+					driver = MonetDB.R()
+				)
+		
 		}
 		
 	
@@ -762,7 +829,26 @@ for ( year in years.to.download ){
 		)
 		# table `day_m_YYYY` now available for analysis!
 
+		# add the `idkey` column to the merged person-day-level table
+		dbSendUpdate( db , paste0( 'alter table day_m_' , year , ' add column idkey int auto_increment' ) )
+		
+		# immediately make the person-day-level sqlrepsurvey object.
+		nhts.day.design <- 									# name the survey object
+			sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+				weight = day.wgt ,
+				repweights = day.repwt ,
+				scale = sca ,
+				rscales = rsc ,
+				mse = TRUE ,
+				table.name = paste0( 'day_m_' , year ) , 	# use the person-day-merge data table
+				key = "idkey" ,
+				# use the `.header` object to determine which columns are character or factor types
+				check.factors = get( paste0( day.table , '_' , year , '.header' ) ) ,
+				database = monet.url ,
+				driver = MonetDB.R()
+			)
 
+			
 		# merge the person table with the person-level weights
 		nonmatching.fields <- nmf( db , wt.table , per.table , year )
 		
@@ -786,6 +872,27 @@ for ( year in years.to.download ){
 		)
 		# table `per_m_YYYY` now available for analysis!
 
+		# add the `idkey` column to the merged person-level table
+		dbSendUpdate( db , paste0( 'alter table per_m_' , year , ' add column idkey int auto_increment' ) )
+		
+		# immediately make the person-level sqlrepsurvey object.
+		nhts.per.design <- 									# name the survey object
+			sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+				weight = per.wt ,
+				repweights = per.repwt ,
+				scale = sca ,
+				rscales = rsc ,
+				mse = TRUE ,
+				table.name = paste0( 'per_m_' , year ) , 	# use the person-merge data table
+				key = "idkey" ,
+				# use the `.header` object to determine which columns are character or factor types
+				check.factors = get( paste0( per.table , '_' , year , '.header' ) ) ,
+				database = monet.url ,
+				driver = MonetDB.R()
+			)
+
+
+		
 
 		# merge the household table with the household-level weights
 		nonmatching.fields <- nmf( db , 'hh50wt' , hh.table , year )
@@ -808,6 +915,45 @@ for ( year in years.to.download ){
 		)
 		# table `hh_m_YYYY` now available for analysis!
 
+		
+		# add the `idkey` column to the merged household-level table
+		dbSendUpdate( db , paste0( 'alter table hh_m_' , year , ' add column idkey int auto_increment' ) )
+		
+		# immediately make the household-level sqlrepsurvey object.
+		nhts.hh.design <- 									# name the survey object
+			sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+				weight = hh.wgt ,
+				repweights = hh.repwt ,
+				scale = sca ,
+				rscales = rsc ,
+				mse = TRUE ,
+				table.name = paste0( 'hh_m_' , year ) , 	# use the household-merge data table
+				key = "idkey" ,
+				# use the `.header` object to determine which columns are character or factor types
+				check.factors = get( paste0( hh.table , '_' , year , '.header' ) ) ,
+				database = monet.url ,
+				driver = MonetDB.R()
+			)
+
+
+		# done.  phew.  save all the objects to the current working directory
+		if ( year == 2001 ){
+
+			save( 
+				nhts.ldt.design , nhts.day.design , nhts.per.design , nhts.hh.design ,
+				file = '2001 designs.rda'
+			)
+			
+		} else {
+		
+			save( 
+				nhts.day.design , nhts.per.design , nhts.hh.design ,
+				file = '2001 designs.rda'
+			)
+			
+		}
+	
+	
 	}
 	
 	# disconnect from the current monet database
@@ -817,17 +963,9 @@ for ( year in years.to.download ){
 	monetdb.server.stop( pid )
 
 }
-	
-# take a look at all the new data tables that have been added to your RAM-free SQLite database
-# dbListTables( db )
 
-# double-check the tables for correct sizes
-for ( i in dbListTables( db ) ){ print( i ) ; print( dbGetQuery( db , paste( 'select count(*) from' , i ) ) ) }
-
-stop( 'create survey objects' )
-
-# disconnect from the current database
-# dbDisconnect( db )
+# double-check that all tables have at least one record
+for ( i in dbListTables( db ) ){ stopifnot( dbGetQuery( db , paste( 'select count(*) from' , i ) ) > 0 ) }
 
 # remove the temporary file from the local disk
 file.remove( tf )
