@@ -798,7 +798,7 @@ for ( year in years.to.download ){
 					table.name = paste0( 'ldt_m_' , year ) , 	# use the person-ldt-merge data table
 					key = "idkey" ,
 					# use the `.header` object to determine which columns are character or factor types
-					check.factors = get( paste0( ldt.table , '_' , year , '.header' ) ) ,
+					check.factors = get( paste0( 'ldtpub' , year , '.header' ) ) ,
 					database = monet.url ,
 					driver = MonetDB.R()
 				)
@@ -835,7 +835,7 @@ for ( year in years.to.download ){
 		# immediately make the person-day-level sqlrepsurvey object.
 		nhts.day.design <- 									# name the survey object
 			sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
-				weight = day.wgt ,
+				weight = day.wt ,
 				repweights = day.repwt ,
 				scale = sca ,
 				rscales = rsc ,
@@ -843,7 +843,7 @@ for ( year in years.to.download ){
 				table.name = paste0( 'day_m_' , year ) , 	# use the person-day-merge data table
 				key = "idkey" ,
 				# use the `.header` object to determine which columns are character or factor types
-				check.factors = get( paste0( day.table , '_' , year , '.header' ) ) ,
+				check.factors = get( paste0( day.table , year , '.header' ) ) ,
 				database = monet.url ,
 				driver = MonetDB.R()
 			)
@@ -886,7 +886,7 @@ for ( year in years.to.download ){
 				table.name = paste0( 'per_m_' , year ) , 	# use the person-merge data table
 				key = "idkey" ,
 				# use the `.header` object to determine which columns are character or factor types
-				check.factors = get( paste0( per.table , '_' , year , '.header' ) ) ,
+				check.factors = get( paste0( per.table , year , '.header' ) ) ,
 				database = monet.url ,
 				driver = MonetDB.R()
 			)
@@ -922,7 +922,7 @@ for ( year in years.to.download ){
 		# immediately make the household-level sqlrepsurvey object.
 		nhts.hh.design <- 									# name the survey object
 			sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
-				weight = hh.wgt ,
+				weight = hh.wt ,
 				repweights = hh.repwt ,
 				scale = sca ,
 				rscales = rsc ,
@@ -930,7 +930,7 @@ for ( year in years.to.download ){
 				table.name = paste0( 'hh_m_' , year ) , 	# use the household-merge data table
 				key = "idkey" ,
 				# use the `.header` object to determine which columns are character or factor types
-				check.factors = get( paste0( hh.table , '_' , year , '.header' ) ) ,
+				check.factors = get( paste0( hh.table , year , '.header' ) ) ,
 				database = monet.url ,
 				driver = MonetDB.R()
 			)
@@ -948,7 +948,7 @@ for ( year in years.to.download ){
 		
 			save( 
 				nhts.day.design , nhts.per.design , nhts.hh.design ,
-				file = '2001 designs.rda'
+				file = paste( year , 'designs.rda' )
 			)
 			
 		}
