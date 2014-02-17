@@ -694,27 +694,6 @@ for ( year in years.to.download ){
 		
 		sql.process( db , i , new.tablename )
 
-		# add indexes for faster joins #
-
-		# if `personid` is available in the table..
-		# if ( 'personid' %in% dbListFields( db , new.tablename ) ){
-			
-			# ..use both `houseid` and `personid` for the sort columns..
-			# dbSendUpdate( db , paste0( 'create index ' , prefix , '_' , year , '_index ON ' , prefix , '_' , year , ' ( houseid , personid )' ) )
-			
-		# otherwise,
-		# } else {
-			
-			# if `houseid` is available in the table..
-			# if ( 'houseid' %in% dbListFields( db , new.tablename ) ){
-			
-				# ..just use `houseid`
-				# dbSendUpdate( db , paste0( 'create index ' , prefix , '_' , year , '_index ON ' , prefix , '_' , year , ' ( houseid )' ) )
-			
-			# }
-		
-		# }
-		
 	}
 
 	
@@ -964,8 +943,6 @@ for ( year in years.to.download ){
 
 }
 
-# double-check that all tables have at least one record
-for ( i in dbListTables( db ) ){ stopifnot( dbGetQuery( db , paste( 'select count(*) from' , i ) ) > 0 ) }
 
 # remove the temporary file from the local disk
 file.remove( tf )
@@ -1004,6 +981,13 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 # # # # run your analysis commands # # # #
 
+# double-check that all tables have at least one record #
+# all tables created by this script end in numbers
+tein <- dbListTables( db )[ grep( '(.)*[0-9][0-9][0-9][0-9]' , dbListTables( db ) ) ]
+# loop through all tables with underscores and check
+for ( i in tein ){ stopifnot( dbGetQuery( db , paste( 'select count(*) from' , i ) ) > 0 ) }
+
+# # # # end of all analysis commands # # # #
 
 # disconnect from the current monet database
 dbDisconnect( db )
