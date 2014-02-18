@@ -8,7 +8,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/NHTS/" )
 # years.to.download <- c( 1983 , 1990 , 1995 , 2001 , 2009 )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Household%20and%20Travel%20Survey/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Household%20Travel%20Survey/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
