@@ -732,7 +732,7 @@ for ( year in years.to.download ){
 			# weights and replicate weights
 			ldt.wt <- NULL ; ldt.repwt <- NULL
 			hh.wt <- 'wthhfin' ; hh.repwt <- 'hhwgt[0-9]' 
-			per.wt <- 'wttrdfin' ; per.repwt <- 'wtperfin[1-9]' 
+			per.wt <- 'wtperfin' ; per.repwt <- 'wtperfin[1-9]' 
 			day.wt <- 'wttrdfin' ; day.repwt <- 'daywgt[1-9]'
 						
 		}
