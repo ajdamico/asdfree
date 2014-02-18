@@ -1,5 +1,5 @@
 # analyze survey data for free (http://asdfree.com) with the r language
-# national household and travel survey
+# national household travel survey
 # 1983 , 1990 , 1995 , 2001 , 2009
 
 # # # # # # # # # # # # # # # # #
@@ -216,7 +216,7 @@ source_url(
 # in the appropriate directory on your local disk.
 # when adding new files or adding a new year of data, this script does not need to be re-run.
 
-# create a monetdb executable (.bat) file for the national household and travel survey
+# create a monetdb executable (.bat) file for the national household travel survey
 batfile <-
 	monetdb.server.setup(
 					
@@ -264,7 +264,7 @@ batfile
 
 # hold on to that line for future scripts.
 # you need to run this line *every time* you access
-# the national household and travel survey files with monetdb.
+# the national household travel survey files with monetdb.
 # this is the monetdb server.
 
 # two other things you need: the database name and the database port.
@@ -952,7 +952,7 @@ unlink( td , recursive = TRUE )
 
 
 # once complete, this script does not need to be run again.
-# instead, use one of the national household and travel survey analysis scripts
+# instead, use one of the national household travel survey analysis scripts
 # which utilize these newly-created survey objects
 
 
