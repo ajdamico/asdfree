@@ -773,6 +773,7 @@ for ( year in years.to.download ){
 					repweights = ldt.repwt ,
 					scale = sca ,
 					rscales = rsc ,
+					degf = 99 ,
 					mse = TRUE ,
 					table.name = paste0( 'ldt_m_' , year ) , 	# use the person-ldt-merge data table
 					key = "idkey" ,
@@ -818,6 +819,7 @@ for ( year in years.to.download ){
 				repweights = day.repwt ,
 				scale = sca ,
 				rscales = rsc ,
+				degf = 99 ,
 				mse = TRUE ,
 				table.name = paste0( 'day_m_' , year ) , 	# use the person-day-merge data table
 				key = "idkey" ,
@@ -861,6 +863,7 @@ for ( year in years.to.download ){
 				repweights = per.repwt ,
 				scale = sca ,
 				rscales = rsc ,
+				degf = 99 ,
 				mse = TRUE ,
 				table.name = paste0( 'per_m_' , year ) , 	# use the person-merge data table
 				key = "idkey" ,
@@ -905,6 +908,7 @@ for ( year in years.to.download ){
 				repweights = hh.repwt ,
 				scale = sca ,
 				rscales = rsc ,
+				degf = 99 ,
 				mse = TRUE ,
 				table.name = paste0( 'hh_m_' , year ) , 	# use the household-merge data table
 				key = "idkey" ,
