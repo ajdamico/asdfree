@@ -159,46 +159,46 @@ nhts.moe( ~I( hhvehcnt ) , nhts.hh.design )
 # replication of person-level estimates #
 #########################################
 
-# excel cell XX
+# excel cell H24
 svytotal( ~I( r_sex == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell I24
 nhts.moe( ~I( r_sex == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell H25
 svytotal( ~I( r_sex == 2 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell I25
 nhts.moe( ~I( r_sex == 2 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell H13
 svytotal( ~I( r_age < 16 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell I13
 nhts.moe( ~I( r_age < 16 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell H27
 svytotal( ~I( driver == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell I27
 nhts.moe( ~I( driver == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell H28
 svytotal( ~I( r_sex == 1 & driver == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell I28
 nhts.moe( ~I( r_sex == 1 & driver == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell H29
 svytotal( ~I( r_sex == 2 & driver == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell I29
 nhts.moe( ~I( r_sex == 2 & driver == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell H31
 svytotal( ~I( worker == 1 ) , nhts.per.design )
 
-# excel cell XX
+# excel cell I31
 nhts.moe( ~I( worker == 1 ) , nhts.per.design )
 
 
@@ -207,16 +207,16 @@ nhts.moe( ~I( worker == 1 ) , nhts.per.design )
 # replication of trip-level estimates #
 #######################################
 
-# excel cell XX
+# excel cell H41
 svytotal( ~one , nhts.day.design )
 
-# excel cell XX
+# excel cell I41
 nhts.moe( ~one , nhts.day.design )
 
-# excel cell XX
+# excel cell H43
 svytotal( ~trpmiles , nhts.day.design )
 
-# excel cell XX
+# excel cell I43
 nhts.moe( ~trpmiles , nhts.day.design )
 
 
