@@ -98,32 +98,17 @@ pufs <-
 		substr( year , 3 , 4 ) 
 	)
 
+	
 # loop through each public use file..
 for ( i in pufs ){
 
 	# print the name of the current table
 	print( i )
-	
-	
-	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-	# create a monet.frame object (experimental, but designed to behave like an R data frame) #
-	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-	assign( i , monet.frame( db , i ) )
 
 	# print the number of records stored in that table
-	print( 
-		paste( 
-			"table" , 
-			i , 
-			"contains" , 
-			nrow( get( i ) ) , 
-			"rows" 
-		) 
-	)
+	print( dbGetQuery( db , paste0( "select count(*) from " , i ) ) )
+	
 }
-
-# and now you can access each of those objects as if they were an R data frame #
 
 
 # # # # # # # # # # # # # #
@@ -150,10 +135,6 @@ benes <-
 # print this matrix to the screen
 benes
 
-# examine the first and last six records of the home health agency (hha) table
-head( hha08 )
-
-tail( hha08 )
 
 # create an 'hhusers' data frame, constructed by querying the monet database
 hhusers <-
@@ -209,11 +190,8 @@ round( hhusers / benes , 4 )
 # the following code will precisely match the 'total' (bottom) row in tables 5 and 6 of the inpatient documentation (pdf page 20)
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_Inpatient_Claims_PUF_GenDoc.pdf
 
-# examine the first six records of the 2008 inpatient claims (inpatient08) table using SQL..
+# examine the first six records of the 2008 inpatient claims (inpatient08) table using SQL
 dbGetQuery( db , "select * from inpatient08 limit 6" )
-
-# ..or access the monet.frame object
-head( inpatient08 )
 
 
 # run a simple sql query on the inpatient claims table in the 2008 monet database
@@ -243,11 +221,9 @@ dbGetQuery(
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_Inpatient_Claims_PUF_GenDoc.pdf
 
 
-# count the total number of claims in the monet data table using SQL..
+# count the total number of claims in the monet data table using SQL
 ( total.claims <- dbGetQuery( db , "select count(*) from inpatient08" ) )
 
-# ..or as a monet.frame
-nrow( inpatient08 )
 
 # print the distinct values of the 'ip_clm_days_cd' column to the screen
 dbGetQuery( db , "select distinct ip_clm_days_cd from inpatient08" )
@@ -291,18 +267,11 @@ table12
 # the following code will precisely match the puf (rightmost) column in table 4 of the hospice documentation (pdf page 7)
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_Hospice_Bene_PUF_GenDoc.pdf
 
-# examine the first six records of the 2008 hospice enrollee (hospice08) table using SQL..
+# examine the first six records of the 2008 hospice enrollee (hospice08) table using SQL
 dbGetQuery( db , "select * from hospice08 limit 6" )
-
-# ..or access it as a monet.frame
-head( hospice08 )
-
 
 # store the number of beneficiaries in hospice (remember this is about 5% of the total population)
 ( total.benes <- dbGetQuery( db , "select count(*) from hospice08" ) )
-
-# same old same old
-nrow( hospice08 )
 
 # store the number of beneficiaries in hospice - in each sex category - into a data frame called 'table4'
 table4 <- 
@@ -362,11 +331,8 @@ snf.users.by.admissions$count / sum( snf.users.by.admissions$count )
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_Carrier_Line_Items_PUF_GenDoc.pdf
 
 
-# examine the first six records of the 2008 carrier line item (carrier08) table using SQL..
+# examine the first six records of the 2008 carrier line item (carrier08) table using SQL
 dbGetQuery( db , "select *  from carrier08 limit 6" )
-
-# ..or as a monet.frame
-head( carrier08 )
 
 # count the total number of line items
 # note: the 'medicare payments' also comes close to the 'medicare payments' column
@@ -383,11 +349,8 @@ dbGetQuery( db , "select count(*) as number_of_line_items , sum( car_hcpcs_pmt_a
 # the following code will precisely match the distribution in table 10 of the prescription drug events documentation (pdf page 9)
 # http://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_BSA_PD_Events_PUF_GenDoc.pdf
 
-# examine the first six records of the 2008 prescription drug events (pde08) table with SQL..
+# examine the first six records of the 2008 prescription drug events (pde08) table with SQL
 dbGetQuery( db , "select * from pde08 limit 6" )
-
-# ..or with monet.frame
-head( pde08 )
 
 # count the number of events shown in table 1 (on pdf page 2) and get close (but not perfect) to the total drug cost, due to rounding
 table1 <- dbGetQuery( db , "select count(*) as num_events , sum( pde_drug_cost ) as drug_cost_sum from pde08" )
@@ -419,11 +382,8 @@ as.numeric( patient.payment.dist$L1 ) / as.numeric( table1[1] )
 # the following code will precisely match the counts in table 5 of the chronic conditions puf general documentation (pdf page 13)
 # https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/BSAPUFS/Downloads/2008_Chronic_Conditions_PUF_GenDoc.pdf
 
-# examine the first six records of the 2008 chronic conditions (cc08) table using SQL..
+# examine the first six records of the 2008 chronic conditions (cc08) table using SQL
 dbGetQuery( db , "select * from cc08 limit 6" )
-
-# ..or with monet.frame
-head( cc08 )
 
 # create a character vector containing each of the data columns matching the enrollee columns in table 5
 count.columns <-
