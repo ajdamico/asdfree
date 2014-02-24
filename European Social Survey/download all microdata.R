@@ -321,15 +321,15 @@ for ( curDownload in downloads ){
 		# clear up RAM
 		gc()
 
-		# remove the temporary file..
+		# remove the temporary file
 		file.remove( tf )
-		
-		# ..and all contents of the temporary directory
-		unlink( td , recursive = TRUE )
-	
+			
 	}
 	
 }
+
+# remove all contents of the temporary directory
+unlink( td , recursive = TRUE )
 
 
 # for more details on how to work with data in r
