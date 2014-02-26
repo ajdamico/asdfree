@@ -107,10 +107,10 @@ db <- dbConnect( SQLite() , pnad.dbname )
 
 
 # download and import the tables containing missing codes
-download.cache( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/household_nr.csv" , tf , FUN = download )
+download( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/household_nr.csv" , tf )
 household.nr <- read.csv( tf , colClasses = 'character' )
 
-download.cache( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/person_nr.csv" , tf , FUN = download )
+download( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/person_nr.csv" , tf )
 person.nr <- read.csv( tf , colClasses = 'character' )
 
 # convert these tables to lowercase
