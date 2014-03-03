@@ -130,9 +130,14 @@ summary( lm( trstun ~ tvtot , y , weights = y$dweight ) )
 
 
 
-########################################################################
-# replicate the estimation of design effects for ess round ii document #
-########################################################################
+#########################################################################
+# replicate the estimation of design effects for ess round one document #
+#########################################################################
+
+
+# here's some step-by-step calculations that either exactly or nearly match the official document
+# http://www.europeansocialsurvey.org/docs/round1/methods/ESS1_sddf_documentation.pdf
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # some few reasons to accept the methods below as correct #
