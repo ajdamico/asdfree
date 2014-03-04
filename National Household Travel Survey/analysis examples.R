@@ -173,7 +173,7 @@ svytotal( ~one , nhts.per.design , byvar = ~hhstate )
 svymean( ~r_age , nhts.per.design )
 
 # by state
-svymean( ~agep , nhts.per.design , byvar = ~hhstate )
+svymean( ~r_age , nhts.per.design , byvar = ~hhstate )
 
 
 # calculate the distribution of a categorical variable #
