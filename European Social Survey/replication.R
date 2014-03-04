@@ -78,9 +78,13 @@ options( survey.lonely.psu = "adjust" )
 
 
 
-# # # # # warning: do not use nesstar for your analysis # # # # #
-# it's a rudimentary online table creator.
-# it does not produce standard errors or confidence intervals correctly.
+# warning: for non-simple random sample data sets, nesstar3 will
+# not produce standard errors or confidence intervals correctly.
+
+# only a few of the country-rounds _are_ simple random samples,
+# so if you need any measure of variance,
+# it's safer to use the R survey design object
+
 
 ######################################################################
 # replicate the european social survey's nesstar online query system #
@@ -101,7 +105,9 @@ y <- subset( x , !is.na( tvtot ) & !is.na( trstun ) )
 # sum up the weight variable
 sum( y$dweight )
 
-# run a simple regression using the design weight, using `tv watching time` as the independent and `trust in the united nations` as the dependent variables
+# run a simple regression using the design weight,
+# using `tv watching time` as the independent and 
+# `trust in the united nations` as the dependent variables
 summary( lm( trstun ~ tvtot , y , weights = y$dweight ) )
 
 # everything below the `valid N` is based on a frequency-weighted (instead of probability-weighted) sample,
@@ -109,7 +115,6 @@ summary( lm( trstun ~ tvtot , y , weights = y$dweight ) )
 
 # but the coefficients and intercepts match.
 
-# anyway, do not use nesstar for your analysis.
 
 # the middle of pdf page 4 of
 # http://www.europeansocialsurvey.org/docs/methodology/ESS_weighting_data.pdf
@@ -122,10 +127,10 @@ summary( lm( trstun ~ tvtot , y , weights = y$dweight ) )
 # A detailed description of the ESS sample designs can be found in the ESS Documentation Report.                          #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# but none of the data are collected as simple random samples.
-# that means that every number related to the variance - 
+# but only a few country-rounds are collected as simple random samples.
+# that means that most numbers related to the variance - 
 # standard errors, significance values, confidence intervals, f statistics, etc. etc. -
-# will be wrong with nesstar.
+# will be incorrectly small with nesstar.  safer to use the R survey design if you're statistical testing anything.
 
 
 
@@ -219,7 +224,7 @@ vcm <- VarCorr(m)
 # extract the variance component of the psu
 var.psu <- vcm$psu[1]
 
-# square the residual
+#  square the residual standard deviation to obtain the variance
 var.resid <- attr( vcm , "sc" ) ^ 2
 
 # calculate the anova estimator
