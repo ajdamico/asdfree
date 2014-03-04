@@ -39,7 +39,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #########################################################################################################################
-# prior to running this replication script, the 2004 and 2012 ess microdata files must be loaded as R data files (.rda) #
+# prior to running this replication script, the 2004 and 2010 ess microdata files must be loaded as R data files (.rda) #
 # on the local machine. running the "download all microdata.R" script will create this file for you with zero hassle.   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw.github.com/ajdamico/usgsd/master/European%20Social%20Survey/download%20all%20microdata.R                  #
