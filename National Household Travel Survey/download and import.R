@@ -739,6 +739,27 @@ for ( year in years.to.download ){
 	
 
 		if ( year == 2001 ){
+					
+			# kill and re-start the server before every merge #
+
+			# disconnect from the current monet database
+			dbDisconnect( db )
+
+			# and close it using the `pid`
+			monetdb.server.stop( pid )
+
+			# wait ten seconds, just to make sure any previous servers closed
+			# and you don't get a gdk-lock error from opening two-at-once
+			Sys.sleep( 10 )
+
+			# launch the current monet database
+			pid <- monetdb.server.start( batfile )
+
+			# immediately connect to it
+			db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+			# end of mserver death and resurrection #
+
 		
 			# merge the `ldt` table with the ldt weights
 			nonmatching.fields <- nmf( db , 'ldt50wt' , 'ldtpub' , year )
@@ -785,7 +806,28 @@ for ( year in years.to.download ){
 		
 		}
 		
-	
+
+		# kill and re-start the server before every merge #
+
+		# disconnect from the current monet database
+		dbDisconnect( db )
+
+		# and close it using the `pid`
+		monetdb.server.stop( pid )
+
+		# wait ten seconds, just to make sure any previous servers closed
+		# and you don't get a gdk-lock error from opening two-at-once
+		Sys.sleep( 10 )
+
+		# launch the current monet database
+		pid <- monetdb.server.start( batfile )
+
+		# immediately connect to it
+		db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+		# end of mserver death and resurrection #
+
+		
 		# merge the `day` table with the person-level weights
 		nonmatching.fields <- nmf( db , wt.table , day.table , year )
 		
@@ -828,6 +870,27 @@ for ( year in years.to.download ){
 				database = monet.url ,
 				driver = MonetDB.R()
 			)
+
+
+		# kill and re-start the server before every merge #
+
+		# disconnect from the current monet database
+		dbDisconnect( db )
+
+		# and close it using the `pid`
+		monetdb.server.stop( pid )
+
+		# wait ten seconds, just to make sure any previous servers closed
+		# and you don't get a gdk-lock error from opening two-at-once
+		Sys.sleep( 10 )
+
+		# launch the current monet database
+		pid <- monetdb.server.start( batfile )
+
+		# immediately connect to it
+		db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+		# end of mserver death and resurrection #
 
 			
 		# merge the person table with the person-level weights
@@ -873,9 +936,28 @@ for ( year in years.to.download ){
 				driver = MonetDB.R()
 			)
 
+	
+		# kill and re-start the server before every merge #
+
+		# disconnect from the current monet database
+		dbDisconnect( db )
+
+		# and close it using the `pid`
+		monetdb.server.stop( pid )
+
+		# wait ten seconds, just to make sure any previous servers closed
+		# and you don't get a gdk-lock error from opening two-at-once
+		Sys.sleep( 10 )
+
+		# launch the current monet database
+		pid <- monetdb.server.start( batfile )
+
+		# immediately connect to it
+		db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+		# end of mserver death and resurrection #
 
 		
-
 		# merge the household table with the household-level weights
 		nonmatching.fields <- nmf( db , 'hh50wt' , hh.table , year )
 		
