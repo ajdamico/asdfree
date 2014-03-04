@@ -246,8 +246,8 @@ var.resid <- attr( vcm , "sc" ) ^ 2
 # it's safe to assume that any methodological differences are not worth arguing about.
 
 
-# remember how we created the R `complex-sample` and `simple-random-sample` design objects earlier?
-# now let's use those to get nearly the same result in one step.
+# remember how we created the R `complex-sample` design object earlier?
+# now let's use that to get nearly the same result in one step.
 
 
 # step one: calculate the stflife variable mean, retaining the design effect information
