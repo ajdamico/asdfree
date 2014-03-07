@@ -244,7 +244,7 @@ monetdb.server.stop( pid )
 # five-year datasets are available back to 2009
 # uncomment this line to download all available five-year data sets
 # uncomment this line by removing the `#` at the front
-# five.year.datasets.to.download <- 2009:2011
+# five.year.datasets.to.download <- 2009:2012
 
 # # # # # # # # # # # # # #
 # other download examples #
