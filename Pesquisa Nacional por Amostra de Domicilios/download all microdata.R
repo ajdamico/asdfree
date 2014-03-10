@@ -140,57 +140,19 @@ for ( year in years.to.download ){
 
 	# note: this PNAD ASCII (fixed-width file) contains household- and person-level records.
 
-	# starting in 2011, the IBGE ftp site has both different filepaths and storage structures
-	if ( year > 2010 ){
+	# figure out the exact filepath of the re-weighted pnad year
+	ftp.path <-
+		paste0(
+			"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/microdados/reponderacao_2001_2012/PNAD_reponderado_" ,
+			year ,
+			".zip"
+		)
 
-		# newer microdata filepath on the IBGE FTP site
-		ftp.path <-
-			paste0(
-				"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/microdados/" ,
-				year ,
-				"/"
-			)
-		
-		# newer data file location inside the FTP directory
-		data.file <- paste0( ftp.path , "/Dados.zip" )
-		
-		# switch between the appropriate dictionary name
-		dict.name <- ifelse( year == 2011 , "/Dicionarios.zip" , "Dicionarios_e_input.zip" )
-		
-		# newer sas importation instructions location inside the FTP directory
-		sas.input.instructions <- paste0( ftp.path , dict.name )
-
-		# download the household and person ascii data files to the local computer..
-		download.cache( data.file , tf , mode = "wb" )
-
-		# ..then unzip them into the temporary directory
-		files <- unzip( tf , exdir = td )
-
-		# download the sas importation instructions inside the same FTP directory..
-		download.cache( sas.input.instructions , tf , mode = "wb" )
-
-		# ..then also unzip them into the temporary directory
-		files <- c( files , unzip( tf , exdir = td ) )
-
-	} else {
+	# download the data and sas importation instructions all at once..
+	download.cache( ftp.path , tf , mode = "wb" )
 	
-		# 2001 - 2009 contain the microdata in a single file
-
-		# older microdata filepath on the IBGE FTP site
-		ftp.path <-
-			paste0(
-				"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/microdados/reponderacao_2001_2009/PNAD_reponderado_" ,
-				year ,
-				".zip"
-			)
-	
-		# download the data and sas importation instructions all at once..
-		download.cache( ftp.path , tf , mode = "wb" )
-		
-		# ..then also unzip them into the temporary directory
-		files <- unzip( tf , exdir = td )
-		
-	}
+	# ..then also unzip them into the temporary directory
+	files <- unzip( tf , exdir = td )
 
 	# convert the character vector containing the filepaths where all data and import instructions are stored to lowercase
 	files <- tolower( files )
