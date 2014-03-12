@@ -428,7 +428,7 @@ pes.factors <- intersect( pes.fields , c( dom.char , pes.char ) )
 
 
 
-#####################################
+#################################################
 # create a sqlsurvey complex sample design object
 dom.design <-
 	sqlsurvey(
@@ -436,6 +436,7 @@ dom.design <-
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = 'v0011' ,					# stratification variable column (defined in the character string above)
 		id = 'v0300' ,						# sampling unit column (defined in the character string above)
+		fpc = 'dom_fpc' ,					# within-data pre-computed finite population correction
 		table.name = 'c10_dom' ,			# table name within the monet database (defined in the character string above)
 		key = "idkey" ,						# sql primary key column (created with the auto_increment line above)
 		check.factors = dom.factors ,		# defaults to ten
@@ -451,7 +452,7 @@ save( dom.design , file = 'dom 2010 design.rda' )
 
 
 
-#####################################
+#################################################
 # create a sqlsurvey complex sample design object
 pes.design <-
 	sqlsurvey(
@@ -459,6 +460,7 @@ pes.design <-
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = 'v0011' ,					# stratification variable column (defined in the character string above)
 		id = 'v0300' ,						# sampling unit column (defined in the character string above)
+		fpc = 'pes_fpc' ,					# within-data pre-computed finite population correction
 		table.name = 'c10' ,				# table name within the monet database (defined in the character string above)
 		key = "idkey" ,						# sql primary key column (created with the auto_increment line above)
 		check.factors = pes.factors ,		# defaults to ten
@@ -472,60 +474,12 @@ pes.design <-
 save( pes.design , file = 'pes 2010 design.rda' )
 
 
-stop( 'does this match?' )
-svymean( ~v0601 , pes.design , byvar = ~v0001 , se = TRUE )
-
-# this is wrong #
-stop( "incomplete" )
-
-
-# create a sqlrepsurvey complex sample design object
-# using the merged (household+person) table
-
-acs.m.design <- 									# name the survey object
-	sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
-		weight = 'pwgtp' , 							# person-level weights are stored in column "pwgtp"
-		repweights = paste0( 'pwgtp' , 1:80 ) ,		# the acs contains 80 replicate weights, pwgtp1 - pwgtp80.  this [0-9] format captures all numeric values
-		scale = 4 / 80 ,
-		rscales = rep( 1 , 80 ) ,
-		mse = TRUE ,
-		table.name = paste0( k , '_m' ) , 			# use the person-household-merge data table
-		key = "idkey" ,
-		# check.factors = 10 by default.. uncommenting this next line would compute column classes based on `headers.m` instead
-		# check.factors = headers.m[ NULL , ] ,		# use `headers.m` to determine the column types
-		database = monet.url ,
-		driver = MonetDB.R()
-	)
-
-# create a sqlrepsurvey complex sample design object
-# using the household-level table
-
-acs.h.design <- 									# name the survey object
-	sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
-		weight = 'wgtp' , 							# household-level weights are stored in column "wgtp"
-		repweights = paste0( 'wgtp' , 1:80 ) ,		# the acs contains 80 replicate weights, wgtp1 - wgtp80.  this [0-9] format captures all numeric values
-		scale = 4 / 80 ,
-		rscales = rep( 1 , 80 ) ,
-		mse = TRUE ,
-		table.name = paste0( k , '_h' ) , 			# use the household-level data table
-		key = "idkey" ,
-		# check.factors = 10 by default.. uncommenting this next line would compute column classes based on `headers.m` instead
-		# check.factors = headers.h[ NULL , ] ,		# use `headers.h` to determine the column types
-		database = monet.url ,
-		driver = MonetDB.R()
-	)
-
-# save both complex sample survey designs
-# into a single r data file (.rda) that can now be
-# analyzed quicker than anything else.
-save( acs.m.design , acs.h.design , file = paste0( k , '.rda' ) )
-
-# close the connection to the two sqlrepsurvey design objects
-close( acs.m.design )
-close( acs.h.design )
+# close the connection to the two sqlsurvey design objects
+close( dom.design )
+close( pes.design )
 
 # remove these two objects from memory
-rm( acs.m.design , acs.h.design )
+rm( dom.design , pes.design )
 
 # clear up RAM
 gc()
@@ -539,7 +493,6 @@ monetdb.server.stop( pid )
 
 # the current working directory should now contain one r data file (.rda)
 # for each monet database-backed complex sample survey design object
-# for each year specified and for each size (one, three, and five year) specified
 
 
 # once complete, this script does not need to be run again.
@@ -551,7 +504,7 @@ monetdb.server.stop( pid )
 # and you don't get a gdk-lock error from opening two-at-once
 Sys.sleep( 10 )
 
-####################################################################
+##################################################################################
 # lines of code to hold on to for all other `censo_demografico` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
@@ -580,7 +533,7 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # end of lines of code to hold on to for all other `censo_demografico` monetdb analyses #
-###########################################################################
+#########################################################################################
 
 
 # unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
