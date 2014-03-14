@@ -336,6 +336,18 @@ pes.stack <-
 
 dbSendUpdate( db , pes.stack )
 
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# launch the current monet database
+pid <- monetdb.server.start( batfile )
+
+# immediately connect to it
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
 dom.fpc.create <-
 	'create table c10_dom_fpc as (select v0011 , sum( v0010 ) as sum_v0010 from c10_dom_pre_fpc group by v0011) WITH DATA'
 
@@ -345,6 +357,18 @@ pes.fpc.create <-
 	'create table c10_pes_fpc as (select v0011 , sum( v0010 ) as sum_v0010 from c10_pes_pre_fpc group by v0011) WITH DATA'
 
 dbSendUpdate( db , pes.fpc.create )
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# launch the current monet database
+pid <- monetdb.server.start( batfile )
+
+# immediately connect to it
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 dom.fpc.merge <-
 	'create table c10_dom as (select a.* , b.sum_v0010 as dom_fpc from c10_dom_pre_fpc as a inner join c10_dom_fpc as b on a.v0011 = b.v0011) WITH DATA'
@@ -356,6 +380,17 @@ pes.fpc.merge <-
 
 dbSendUpdate( db , pes.fpc.merge )
 
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# launch the current monet database
+pid <- monetdb.server.start( batfile )
+
+# immediately connect to it
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 dbSendUpdate( db , 'ALTER TABLE c10_dom ADD COLUMN dom_wgt DOUBLE PRECISION' )
 dbSendUpdate( db , 'ALTER TABLE c10_pes ADD COLUMN pes_wgt DOUBLE PRECISION' )
@@ -425,7 +460,17 @@ pes.char <- tolower( pes.all[ pes.all$char , 'varname' ] )
 dom.factors <- intersect( dom.fields , c( dom.char , pes.char ) )
 pes.factors <- intersect( pes.fields , c( dom.char , pes.char ) )
 
+# disconnect from the current monet database
+dbDisconnect( db )
 
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# launch the current monet database
+pid <- monetdb.server.start( batfile )
+
+# immediately connect to it
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 #################################################
