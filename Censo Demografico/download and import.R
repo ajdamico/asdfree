@@ -477,13 +477,13 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # create a sqlsurvey complex sample design object
 dom.design <-
 	sqlsurvey(
-		weight = 'dom_wgt' ,				# weight variable column (defined in the character string above)
+		weight = 'dom_wgt' ,				# weight variable column (defined in the character string)
 		nest = TRUE ,						# whether or not psus are nested within strata
-		strata = 'v0011' ,					# stratification variable column (defined in the character string above)
-		id = 'v0300' ,						# sampling unit column (defined in the character string above)
-		fpc = 'dom_fpc' ,					# within-data pre-computed finite population correction
-		table.name = 'c10_dom' ,			# table name within the monet database (defined in the character string above)
-		key = "idkey" ,						# sql primary key column (created with the auto_increment line above)
+		strata = 'v0011' ,					# stratification variable column (defined in the character string)
+		id = 'v0300' ,						# sampling unit column (defined in the character string)
+		fpc = 'dom_fpc' ,					# within-data pre-computed finite population correction for the household
+		table.name = 'c10_dom' ,			# table name within the monet database (defined in the character string)
+		key = "idkey" ,						# sql primary key column (created with the auto_increment line)
 		check.factors = dom.factors ,		# defaults to ten
 		database = monet.url ,				# monet database location on localhost
 		driver = MonetDB.R()
@@ -501,13 +501,13 @@ save( dom.design , file = 'dom 2010 design.rda' )
 # create a sqlsurvey complex sample design object
 pes.design <-
 	sqlsurvey(
-		weight = 'pes_wgt' ,				# weight variable column (defined in the character string above)
+		weight = 'pes_wgt' ,				# weight variable column (defined in the character string)
 		nest = TRUE ,						# whether or not psus are nested within strata
-		strata = 'v0011' ,					# stratification variable column (defined in the character string above)
-		id = 'v0300' ,						# sampling unit column (defined in the character string above)
-		fpc = 'pes_fpc' ,					# within-data pre-computed finite population correction
-		table.name = 'c10' ,				# table name within the monet database (defined in the character string above)
-		key = "idkey" ,						# sql primary key column (created with the auto_increment line above)
+		strata = 'v0011' ,					# stratification variable column (defined in the character string)
+		id = 'v0300' ,						# sampling unit column (defined in the character string)
+		fpc = 'dom_fpc' ,					# within-data pre-computed finite population correction, also for the household
+		table.name = 'c10' ,				# table name within the monet database (defined in the character string)
+		key = "idkey" ,						# sql primary key column (created with the auto_increment line)
 		check.factors = pes.factors ,		# defaults to ten
 		database = monet.url ,				# monet database location on localhost
 		driver = MonetDB.R()
