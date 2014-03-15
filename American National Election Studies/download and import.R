@@ -159,6 +159,9 @@ no.data.studies <-
 		'ANES 2010 Time Series Study' ,
 		'ANES 2006' ,
 		"Auxiliary File ANES 2004 Time Series and Panel Contextual File" ,
+		# these two are just full of broken links
+		"User-Contributed Data (for use with the ANES 1996 Time Series Study)" ,
+		"User-Contributed Data (for use with the ANES 1992 Time Series Study)" ,
 		# this last one isn't a no data study, but it needs a database to load into a computer with 4GB
 		# ..and it's not particularly useful
 		"Auxiliary File Supplemental (off-wave non-ANES) Data File"
@@ -175,9 +178,13 @@ files.to.download[[ "ANES 2010-2012 Evaluations of Government and Society Study"
 		"../data/2010_2012EGSS/ANES_EGSS4_preliminary_release_sav.zip" ,
 		"../data/2010_2012EGSS/ANES_EGSS3_preliminary_release_sav.zip" ,
 		"../data/2010_2012EGSS/ANES_EGSS2_preliminary_release_sav.zip" ,
-		"../data/2010_2012EGSS/anes2011_egss1dta.zip"
+		"../data/2010_2012EGSS/anes2010_2012egss1por.zip"
 	)
 
+files.to.download[[ "ANES 2012 Time Series Study" ]] <-
+	"../data/anes_timeseries_2012/anes_timeseries_2012_sav.zip"
+	
+	
 # .por files only
 files.to.download[[ "ANES 2008-2009 Panel Study" ]] <-
 	"../data/2008_2009panel/anes2008_2009panelpor.zip"
