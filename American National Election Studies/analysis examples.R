@@ -89,55 +89,22 @@ KeepVars <-
 	c( 
 		"caseid" ,				# unique record identifiers
 		
-		"weight_full" , 		# full-sample weights
+		"weight.full" , 		# full-sample weights
 		
-		"strata_full" ,			# full-sample strata variable
+		"strata.full" ,			# full-sample strata variable
 
-		"sample_fullpsu" ,		# newly-created full-sample cluster variable
+		"psu.full" ,			# full-sample cluster variable
 		
-		"dem_agegrp_iwdate" , 	# respondent age group
+		"dem.agegrp.iwdate.x" , # respondent age group
 		
-		"gender_respondent" ,	# respondent sex
+		"gender.respondent.x" ,	# respondent sex
 		
-		"dem_hrsrecent" ,		# how many hours do you work the average week
+		"dem.hrsrecent" ,		# how many hours do you work the average week
 		
-		"tea_supp"				# do you support or oppose the tea party
+		"tea.supp"				# do you support or oppose the tea party
 	)
 
 	
-# # # # # # # # # # # # # # # # # # # # # # #
-# create a clustering variable for both the #
-# face-to-face and the web version together #
-# # # # # # # # # # # # # # # # # # # # # # #
-
-# confirm that the `mode` column contains
-# only ones and twos (face-to-face and web)
-stopifnot( all( x$mode %in% c( 1 , 2 ) ) )
-
-# for face-to-face responses, the cluster variable
-# is the same as it is for sample_ftfpsu
-x[ x$mode %in% 1 , 'sample_fullpsu' ] <-
-	x[ x$mode %in% 1 , 'sample_ftfpsu' ]
-	
-# for the web responses, the cluster variable
-# should be completely unique.
-# the easiest way to create a unique variable is
-# to find a starting point..
-starting.point <- max( x$sample_ftfpsu , na.rm = TRUE ) + 1
-
-# ..and then extract the unique record numbers
-# of each of the web records, but re-hash them to start at 1
-web.psu.line <- as.numeric( as.factor( which( x$mode %in% 2 ) ) )
-
-# at this point, add them to the starting point and slip 'em in
-x[ x$mode %in% 2 , 'sample_fullpsu' ] <- web.psu.line
-
-# # # # # # # # # # # # # # # # # # # #
-# end of clustering variable creation #
-# # # # # # # # # # # # # # # # # # # #
-
-
-
 # limit the r data frame (x) containing all variables
 # to a severely-restricted r data frame containing only the seven variables
 # specified in character vector 'KeepVars'
@@ -151,7 +118,7 @@ gc()
 
 
 # anyone with a negative value in any of these variables..
-negatives.to.blank <- c( "dem_agegrp_iwdate" , "gender_respondent" , "dem_hrsrecent" , "tea_supp" )
+negatives.to.blank <- c( "dem.agegrp.iwdate.x" , "gender.respondent.x" , "dem.hrsrecent" , "tea.supp" )
 # ..should actually have a missing instead
 y[ , negatives.to.blank ] <- sapply( y[ , negatives.to.blank ] , function( z ) { z[ z < 0 ] <- NA ; z } )
 
@@ -165,10 +132,10 @@ y[ , negatives.to.blank ] <- sapply( y[ , negatives.to.blank ] , function( z ) {
 # create a survey design object (anes.design) with ANES design information
 anes.design <- 
 	svydesign( 
-		~sample_fullpsu , 
-		strata = ~strata_full , 
+		~psu.full , 
+		strata = ~strata.full , 
 		data = y , 
-		weights = ~weight_full , 
+		weights = ~weight.full , 
 		nest = TRUE 
 	)
 	
@@ -198,8 +165,8 @@ nrow( anes.design )
 # broken out by age group #
 
 svyby(
-	~tea_supp ,
-	~dem_agegrp_iwdate ,
+	~tea.supp ,
+	~dem.agegrp.iwdate.x ,
 	anes.design ,
 	unwtd.count
 )
@@ -229,7 +196,7 @@ svytotal(
 # broken out by age group #
 svyby(
 	~one ,
-	~dem_agegrp_iwdate ,
+	~dem.agegrp.iwdate.x ,
 	anes.design ,
 	svytotal
 )
@@ -239,15 +206,15 @@ svyby(
 
 # average hours worked per week - among all eligible voters
 svymean( 
-	~dem_hrsrecent , 
+	~dem.hrsrecent , 
 	design = anes.design ,
 	na.rm = TRUE
 )
 
 # by age group
 svyby( 
-	~dem_hrsrecent , 
-	~dem_agegrp_iwdate ,
+	~dem.hrsrecent , 
+	~dem.agegrp.iwdate.x ,
 	design = anes.design ,
 	svymean ,
 	na.rm = TRUE
@@ -256,28 +223,28 @@ svyby(
 
 # calculate the distribution of a categorical variable #
 
-# tea_supp should be treated as a factor (categorical) variable
+# tea.supp should be treated as a factor (categorical) variable
 # instead of a numeric (linear) variable
 # this update statement converts it.
 # the svyby command below will not run without this
 anes.design <-
 	update( 
-		tea_supp = factor( tea_supp ) ,
+		tea.supp = factor( tea.supp ) ,
 		anes.design
 	)
 
 
 # distribution of tea party support (support/oppose/neither) - nationwide
 svymean( 
-	~tea_supp , 
+	~tea.supp , 
 	design = anes.design ,
 	na.rm = TRUE
 )
 
 # by age group
 svyby( 
-	~tea_supp , 
-	~dem_agegrp_iwdate ,
+	~tea.supp , 
+	~dem.agegrp.iwdate.x ,
 	design = anes.design ,
 	svymean , 
 	na.rm = TRUE
@@ -291,7 +258,7 @@ svyby(
 # minimum, 25th, 50th, 75th, maximum 
 # hours worked in the united states
 svyquantile( 
-	~dem_hrsrecent , 
+	~dem.hrsrecent , 
 	design = anes.design ,
 	c( 0 , .25 , .5 , .75 , 1 ) ,
 	na.rm = TRUE
@@ -299,8 +266,8 @@ svyquantile(
 
 # by age group
 svyby( 
-	~dem_hrsrecent , 
-	~dem_agegrp_iwdate ,
+	~dem.hrsrecent , 
+	~dem.agegrp.iwdate.x ,
 	design = anes.design ,
 	svyquantile ,
 	c( 0 , .25 , .5 , .75 , 1 ) ,
@@ -317,7 +284,7 @@ svyby(
 anes.design.female <-
 	subset(
 		anes.design ,
-		gender_respondent %in% 2
+		gender.respondent.x %in% 2
 	)
 # now any of the above commands can be re-run
 # using the anes.design.female object
@@ -328,7 +295,7 @@ anes.design.female <-
 
 # average hours worked - nationwide, restricted to females
 svymean( 
-	~dem_hrsrecent , 
+	~dem.hrsrecent , 
 	design = anes.design.female ,
 	na.rm = TRUE
 )
@@ -344,49 +311,49 @@ svymean(
 
 # store the results into a new object
 
-tea_supp.by.age <-
+tea.supp.by.age <-
 	svyby( 
-		~tea_supp , 
-		~dem_agegrp_iwdate ,
+		~tea.supp , 
+		~dem.agegrp.iwdate.x ,
 		design = anes.design ,
 		svymean ,
 		na.rm = TRUE
 	)
 
 # print the results to the screen 
-tea_supp.by.age
+tea.supp.by.age
 
 # now you have the results saved into a new object of type "svyby"
-class( tea_supp.by.age )
+class( tea.supp.by.age )
 
 # print only the statistics (coefficients) to the screen 
-coef( tea_supp.by.age )
+coef( tea.supp.by.age )
 
 # print only the standard errors to the screen 
-SE( tea_supp.by.age )
+SE( tea.supp.by.age )
 
 # this object can be coerced (converted) to a data frame.. 
-tea_supp.by.age <- data.frame( tea_supp.by.age )
+tea.supp.by.age <- data.frame( tea.supp.by.age )
 
 # ..and then immediately exported as a comma-separated value file 
 # into your current working directory 
-write.csv( tea_supp.by.age , "tea_supp by age.csv" )
+write.csv( tea.supp.by.age , "tea_supp by age.csv" )
 
 # ..or trimmed to only contain the values you need.
 # here's the percent of the country who self-identify as
 # tea party supporters by age, with accompanying standard errors
-tea_supp.rate.by.age <-
-	tea_supp.by.age[ , c( "dem_agegrp_iwdate" , "tea_supp1" , "se.tea_supp1" ) ]
+tea.supp.rate.by.age <-
+	tea.supp.by.age[ , c( "dem.agegrp.iwdate.x" , "tea.supp1" , "se.tea.supp1" ) ]
 
 # that's all rows, and the three specified columns
 
 
 # print the new results to the screen
-tea_supp.rate.by.age
+tea.supp.rate.by.age
 
 # this can also be exported as a comma-separated value file 
 # into your current working directory 
-write.csv( tea_supp.rate.by.age , "tea_supp rate by age.csv" )
+write.csv( tea.supp.rate.by.age , "tea_supp rate by age.csv" )
 
 
 # construct a character vector containing the labels of each age group
@@ -395,7 +362,7 @@ age.group.labels <- c( "17 - 20" , "21 - 24" , "25 - 29" , "30 - 34" , "35 - 39"
 
 # ..or directly made into a bar plot
 barplot(
-	tea_supp.rate.by.age[ , 2 ] ,				# the second column of the data frame contains the main data
+	tea.supp.rate.by.age[ , 2 ] ,				# the second column of the data frame contains the main data
 	main = "Tea Party Support by Age Group" ,	# title the barplot
 	names.arg = age.group.labels ,				# the first column of the data frame contains the names of each bar
 	ylim = c( 0 , .4 ) , 						# set the lower and upper bound of the y axis
