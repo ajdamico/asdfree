@@ -370,8 +370,25 @@ pid <- monetdb.server.start( batfile )
 # immediately connect to it
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
+dom.count.create <-
+	'create table c10_dom_count_pes as (select v0001 , v0300 , count(*) as dom_count_pes from c10_pes_pre_fpc group by v0001 , v0300 ) WITH DATA'
+
+dbSendUpdate( db , dom.count.create )
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# launch the current monet database
+pid <- monetdb.server.start( batfile )
+
+# immediately connect to it
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
 dom.fpc.merge <-
-	'create table c10_dom as (select a.* , b.sum_v0010 as dom_fpc from c10_dom_pre_fpc as a inner join c10_dom_fpc as b on a.v0011 = b.v0011) WITH DATA'
+	'create table c10_dom as ( select a1.* , b1.dom_count_pes from (select a2.* , b2.sum_v0010 as dom_fpc from c10_dom_pre_fpc as a2 inner join c10_dom_fpc as b2 on a2.v0011 = b2.v0011) as a1 inner join c10_dom_count_pes as b1 on a1.v0001 = b1.v0001 AND a1.v0300 = b1.v0300 ) WITH DATA'
 	
 dbSendUpdate( db , dom.fpc.merge )
 
