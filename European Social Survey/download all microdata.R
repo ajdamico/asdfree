@@ -296,17 +296,43 @@ for ( curDownload in downloads ){
 				
 			# if the prior attempt failed..
 			if ( class( attempt.one ) == 'try-error' ){
+				# otherwise, convert all factor variables to character
+				attempt.two <- 
+					try( 
+						# use the `memisc` package's `spss.portable.file` framework instead
+						x <-
+							data.frame(
+								as.data.set(
+									spss.portable.file( 
+										spss.files[ grep( 'por' , spss.files ) ] 
+									)
+								)
+							) ,
+						silent = TRUE
+					)
+					
+			} else attempt.two <- NULL
+			
+			
+			# if the prior attempt failed..
+			if ( class( attempt.two ) == 'try-error' ){
+			
 				# use the `memisc` package's `spss.portable.file` framework instead
-				x <-
-					data.frame(
-						as.data.set(
-							spss.portable.file( 
-								spss.files[ grep( 'por' , spss.files ) ] 
-							)
+				b <-
+					as.data.set(
+						spss.portable.file( 
+							spss.files[ grep( 'por' , spss.files ) ] 
 						)
 					)
-			}
+				
+				# convert all factor variables to character variables
+				b <- sapply( b , function( z ) { if( class( z ) == 'factor' ) z <- as.character( z ) ; z } )
+				
+				# now run the conversion that caused the issue.
+				x <- data.frame( b )
 			
+			}
+					
 		}
 		
 		# convert all column names to lowercase
