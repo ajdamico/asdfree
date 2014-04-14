@@ -480,7 +480,7 @@ barplot(
 	wtd.pcts.by.state$pct_below_272p5 ,
 	main = "Percent of Households Below 272.50" ,
 	names.arg = estado.names ,
-	ylim = c( 0 , .25 ) ,
+	ylim = c( 0 , .6 ) ,
 	cex.names = 0.7 ,
 	las = 2
 )
