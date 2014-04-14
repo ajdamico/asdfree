@@ -129,7 +129,7 @@ if (.Platform$OS.type == "windows") dbSendQuery( db , "set optimizer = 'sequenti
 dbSendUpdate( db , "CREATE TABLE recoded_c10_dom AS SELECT * FROM c10_dom WITH DATA" )
 # this action protects the original 'c10_dom' table from any accidental errors.
 # at any point, we can delete this recoded copy of the data table using the command..
-# dbRemoveTable( db , "recoded_c10" )
+# dbRemoveTable( db , "recoded_c10_dom" )
 # ..and start fresh by re-copying the pristine file from c10_dom
 
 
