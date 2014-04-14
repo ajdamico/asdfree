@@ -1,7 +1,7 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # censo demografico
 # 2010 gerais da amostra (general sample)
-# household-level, person-level, and merged files
+# household + person-level merged files
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
