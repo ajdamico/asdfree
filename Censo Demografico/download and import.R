@@ -18,6 +18,9 @@
 # how to run this script from start to finish
 # http://www.screenr.com/Zpd8
 
+# djalma pessoa
+# djalma.pessoa@ibge.gov.br
+
 # anthony joseph damico
 # ajdamico@gmail.com
 
