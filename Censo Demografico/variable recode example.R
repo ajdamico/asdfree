@@ -467,10 +467,11 @@ estado.names <- c( "Rondônia" , "Acre" , "Amazonas" , "Roraima" , "Pará" , "Am
 # plot the percentage of households below 70 by state
 barplot(
 	wtd.pcts.by.state$pct_below_70 ,
-	main = "Percent of Households Below 70" ,
+	main = "Percent of People in Households With PCI Below 70" ,
 	names.arg = estado.names ,
 	ylim = c( 0 , .25 ) ,
 	cex.names = 0.7 ,
+	col = c( rep( "black" , 7 ) , rep( "white" , 9 ) , rep( "black" , 4 ) , rep( "white" , 3 ) , rep( "black" , 4 ) ) ,
 	las = 2
 )
 
@@ -478,10 +479,11 @@ barplot(
 # plot the percentage of households below 272.5 by state
 barplot(
 	wtd.pcts.by.state$pct_below_272p5 ,
-	main = "Percent of Households Below 272.50" ,
+	main = "Percent of People in Households With PCI Below 272.50" ,
 	names.arg = estado.names ,
 	ylim = c( 0 , .6 ) ,
 	cex.names = 0.7 ,
+	col = c( rep( "black" , 7 ) , rep( "white" , 9 ) , rep( "black" , 4 ) , rep( "white" , 3 ) , rep( "black" , 4 ) ) ,
 	las = 2
 )
 
