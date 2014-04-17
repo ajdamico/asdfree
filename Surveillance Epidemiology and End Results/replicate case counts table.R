@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # surveillance epidemiology and end results
-# 1973 through 2010
+# 1973 through 2011
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -77,7 +77,7 @@ dbListFields( db , 'x' )
 
 
 # precisely match the record counts table available on the nci-seer website
-# http://seer.cancer.gov/manuals/TextData.cd1973-2010counts.pdf
+# http://seer.cancer.gov/manuals/TextData.cd1973-2011counts.pdf
 dbGetQuery( db , 'select tablename , count(*) from x group by tablename' )
 
 # note that 

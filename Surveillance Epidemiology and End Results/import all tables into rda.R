@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # surveillance epidemiology and end results
-# 1973 through 2010
+# 1973 through 2011
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -39,7 +39,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/usgsd/blob/master/Surveillance%20Epidemiology%20and%20End%20Results/download.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a 'SEER_1973_2010_TEXTDATA' directory in C:/My Directory/SEER (or the cw directory) #
+# that script will create a 'SEER_1973_2011_TEXTDATA' directory in C:/My Directory/SEER (or the cw directory) #
 ###############################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -76,7 +76,7 @@ library(SAScii) 		# load the SAScii package (imports ascii data with a SAS scrip
 # first, look in the downloaded zipped file's main directory,
 # and store a character vector `all.files` containing the filepaths
 # to each of the files inside that directory
-all.files <- list.files( "./SEER_1973_2010_TEXTDATA" , full.names = TRUE , recursive = TRUE )
+all.files <- list.files( "./SEER_1973_2011_TEXTDATA" , full.names = TRUE , recursive = TRUE )
 
 # create a character vector matching the different cancer file name identifiers
 words.to.match <- c( "BREAST" , "COLRECT" , "DIGOTHR" , "FEMGEN" , "LYMYLEUK" , "MALEGEN" , "RESPIR" , "URINARY" , "OTHER" )
@@ -101,7 +101,7 @@ words.to.match <- c( "BREAST" , "COLRECT" , "DIGOTHR" , "FEMGEN" , "LYMYLEUK" , 
 edited.sas.instructions <- tempfile()
 
 # read the sas importation script into memory
-z <- readLines( "./SEER_1973_2010_TEXTDATA/incidence/read.seer.research.nov2012.sas" )
+z <- readLines( "./SEER_1973_2011_TEXTDATA/incidence/read.seer.research.nov13.sas" )
 
 # get rid of the first through fourth lines (the -1:-4 part)
 # and at the same time get rid of the word `char` (the gsub part)
@@ -139,7 +139,7 @@ for ( fp in ind.file.matches ){
 	# and converting the file location to lowercase
 	sfl <- 
 		gsub( 
-			"seer_1973_2010_textdata/" , 
+			"seer_1973_2011_textdata/" , 
 			"" , 
 			gsub(
 				".txt" ,
@@ -228,7 +228,7 @@ for ( fp in pop.file.matches ){
 	# and converting the file location to lowercase
 	sfl <- 
 		gsub( 
-			"seer_1973_2010_textdata/" , 
+			"seer_1973_2011_textdata/" , 
 			"" , 
 			gsub(
 				".txt" ,

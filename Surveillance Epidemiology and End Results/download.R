@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # surveillance epidemiology and end results
-# 1973 through 2010
+# 1973 through 2011
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -97,7 +97,7 @@ seer.url <-
 		your.username ,
 		":" ,
 		your.password ,
-		"@seerstat.imsweb.com/.cd_images/SEER_1973_2010_TEXTDATA.d04242013.zip"
+		"@seerstat.imsweb.com/.cd_images/SEER_1973_2011_TEXTDATA.d04152014.zip"
 	)
 
 # download the zipped file to the temporary file
