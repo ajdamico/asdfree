@@ -461,7 +461,7 @@ wtd.pcts.by.state
 # # # # # # # # # #
 
 # create a character vector containing all states in order:
-estado.names <- c( "Rondônia" , "Acre" , "Amazonas" , "Roraima" , "Pará" , "Amapá" , "Tocantins" , "Maranhão" , "Piauí" , "Ceará" , "Rio Grande\ndo Norte" , "Paraíba" , "Pernambuco" , "Alagoas" , "Sergipe" , "Bahia" , "Minas Gerais" , "Espírito Santo" , "Rio de Janeiro" , "São Paulo" , "Paraná" , "Santa Catarina" , "Rio Grande\ndo Sul" , "Mato Grosso\ndo Sul" , "Mato Grosso" , "Goiás" , "Distrito Federal" )
+estado.names <- c( "Rondonia" , "Acre" , "Amazonas" , "Roraima" , "Para" , "Amapa" , "Tocantins" , "Maranhao" , "Piaui" , "Ceara" , "Rio Grande\ndo Norte" , "Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , "Bahia" , "Minas Gerais" , "Espirito Santo" , "Rio de Janeiro" , "Sao Paulo" , "Parana" , "Santa Catarina" , "Rio Grande\ndo Sul" , "Mato Grosso\ndo Sul" , "Mato Grosso" , "Goias" , "Distrito Federal" )
 
 
 # plot the percentage of households below 70 by state
@@ -471,8 +471,14 @@ barplot(
 	names.arg = estado.names ,
 	ylim = c( 0 , .25 ) ,
 	cex.names = 0.7 ,
-	col = c( rep( "black" , 7 ) , rep( "white" , 9 ) , rep( "black" , 4 ) , rep( "white" , 3 ) , rep( "black" , 4 ) ) ,
+	col = c( rep( "lightgreen" , 7 ) , rep( "sandybrown" , 9 ) , rep( "palevioletred" , 4 ) , rep( "plum" , 3 ) , rep( "khaki" , 4 ) ) ,
 	las = 2
+)
+
+legend( 
+	"topright" , 
+	c( "North" , "Northeast" , "Southeast" , "South" , "Midwest") , 
+	fill = c( "lightgreen" , "sandybrown" , "palevioletred" , "plum" , "khaki" ) 
 )
 
 
@@ -483,12 +489,18 @@ barplot(
 	names.arg = estado.names ,
 	ylim = c( 0 , .6 ) ,
 	cex.names = 0.7 ,
-	col = c( rep( "black" , 7 ) , rep( "white" , 9 ) , rep( "black" , 4 ) , rep( "white" , 3 ) , rep( "black" , 4 ) ) ,
+	col = c( rep( "lightgreen" , 7 ) , rep( "sandybrown" , 9 ) , rep( "palevioletred" , 4 ) , rep( "plum" , 3 ) , rep( "khaki" , 4 ) ) ,
 	las = 2
 )
 
+legend( 
+	"topright" , 
+	c( "North" , "Northeast" , "Southeast" , "South" , "Midwest") , 
+	fill = c( "lightgreen" , "sandybrown" , "palevioletred" , "plum" , "khaki" ) 
+)
+
 # # # # # # # # # # # # # #
-# emd of export examples  #
+# end of export examples  #
 # # # # # # # # # # # # # #
 
 
