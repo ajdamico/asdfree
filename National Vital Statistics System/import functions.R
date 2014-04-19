@@ -272,6 +272,8 @@ download.nchs <-
 			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , td ) )
 			
 			file.remove( tf )
+
+			Sys.sleep( 3 )
 			
 			z <- tolower( list.files( td , full.names = TRUE ) )
 			
@@ -327,6 +329,8 @@ download.nchs <-
 			}
 			
 			unlink( z , recursive = TRUE )
+			
+			Sys.sleep( 3 )
 			
 		}	
 		
