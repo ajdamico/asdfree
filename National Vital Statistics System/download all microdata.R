@@ -61,6 +61,10 @@
 # leave it running on friday afternoon (or even better: before you leave for a weeklong vacation).
 # depending on your internet and processor speeds, the entire script should take between one and three days.
 
+# warning: this command must be run before any other
+# internet-accessing lines in the session
+setInternet2(TRUE)
+# you also might need administrative rights
 
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "MonetDB.R" , "SAScii" , "downloader" ) )
