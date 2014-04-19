@@ -66,7 +66,7 @@ import.nchs <-
 			
 			fti <- clear.goofy.characters( files.to.import[ i ] , fl = force.length )
 			
-			on.exit( file.remove( fti ) )
+			on.exit( suppressWarnings( while( any( file.remove( fti ) ) ) Sys.sleep( 1 ) ) )
 			
 			read.SAScii.monetdb( 
 				fn = fti ,
@@ -79,7 +79,7 @@ import.nchs <-
 				connection = db
 			)
 			
-			file.remove( fti )
+			suppressWarnings( while( file.remove( fti ) ) Sys.sleep( 1 ) )
 			
 		}
 		
@@ -249,9 +249,7 @@ download.nchs <-
 		
 		tf <- tempfile() ; td <- tempdir()
 		
-		on.exit( file.remove( tf ) )
-		
-		on.exit( unlink( td ) )
+		on.exit( unlink( td , recursive = TRUE ) )
 		
 		dir.create( y$name )
 		
@@ -271,9 +269,7 @@ download.nchs <-
 			# extracting the results to the temporary directory
 			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , td ) )
 			
-			file.remove( tf )
-
-			Sys.sleep(60)
+			suppressWarnings( while( file.remove( tf ) ) Sys.sleep( 1 ) )
 			
 			z <- tolower( list.files( td , full.names = TRUE ) )
 			
@@ -287,7 +283,7 @@ download.nchs <-
 					file.append( z[ 1 ] , z[ 3 ] )
 					
 					# remove those two files from the disk
-					file.remove( z[ 2 ] , z[ 3 ] )
+					suppressWarnings( while( any( file.remove( z[ 2 ] , z[ 3 ] ) ) ) Sys.sleep( 1 ) )
 					
 					# remove those two files from the vector
 					z <- z[ -2:-3 ]
@@ -328,9 +324,7 @@ download.nchs <-
 				
 			}
 			
-			unlink( z , recursive = TRUE )
-			
-			Sys.sleep(60)
+			suppressWarnings( while( file.remove( z ) ) Sys.sleep( 1 ) )
 			
 		}	
 		
