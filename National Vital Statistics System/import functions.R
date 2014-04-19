@@ -271,9 +271,9 @@ download.nchs <-
 			# extracting the results to the temporary directory
 			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , td ) )
 			
-			z <- tolower( list.files( td , full.names = TRUE ) )
-			
 			file.remove( tf )
+			
+			z <- tolower( list.files( td , full.names = TRUE ) )
 			
 			if ( y$name %in% c( 'mortality' , 'natality' , 'fetaldeath' ) ){
 				
