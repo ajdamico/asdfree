@@ -61,7 +61,7 @@ get.tsv <-
 			
 			# file.remove sometimes needs a few seconds to cool off.
 			remove.attempt <- try( stop() , silent = TRUE )
-			while( class( attempt ) == 'try-error' ){ 
+			while( class( remove.attempt ) == 'try-error' ){ 
 				remove.attempt <- try( file.remove( cur.pums ) , silent = TRUE )
 				Sys.sleep( 1 )
 			}
@@ -149,7 +149,7 @@ get.tsv <-
 		
 		# file.remove sometimes needs a few seconds to cool off.
 		remove.attempt <- try( stop() , silent = TRUE )
-		while( class( attempt ) == 'try-error' ){ 
+		while( class( remove.attempt ) == 'try-error' ){ 
 			remove.attempt <- try( file.remove( cur.pums ) , silent = TRUE )
 			Sys.sleep( 1 )
 		}
