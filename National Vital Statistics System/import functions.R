@@ -247,7 +247,7 @@ remove.overlap <-
 download.nchs <-
 	function( y ){
 		
-		on.exit( unlink( td , recursive = TRUE ) )
+		# on.exit( unlink( td , recursive = TRUE ) )
 		
 		tf <- tempfile() ; td <- tempdir()
 		
@@ -290,12 +290,12 @@ download.nchs <-
 				
 				}
 				
-				while( length( z ) != length( y$name ) ){ 
-					print( z <- tolower( list.files( td , full.names = TRUE ) ) )
-					file.remove( tf )
-					print( "waiting.." )
-					Sys.sleep( 5 ) 
-				}
+				# while( length( z ) != length( y$name ) ){ 
+					# print( z <- tolower( list.files( td , full.names = TRUE ) ) )
+					# file.remove( tf )
+					# print( "waiting.." )
+					# Sys.sleep( 5 ) 
+				# }
 			
 				file.copy( 
 					z , 
