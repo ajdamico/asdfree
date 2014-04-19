@@ -247,9 +247,13 @@ remove.overlap <-
 download.nchs <-
 	function( y ){
 		
-		# on.exit( unlink( td , recursive = TRUE ) )
-		
 		tf <- tempfile() ; td <- tempdir()
+		
+		winrar.dir <- normalizePath( paste( td , "winrar" , sep = "/" ) )
+		
+		on.exit( unlink( winrar.dir , recursive = TRUE ) )
+		
+		on.exit( unlink( tf ) )
 		
 		dir.create( y$name )
 		
@@ -267,11 +271,11 @@ download.nchs <-
 			
 			# actually run winrar on the downloaded file,
 			# extracting the results to the temporary directory
-			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , td ) )
+			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , winrar.dir ) )
 			
-			file.remove( tf )
+			suppressWarnings( while( any( file.remove( tf ) ) ) Sys.sleep( 1 ) )
 			
-			z <- tolower( list.files( td , full.names = TRUE ) )
+			z <- tolower( list.files( winrar.dir , full.names = TRUE ) )
 			
 			if ( y$name %in% c( 'mortality' , 'natality' , 'fetaldeath' ) ){
 				
@@ -290,13 +294,6 @@ download.nchs <-
 				
 				}
 				
-				# while( length( z ) != length( y$name ) ){ 
-					# print( z <- tolower( list.files( td , full.names = TRUE ) ) )
-					# file.remove( tf )
-					# print( "waiting.." )
-					# Sys.sleep( 5 ) 
-				# }
-			browser()
 				file.copy( 
 					z , 
 					paste( 

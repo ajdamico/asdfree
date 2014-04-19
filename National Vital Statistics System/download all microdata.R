@@ -298,9 +298,6 @@ monetdb.server.stop( pid )
 ##################################
 
 
-#create a temporary file..
-tf <- tempfile()
-
 # create a character string containing the cdc's vital statistics website
 url.with.data <- "http://www.cdc.gov/nchs/data_access/vitalstatsonline.htm"
 
