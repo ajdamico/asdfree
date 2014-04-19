@@ -267,7 +267,11 @@ download.nchs <-
 			
 			download.cache( i , tf , mode = 'wb' )
 			
-			z <- tolower( unzip( tf , exdir = td ) )
+			# actually run winrar on the downloaded file,
+			# extracting the results to the temporary directory
+			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , td ) )
+			
+			z <- tolower( list.files( td ) )
 			
 			file.remove( tf )
 			
@@ -322,7 +326,7 @@ download.nchs <-
 				
 			}
 			
-			file.remove( z )
+			unlink( z , recursive = TRUE )
 			
 		}	
 		

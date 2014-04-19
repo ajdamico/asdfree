@@ -12,6 +12,7 @@
 # cohortlinked.sets.to.download <- 2007:1995
 # mortality.sets.to.download <- 2010:2000
 # fetaldeath.sets.to.download <- 2012:2005
+# path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Vital%20Statistics%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -39,6 +40,19 @@
 ###################################################################
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################################
+# prior to running this script you must have the program winrar installed on your computer. it's a free. go to http://www.win-rar.com/download.html #
+# this code has only been tested in a microsoft windows environment, tell us what modifications are needed for other operating systems! cool thanx  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# the line above sets the location of the winrar program on your local computer. uncomment it by removing the `#`                                   #
+#####################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
 # # # # # # # # # # # # # # #
 # warning: monetdb required #
 # # # # # # # # # # # # # # #
@@ -60,11 +74,6 @@
 # you'll be better off leaving this script to run overnight.  if you wanna download all available files and years,
 # leave it running on friday afternoon (or even better: before you leave for a weeklong vacation).
 # depending on your internet and processor speeds, the entire script should take between one and three days.
-
-# warning: this command must be run before any other
-# internet-accessing lines in the session
-setInternet2(TRUE)
-# you also might need administrative rights
 
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "MonetDB.R" , "SAScii" , "downloader" ) )
