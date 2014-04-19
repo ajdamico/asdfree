@@ -7,11 +7,11 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NVSS/" )
-# natality.sets.to.download <- 2011:1999
-# periodlinked.sets.to.download <- 2009:2001
-# cohortlinked.sets.to.download <- 2006:1995
+# natality.sets.to.download <- 2012:1999
+# periodlinked.sets.to.download <- 2010:2001
+# cohortlinked.sets.to.download <- 2007:1995
 # mortality.sets.to.download <- 2010:2000
-# fetaldeath.sets.to.download <- 2007:2005
+# fetaldeath.sets.to.download <- 2012:2005
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Vital%20Statistics%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -209,7 +209,7 @@ monetdb.server.stop( pid )
 # but i've only slogged through the layout files back to 1999
 # uncomment this line to download all unlocked natality data sets
 # uncomment this line by removing the `#` at the front
-# natality.sets.to.download <- 2011:1999
+# natality.sets.to.download <- 2012:1999
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/natality/Nat1998doc.pdf
 
@@ -218,7 +218,7 @@ monetdb.server.stop( pid )
 # but i've only slogged through the layout files back to 2001
 # uncomment this line to download all unlocked period-linked data sets
 # uncomment this line by removing the `#` at the front
-# periodlinked.sets.to.download <- 2009:2001
+# periodlinked.sets.to.download <- 2010:2001
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/periodlinked/LinkPE00Guide.pdf
 
@@ -227,7 +227,7 @@ monetdb.server.stop( pid )
 # but i've only slogged through the layout files back to 1995
 # uncomment this line to download all unlocked cohort-linked data sets
 # uncomment this line by removing the `#` at the front
-# cohortlinked.sets.to.download <- 2006:1995
+# cohortlinked.sets.to.download <- 2007:1995
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/cohortlinked/LinkCO91Guide.pdf
 
@@ -245,7 +245,7 @@ monetdb.server.stop( pid )
 # but i've only slogged through the layout files back to 2005
 # uncomment this line to download all unlocked mortality data sets
 # uncomment this line by removing the `#` at the front
-# fetaldeath.sets.to.download <- 2007:2005
+# fetaldeath.sets.to.download <- 2012:2005
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/fetaldeath/2004FetalUserGuide.pdf
 
@@ -330,8 +330,8 @@ for ( year in natality.sets.to.download ){
 	# throw out all non-digits to extract the year from the data file
 	years <- gsub( "\\D" , "" , natality.us )
 
-	# for 2011, substitute in 2010
-	year.plus.data <- years <- gsub( '2011' , '2010' , years )
+	# for years above 2010, substitute in 2010
+	year.plus.data <- years <- gsub( paste0( 2011:2100 , collapse = "|" ) , '2010' , years )
 
 	# the pre-2006 files have an extra "/data" in the filepath of the sas import script
 	year.plus.data[ as.numeric( year.plus.data ) %in% 1991:2005 ] <- 
