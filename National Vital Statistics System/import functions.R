@@ -273,7 +273,7 @@ download.nchs <-
 			
 			file.remove( tf )
 
-			Sys.sleep( 3 )
+			Sys.sleep(60)
 			
 			z <- tolower( list.files( td , full.names = TRUE ) )
 			
@@ -330,7 +330,7 @@ download.nchs <-
 			
 			unlink( z , recursive = TRUE )
 			
-			Sys.sleep( 3 )
+			Sys.sleep(60)
 			
 		}	
 		
