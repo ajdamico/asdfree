@@ -269,7 +269,7 @@ download.nchs <-
 			# extracting the results to the temporary directory
 			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , td ) )
 			
-			suppressWarnings( while( unlink( tf ) ) Sys.sleep( 1 ) )
+			file.remove( tf )
 			
 			z <- tolower( list.files( td , full.names = TRUE ) )
 			
@@ -283,7 +283,7 @@ download.nchs <-
 					file.append( z[ 1 ] , z[ 3 ] )
 					
 					# remove those two files from the disk
-					suppressWarnings( while( any( unlink( z[ 2 ] , z[ 3 ] ) ) ) Sys.sleep( 1 ) )
+					suppressWarnings( while( any( file.remove( z[ 2 ] , z[ 3 ] ) ) ) Sys.sleep( 1 ) )
 					
 					# remove those two files from the vector
 					z <- z[ -2:-3 ]
@@ -292,12 +292,7 @@ download.nchs <-
 				
 				while( length( z ) != length( y$name ) ){ 
 					print( z <- tolower( list.files( td , full.names = TRUE ) ) )
-					print( "td:" )
-					print( td )
-					print( "tf:" )
 					file.remove( tf )
-					print( "z:" )
-					print( z )
 					print( "waiting.." )
 					Sys.sleep( 5 ) 
 				}
