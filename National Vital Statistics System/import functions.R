@@ -66,7 +66,7 @@ import.nchs <-
 			
 			fti <- clear.goofy.characters( files.to.import[ i ] , fl = force.length )
 			
-			on.exit( suppressWarnings( while( any( file.remove( fti ) ) ) Sys.sleep( 1 ) ) )
+			on.exit( suppressWarnings( while( any( unlink( fti ) ) ) Sys.sleep( 1 ) ) )
 			
 			read.SAScii.monetdb( 
 				fn = fti ,
@@ -79,7 +79,7 @@ import.nchs <-
 				connection = db
 			)
 			
-			suppressWarnings( while( file.remove( fti ) ) Sys.sleep( 1 ) )
+			suppressWarnings( while( unlink( fti ) ) Sys.sleep( 1 ) )
 			
 		}
 		
@@ -269,7 +269,7 @@ download.nchs <-
 			# extracting the results to the temporary directory
 			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , td ) )
 			
-			suppressWarnings( while( file.remove( tf ) ) Sys.sleep( 1 ) )
+			suppressWarnings( while( unlink( tf ) ) Sys.sleep( 1 ) )
 			
 			z <- tolower( list.files( td , full.names = TRUE ) )
 			
@@ -283,19 +283,13 @@ download.nchs <-
 					file.append( z[ 1 ] , z[ 3 ] )
 					
 					# remove those two files from the disk
-					suppressWarnings( while( any( file.remove( z[ 2 ] , z[ 3 ] ) ) ) Sys.sleep( 1 ) )
+					suppressWarnings( while( any( unlink( z[ 2 ] , z[ 3 ] ) ) ) Sys.sleep( 1 ) )
 					
 					# remove those two files from the vector
 					z <- z[ -2:-3 ]
 				
 				}
 				
-				while( length( z ) != length( y$name ) ){ 
-					print( z <- tolower( list.files( td , full.names = TRUE ) ) )
-					print( "waiting.." )
-					Sys.sleep( 5 ) 
-				}
-			
 				file.copy( 
 					z , 
 					paste( 
@@ -330,7 +324,7 @@ download.nchs <-
 				
 			}
 			
-			suppressWarnings( while( file.remove( z ) ) Sys.sleep( 1 ) )
+			suppressWarnings( while( unlink( z ) ) Sys.sleep( 1 ) )
 			
 		}	
 		
