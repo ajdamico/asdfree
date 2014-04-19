@@ -58,7 +58,14 @@ get.tsv <-
 		if ( zipped ) {
 			tf <- tempfile()
 			tf <- unzip( cur.pums )
-			file.remove( cur.pums )
+			
+			# file.remove sometimes needs a few seconds to cool off.
+			remove.attempt <- try( stop() , silent = TRUE )
+			while( class( attempt ) == 'try-error' ){ 
+				remove.attempt <- try( file.remove( cur.pums ) , silent = TRUE )
+				Sys.sleep( 1 )
+			}
+					
 			cur.pums <- tf
 		}
 		
@@ -139,7 +146,14 @@ get.tsv <-
 		close( incon )
 		
 		# remove the file that was downloaded
-		file.remove( cur.pums )
+		
+		# file.remove sometimes needs a few seconds to cool off.
+		remove.attempt <- try( stop() , silent = TRUE )
+		while( class( attempt ) == 'try-error' ){ 
+			remove.attempt <- try( file.remove( cur.pums ) , silent = TRUE )
+			Sys.sleep( 1 )
+		}
+		
 		# now we've got `tf.household` and `tf.person` on the local disk instead.
 		# these have one record per household and one record per person, respectively.
 
