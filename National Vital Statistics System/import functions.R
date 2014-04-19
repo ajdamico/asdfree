@@ -290,6 +290,12 @@ download.nchs <-
 				
 				}
 				
+				while( length( z ) != length( y$name ) ){ 
+					print( z <- tolower( list.files( td , full.names = TRUE ) ) )
+					print( "waiting.." )
+					Sys.sleep( 5 ) 
+				}
+			
 				file.copy( 
 					z , 
 					paste( 
