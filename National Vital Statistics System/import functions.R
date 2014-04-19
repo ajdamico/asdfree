@@ -251,6 +251,8 @@ download.nchs <-
 		
 		winrar.dir <- normalizePath( paste( td , "winrar" , sep = "/" ) )
 		
+		dir.create( winrar.dir )
+		
 		on.exit( unlink( winrar.dir , recursive = TRUE ) )
 		
 		on.exit( unlink( tf ) )
