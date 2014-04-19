@@ -296,7 +296,7 @@ download.nchs <-
 					# print( "waiting.." )
 					# Sys.sleep( 5 ) 
 				# }
-			browse()
+			browser()
 				file.copy( 
 					z , 
 					paste( 
