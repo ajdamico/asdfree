@@ -59,12 +59,8 @@ get.tsv <-
 			tf <- tempfile()
 			tf <- unzip( cur.pums )
 			
-			# file.remove sometimes needs a few seconds to cool off.
-			remove.attempt <- try( stop() , silent = TRUE )
-			while( class( remove.attempt ) == 'try-error' ){ 
-				remove.attempt <- try( file.remove( cur.pums ) , silent = TRUE )
-				Sys.sleep( 1 )
-			}
+			# try to get rid of the file..if it's weirdly-named, who cares.
+			try( file.remove( cur.pums ) , silent = TRUE )
 					
 			cur.pums <- tf
 		}
