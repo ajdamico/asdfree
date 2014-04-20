@@ -158,9 +158,12 @@ download.cache <-
 			}
 			
 		}
-				
-		if (success && usecache) file.copy( destfile , cachefile , overwrite = TRUE )
 		
-		return( invisible( success ) )
+		# double-check that the `success` object exists.. it might not if `attempts` was set to zero.
+		if ( exists( 'success' ) ){
+			if (success && usecache) file.copy( destfile , cachefile , overwrite = TRUE )
+		
+			return( invisible( success ) )
+		} else return( invisible( FALSE ) )
 		
 	}
