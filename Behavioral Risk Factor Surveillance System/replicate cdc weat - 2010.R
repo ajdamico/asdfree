@@ -5,6 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( "monetdb.sequential" = TRUE )
 # library(downloader)
 # batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"
 # load( 'C:/My Directory/BRFSS/b2010 design.rda' )	# analyze the 2010 single-year brfss
@@ -32,6 +33,22 @@
 # this script matches the web-enabled analysis tool output shown at  ##############################################################################################################
 # https://github.com/ajdamico/usgsd/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/WEAT%202010%20Asthma%20Status%20-%20Crosstab%20Analysis%20Results.pdf?raw=true #
 ###################################################################################################################################################################################
+
+
+# windows machines and also machines without access
+# to large amounts of ram will often benefit from
+# the following option, available as of MonetDB.R 0.9.2 --
+# remove the `#` in the line below to turn this option on.
+# options( "monetdb.sequential" = TRUE )
+# -- whenever connecting to a monetdb server,
+# this option triggers sequential server processing
+# in other words: single-threading.
+# if you would prefer to turn this on or off immediately
+# (that is, without a server connect or disconnect), use
+# turn on single-threading only
+# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
+# restore default behavior -- or just restart instead
+# dbSendQuery(db,"set optimizer = 'default_pipe';")
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

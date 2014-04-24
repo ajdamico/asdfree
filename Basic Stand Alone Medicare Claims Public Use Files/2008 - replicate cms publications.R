@@ -5,6 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( "monetdb.sequential" = TRUE )
 # library(downloader)
 # batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Basic%20Stand%20Alone%20Medicare%20Claims%20Public%20Use%20Files/2008%20-%20replicate%20cms%20publications.R" , prompt = FALSE , echo = TRUE )
@@ -44,6 +45,22 @@
 # # # # # # # # # # # # # # #
 # warning: monetdb required #
 # # # # # # # # # # # # # # #
+
+
+# windows machines and also machines without access
+# to large amounts of ram will often benefit from
+# the following option, available as of MonetDB.R 0.9.2 --
+# remove the `#` in the line below to turn this option on.
+# options( "monetdb.sequential" = TRUE )
+# -- whenever connecting to a monetdb server,
+# this option triggers sequential server processing
+# in other words: single-threading.
+# if you would prefer to turn this on or off immediately
+# (that is, without a server connect or disconnect), use
+# turn on single-threading only
+# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
+# restore default behavior -- or just restart instead
+# dbSendQuery(db,"set optimizer = 'default_pipe';")
 
 
 library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
