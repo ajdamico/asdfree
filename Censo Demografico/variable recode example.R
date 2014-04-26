@@ -489,7 +489,20 @@ barplot(
 	ylim = c( 0 , .25 ) ,
 	cex.names = 0.7 ,
 	col = c( rep( "lightgreen" , 7 ) , rep( "sandybrown" , 9 ) , rep( "palevioletred" , 4 ) , rep( "plum" , 3 ) , rep( "khaki" , 4 ) ) ,
-	las = 2
+	las = 2 ,
+	# do not print the y axis at first
+	yaxt = "n"
+)
+
+# add the y axis..
+axis( 
+	side = 2 , 
+	# from 0 to 0.25, with tick marks every 0.05
+	at = seq( 0 , .25 , .05 ) , 
+	# saying 0%, 5% ..etc.. up to 25%
+	labels = paste0( seq( 0 , 25 , 5 ) , "%" ) , 
+	# turn the numbers rightside-up
+	las = 2 
 )
 
 legend( 
@@ -507,7 +520,20 @@ barplot(
 	ylim = c( 0 , .6 ) ,
 	cex.names = 0.7 ,
 	col = c( rep( "lightgreen" , 7 ) , rep( "sandybrown" , 9 ) , rep( "palevioletred" , 4 ) , rep( "plum" , 3 ) , rep( "khaki" , 4 ) ) ,
-	las = 2
+	las = 2 ,
+	# do not print the y axis at first
+	yaxt = "n"
+)
+
+# add the y axis..
+axis( 
+	side = 2 , 
+	# from 0 to 0.6, with tick marks every 0.1
+	at = seq( 0 , .6 , .1 ) , 
+	# saying 0%, 5% ..etc.. up to 25%
+	labels = paste0( seq( 0 , 60 , 10 ) , "%" ) , 
+	# turn the numbers rightside-up
+	las = 2 
 )
 
 legend( 
