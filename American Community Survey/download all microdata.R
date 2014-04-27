@@ -80,42 +80,10 @@
 # it's running.  don't believe me?  check the working directory (set below) for a new r data file (.rda) every few hours.
 
 
-# # # # # # # grab sas7bdat from github # # # # # # # # # # #
-# warning: the 2012 american community survey's sas7bdat file
-# cannot be read into R with the `read.sas7bdat` function currently on CRAN (v 0.3)
-# however, it works just fine with (v 0.4), which is currently only available on github.
-# therefore, this little block of fun will download the sas7bdat function from github instead.
-
-# # # # # #
-# but first, you must download and install R tools
-# http://cran.r-project.org/bin/windows/Rtools/
-# # # # # #
-
-# and then uncomment and run these three lines of code:
-
-# # # # # #
-# install.packages( 'devtools' )
-# library(devtools)
-# install_github( 'sas7bdat' , 'biostatmatt' )
-# # # # # #
-
-# once you've done that, you should have `sas7bdat` version 0.4 instead of 0.3
-# you can check what version of the package you have by loading it..
-
-# library(sas7bdat)
-
-# ..and then typing..
-
-# sessionInfo()
-
-# capice?
-
-# # # # # # # end of sas7bdat github grab # # # # # # # # # #
-
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "R.utils" , "downloader" ) )
+# install.packages( c( "R.utils" , "downloader" , "sas7bdat" ) )
 
 
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
