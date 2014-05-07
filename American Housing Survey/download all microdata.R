@@ -504,7 +504,7 @@ for ( curdir in rev( precise.links ) ){
 			stopifnot( nrow( get( hhlf ) ) == nrow( get( wgtf ) ) )
 			
 			# confirm both tables have only one intersecting column name: `control`
-			stopifnot( intersect( names( get( hhlf ) ) , names( get( wgtf ) ) ) == 'control' )
+			stopifnot( all( intersect( names( get( hhlf ) ) , names( get( wgtf ) ) ) %in% c( 'smsa' , 'control' ) ) )
 			
 			# merge these two files together
 			x <- merge( get( hhlf ) , get( wgtf ) )
