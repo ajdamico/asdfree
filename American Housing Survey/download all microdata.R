@@ -334,9 +334,8 @@ for ( curdir in rev( precise.links ) ){
 								# add a column of all ones
 								x$one <- 1
 								
-								
 								# blank out negative fives through negative nines
-								x[ , ] <- sapply( x[ , ] , function( z ) { z[ z %in% -5:-9 ] <- NA ; z } )
+								for ( i in seq( ncol( x ) ) ) x[ x[ , i ] %in% -5:-9 , i ] <- NA
 							}
 							
 							
