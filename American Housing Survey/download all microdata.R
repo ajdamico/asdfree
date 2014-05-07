@@ -335,7 +335,7 @@ for ( curdir in rev( precise.links ) ){
 								x$one <- 1
 								
 								# blank out negative fives through negative nines
-								for ( i in seq( ncol( x ) ) ) x[ x[ , i ] %in% -5:-9 , i ] <- NA
+								for ( j in seq( ncol( x ) ) ) x[ x[ , j ] %in% -5:-9 , j ] <- NA
 							}
 							
 							
