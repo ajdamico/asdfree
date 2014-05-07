@@ -327,8 +327,13 @@ for ( curdir in rev( precise.links ) ){
 								
 								# overwrite all of those missings with zeroes
 								x[ is.na( x ) ] <- 0
-								
+							
+							# if it's not the weight table, add a column of all ones
+							} else {
+								x$one <- 1
 							}
+							
+							
 
 						} , 
 						silent = TRUE
@@ -368,19 +373,25 @@ for ( curdir in rev( precise.links ) ){
 							sep = "_"
 						)
 					
-					# if the dbWriteTable tries to overwrite something else,
-					# break.  the program should not work.
-					stopifnot( 
-						# store the current data.frame (x) in the sqlite database
-						dbWriteTable( 
-							db , 
-							db.tablename , 
-							x , 
-							row.names = FALSE , 
-							overwrite = FALSE 
+					# some tables should not be read into the database,
+					# like the `newformat` tables (which are just metadata)
+					if ( !( grepl( 'newformat' , db.tablename ) ) ){
+						
+						# if the dbWriteTable tries to overwrite something else,
+						# break.  the program should not work.
+						stopifnot( 
+							# store the current data.frame (x) in the sqlite database
+							dbWriteTable( 
+								db , 
+								db.tablename , 
+								x , 
+								row.names = FALSE , 
+								overwrite = FALSE 
+							)
 						)
-					)
-				
+						
+					}
+					
 					# copy the data.frame `x` to a less mysteriously-named object
 					assign( prefix[ i ] , x )
 					
