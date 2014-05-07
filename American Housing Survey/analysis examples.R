@@ -177,7 +177,8 @@ svyby(
 # percent owners, renters, non-paying renters, missing.
 svymean(
 	~factor( tenure ) ,
-	design = ahs.design
+	design = ahs.design ,
+	na.rm = TRUE
 )
 
 # by region
@@ -185,7 +186,8 @@ svyby(
 	~factor( tenure ) ,
 	~region ,
 	design = ahs.design ,
-	svymean
+	svymean ,
+	na.rm = TRUE
 )
 
 # calculate the median and other percentiles #
@@ -244,7 +246,8 @@ householder.by.region <-
 		~factor( tenure ) ,
 		~region ,
 		design = ahs.design ,
-		svymean
+		svymean ,
+		na.rm = TRUE
 	)
 
 # print the results to the screen
@@ -273,7 +276,7 @@ write.csv( householder.by.region , "householder by region.csv" )
 # here's the "percent female" by region,
 # with accompanying standard errors
 owner_occupants.by.region <-
-	householder.by.region[ , c( "region" , "factor.tenure.1" , "se2" ) ]
+	householder.by.region[ , c( "region" , "factor.tenure.1" , "se1" ) ]
 
 
 # print the new results to the screen
