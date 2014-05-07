@@ -79,7 +79,7 @@ ahs.design <-
 		repweights = "repwgt[1-9]" ,
 		type = "Fay" ,
 		rho = ( 1 - 1 / sqrt( 4 ) ) ,
-		data = "tnewhouse_trepwgt_2011_national" ,
+		data = "tnewhouse_trepwgt_2011_v14" ,
 		dbtype = "SQLite" ,
 		dbname = ahs.dbname
 	)
