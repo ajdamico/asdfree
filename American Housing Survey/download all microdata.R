@@ -612,7 +612,9 @@ for ( curdir in rev( precise.links ) ){
 					db.hhfn , 
 					"AS a INNER JOIN" ,
 					db.wgtfn ,
-					"AS b ON a.control = b.control"
+					"AS b USING (" ,
+					intersect( dbListFields( db , db.hhfn ) , dbListFields( db , db.wgtfn ) ) ,
+					")"
 				)
 			)
 		
