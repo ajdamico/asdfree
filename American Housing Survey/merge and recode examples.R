@@ -409,8 +409,8 @@ x[ is.na( x$num_persons ) , 'num_persons' ] <- 0
 # simply re-run the svrepdesign() syntax with an updated `data = ` parameter
 # pointing toward the new merged table
 
-##############################################
-# survey design for a database-backed object #
+#########################################
+# survey design for an in-memory object #
 ahs.merged.svynodb <-
 	svrepdesign(
 		weights = ~repwgt0,
