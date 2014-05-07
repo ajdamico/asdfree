@@ -328,9 +328,15 @@ for ( curdir in rev( precise.links ) ){
 								# overwrite all of those missings with zeroes
 								x[ is.na( x ) ] <- 0
 							
-							# if it's not the weight table, add a column of all ones
+							# if it's not the weight table
+							
 							} else {
+								# add a column of all ones
 								x$one <- 1
+								
+								
+								# blank out negative fives through negative nines
+								x[ , ] <- sapply( x[ , ] , function( z ) { z[ z %in% -5:-9 ] <- NA ; z } )
 							}
 							
 							
@@ -613,7 +619,7 @@ for ( curdir in rev( precise.links ) ){
 					"AS a INNER JOIN" ,
 					db.wgtfn ,
 					"AS b USING (" ,
-					intersect( dbListFields( db , db.hhfn ) , dbListFields( db , db.wgtfn ) ) ,
+					paste( intersect( dbListFields( db , db.hhfn ) , dbListFields( db , db.wgtfn ) ) , collapse = " , " ) ,
 					")"
 				)
 			)
