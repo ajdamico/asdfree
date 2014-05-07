@@ -293,6 +293,12 @@ for ( curdir in rev( precise.links ) ){
 		# loop through each of the available files
 		for ( i in seq( extension ) ){
 		
+			# start with a fresh `x` object every time
+			rm( x )
+			
+			# clear up ram
+			gc()
+		
 			# tell us what you're at!
 			cat( "now loading" , this.year , "..." , prefix[ i ] , '\n\r' )
 
@@ -308,6 +314,21 @@ for ( curdir in rev( precise.links ) ){
 							if ( extension[ i ] == 'csv' ) x <- read.csv( tf[ i ] , stringsAsFactors = FALSE , quote = "'" )
 							
 							if ( extension[ i ] == 'sas7bdat' ) x <- read.sas7bdat( tf[ i ] )
+
+							
+							# if the file that's just been imported is a weight file..
+							if ( grepl( 'wgt|weight' , prefix[ i ] ) ){
+							
+								# determine the control column's position
+								ccp <- which( tolower( names( x ) ) == 'control' )
+								
+								# convert all columns except for the `control` column to numeric
+								x[ , -ccp ] <- sapply( x[ , -ccp ] , as.numeric )
+								
+								# overwrite all of those missings with zeroes
+								x[ is.na( x ) ] <- 0
+								
+							}
 
 						} , 
 						silent = TRUE
