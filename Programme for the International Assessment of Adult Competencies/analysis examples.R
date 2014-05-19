@@ -95,7 +95,7 @@ nrow( prgusap1.design )
 table( prgusap1$ageg10lfs )
 
 # ..or the survey design object
-svyby( ~ one , ~ ageg10lfs , prgusap1.design , unwtd.count )
+MIcombine( with( prgusap1.design , svyby( ~ one , ~ ageg10lfs , unwtd.count ) ) )
 
 
 # count the weighted number of adults aged 16 to 65 in the united states
