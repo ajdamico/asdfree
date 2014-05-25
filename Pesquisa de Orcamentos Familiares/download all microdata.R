@@ -1,6 +1,6 @@
 #if running on a macintosh, uncomment the lines below
-options( encoding="windows-1252" )
-Sys.setlocale(,"pt_BR")
+options( encoding="LATIN-9" )
+
 # analyze survey data for free (http://asdfree.com) with the r language
 # pesquisa orcamentos familiares
 # 2002-2003 and 2008-2009
@@ -370,7 +370,7 @@ for ( year in years.to.download ){
       data.file <- gsub( ".7Z" , ".7z" , basename(toupper(data.file) ) )
       data.file <- paste(td,"Dados",data.file,sep="/")
       # build the string to send to DOS
-            dos.command <- paste0( '"' , path.to.7z , '" x ' , data.file, "-aoa" )
+            dos.command <- paste0( '"' , path.to.7z , '" x ' , data.file, " -aoa" )
       
       # extract the file
       system( dos.command )
