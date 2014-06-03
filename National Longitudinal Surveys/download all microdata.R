@@ -91,9 +91,9 @@ for ( this.study in study.names ){
 						GET( "https://www.nlsinfo.org/investigator/servlet1?set=tagset&select=all&value=true" )
 
 						# add `identification code` to every query, no matter what.
-						GET( "https://www.nlsinfo.org/investigator/servlet1?get=ResultCount&criteria=QTEXT%7CCNT%7Cidentification%20code" )
-						GET( "https://www.nlsinfo.org/investigator/servlet1?set=tagset&select=all&value=true" )
-
+						# GET( "https://www.nlsinfo.org/investigator/servlet1?get=ResultCount&criteria=QTEXT%7CCNT%7Cidentification%20code" )
+						# GET( "https://www.nlsinfo.org/investigator/servlet1?set=tagset&select=all&value=true" )
+						# no longer necessary now that steve set to default
 						
 						job.char <- GET( "https://www.nlsinfo.org/investigator/servlet1?collection=on&sas=off&spss=off&stata=off&codebook=on&csv=on&event=start&cmd=extract&desc=default" )
 
