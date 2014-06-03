@@ -181,7 +181,7 @@ for ( this.study in study.names ){
 				
 			}
 
-			save( x , file = load( paste0( this.dir , "/" , "all columns.rda" ) ) )
+			save( x , file = paste0( this.dir , "/" , "all columns.rda" ) )
 			
 			rm( list = c( 'x' , ov ) )
 			
