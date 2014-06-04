@@ -1,8 +1,10 @@
 library(httr)
 library(XML)
 library(stringr)
+library(RSQLite)
 
 # setwd( "C:/My Directory/NLS" )
+# setwd( "R:/National Longitudinal Surveys/" )
 
 studies <- GET( "https://www.nlsinfo.org/investigator/servlet1?get=STUDIES" )
 
@@ -14,7 +16,7 @@ tf <- tempfile() ; td <- tempdir()
 
 						
 for ( this.study in study.names ){
-# for ( this.study in study.names[2] ){
+# for ( this.study in study.names[5] ){
 
 	substudies <- 
 		GET( 
@@ -87,7 +89,11 @@ for ( this.study in study.names ){
 							) 
 						)
 
+						
+						GET( "https://www.nlsinfo.org/investigator/servlet1?set=preference&pref=all" )
+						
 						GET( paste0( "https://www.nlsinfo.org/investigator/servlet1?get=Results&xml=true&criteria=RNUM%7CSW%7C" , option.value , "&sortKey=RNUM&sortOrder=ascending&&PUBID=noid&limit=all" ) )
+					
 						GET( "https://www.nlsinfo.org/investigator/servlet1?set=tagset&select=all&value=true" )
 
 						# add `identification code` to every query, no matter what.
@@ -96,7 +102,7 @@ for ( this.study in study.names ){
 						# no longer necessary now that steve set to default
 						
 						job.char <- GET( "https://www.nlsinfo.org/investigator/servlet1?collection=on&sas=off&spss=off&stata=off&codebook=on&csv=on&event=start&cmd=extract&desc=default" )
-
+													
 						job.id <- gsub( 'job:' , '' , as.character( job.char ) )
 
 						GET( "https://www.nlsinfo.org/investigator/servlet1?get=downloads&study=current" )
@@ -107,7 +113,18 @@ for ( this.study in study.names ){
 						while( !( grepl( "{\"status_response\":{\"message\":\"\",\"name\"" , as.character( v ) , fixed = TRUE ) ) ){
 							
 							v <- GET( paste0( "https://www.nlsinfo.org/investigator/servlet1?job=" , job.id , "&event=progress&cmd=extract&_=" , as.numeric( Sys.time() ) * 1000 ) )
+						
+							# if the download hits an error, break out of the current loop.
+							ep <- FALSE
 							
+							# see if the current page contains an error page text
+							# instead of actual data.
+							try( ep <- xpathSApply( htmlParse( v , asText = TRUE ) , '//title' , xmlValue ) == 'Error Page' , silent = TRUE )
+							
+							# if it does contain an error page, break the program.
+							if( ( length( ep ) > 0 ) && ( ep ) ) stop( "Error Page" )
+							# first successful usage of `&&` operator.  pat on the back.
+						
 							msg <- strsplit( strsplit( as.character(v) , 'message\":\"' )[[1]][2] , '\",\"name' )[[1]][1]
 							
 							cat( "    " , msg , "\r" )
@@ -159,35 +176,66 @@ for ( this.study in study.names ){
 
 
 
+		db <- dbConnect( SQLite() , paste0( this.dir , "/" , 'study.db' ) )
+				
 		for ( ov in all.option.values ){
 
-
 			load( paste0( this.dir , "/" , ov , ".rda" ) )
-			
-			if ( ov == all.option.values[1] ){
-			
-				x <- get( ov )
 				
-				first.rowsize <- nrow( x )
+			if ( ov == all.option.values[1] ){
+							
+				first.rowsize <- nrow( get( ov ) )
+							
+				dbWriteTable( db , 'x' , get( ov ) )
+				
+				dbWriteTable( db , ov , get( ov ) )
 				
 			} else {
-			
-				load( paste0( this.dir , "/" , "all columns.rda" ) )
 
-				x <- merge( x , get( ov ) )
+				dbWriteTable( db , ov , get( ov ) )
+			
+				( columns.in.both.dfs <- intersect( dbListFields( db , 'x' ) , names( get( ov ) ) ) )
+			
+				sql <- 
+					paste( 
+						'CREATE TABLE y AS SELECT * FROM x INNER JOIN' , 
+						ov , 
+						'USING (' ,
+						paste( columns.in.both.dfs , collapse = " , " ) ,
+						')'
+					)
+			
+				dbSendQuery( db , sql )
+				
+				dbRemoveTable( db , 'x' )
+				
+				# dbRemoveTable( db , ov )
+				
+				dbSendQuery( db , 'CREATE TABLE x as SELECT * FROM y' )
+			
+				dbRemoveTable( db , 'y' )
 				
 				# this never changes.
-				stopifnot( nrow( x ) == first.rowsize )
+				stopifnot( as.numeric( dbGetQuery( db , 'SELECT count(*) FROM x' ) ) == first.rowsize )
 				
 			}
-
-			save( x , file = paste0( this.dir , "/" , "all columns.rda" ) )
 			
-			rm( list = c( 'x' , ov ) )
+			rm( list = ov )
 			
 			gc()
 
 		}
+		
+		x <- dbReadTable( db , 'x' )
+		
+		dbDisconnect( db )
+		
+		save( x , file = paste0( this.dir , "/all columns.rda" ) )
+		
+		rm( x )
+		
+		gc()
+	
 	}
 }
 
