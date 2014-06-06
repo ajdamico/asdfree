@@ -69,6 +69,9 @@ for ( this.study in study.names ){
 				
 				attempt.count <- attempt.count + 1
 			
+				# display any actual errors.
+				if ( attempt.count > 1 ) print( attempt )
+			
 				if ( attempt.count > 5 ) stop( "tried five times with no luck.  peace out." )
 			
 				attempt <-
