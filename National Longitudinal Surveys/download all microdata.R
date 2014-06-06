@@ -168,7 +168,9 @@ for ( this.study in study.names ){
 					silent = TRUE 
 				)
 				
-				if( class( attempt ) == 'try-error' ) Sys.sleep( 60 ) else Sys.sleep( 15 )	
+				# wait the same number of minutes as you have attempted-counted,
+				# but after the last attempt, don't wait at all.
+				if( class( attempt ) == 'try-error' ) Sys.sleep( 60 * ifelse( attempt.count >= 5 , 0 , attempt.count ) )
 					
 			}
 				
