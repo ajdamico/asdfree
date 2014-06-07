@@ -181,24 +181,28 @@ for ( this.study in study.names ){
 
 
 
+		x <- NULL
+		
+		re.start <- FALSE
+		
 		db <- dbConnect( SQLite() , paste0( this.dir , "/" , 'study.db' ) )
 				
 		for ( ov in all.option.values ){
 
 			load( paste0( this.dir , "/" , ov , ".rda" ) )
 				
-			if ( ov == all.option.values[1] ){
+			dbWriteTable( db , ov , get( ov ) )
+				
+			if ( ov == all.option.values[1] | re.start ){
 							
 				first.rowsize <- nrow( get( ov ) )
 							
 				dbWriteTable( db , 'x' , get( ov ) )
 				
-				dbWriteTable( db , ov , get( ov ) )
+				re.start <- FALSE
 				
 			} else {
 
-				dbWriteTable( db , ov , get( ov ) )
-			
 				( columns.in.both.dfs <- intersect( dbListFields( db , 'x' ) , names( get( ov ) ) ) )
 			
 				sql <- 
@@ -223,6 +227,30 @@ for ( this.study in study.names ){
 				# this never changes.
 				stopifnot( as.numeric( dbGetQuery( db , 'SELECT count(*) FROM x' ) ) == first.rowsize )
 				
+				
+				if ( length( dbListFields( db , 'x' ) ) > 25000 ){
+				
+					if( is.null( x ) ){
+					
+						x <- dbReadTable( db , 'x' )
+		
+					} else {
+					
+						x <- merge( x , dbReadTable( db , 'x' ) )
+					
+					}
+		
+					dbRemoveTable( db , 'x' )
+								
+					re.start <- TRUE
+					
+					stopifnot( nrow( x ) == first.rowsize )
+					
+					gc()
+					
+				}
+				
+				
 			}
 			
 			rm( list = ov )
@@ -231,7 +259,11 @@ for ( this.study in study.names ){
 
 		}
 		
-		x <- dbReadTable( db , 'x' )
+		if( !re.start ){
+			x <- merge( x , dbReadTable( db , 'x' ) )
+		
+			dbRemoveTable( db , 'x' )
+		}
 		
 		dbDisconnect( db )
 		
