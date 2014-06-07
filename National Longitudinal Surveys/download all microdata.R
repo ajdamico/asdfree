@@ -189,6 +189,17 @@ for ( this.study in study.names ){
 				
 		for ( ov in all.option.values ){
 
+			print( 
+				paste( 
+					"currently merging file" , 
+					which( ov == all.option.values ) ,
+					"of" ,
+					length( all.option.values ) ,
+					"extract" ,
+					ov
+				) 
+			)
+		
 			load( paste0( this.dir , "/" , ov , ".rda" ) )
 				
 			dbWriteTable( db , ov , get( ov ) )
