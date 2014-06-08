@@ -81,7 +81,7 @@ for ( this.study in study.names ){
 
 						print( 
 							paste( 
-								"currently working on file" , 
+								"currently downloading extract" , 
 								which( option.value == all.option.values ) ,
 								"of" ,
 								length( all.option.values ) ,
@@ -173,7 +173,7 @@ for ( this.study in study.names ){
 				
 				# wait the same number of minutes as you have attempted-counted,
 				# but after the last attempt, don't wait at all.
-				if( class( attempt ) == 'try-error' ) Sys.sleep( 60 * ifelse( attempt.count >= 5 , 0 , attempt.count ) )
+				if( class( attempt ) == 'try-error' ) Sys.sleep( 60 * ifelse( attempt.count >= 5 , 0 , attempt.count ) ) else Sys.sleep( 15 )
 					
 			}
 				
