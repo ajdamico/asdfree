@@ -216,6 +216,8 @@ for ( this.study in study.names ){
 
 				( columns.in.both.dfs <- intersect( dbListFields( db , 'x' ) , names( get( ov ) ) ) )
 			
+				dbRemoveTable( db , 'y' )
+				
 				sql <- 
 					paste( 
 						'CREATE TABLE y AS SELECT * FROM x INNER JOIN' , 
@@ -233,8 +235,6 @@ for ( this.study in study.names ){
 				
 				dbSendQuery( db , 'CREATE TABLE x as SELECT * FROM y' )
 			
-				dbRemoveTable( db , 'y' )
-				
 				# this never changes.
 				stopifnot( as.numeric( dbGetQuery( db , 'SELECT count(*) FROM x' ) ) == first.rowsize )
 				
@@ -274,6 +274,8 @@ for ( this.study in study.names ){
 			x <- merge( x , dbReadTable( db , 'x' ) )
 		
 			dbRemoveTable( db , 'x' )
+			
+			dbRemoveTable( db , 'y' )
 		}
 		
 		dbDisconnect( db )
