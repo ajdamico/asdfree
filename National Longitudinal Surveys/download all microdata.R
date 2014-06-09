@@ -202,13 +202,13 @@ for ( this.study in study.names ){
 		
 			load( paste0( this.dir , "/" , ov , ".rda" ) )
 				
-			dbWriteTable( db , ov , get( ov ) )
+			dbWriteTable( db , ov , get( ov ) , row.names = FALSE )
 				
 			if ( ov == all.option.values[1] | re.start ){
 							
 				first.rowsize <- nrow( get( ov ) )
 							
-				dbWriteTable( db , 'x' , get( ov ) )
+				dbWriteTable( db , 'x' , get( ov ) , row.names = FALSE )
 				
 				re.start <- FALSE
 				
