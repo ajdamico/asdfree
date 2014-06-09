@@ -1,10 +1,21 @@
+
+# rm( only.study )
+# only.study <- "NLSY97"
+# only.study <- c( "NLSCYA" , "NLSY79" )
+# only.study <- c( "NLSW" , "NLSM" )
+
+
+# setwd( "C:/My Directory/NLS" )
+# setwd( "R:/National Longitudinal Surveys/" )
+
+# library(downloader)
+# source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/National%20Longitudinal%20Surveys/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+
+
 library(httr)
 library(XML)
 library(stringr)
 library(RSQLite)
-
-# setwd( "C:/My Directory/NLS" )
-# setwd( "R:/National Longitudinal Surveys/" )
 
 studies <- GET( "https://www.nlsinfo.org/investigator/servlet1?get=STUDIES" )
 
@@ -14,9 +25,18 @@ study.names <- study.names[ study.names != '-1' ]
 
 tf <- tempfile() ; td <- tempdir()
 
+# available studies
+print( studies )
+
+# text names of each study available
+print( study.names )
+
+# look for an object "only.study" and if it exists,
+# limit the studies downloaded to the ones specified
+
+if( exists( 'only.study' ) ) study.names <- study.names[ study.names %in% only.study ]
 						
 for ( this.study in study.names ){
-# for ( this.study in study.names[5] ){
 
 	substudies <- 
 		GET( 
