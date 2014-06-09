@@ -271,7 +271,16 @@ for ( this.study in study.names ){
 		}
 		
 		if( !re.start ){
-			x <- merge( x , dbReadTable( db , 'x' , row.names = 0 ) )
+
+			if( is.null( x ) ){
+			
+				x <- dbReadTable( db , 'x' , row.names = 0 )
+
+			} else {
+			
+				x <- merge( x , dbReadTable( db , 'x' , row.names = 0 ) )
+			
+			}
 		
 			dbRemoveTable( db , 'x' )
 			
