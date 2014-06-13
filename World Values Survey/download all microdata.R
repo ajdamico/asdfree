@@ -192,7 +192,7 @@ for ( this.wave in waves.to.download ){
 			z <- unzip( tf , exdir = td )
 			
 			# confirm that the unzipped file length is one or it is not an rda/dta/sav file
-			stopifnot ( length( z ) == 1 | !( grepl( 'stata_dta|spss|rda' , fn ) ) ) 
+			stopifnot ( length( z ) == 1 | !( grepl( 'stata_dta|spss|rdata' , fn ) ) ) 
 
 			# if it's a stata file, import with `read.dta`
 			if( grepl( 'stata_dta' , tolower( fn ) ) ) x <- read.dta( z , convert.factors = FALSE )
@@ -328,7 +328,7 @@ for ( this.wave in waves.to.download ){
 					z <- unzip( tf , exdir = td )
 					
 					# confirm that the unzipped file length is one or it is not an rda/dta/sav file
-					stopifnot ( length( z ) == 1 | !( grepl( 'stata_dta|spss|rda' , fn ) ) ) 
+					stopifnot ( length( z ) == 1 | !( grepl( 'stata_dta|spss|rdata' , fn ) ) ) 
 
 					# if it's a stata file, import with `read.dta`
 					if( grepl( 'stata_dta' , tolower( fn ) ) ) x <- read.dta( z , convert.factors = FALSE )
