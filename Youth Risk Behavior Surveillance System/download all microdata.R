@@ -1,14 +1,13 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # youth risk behavior surveillance system
-# 1991 - 2011
+# all available years
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/YRBSS/" )
-# years.to.download <- seq( 1991 , 2011 , by = 2 )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Youth%20Risk%20Behavior%20Surveillance%20System/1991%20-%202011%20download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Youth%20Risk%20Behavior%20Surveillance%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -47,17 +46,6 @@
 
 # remove the # in order to run this install.packages line only once
 # install.packages( "SAScii" )
-
-
-
-# uncomment this line to download every available year
-# years.to.download <- seq( 1991 , 2011 , by = 2 )
-
-# uncomment this line to only download the 2011 single-year file and no others
-# years.to.download <- 2011
-
-# uncomment these lines to only download the 1991 and also 2001 thru 2011 files
-# years.to.download <- c( 1991 , seq( 2001 , 2011 , by = 2 ) )
 
 
 # no need to edit anything below this line #
@@ -99,6 +87,46 @@ sas.switcharoo <-
 
 #create a temporary file
 tf <- tempfile()
+
+
+# determine which years are available for downloading
+years.to.download <- NULL
+
+# set the first yrbs year
+year <- 1991
+
+# set a non-error-message attempt object
+attempt <- NA
+
+# continue looping so long as you do not hit an error
+while( class( attempt ) != 'try-error' ){
+
+	# set the filepath of the sas read-in script
+	this.sas_ri <-
+		paste0(
+			"ftp://ftp.cdc.gov/pub/data/yrbs/" ,
+			year , 
+			"/YRBS_" ,
+			year , 
+			"_SAS_Input_Program.sas"
+		)
+
+	# see if you can read the sas imput program for this year
+	attempt <- 
+		try( {
+		
+			# test that the current file is actually readable
+			readLines( this.sas_ri )
+
+			# if you made it past the readLines command,
+			# then this year is valid, so store it.
+			years.to.download <- c( years.to.download , year )
+			
+			# add two years
+			year <- year + 2
+		} , silent = TRUE )
+
+}
 
 
 # loop through each possible yrbss year
