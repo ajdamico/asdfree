@@ -162,53 +162,83 @@ for ( year in years.to.download ){
 	# into working memory immediately
 	sas_text <- tolower( readLines( sas_ri ) )
 
-	# the R SAScii package cannot handle `$char8.`
-	# so here's the first half of q4 patch,
-	# where those lines of the sas importation scripts
-	# are manually dealt with
-	sas_text <- gsub( "q4orig $char8." , "q4orig  8.0" , sas_text , fixed = TRUE )
+	# if there's an @1 site $3. out of order,
+	# re-order the text file so it goes in the front
+	if( any( sas_text == '@1 site $3.' ) ){
 	
-	# find all strings that begin with "@"
-	at.beginners <- which( substr( sas_text , 1 , 1 ) == "@" )
-	
-	# remove all "" empty strings
-	no.empty <- lapply( strsplit( sas_text[ at.beginners ] , " " ) , function( z ) z[ z != '' ] )
-	
-	# take all of the _second_ elements
-	vars.to.flip <- lapply( no.empty , "[[" , 2 )
-	
-	# repeatedly run the previously-constructed `sas.switcharoo` function
-	# on all of the lines that need lines flipped
-	for ( var.to.flip in vars.to.flip ) sas_text <- sas.switcharoo( sas_text , var.to.flip )	
-	
-	# and here's the second half of q4 patch
-	# q4orig should be treated as a string, not numeric
-	sas_text <- gsub( "q4orig" , "q4orig $" , sas_text , fixed = TRUE )
-
-	
-	# here's some more code to deal with quirky sas importation instructions:
-	
-	# if the first column position isn't at one..
-	first.instruction <- grep( 'input' , SAS.uncomment( sas_text , '/*' , '*/') ) + 1
-	
-	if ( !grepl( " 1-" , sas_text[ first.instruction ] ) ){
-	
-		# find the first position
-		dash.position <- gregexpr( "-" , sas_text[ first.instruction ] )[[1]][1]
-		start.blank <- as.numeric( substr( sas_text[ first.instruction ] , dash.position - 3 , dash.position - 1 ) ) - 1
+		# find the site location
+		site.location <- which( sas_text == '@1 site $3.' )
 		
-		# add a blank in sas_text
-		sas_text <-
-			c(
-				sas_text[ 1:( first.instruction - 1 ) ] ,
-				paste0( "blank $ 1-" , start.blank ) ,
-				sas_text[ first.instruction:length( sas_text ) ]
-			)	
-		# adding this `blank` will effectively create a column full of nothing
-		# in the final data file as read-in by read.SAScii
-		# ..but that'll get thrown out later
+		# find the start field location
+		input.location <- which( sas_text == "input" )
+		
+		# create a vector from 1 to the length of the text file
+		sas_length <- seq( length( sas_text ) )
+		
+		# remove the site location
+		sas_length <- sas_length[ -site.location ]
+		
+		# re-insert the site location right after input
+		sas_reorder <- c( sas_length[ seq( input.location ) ] , site.location , sas_length[ seq( input.location + 1 , length( sas_length ) ) ] )
+
+		# re-order the sas text file
+		sas_text <- sas_text[ sas_reorder ]
 	}
 	
+	
+	# older sas import scripts have some
+	# serious quirks that need to be twerked out.
+	if ( year < 2013 ){
+			
+		# the R SAScii package cannot handle `$char8.`
+		# so here's the first half of q4 patch,
+		# where those lines of the sas importation scripts
+		# are manually dealt with
+		sas_text <- gsub( "q4orig $char8." , "q4orig  8.0" , sas_text , fixed = TRUE )
+		
+		# find all strings that begin with "@"
+		at.beginners <- which( substr( sas_text , 1 , 1 ) == "@" )
+		
+		# remove all "" empty strings
+		no.empty <- lapply( strsplit( sas_text[ at.beginners ] , " " ) , function( z ) z[ z != '' ] )
+		
+		# take all of the _second_ elements
+		vars.to.flip <- lapply( no.empty , "[[" , 2 )
+		
+		# repeatedly run the previously-constructed `sas.switcharoo` function
+		# on all of the lines that need lines flipped
+		for ( var.to.flip in vars.to.flip ) sas_text <- sas.switcharoo( sas_text , var.to.flip )	
+		
+		# and here's the second half of q4 patch
+		# q4orig should be treated as a string, not numeric
+		sas_text <- gsub( "q4orig" , "q4orig $" , sas_text , fixed = TRUE )
+
+		# here's some more code to deal with quirky sas importation instructions:
+		
+		# if the first column position isn't at one..
+		first.instruction <- grep( 'input' , SAS.uncomment( sas_text , '/*' , '*/') ) + 1
+		
+		if ( !grepl( " 1-" , sas_text[ first.instruction ] ) ){
+		
+			# find the first position
+			dash.position <- gregexpr( "-" , sas_text[ first.instruction ] )[[1]][1]
+			start.blank <- as.numeric( substr( sas_text[ first.instruction ] , dash.position - 3 , dash.position - 1 ) ) - 1
+			
+			# add a blank in sas_text
+			sas_text <-
+				c(
+					sas_text[ 1:( first.instruction - 1 ) ] ,
+					paste0( "blank $ 1-" , start.blank ) ,
+					sas_text[ first.instruction:length( sas_text ) ]
+				)	
+			# adding this `blank` will effectively create a column full of nothing
+			# in the final data file as read-in by read.SAScii
+			# ..but that'll get thrown out later
+		}
+
+	}
+		
+		
 	# save the final sas importation script to
 	# a file on the hard disk (since ?read.SAScii and ?parse.SAScii
 	# require a file, not something read into working memory)
