@@ -59,7 +59,7 @@ library(mitools)	# load mitools package (analyzes multiply-imputed data)
 library(RCurl)		# load RCurl package (downloads https files)
 
 # set R to produce conservative standard errors instead of crashing
-# http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
+# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
 # options( survey.lonely.psu = "adjust" )
 
 #############################################

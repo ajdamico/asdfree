@@ -87,7 +87,7 @@ library(survey)  # load survey package (analyzes complex design surveys)
 
 # by default, R will crash if a primary sampling unit (psu) has a single observation
 # set R to produce conservative standard errors instead of crashing
-# http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
+# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
 # by keeping this line uncommented:
 options( survey.lonely.psu = "adjust" )
 # this setting matches the MISSUNIT option in SUDAAN

@@ -74,7 +74,7 @@ library(foreign) 	# load foreign package (converts data files into R)
 
 # by default, R will crash if a primary sampling unit (psu) has a single observation
 # set R to produce conservative standard errors instead of crashing
-# http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
+# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
 # by uncommenting this line:
 # options( survey.lonely.psu = "adjust" )
 # this setting matches the MISSUNIT option in SUDAAN

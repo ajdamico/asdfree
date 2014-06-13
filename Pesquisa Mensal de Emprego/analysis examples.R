@@ -51,7 +51,7 @@ library(survey)		# load survey package (analyzes complex design surveys)
 
 
 # set R to produce conservative standard errors instead of crashing
-# http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
+# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
 options( survey.lonely.psu = "adjust" )
 # this setting matches the MISSUNIT option in SUDAAN
 # SAS uses "remove" instead of "adjust" by default,

@@ -65,7 +65,7 @@ library(reshape2)	# load reshape2 package (transposes data frames quickly)
 
 
 # set R to produce conservative standard errors instead of crashing
-# http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
+# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
 options( survey.lonely.psu = "adjust" )
 # this setting matches the MISSUNIT option in SUDAAN
 

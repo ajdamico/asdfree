@@ -46,7 +46,7 @@ library(survey)          # required for the analysis of complex survey samples
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Setting to produce conservative standard errors instead of crashing
 # this setting matches the MISSUNIT option in SUDAAN
-# http://faculty.washington.edu/tlumley/survey/exmample-lonely.html
+# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 options(survey.lonely.psu="adjust")
 
