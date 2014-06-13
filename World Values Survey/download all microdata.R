@@ -120,7 +120,7 @@ values <-
 		LIEMPRESA = your.organization ,
 		LIEMAIL = your.email ,
 		LIPROJECT = your.project ,
-		LIUSE = 1 ,
+		LIUSE = as.numeric( do.you.agree ) ,
 		LIPURPOSE = your.purpose ,
 		LIAGREE = as.numeric( do.you.agree ) ,
 		AJArchive = "WVS Data Archive" ,
