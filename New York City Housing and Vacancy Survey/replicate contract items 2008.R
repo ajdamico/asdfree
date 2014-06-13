@@ -117,7 +117,7 @@ y <- svydesign( ~1 , data = occ , weights = ~hhweight )
 # # # # # #
 
 # at this point, using svymean, svyquantile, svytotal and all other functions listed on
-# http://faculty.washington.edu/tlumley/survey/
+# http://r-survey.r-forge.r-project.org/survey/
 # will result in confidence intervals and standard errors that are *too small* - that is, false positives.
 
 # to get only false negatives, simply multiply the standard errors by *two*

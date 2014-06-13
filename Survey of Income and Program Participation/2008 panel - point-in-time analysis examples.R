@@ -412,7 +412,7 @@ confint( svyby( ~nm , ~esex , z.15p , svymean ) , level = .9 )
 # note: these analysis examples are intentionally sparse
 # (to focus attention on the data manipulation part, which is much harder in sipp)
 # once the replicate-weighted survey design object has been created,
-# any of the features described on http://faculty.washington.edu/tlumley/survey/ can be used.
+# any of the features described on http://r-survey.r-forge.r-project.org/survey/ can be used.
 # all of the analysis examples shown for other survey data sets can be used on a sipp survey design too,
 # so be sure to check out other data sets on http://asdfree.com/ for more thorough examples
 

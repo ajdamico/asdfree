@@ -105,7 +105,7 @@ options( survey.replicates.mse = TRUE )
 # connected to the 2009 tables
 
 # sqlite database-backed survey objects are described here: 
-# http://faculty.washington.edu/tlumley/survey/svy-dbi.html
+# http://r-survey.r-forge.r-project.org/survey/svy-dbi.html
 # monet database-backed survey objects are similar, but:
 # the database engine is, well, blazingly faster
 # the setup is kinda more complicated (but all done for you)
