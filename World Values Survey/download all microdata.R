@@ -107,27 +107,32 @@ library(tools)		# allows rapid extraction of filename extensions
 tf <- tempfile() ; td <- tempdir()
 
 
-# initiate a list object containing all 
-# parameters necessary to automate the
-# login to the worldvaluessurvey.org system
-values <-
-	list(
-		ulthost = "WVS" ,
-		CMSID = "" ,
-		INID  = "" ,
-		LITITLE = "" ,
-		LINOMBRE = your.name ,
-		LIEMPRESA = your.organization ,
-		LIEMAIL = your.email ,
-		LIPROJECT = your.project ,
-		LIUSE = as.numeric( do.you.agree ) ,
-		LIPURPOSE = your.purpose ,
-		LIAGREE = as.numeric( do.you.agree ) ,
-		AJArchive = "WVS Data Archive" ,
-		EdFunction = "" ,
-		DOP = "" ,
-		PUB = ""
-	)
+# only if the user explicitly agrees to the terms..
+if( do.you.agree ){
+
+	# initiate a list object containing all 
+	# parameters necessary to automate the
+	# login to the worldvaluessurvey.org system
+
+	values <-
+		list(
+			ulthost = "WVS" ,
+			CMSID = "" ,
+			INID  = "" ,
+			LITITLE = "" ,
+			LINOMBRE = your.name ,
+			LIEMPRESA = your.organization ,
+			LIEMAIL = your.email ,
+			LIPROJECT = your.project ,
+			LIUSE = 1 ,
+			LIPURPOSE = your.purpose ,
+			LIAGREE = 1 ,
+			AJArchive = "WVS Data Archive" ,
+			EdFunction = "" ,
+			DOP = "" ,
+			PUB = ""
+		)
+} else stop( "please read the instructions" )
 
 
 # loop through each wave requested by the user
