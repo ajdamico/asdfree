@@ -191,7 +191,7 @@ for ( this.wave in waves.to.download ){
 			# unzip it into the local temporary directory
 			z <- unzip( tf , exdir = td )
 			
-			# confirm that the unzipped file length is one and that it's an rda/dta/sav file
+			# confirm that the unzipped file length is one or it is not an rda/dta/sav file
 			stopifnot ( length( z ) == 1 | !( grepl( 'stata_dta|spss|rda' , fn ) ) ) 
 
 			# if it's a stata file, import with `read.dta`
@@ -219,20 +219,25 @@ for ( this.wave in waves.to.download ){
 				rm( list = dfn )
 				
 			}
-			
-			# convert all column names to lowercase
-			names( x ) <- tolower( names( x ) )
-			
-			# determine the filepath to store this data.frame object on the local disk
-			# if it was "thisfile.sav" then make it "yourdirectory/subdirectory/thisfile.rda"
-			rfn <- paste0( this.subdir , "/" , gsub( file_ext( fn ) , "rda" , fn ) )
-			
-			# store the data.frame object on the local disk
-			save( x , file = rfn )
-			
-			# remove the data.frame from working memory
-			rm( x )
 
+			# if a data.frame object has been imported..
+			if( exists( 'x' ) ){
+				
+				# convert all column names to lowercase
+				names( x ) <- tolower( names( x ) )
+				
+				# determine the filepath to store this data.frame object on the local disk
+				# if it was "thisfile.sav" then make it "yourdirectory/subdirectory/thisfile.rda"
+				rfn <- paste0( this.subdir , "/" , gsub( file_ext( fn ) , "rda" , fn ) )
+				
+				# store the data.frame object on the local disk
+				save( x , file = rfn )
+				
+				# remove the data.frame from working memory
+				rm( x )
+
+			}
+				
 		}
 		
 		# clear up RAM
@@ -322,7 +327,7 @@ for ( this.wave in waves.to.download ){
 					# unzip it into the local temporary directory
 					z <- unzip( tf , exdir = td )
 					
-					# confirm that the unzipped file length is one and that it's an rda/dta/sav file
+					# confirm that the unzipped file length is one or it is not an rda/dta/sav file
 					stopifnot ( length( z ) == 1 | !( grepl( 'stata_dta|spss|rda' , fn ) ) ) 
 
 					# if it's a stata file, import with `read.dta`
@@ -351,19 +356,24 @@ for ( this.wave in waves.to.download ){
 						
 					}
 					
-					# convert all column names to lowercase
-					names( x ) <- tolower( names( x ) )
+					# if a data.frame object has been imported..
+					if( exists( 'x' ) ){
+
+						# convert all column names to lowercase
+						names( x ) <- tolower( names( x ) )
+						
+						# determine the filepath to store this data.frame object on the local disk
+						# if it was "thisfile.sav" then make it "yourdirectory/subdirectory/thisfile.rda"
+						rfn <- paste0( this.subdir , "/" , gsub( file_ext( fn ) , "rda" , fn ) )
+						
+						# store the data.frame object on the local disk
+						save( x , file = rfn )
+						
+						# remove the data.frame from working memory
+						rm( x )
 					
-					# determine the filepath to store this data.frame object on the local disk
-					# if it was "thisfile.sav" then make it "yourdirectory/subdirectory/thisfile.rda"
-					rfn <- paste0( this.subdir , "/" , gsub( file_ext( fn ) , "rda" , fn ) )
-					
-					# store the data.frame object on the local disk
-					save( x , file = rfn )
-					
-					# remove the data.frame from working memory
-					rm( x )
-					
+					}
+						
 				}
 				
 				# clear up RAM
