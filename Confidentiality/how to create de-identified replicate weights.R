@@ -1,3 +1,10 @@
+# analyze survey data for free (http://asdfree.com) with the r language
+# how to create de-identified replicate weights
+# in less than ten steps
+
+# anthony joseph damico
+# ajdamico@gmail.com
+
 
 # the institute for digital research and education at ucla
 # hosts a very readable explanation of replicate weights,
@@ -5,8 +12,16 @@
 # http://www.ats.ucla.edu/stat/stata/library/replicate_weights.htm
 
 
+
+# remove the # in order to run this install.packages line only once
+# install.packages( c( "survey" , "sdcMicro" ) )
+
+
 # load the r survey package
 library(survey)
+
+# load the sdcMicro package
+library(sdcMicro)
 
 
 # load some sample complex sample survey data
@@ -179,20 +194,182 @@ your.replicate.weights <- data.frame( unclass( api.jkn$repweights ) )
 # # # # # # # # # # # # # # # # # # # # # # # #
 # you've created the set of replicate-weights #
 
-###########################################
-# # # # # # # # # # # # # # # # # # # # # #
-# part two. share these replicate weights #
-# # # # # # # # # # # # # # # # # # # # # #
-###########################################
+#############################################
+# # # # # # # # # # # # # # # # # # # # # # #
+# part two. mask the strata from evil users #
+# # # # # # # # # # # # # # # # # # # # # # #
+#############################################
 
-# now share these weights with your users.    #
+# now prevent users from reidentifying strata #
 # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# step one: remove the confidential fields from your data #
-# and tack on the replicate weight columns created above. #
+# step four: understand how a malicious user might easily #
+# identify clustering variables on un-obfuscated data     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# start with the replicate weights object from the script
+transposed.rw <- t( your.replicate.weights )
+
+# the first record of apistrat has dnum==401 and stype=='E'
+
+# going back to the original microdata set,
+# eleven records are in this cluster x stratum
+which( apistrat$dnum == 401 & apistrat$stype == 'E' )
+
+# without massaging your replicate weights at all,
+# a malicious user could easily view the correlations
+# between each record's replicate weights
+# in order to determine what other records
+# land in the same cluster x strata
+
+# for example, here are all replicate-weight records that
+# perfectly (after rounding) correlate with 
+# the first record.
+which( round( cor( transposed.rw )[ 1 , ] ) == 1 )
+
+# same numbers!
+
+# (wikipedia has a great definition: http://en.wikipedia.org/wiki/Obfuscation)
+# if you do not obfuscate your data, a malicious user could
+# identify unique clusters and strata even if only given replicate weights
+
+
+# # # # # # # # # # # # # # # #
+# step five: BRING THE NOISE  #
+# # # # # # # # # # # # # # # #
+
+# set a random seed.  this allows you to
+# go back to this code and reproduce the
+# exact same results in the future.
+
+# the following steps include a random process
+# setting a seed enforces the same random process every time
+sum( utf8ToInt( "anthony is cool" ) )
+# my current favorite number is 1482, so let's go with that.
+set.seed( 1482 )
+
+
+# figure out how much noise to add.
+noisy.transposed.rw <- addNoise( transposed.rw , noise = 1 )$xm
+# this is probably too much.
+
+# remember, on the original replicate weight objects,
+# the correlations between the first record and
+# other records within the same clusters and strata
+# were perfect.
+which( round( cor( transposed.rw )[ 1 , ] ) == 1 )
+
+# run the same test on noisified weights
+which( round( cor( noisy.transposed.rw )[ 1 , ] ) == 1 )
+# and suddenly none of the other records are perfectly correlated
+
+
+# but even moderately correlations might allow evildoers
+# to identify clusters and strata
+# these records have a 0.1 or higher correlation coefficient
+which( cor( noisy.transposed.rw )[ 1 , ] > 0.1 )
+# these records have a 0.2 or higher correlation coefficient
+which( cor( noisy.transposed.rw )[ 1 , ] > 0.2 )
+# whoops.  we did not add enough noise.
+
+# okay.  this will make a big difference
+# on the size of the standard errors that
+# your users will actually see.
+
+# make a clutch decision:
+# how much noise can you tolerate?
+# hmncyt <- 1
+hmncyt <- 3
+# hmncyt <- 10
+
+# you need to run this script a few times
+# because the size of your standard errors
+# are going to change, depending on your data set.
+
+
+# essentially, choose the lowest noise value
+# that does not lead you to uncomfortable levels
+# of correlation within cluster/strata
+# in your replicate weights columns
+
+
+# crank up the random noise percentage to three
+noisy.transposed.rw <- addNoise( transposed.rw , noise = hmncyt )$xm
+# and suddenly..
+
+# records 29, 73 and 158 have a correlation coefficient
+# that's greater than two.
+which( cor( noisy.transposed.rw )[ 1 , ] > 0.2 )
+
+# and of those, only record #29 is in the same cluster x strata
+intersect(
+	which( cor( noisy.transposed.rw )[ 1 , ] > 0.2 ) ,
+	which( round( cor( transposed.rw )[ 1 , ] ) == 1 )
+)
+# that's awesome, because you have two false-positives here.
+# the "73" and "158" will throw off a malicious user.
+
+
+# these records have a 0.1 or higher correlation coefficient
+which( cor( noisy.transposed.rw )[ 1 , ] > 0.1 )
+# and that looks very good.
+# because less than half of those records
+# are actually in the same cluster x strata
+intersect(
+	which( cor( noisy.transposed.rw )[ 1 , ] > 0.1 ) ,
+	which( round( cor( transposed.rw )[ 1 , ] ) == 1 )
+)
+# and there are lots of other records with high correlations (false positives)
+# that in fact are not in the same strata.  great.  perf.  magnifique!
+
+# this object `noisy.transposed.rw` is the set of replicate weights
+# that you might now feel comfortable disclosing to your users.
+
+# bee tee dubs
+
+# you should un-transpose the weights rightaboutnow
+noisy.rw <- t( noisy.transposed.rw )
+
+
+# # # # # # # # # # # # # # # # # # # # #
+# step six: check with your legal dept. #
+# # # # # # # # # # # # # # # # # # # # #
+
+# brilliant malicious users might still be able to identify certain records
+# if they work really really really hard and have access to other information
+# included in your survey microdata set.
+
+# for example:
+# if your technical documentation says that memphis was one of your sampled clusters, and
+# if your microdata does have a state identifier, and
+# if the content of your survey was about barbeque consumption
+
+# it's possible that no amount of masking, obfuscating, massaging, noising, whathaveyouing
+# will prevent malicious users from determining the geography of some of the records
+# included in your public use file.  so don't mindlessly follow this example.
+
+# consider exactly what you're disclosing, and how someone might use it improperly.
+
+
+# # # # # # # # # # # # # # # # # # # # # # #
+# you've protected cluster confidentiality  #
+
+#############################################
+# # # # # # # # # # # # # # # # # # # # # # #
+# part three. share these replicate weights #
+# # # # # # # # # # # # # # # # # # # # # # #
+#############################################
+
+# now share these weights with your users.  #
+# # # # # # # # # # # # # # # # # # # # # # #
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# step seven: remove the confidential fields from your data #
+# and tack on the replicate weight columns created above.   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # go back to our original data.frame object `apistrat`
@@ -210,8 +387,8 @@ head( x )
 
 # merge on the replicate weight data.frame
 # that we just created, which contains
-# no confidential information for users
-y <- cbind( x , your.replicate.weights )
+# obfuscated-confidential information for users
+y <- cbind( x , noisy.rw )
 
 # look at the first six records
 # to confirm the weights have been tacked on
@@ -236,10 +413,10 @@ head( y )
 # that no longer contains identifiable geographic information
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# step two: determine the `svrepdesign` specification to  #
-# match the survey object above, but without cluster info #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# step eight: determine the `svrepdesign` specification to  #
+# match the survey object above, but without cluster info   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # once users have a copy of this de-identified
@@ -267,18 +444,40 @@ z <-
 		combined.weights = FALSE ,
 		mse = TRUE
 	)
-
+# is it giving you a warning about calculate the rscales by itself?
+# good.  then you're doing right by me.
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# step three: confirm this new replication survey object  #
+# step nine: confirm this new replication survey object   #
 # matches the standard errors derived from as.svrepdesign #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	
 # this `z` object can now be analyzed
-# and will match the `api.jkn` shown above
+# and the statistics but not the standard errors
+# will match the `api.jkn` shown above.
 svymean( ~ api99 + api00 , z )
 svymean( ~ api99 + api00 , api.jkn )
 
 svyby( ~ api99 + api00 , ~ awards , z , svymean )
 svyby( ~ api99 + api00 , ~ awards , api.jkn , svymean )
+# see how the standard errors have a-little-more-than-doubled?
+# that's because we had to BRING THE NOISE to the replicate weights
+
+# if you re-run this script but lower the value of `hmncyt`
+# your standard errors will *decrease* and get closer to
+# what they actually are when you have the confidential information.
+
+# that's the trade-off.  re-run this entire script but set `hmncyt <- 0`
+# and you'll see some almost-perfect standard errors..
+# but doing that would allow malicious users to identify clusters easily
+
+# then re-run it again and set `hmncyt <- 10` and suddenly
+# no way in hell can a malicious user identify clustering information
+# but your standard errors (and subsequent confidence intervals) are ginormous
+
+# obfuscating your replicate weights is going to make it harder for users
+# to detect statistically significant changes in your microdata.  no way around that.
+# but minimizing the amount of obfuscation will temper that damage.
+
+# dooooo it.  public use microdata are an indisputable good.
