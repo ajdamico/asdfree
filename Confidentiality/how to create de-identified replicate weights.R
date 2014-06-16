@@ -253,7 +253,7 @@ set.seed( 1482 )
 
 # figure out how much noise to add.
 noisy.transposed.rw <- addNoise( transposed.rw , noise = 1 )$xm
-# this is probably too much.
+
 
 # remember, on the original replicate weight objects,
 # the correlations between the first record and
@@ -273,6 +273,10 @@ which( cor( noisy.transposed.rw )[ 1 , ] > 0.1 )
 # these records have a 0.2 or higher correlation coefficient
 which( cor( noisy.transposed.rw )[ 1 , ] > 0.2 )
 # whoops.  we did not add enough noise.
+# records in the same cluster x strata still have
+# too high of a correlation coefficient,
+# relative to other records
+
 
 # okay.  this will make a big difference
 # on the size of the standard errors that
@@ -300,7 +304,7 @@ noisy.transposed.rw <- addNoise( transposed.rw , noise = hmncyt )$xm
 # and suddenly..
 
 # records 29, 73 and 158 have a correlation coefficient
-# that's greater than two.
+# that's greater than zero point two.
 which( cor( noisy.transposed.rw )[ 1 , ] > 0.2 )
 
 # and of those, only record #29 is in the same cluster x strata
@@ -477,7 +481,8 @@ svyby( ~ api99 + api00 , ~ awards , api.jkn , svymean )
 # but your standard errors (and subsequent confidence intervals) are ginormous
 
 # obfuscating your replicate weights is going to make it harder for users
-# to detect statistically significant changes in your microdata.  no way around that.
-# but minimizing the amount of obfuscation will temper that damage.
+# to detect statistically significant differences when analyzing your microdata.
+# no way around that.
+# just do your best to minimize the amount of obfuscation.
 
 # dooooo it.  public use microdata are an indisputable good.
