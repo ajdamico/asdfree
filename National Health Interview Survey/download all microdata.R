@@ -1,6 +1,5 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # national health interview survey
-# 1963 through 2012
 # all available files (including documentation)
 
 # # # # # # # # # # # # # # # # #
@@ -8,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NHIS/" )
-# nhis.years.to.download <- 2012:1963
+# nhis.years.to.download <- 2013:1963
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Health%20Interview%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -69,9 +68,9 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# nhis.years.to.download <- 2012:1963
+# nhis.years.to.download <- 2013:1963
 
-# uncomment this line to only download the most current year
+# uncomment this line to only download the 2012 files
 # nhis.years.to.download <- 2012
 
 # uncomment this line to download, for example, 2000 and 2009-2011
