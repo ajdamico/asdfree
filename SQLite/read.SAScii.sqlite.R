@@ -14,7 +14,7 @@ read.SAScii.sqlite <-
 		zipped = F , 
 		# n = -1 , 			# no n parameter available for this - you must read in the entire table!
 		lrecl = NULL , 
-		# skip.decimal.division = NULL , skipping decimal division not an option
+		skip.decimal.division = FALSE , # skipping decimal division is a modified option
 		tl = F ,			# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,	# overwrite existing table?
@@ -153,6 +153,7 @@ read.SAScii.sqlite <-
 	file.remove( tf2 )
 		
 
+	if( skip.decimal.division ) y[ , 'divisor' ] <- 1
 		
 	# construct the sql string used to multiply by all divisors at once
 	sql.divisor <- 
