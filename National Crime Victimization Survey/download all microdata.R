@@ -11,7 +11,7 @@
 # your.username <- 'your@login.com'
 # your.password <- 'yourpassword'
 # rm( studies.to.download ) # or pick a few # studies.to.download <- c( "2003 Record-Type Files" , "2012 Identity Theft Supplement" , "1995 School Crime Supplement" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Panel%20Study%20of%20Income%20Dynamics/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Crime%20Victimization%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
