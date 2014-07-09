@@ -299,11 +299,11 @@ for ( i in numbers.to.download ){
 		h <- basicHeaderGatherer()
 
 		# attempt to decipher the filename
-		fn.attempt <- try( doc <- getURI( dp , headerfunction = h$update ) , silent = TRUE )
+		fn.attempt <- try( doc <- getURI( dp , headerfunction = h$update , curl = curl ) , silent = TRUE )
 		
-		# if the filename attempt failed, name it after the file_id=
+		# if the filename attempt failed, name it after the study= and ds= positions
 		if( class( fn.attempt ) == 'try-error' ) {
-			lfn <- paste0( gsub( "(.*)file_id\\=([0-9]*)(.*)" , "\\2" , j ) , ".zip" )
+			lfn <- paste0( gsub( "(.*)study\\=([0-9]*)(.*)ds\\=([0-9]*)(.*)" , "\\2_\\4" , j ) , ".zip" )
 		} else {
 			# otherwise use the download file name extracted from getURI
 			lfn <- gsub( '(.*)\\"(.*)\\"' , "\\2" , h$value()[["Content-Type"]] )
