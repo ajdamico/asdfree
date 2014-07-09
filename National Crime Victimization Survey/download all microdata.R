@@ -80,12 +80,6 @@
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "SAScii" , "RCurl" , "RSQLite" , "descr" , "downloader" , "R.utils" , "stringr" ) )
 
-# no need to edit anything below this line #
-
-
-# # # # # # # # #
-# program start #
-# # # # # # # # #
 
 
 library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
