@@ -213,16 +213,11 @@ for ( i in numbers.to.download ){
 		# initiate a header
 		h <- basicHeaderGatherer()
 		
-		# attempt to decipher the filename
-		fn.attempt <- try( doc <- getURI( dp , headerfunction = h$update ) , silent = TRUE )
+		# pull the filename off of the server
+		try( doc <- getURI( dp , headerfunction = h$update ) , silent = TRUE )
 		
-		# if the filename attempt failed, name it after the file_id=
-		if( class( fn.attempt ) == 'try-error' ) {
-			lfn <- paste0( gsub( "(.*)file_id\\=([0-9]*)(.*)" , "\\2" , j ) , ".pdf" )
-		} else {
-			# otherwise use the download file name extracted from getURI
-			lfn <- gsub( '(.*)\\"(.*)\\"' , "\\2" , h$value()[["Content-Type"]] )
-		}
+		# extract the name from that `h` object
+		lfn <- gsub( '(.*)\\"(.*)\\"' , "\\2" , h$value()[["Content-Type"]] )
 		
 		# save the actual downloaded-file to the filepath specified on the local disk
 		writeBin( this.doc , paste0( this.dir , "/" , lfn ) )
@@ -298,16 +293,11 @@ for ( i in numbers.to.download ){
 		# initiate a heading object
 		h <- basicHeaderGatherer()
 
-		# attempt to decipher the filename
-		fn.attempt <- try( doc <- getURI( dp , headerfunction = h$update , curl = curl ) , silent = TRUE )
+		# pull the filename off of the server
+		try( doc <- getURI( dp , headerfunction = h$update , curl = curl ) , silent = TRUE )
 		
-		# if the filename attempt failed, name it after the study= and ds= positions
-		if( class( fn.attempt ) == 'try-error' ) {
-			lfn <- paste0( gsub( "(.*)study\\=([0-9]*)(.*)ds\\=([0-9]*)(.*)" , "\\2_\\4" , j ) , ".zip" )
-		} else {
-			# otherwise use the download file name extracted from getURI
-			lfn <- gsub( '(.*)\\"(.*)\\"' , "\\2" , h$value()[["Content-Type"]] )
-		}
+		# extract the name from that `h` object
+		lfn <- gsub( '(.*)\\"(.*)\\"' , "\\2" , h$value()[["Content-Type"]] )
 		
 		# save the actual downloaded-file to the filepath specified on the local disk
 		writeBin( this.sas_ri , paste0( this.dir , "/" , lfn ) )
