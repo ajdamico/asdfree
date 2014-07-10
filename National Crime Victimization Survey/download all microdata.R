@@ -144,16 +144,16 @@ study.names <- str_trim( study.names )
 # print the list of all study names available for download.
 print( study.names )
 
+
 # if you want to download all studies, ignore this next block.
 # by default, this script downloads everything.  but that takes a while
-# (a few weeks, for serious) so you might prefer to only download a subset.
+# (a few days, for serious) so you might prefer to only download a subset.
 # the very first study (the multiple-year concatenated file)
-# and the identity theft supplements take the longest
-# so it'd be smart to specify which microdata you want here:
+# takes approximately as long as all of the other files combined.  woah.
 
 
-# if you wanted to download only these three studies, you could
-# uncomment this next line by removing the `#` in front
+# if, for example, you wanted to download only these three studies,
+# you could uncomment this next line by removing the `#` in front
 # studies.to.download <- c( "2003 Record-Type Files" , "2012 Identity Theft Supplement" , "1995 School Crime Supplement" )
 # read the text in the `study.names` object and subset according to those blocks.
 
