@@ -80,7 +80,7 @@ get.tsv <-
 		line.num <- 0
 
 		# loop through every row of data in the original input file
-		while( length( line <- readLines( incon , 1 , skipNul = TRUE ) ) > 0 ){
+		while( length( line <- readLines( incon , 1 ) ) > 0 ){
 
 			# confirm this is either a household or person record..
 			stopifnot( substr( line , 1 , 1 ) %in% c( 'H' , 'P' ) )
