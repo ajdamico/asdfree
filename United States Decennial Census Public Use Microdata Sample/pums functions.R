@@ -87,12 +87,15 @@ get.tsv <-
 			# ..otherwise, there's something wrong with the file!
 
 			# remove goofy special characters (that will break monetdb)
+			line <- gsub( "Î?" , "62" , line , fixed = TRUE )
+			line <- gsub( "zÙ" , " " , line , fixed = TRUE )
+			line <- gsub( "äm99" , " 99" , line , fixed = TRUE )
+			line <- gsub( "jÂ" , " " , line , fixed = TRUE )
+			
 			line <- gsub( "[^[:alnum:]///' ]" , " " ,  line )
 			
 			line <- iconv( line , "" , "ASCII" , sub = " " )
 
-			line <- gsub( " m99" , "  99" , line , fixed = TRUE )
-		
 			line <- gsub( "P00083710210010540112000012110014100000028401800020193999910000000200000000000000000000000000000000000000p" , "P00083710210010540112000012110014100000028401800020193999910000000200000000000000000000000000000000000000  " , line , fixed = TRUE )
 			# end of goofy special character removal
 			
