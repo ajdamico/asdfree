@@ -86,11 +86,13 @@ get.tsv <-
 			stopifnot( substr( line , 1 , 1 ) %in% c( 'H' , 'P' ) )
 			# ..otherwise, there's something wrong with the file!
 
-			# remove goofy special characters (that will break monetdb)
-			line <- gsub( "Î?" , "62" , line , fixed = TRUE )
-			line <- gsub( "zÙ" , " " , line , fixed = TRUE )
-			line <- gsub( "m99" , " 99" , line , fixed = TRUE )
-			line <- gsub( "jÂ" , " " , line , fixed = TRUE )
+			if ( line.num > 1 ){
+				# remove goofy special characters (that will break monetdb)
+				line <- gsub( "Î?" , "62" , line , fixed = TRUE )
+				line <- gsub( "z" , " " , line , fixed = TRUE )
+				line <- gsub( "m99" , " 99" , line , fixed = TRUE )
+				line <- gsub( "j" , " " , line , fixed = TRUE )
+			}
 			
 			line <- gsub( "[^[:alnum:]///' ]" , " " ,  line )
 			
