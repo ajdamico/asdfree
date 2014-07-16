@@ -89,7 +89,7 @@ get.tsv <-
 			# remove goofy special characters (that will break monetdb)
 			line <- gsub( "Î?" , "62" , line , fixed = TRUE )
 			line <- gsub( "zÙ" , " " , line , fixed = TRUE )
-			line <- gsub( "äm99" , " 99" , line , fixed = TRUE )
+			line <- gsub( "m99" , " 99" , line , fixed = TRUE )
 			line <- gsub( "jÂ" , " " , line , fixed = TRUE )
 			
 			line <- gsub( "[^[:alnum:]///' ]" , " " ,  line )
