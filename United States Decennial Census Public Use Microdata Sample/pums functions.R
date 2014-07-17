@@ -88,7 +88,7 @@ get.tsv <-
 
 			if ( line.num > 1 ){
 				# remove goofy special characters (that will break monetdb)
-				line <- gsub( "Î?" , "" , line , fixed = TRUE )
+				line <- gsub( "Î?" , "6" , line , fixed = TRUE )
 				line <- gsub( "z" , " " , line , fixed = TRUE )
 				line <- gsub( "m99" , " 99" , line , fixed = TRUE )
 				line <- gsub( "j" , " " , line , fixed = TRUE )
