@@ -88,7 +88,6 @@ get.tsv <-
 
 			if ( line.num > 1 ){
 				# remove goofy special characters (that will break monetdb)
-				line <- gsub( "Î?" , "6" , line , fixed = TRUE )
 				line <- gsub( "z" , " " , line , fixed = TRUE )
 				line <- gsub( "m99" , " 99" , line , fixed = TRUE )
 				line <- gsub( "j" , " " , line , fixed = TRUE )
@@ -99,7 +98,7 @@ get.tsv <-
 			line <- iconv( line , "" , "ASCII" , sub = " " )
 
 			line <- gsub( "P00083710210010540112000012110014100000028401800020193999910000000200000000000000000000000000000000000000p" , "P0008371021001054011200001211001410000002840180002019399991000000020000000000000000000000000000000000000000" , line , fixed = TRUE )
-			line <- gsub( "H0008376623180140050999900 9" , "H000837623180140050999900 9" , line , fixed = TRUE )
+			line <- gsub( "H000837  623180140050999900 90012801000002005122050000000531112111521" , "H000837623180140050999900 90012801000002005122050000000531112111521" , line , fixed = TRUE )
 			# end of goofy special character removal
 			
 			# ..and if the first character is a H, add it to the new household-only pums file.
