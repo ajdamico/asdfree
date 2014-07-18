@@ -2,7 +2,7 @@
 # survey of income and program participation
 # 2008 panel
 # 14 core waves, 14 wave-specific replicate weights, 12 topical modules, 
-# 3 panel year replicate weights, 3 calendar year replicate weights, 1 longitudinal weights
+# 4 panel year replicate weights, 4 calendar year replicate weights, 1 longitudinal weights
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -55,8 +55,8 @@ sipp.core.waves <- 1:14																	# either choose which core survey waves 
 sipp.replicate.waves <- 1:14															# either choose which replicate weight waves to download, or set to NULL
 sipp.topical.modules <- c( 1:11 , 13 )													# either choose which topical modules to download, or set to NULL
 sipp.longitudinal.weights <- TRUE														# set to FALSE to prevent download
-sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:3 )							# reads in 2009-2011
-sipp.pnl.longitudinal.replicate.weights <- paste0( 'pn' , 1:3 )							# reads in 2009-2011
+sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:4 )							# reads in 2009-2012
+sipp.pnl.longitudinal.replicate.weights <- paste0( 'pn' , 1:4 )							# reads in 2009-2012
 
 ############################################
 # no need to edit anything below this line #
