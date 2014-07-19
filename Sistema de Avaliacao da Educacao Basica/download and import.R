@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SAEB/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Sistema%20da%20Avaliacao%20da%20Educacao%20Basica/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Sistema%20de%20Avaliacao%20da%20Educacao%20Basica/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -29,7 +29,7 @@
 
 
 ################################################################
-# download all sistema da avaliacao da educacao basico with R, #
+# download all sistema de avaliacao da educacao basico with R, #
 # then save every file as both sqlite and (where possible) rda #
 ################################################################
 
