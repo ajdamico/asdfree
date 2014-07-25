@@ -431,6 +431,14 @@ for ( year in consolidated.files.to.create ){
 		
 	x <- ric.merge( x , ric2_ric2f )
 	
+	
+	# if `community` is missing, print a warning..
+	if( any( is.na( x$community ) ) ) warning( "some records were not available in ric2 or ric2f for some reason?" )
+	
+	# ..and overwrite with community
+	x[ is.na( x$community ) , 'community' ] <- 1
+	
+	
 	# starting in 2001, the cost & use was released with a complete `RICA` file
 	# however, before then, the `RICA` file was complete
 	# and data users needed to wait for a later `RICA2` release
