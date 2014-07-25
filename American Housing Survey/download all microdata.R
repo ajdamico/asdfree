@@ -127,7 +127,7 @@ for ( curdir in rev( precise.links ) ){
 	precise.files <- gsub('(.*) (.*)' , '\\2' , ftp.contents )
 		
 	# look for exact matches, only zipped.
-	pfi <- gsub( '.zip' , '' , precise.files )
+	pfi <- gsub( '\\.zip|\\.Zip|\\.ZIP' , '' , precise.files )
 	
 	# these files match a `.zip` file
 	zip.matches <- pfi[ duplicated( pfi ) ]
@@ -212,7 +212,7 @@ for ( curdir in rev( precise.links ) ){
 		previous.tf <- NULL
 		
 		# if the file is a zipped file..
-		if ( extension %in% 'zip' ){
+		if ( tolower( extension ) %in% 'zip' ){
 		
 			# unzip it to the temporary directory,
 			# overwriting the single file's filepath
