@@ -388,7 +388,7 @@ svyby(
 gss.design.female <-
 	subset(
 		gss.design ,
-		sex %in% 'female'
+		sex %in% 2
 	)
 # now any of the above commands can be re-run
 # using the gss.design.female object
@@ -447,7 +447,7 @@ write.csv( polviews.by.region , "polviews by region.csv" )
 # here's the percent of the country who self-identify as
 # moderate by region, with accompanying standard errors
 moderate.rate.by.region <-
-	polviews.by.region[ , c( "region" , "polviewsmoderate" , "se.polviewsmoderate" ) ]
+	polviews.by.region[ , c( "region" , "polviews4" , "se.polviews4" ) ]
 
 # that's all rows, and the three specified columns
 
