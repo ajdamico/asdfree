@@ -72,7 +72,7 @@ library(survey)  # load survey package (analyzes complex design surveys)
 # create new character variables containing the full filepath of the file on norc's website
 # that needs to be downloaded and imported into r for analysis
 GSS.2012.CS.file.location <-
-	"http://publicdata.norc.org/GSS/DOCUMENTS/OTHR/GSS_stata.zip"
+	"http://publicdata.norc.org/GSS/DOCUMENTS/OTHR/GSS_spss.zip"
 
 
 # create a temporary file and a temporary directory
@@ -106,15 +106,15 @@ fn <-
 		overwrite = T
 	)
 
-# print the temporary location of the stata (.dta) file to the screen
+# print the temporary location of the spss (.sav) file to the screen
 print( fn )
 	
 
 # these two steps take a while.  but once saved as a .rda, future loading becomes fast forever after #
 
 
-# convert the stata (.dta) file saved on the local disk (at 'fn') into an r data frame
-GSS.2012.CS.df <- read.dta( fn )
+# convert the spss (.sav) file saved on the local disk (at 'fn') into an r data frame
+GSS.2012.CS.df <- read.spss( fn , to.data.frame = TRUE , use.value.labels = FALSE )
 
 	
 # save the cross-sectional cumulative gss r data frame inside an r data file (.rda)
