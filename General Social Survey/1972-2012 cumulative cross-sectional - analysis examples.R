@@ -107,14 +107,40 @@ fn <-
 	)
 
 # print the temporary location of the spss (.sav) file to the screen
-print( fn )
+print( fn[ grep( "sav$" , fn ) ] )
 	
 
 # these two steps take a while.  but once saved as a .rda, future loading becomes fast forever after #
 
 
 # convert the spss (.sav) file saved on the local disk (at 'fn') into an r data frame
-GSS.2012.CS.df <- read.spss( fn , to.data.frame = TRUE , use.value.labels = FALSE )
+GSS.2012.CS.df <- 
+	read.spss( 
+		fn[ grep( "sav$" , fn ) ] , 
+		to.data.frame = TRUE , 
+		use.value.labels = FALSE 
+	)
+
+# copy to a different object
+z <- GSS.2012.CS.df
+
+# remove the original from RAM
+rm( GSS.2012.CS.df )
+
+# clear up memory
+gc()
+
+# repeat
+GSS.2012.CS.df <- z
+
+# repeat
+rm( z )
+
+# i have no idea why this works.
+gc()
+# but if you don't do this on a 3gb ram machine
+# you will run out of memory.  go figure.
+
 
 	
 # save the cross-sectional cumulative gss r data frame inside an r data file (.rda)
@@ -130,7 +156,8 @@ save( GSS.2012.CS.df , file = "GSS.2012.CS.rda" )
 
 # now the r data frame can be loaded directly
 # from your local hard drive.  this is much faster.
-load( "GSS.2012.CS.rda" )
+# load( "GSS.2012.CS.rda" )
+# remove the `#` on the line above to uncomment.
 
 
 # display the number of rows in the cross-sectional cumulative data set
