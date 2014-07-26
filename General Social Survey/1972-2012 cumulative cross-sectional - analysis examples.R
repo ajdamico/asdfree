@@ -118,7 +118,7 @@ GSS.2012.CS.df <-
 	read.spss( 
 		fn[ grep( "sav$" , fn ) ] , 
 		to.data.frame = TRUE , 
-		use.value.labels = TRUE 
+		use.value.labels = FALSE 
 	)
 
 # copy to a different object
