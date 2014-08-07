@@ -47,7 +47,31 @@ spss.based.missing.blankouts <-
 				)
 			
 			# execute the update line
-			dbSendUpdate( conn , update.sql )
+			perhaps.uncast <- try( dbSendUpdate( conn , update.sql ) , silent = TRUE )
+			
+			# but if that line failed..
+			if( class( perhaps.uncast ) == 'try-error' ){
+				
+				# then re-try it without the casting to double
+				
+				# write out the UPDATE line that will set certain values to null
+				update.sql <-
+					paste(
+						"UPDATE" , 
+						tablename ,
+						"SET" , 
+						vars[ i ] , 
+						"= NULL WHERE" ,
+						vars[ i ] ,
+						"IN" ,
+						vals[ i ]
+					)
+				
+				# re-execute the query hooray
+				dbSendUpdate( conn , update.sql )
+				
+				
+			}
 			
 		}
 
