@@ -40,9 +40,9 @@ spss.based.missing.blankouts <-
 					tablename ,
 					"SET" , 
 					vars[ i ] , 
-					"= NULL WHERE" ,
+					"= NULL WHERE CAST( " ,
 					vars[ i ] ,
-					"IN" ,
+					" AS DOUBLE ) IN" ,
 					vals[ i ]
 				)
 			
@@ -94,9 +94,9 @@ missing.updates <-
 					tablename ,
 					'SET' ,
 					i ,
-					" = NULL WHERE" ,
+					" = NULL WHERE CAST( " ,
 					i ,
-					" IN (" ,
+					" AS DOUBLE ) IN (" ,
 					paste( missing.values , collapse = " , " ) ,
 					")"
 				)
