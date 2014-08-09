@@ -96,7 +96,7 @@ csv <- FALSE
 # no need to edit anything below this line #
 
 
-if ( 2013 %in% nhis.years.to.download ) message( "2013 imputed income not yet available" )
+if ( 2014 %in% nhis.years.to.download ) message( "2014 imputed income not yet available" )
 
 
 # # # # # # # # #
