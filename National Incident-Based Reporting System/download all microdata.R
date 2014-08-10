@@ -243,9 +243,6 @@ monetdb.server.stop( pid )
 # http://stackoverflow.com/questions/15853204/how-to-login-and-then-download-a-file-from-aspx-web-pages-with-r
 
 
-# create a temporary file
-tf <- tempfile()
-
 
 # load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
@@ -659,6 +656,11 @@ for ( i in numbers.to.download ){
 		monetdb.server.stop( pid )
 	
 	}
+	
+	# at the end of each of these runs, the temporary directory
+	# needs to be wiped out.  otherwise, all the big downloads
+	# and unzips will eat up all the storage on a smaller hard disk
+	file.remove( list.files( tempdir() , full.names = TRUE ) )
 	
 }
 
