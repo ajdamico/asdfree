@@ -186,7 +186,7 @@ for ( i in numbers.to.download ){
 		paste0( 
 			"http://www.icpsr.umich.edu/icpsrweb/NACJD/series/00128/studies/" , 
 			study.numbers[ i ] ,
-			"?archive=NACJD&q=&paging.rows=10000&sortBy=7" 
+			"?archive=NACJD&q=&paging.rows=10000&sortBy=7#" 
 		)
 
 	# download that homepage
@@ -227,7 +227,7 @@ for ( i in numbers.to.download ){
 			paste0(
 				"terms2\\?study=" ,
 				study.numbers[ i ] ,
-				"\\&ds=[0-9]\\&bundle=ascsas\\&path=NACJD"
+				"\\&ds=[0-9][0-9]?\\&bundle=ascsas\\&path=NACJD"
 			) , 
 			study.homepage 
 		)
@@ -255,8 +255,8 @@ for ( i in numbers.to.download ){
 		# list out the filepath on the server of the file-to-download
 		dp <- paste0( "http://www.icpsr.umich.edu/cgi-bin/bob/" , j )
 			
-		# this script only works on study ids 1 thru 9, so if you go into double-digits, crash.
-		if ( gsub( "(.*)ds=([0-9])(.*)" , "\\2" , j ) == 9 ) stop( "a study contains at least nine files - program needs to be modified to deal with ten or more" )
+		# this script only works on study ids 0 thru 99, so if you go into triple-digits, crash.
+		if ( gsub( "(.*)ds=([0-9][0-9]?)(.*)" , "\\2" , j ) == 99 ) stop( "a study contains at least ninety-nine files - program needs to be modified to deal with one hundred or more" )
 
 		# post your username and password to the umich server
 		login.page <- 
@@ -277,7 +277,7 @@ for ( i in numbers.to.download ){
 				agree = 'yes' ,
 				path = "NACJD" , 
 				study = study.numbers[ i ] , 
-				ds = gsub( "(.*)ds=([0-9])(.*)" , "\\2" , j ) , 
+				ds = gsub( "(.*)ds=([0-9][0-9]?)(.*)" , "\\2" , j ) , 
 				bundle = "ascsas" , 
 				dups = "yes" ,
 				style = "POST" ,
@@ -481,6 +481,23 @@ for ( i in numbers.to.download ){
 					dbCommit( db )
 				
 				}
+				
+			}
+			
+		# otherwise, if there's no recoding to be done at all
+		} else {
+			
+			# check whether the current table has less than 100000 records..
+			if ( dbGetQuery( db , 'select count(*) from x' )[ 1 , 1 ] < 100000 ){
+			
+				# pull the data file into working memory
+				x <- dbReadTable( db , 'x' )
+			
+				# save the r data.frame object to the local disk as an `.rda`
+				save( x , file = gsub( "txt$" , "rda" , data.file ) )
+			
+				# remove the object from working memory
+				rm( x )
 				
 			}
 			
