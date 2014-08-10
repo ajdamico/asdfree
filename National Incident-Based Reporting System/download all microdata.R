@@ -10,6 +10,7 @@
 # setwd( "C:/My Directory/NIBRS/" )
 # your.username <- 'your@login.com'
 # your.password <- 'yourpassword'
+# options( "monetdb.sequential" = TRUE )
 # rm( studies.to.download ) # or pick a few # studies.to.download <- c( "2012 Extract Files" , "2004" , "2009 Uniform Crime Reporting" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Incident-Based%20Reporting%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -31,10 +32,10 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-####################################################################################
-# download every file from every year of the national incident-based reporting system   #
-# then save every file as an R data frame (.rda) so future analyses can be rapid.  #
-####################################################################################
+#######################################################################################
+# download every file from every year of the national incident-based reporting system #
+# then save every file as an R data frame (.rda) so future analyses can be rapid.     #
+#######################################################################################
 
 
 # # # # # # # # # # # # # #
@@ -66,6 +67,50 @@
 # # # # # # # # # # # # # # # # #
 
 
+
+# # # # # # # # # # # # # # #
+# warning: monetdb required #
+# # # # # # # # # # # # # # #
+
+
+# windows machines and also machines without access
+# to large amounts of ram will often benefit from
+# the following option, available as of MonetDB.R 0.9.2 --
+# remove the `#` in the line below to turn this option on.
+# options( "monetdb.sequential" = TRUE )
+# -- whenever connecting to a monetdb server,
+# this option triggers sequential server processing
+# in other words: single-threading.
+# if you would prefer to turn this on or off immediately
+# (that is, without a server connect or disconnect), use
+# turn on single-threading only
+# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
+# restore default behavior -- or just restart instead
+# dbSendQuery(db,"set optimizer = 'default_pipe';")
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###################################################################################################################################
+# prior to running this analysis script, monetdb must be installed on the local machine.  follow each step outlined on this page: #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/MonetDB/monetdb%20installation%20instructions.R                                   #
+###################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# # # # # # # # # # # # # # # #
+# warning: this takes a while #
+# # # # # # # # # # # # # # # #
+
+# even if you're only downloading a single extract and you've got a fast internet connection,
+# you'll be better off leaving this script to run overnight.  if you wanna download all available files and years,
+# leave it running on friday afternoon (or even better: before you leave for a weeklong vacation).
+# depending on your internet and processor speeds, the entire script should take between two and ten days.
+# it's running.  don't believe me?  check the working directory (set below) for a new r data file (.rda) every few hours.
+
+
+
+
+
 # set your working directory.
 # all NIBRS data files will be stored here
 # after downloading.
@@ -78,7 +123,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "RCurl" , "RSQLite" , "descr" , "downloader" , "R.utils" , "stringr" ) )
+# install.packages( c( "SAScii" , "RCurl" , "descr" , "downloader" , "R.utils" , "stringr" ) )
 
 
 
@@ -86,10 +131,112 @@ library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script
 library(RCurl)		# load RCurl package (downloads https files)
 library(stringr)	# load stringr package (manipulates character strings easily)
 library(downloader)	# downloads and then runs the source() function on scripts from github
-library(RSQLite)	# load RSQLite package (creates database files in R)
+library(MonetDB.R)	# load MonetDB.R package (creates database files in R)
 library(descr)		# load the descr package (converts fixed-width files to delimited files)
 library(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
 library(foreign)	# load foreign package (converts data files into R)
+
+
+# configure a monetdb database for the nibrs on windows #
+
+# note: only run this command once.  this creates an executable (.bat) file
+# in the appropriate directory on your local disk.
+# when adding new files or adding a new year of data, this script does not need to be re-run.
+
+# create a monetdb executable (.bat) file for the national incident-based reporting system
+batfile <-
+	monetdb.server.setup(
+					
+					# set the path to the directory where the initialization batch file and all data will be stored
+					database.directory = paste0( getwd() , "/MonetDB" ) ,
+					# must be empty or not exist
+					
+					# find the main path to the monetdb installation program
+					monetdb.program.path = 
+						ifelse( 
+							.Platform$OS.type == "windows" , 
+							"C:/Program Files/MonetDB/MonetDB5" , 
+							"" 
+						) ,
+					# note: for windows, monetdb usually gets stored in the program files directory
+					# for other operating systems, it's usually part of the PATH and therefore can simply be left blank.
+										
+					# choose a database name
+					dbname = "nibrs" ,
+					
+					# choose a database port
+					# this port should not conflict with other monetdb databases
+					# on your local computer.  two databases with the same port number
+					# cannot be accessed at the same time
+					dbport = 50014
+	)
+
+	
+# this next step is so very important.
+
+# store a line of code that will make it easy to open up the monetdb server in the future.
+# this should contain the same file path as the batfile created above,
+# you're best bet is to actually look at your local disk to find the full filepath of the executable (.bat) file.
+# if you ran this script without changes, the batfile will get stored in C:\My Directory\NIBRS\MonetDB\nibrs.bat
+
+# here's the batfile location:
+batfile
+
+# note that since you only run the `monetdb.server.setup()` function the first time this script is run,
+# you will need to note the location of the batfile for future MonetDB analyses!
+
+# in future R sessions, you can create the batfile variable with a line like..
+# batfile <- "C:/My Directory/NIBRS/MonetDB/nibrs.bat"
+# obviously, without the `#` comment character
+
+# hold on to that line for future scripts.
+# you need to run this line *every time* you access
+# the national incident-based reporting system files with monetdb.
+# this is the monetdb server.
+
+# two other things you need: the database name and the database port.
+# store them now for later in this script, but hold on to them for other scripts as well
+dbname <- "nibrs"
+dbport <- 50014
+
+# now the local windows machine contains a new executable program at "c:\my directory\nibrs\monetdb\nibrs.bat"
+
+
+
+
+# it's recommended that after you've _created_ the monetdb server,
+# you create a block of code like the one below to _access_ the monetdb server
+
+
+######################################################################
+# lines of code to hold on to for all other `nibrs` monetdb analyses #
+
+# first: specify your batfile.  again, mine looks like this:
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/NIBRS/MonetDB/nibrs.bat"
+
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: your five lines to make a monet database connection.
+# just like above, mine look like this:
+dbname <- "nibrs"
+dbport <- 50014
+
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `nibrs` monetdb analyses #
+#############################################################################
+
+
 
 
 # follow the authentication technique described on this stackoverflow post
@@ -100,8 +247,8 @@ library(foreign)	# load foreign package (converts data files into R)
 tf <- tempfile()
 
 
-# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
+# load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
+source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 # download the contents of the webpage hosting all nibrs data files
 all.nibrs.studies <- getURL( "http://www.icpsr.umich.edu/icpsrweb/NACJD/series/00128/studies?archive=NACJD&q=&paging.rows=10000&sortBy=7" )
@@ -325,26 +472,30 @@ for ( i in numbers.to.download ){
 		# let the user/viewer know whatcha doin'
 		print( paste( "currently importing" , data.file ) )
 		
-		# initiate a sqlite database for this file on your local computer
-		db <- dbConnect( SQLite() , gsub( "txt$" , "db" , data.file ) )
+		# determine the tablename within the big database
+		tablename <- gsub( "(.*)/ICPSR_(.*)/(.*)" , "x\\2_\\3" , dirname( data.file ) )
+		# it should be x[study number]_[dataset number]
+		
+		# launch the current monet database
+		pid <- monetdb.server.start( batfile )
+		
+		# immediately connect to it
+		db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 		# in most cases, the sas importation script should start right at the beginning..
 		beginline <- 1
 		
-		# read the data file into an r sqlite database
-		read.SAScii.sqlite(
+		# read the data file into an r monetdb database
+		read.SAScii.monetdb(
 			fn = data.file ,
 			sas_ri = sas.import ,
 			tl = TRUE ,	# convert all column names to lowercase?
-			tablename = "x" ,
+			tablename = tablename ,
 			beginline = beginline ,
 			skip.decimal.division = TRUE ,
 			conn = db
 		)
-
-		# clear up empty space in the database
-		dbSendQuery( db , 'VACUUM' )
-
+		
 		
 		# figure out which variables need to be recoded to system missing #
 		
@@ -401,10 +552,10 @@ for ( i in numbers.to.download ){
 			# this loop assumes you have less than 4GB of RAM, so tables with more
 			# than 100,000 records will not automatically get read in unless you comment
 			# out this `if` block by adding `#` in front of this line and the accompanying `}`
-			if ( dbGetQuery( db , 'select count(*) from x' )[ 1 , 1 ] < 100000 ){
+			if ( dbGetQuery( db , paste( 'select count(*) from ' , tablename ) )[ 1 , 1 ] < 100000 ){
 				
 				# pull the data file into working memory
-				x <- dbReadTable( db , 'x' )
+				x <- dbReadTable( db , tablename )
 			
 				# if there are any missing values to recode
 				if ( length( mvr ) == 1 ){
@@ -433,11 +584,11 @@ for ( i in numbers.to.download ){
 					}
 					
 					# remove the current data table from the database
-					dbRemoveTable( db , 'x' )
+					dbRemoveTable( db , tablename )
 					
 					# ..and overwrite it with the data.frame object
 					# that you've just blessedly cleaned up
-					dbWriteTable( db , 'x' , x )
+					dbWriteTable( db , tablename , x )
 
 				}
 				
@@ -453,9 +604,6 @@ for ( i in numbers.to.download ){
 								
 				# if there are any variables that need system missing-ing
 				if( length( mvr ) == 1 ){
-				
-					# tell the sqlite database you're sending in a bunch of commands at once
-					dbBeginTransaction( db )
 					
 					# loop through each variable to recode
 					for ( k in seq_along( vtr ) ){
@@ -467,7 +615,9 @@ for ( i in numbers.to.download ){
 						dbSendQuery( 
 							db , 
 							paste(
-								"UPDATE x SET" ,
+								"UPDATE" ,
+								tablename ,
+								"SET" ,
 								vtr[ k ] ,
 								" = NULL WHERE" ,
 								ptm[ k ]
@@ -476,10 +626,6 @@ for ( i in numbers.to.download ){
 						
 					}
 					
-					# once all system missings have been overwritten with missing,
-					# save those changes in the r sqlite database
-					dbCommit( db )
-				
 				}
 				
 			}
@@ -488,10 +634,10 @@ for ( i in numbers.to.download ){
 		} else {
 			
 			# check whether the current table has less than 100000 records..
-			if ( dbGetQuery( db , 'select count(*) from x' )[ 1 , 1 ] < 100000 ){
+			if ( dbGetQuery( db , paste( 'select count(*) from ' , tablename ) )[ 1 , 1 ] < 100000 ){
 			
 				# pull the data file into working memory
-				x <- dbReadTable( db , 'x' )
+				x <- dbReadTable( db , tablename )
 			
 				# save the r data.frame object to the local disk as an `.rda`
 				save( x , file = gsub( "txt$" , "rda" , data.file ) )
@@ -506,12 +652,66 @@ for ( i in numbers.to.download ){
 		# clear up RAM	
 		gc()
 			
-		# disconnect from the current sqlite database
+		# disconnect from the current monetdb session
 		dbDisconnect( db )
+				
+		# and close it using the `pid`
+		monetdb.server.stop( pid )
 	
 	}
 	
 }
+
+
+# once complete, this script does not need to be run again.
+# instead, use one of the national incident-based reporting system
+# analysis scripts which utilize this central monetdb file
+
+
+# wait ten seconds, just to make sure any previous servers closed
+# and you don't get a gdk-lock error from opening two-at-once
+Sys.sleep( 10 )
+
+
+
+######################################################################
+# lines of code to hold on to for all other `nibrs` monetdb analyses #
+
+# first: specify your batfile.  again, mine looks like this:
+# uncomment this line by removing the `#` at the front..
+# batfile <- "C:/My Directory/NIBRS/MonetDB/nibrs.bat"
+
+# second: run the MonetDB server
+pid <- monetdb.server.start( batfile )
+
+# third: your five lines to make a monet database connection.
+# just like above, mine look like this:
+dbname <- "nibrs"
+dbport <- 50014
+
+monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+
+# # # # run your analysis commands # # # #
+
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+# end of lines of code to hold on to for all other `nibrs` monetdb analyses #
+#############################################################################
+
+
+
+
+# unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
+message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
+
+message( "got that? monetdb directories should not be set read-only." )
 
 
 # for more details on how to work with data in r
