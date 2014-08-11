@@ -662,6 +662,8 @@ for ( i in numbers.to.download ){
 	# and unzips will eat up all the storage on a smaller hard disk
 	file.remove( list.files( tempdir() , full.names = TRUE ) )
 	
+	closeAllConnections()
+	
 }
 
 
