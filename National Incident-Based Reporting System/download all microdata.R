@@ -470,7 +470,7 @@ for ( i in numbers.to.download ){
 		print( paste( "currently importing" , data.file ) )
 		
 		# determine the tablename within the big database
-		tablename <- gsub( "(.*)/ICPSR_(.*)/(.*)" , "x\\2_\\3" , dirname( data.file ) )
+		tablename <- gsub( "(.*)/ICPSR_(.*)/(DS|ds)(.*)" , "x\\2_\\4" , dirname( data.file ) )
 		# it should be x[study number]_[dataset number]
 		
 		# launch the current monet database
