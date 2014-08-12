@@ -455,6 +455,21 @@ for ( i in numbers.to.download ){
 		# determine the filenames that end with `sas`
 		sas.import <- z[ grep( "sas$" , tolower( z ) ) ]
 	
+		# the 2004 - 2008 files have one character field in the sas file
+		# that's been designated as numeric incorrectly.  fix it.
+		if( study.names[ i ] %in% as.character( 2004:2008 ) ){
+		
+			# read in the file
+			sip <- readLines( sas.import )
+		
+			# add a character string identifier to one field
+			sip <- gsub( "V1012 46-49" , "V1012 $ 46-49" , sip )
+			
+			# overwrite the sas import script on the local disk
+			writeLines( sip , sas.import )
+		
+		}
+	
 		# determine the filenames containing the word `data`
 		data.file <- z[ grep( "data" , tolower( basename( z ) ) ) ]
 	
