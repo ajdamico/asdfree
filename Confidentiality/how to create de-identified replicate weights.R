@@ -259,10 +259,10 @@ noisy.transposed.rw <- addNoise( transposed.rw , noise = 1 )$xm
 # the correlations between the first record and
 # other records within the same clusters and strata
 # were perfect.
-which( round( cor( transposed.rw )[ 1 , ] ) == 1 )
+which( sapply( cor( transposed.rw )[ 1 , ] , function( z ) isTRUE( all.equal( z , 1 ) ) ) )
 
 # run the same test on noisified weights
-which( round( cor( noisy.transposed.rw )[ 1 , ] ) == 1 )
+which( sapply( cor( noisy.transposed.rw )[ 1 , ] , function( z ) isTRUE( all.equal( z , 1 ) ) ) )
 # and suddenly none of the other records are perfectly correlated
 
 
@@ -354,7 +354,7 @@ noisy.rw <- t( noisy.transposed.rw )
 # will prevent malicious users from determining the geography of some of the records
 # included in your public use file.  so don't mindlessly follow this example.
 
-# consider exactly what you're disclosing, and how someone might use it improperly.
+# consider exactly what you're disclosing, consider how someone might use it improperly.
 
 
 # # # # # # # # # # # # # # # # # # # # # # #
@@ -448,7 +448,7 @@ z <-
 		combined.weights = FALSE ,
 		mse = TRUE
 	)
-# is it giving you a warning about calculate the rscales by itself?
+# is it giving you a warning about calculating the rscales by itself?
 # good.  then you're doing right by me.
 
 
@@ -456,7 +456,7 @@ z <-
 # step nine: confirm this new replication survey object   #
 # matches the standard errors derived from as.svrepdesign #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-	
+
 # this `z` object can now be analyzed
 # and the statistics but not the standard errors
 # will match the `api.jkn` shown above.
