@@ -68,11 +68,11 @@ load( "round 04.rda" )
 
 
 # create a taylor-series linearization design object
-y <- svydesign( ~ r4_a_psu_pub , strata = ~r4_a_strata , data = x , weights = ~r4_wtr4_ben )
+y <- svydesign( ~ a_psu_pub , strata = ~a_strata , data = x , weights = ~wtr4_ben )
 
 
 # calculate the percent of male respondents
-svymean( ~r4_orgsampinfo_sex , y )
+svymean( ~orgsampinfo_sex , y )
 # as coded on pdf page 69 of the general round four documentation
 # http://www.ssa.gov/disabilityresearch/documents/NBS%20R4%20PUF%20Codebook%28508%29.pdf#69
 
