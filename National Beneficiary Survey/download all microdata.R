@@ -76,6 +76,10 @@ for ( i in seq_along( rounds ) ){
 	# convert all column names to lowercase
 	names( x ) <- tolower( names( x ) )
 	
+	# remove those rounds at the front of the column names
+	names( x ) <- gsub( paste0( "^r" , i , "_" ) , "" , names( x ) )
+	# that `^` symbol instructs r to only match a pattern at the start of the string.
+	
 	# store the current data.frame object as a `.rda` file within the current working directory
 	save( x , file = paste0( "round " , str_pad( i , 2 , pad = "0" ) , ".rda" ) )
 	
