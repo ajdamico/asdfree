@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # behavioral risk factor surveillance system
-# 1984-2012 single-year files
+# 1984-2013 single-year files
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -8,7 +8,7 @@
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
 # setwd( "C:/My Directory/BRFSS/" )
-# years.to.download <- 1984:2012
+# years.to.download <- 1984:2013
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Behavioral%20Risk%20Factor%20Surveillance%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -206,7 +206,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- 1984:2012
+# years.to.download <- 1984:2013
 
 # pretty orwellian, huh?	
 
@@ -376,12 +376,12 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		
 
 		
-# the 2002 - 2012 brfss single-year files are too large to be read directly into RAM
+# the 2002 - 2013 brfss single-year files are too large to be read directly into RAM
 # so import them using the read.SAScii.monetdb() function,
 # a variant of the SAScii package's read.SAScii() function
 
-# loop through each year specified by the user, so long as it's within the 2002-2012 range
-for ( year in intersect( years.to.download , 2002:2012 ) ){
+# loop through each year specified by the user, so long as it's within the 2002-2013 range
+for ( year in intersect( years.to.download , 2002:2013 ) ){
 
 	# remove the temporary file (defined waaaay above) from the local disk, if it exists
 	file.remove( tf )
@@ -457,10 +457,10 @@ for ( year in intersect( years.to.download , 2002:2012 ) ){
 # create a data frame containing all weight, psu, and stratification variables for each year
 survey.vars <-
 	data.frame(
-		year = 1984:2012 ,
-		weight = c( rep( 'x_finalwt' , 10 ) , rep( 'xfinalwt' , 17 ) , rep( 'xllcpwt' , 2 ) ) ,
-		psu = c( rep( 'x_psu' , 10 ) , rep( 'xpsu' , 19 ) ) ,
-		strata = c( rep( 'x_ststr' , 10 ) , rep( 'xststr' , 19 ) )
+		year = 1984:2013 ,
+		weight = c( rep( 'x_finalwt' , 10 ) , rep( 'xfinalwt' , 17 ) , rep( 'xllcpwt' , 3 ) ) ,
+		psu = c( rep( 'x_psu' , 10 ) , rep( 'xpsu' , 20 ) ) ,
+		strata = c( rep( 'x_ststr' , 10 ) , rep( 'xststr' , 20 ) )
 	)
 
 # convert all columns in the survey.vars table to character strings,
