@@ -68,7 +68,7 @@ load( "round 04.rda" )
 
 
 # create a taylor-series linearization design object
-y <- svydesign( ~ a_psu_pub , strata = ~a_strata , data = x , weights = ~wtr4_ben )
+y <- svydesign( ~ a_psu_pub , strata = ~ a_strata , data = x , weights = ~ wtr4_ben )
 
 
 # calculate the percent of male respondents
