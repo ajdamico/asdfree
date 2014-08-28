@@ -365,10 +365,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		dbSendUpdate( db , sql.update )
 			
 	}
-	
-	# remove the sas transport file from the local disk
-	file.remove ( local.fn )
-	
+		
 	# free up RAM
 	rm( x )
 	
