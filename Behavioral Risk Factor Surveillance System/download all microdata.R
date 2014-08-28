@@ -234,8 +234,11 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 ##################################
 
 						
-#create a temporary file and a temporary directory..
-tf <- tempfile() ; td <- tempdir()
+# create three temporary files and a temporary directory..
+tf <- tempfile() ; td <- tempdir() ; zf <- tempfile() ; zf2 <- tempfile()
+
+# create a download directory
+dir.create( "download" , showWarnings = FALSE )
 
 
 # the 1984 - 2001 brfss single-year files are small enough to be read directly into RAM
@@ -264,7 +267,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 	
 	# unzip it within the temporary directory on your local hard drive and
 	# store the location it's been unzipped into a new character string variable called local.fn
-	local.fn <- unzip( tf , exdir = td )
+	local.fn <- unzip( tf , exdir = "download" )
 	
 	# read the sas transport file into r
 	x <- read.xport( local.fn ) 
@@ -415,6 +418,8 @@ for ( year in intersect( years.to.download , 2002:2013 ) ){
 	# throw out a few columns that cause importation trouble with monetdb
 	if ( year == 2009 ) z <- z[ -159:-168 ]
 	if ( year == 2011 )	z <- z[ !grepl( "CHILDAGE" , z ) ]
+	if ( year == 2013 ) z[ 361:362 ] <- c( "_FRTLT1z       2259" , "_VEGLT1z       2260" )
+
 
 	# replace all underscores in variable names with x's
 	z <- gsub( "_" , "x" , z , fixed = TRUE )
@@ -432,13 +437,55 @@ for ( year in intersect( years.to.download , 2002:2013 ) ){
 	# re-write the sas importation script to a file on the local hard drive
 	writeLines( z , tf )
 
+	# download the zipped file
+	download.cache( fn , zf , mode = 'wb' )
+	
+	#unzip the file's contents and store the file name within the temporary directory
+	local.fn <- unzip( zf , exdir = 'download' , overwrite = T )
+	
+	# if it's 2013..
+	if ( year == 2013 ){
+		
+		# create a read connection..
+		incon <- file( local.fn , "r")
+		
+		# ..and a write connection
+		outcon <- file( zf2 , "w" )
+	
+		# read through every line
+		while( length( line <- readLines( incon , 1 , skipNul = TRUE ) ) > 0 ){
+		
+			# remove the stray slash
+			line <- gsub( "\\" , " " , line , fixed = TRUE )
+			
+			# remove the stray everythings
+			line <- gsub( "[^[:alnum:]///' ]" , " " , line )
+			line <- iconv( line , "" , "ASCII" , sub = " " )
+			
+			# write the result to the output connection
+			writeLines( line , outcon )
+			
+		}
+		
+		# remove the original
+		file.remove( local.fn )
+		
+		# redirect the local filename to the new file
+		local.fn <- zf2
+		
+		# close both connections
+		close( outcon )
+		close( incon )
+		
+	}
+	
 	# actually run the read.SAScii.monetdb() function
 	# and import the current fixed-width file into the monet database
 	read.SAScii.monetdb (
-		fn ,
+		local.fn ,
 		tf ,
 		beginline = 70 ,
-		zipped = T ,						# the ascii file is stored in a zipped file
+		zipped = F ,						# the ascii file is no longer stored in a zipped file
 		tl = TRUE ,							# convert all column names to lowercase
 		tablename = paste0( 'b' , year ) ,	# the table will be stored in the monet database as bYYYY.. for example, 2010 will be stored as the 'b2010' table
 		connection = db
