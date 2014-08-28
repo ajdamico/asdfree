@@ -459,7 +459,7 @@ for ( year in intersect( years.to.download , 2002:2013 ) ){
 			line <- gsub( "\\" , " " , line , fixed = TRUE )
 			
 			# remove the stray everythings
-			line <- gsub( "[^[:alnum:]///' ]" , " " , line )
+			line <- gsub( "[^[:alnum:]///' \\.]" , " " , line )
 			line <- iconv( line , "" , "ASCII" , sub = " " )
 			
 			# write the result to the output connection
