@@ -146,10 +146,10 @@ a$city_cat <- findInterval( a$city_size , c( 20 , 30 , 40 , 50 , 60 , 80 , 90 ) 
 a$city_cat <- 
 	c( 
 		"Group I (Cities 250,000 and over)" , 
-		"Group II (Cities 100,000 − 249,999)" ,
-		"Group III (Cities 50,000 − 99,999)" ,
-		"Group IV (Cities 25,000 − 49,999)" ,
-		"Group V (Cities 10,000 − 24,999)" ,
+		"Group II (Cities 100,000 - 249,999)" ,
+		"Group III (Cities 50,000 - 99,999)" ,
+		"Group IV (Cities 25,000 - 49,999)" ,
+		"Group V (Cities 10,000 - 24,999)" ,
 		"Group VI (Cities under 10,000)" ,
 		"Nonmetropolitan Counties" ,
 		"Metropolitan Counties"
