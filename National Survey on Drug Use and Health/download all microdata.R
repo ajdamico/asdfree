@@ -149,7 +149,7 @@ for ( i in rev( seq( nrow( studies.by.year ) ) ) ){
 			path = "SAMHDA" , 
 			study = id , 
 			ds = "" , 
-			bundle = "stata" , 
+			bundle = "" , 
 			dups = "yes"
 		)
 
@@ -193,7 +193,17 @@ for ( i in rev( seq( nrow( studies.by.year ) ) ) ){
 	path.to.dta <- paste0( getwd() , "/" , year , "/DS0001/" , id5 , "-0001-Data.dta" )
 
 	# read in the stata file
-	x <- read.dta( path.to.dta , convert.factors = FALSE )
+	stata.attempt <- try( x <- read.dta( path.to.dta , convert.factors = FALSE ) , silent = TRUE )
+	
+	
+	# if the stata file type isn't valid for the R `foreign` package, import the spss file instead..
+	if( class( stata.attempt ) == 'try-error' ){
+	
+		path.to.sav <- paste0( getwd() , "/" , year , "/DS0001/" , id5 , "-0001-Data.sav" )
+	
+		x <- read.spss( path.to.sav , to.data.frame = TRUE , use.value.labels = FALSE )
+	
+	}
 
 	# path to the supplemental recodes file
 	path.to.supp <- paste0( getwd() , "/" , year , "/DS0001/" , id5 , "-0001-Supplemental_syntax.do" )
