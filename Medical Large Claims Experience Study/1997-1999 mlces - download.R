@@ -44,6 +44,14 @@
 # ..in order to set your current working directory
 
 
+# remove the # in order to run this install.packages line only once
+# install.packages( "downloader" )
+
+
+# uncomment this line to download all available data sets
+# uncomment this line by removing the `#` at the front
+# years.to.download <- 1997:1999
+
 
 ############################################
 # no need to edit anything below this line #
@@ -53,22 +61,21 @@
 # # # # # # # # #
 
 
+library(downloader)	# downloads files easily from https sites
+
+
 # create a temporary file and temporary directory
 tf <- tempfile() ; td <- tempdir()
-
-# uncomment this line to download all available data sets
-# uncomment this line by removing the `#` at the front
-# years.to.download <- 1997:1999
 
 # loop through each of the years to download and..
 for ( year in years.to.download ){
 
 	# determine the filepath on the society of actuaries' website to the file
-	fp <- paste0( "http://www.soa.org/Files/Research/" , year , ".zip" )
+	fp <- paste0( "https://www.soa.org/Files/Research/" , year , ".zip" )
 		
 	# download the current MLCES file
 	# and save it as the temporary file
-	download.file( fp , tf , mode = 'wb' )
+	download( fp , tf , mode = 'wb' )
 
 
 	# unzip all of the files in the downloaded .zip file into the current working directory
