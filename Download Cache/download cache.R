@@ -165,10 +165,7 @@ download.cache <-
 		
 			return( invisible( success ) )
 		
-		# if nothing worked, return a nonzero integer, just like `download.file`
-		} else {
-			warning( "download had nonzero exit status" )
-			return( invisible( 1L ) )
-		}
-		
+		# otherwise break.
+		} else stop( paste( "download failed after" , attempts , "attempts" ) )
+
 	}
