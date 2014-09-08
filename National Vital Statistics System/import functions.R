@@ -340,9 +340,9 @@ download.nchs <-
 			# wait one minute before each download
 			Sys.sleep( 60 )
 				
-			attempt.one <- try( download.cache( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
+			attempt.one <- download.cache( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' )
 			
-			if ( class( attempt.one ) == 'try-error' ) {
+			if ( !attempt.one ) {
 				Sys.sleep( 60 )
 				
 				download.cache( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' )

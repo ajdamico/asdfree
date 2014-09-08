@@ -118,18 +118,18 @@ for ( year in nis.years.to.download ){
 	# for these two years, don't even try to download the `dat` file since it's goofy.
 	if ( year %in% c( 1998 , 2006 ) ){
 
-		# trigger the `try-error` emergency loop
-		sdat <- try( stop( 'get the zip instead of the dat these two years' ) , silent = TRUE )
+		# trigger the emergency loop
+		sdat <- FALSE
 
 	} else {
 	
 		# try to download the `dat` file from the cdc's website directly
-		sdat <- try( download.cache( straight.dat , tf , mode = 'wb' ) , silent = TRUE )
+		sdat <- download.cache( straight.dat , tf , mode = 'wb' )
 
 	}
 		
 	# if the download failed (or if the failure was intentional)..
-	if( class( sdat ) == 'try-error' ){
+	if( !sdat ){
 		
 		# take a first guess at the location of the zipped file containing the `dat` file
 		zip.dat <-
@@ -140,10 +140,10 @@ for ( year in nis.years.to.download ){
 			)
 		
 		# try downloading the zipped file
-		zdat <- try( download.cache( zip.dat , tf , mode = 'wb' ) , silent = TRUE )
+		zdat <- download.cache( zip.dat , tf , mode = 'wb' )
 
 		# if the download failed..
-		if( class( zdat ) == 'try-error' ){
+		if( !zdat ){
 					
 			# take a second guess at the location of the zipped file
 			zip.dat <-
@@ -154,10 +154,10 @@ for ( year in nis.years.to.download ){
 				)
 			
 			# try downloading the zipped file again
-			zdat <- try( download.cache( zip.dat , tf , mode = 'wb' ) , silent = TRUE )
+			zdat <- download.cache( zip.dat , tf , mode = 'wb' )
 
 			# if the download failed..
-			if( class( zdat ) == 'try-error' ){
+			if( !zdat ){
 		
 				# take a third and final guess at the location of the zipped file
 				zip.dat <-
@@ -207,10 +207,10 @@ for ( year in nis.years.to.download ){
 	
 	
 	# try downloading the script directly
-	rs <- try( download.cache( script.r , tf , mode = 'wb' ) , silent = TRUE )
+	rs <- download.cache( script.r , tf , mode = 'wb' )
 
 	# if the r script does not exist..
-	if( class( rs ) == 'try-error' ){	
+	if( !rs ){	
 		
 		# look for a sas import script
 		script.sas <-

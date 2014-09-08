@@ -153,7 +153,7 @@ download.cache <-
 			
 			# if the download did not work, wait 60 seconds and try again.
 			if( class( failed.attempt ) == 'try-error' ){
-				cat( paste0( "download issue with" , url ) )
+				cat( paste( "download issue with" , url ) )
 				Sys.sleep( 60 )
 			}
 			
