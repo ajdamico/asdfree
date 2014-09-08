@@ -164,6 +164,11 @@ download.cache <-
 			if (success && usecache) file.copy( destfile , cachefile , overwrite = TRUE )
 		
 			return( invisible( success ) )
-		} else return( invisible( FALSE ) )
+		
+		# if nothing worked, return a nonzero integer, just like `download.file`
+		} else {
+			warning( "download had nonzero exit status" )
+			return( invisible( 1L ) )
+		}
 		
 	}
