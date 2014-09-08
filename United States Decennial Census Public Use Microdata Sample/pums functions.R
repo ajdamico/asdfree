@@ -28,21 +28,21 @@ get.tsv <-
 		cur.pums <- tempfile()
 
 		# try to download the text file
-		attempt1 <- download.cache( fp , cur.pums , mode = 'wb' )
+		attempt1 <- try( download.cache( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
 		
 		# if the first attempt returned an error..
-		if ( !attempt1 ) {
+		if ( class( attempt1 ) == 'try-error' ) {
 		
 			# wait sixty seconds
 			Sys.sleep( 60 )
 			
 			# and try again
-			attempt2 <- download.cache( fp , cur.pums , mode = 'wb' )
+			attempt2 <- try( download.cache( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
 			
 		}	
 		
 		# if the second attempt returned an error..
-		if ( !attempt2 ) {
+		if ( class( attempt2 ) == 'try-error' ) {
 		
 			# wait two minutes
 			Sys.sleep( 120 )
