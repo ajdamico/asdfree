@@ -119,17 +119,17 @@ for ( year in nis.years.to.download ){
 	if ( year %in% c( 1998 , 2006 ) ){
 
 		# trigger the emergency loop
-		sdat <- FALSE
+		sdat <- try( stop() , silent = TRUE )
 
 	} else {
 	
 		# try to download the `dat` file from the cdc's website directly
-		sdat <- download.cache( straight.dat , tf , mode = 'wb' )
+		sdat <- try( download.cache( straight.dat , tf , mode = 'wb' ) , silent = TRUE )
 
 	}
 		
 	# if the download failed (or if the failure was intentional)..
-	if( !sdat ){
+	if( class( sdat ) == 'try-error' ){
 		
 		# take a first guess at the location of the zipped file containing the `dat` file
 		zip.dat <-
@@ -140,10 +140,10 @@ for ( year in nis.years.to.download ){
 			)
 		
 		# try downloading the zipped file
-		zdat <- download.cache( zip.dat , tf , mode = 'wb' )
+		zdat <- try( download.cache( zip.dat , tf , mode = 'wb' ) , silent = TRUE )
 
 		# if the download failed..
-		if( !zdat ){
+		if( class( zdat ) == 'try-error' ){
 					
 			# take a second guess at the location of the zipped file
 			zip.dat <-
@@ -154,10 +154,10 @@ for ( year in nis.years.to.download ){
 				)
 			
 			# try downloading the zipped file again
-			zdat <- download.cache( zip.dat , tf , mode = 'wb' )
+			zdat <- try( download.cache( zip.dat , tf , mode = 'wb' ) , silent = TRUE )
 
 			# if the download failed..
-			if( !zdat ){
+			if( class( zdat ) == 'try-error' ){
 		
 				# take a third and final guess at the location of the zipped file
 				zip.dat <-
@@ -207,10 +207,10 @@ for ( year in nis.years.to.download ){
 	
 	
 	# try downloading the script directly
-	rs <- download.cache( script.r , tf , mode = 'wb' )
+	rs <- try( download.cache( script.r , tf , mode = 'wb' ) , silent = TRUE )
 
 	# if the r script does not exist..
-	if( !rs ){	
+	if( class( rs ) == 'try-error' ){	
 		
 		# look for a sas import script
 		script.sas <-
