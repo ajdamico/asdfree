@@ -209,11 +209,11 @@ for ( year in available.years ){
 			)
 		
 		# try to download the zipped file..
-		attempt.one <- download.cache( current.zipfile , tf , mode = 'wb' )
+		attempt.one <- try( download.cache( current.zipfile , tf , mode = 'wb' ) , silent = TRUE )
 		
 		# ..but if the first attempt fails,
 		# wait for three minutes and try again.
-		if ( !attempt.one ){
+		if ( class( attempt.one ) == 'try-error' ){
 
 			Sys.sleep( 180 )
 			
