@@ -198,10 +198,27 @@ for ( i in rev( seq( nrow( studies.by.year ) ) ) ){
 	
 	# if the stata file type isn't valid for the R `foreign` package, import the spss file instead..
 	if( class( stata.attempt ) == 'try-error' ){
+
+		# clear up RAM
+		rm( x ) ; gc()
 	
-		path.to.sav <- paste0( getwd() , "/" , year , "/DS0001/" , id5 , "-0001-Data.sav" )
+		# find the rda file
+		path.to.rda <- paste0( getwd() , "/" , year , "/DS0001/" , id5 , "-0001-Data.rda" )
 	
-		x <- read.spss( path.to.sav , to.data.frame = TRUE , use.value.labels = FALSE )
+		# load it
+		load( path.to.rda )
+		
+		# copy it over to the data.frame object `x`
+		x <- get( paste0( 'da' , id5 , '.0001' ) )
+		
+		# remove the original data.frame
+		rm( list = paste0( 'da' , id5 , '.0001' ) ) ; gc()
+		
+		# find all factor variables
+		fvars <- names( x )[ sapply( x , is.factor ) ]
+		
+		# loop through each of them, converting them all to numeric.
+		for ( fv in fvars ) x[ , fv ] <- as.numeric( x[ , fv ] )
 	
 	}
 
