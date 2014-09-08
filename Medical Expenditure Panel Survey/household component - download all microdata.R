@@ -379,9 +379,9 @@ for ( i in nrow( mm ):1 ) {
 			if (! class(err) == "try-error" ) attempt1 <- download.cache(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" )
 			
 			# if the first documentation download broke, wait 60 seconds and try again
-			if ( !attempt1 ){
+			if ( attempt1 > 0 ){
 				Sys.sleep( 60 )
-				download.cache(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
+				download.cache(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
@@ -410,7 +410,7 @@ for ( i in nrow( mm ):1 ) {
 			}
 			
 			# if the first documentation download broke, wait 60 seconds and try again
-			if ( !attempt1 ){
+			if ( attempt1 > 0 ){
 				Sys.sleep( 60 )
 				download.cache(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
 			}
