@@ -132,6 +132,9 @@ download.cache <-
 		
 		# keep trying the download until you run out of attempts
 		# and all previous attempts have failed
+		
+		initial.attempts <- attempts
+		
 		while( attempts > 0 & class( failed.attempt ) == 'try-error' ){
 		
 			# only run this loop a few times..
@@ -166,6 +169,6 @@ download.cache <-
 			return( invisible( success ) )
 		
 		# otherwise break.
-		} else stop( paste( "download failed after" , attempts , "attempts" ) )
+		} else stop( paste( "download failed after" , initial.attempts , "attempts" ) )
 
 	}
