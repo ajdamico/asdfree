@@ -158,14 +158,14 @@ for ( year in nhis.years.to.download ){
 		
 		for ( fn in doc.files ){
 		
-			try.error <- NULL
+			attempt1 <- NULL
 			
 			# attempt #1:
 			# simply download the file into the local directory
-			try.error <- download.cache( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
+			attempt1 <- try( download.cache( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' ) , silent = TRUE )
 			
 			# if the attempt to download the file resulted in an error..
-			if ( !try.error ){
+			if ( class( attempt1 ) == 'try-error' ){
 				
 				# attempt #2
 				
@@ -335,10 +335,10 @@ for ( year in nhis.years.to.download ){
 			
 			# attempt #1:
 			# simply download the file into the local directory
-			try.error <- download.cache( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' )
+			try.error <- try( download.cache( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' ) , silent = TRUE )
 			
 			# if the attempt to download the file resulted in an error..
-			if ( !try.error ){
+			if ( class( try.error ) == 'try-error' ){
 				
 				# attempt #2
 				
