@@ -224,7 +224,6 @@ for ( year in years.to.download ){
 
 	# loop through each available csv (also data) file..
 	for ( this.csv in csv.files ){
-
 	
 		# connect to (and, if it doesn't exist, initiate) a sqlite database
 		db <- dbConnect( SQLite() , paste0( "./" , year , "/saeb.db" ) )
@@ -232,8 +231,58 @@ for ( year in years.to.download ){
 		# remove the `.csv` to determine the name of the current table
 		table.name <- gsub( "\\.csv$" , "" , tolower( basename( this.csv ) ) )
 
-		# pull the csv file directly into the sqlite database, never touching RAM
-		dbWriteTable( db , table.name , this.csv , sep = ";" , dec = "," , header = TRUE , overwrite = TRUE , eol = "\r\n" )
+		# specify the chunk size to read in
+		chunk_size <- 250000
+
+		# create a file connection to the current csv
+		input <- file( this.csv , "r")
+
+		# read in the first chunk
+		headers <- read.csv( input , sep = ";" , dec = "," , na.strings = "." , nrows = chunk_size )
+		
+		cc <- sapply( headers , class )
+		
+		# initiate the current table
+		dbWriteTable( db , table.name , headers , overwrite = TRUE , row.names = FALSE )
+		
+		# create a sql.in string command
+		sql.in <- 
+			sprintf( 
+				paste( 
+					"INSERT INTO" , 
+					table.name , 
+					"VALUES (%s)"
+				) , 
+				paste( rep( "?" , ncol( headers ) ) , collapse = ",")
+			)
+		
+		# start a sqlite transaction
+		dbBeginTransaction(db)
+
+		# so long as there are lines to read, add them to the current table
+		tryCatch({
+		   while (TRUE) {
+			   part <- 
+				read.csv(
+					input , 
+					nrows = chunk_size , 
+					sep = ";" ,
+					dec = "," ,
+					na.strings = "." , 
+					colClasses = cc
+				)
+				
+			   dbGetPreparedQuery( db , sql.in , bind.data = part )
+		   }
+		   
+		} , error = function(e) { if ( grepl( "no lines available" , conditionMessage( e ) ) ) TRUE else stop( conditionMessage( e ) ) }
+		)
+		
+		# commit the entire table
+		dbCommit( db )
+		
+		# clear up RAM
+		rm( headers , part ) ; gc()
 		
 		# disconnect from the sqlite database
 		dbDisconnect( db )
