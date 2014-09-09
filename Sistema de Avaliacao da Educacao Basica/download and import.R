@@ -266,6 +266,7 @@ for ( year in years.to.download ){
 			   part <- 
 				read.csv(
 					input , 
+					header = FALSE ,
 					nrows = chunk_size , 
 					sep = ";" ,
 					dec = "," ,
