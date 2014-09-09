@@ -59,6 +59,7 @@
 
 library(RSQLite) 	# load RSQLite package (creates database files in R)
 library(SAScii)		# load the SAScii package (imports ascii data with a SAS script)
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # specify which years of saeb data are currently available for download
