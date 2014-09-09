@@ -174,6 +174,9 @@ for ( i in rev( seq( nrow( studies.by.year ) ) ) ){
 	# write the content of the download to a binary temporary file
 	writeBin( content( resp , "raw" ) , tf )
 
+	# clear up RAM no matter what
+	rm( resp ) ; gc()
+
 	# unzip the contents of the stata file into the current working directory
 	unzip( tf )
 
