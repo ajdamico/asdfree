@@ -233,7 +233,7 @@ for ( year in years.to.download ){
 		table.name <- gsub( "\\.csv$" , "" , tolower( basename( this.csv ) ) )
 
 		# pull the csv file directly into the sqlite database, never touching RAM
-		dbWriteTable( db , table.name , this.csv , sep = ";" , header = TRUE , overwrite = TRUE , eol = "\r\n" )
+		dbWriteTable( db , table.name , this.csv , sep = ";" , dec = "," , header = TRUE , overwrite = TRUE , eol = "\r\n" )
 		
 		# disconnect from the sqlite database
 		dbDisconnect( db )
