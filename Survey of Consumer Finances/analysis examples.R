@@ -1,13 +1,13 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # survey of consumer finances
-# 2010 public use microdata
+# any year of public use microdata
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SCF/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/2010%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -28,21 +28,21 @@
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#############################################################################################################################
-# prior to running this replication script, the 2010 scf public use microdata files must be loaded as R data files (.rda)   #
-# on the local machine. running the "1989-2010 download all microdata.R" script will create this file for you.              #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Consumer%20Finances/1989-2010%20download%20all%20microdata.R  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will save a number of .rda files in C:/My Directory/SCF/ (or the working directory was chosen)                #
-#############################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#################################################################################################################
+# prior to running this replication script, the scf public use microdata files must be loaded as R data files   #
+# on the local machine. running the "download all microdata.R" script will create this file for you.            #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Consumer%20Finances/download%20all%20microdata.R  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will save a number of .rda files in C:/My Directory/SCF/ (or the working directory was chosen)    #
+#################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 # set your working directory.
-# the SCF 2010 R data file (scf2010.rda) should have been stored in this folder.
+# the SCF R data file (scfYYYY.rda) should have been stored in this folder.
 
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/SCF/" )
@@ -60,7 +60,7 @@ library(downloader)	# downloads and then runs the source() function on scripts f
 library(foreign) 	# load foreign package (converts data files into R)
 
 
-# load the 2010 survey of consumer finances into memory
+# for example, load the 2010 survey of consumer finances into memory
 load( "scf2010.rda" )
 
 

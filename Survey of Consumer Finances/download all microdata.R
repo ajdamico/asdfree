@@ -1,15 +1,15 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # survey of consumer finances
-# 1989 through 2010
+# all available years
 # main, extract, and replicate weights
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
-# years.to.download <- c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 2010 )
+# years.to.download <- c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 2010 , 2013 )
 # setwd( "C:/My Directory/SCF/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/1989-2010%20download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -39,10 +39,10 @@
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 2010 )
+# years.to.download <- c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 2010 , 2013 )
 
-# uncomment this line to only download the most current year
-# years.to.download <- 2010
+# uncomment this line to only download 2007
+# years.to.download <- 2007
 
 # uncomment this line to download, for example, 1989, 2004, and 2010
 # years.to.download <- c( 1989 , 2004 , 2010 )
@@ -74,13 +74,13 @@ library(foreign) 	# load foreign package (converts data files into R)
 downloads <-
 	data.frame(
 		year = 
-			c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 2010 ) ,
+			c( 1989 , 1992 , 1995 , 1998 , 2001 , 2004 , 2007 , 2009 , 2010  , 2013 ) ,
 		main = 
-			c( 'scf89s' , 'scf92s' , 'scf95s' , 'scf98s' , 'scf01s' , 'scf2004s' , 'scf2007s' , 'scf2009ps' , 'scf2010s' ) ,
+			c( 'scf89s' , 'scf92s' , 'scf95s' , 'scf98s' , 'scf01s' , 'scf2004s' , 'scf2007s' , 'scf2009ps' , 'scf2010s' , 'scf2013s' ) ,
 		extract = 
-			c( 'scfp1989s' , 'scfp1992s' , 'scfp1995s' , 'scfp1998s' , 'scfp2001s' , 'scfp2004s' , 'scfp2007s' , 'rscfp2009panels' , 'scfp2010s' ) ,
+			c( 'scfp1989s' , 'scfp1992s' , 'scfp1995s' , 'scfp1998s' , 'scfp2001s' , 'scfp2004s' , 'scfp2007s' , 'rscfp2009panels' , 'scfp2010s' , 'scfp2013s' ) ,
 		rw = 
-			c( 'scf89rw1s' , '1992_scf92rw1s' , '1995_scf95rw1s' , '1998_scf98rw1s' , 'scf2001rw1s' , '2004_scf2004rw1s' , '2007_scfrw1s' , 'scf2009prw1s' , 'scf2010rw1s' )
+			c( 'scf89rw1s' , '1992_scf92rw1s' , '1995_scf95rw1s' , '1998_scf98rw1s' , 'scf2001rw1s' , '2004_scf2004rw1s' , '2007_scfrw1s' , 'scf2009prw1s' , 'scf2010rw1s' , 'scf2013rw1s' )
 	)
 
 	
