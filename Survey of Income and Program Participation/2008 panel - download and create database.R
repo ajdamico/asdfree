@@ -226,14 +226,14 @@ SIPP.longitudinal.replicate.sas <-
 # if the longitudinal weights flag has been set to TRUE above..
 if ( sipp.longitudinal.weights ){
 
-	# add the longitudinal weights to the database in a table 'wgtw7'
+	# add the longitudinal weights to the database in a table 'wgtw14'
 	read.SAScii.sqlite(
-		"http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w11.zip" ,
-		chop.suid( fix.ct( "http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w11.sas" ) ) ,
+		"http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w14.zip" ,
+		chop.suid( fix.ct( "http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w14.sas" ) ) ,
 		beginline = 5 ,
 		zipped = T ,
 		tl = TRUE ,
-		tablename = "wgtw7" ,
+		tablename = "wgtw14" ,
 		conn = db
 	)
 }
