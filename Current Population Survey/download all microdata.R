@@ -1,14 +1,14 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # current population survey 
 # annual social and economic supplement
-# 2005 - 2013
+# 2005 - 2014
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
-# cps.years.to.download <- 2013:2005
+# cps.years.to.download <- 2014:2005
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -30,7 +30,7 @@
 
 
 #########################################################################################################
-# Analyze the 2005 - 2013 Current Population Survey - Annual Social and Economic Supplement file with R #
+# Analyze the 2005 - 2014 Current Population Survey - Annual Social and Economic Supplement file with R #
 #########################################################################################################
 
 
@@ -53,7 +53,7 @@
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# cps.years.to.download <- 2013:2005
+# cps.years.to.download <- 2014:2005
 
 # uncomment this line to only download the most current year
 # cps.years.to.download <- 2011
@@ -113,10 +113,10 @@ options( survey.replicates.mse = TRUE )
 # this data frame contains one set of beginline parameters for each year for each file to be read in
 begin.lines <-
 	data.frame(
-		year = 2013:2005 ,
-		household = c( 993 , 993 , 988 , 964 , 994 , 981 , 994 , 989 , 992 ) ,
-		family = c( 1129 , 1129 , 1121 , 1094 , 1137 , 1124 , 1143 , 1138 , 1141 ) ,
-		person = c( 1218 , 1218 , 1209 , 1177 , 1221 , 1208 , 1227 , 1222 , 1225 )
+		year = 2014:2005 ,
+		household = c( 993 , 993 , 993 , 988 , 964 , 994 , 981 , 994 , 989 , 992 ) ,
+		family = c( 1129 , 1129 , 1129 , 1121 , 1094 , 1137 , 1124 , 1143 , 1138 , 1141 ) ,
+		person = c( 1218 , 1218 , 1218 , 1209 , 1177 , 1221 , 1208 , 1227 , 1222 , 1225 )
 	)
 
 
@@ -144,13 +144,17 @@ for ( year in cps.years.to.download ){
 			# if the year to download is 2007, the filename doesn't match the others..
 			year == 2007 ,
 			"http://thedataweb.rm.census.gov/pub/cps/march/asec2007_pubuse_tax2.zip" ,
-			paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+			ifelse(
+				year == 2014 ,
+				"http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.zip" ,
+				paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+			)
 		)
 
 	# national bureau of economic research website containing the current population survey's SAS import instructions
 	CPS.ASEC.mar.SAS.read.in.instructions <- 
 			ifelse(
-				year == 2013 ,
+				year %in% 2013:2014 ,
 				paste0( "http://www.nber.org/data/progs/cps/cpsmar12.sas" ) ,
 				paste0( "http://www.nber.org/data/progs/cps/cpsmar" , substr( year , 3 , 4 ) , ".sas" ) 
 			)
