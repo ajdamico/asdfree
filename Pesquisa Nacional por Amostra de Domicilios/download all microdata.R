@@ -1,13 +1,13 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # pesquisa nacional por amostra de domicilios
-# 2001 - 2012
+# 2001 - 2013
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PNAD/" )
-# years.to.download <- c( 2001:2009 , 2011:2012 )
+# years.to.download <- c( 2001:2009 , 2011:2013 )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -29,12 +29,12 @@
 
 
 ###################################################################################
-# Analyze the 2001 - 2012 Pesquisa Nacional por Amostra de Domicilios file with R #
+# Analyze the 2001 - 2013 Pesquisa Nacional por Amostra de Domicilios file with R #
 ###################################################################################
 
 
 # set your working directory.
-# the PNAD 2001 - 2012 data files will be stored here
+# the PNAD 2001 - 2013 data files will be stored here
 # after downloading and importing them.
 # use forward slashes instead of back slashes
 
@@ -52,7 +52,7 @@
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- c( 2001:2009 , 2011:2012 )
+# years.to.download <- c( 2001:2009 , 2011:2013 )
 
 # uncomment this line to download only a single year
 # years.to.download <- 2011
@@ -140,20 +140,53 @@ for ( year in years.to.download ){
 
 	# note: this PNAD ASCII (fixed-width file) contains household- and person-level records.
 
-	# figure out the exact filepath of the re-weighted pnad year
-	ftp.path <-
-		paste0(
-			"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/microdados/reponderacao_2001_2012/PNAD_reponderado_" ,
-			year ,
-			".zip"
-		)
+	if ( year < 2011 ){
+		
+		# figure out the exact filepath of the re-weighted pnad year
+		ftp.path <-
+			paste0(
+				"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/microdados/reponderacao_2001_2012/PNAD_reponderado_" ,
+				year ,
+				".zip"
+			)
 
-	# download the data and sas importation instructions all at once..
-	download.cache( ftp.path , tf , mode = "wb" )
+		# download the data and sas importation instructions all at once..
+		download.cache( ftp.path , tf , mode = "wb" )
+		
+		# ..then also unzip them into the temporary directory
+		files <- unzip( tf , exdir = td )
+
+	# if the files aren't already in a convenient zipped file..
+	} else {
 	
-	# ..then also unzip them into the temporary directory
-	files <- unzip( tf , exdir = td )
-
+		# point to their main path
+		ftp.path <-
+			paste0( 
+				"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/microdados/" , 
+				year , 
+				"/" 
+			)
+	
+		# blank out the files object from the previous go-round of the loop
+		files <- NULL
+	
+		# loop through each of the files you might need
+		for ( this.file in c( "Dados.zip" , "Dicionarios_e_input.zip" , "Dicionarios.zip" ) ) {
+		
+			try({
+				
+				# give downloading 'em a shot
+				download.cache( paste0( ftp.path , this.file ) , tf , mode = 'wb' )
+				
+				# unzip them into the same place
+				files <- c( files , unzip( tf , exdir = td ) )
+				
+			} , silent = TRUE )
+			
+		}
+	
+	}
+		
 	# convert the character vector containing the filepaths where all data and import instructions are stored to lowercase
 	files <- tolower( files )
 	
