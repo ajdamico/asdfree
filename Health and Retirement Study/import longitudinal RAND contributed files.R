@@ -79,8 +79,8 @@ db <- dbConnect( SQLite() , paste( getwd() , db.name , sep = "/" ) )
 
 # figure out the locations of the four RAND longitudinal enhanced files
 hrsM.file <- paste( getwd() , "download/randmstataSE/rndhrs_m.dta" , sep = "/" )
-famR.file <- paste( getwd() , "download/rndfamc_stata/StateSE/rndfamr_c.dta" , sep = "/" )
-famK.file <- paste( getwd() , "download/rndfamc_stata/StateSE/rndfamk_c.dta" , sep = "/" )
+famR.file <- paste( getwd() , "download/rndfamc_stata/StataSE/rndfamr_c.dta" , sep = "/" )
+famK.file <- paste( getwd() , "download/rndfamc_stata/StataSE/rndfamk_c.dta" , sep = "/" )
 cams.file <- paste( getwd() , "download/randcams_b/randcams_b.dta" , sep = "/" )
 
 
