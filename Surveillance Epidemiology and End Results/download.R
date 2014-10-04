@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # surveillance epidemiology and end results
-# 1973 through 2011
+# 1973 and beyond
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -89,6 +89,23 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 # create a temporary file on your local disk
 tf <- tempfile()
 
+
+# find the seerstat page containing the link to the latest zipped file
+ssp <- readLines( "http://seer.cancer.gov/data/options.html" )
+
+
+# find the latest filepath
+fp <- 
+	# extract just the https:// address
+	gsub( '(.*)\"https://(.*)\\.(zip|ZIP)\"(.*)' , "\\2.\\3" , 
+		# find the line with the zipped file on it
+		grep( "\\.(zip|ZIP)" , ssp , value = TRUE ) 
+	)
+
+# there can be only one
+stopifnot( length( fp ) == 1 )
+
+
 # build the https:// path to the seer ascii data file,
 # which includes the login information you should have entered above
 seer.url <- 
@@ -97,9 +114,11 @@ seer.url <-
 		your.username ,
 		":" ,
 		your.password ,
-		"@seerstat.imsweb.com/.cd_images/SEER_1973_2011_TEXTDATA.d04152014.zip"
+		"@" , 
+		fp
 	)
 
+	
 # download the zipped file to the temporary file
 download( seer.url , tf )
 
