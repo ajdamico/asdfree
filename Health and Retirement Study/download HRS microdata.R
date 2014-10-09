@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # health and retirement study
-# 1992 through 2010
+# all available years
 # hrs core (final), ahead core (final), exit interviews, imputations
 
 # # # # # # # # # # # # # # # # #
@@ -10,7 +10,7 @@
 # your.password <- "password"
 # library(downloader)
 # setwd( "C:/My Directory/HRS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Health%20and%20Retirement%20Study/1992%20-%202010%20download%20HRS%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Health%20and%20Retirement%20Study/download%20HRS%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

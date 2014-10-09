@@ -35,7 +35,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw.github.com/ajdamico/usgsd/master/Health%20and%20Retirement%20Study/1992-2010%20download%20HRS%20microdata.R   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will place the HRS files "rndhrs_m.dta" and a few others in the "C:/My Directory/HRS/download" folder         #
+# that script will place the HRS files "rndhrs_n.dta" and a few others in the "C:/My Directory/HRS/download" folder         #
 #############################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -78,14 +78,14 @@ db <- dbConnect( SQLite() , paste( getwd() , db.name , sep = "/" ) )
 
 
 # figure out the locations of the four RAND longitudinal enhanced files
-hrsM.file <- paste( getwd() , "download/randmstataSE/rndhrs_m.dta" , sep = "/" )
+hrsN.file <- paste( getwd() , "download/randmstataSE/rndhrs_n.dta" , sep = "/" )
 famR.file <- paste( getwd() , "download/rndfamc_stata/StataSE/rndfamr_c.dta" , sep = "/" )
 famK.file <- paste( getwd() , "download/rndfamc_stata/StataSE/rndfamk_c.dta" , sep = "/" )
 cams.file <- paste( getwd() , "download/randcams_b/randcams_b.dta" , sep = "/" )
 
 
 # create a character vector with the four table names
-tn <- c( 'hrsM' , 'famR' , 'famK' , 'cams' )
+tn <- c( 'hrsN' , 'famR' , 'famK' , 'cams' )
 
 
 # all of these files are large enough to be read into RAM on a 4GB computer
