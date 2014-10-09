@@ -53,17 +53,15 @@ read.SAScii.monetdb <-
 		tf <- tempfile()
 		td <- tempdir()
 		tf2 <- tempfile() 
-		tf3 <- tempfile()
 	} else {
 		# otherwise, put them in the protected folder
 		tf.path <- normalizePath( tf.path )
 		td <- tf.path
 		tf <- paste0( tf.path , "/" , tablename , "1" )
 		tf2 <- paste0( tf.path , "/" , tablename , "2" )
-		tf3 <- paste0( tf.path , "/" , tablename , "3" )
 	}
 	
-	file.create( tf , tf2 , tf3 )
+	file.create( tf , tf2 )
 	
 	
 	# scientific notation contains a decimal point when converted to a character string..
@@ -180,27 +178,14 @@ read.SAScii.monetdb <-
 	}
 	
 	# create another file connection to the temporary file to store the fwf2csv output..
-	zz <- file( tf3 , open = 'wt' )
-	sink( zz , type = 'message' )
 	
 	# convert the fwf to a csv
 	# verbose = TRUE prints a message, which has to be captured.
-	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = TRUE )
+	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = F )
 	on.exit( { file.remove( tf2 ) } )
 	
-	# stop storing the output
-	sink( type = "message" )
-	# unlink( tf3 )
-	on.exit( { file.remove( tf3 ) } )
-	
-	# read the contents of that message into a character string
-	zzz <- readLines( tf3 )
-	
-	# read it up to the first space..
-	last.char <- which( strsplit( zzz , '')[[1]]==' ')
-	
 	# ..and that's the number of lines in the file
-	num.lines <- substr( zzz , 1 , last.char - 1 )
+	num.lines <- length(readLines(tf2))
 	
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..

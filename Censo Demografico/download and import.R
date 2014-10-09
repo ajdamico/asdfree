@@ -235,7 +235,7 @@ all.files <- getURL( ftp.path , dirlistonly = TRUE )
 # those files are separated by newline characters in the code,
 # so simply split them up into a character vector
 # full of individual zipped file strings
-all.files <- scan( text = all.files , what = "character" )
+all.files <- scan( text = all.files , what = "character", quiet = T )
 
 # remove the two files you don't need to import
 files.to.download <- all.files[ !( all.files %in% c( 'Atualizacoes.txt' , 'Documentacao.zip' ) ) ]
