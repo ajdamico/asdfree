@@ -232,10 +232,10 @@ ftp.path <-	"ftp://ftp.ibge.gov.br/Censos/Censo_Demografico_2010/Resultados_Gera
 # fetch all available files in the ftp site's directory
 all.files <- getURL( ftp.path , dirlistonly = TRUE )
 
-# those files are separated by \r\n characters in the code,
+# those files are separated by newline characters in the code,
 # so simply split them up into a character vector
 # full of individual zipped file strings
-all.files <- strsplit( all.files , '\r\n' )[[ 1 ]]
+all.files <- scan( text = all.files , what = "character" )
 
 # remove the two files you don't need to import
 files.to.download <- all.files[ !( all.files %in% c( 'Atualizacoes.txt' , 'Documentacao.zip' ) ) ]
@@ -275,8 +275,8 @@ for ( curFile in files.to.download ){
 		if( i > 5 ) stop( "after five download attempts, i give up." )
 	}
 
-	dom.file <- unzipped.files[ grep( 'Domicilios' , unzipped.files ) ]
-	pes.file <- unzipped.files[ grep( 'Pessoas' , unzipped.files ) ]
+	dom.file <- unzipped.files[ grep( 'Domicilios' , unzipped.files , useBytes = TRUE ) ]
+	pes.file <- unzipped.files[ grep( 'Pessoas' , unzipped.files , useBytes = TRUE ) ]
 	
 	dom.curTable <- gsub( '.zip' , '_dom' , curFile )
 	pes.curTable <- gsub( '.zip' , '_pes' , curFile )
