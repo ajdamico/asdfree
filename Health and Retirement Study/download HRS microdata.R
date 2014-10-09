@@ -262,8 +262,12 @@ for ( vid in versids ){
 				# unzip it, and store the exact filepaths while you're at it
 				uzcontents <- unzip( fs , exdir = uzdir )
 				
+				# again, look for and loop through zipped files
+				newunz <- grep( "\\.zip$" , uzcontents , value = TRUE )
+				
 				# loop through those filepaths
-				for ( uzc in uzcontents ){
+				for ( uzc in newunz ){
+				
 					# figure out the directory it belongs in..
 					uzdir <- gsub( ".zip" , "" , uzc , fixed = TRUE )
 				
