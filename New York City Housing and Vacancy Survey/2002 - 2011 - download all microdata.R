@@ -114,7 +114,7 @@ for ( year in years.to.download ){
 	
 	# only the occupied & vacant unit files are available for the most current year,
 	# so use those in 2011 but all four for previous years
-	if ( year == 2011 ) filetypes <- c( 'occ' , 'vac' ) else filetypes <- c( 'occ' , 'vac' , 'per' , 'ni' )
+	if ( year == 2011 ) filetypes <- c( 'occ' , 'vac' , 'per' ) else filetypes <- c( 'occ' , 'vac' , 'per' , 'ni' )
 	
 	
 	# loop through each available filetype
