@@ -99,21 +99,12 @@ db <- dbConnect( SQLite() , temp.db )
 
 # parse through the ARF without touching RAM #
 read.SAScii.sqlite( 
-<<<<<<< HEAD
-		fn = fn ,
-		sas_ri = sas_ri ,
-		tl = TRUE ,			# convert all column names to lowercase?
-		tablename = 'arf' ,
-		conn = db
-	)
-=======
   fn = fn ,
   sas_ri = sas_ri ,
   tl = TRUE ,			# convert all column names to lowercase?
   tablename = 'arf' ,
   conn = db
 )
->>>>>>> ee0667cbba15abbc69e7995d616295f41443b134
 
 
 # read the ARF into RAM
