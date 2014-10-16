@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # area resource file
-# 2012-2013
+# 2013-2014
 
 # if you have never used the r language before,
 # watch this two minute video i made outlining
@@ -65,7 +65,7 @@ tf <- tempfile()
 
 # download the most current ARF file
 # and save it as the temporary file
-download.file( "http://datawarehouse.hrsa.gov/DataDownload/ARF/AHRF_2012-2013.zip" , tf , mode = 'wb' )
+download.file( "http://datawarehouse.hrsa.gov/DataDownload/ARF/AHRF_2013-2014.zip" , tf , mode = 'wb' )
 
 
 # unzip all of the files in the downloaded .zip file into the current working directory
@@ -110,11 +110,11 @@ file.remove( temp.db )
 
 # save the arf data table as an R data file (.rda)
 # (for quick loading later)
-save( arf , file = file.path( getwd() , "arf2012.rda" ) )
+save( arf , file = file.path( getwd() , "arf2013.rda" ) )
 
 
 # uncomment this line to export the arf data table as a csv file
-# write.csv( arf , file.path( getwd() , "arf2012.csv" ) )
+# write.csv( arf , file.path( getwd() , "arf2013.csv" ) )
 
 
 # uncomment this line to export the arf data table as a stata file
