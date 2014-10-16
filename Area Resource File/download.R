@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # area resource file
-# 2012-2013
+# 2013-2014
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -75,7 +75,7 @@ tf <- tempfile()
 
 # download the most current ARF file
 # and save it as the temporary file
-download.file( "http://datawarehouse.hrsa.gov/DataDownload/ARF/AHRF_2012-2013.zip" , tf , mode = 'wb' )
+download.file( "http://datawarehouse.hrsa.gov/DataDownload/ARF/AHRF_2013-2014.zip" , tf , mode = 'wb' )
 
 
 # unzip all of the files in the downloaded .zip file into the current working directory
@@ -99,12 +99,21 @@ db <- dbConnect( SQLite() , temp.db )
 
 # parse through the ARF without touching RAM #
 read.SAScii.sqlite( 
+<<<<<<< HEAD
 		fn = fn ,
 		sas_ri = sas_ri ,
 		tl = TRUE ,			# convert all column names to lowercase?
 		tablename = 'arf' ,
 		conn = db
 	)
+=======
+  fn = fn ,
+  sas_ri = sas_ri ,
+  tl = TRUE ,			# convert all column names to lowercase?
+  tablename = 'arf' ,
+  conn = db
+)
+>>>>>>> ee0667cbba15abbc69e7995d616295f41443b134
 
 
 # read the ARF into RAM
@@ -120,15 +129,17 @@ file.remove( temp.db )
 
 # save the arf data table as an R data file (.rda)
 # (for quick loading later)
-save( arf , file = file.path( getwd() , "arf2012.rda" ) )
+save( arf , file = file.path( getwd() , "arf2013.rda" ) )
 
 
 # uncomment this line to export the arf data table as a csv file
-# write.csv( arf , file.path( getwd() , "arf2012.csv" ) )
+# write.csv( arf , file.path( getwd() , "arf2013.csv" ) )
 
 
 # uncomment this line to export the arf data table as a stata file
-# write.dta( arf , file.path( getwd() , "arf2012.dta" ) )
+# Recode blanks to NA, first. You get an "empty string is not valid in Stata's documented format" message otherwise.
+# arf[arf == ""] <- NA
+# write.dta( arf , file.path( getwd() , "arf2013.dta" ) )
 
 
 # delete the ARF table from RAM
