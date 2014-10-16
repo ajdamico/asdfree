@@ -118,7 +118,9 @@ save( arf , file = file.path( getwd() , "arf2012.rda" ) )
 
 
 # uncomment this line to export the arf data table as a stata file
-# write.dta( arf , file.path( getwd() , "arf2012.dta" ) )
+# Recode blanks to NA, first. You get an "empty string is not valid in Stata's documented format" message otherwise.
+# arf[arf == ""] <- NA
+# write.dta( arf , file.path( getwd() , "arf2013.dta" ) )
 
 
 # delete the ARF table from RAM
