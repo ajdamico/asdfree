@@ -209,8 +209,30 @@ dbGetQuery( db , "SELECT state , SUM( pweight ) AS sum_weights FROM pums_2000_5_
 # average age - nationwide
 svymean( ~age , pums.design )
 
-# by state
-svymean( ~age , pums.design , byvar = ~state )
+# try this by state..
+problem <- try( svymean( ~age , pums.design , byvar = ~state ) , silent = TRUE )
+
+# ..but:
+if( class( problem ) == 'try-error' ) print( "this resulted in an error because it's too big of a query" )
+
+# break it up into smaller queries
+all.states <- dbGetQuery( db , 'select distinct state from pums_2000_5_m' )[ , 1 ]
+
+# loop through each state..
+for ( this.state in all.states ){
+
+	# construct the entire query as a string (this is generally not recommended)
+	svy.string <- 
+		paste( 
+			"svymean( ~ age , subset( pums.design , ( state ==" ,
+			this.state ,
+			") ) )"
+		)
+		
+	# manually evaluate the string
+	print( eval( parse( text = svy.string ) ) )
+
+}
 
 
 # calculate the distribution of a categorical variable #
@@ -226,8 +248,28 @@ svymean( ~age , pums.design , byvar = ~state )
 # percent married - nationwide
 svymean( ~marstat , pums.design )
 
-# by state
-data.frame( svymean( ~marstat , pums.design , byvar = ~state ) )
+# by state..
+problem <- try( svymean( ~marstat , pums.design , byvar = ~state ) , silent = TRUE )
+
+# ..but:
+if( class( problem ) == 'try-error' ) print( "this resulted in an error because it's too big of a query" )
+
+
+# loop through each state..
+for ( this.state in all.states ){
+
+	# construct the entire query as a string (this is generally not recommended)
+	svy.string <- 
+		paste( 
+			"svymean( ~ marstat , subset( pums.design , ( state ==" ,
+			this.state ,
+			") ) )"
+		)
+		
+	# manually evaluate the string
+	print( eval( parse( text = svy.string ) ) )
+
+}
 
 
 # calculate the median and other percentiles #
