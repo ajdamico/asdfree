@@ -51,6 +51,7 @@
 library(httr)		# load httr package (downloads files from the web, with SSL and cookies)
 library(XML)		# load XML (parses through html code to extract links)
 library(stringr)	# load stringr package (manipulates character strings easily)
+library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
 # log on to the nlsinfo investigator and pull all available studies
@@ -149,7 +150,31 @@ for ( this.study in study.names ){
 		
 		# ..and actually create it.  this is where all data extracts will be stored
 		dir.create( this.dir , showWarnings = FALSE , recursive = TRUE )
+
+
+		# download the strata and psu for studies where they're available
+		if( study.id == "1.6" ){
 		
+			# download the nlsy 1997 cohort's sampling information
+			download( "https://www.nlsinfo.org/sites/nlsinfo.org/files/attachments/140618/nlsy97stratumpsu.zip" , tf , mode = 'wb' )
+			
+			# unzip to the local disk
+			z <- unzip( tf , exdir = td )
+
+			strpsu <- read.csv( z[ grep( '\\.csv' , z ) ] )
+			
+			# store the complex sample variables on the local disk
+			save( strpsu , file = paste0( this.dir , "/strpsu.rda" ) )
+			
+			# clear up all the bigger objects from working memory
+			rm( strpsu )
+			
+			# clear up RAM
+			gc()
+		
+		}
+
+
 		# set the nls investigator to allow downloads for this substudy
 		GET( paste0( "https://www.nlsinfo.org/investigator/servlet1?set=STUDY&id=" , study.id ) )
 
