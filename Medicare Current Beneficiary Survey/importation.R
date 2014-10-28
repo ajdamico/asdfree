@@ -257,7 +257,6 @@ for ( year in consolidated.files.to.create ){
 		# ..but don't use this method for all files, because it's a lot slower
 		if (
 			( year == 1999 & i == 'ricss' ) |
-			( year %in% 2007 & i == 'ric2' ) | 
 			( year %in% c( 2001 , 2008 ) & i == 'ricx' ) | 
 			( year == 2005 & i == 'ric4' ) |
 			( year == 2007 & i == 'ric5' ) |
