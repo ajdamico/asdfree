@@ -431,11 +431,14 @@ barplot(
 	names.arg = c( "Never Married" , "Married" , "Separated" , "Divorced" , "Widowed" ) ,
 	ylim = c( 0 , 1 )
 )
-# note that the `widowed` category is bizarre.  why would only one-quarter of widowed respondents be female?
-# because the sample size of this category is too small.
+# note that the `widowed` category is bizarrely lopsided.
+# why would three-quarters of widowed respondents be female?
 svyby( ~ one , ~ T6662900 , y , unwtd.count )
+# the sample size of this category is too small.
+
 # this is a survey of a panel of adults who are still relatively young.
-# only eleven of them are widowed.  that statistic is garbage.
+# at this young age, only eleven respondents have been  widowed.
+# that percent is garbage.
 
 
 # for more details on how to work with data in r
