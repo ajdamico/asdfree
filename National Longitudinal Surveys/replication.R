@@ -28,11 +28,6 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# analyze survey data for free (http://asdfree.com) with the r language
-# national longitudinal surveys
-# nlsy97, nlsy79, nlsy79cya, older men, mature women, young men, young women
-
-
 ###########################################################################
 # this script matches the nlsy complex sample survey design statistics at #####################################################
 # https://www.nlsinfo.org/content/cohorts/nlsy97/other-documentation/errata/errata-nlsy97-round-15-release/calculating-design #
