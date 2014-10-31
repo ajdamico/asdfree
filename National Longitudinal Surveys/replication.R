@@ -2,7 +2,6 @@
 # national longitudinal surveys
 # nlsy97
 
-
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #

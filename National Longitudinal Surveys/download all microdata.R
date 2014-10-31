@@ -2,7 +2,6 @@
 # national longitudinal surveys
 # nlsy97, nlsy79, nlsy79cya, older men, mature women, young men, young women
 
-
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
