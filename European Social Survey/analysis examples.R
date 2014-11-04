@@ -125,8 +125,8 @@ head( ess5.be.m )
 # limit the file to only the variables needed
 KeepVars <-
 	c( 
-		# average hours of television viewed
-		"tvtot" , 
+		# average age
+		"agea" , 
 		
 		# child living at home
 		"chldhm" ,
@@ -246,16 +246,16 @@ svyby(
 
 # calculate the mean of a linear variable #
 
-# average hours of television viewed - among belgian residents aged 15+
+# average age - among belgian residents aged 15+
 svymean( 
-	~tvtot , 
+	~agea , 
 	design = ess5.be.design ,
 	na.rm = TRUE
 )
 
 # by child living at home
 svyby( 
-	~tvtot , 
+	~agea , 
 	~chldhm ,
 	design = ess5.be.design ,
 	svymean ,
@@ -298,9 +298,9 @@ svyby(
 # does not allow calculation of standard errors
 
 # minimum, 25th, 50th, 75th, maximum 
-# hours of television viewed in belgium
+# age
 svyquantile( 
-	~tvtot , 
+	~agea , 
 	design = ess5.be.design ,
 	c( 0 , .25 , .5 , .75 , 1 ) ,
 	na.rm = TRUE
@@ -308,7 +308,7 @@ svyquantile(
 
 # by child living at home
 svyby( 
-	~tvtot , 
+	~agea , 
 	~chldhm ,
 	design = ess5.be.design ,
 	svyquantile ,
@@ -335,9 +335,9 @@ ess5.be.design.female <-
 	
 # calculate the mean of a linear variable #
 
-# average hours of television viewed - among belgian residents aged 15+, restricted to females
+# average age - among belgian residents aged 15+, restricted to females
 svymean( 
-	~tvtot , 
+	~agea , 
 	design = ess5.be.design.female ,
 	na.rm = TRUE
 )
