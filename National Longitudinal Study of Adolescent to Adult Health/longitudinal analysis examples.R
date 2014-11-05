@@ -1,5 +1,5 @@
 # analyze survey data for free (http://asdfree.com) with the r language
-# national longitudinal study of adolescent health
+# national longitudinal study of adolescent to adult health
 # waves 1 and 3 public use file longitudinal analysis example
 
 # # # # # # # # # # # # # # # # #
@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/AddHealth/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Longitudinal%20Study%20of%20Adolescent%20Health/longitudinal%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Longitudinal%20Study%20of%20Adolescent%20to%20Adult%20Health/longitudinal%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -32,16 +32,16 @@
 # prior to running this replication script, at least wave 1 of the addhealth public use microdata files must be loaded as R data          #
 # files (.rda) on the local machine. running the "download and consolidate.R" script will create these files.                             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/National%20Longitudinal%20Study%20of%20Adolescent%20Health/download%20and%20consolidate.R  #
+# https://raw.github.com/ajdamico/usgsd/master/National%20Longitudinal%20Study%20of%20Adolescent%20to%20Adult%20Health/download%20and%20consolidate.R
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/AddHealth/ (or the working directory chosen)                            #
 ###########################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-#######################################################################
-# Analyze the National Longitudinal Study of Adolescent Health with R #
-#######################################################################
+################################################################################
+# Analyze the National Longitudinal Study of Adolescent to Adult Health with R #
+################################################################################
 
 
 # set your working directory.
@@ -205,7 +205,7 @@ y <-
 # analysis examples #
 #####################
 
-# count the total (unweighted) number of records in the wave 1 national longitudinal study of adolescent health data set #
+# count the total (unweighted) number of records in the wave 1 national longitudinal study of adolescent to adult health data set #
 
 # the nrow function which works on both data frame objects..
 class( x )

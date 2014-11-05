@@ -1,5 +1,5 @@
 # analyze survey data for free (http://asdfree.com) with the r language
-# national longitudinal study of adolescent health
+# national longitudinal study of adolescent to adult health
 # waves 1 through 4, interviews 1994 - 2008
 
 # # # # # # # # # # # # # # # # #
@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/AddHealth/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Longitudinal%20Study%20of%20Adolescent%20Health/download%20and%20consolidate.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Longitudinal%20Study%20of%20Adolescent%20to%20Adult%20Health/download%20and%20consolidate.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -27,10 +27,10 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-###########################################################################################################
-# download every file from every year of the National Longitudinal Study on Adolescent Health with R then #
-# create a consolidated file and save everything as an R data frame (.rda) for rapid  future analyses.    #
-###########################################################################################################
+###############################################################################################################
+# download every file from every year of the National Longitudinal Study on Adolescent to Adult Health with R #
+# then create a consolidated file and save everything as an R data frame (.rda) for rapid  future analyses.   #
+###############################################################################################################
 
 
 # # # # # # # # # # # # # #
