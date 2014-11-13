@@ -406,7 +406,7 @@ message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scr
 
 message( "got that? monetdb directories should not be set read-only." )
 # don't worry, you won't update any of these tables so long as you exclusively stick with the dbGetQuery() function
-# instead of the dbSendUpdate() function (you'll see examples in the analysis scripts)
+# instead of the dbSendQuery() function (you'll see examples in the analysis scripts)
 
 
 # for more details on how to work with data in r

@@ -296,7 +296,7 @@ for ( i in seq( length( table.names ) ) ){
 		)
 	
 	# execute the sql 'alter table' command
-	dbSendUpdate( db , add.tn.column.sql )
+	dbSendQuery( db , add.tn.column.sql )
 	
 	
 	# construct a sql update statement to make all records in the current table
@@ -313,7 +313,7 @@ for ( i in seq( length( table.names ) ) ){
 	# are stacked on top of each other)
 		
 	# execute the sql `update` command
-	dbSendUpdate( db , update.tn.column.sql )
+	dbSendQuery( db , update.tn.column.sql )
 	
 }
 
@@ -336,7 +336,7 @@ sql.union <-
 		'with data'
 	)
 # execute the sql `union` command
-dbSendUpdate( db , sql.union )
+dbSendQuery( db , sql.union )
 
 
 # end of stacking individual-level files  #

@@ -345,7 +345,7 @@ dom.stack <-
 		') WITH DATA'
 	)
 
-dbSendUpdate( db , dom.stack )
+dbSendQuery( db , dom.stack )
 
 pes.stack <-
 	paste(
@@ -354,7 +354,7 @@ pes.stack <-
 		') WITH DATA'
 	)
 
-dbSendUpdate( db , pes.stack )
+dbSendQuery( db , pes.stack )
 
 # disconnect from the current monet database
 dbDisconnect( db )
@@ -371,12 +371,12 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 dom.fpc.create <-
 	'create table c10_dom_fpc as (select v0011 , sum( v0010 ) as sum_v0010 from c10_dom_pre_fpc group by v0011) WITH DATA'
 
-dbSendUpdate( db , dom.fpc.create )
+dbSendQuery( db , dom.fpc.create )
 
 pes.fpc.create <-
 	'create table c10_pes_fpc as (select v0011 , sum( v0010 ) as sum_v0010 from c10_pes_pre_fpc group by v0011) WITH DATA'
 
-dbSendUpdate( db , pes.fpc.create )
+dbSendQuery( db , pes.fpc.create )
 
 # disconnect from the current monet database
 dbDisconnect( db )
@@ -393,7 +393,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 dom.count.create <-
 	'create table c10_dom_count_pes as (select v0001 , v0300 , count(*) as dom_count_pes from c10_pes_pre_fpc group by v0001 , v0300 ) WITH DATA'
 
-dbSendUpdate( db , dom.count.create )
+dbSendQuery( db , dom.count.create )
 
 # disconnect from the current monet database
 dbDisconnect( db )
@@ -410,12 +410,12 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 dom.fpc.merge <-
 	'create table c10_dom as ( select a1.* , b1.dom_count_pes from (select a2.* , b2.sum_v0010 as dom_fpc from c10_dom_pre_fpc as a2 inner join c10_dom_fpc as b2 on a2.v0011 = b2.v0011) as a1 inner join c10_dom_count_pes as b1 on a1.v0001 = b1.v0001 AND a1.v0300 = b1.v0300 ) WITH DATA'
 	
-dbSendUpdate( db , dom.fpc.merge )
+dbSendQuery( db , dom.fpc.merge )
 
 pes.fpc.merge <-
 	'create table c10_pes as (select a.* , b.sum_v0010 as pes_fpc from c10_pes_pre_fpc as a inner join c10_pes_fpc as b on a.v0011 = b.v0011) WITH DATA'
 
-dbSendUpdate( db , pes.fpc.merge )
+dbSendQuery( db , pes.fpc.merge )
 
 # disconnect from the current monet database
 dbDisconnect( db )
@@ -429,14 +429,14 @@ pid <- monetdb.server.start( batfile )
 # immediately connect to it
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
-dbSendUpdate( db , 'ALTER TABLE c10_dom ADD COLUMN dom_wgt DOUBLE PRECISION' )
-dbSendUpdate( db , 'ALTER TABLE c10_pes ADD COLUMN pes_wgt DOUBLE PRECISION' )
+dbSendQuery( db , 'ALTER TABLE c10_dom ADD COLUMN dom_wgt DOUBLE PRECISION' )
+dbSendQuery( db , 'ALTER TABLE c10_pes ADD COLUMN pes_wgt DOUBLE PRECISION' )
 
-dbSendUpdate( db , 'UPDATE c10_dom SET dom_wgt = v0010' )
-dbSendUpdate( db , 'UPDATE c10_pes SET pes_wgt = v0010' )
+dbSendQuery( db , 'UPDATE c10_dom SET dom_wgt = v0010' )
+dbSendQuery( db , 'UPDATE c10_pes SET pes_wgt = v0010' )
 
-dbSendUpdate( db , 'ALTER TABLE c10_dom DROP COLUMN v0010' )
-dbSendUpdate( db , 'ALTER TABLE c10_pes DROP COLUMN v0010' )
+dbSendQuery( db , 'ALTER TABLE c10_dom DROP COLUMN v0010' )
+dbSendQuery( db , 'ALTER TABLE c10_pes DROP COLUMN v0010' )
 
 
 b.fields <- dbListFields( db , 'c10_pes' )[ !( dbListFields( db , 'c10_pes' ) %in% dbListFields( db , 'c10_dom' ) ) ]
@@ -448,23 +448,23 @@ final.merge <-
 		' from c10_dom as a inner join c10_pes as b ON a.v0001 = b.v0001 AND a.v0300 = b.v0300) WITH DATA'
 	)
 	
-dbSendUpdate( db , final.merge )
+dbSendQuery( db , final.merge )
 
 
 # add columns named 'one' to each table..
-dbSendUpdate( db , 'alter table c10_dom add column one int' )
-dbSendUpdate( db , 'alter table c10_pes add column one int' )
-dbSendUpdate( db , 'alter table c10 add column one int' )
+dbSendQuery( db , 'alter table c10_dom add column one int' )
+dbSendQuery( db , 'alter table c10_pes add column one int' )
+dbSendQuery( db , 'alter table c10 add column one int' )
 
 # ..and fill them all with the number 1.
-dbSendUpdate( db , 'UPDATE c10_dom SET one = 1' )
-dbSendUpdate( db , 'UPDATE c10_pes SET one = 1' )
-dbSendUpdate( db , 'UPDATE c10 SET one = 1' )
+dbSendQuery( db , 'UPDATE c10_dom SET one = 1' )
+dbSendQuery( db , 'UPDATE c10_pes SET one = 1' )
+dbSendQuery( db , 'UPDATE c10 SET one = 1' )
 		
 # add a column called 'idkey' containing the row number
-dbSendUpdate( db , 'alter table c10_dom add column idkey int auto_increment' )
-dbSendUpdate( db , 'alter table c10_pes add column idkey int auto_increment' )
-dbSendUpdate( db , 'alter table c10 add column idkey int auto_increment' )
+dbSendQuery( db , 'alter table c10_dom add column idkey int auto_increment' )
+dbSendQuery( db , 'alter table c10_pes add column idkey int auto_increment' )
+dbSendQuery( db , 'alter table c10 add column idkey int auto_increment' )
 
 
 # now the current database contains three tables more tables than it did before

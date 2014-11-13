@@ -7,7 +7,7 @@ sql.copy.into <-
 		
 		# import the data into the database
 		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
-		dbSendUpdate( connection , sql.update )
+		dbSendQuery( connection , sql.update )
 		
 		# return true when it's completed
 		TRUE
@@ -191,7 +191,7 @@ read.SAScii.monetdb <-
 	# than setting a very high number and letting it finish..
 
 	# create the table in the database
-	dbSendUpdate( connection , sql.create )
+	dbSendQuery( connection , sql.create )
 	
 	##############################
 	# begin importation attempts #
@@ -254,7 +254,7 @@ read.SAScii.monetdb <-
 				)
 				
 			if ( !skip.decimal.division ){
-				dbSendUpdate( connection , sql )
+				dbSendQuery( connection , sql )
 			
 				# give the MonetDB mserver.exe a certain number of seconds to process each column
 				Sys.sleep( sleep.between.col.updates )
@@ -275,7 +275,7 @@ read.SAScii.monetdb <-
 			sql.drop <- paste0( "ALTER TABLE " , tablename , " DROP toss_" , i )
 			
 			# and drop them!
-			dbSendUpdate( connection , sql.drop )
+			dbSendQuery( connection , sql.drop )
 		}
 	}
 	

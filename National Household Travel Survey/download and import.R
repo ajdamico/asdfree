@@ -132,7 +132,7 @@ sql.process <-
 		
 		# loop through every field in the data set
 		# and blank out all negative numbers
-		for ( j in cols.to.blank ) dbSendUpdate( db , paste( 'UPDATE' , pre , 'SET' , j , '= NULL WHERE' , j , '< 0' ) )
+		for ( j in cols.to.blank ) dbSendQuery( db , paste( 'UPDATE' , pre , 'SET' , j , '= NULL WHERE' , j , '< 0' ) )
 		
 		# get rid of `id9` field #
 		lowered.edited.fields <- tolower( dbListFields( db , pre ) )
@@ -173,7 +173,7 @@ sql.process <-
 			)
 
 		# actually execute the create table command
-		dbSendUpdate( db , sql.create.table )
+		dbSendQuery( db , sql.create.table )
 
 		# remove the source data table
 		dbRemoveTable( db , pre )
@@ -781,7 +781,7 @@ for ( year in years.to.download ){
 			# merge the `ldt` table with the ldt weights
 			nonmatching.fields <- nmf( db , 'ldt50wt' , 'ldtpub' , year )
 			
-			dbSendUpdate( 
+			dbSendQuery( 
 				db , 
 				paste0(
 					'create table ldt_m_' , 
@@ -802,7 +802,7 @@ for ( year in years.to.download ){
 			# table `ldt_m_YYYY` now available for analysis!
 		
 			# add the `idkey` column to the merged ldt-level table
-			dbSendUpdate( db , paste0( 'alter table ldt_m_' , year , ' add column idkey int auto_increment' ) )
+			dbSendQuery( db , paste0( 'alter table ldt_m_' , year , ' add column idkey int auto_increment' ) )
 			
 			# immediately make the person-ldt-level sqlrepsurvey object.
 			nhts.ldt.design <- 									# name the survey object
@@ -848,7 +848,7 @@ for ( year in years.to.download ){
 		# merge the `day` table with the person-level weights
 		nonmatching.fields <- nmf( db , wt.table , day.table , year )
 		
-		dbSendUpdate( 
+		dbSendQuery( 
 			db , 
 			paste0(
 				'create table day_m_' , 
@@ -869,7 +869,7 @@ for ( year in years.to.download ){
 		# table `day_m_YYYY` now available for analysis!
 
 		# add the `idkey` column to the merged person-day-level table
-		dbSendUpdate( db , paste0( 'alter table day_m_' , year , ' add column idkey int auto_increment' ) )
+		dbSendQuery( db , paste0( 'alter table day_m_' , year , ' add column idkey int auto_increment' ) )
 		
 		# immediately make the person-day-level sqlrepsurvey object.
 		nhts.day.design <- 									# name the survey object
@@ -913,7 +913,7 @@ for ( year in years.to.download ){
 		# merge the person table with the person-level weights
 		nonmatching.fields <- nmf( db , wt.table , per.table , year )
 		
-		dbSendUpdate( 
+		dbSendQuery( 
 			db , 
 			paste0(
 				'create table per_m_' ,
@@ -934,7 +934,7 @@ for ( year in years.to.download ){
 		# table `per_m_YYYY` now available for analysis!
 
 		# add the `idkey` column to the merged person-level table
-		dbSendUpdate( db , paste0( 'alter table per_m_' , year , ' add column idkey int auto_increment' ) )
+		dbSendQuery( db , paste0( 'alter table per_m_' , year , ' add column idkey int auto_increment' ) )
 		
 		# immediately make the person-level sqlrepsurvey object.
 		nhts.per.design <- 									# name the survey object
@@ -978,7 +978,7 @@ for ( year in years.to.download ){
 		# merge the household table with the household-level weights
 		nonmatching.fields <- nmf( db , 'hh50wt' , hh.table , year )
 		
-		dbSendUpdate( 
+		dbSendQuery( 
 			db , 
 			paste0(
 				'create table hh_m_' ,
@@ -998,7 +998,7 @@ for ( year in years.to.download ){
 
 		
 		# add the `idkey` column to the merged household-level table
-		dbSendUpdate( db , paste0( 'alter table hh_m_' , year , ' add column idkey int auto_increment' ) )
+		dbSendQuery( db , paste0( 'alter table hh_m_' , year , ' add column idkey int auto_increment' ) )
 		
 		# immediately make the household-level sqlrepsurvey object.
 		nhts.hh.design <- 									# name the survey object

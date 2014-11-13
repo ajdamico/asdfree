@@ -334,7 +334,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			sql.create <- sprintf( paste( "CREATE TABLE" , tablename , "(%s)" ) , paste( col_str , collapse = ", " ) )
 
 			# initiate the monetdb table
-			dbSendUpdate( db , sql.create )
+			dbSendQuery( db , sql.create )
 
 			# find the url folder and the appropriate delimiter line for the monetdb COPY INTO command
 			if ( short.name == "lar" ){
@@ -371,7 +371,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 				)
 				
 			# actually execute the COPY INTO command
-			dbSendUpdate( db , sql.copy )
+			dbSendQuery( db , sql.copy )
 		
 			# conversion of numeric columns incorrectly stored as character strings #
 		
@@ -385,22 +385,22 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			for ( col.rev in field.revisions ){
 
 				# add a new `temp_double` column in the data table
-				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "ADD COLUMN temp_double DOUBLE" ) )
+				dbSendQuery( db , paste( "ALTER TABLE" , tablename , "ADD COLUMN temp_double DOUBLE" ) )
 
 				# copy over the contents of the character-typed column so long as the column isn't a textual missing
-				dbSendUpdate( db , paste( "UPDATE" , tablename , "SET temp_double = CAST(" , col.rev , " AS DOUBLE ) WHERE NOT ( " , col.rev , " = 'NA    ' ) AND NOT ( " , col.rev , " = 'NA      ' )" ) )
+				dbSendQuery( db , paste( "UPDATE" , tablename , "SET temp_double = CAST(" , col.rev , " AS DOUBLE ) WHERE NOT ( " , col.rev , " = 'NA    ' ) AND NOT ( " , col.rev , " = 'NA      ' )" ) )
 				
 				# remove the character-typed column from the data table
-				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "DROP COLUMN" , col.rev ) )
+				dbSendQuery( db , paste( "ALTER TABLE" , tablename , "DROP COLUMN" , col.rev ) )
 				
 				# re-initiate the same column name, but as a numeric type
-				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "ADD COLUMN" , col.rev , "DOUBLE" ) )
+				dbSendQuery( db , paste( "ALTER TABLE" , tablename , "ADD COLUMN" , col.rev , "DOUBLE" ) )
 				
 				# copy the corrected contents back to the original column name
-				dbSendUpdate( db , paste( "UPDATE" , tablename , "SET" , col.rev , "= temp_double" ) )
+				dbSendQuery( db , paste( "UPDATE" , tablename , "SET" , col.rev , "= temp_double" ) )
 				
 				# remove the temporary column from the data table
-				dbSendUpdate( db , paste( "ALTER TABLE" , tablename , "DROP COLUMN temp_double" ) )
+				dbSendQuery( db , paste( "ALTER TABLE" , tablename , "DROP COLUMN temp_double" ) )
 
 			}
 
@@ -459,7 +459,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			)
 		
 		# with your sql string built, execute the command
-		dbSendUpdate( db , sql.merge.command )
+		dbSendQuery( db , sql.merge.command )
 		
 		# step three: confirm that the merged table contains the same record count
 		stopifnot( 
@@ -484,11 +484,11 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 		# # # # # # # # # # # # # # # # # #
 		
 		# number of minority races of applicant and co-applicant
-		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN app_min_cnt INTEGER' ) )
-		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN co_min_cnt INTEGER' ) )
+		dbSendQuery( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN app_min_cnt INTEGER' ) )
+		dbSendQuery( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN co_min_cnt INTEGER' ) )
 
 		# sum up all four possibilities
-		dbSendUpdate( 
+		dbSendQuery( 
 			db , 
 			paste(
 				'UPDATE' ,
@@ -506,7 +506,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 		)
 
 		# same for the co-applicant
-		dbSendUpdate( 
+		dbSendQuery( 
 			db , 
 			paste(
 				'UPDATE' ,
@@ -524,11 +524,11 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 		)
 
 		# zero-one test of whether the applicant or co-applicant indicated white
-		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN appwhite INTEGER' ) )
-		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN cowhite INTEGER' ) )
+		dbSendQuery( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN appwhite INTEGER' ) )
+		dbSendQuery( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN cowhite INTEGER' ) )
 
 		# check all five race categories for the answer
-		dbSendUpdate( 
+		dbSendQuery( 
 			db , 
 			paste(
 				'UPDATE' ,
@@ -546,7 +546,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 		)
 
 		# same for the co-applicant
-		dbSendUpdate( 
+		dbSendQuery( 
 			db , 
 			paste(
 				'UPDATE' ,
@@ -564,38 +564,38 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 		)
 
 		# if the applicant or co-applicant has a missing first race, set the above variables to missing as well
-		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET app_min_cnt = NULL WHERE applicantrace1 IN ( 6 , 7 )' ) )
-		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET appwhite = NULL WHERE applicantrace1 IN ( 6 , 7 )' ) )
-		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET co_min_cnt = NULL WHERE coapplicantrace1 IN ( 6 , 7 , 8 )' ) )
-		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET cowhite = NULL WHERE coapplicantrace1 IN ( 6 , 7 , 8 )' ) )
+		dbSendQuery( db , paste( 'UPDATE' , new.tablename , 'SET app_min_cnt = NULL WHERE applicantrace1 IN ( 6 , 7 )' ) )
+		dbSendQuery( db , paste( 'UPDATE' , new.tablename , 'SET appwhite = NULL WHERE applicantrace1 IN ( 6 , 7 )' ) )
+		dbSendQuery( db , paste( 'UPDATE' , new.tablename , 'SET co_min_cnt = NULL WHERE coapplicantrace1 IN ( 6 , 7 , 8 )' ) )
+		dbSendQuery( db , paste( 'UPDATE' , new.tablename , 'SET cowhite = NULL WHERE coapplicantrace1 IN ( 6 , 7 , 8 )' ) )
 
 		# main race variable
-		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN race INTEGER' ) )
+		dbSendQuery( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN race INTEGER' ) )
 
 		# 7 indicates a loan by a white applicant and non-white co-applicant or vice-versa
-		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET race = 7 WHERE ( appwhite = 1 AND app_min_cnt = 0 AND co_min_cnt > 0 ) OR ( cowhite = 1 AND co_min_cnt = 0 AND app_min_cnt > 0 )' ) )
+		dbSendQuery( db , paste( 'UPDATE' , new.tablename , 'SET race = 7 WHERE ( appwhite = 1 AND app_min_cnt = 0 AND co_min_cnt > 0 ) OR ( cowhite = 1 AND co_min_cnt = 0 AND app_min_cnt > 0 )' ) )
 
 		# 6 indicates the main applicant listed multiple non-white races
-		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , 'SET race = 6 WHERE ( app_min_cnt > 1 ) AND ( race IS NULL )' ) )
+		dbSendQuery( db , paste( 'UPDATE' , new.tablename , 'SET race = 6 WHERE ( app_min_cnt > 1 ) AND ( race IS NULL )' ) )
 
 		# for everybody else: if the first race listed by the applicant isn't white, use that.
-		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET race = applicantrace1 WHERE ( applicantrace1 IN ( '1' , '2' , '3' , '4' ) ) AND ( app_min_cnt = 1 ) AND ( race IS NULL )" ) )
+		dbSendQuery( db , paste( "UPDATE" , new.tablename , "SET race = applicantrace1 WHERE ( applicantrace1 IN ( '1' , '2' , '3' , '4' ) ) AND ( app_min_cnt = 1 ) AND ( race IS NULL )" ) )
 		# otherwise look to the second listed race
-		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET race = applicantrace2 WHERE ( applicantrace2 IN ( '1' , '2' , '3' , '4' ) ) AND ( app_min_cnt = 1 ) AND ( race IS NULL )" ) )
+		dbSendQuery( db , paste( "UPDATE" , new.tablename , "SET race = applicantrace2 WHERE ( applicantrace2 IN ( '1' , '2' , '3' , '4' ) ) AND ( app_min_cnt = 1 ) AND ( race IS NULL )" ) )
 		# otherwise confirm the applicant indicated he or she was white
-		dbSendUpdate( db , paste( 'UPDATE' , new.tablename , "SET race = 5 WHERE ( appwhite = 1 ) AND ( race IS NULL )" ) )
+		dbSendQuery( db , paste( 'UPDATE' , new.tablename , "SET race = 5 WHERE ( appwhite = 1 ) AND ( race IS NULL )" ) )
 
 		# main ethnicity variable
-		dbSendUpdate( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN ethnicity VARCHAR (255)' ) )
+		dbSendQuery( db , paste( 'ALTER TABLE' , new.tablename , 'ADD COLUMN ethnicity VARCHAR (255)' ) )
 
 		# simple.  check the applicant's ethnicity
-		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Not Hispanic' WHERE applicantethnicity IN ( 2 )" ) )
+		dbSendQuery( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Not Hispanic' WHERE applicantethnicity IN ( 2 )" ) )
 		
 		# simple.  check the applicant's ethnicity again
-		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Hispanic' WHERE applicantethnicity IN ( 1 )" ) )
+		dbSendQuery( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Hispanic' WHERE applicantethnicity IN ( 1 )" ) )
 		
 		# overwrite the ethnicity variable if the main applicant indicates hispanic but the co-applicant does not.  or vice versa.
-		dbSendUpdate( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Joint' WHERE ( applicantethnicity IN ( 1 ) AND coapplicantethnicity IN ( 2 ) ) OR ( applicantethnicity IN ( 2 ) AND coapplicantethnicity IN ( 1 ) )" ) )
+		dbSendQuery( db , paste( "UPDATE" , new.tablename , "SET ethnicity = 'Joint' WHERE ( applicantethnicity IN ( 1 ) AND coapplicantethnicity IN ( 2 ) ) OR ( applicantethnicity IN ( 2 ) AND coapplicantethnicity IN ( 1 ) )" ) )
 
 		# # # # # # # # # # # # # # # # # # # # # # # # #
 		# # finished with race and ethnicity recoding # #

@@ -190,11 +190,11 @@ deaths.from.all.causes / sum( pbac$pop )
 # the last three digits are the actually age (in years/months/days)
 
 # so after excluding all of the `9999` values, "age in years" can be computed with
-# dbSendUpdate( db , "ALTER TABLE mortality_us_2010 ADD COLUMN age_in_years DOUBLE PRECISION" )
+# dbSendQuery( db , "ALTER TABLE mortality_us_2010 ADD COLUMN age_in_years DOUBLE PRECISION" )
 # according to the 2010 codebook, anyone with a first digit between 2 and 8 died before age 1
-# dbSendUpdate( db , "UPDATE mortality_us_2010 SET age_in_years = 0 WHERE age >= 2000 & age < 9000" )
+# dbSendQuery( db , "UPDATE mortality_us_2010 SET age_in_years = 0 WHERE age >= 2000 & age < 9000" )
 # everyone with a "1" starting digit just has the age designated in the 2nd, 3rd, and 4th position.
-# dbSendUpdate( db , "UPDATE mortality_us_2010 SET age_in_years = ( age - 1000 ) WHERE age < 2000" )
+# dbSendQuery( db , "UPDATE mortality_us_2010 SET age_in_years = ( age - 1000 ) WHERE age < 2000" )
 
 # end of diversionary sidenote  #
 # # # # # # # # # # # # # # # # #

@@ -123,7 +123,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 
 # however, making any changes to the data table downloaded directly from the oecd
-# currently requires directly accessing the table using dbSendUpdate() to run sql commands
+# currently requires directly accessing the table using dbSendQuery() to run sql commands
 
 
 # note: recoding (writing) variables in monetdb often takes much longer
@@ -162,7 +162,7 @@ paste0( 'int_stu12_dec03_imp' , 1:5 )
 for ( i in 1:5 ){
 
 	# now simply copy you'd like to recode into a new table
-	dbSendUpdate( db , paste0( "CREATE TABLE recoded_int_stu12_dec03_imp" , i , " AS SELECT * FROM int_stu12_dec03_imp" , i , " WITH DATA" ) )
+	dbSendQuery( db , paste0( "CREATE TABLE recoded_int_stu12_dec03_imp" , i , " AS SELECT * FROM int_stu12_dec03_imp" , i , " WITH DATA" ) )
 	# this action protects the original 'int_stu12_dec03_imp[1-5]' tables from any accidental errors.
 	
 	# at any point, we can delete these recoded copies of the data tables using the command..
@@ -201,10 +201,10 @@ for ( i in 1:5 ){
 
 # add a new column.  call it, oh i don't know, progcat?
 # since it's actually a categorical variable, make it VARCHAR( 255 )
-for ( i in 1:5 ) dbSendUpdate( db , paste0( "ALTER TABLE recoded_int_stu12_dec03_imp" , i , " ADD COLUMN progcat VARCHAR( 255 )" ) )
+for ( i in 1:5 ) dbSendQuery( db , paste0( "ALTER TABLE recoded_int_stu12_dec03_imp" , i , " ADD COLUMN progcat VARCHAR( 255 )" ) )
 
 # if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION like this:
-# for ( i in 1:5 ) dbSendUpdate( db , paste0( "ALTER TABLE recoded_int_stu12_dec03_imp" , i , " ADD COLUMN progcat DOUBLE PRECISION" ) )
+# for ( i in 1:5 ) dbSendQuery( db , paste0( "ALTER TABLE recoded_int_stu12_dec03_imp" , i , " ADD COLUMN progcat DOUBLE PRECISION" ) )
 # ..but then progcat would have to be be numbers (maybe zero and one) instead of the strings shown below ('always, almost always, or often' - 'sometimes, rarely, or never')
 
 
@@ -212,10 +212,10 @@ for ( i in 1:5 ) dbSendUpdate( db , paste0( "ALTER TABLE recoded_int_stu12_dec03
 for ( i in 1:5 ){
 
 	# wherever `st49q07` is a 1 or a 2, code `progcat` as 'always, almost always, or often'
-	dbSendUpdate( db , paste0( "UPDATE recoded_int_stu12_dec03_imp" , i , " SET progcat = 'always, almost always, or often' WHERE st49q07 IN ( 1 , 2 )" ) )
+	dbSendQuery( db , paste0( "UPDATE recoded_int_stu12_dec03_imp" , i , " SET progcat = 'always, almost always, or often' WHERE st49q07 IN ( 1 , 2 )" ) )
 
 	# wherever `st49q07` is a 1 or a 2, code `progcat` as 'always, almost always, or often'
-	dbSendUpdate( db , paste0( "UPDATE recoded_int_stu12_dec03_imp" , i , " SET progcat = 'sometimes, rarely, or never' WHERE st49q07 IN ( 3 , 4 )" ) )
+	dbSendQuery( db , paste0( "UPDATE recoded_int_stu12_dec03_imp" , i , " SET progcat = 'sometimes, rarely, or never' WHERE st49q07 IN ( 3 , 4 )" ) )
 
 }
 

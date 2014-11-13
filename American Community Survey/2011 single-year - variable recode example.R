@@ -103,7 +103,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # connected to the 2011 single-year table
 
 # however, making any changes to the data table downloaded directly from the census bureau
-# currently requires directly accessing the table using dbSendUpdate() to run sql commands
+# currently requires directly accessing the table using dbSendQuery() to run sql commands
 
 
 # note: recoding (writing) variables in monetdb often takes much longer
@@ -126,7 +126,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # has already connected the current instance of r to the monet database
 
 # now simply copy you'd like to recode into a new table
-dbSendUpdate( db , "CREATE TABLE recoded_acs2011_1yr_m AS SELECT * FROM acs2011_1yr_m WITH DATA" )
+dbSendQuery( db , "CREATE TABLE recoded_acs2011_1yr_m AS SELECT * FROM acs2011_1yr_m WITH DATA" )
 # this action protects the original 'acs2011_1yr_m' table from any accidental errors.
 # at any point, we can delete this recoded copy of the data table using the command..
 # dbRemoveTable( db , "recoded_acs2011_1yr_m" )
@@ -142,27 +142,27 @@ dbSendUpdate( db , "CREATE TABLE recoded_acs2011_1yr_m AS SELECT * FROM acs2011_
 
 # add a new column.  call it, oh i don't know, agecat?
 # since it's actually a categorical variable, make it VARCHAR( 255 )
-dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat VARCHAR( 255 )" )
+dbSendQuery( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat VARCHAR( 255 )" )
 
 # if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION like this:
-# dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecatx DOUBLE PRECISION" )
+# dbSendQuery( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecatx DOUBLE PRECISION" )
 # ..but then agecat would have to be be numbers (1 - 13) instead of the strings shown below ('01' - '13')
 
 
 # by hand, you could set the values of the agecat column anywhere between '01' and '13'
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '01' WHERE agep >= 0 AND agep < 5" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '02' WHERE agep >= 5 AND agep < 10" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '03' WHERE agep >= 10 AND agep < 15" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '04' WHERE agep >= 15 AND agep < 20" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '05' WHERE agep >= 20 AND agep < 25" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '06' WHERE agep >= 25 AND agep < 35" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '07' WHERE agep >= 35 AND agep < 45" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '08' WHERE agep >= 45 AND agep < 55" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '09' WHERE agep >= 55 AND agep < 60" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '10' WHERE agep >= 60 AND agep < 65" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '11' WHERE agep >= 65 AND agep < 75" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '12' WHERE agep >= 75 AND agep < 85" )
-dbSendUpdate( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '13' WHERE agep >= 85 AND agep < 101" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '01' WHERE agep >= 0 AND agep < 5" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '02' WHERE agep >= 5 AND agep < 10" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '03' WHERE agep >= 10 AND agep < 15" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '04' WHERE agep >= 15 AND agep < 20" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '05' WHERE agep >= 20 AND agep < 25" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '06' WHERE agep >= 25 AND agep < 35" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '07' WHERE agep >= 35 AND agep < 45" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '08' WHERE agep >= 45 AND agep < 55" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '09' WHERE agep >= 55 AND agep < 60" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '10' WHERE agep >= 60 AND agep < 65" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '11' WHERE agep >= 65 AND agep < 75" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '12' WHERE agep >= 75 AND agep < 85" )
+dbSendQuery( db , "UPDATE recoded_acs2011_1yr_m SET agecat = '13' WHERE agep >= 85 AND agep < 101" )
 
 
 # quickly check your work by running a simple SELECT COUNT(*) command with sql
@@ -178,7 +178,7 @@ dbGetQuery( db , "SELECT agecat , agep , COUNT(*) as number_of_records from reco
 # with code you'll be able to modify a lot faster
 
 # remember, since it's actually a categorical variable, make the column type VARCHAR( 255 )
-dbSendUpdate( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat2 VARCHAR( 255 )" )
+dbSendQuery( db , "ALTER TABLE recoded_acs2011_1yr_m ADD COLUMN agecat2 VARCHAR( 255 )" )
 
 
 # to automate things, just create a vector of each age bound
@@ -195,7 +195,7 @@ for ( i in 1:( length( agebounds ) - 1 ) ){
 	print( update.sql.string )
 	
 	# now actually run the sql string
-	dbSendUpdate( db , update.sql.string )
+	dbSendQuery( db , update.sql.string )
 }
 
 

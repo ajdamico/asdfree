@@ -166,12 +166,12 @@ construct.pisa.sqlsurvey.designs <-
 
 			# actually create the current implicate,
 			# using the string constructed above
-			dbSendUpdate( conn , sql )
+			dbSendQuery( conn , sql )
 
 			
 			# add a new column to the monetdb data table called `row_names`
 			# that simply contains the row id
-			dbSendUpdate( 
+			dbSendQuery( 
 				conn , 
 				paste( 
 					'alter table' ,
@@ -182,7 +182,7 @@ construct.pisa.sqlsurvey.designs <-
 			
 			
 			# add an empty column called `one` that's an integer
-			dbSendUpdate( 
+			dbSendQuery( 
 				conn , 
 				paste( 
 					'alter table' ,
@@ -193,7 +193,7 @@ construct.pisa.sqlsurvey.designs <-
 			
 			
 			# fill it full of ones
-			dbSendUpdate( 
+			dbSendQuery( 
 				conn , 
 				paste( 
 					'UPDATE' ,

@@ -103,7 +103,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # connected to the 2010 single-year table
 
 # however, making any changes to the data table downloaded directly from the census bureau
-# currently requires directly accessing the table using dbSendUpdate() to run sql commands
+# currently requires directly accessing the table using dbSendQuery() to run sql commands
 
 
 # note: recoding (writing) variables in monetdb often takes much longer
@@ -126,7 +126,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # has already connected the current instance of r to the monet database
 
 # now simply copy you'd like to recode into a new table
-dbSendUpdate( db , "CREATE TABLE recoded_b2010 AS SELECT * FROM b2010 WITH DATA" )
+dbSendQuery( db , "CREATE TABLE recoded_b2010 AS SELECT * FROM b2010 WITH DATA" )
 # this action protects the original 'b2010' table from any accidental errors.
 # at any point, we can delete this recoded copy of the data table using the command..
 # dbRemoveTable( db , "recoded_b2010" )
@@ -142,10 +142,10 @@ dbSendUpdate( db , "CREATE TABLE recoded_b2010 AS SELECT * FROM b2010 WITH DATA"
 
 # add a new column.  call it, oh i don't know, drinks_per_month
 # since it's actually a categorical variable, make it VARCHAR( 255 )
-dbSendUpdate( db , "ALTER TABLE recoded_b2010 ADD COLUMN drinks_per_month VARCHAR( 255 )" )
+dbSendQuery( db , "ALTER TABLE recoded_b2010 ADD COLUMN drinks_per_month VARCHAR( 255 )" )
 
 # if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION like this:
-# dbSendUpdate( db , "ALTER TABLE recoded_b2010 ADD COLUMN drinks_per_monthx DOUBLE PRECISION" )
+# dbSendQuery( db , "ALTER TABLE recoded_b2010 ADD COLUMN drinks_per_monthx DOUBLE PRECISION" )
 # ..but then drinks_per_month would have to be be numbers (1 - 5) instead of the strings shown below ('01' - '05')
 
 
@@ -154,11 +154,11 @@ dbSendUpdate( db , "ALTER TABLE recoded_b2010 ADD COLUMN drinks_per_month VARCHA
 # therefore, this first command will identify these individuals using the WHERE <varname> IS NULL clause
 
 
-dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '01' WHERE xdrnkmo3 = 0" )
-dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '02' WHERE xdrnkmo3 >= 1 AND xdrnkmo3 < 11" )
-dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '03' WHERE xdrnkmo3 >= 11 AND xdrnkmo3 < 26" )
-dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '04' WHERE xdrnkmo3 >= 26 AND xdrnkmo3 < 51" )
-dbSendUpdate( db , "UPDATE recoded_b2010 SET drinks_per_month = '05' WHERE xdrnkmo3 >= 51" )
+dbSendQuery( db , "UPDATE recoded_b2010 SET drinks_per_month = '01' WHERE xdrnkmo3 = 0" )
+dbSendQuery( db , "UPDATE recoded_b2010 SET drinks_per_month = '02' WHERE xdrnkmo3 >= 1 AND xdrnkmo3 < 11" )
+dbSendQuery( db , "UPDATE recoded_b2010 SET drinks_per_month = '03' WHERE xdrnkmo3 >= 11 AND xdrnkmo3 < 26" )
+dbSendQuery( db , "UPDATE recoded_b2010 SET drinks_per_month = '04' WHERE xdrnkmo3 >= 26 AND xdrnkmo3 < 51" )
+dbSendQuery( db , "UPDATE recoded_b2010 SET drinks_per_month = '05' WHERE xdrnkmo3 >= 51" )
 
 
 

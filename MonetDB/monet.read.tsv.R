@@ -42,7 +42,7 @@ monet.read.tsv <-
         if (length(nrows) == 1) nrows <- rep(nrows, length(files))
         for (i in seq_along(files)) {
             cat(files[i], thefile <- normalizePath(files[i]), "\n")
-            dbSendUpdate(
+            dbSendQuery(
 				conn , 
 				paste(
 					"copy", 
@@ -60,7 +60,7 @@ monet.read.tsv <-
     } else {
         for (i in seq_along(files)) {
             cat(files[i], thefile <- normalizePath(files[i]), "\n")
-            dbSendUpdate(
+            dbSendQuery(
 				conn, 
 				paste(
 					"copy into", 

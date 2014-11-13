@@ -346,7 +346,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 			)
 		
 		# create the table in the database
-		dbSendUpdate( db , sql.create )
+		dbSendQuery( db , sql.create )
 		
 		# now build the sql command that will copy all records from the csv file (still on the local hard disk)
 		# into the monet database, using the structure that's just been defined by the sql.create object above
@@ -362,7 +362,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 			)
 			
 		# run the sql command
-		dbSendUpdate( db , sql.update )
+		dbSendQuery( db , sql.update )
 			
 	}
 		
@@ -529,11 +529,11 @@ for ( year in years.to.download ){
 	weight <- survey.vars[ survey.vars$year == year , 'weight' ]
 
 	# add a column containing all ones to the current table
-	dbSendUpdate( db , paste0( 'alter table ' , tablename , ' add column one int' ) )
-	dbSendUpdate( db , paste0( 'UPDATE ' , tablename , ' SET one = 1' ) )
+	dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column one int' ) )
+	dbSendQuery( db , paste0( 'UPDATE ' , tablename , ' SET one = 1' ) )
 	
 	# add a column containing the record (row) number
-	dbSendUpdate( db , paste0( 'alter table ' , tablename , ' add column idkey int auto_increment' ) )
+	dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column idkey int auto_increment' ) )
 
 	# create a sqlsurvey complex sample design object
 	brfss.design <-

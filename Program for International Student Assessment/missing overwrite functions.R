@@ -47,7 +47,7 @@ spss.based.missing.blankouts <-
 				)
 			
 			# execute the update line
-			perhaps.uncast <- try( dbSendUpdate( conn , update.sql ) , silent = TRUE )
+			perhaps.uncast <- try( dbSendQuery( conn , update.sql ) , silent = TRUE )
 			
 			# but if that line failed..
 			if( class( perhaps.uncast ) == 'try-error' ){
@@ -68,7 +68,7 @@ spss.based.missing.blankouts <-
 					)
 				
 				# re-execute the query hooray
-				dbSendUpdate( conn , update.sql )
+				dbSendQuery( conn , update.sql )
 				
 				
 			}
@@ -111,7 +111,7 @@ missing.updates <-
 			# wherever the current variable `i` is one of the possible
 			# `missing.values` (passed in at the start of this function)
 			# replace it with NULL
-			dbSendUpdate( 
+			dbSendQuery( 
 				db , 
 				paste(
 					'UPDATE' ,
@@ -460,7 +460,7 @@ int_cogn06_t_dec07.missings <-
 		"M033Q01 M034Q01T M155Q01 M155Q02T M155Q03T M155Q04T M192Q01T M273Q01T M302Q01T M302Q02 M302Q03 M305Q01 M406Q01 M406Q02 M408Q01T M411Q01 M411Q02 M420Q01T M421Q01 M421Q02T M421Q03 M423Q01 M442Q02 M446Q01 M446Q02 M447Q01 M462Q01T M464Q01T M474Q01 M496Q01T M496Q02 M559Q01 M564Q01 M564Q02 M571Q01 M598Q01 M603Q01T M603Q02T M710Q01 M800Q01 M803Q01T M810Q01T M810Q02T M810Q03T M828Q01 M828Q02 M828Q03 M833Q01T R055Q01 R055Q02 R055Q03 R055Q05 R067Q01 R067Q04 R067Q05 R102Q04A R102Q05 R102Q07 R104Q01 R104Q02 R104Q05 R111Q01 R111Q02B R111Q06B R219Q01E R219Q01T R219Q02 R220Q01 R220Q02B R220Q04 R220Q05 R220Q06 R227Q01 R227Q02T R227Q03 R227Q06 S114Q03T S114Q04T S114Q05T S131Q02T S131Q04T S213Q01T S213Q02 S256Q01 S268Q01 S268Q02T S268Q06 S269Q01 S269Q03T S269Q04T S304Q01 S304Q02 S304Q03A S304Q03B S326Q01 S326Q02 S326Q03 S326Q04T S408Q01 S408Q03 S408Q04T S408Q05 S413Q04T S413Q05 S413Q06 S415Q02 S415Q07T S415Q08T S416Q01 S421Q01 S421Q03 S425Q02 S425Q03 S425Q04 S425Q05 S426Q03 S426Q05 S426Q07T S428Q01 S428Q03 S428Q05 S437Q01 S437Q03 S437Q04 S437Q06 S438Q01T S438Q02 S438Q03T S447Q02 S447Q03 S447Q04 S447Q05 S458Q01 S458Q02T S465Q01 S465Q02 S465Q04 S466Q01T S466Q05 S466Q07T S476Q01 S476Q02 S476Q03 S477Q02 S477Q03 S477Q04 S478Q01 S478Q02T S478Q03T S485Q02 S485Q03 S485Q05 S493Q01T S493Q03T S493Q05T S495Q01T S495Q02T S495Q03 S495Q04T S498Q02T S498Q03 S498Q04 S508Q02T S508Q03 S510Q01T S510Q04T S514Q02 S514Q03 S514Q04 S519Q01 S519Q02T S519Q03 S521Q02 S521Q06 S524Q06T S524Q07 S527Q01T S527Q03T S527Q04T"
 
 	for ( i in split.n.clean( seven.to.n.txt ) ){
-		dbSendUpdate(
+		dbSendQuery(
 			db ,
 			paste(
 				"UPDATE INT_Cogn06_T_Dec07 SET" ,
@@ -476,7 +476,7 @@ int_cogn06_t_dec07.missings <-
 		"S408QNA S408QNB S408QNC S413QNA S413QNB S413QNC S416QNA S416QNB S428QNA S428QNB S428QNC S437QNA S437QNB S437QNC S438QNA S438QNB S438QNC S456QNA S456QNB S456QNC S466QNA S466QNB S466QNC S476QNA S476QNB S476QNC S478QNA S478QNB S478QNC S485QNA S485QNB S485QNC S498QNA S498QNB S498QNC S508QNA S508QNB S508QNC S514QNA S514QNB S514QNC S519QNA S519QNB S519QNC S521QNA S521QNB S524QNA S524QNB S524QNC S527QNA S527QNB S527QNC S408QSA S408QSB S408QSC S416QSA S416QSB S416QSC S421QSA S421QSC S425QSA S425QSB S425QSC S426QSA S426QSB S426QSC S438QSA S438QSB S438QSC S456QSA S456QSB S456QSC S465QSA S465QSB S476QSA S476QSB S476QSC S477QSA S477QSB S477QSC S485QSB S485QSC S498QSA S498QSB S519QSA S519QSB S519QSC S527QSB S527QSC"
 
 	for ( i in split.n.clean( seven.to.n.txt ) ){
-		dbSendUpdate(
+		dbSendQuery(
 			db ,
 			paste(
 				"UPDATE INT_Cogn06_T_Dec07 SET" ,
@@ -487,7 +487,7 @@ int_cogn06_t_dec07.missings <-
 			)
 		)
 
-		dbSendUpdate(
+		dbSendQuery(
 			db ,
 			paste(
 				"UPDATE INT_Cogn06_T_Dec07 SET" ,
@@ -498,7 +498,7 @@ int_cogn06_t_dec07.missings <-
 			)
 		)
 
-		dbSendUpdate(
+		dbSendQuery(
 			db ,
 			paste(
 				"UPDATE INT_Cogn06_T_Dec07 SET" ,
@@ -588,7 +588,7 @@ int_cogn06_t_dec07.missings <-
 
 			if( dbDataType( db , n.outs[ i , 3 ] ) == 'varchar' ) {
 
-				dbSendUpdate(
+				dbSendQuery(
 					db ,
 					paste0(
 						"UPDATE INT_Cogn06_T_Dec07 SET " ,
@@ -603,7 +603,7 @@ int_cogn06_t_dec07.missings <-
 			
 			} else {
 			
-				dbSendUpdate(
+				dbSendQuery(
 					db ,
 					paste0(
 						"UPDATE INT_Cogn06_T_Dec07 SET " ,
@@ -666,7 +666,7 @@ int_schi_2003.missings <-
 
 		for ( i in split.n.clean( "SC26Q01 SC26Q02 SC26Q03 SC26Q04 SC26Q05 SC26Q06 SC26Q07 SC26Q08 SC26Q09 SC26Q10 SC26Q11 SC26Q12" ) ){
 
-			dbSendUpdate(
+			dbSendQuery(
 				db ,
 				paste(
 					"UPDATE int_schi_2003 SET" ,
@@ -677,7 +677,7 @@ int_schi_2003.missings <-
 				)
 			)
 			
-			dbSendUpdate(
+			dbSendQuery(
 				db ,
 				paste(
 					"UPDATE int_schi_2003 SET" ,
@@ -688,7 +688,7 @@ int_schi_2003.missings <-
 				)
 			)
 			
-			dbSendUpdate(
+			dbSendQuery(
 				db ,
 				paste(
 					"UPDATE int_schi_2003 SET" ,
@@ -703,7 +703,7 @@ int_schi_2003.missings <-
 
 		for ( i in split.n.clean( "SC27Q01 SC27Q02 SC27Q03 SC27Q04 SC27Q05 SC27Q06 SC27Q07" ) ){
 
-			dbSendUpdate(
+			dbSendQuery(
 				db ,
 				paste(
 					"UPDATE int_schi_2003 SET" ,
@@ -714,7 +714,7 @@ int_schi_2003.missings <-
 				)
 			)
 			
-			dbSendUpdate(
+			dbSendQuery(
 				db ,
 				paste(
 					"UPDATE int_schi_2003 SET" ,
@@ -725,7 +725,7 @@ int_schi_2003.missings <-
 				)
 			)
 			
-			dbSendUpdate(
+			dbSendQuery(
 				db ,
 				paste(
 					"UPDATE int_schi_2003 SET" ,
@@ -777,25 +777,25 @@ int_stui_2003_v2.missings <-
 
 		for ( i in split.n.clean( "iso_s iso_m iso_f" ) ){
 
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'N' WHERE" , i , "IN ( '99999970' , '' , ' ' )" ) )
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'I' WHERE" , i , "= '99999980'" ) )
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'M' WHERE" , i , "= '99999990'" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'N' WHERE" , i , "IN ( '99999970' , '' , ' ' )" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'I' WHERE" , i , "= '99999980'" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'M' WHERE" , i , "= '99999990'" ) )
 			
 		}
 
 		for ( i in split.n.clean( "ST07Q01 ST09Q01 EC08Q01 EC06Q02" ) ){
 
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'N' WHERE" , i , "IN ( '9997' , '' , ' ' )" ) )
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'I' WHERE" , i , "= '9998'" ) )
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'M' WHERE" , i , "= '9999'" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'N' WHERE" , i , "IN ( '9997' , '' , ' ' )" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'I' WHERE" , i , "= '9998'" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'M' WHERE" , i , "= '9999'" ) )
 			
 		}
 
 		for ( i in split.n.clean( "ST17Q14 ST17Q15 ST17Q16 LANGN" ) ){
 
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'N' WHERE" , i , "IN ( '99997' , '' , ' ' )" ) )
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'I' WHERE" , i , "= '99998'" ) )
-			dbSendUpdate( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'M' WHERE" , i , "= '99999'" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'N' WHERE" , i , "IN ( '99997' , '' , ' ' )" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'I' WHERE" , i , "= '99998'" ) )
+			dbSendQuery( db , paste( "UPDATE int_stuI_2003_v2 SET" , i , "= 'M' WHERE" , i , "= '99999'" ) )
 			
 		}
 

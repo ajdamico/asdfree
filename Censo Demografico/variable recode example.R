@@ -120,7 +120,7 @@ if (.Platform$OS.type == "windows") dbSendQuery( db , "set optimizer = 'sequenti
 
 
 # making any changes to the data table downloaded directly from ibge currently
-# requires directly accessing the table using dbSendUpdate() to run sql commands
+# requires directly accessing the table using dbSendQuery() to run sql commands
 
 
 # note: recoding (writing) variables in monetdb often takes much longer
@@ -143,7 +143,7 @@ if (.Platform$OS.type == "windows") dbSendQuery( db , "set optimizer = 'sequenti
 # has already connected the current instance of r to the monet database
 
 # now simply copy you'd like to recode into a new table
-dbSendUpdate( db , "CREATE TABLE recoded_c10_dom AS SELECT * FROM c10_dom WITH DATA" )
+dbSendQuery( db , "CREATE TABLE recoded_c10_dom AS SELECT * FROM c10_dom WITH DATA" )
 # this action protects the original 'c10_dom' table from any accidental errors.
 # at any point, we can delete this recoded copy of the data table using the command..
 # dbRemoveTable( db , "recoded_c10_dom" )
@@ -160,28 +160,28 @@ dbSendUpdate( db , "CREATE TABLE recoded_c10_dom AS SELECT * FROM c10_dom WITH D
 # add new columns for each poverty line
 
 # since it's actually a categorical variable, make it DOUBLE PRECISION
-dbSendUpdate( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob1 DOUBLE PRECISION" )
-dbSendUpdate( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob2 DOUBLE PRECISION" )
-dbSendUpdate( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob3 DOUBLE PRECISION" )
-dbSendUpdate( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob4 DOUBLE PRECISION" )
-dbSendUpdate( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob5 DOUBLE PRECISION" )
-dbSendUpdate( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob6 DOUBLE PRECISION" )
+dbSendQuery( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob1 DOUBLE PRECISION" )
+dbSendQuery( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob2 DOUBLE PRECISION" )
+dbSendQuery( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob3 DOUBLE PRECISION" )
+dbSendQuery( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob4 DOUBLE PRECISION" )
+dbSendQuery( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob5 DOUBLE PRECISION" )
+dbSendQuery( db , "ALTER TABLE recoded_c10_dom ADD COLUMN nmorpob6 DOUBLE PRECISION" )
 
-dbSendUpdate( db , "ALTER TABLE recoded_c10_dom ADD COLUMN mult_nmorpob1 DOUBLE PRECISION" )
+dbSendQuery( db , "ALTER TABLE recoded_c10_dom ADD COLUMN mult_nmorpob1 DOUBLE PRECISION" )
 
 
 # if you wanted to create a numeric variable, substitute DOUBLE PRECISION with VARCHAR( 255 ) like this:
-# dbSendUpdate( db , "ALTER TABLE recoded_c10_dom ADD COLUMN new_column VARCHAR( 255 )" )
+# dbSendQuery( db , "ALTER TABLE recoded_c10_dom ADD COLUMN new_column VARCHAR( 255 )" )
 
 
-dbSendUpdate( db , "UPDATE recoded_c10_dom SET nmorpob1 = 1 * ( v6531 < 70 )" )
-dbSendUpdate( db , "UPDATE recoded_c10_dom SET nmorpob2 = 1 * ( v6531 < 80 )" )
-dbSendUpdate( db , "UPDATE recoded_c10_dom SET nmorpob3 = 1 * ( v6531 < 90 )" )
-dbSendUpdate( db , "UPDATE recoded_c10_dom SET nmorpob4 = 1 * ( v6531 < 100 )" )
-dbSendUpdate( db , "UPDATE recoded_c10_dom SET nmorpob5 = 1 * ( v6531 < 140 )" )
-dbSendUpdate( db , "UPDATE recoded_c10_dom SET nmorpob6 = 1 * ( v6531 < 272.50 )" )
+dbSendQuery( db , "UPDATE recoded_c10_dom SET nmorpob1 = 1 * ( v6531 < 70 )" )
+dbSendQuery( db , "UPDATE recoded_c10_dom SET nmorpob2 = 1 * ( v6531 < 80 )" )
+dbSendQuery( db , "UPDATE recoded_c10_dom SET nmorpob3 = 1 * ( v6531 < 90 )" )
+dbSendQuery( db , "UPDATE recoded_c10_dom SET nmorpob4 = 1 * ( v6531 < 100 )" )
+dbSendQuery( db , "UPDATE recoded_c10_dom SET nmorpob5 = 1 * ( v6531 < 140 )" )
+dbSendQuery( db , "UPDATE recoded_c10_dom SET nmorpob6 = 1 * ( v6531 < 272.50 )" )
 
-dbSendUpdate( db , "UPDATE recoded_c10_dom SET mult_nmorpob1 = nmorpob1 * dom_count_pes" )
+dbSendQuery( db , "UPDATE recoded_c10_dom SET mult_nmorpob1 = nmorpob1 * dom_count_pes" )
 
 
 # quickly check your work by running a simple SELECT COUNT(*) command with sql

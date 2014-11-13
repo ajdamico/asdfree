@@ -259,12 +259,12 @@ pums.import.merge.design <-
 		# remove blank_# fields in the monetdb household table
 		lf <- dbListFields( db , hh.tn )
 		hh.blanks <- lf[ grep( 'blank_' , lf ) ]
-		for ( i in hh.blanks ) dbSendUpdate( db , paste( 'alter table' , hh.tn , 'drop column' , i ) )
+		for ( i in hh.blanks ) dbSendQuery( db , paste( 'alter table' , hh.tn , 'drop column' , i ) )
 
 		# remove blank_# fields in the monetdb person table
 		lf <- dbListFields( db , person.tn )
 		person.blanks <- lf[ grep( 'blank_' , lf ) ]
-		for ( i in person.blanks ) dbSendUpdate( db , paste( 'alter table' , person.tn , 'drop column' , i ) )
+		for ( i in person.blanks ) dbSendQuery( db , paste( 'alter table' , person.tn , 'drop column' , i ) )
 
 
 		# intersect( dbListFields( db , hh.tn ) , dbListFields( db , person.tn ) )
@@ -292,10 +292,10 @@ pums.import.merge.design <-
 			)
 		
 		# create a new merged table (named according to the input parameter `merged.tn`
-		dbSendUpdate( db , ij )
+		dbSendQuery( db , ij )
 
 		# modify the `rectype` column for this new merged table so it's all Ms
-		dbSendUpdate( db , paste( "update" , merged.tn , "set rectype = 'M'" ) )
+		dbSendQuery( db , paste( "update" , merged.tn , "set rectype = 'M'" ) )
 
 		# confirm that the number of records in the merged file
 		# matches the number of records in the person file
@@ -308,11 +308,11 @@ pums.import.merge.design <-
 		
 
 		# add a column containing all ones to the current table
-		dbSendUpdate( db , paste0( 'alter table ' , merged.tn , ' add column one int' ) )
-		dbSendUpdate( db , paste0( 'UPDATE ' , merged.tn , ' SET one = 1' ) )
+		dbSendQuery( db , paste0( 'alter table ' , merged.tn , ' add column one int' ) )
+		dbSendQuery( db , paste0( 'UPDATE ' , merged.tn , ' SET one = 1' ) )
 		
 		# add a column containing the record (row) number
-		dbSendUpdate( db , paste0( 'alter table ' , merged.tn , ' add column idkey int auto_increment' ) )
+		dbSendQuery( db , paste0( 'alter table ' , merged.tn , ' add column idkey int auto_increment' ) )
 		
 		# store the names of factor/character variables #
 		hh.char <- hh.stru[ hh.stru$char %in% TRUE , 'variable' ]

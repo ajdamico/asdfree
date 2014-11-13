@@ -126,7 +126,7 @@ read.SAScii.sqlite <-
 			# )
 		# )
 	
-	# dbSendUpdate( conn , sql )
+	# dbSendQuery( conn , sql )
 
 	# create a second temporary file
 	tf2 <- tempfile()

@@ -500,7 +500,7 @@ for ( year in 2050:2005 ){
 					)
 				
 				# actually execute the 'create table' sql command
-				dbSendUpdate( db , sql )
+				dbSendQuery( db , sql )
 
 				# end of initiating the table in the database #
 				
@@ -513,7 +513,7 @@ for ( year in 2050:2005 ){
 					# now try to copy the current csv file into the database
 					first.attempt <-
 						try( {
-							dbSendUpdate( 
+							dbSendQuery( 
 								db , 
 								paste0( 
 									"copy " , 
@@ -551,7 +551,7 @@ for ( year in 2050:2005 ){
 						# and run the exact same command again.
 						second.attempt <-
 							try( {
-								dbSendUpdate( 
+								dbSendQuery( 
 									db , 
 									paste0( 
 										"copy " , 
@@ -603,7 +603,7 @@ for ( year in 2050:2005 ){
 						close( fpt )
 						
 						# re-run the copy into command..
-						dbSendUpdate( 
+						dbSendQuery( 
 								db , 
 								paste0( 
 									"copy " , 
@@ -686,22 +686,22 @@ for ( year in 2050:2005 ){
 			headers.m <- unique( c( headers.h , headers.p ) )
 			
 			# create the merged table
-			dbSendUpdate( db , i.j )
+			dbSendQuery( db , i.j )
 			
 			# add columns named 'one' to each table..
-			dbSendUpdate( db , paste0( 'alter table ' , k , '_p add column one int' ) )
-			dbSendUpdate( db , paste0( 'alter table ' , k , '_h add column one int' ) )
-			dbSendUpdate( db , paste0( 'alter table ' , k , '_m add column one int' ) )
+			dbSendQuery( db , paste0( 'alter table ' , k , '_p add column one int' ) )
+			dbSendQuery( db , paste0( 'alter table ' , k , '_h add column one int' ) )
+			dbSendQuery( db , paste0( 'alter table ' , k , '_m add column one int' ) )
 
 			# ..and fill them all with the number 1.
-			dbSendUpdate( db , paste0( 'UPDATE ' , k , '_p SET one = 1' ) )
-			dbSendUpdate( db , paste0( 'UPDATE ' , k , '_h SET one = 1' ) )
-			dbSendUpdate( db , paste0( 'UPDATE ' , k , '_m SET one = 1' ) )
+			dbSendQuery( db , paste0( 'UPDATE ' , k , '_p SET one = 1' ) )
+			dbSendQuery( db , paste0( 'UPDATE ' , k , '_h SET one = 1' ) )
+			dbSendQuery( db , paste0( 'UPDATE ' , k , '_m SET one = 1' ) )
 					
 			# add a column called 'idkey' containing the row number
-			dbSendUpdate( db , paste0( 'alter table ' , k , '_p add column idkey int auto_increment' ) )
-			dbSendUpdate( db , paste0( 'alter table ' , k , '_h add column idkey int auto_increment' ) )
-			dbSendUpdate( db , paste0( 'alter table ' , k , '_m add column idkey int auto_increment' ) )
+			dbSendQuery( db , paste0( 'alter table ' , k , '_p add column idkey int auto_increment' ) )
+			dbSendQuery( db , paste0( 'alter table ' , k , '_h add column idkey int auto_increment' ) )
+			dbSendQuery( db , paste0( 'alter table ' , k , '_m add column idkey int auto_increment' ) )
 			
 			
 			# now the current database contains three tables more tables than it did before
