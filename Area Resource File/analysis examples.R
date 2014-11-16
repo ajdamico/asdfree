@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # area resource file
-# 2012-2013
+# 2013-2014
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -35,13 +35,13 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/usgsd/blob/master/Area%20Resource%20File/download.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "arf2012.rda" with 'arf' in C:/My Directory/ARF  #
+# that script will create a file "arf2013.rda" with 'arf' in C:/My Directory/ARF  #
 ###################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # set your working directory.
-# the ARF 2012-2013 data files should have been stored here
+# the ARF 2013-2014 data files should have been stored here
 # after running the program described above
 # use forward slashes instead of back slashes
 
@@ -50,8 +50,8 @@
 # ..in order to set your current working directory
 
 
-# load the 2012-2013 ARF data file
-load( "arf2012.rda" )
+# load the 2013-2014 ARF data file
+load( "arf2013.rda" )
 
 
 # now the 'arf' data frame is available in memory..
@@ -59,7 +59,7 @@ load( "arf2012.rda" )
 ncol( arf )
 
 
-# the "AHRF 2012-2013 Technical Documentation.xls" file in the current working directory contains field labels
+# the "AHRF 2013-2014 Technical Documentation.xls" file in the current working directory contains field labels
 # so create a smaller data table with only a few columns of interest
 # first, create a character vector containing only the columns you'll need:
 variables.to.keep <-
