@@ -69,7 +69,6 @@ variables.to.keep <-
 		"f12424" , 			# state abbreviation
 		"f00010" , 			# county name
 		"f13156" , 			# ssa beneficiary county code
-		"f1389209" ,		# metro/micro statistical area name
 		"f0453010" ,		# 2010 census population
 		"f1212910"	 		# total active m.d.s non-federal & federal
 	)
@@ -84,7 +83,7 @@ head( arf.sub )
 
 
 # rename the variables something more user-friendly
-names( arf.sub ) <- c( "fips" , "state" , "stateab" , "county" , "ssa" , "mmsa" , "pop2010" , "md2010" )
+names( arf.sub ) <- c( "fips" , "state" , "stateab" , "county" , "ssa" , "pop2010" , "md2010" )
 
 # and re-examine the first six records
 head( arf.sub )
@@ -202,7 +201,7 @@ nrow( fakedata )
 # follow the code presented at http://www.thisisthegreenroom.com/2009/choropleths-in-r/
 
 # install the maps package if you don't already have it
-install.packages( c( "maps" , "mapproj" ) )
+# install.packages( c( "maps" , "mapproj" ) )
 
 # load the maps and mapproj packages - both include mapping-related functions
 library(maps)
