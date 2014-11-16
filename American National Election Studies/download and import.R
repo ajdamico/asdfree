@@ -181,6 +181,9 @@ files.to.download[[ "ANES 2010-2012 Evaluations of Government and Society Study"
 		"../data/2010_2012EGSS/anes2010_2012egss1por.zip"
 	)
 
+files.to.download[[ "ANES Time Series Cumulative Data File" ]] <-
+		"../data/anes_timeseries_cdf/anes_timeseries_cdf_sav.zip"
+
 files.to.download[[ "ANES 2012 Time Series Study" ]] <-
 	"../data/anes_timeseries_2012/anes_timeseries_2012_sav.zip"
 	
