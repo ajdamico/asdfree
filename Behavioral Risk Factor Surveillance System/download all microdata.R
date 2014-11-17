@@ -95,6 +95,17 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 # setwd( "C:/My Directory/BRFSS/" )
 
 
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
+
+
 # load the download.cache and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
