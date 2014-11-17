@@ -6,6 +6,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
 # setwd( "C:/My Directory/PISA/" )
@@ -112,6 +113,16 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.mo
 
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/PISA/" )
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
 
 
 # configure a monetdb database for the pisa on windows #
