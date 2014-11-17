@@ -174,7 +174,7 @@ batfile
 # you will need to note the location of the batfile for future MonetDB analyses!
 
 # in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
+# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 # obviously, without the `#` comment character
 
 # hold on to that line for future scripts.
@@ -187,7 +187,7 @@ batfile
 dbname <- "pisa"
 dbport <- 50007
 
-# now the local windows machine contains a new executable program at "c:\my directory\pisa\monetdb\pisa.bat"
+# now the local windows machine contains a new executable program at "c:\my directory\pisa\monetdb\pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 
 
 
@@ -201,7 +201,7 @@ dbport <- 50007
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
+# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -769,7 +769,7 @@ Sys.sleep( 10 )
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
+# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

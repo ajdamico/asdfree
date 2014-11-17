@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
+# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 # setwd( "C:/My Directory/PISA/" )
 # load( '2012 int_stu12_dec03.rda' )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
@@ -100,7 +100,7 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20Intern
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
+# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -308,7 +308,7 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20Intern
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
+# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

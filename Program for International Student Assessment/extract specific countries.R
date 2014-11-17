@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
+# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 # setwd( "C:/My Directory/PISA/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Program%20for%20International%20Student%20Assessment/extract%20specific%20countries.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -83,7 +83,7 @@ library(survey)			# load survey package (analyzes complex design surveys)
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"
+# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
