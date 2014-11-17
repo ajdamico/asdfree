@@ -118,15 +118,15 @@ for ( curdir in rev( precise.links ) ){
 	# by scraping the ahs ftp web page contents into a character vector
 	ftp.contents <- readLines( textConnection( getURL( paste0( ahs.ftp , curdir , '/' ) ) ) )
 	
-	# extract only the final text of the line after the last space,
+	# extract only the text starting at the 57th position
 	# which contains each of the file names.
-	precise.files <- gsub('(.*) (.*)' , '\\2' , ftp.contents )
+	precise.files <- substr( ftp.contents , 57 , nchar( ftp.contents ) )
 	
 	# remove empty strings
 	precise.files <- precise.files[ precise.files != '' ]
 	
 	# look for exact matches, only zipped.
-	pfi <- grep( '\\.zip|\\.Zip|\\.ZIP' , precise.files )
+	pfi <- gsub( '\\.zip|\\.Zip|\\.ZIP' , precise.files )
 	
 	# these files match a `.zip` file
 	zip.matches <- pfi[ duplicated( pfi ) ]
