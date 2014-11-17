@@ -328,7 +328,7 @@ demo06 <- read.csv( demo.file )
 # convert all column names to lowercase
 names( demo06 ) <- tolower( names( demo06 ) )
 
-# confirm exactly 4,84,254 records
+# confirm exactly 4,384,254 records
 # as specified on pdf page 1 of the earnings dictionary
 # http://www.ssa.gov/policy/docs/microdata/epuf/epuf_dictionary.pdf
 nrow( demo06 )
