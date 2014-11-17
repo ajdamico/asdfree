@@ -140,7 +140,7 @@ for ( year in years.to.download ){
 
 	# note: this PNAD ASCII (fixed-width file) contains household- and person-level records.
 
-	if ( year < 2011 ){
+	if ( year < 2013 ){
 		
 		# figure out the exact filepath of the re-weighted pnad year
 		ftp.path <-
