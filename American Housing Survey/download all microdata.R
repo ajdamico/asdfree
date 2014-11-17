@@ -44,7 +44,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "RCurl" , "sas7bdat" , "downloader" ) )
+# install.packages( c( "RSQLite" , "RCurl" , "sas7bdat" , "downloader" , "stringr" ) )
 
 
 # name the database (.db) file to be saved in the working directory
@@ -68,7 +68,7 @@ library(tools)		# allows rapid extraction of filename extensions
 library(downloader)	# downloads and then runs the source() function on scripts from github
 library(RSQLite) 	# load RSQLite package (creates database files in R)
 library(RCurl)		# load RCurl package (downloads https files)
-
+library(stringr) 	# load stringr package (manipulates character strings easily)
 
 
 # load the download.cache and related functions
@@ -122,11 +122,14 @@ for ( curdir in rev( precise.links ) ){
 	# which contains each of the file names.
 	precise.files <- substr( ftp.contents , 57 , nchar( ftp.contents ) )
 	
+	# trim whitespace
+	precise.files <- str_trim( precise.files )
+	
 	# remove empty strings
 	precise.files <- precise.files[ precise.files != '' ]
 	
 	# look for exact matches, only zipped.
-	pfi <- gsub( '\\.zip|\\.Zip|\\.ZIP' , precise.files )
+	pfi <- gsub( '\\.zip|\\.Zip|\\.ZIP' , "" , precise.files )
 	
 	# these files match a `.zip` file
 	zip.matches <- pfi[ duplicated( pfi ) ]
