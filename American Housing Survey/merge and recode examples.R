@@ -264,7 +264,7 @@ svymean( ~ pct_adults , ahs.merged.svydb , na.rm = TRUE )
 
 
 # average household-weighted sum of salaries, broken out by number of adults in the household.
-svyby( ~ total_household_salaries , ~ num_adults , ahs.merged.svydb , svymean , na.rm.all = TRUE )
+svyby( ~ total_household_salaries , ~ num_adults , ahs.merged.svydb , svymean , na.rm = TRUE , na.rm.all = TRUE )
 
 
 # done?  done.  time to clean up.
@@ -443,7 +443,7 @@ svymean( ~ pct_adults , ahs.merged.svynodb , na.rm = TRUE )
 
 
 # average household-weighted sum of salaries, broken out by number of adults in the household.
-svyby( ~ total_household_salaries , ~ num_adults , ahs.merged.svynodb , svymean , na.rm = TRUE )
+svyby( ~ total_household_salaries , ~ num_adults , ahs.merged.svynodb , svymean , na.rm = TRUE , na.rm.all = TRUE )
 
 
 # done?  done.  time to clean up.
