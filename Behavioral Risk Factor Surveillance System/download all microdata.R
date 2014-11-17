@@ -5,7 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )	# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/BRFSS/" )
 # years.to.download <- 1984:2013
@@ -410,7 +410,7 @@ for ( year in intersect( years.to.download , 2002:2013 ) ){
 	}
 
 	# read the entire sas importation script into memory
-	z <- readLines( sas_ri )
+	z <- iconv( readLines( sas_ri ) , "windows-1252" , "utf-8" )
 
 	# throw out a few columns that cause importation trouble with monetdb
 	if ( year == 2009 ) z <- z[ -159:-168 ]
