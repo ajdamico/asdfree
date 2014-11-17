@@ -90,18 +90,17 @@ db <- dbConnect( SQLite() , ahs.dbname )
 # hard-code the location of the census bureau's ahs ftp directory
 ahs.ftp <- "ftp://ftp2.census.gov/AHS/"
 
-# read in all available microdata years and categories to be downloaded
-# by scraping the ahs ftp web page contents into a character vector
-tf <- getURL( ahs.ftp )
-
 # split up the page into separate lines
-ftp.contents <- strsplit( tf , '\r\n' )[[1]]
+ftp.contents <- readLines( textConnection( getURL( ahs.ftp ) ) )
 
 # extract only the final text of the line after the last space.
 precise.links <- gsub('(.*) (.*)' , '\\2' , ftp.contents )
 
 # remove directories that don't contain anything of value
 precise.links <- precise.links[ !grepl( "higher level directory|tmp|Sample" , precise.links ) ]
+
+# remove empty strings
+precise.links <- precise.links[ precise.links != '' ]
 
 # loop through each of those directories, starting at the end (i.e. most recent)
 for ( curdir in rev( precise.links ) ){
