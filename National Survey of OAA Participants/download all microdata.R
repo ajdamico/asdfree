@@ -62,7 +62,7 @@ source_url(
 tf <- tempfile() ; td <- tempdir()
 
 # set the agidnet page containing all of the available microdata files
-main.file.page <- "http://www.agidnet.org/DataFiles/NPS/"
+main.file.page <- "http://www.agid.acl.gov/DataFiles/NPS/"
 
 # download the contents of that page to an object
 z <- GET( main.file.page )
@@ -116,7 +116,7 @@ for ( year in all.years ){
 		
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/Caregiver" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/Caregiver" , 
 					year , 
 					"/Caregiver_" , 
 					year , 
@@ -132,7 +132,7 @@ for ( year in all.years ){
 		
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/Collected_Caregiver" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/Collected_Caregiver" , 
 					year , 
 					"/Collected_Caregiver_" , 
 					year , 
@@ -148,7 +148,7 @@ for ( year in all.years ){
 		
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/Family_Caregiver" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/Family_Caregiver" , 
 					year , 
 					"/Family_Caregiver_" , 
 					year , 
@@ -164,7 +164,7 @@ for ( year in all.years ){
 		
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/HomeDeliveredMeals" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/HomeDeliveredMeals" , 
 					year , 
 					"/Home_Meals_" , 
 					year , 
@@ -180,7 +180,7 @@ for ( year in all.years ){
 
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/CongregateMeals" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/CongregateMeals" , 
 					year , 
 					"/Cong_Meals_" , 
 					year , 
@@ -196,7 +196,7 @@ for ( year in all.years ){
 		
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/Homemaker" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/Homemaker" , 
 					year , 
 					"/Homemaker_" , 
 					year , 
@@ -212,7 +212,7 @@ for ( year in all.years ){
 				
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/InfoAssistance" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/InfoAssistance" , 
 					year , 
 					"/InfoAssistance_" , 
 					year , 
@@ -228,7 +228,7 @@ for ( year in all.years ){
 		
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/Transportation" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/Transportation" , 
 					year , 
 					"/Transportation_" , 
 					year , 
@@ -244,7 +244,7 @@ for ( year in all.years ){
 		
 			csv.fn <- 
 				paste0(
-					"http://www.agidnet.org/DataFiles/Documents/NPS/CaseManagement" , 
+					"http://www.agid.acl.gov/DataFiles/Documents/NPS/CaseManagement" , 
 					year , 
 					"/Case_Management_" , 
 					year , 
