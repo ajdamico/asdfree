@@ -95,9 +95,6 @@ z <- unzip( tf , exdir = td )
 # connect to an rsqlite database on the local disk
 db <- dbConnect( SQLite() , sbo.dbname )
 
-# load the mathematical functions in the r package RSQLite.extfuns
-init_extensions(db)
-
 # read the comma separated value (csv) file you just downloaded
 # directly into the rsqlite database you just created.
 dbWriteTable( db , 'z' , z , sep = "," , header = TRUE )
