@@ -44,7 +44,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "RSQLite.extfuns" , "mitools" , "downloader" ) )
+# install.packages( c( "survey" , "RSQLite" , "mitools" , "downloader" ) )
 
 
 # name the database (.db) file to be saved in the working directory
@@ -63,7 +63,6 @@ if ( file.exists( paste( getwd() , sbo.dbname , sep = "/" ) ) ) warning( "the da
 
 
 library(RSQLite) 			# load RSQLite package (creates database files in R)
-library(RSQLite.extfuns) 	# load RSQLite package (allows mathematical functions, like SQRT)
 library(mitools) 			# load mitools package (analyzes multiply-imputed data)
 library(survey) 			# load survey package (analyzes complex design surveys)
 library(downloader)			# downloads and then runs the source() function on scripts from github
