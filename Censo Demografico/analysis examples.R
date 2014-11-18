@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
-# batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"
+# batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"		# # note for mac and *nix users: `censo_demografico.bat` might be `censo_demografico.sh` instead
 # load( 'C:/My Directory/CENSO/pes 2010 design.rda' )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Censo%20Demografico/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -86,7 +86,7 @@ options( survey.lonely.psu = "remove" )
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"
+# batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"		# # note for mac and *nix users: `censo_demografico.bat` might be `censo_demografico.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
