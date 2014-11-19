@@ -563,7 +563,7 @@ for ( year in years.to.download ){
 
 				# and name that object the current tablename dot header for future use.
 				assign( 
-					paste0( tablename , '.header' ) , 
+					paste0( tolower( tablename ) , '.header' ) , 
 					this.header
 				)
 				
