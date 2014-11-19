@@ -122,13 +122,24 @@ viewstate <-
 		)
 	)
 
+# extract the `eventvalidation` string
+eventvalidation <- 
+	as.character(
+		sub(
+			'.*id="__EVENTVALIDATION" value="([0-9a-zA-Z+/=]*).*' , 
+			'\\1' , 
+			html
+		)
+	)
+
 # construct a list full of parameters to pass to the umich website
 params <- 
 	list(
-		'ctl00$ContentPlaceHolder3$Login1$UserName'    = your.username ,
-		'ctl00$ContentPlaceHolder3$Login1$Password'    = your.password ,
-		'ctl00$ContentPlaceHolder3$Login1$LoginButton' = 'Log In' ,
-		'__VIEWSTATE'                                  = viewstate
+		'ctl00$ContentPlaceHolder1$Login1$UserName'    = your.username ,
+		'ctl00$ContentPlaceHolder1$Login1$Password'    = your.password ,
+		'ctl00$ContentPlaceHolder1$Login1$LoginButton' = 'Log In' ,
+		'__VIEWSTATE'                                  = viewstate ,
+		'__EVENTVALIDATION'                            = eventvalidation
     )
 # and now, with the username, password, and viewstate parameters all squared away
 # it's time to start downloading individual files from the umich website	
@@ -143,7 +154,7 @@ save.psid <-
 	function( file , name , params , curl ){
 
 		# logs into the umich form
-		html = postForm('http://simba.isr.umich.edu/u/Login.aspx', .params = params, curl = curl)
+		html = postForm('http://simba.isr.umich.edu/U/Login.aspx', .params = params, curl = curl)
 		
 		# confirms the result's contents contains the word `Logout` because
 		# if it does not contain this text, you're not logged in.  sorry.
