@@ -441,6 +441,9 @@ for ( year in years.to.download ){
 				# find the .lst filepath with the same name as the .txt
 				lst.filepath <- gsub( 'txt$|TXT$' , 'lst' , i )
 			
+				# the 1995 person .lst file isn't cased the same as its data file.
+				lst.filepath <- gsub( "PERS95_2" , "pers95_2" , lst.filepath )
+			
 				# read in the lsc file
 				lst.file <- tolower( readLines( lst.filepath ) )
 				
