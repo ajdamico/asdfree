@@ -155,7 +155,7 @@ SIPP.replicate.sas <-
 	"http://thedataweb.rm.census.gov/pub/sipp/2001/rw01wx.sas"
 	
 SIPP.longitudinal.replicate.sas <-
-	"http://thedataweb.rm.census.gov/pub/sipp/2001/repwgt_sas_input.sas"
+	"http://thedataweb.rm.census.gov/pub/sipp/2001/lrw01_xx.sas"
 
 # if the household extract flag has been set to TRUE above..
 if ( sipp.household.extract ){
