@@ -420,9 +420,6 @@ for ( year in years.to.download ){
 		# unzip the temporary (zipped) file into the temporary directory
 		# and store the filepath of the unzipped file(s) into a character vector `z`
 		z <- unzip( tf , exdir = td )
-
-		# make `z` lowercase
-		z <- tolower( z )
 		
 		# `citation` document does not need to be imported
 		z <- z[ !grepl( 'citation' , tolower( z ) ) ]
@@ -433,16 +430,16 @@ for ( year in years.to.download ){
 		if ( year == 1995 ){
 
 			# isolate .lsc files
-			lsc <- z[ grepl( '.lsc' , z , fixed = TRUE ) ]
+			lsc <- z[ grepl( 'lsc$|LSC$' , z ) ]
 			
 			# isolate .txt files
-			txt <- z[ grepl( '.txt' , z , fixed = TRUE ) ]
+			txt <- z[ grepl( 'txt$|TXT$' , z ) ]
 		
 			# loop through each text file
 			for ( i in txt ){
 				
 				# find the .lst filepath with the same name as the .txt
-				lst.filepath <- gsub( '.txt' , '.lst' , i , fixed = TRUE )
+				lst.filepath <- gsub( 'txt$|TXT$' , 'lst' , i )
 			
 				# read in the lsc file
 				lst.file <- tolower( readLines( lst.filepath ) )
