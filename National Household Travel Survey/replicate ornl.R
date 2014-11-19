@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
-# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"
+# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"	# # note for mac and *nix users: `nhts.bat` might be `nhts.sh` instead"
 # load( 'C:/My Directory/NHTS/2009 designs.rda' )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Household%20Travel%20Survey/replicate%20ornl.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -80,7 +80,7 @@ library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"
+# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"	# # note for mac and *nix users: `nhts.bat` might be `nhts.sh` instead"
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
