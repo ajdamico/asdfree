@@ -95,7 +95,7 @@ names( NHIS.00.personsx.df ) <- tolower( names( NHIS.00.personsx.df ) )
 
 # location of incmimp sas import file - no longer hosted on the cdc's ftp site
 incmimp.sas <- 
-	"https://raw.github.com/ajdamico/usgsd/master/National%20Health%20Interview%20Survey/INCMIMP2000.sas"
+	"https://raw.githubusercontent.com/ajdamico/usgsd/master/National%20Health%20Interview%20Survey/INCMIMP2000.sas"
 
 # location of incmimp ascii data files
 incmimp.exe <- 
