@@ -170,7 +170,7 @@ for ( year in years.to.download ){
 		
 		# household weights need to be divided by one hundred thousand,
 		# person-weights need to be divided by ten for more recent years
-		if ( filetype != 'per' ) x$hhweight <- x$hhweight / 10^5 else if ( year > 2005 ) x$perwgt <- x$perwgt / 10
+		if ( !( filetype %in% c( 'per' , 'pers' ) ) x$hhweight <- x$hhweight / 10^5 else if ( year > 2005 ) x$perwgt <- x$perwgt / 10
 		
 		# save the data frame `x` to whatever the current filetype is
 		assign( filetype , x )
