@@ -111,30 +111,28 @@ for ( year in years.to.download ){
 	latesubyear <- ifelse( year == 2002 , '05' , subyear )
 	lateyear <- ifelse( year == 2002 , 2005 , year )
 
+	# they started naming things differently in 2011
+	if ( year == 2011 ) filetypes <- c( 'occ' , 'vac' , 'pers' ) else filetypes <- c( 'occ' , 'vac' , 'per' , 'ni' )
+		
+	web <- ifelse( year > 2005 , '_web' , '' )
 	
-	# only the occupied & vacant unit files are available for the most current year,
-	# so use those in 2011 but all four for previous years
-	if ( year == 2011 ) filetypes <- c( 'occ' , 'vac' , 'per' ) else filetypes <- c( 'occ' , 'vac' , 'per' , 'ni' )
-	
+	prefix <- ifelse( year > 2008 , paste0( "/uf_" , latesubyear ) , paste0( "/lng" , latesubyear ) )
 	
 	# loop through each available filetype
 	for ( filetype in filetypes ){
 
 		# construct the url of the file to download #
-		
-		web <- ifelse( year > 2005 , '_web' , '' )
 
 		census.url <-
 			paste0( 
 				"http://www.census.gov/housing/nychvs/data/" , 
 				lateyear , 
-				"/lng" , 
-				latesubyear , 
+				prefix , 
 				"_" , 
 				filetype , 
-				subyear , 
+				ifelse( year > 2008 , '' , subyear ) , 
 				web , 
-				".dat" 
+				ifelse( year > 2008 , ".txt" , ".dat" )
 			)
 
 		# the `census.url` object now contains the complete filepath
