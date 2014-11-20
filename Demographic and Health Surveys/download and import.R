@@ -231,7 +231,7 @@ for ( j in seq( length( country.numbers ) ) ){
 		ytab <- readHTMLTable( content( z ) )
 
 		# if it's more than just the main survey, stack 'em
-		if ( length( y ) == 1 ) y <- ytab[[1]] else {
+		if ( length( ytab ) == 1 ) y <- ytab[[1]] else {
 			y <- ytab[[1]]
 			for ( k in seq( 2 , length( ytab ) ) ){
 				
