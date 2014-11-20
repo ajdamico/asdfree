@@ -228,11 +228,25 @@ for ( j in seq( length( country.numbers ) ) ){
 		z <- GET( paste0( "https://dhsprogram.com" , data.link ) )
 
 		# now pull all the file names, sizes, and titles
-		y <- readHTMLTable( content( z ) )
+		ytab <- readHTMLTable( content( z ) )
 
-		# only download the survey data sets, so just the first item in the table
-		y <- y[[1]]
-
+		# if it's more than just the main survey, stack 'em
+		if ( length( y ) == 1 ) y <- ytab[[1]] else {
+			y <- ytab[[1]]
+			for ( k in seq( 2 , length( ytab ) ) ){
+				
+				hsep <- data.frame( "File Name" = "Supplemental" , "File Size" = NA , "File Format" = NA )
+				names( hsep ) <- c( "File Name" , "File Size" , "File Format" )
+			
+				y <- 
+					rbind( 
+						y , 
+						hsep ,
+						ytab[[k]]
+					)
+			}
+		}
+		
 		# also find the country codes and links
 		all.links <- unique( tolower( xpathSApply( content( z ) , "//div//a" , xmlGetAttr , "href" ) ) )
 
