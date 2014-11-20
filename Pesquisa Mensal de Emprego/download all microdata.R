@@ -4,6 +4,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PME/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Mensal%20de%20Emprego/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
@@ -41,6 +42,17 @@
 # ..in order to set your current working directory
 
 
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
+
+
 # if you want to overwrite previously-download files
 # redownload.all <- TRUE
 # uncomment the above line.
@@ -48,15 +60,9 @@
 # then this program will, by default, _not_ re-download
 # pme months that are already saved in your current working directory
 
-# warning: this command must be run before any other
-# internet-accessing lines in the session
-setInternet2(TRUE)
-# you also might need administrative rights
-
-
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "downloader" ) )
+# install.packages( c( "SAScii" , "downloader" , "RCurl" ) )
 
 
 ############################################
@@ -69,6 +75,7 @@ setInternet2(TRUE)
 
 library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
 library(downloader)	# downloads and then runs the source() function on scripts from github
+library(RCurl)		# load RCurl package (downloads https files)
 
 
 # load the download.cache and related functions
@@ -85,7 +92,7 @@ tf <- tempfile() ; td <- tempdir()
 
 
 # download the sas importation scripts..
-download.cache( 
+download( 
 	"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Mensal_de_Emprego/Microdados/documentacao/Documentacao.zip" , 
 	tf 
 )
@@ -99,13 +106,6 @@ z <- unzip( tf , exdir = td )
 input <- z[ grep( "INPUT" , z ) ]
 
 
-# download the contents of the ftp directory for all microdata
-download.cache(
-	"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Mensal_de_Emprego/Microdados/" , 
-	tf
-)
-
-
 # if this object does not exist, then create it
 # (see `redownload.all` note above) for more detail
 # about what it does
@@ -113,36 +113,31 @@ if ( !exists( 'redownload.all' ) ) redownload.all <- FALSE
 
 
 # read the text of the microdata ftp into working memory
-ftp.listing <- readLines( tf )
+# download the contents of the ftp directory for all microdata
+ftp.listing <- readLines( textConnection( getURL( "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Mensal_de_Emprego/Microdados/" ) ) )
 
 # extract the text from all lines containing a year of microdata
-year.lines <- ftp.listing[ grep( '/Microdados/20' , ftp.listing , fixed = TRUE ) ]
-
 # figure out the names of those year directories
-available.years <- rev( gsub( "(.*<B>)(.*)(</B>.*)" , "\\2" , year.lines ) )
+ay <- rev( gsub( "(.*) (.*)" , "\\2" , ftp.listing ) )
+
+# remove non-numeric strings
+available.years <- ay[ as.numeric( ay ) %in% ay ]
 # now `available.years` should contain all of the available years on the pme ftp site
 
 # loop through each of the available years
 for ( year in available.years ){
 
-	# take a look inside the year-specific ftp filepath
-	download.cache(
-		paste0(
-			"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Mensal_de_Emprego/Microdados/" , 
-			year 
-		) , 
-		tf
-	)
+	# define path of this year
+	this.year <- paste0( "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Mensal_de_Emprego/Microdados/" , year , "/" )
 
 	# just like above, read those lines into working memory
-	year.ftp.listing <- readLines( tf )
+	year.ftp.string <- readLines( textConnection( getURL( this.year ) ) )
 	
-	# store each line containing the text `.zip`
-	# into a character vector `zip.lines`
-	zip.lines <- year.ftp.listing[ grep( '.zip' , year.ftp.listing , fixed = TRUE ) ]
+	# break up the string based on the ending extension
+	zip.lines <- unlist( strsplit( year.ftp.string , "\\.zip$" ) )
 	
 	# extract the precise filename of the `.zip` file
-	zip.filenames <- gsub( '(.*zip\">)(.*)</A>' , "\\2" , zip.lines )
+	zip.filenames <- gsub( '(.*) (.*)' , "\\2.zip" , zip.lines )
 
 	# in 2008, the files are named by three-letter month.
 	# in portuguese, sorted alphabetically, april is the first month, followed by august, and so on.
