@@ -295,7 +295,7 @@ for ( this.study in study.names ){
 						start.time <- Sys.time()
 						
 						# so long as the status code returns unfinished
-						while( u$headers$status == 500 ){
+						while( !is.null( u$headers$status ) && u$headers$status == 500 ){
 
 							# if you've been waiting more than two minutes, just stop.
 							if ( Sys.time() - start.time > 120 ) stop( 'waited two minutes after extract created, still no download' )
