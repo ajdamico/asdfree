@@ -216,9 +216,6 @@ SIPP.core.sas <-
 	
 SIPP.replicate.sas <-
 	"http://thedataweb.rm.census.gov/pub/sipp/2008/rw08wx.sas"
-	
-SIPP.longitudinal.sas <-
-	"http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w7.sas"
 
 SIPP.longitudinal.replicate.sas <-
 	"http://thedataweb.rm.census.gov/pub/sipp/2008/lrw08_xx.sas"
