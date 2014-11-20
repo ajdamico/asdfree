@@ -144,6 +144,73 @@ chop.suid <-
 ##################################################################################
 
 
+###################################################################################
+# function to fix sas input scripts where repwgt values are collapsed into one line
+# (the SAScii function cannot currently handle this SAS configuration on its own)
+fix.repwgt <-
+	function( sasfile ){
+		sas_lines <- readLines( sasfile )
+
+		# identify the line containing REPWGT
+		rep.position <- grep( "REPWGT" , sas_lines )
+		
+		# look at the line directly above it..
+		line.above <- strsplit( sas_lines[ rep.position - 1 ] , "-" )[[1]]
+		
+		# ..and figure out what position it ends at
+		end.position <- as.numeric( line.above[ length( line.above ) ] )
+		
+		# start with a line containing ()
+		j <- sas_lines[ rep.position ]
+
+		# courtesy of this discussion on stackoverflow.com
+		# http://stackoverflow.com/questions/8613237/extract-info-inside-all-parenthesis-in-r-regex
+		# break it into two strings without the ()
+		k <- gsub( 
+				"[\\(\\)]", 
+				"" , 
+				regmatches(
+					j , 
+					gregexpr( 
+						"\\(.*?\\)" , 
+						j
+					)
+				)[[1]]
+			)
+
+		# number of repweights
+		l <- as.numeric( gsub( "REPWGT1-REPWGT" , "" , k )[1] )
+
+		# length of repweights (assumes no decimals!)
+		m <- as.numeric( k[2] )
+
+		# these should start at the end position (determined above) plus one
+		start.vec <- ( end.position + 1 ) + ( m * 0:( l - 1 ) )
+		end.vec <- ( end.position ) + ( m * 1:l )
+		
+		
+		# vector of all repweight lines
+		repwgt.lines <-
+			paste0( "REPWGT" , 1:l , " " , start.vec , "-" , end.vec )
+
+		# collapse them all together into one string
+		repwgt.line <- paste( repwgt.lines , collapse = " " )
+
+		# finally replace the old line with the new line in the sas input script
+		sas_lines <- gsub( j , repwgt.line , sas_lines , fixed = TRUE )
+		
+		# create a temporary file
+		tf <- tempfile()
+		
+		# write the updated sas input file to the temporary file
+		writeLines( sas_lines , tf )
+
+		# return the filepath to the temporary file containing the updated sas input script
+		tf
+	}
+##################################################################################
+
+
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
 source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
 
@@ -321,8 +388,8 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 	# add each longitudinal replicate weight file to the database in a table cy1-3 or pnl1-3
 	read.SAScii.sqlite (
 			SIPP.lrw ,
-			chop.suid( fix.ct( SIPP.longitudinal.replicate.sas ) ) ,
-			beginline = 5 ,
+			fix.repwgt( SIPP.longitudinal.replicate.sas ) ,
+			beginline = 7 ,
 			zipped = T ,
 			tl = TRUE ,
 			tablename = i ,
