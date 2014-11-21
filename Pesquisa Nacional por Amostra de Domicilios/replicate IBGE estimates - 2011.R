@@ -5,6 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PNAD/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/replicate%20IBGE%20estimates%20-%202011.R" , prompt = FALSE , echo = TRUE )
@@ -52,6 +53,18 @@
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/PNAD/" )
 # ..in order to set your current working directory
+
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# ibge's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
+
 
 # name the database (.db) file that should have been saved in the working directory
 pnad.dbname <- "pnad.db"
