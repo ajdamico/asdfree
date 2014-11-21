@@ -5,6 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PNAD/" )
 # years.to.download <- c( 2001:2009 , 2011:2013 )
@@ -42,6 +43,16 @@
 # setwd( "C:/My Directory/PNAD/" )
 # ..in order to set your current working directory
 
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
 
 
 # remove the # in order to run this install.packages line only once
@@ -186,19 +197,19 @@ for ( year in years.to.download ){
 		}
 	
 	}
-		
-	# convert the character vector containing the filepaths where all data and import instructions are stored to lowercase
-	files <- tolower( files )
+
+	# manually set the encoding of the unziped files so they don't break things.
+	Encoding( files ) <- 'UTF-8'
 	
 	# remove the UF column and the mistake with "LOCAL ÚLTIMO FURTO"
 	# described in the remove.uf() function that was loaded with source_url as pnad.survey.R
-	dom.sas <- remove.uf( files[ grepl( paste0( 'input[^?]dom' , year , '.txt' ) , files ) ] )
-	pes.sas <- remove.uf( files[ grepl( paste0( 'input[^?]pes' , year , '.txt' ) , files ) ] )
+	dom.sas <- remove.uf( files[ grepl( paste0( 'input[^?]dom' , year , '.txt' ) , tolower( files ) ) ] )
+	pes.sas <- remove.uf( files[ grepl( paste0( 'input[^?]pes' , year , '.txt' ) , tolower( files ) ) ] )
 
 	# since `files` contains multiple file paths,
 	# determine the filepath on the local disk to the household (dom) and person (pes) files
-	dom.fn <- files[ grepl( paste0( 'dados/dom' , year ) , files ) ]
-	pes.fn <- files[ grepl( paste0( 'dados/pes' , year ) , files ) ]
+	dom.fn <- files[ grepl( paste0( 'dados/dom' , year ) , tolower( files ) ) ]
+	pes.fn <- files[ grepl( paste0( 'dados/pes' , year ) , tolower( files ) ) ]
 
 	# store the PNAD household records as a SQLite database
 	read.SAScii.sqlite ( 
@@ -231,7 +242,7 @@ for ( year in years.to.download ){
 	# this section loops through the non-response values & variables for all years
 	# and sets those variables to NULL.
 	cat( 'non-response variable blanking-out only occurs on numeric variables\n' )
-	cat( 'categorical variable blanks are usually 9 in the psid\n' )
+	cat( 'categorical variable blanks are usually 9 in the pnad\n' )
 	cat( 'thanks for listening\n' )
 	
 	# loop through each row in the missing household-level  codes table
