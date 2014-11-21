@@ -235,8 +235,10 @@ for ( year in years.to.download ){
 
 	# the ASCII and SAS importation instructions stored in temporary files
 	# on the local disk are no longer necessary, so delete them.
-	file.remove( files )
-
+	attempt.one <- try( file.remove( files ) , silent = TRUE )
+	# weird brazilian file encoding operates differently on mac+*nix versus windows, so try both ways.
+	if( class( attempt.one ) == 'try-error' ) { Encoding( files ) <- '' ; file.remove( files ) }
+	
 	
 	# missing level blank-outs #
 	# this section loops through the non-response values & variables for all years
