@@ -142,7 +142,9 @@ versid.links <- all.links[ grepl( 'versid' , all.links ) ]
 # so you only maintain the version ids
 versids <- gsub( 'files2.php?versid=' , '' , versid.links , fixed = TRUE )
 
-
+# create a temporary file
+tf <- tempfile()
+		
 # loop through all version ids
 for ( vid in versids ){
 
@@ -151,40 +153,56 @@ for ( vid in versids ){
 	# read the current version id's html page
 	dls <- GET( download.page )
 
-	#############################################################################
-	# figure out if there's a 'distribution set' available on the download page #
+	# figure out if the table is NA (which has a specific length)
+	if( dls$headers$`content-length` == 7692 ){
 	
-	# parse through the HTML code to find a specific character string
-	pagetree <- htmlTreeParse( dls , useInternalNodes = TRUE )
-	table.rows <- xpathSApply( pagetree , "//*/tr" , xmlValue )
-	which.table <- grep( 'distribution set' , tolower( table.rows ) )
+		# store the content to a temporary file..
+		writeBin( dls$content , tf )
+		
+		# extract the download numbers
+		dln <- strsplit( paste( readLines( tf ) , collapse = "" ) , "filedownload2\\.php\\?d=" )[[1]][-1]
+		
+		# remove the tails.. that's the distribution set numbers.
+		ds <- unlist( sapply( strsplit( dln , '\\"' ) , '[[' , 1 ) ) 
 	
-	fne <- NULL
-	
-	# if there is a distribution set
-	if ( length( which.table ) > 0 ){
+	} else {
 		
-		# find the filename #
+		#############################################################################
+		# figure out if there's a 'distribution set' available on the download page #
 		
-		# isolate the first non-empty string
-		table.contents <- strsplit( table.rows[ which.table ] , " " )[[1]]
-		fne <- table.contents[ table.contents != "" ][ 1 ]
+		# parse through the HTML code to find a specific character string
+		pagetree <- htmlTreeParse( dls , useInternalNodes = TRUE )
+		table.rows <- xpathSApply( pagetree , "//*/tr" , xmlValue )
+		which.table <- grep( 'distribution set' , tolower( table.rows ) )
 		
+		fne <- NULL
+		
+		# if there is a distribution set
+		if ( length( which.table ) > 0 ){
+			
+			# find the filename #
+			
+			# isolate the first non-empty string
+			table.contents <- strsplit( table.rows[ which.table ] , " " )[[1]]
+			fne <- table.contents[ table.contents != "" ][ 1 ]
+			
+		}
+		
+		# extract all `href` html links
+		h2 = getLinks()
+		htmlTreeParse( dls , handlers = h2 )
+
+		# save all files to download into a new object containing all character strings..
+		ftd <- h2$links()
+		# ..and immediately limit it to only strings containing `filedownload2`
+		ftd.links <- ftd[ grepl( 'filedownload2' , ftd ) ]
+
+		# remove 'filedownload2.php?d=' from each string,
+		# so you only maintain the download id
+		ds <- gsub( 'filedownload2.php?d=' , '' , ftd.links , fixed = TRUE )
+
 	}
-	
-	# extract all `href` html links
-	h2 = getLinks()
-	htmlTreeParse( dls , handlers = h2 )
-
-	# save all files to download into a new object containing all character strings..
-	ftd <- h2$links()
-	# ..and immediately limit it to only strings containing `filedownload2`
-	ftd.links <- ftd[ grepl( 'filedownload2' , ftd ) ]
-
-	# remove 'filedownload2.php?d=' from each string,
-	# so you only maintain the download id
-	ds <- gsub( 'filedownload2.php?d=' , '' , ftd.links , fixed = TRUE )
-	
+		
 	# loop through all files to download
 	for ( did in ds ){
 	
