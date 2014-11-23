@@ -190,8 +190,39 @@ for ( i in seq( length( wave ) ) ){
 		if ( length( stata.file ) > 1 ) stop( "should only be one dta per zip" )
 		
 		# read the stata file into an R data.frame
-		x <- read.dta( stata.file , convert.factors = FALSE )
+		stata.success <- try( x <- read.dta( stata.file , convert.factors = FALSE ) , silent = TRUE )
 
+		# if the stata file cannot be imported..
+		if( class( stata.success ) == 'try-error' ){
+
+			# design the full filepath of the stata data set to download
+			fp <- paste0( "http://www.icpsr.umich.edu/cgi-bin/bob/zipcart2?path=ICPSR&study=21600&bundle=spss&ds=" , ds , "&dups=yes" )
+		
+			# download the current stata file into working memory
+			file <- getBinaryURL( fp , curl = curl )
+
+			# save the current downloaded file to the temporary file on the hard disk
+			writeBin( file , tf )
+
+			# unzip that file..
+			all.files <- unzip( tf )
+			
+			# find the `.sav` within the zip
+			spss.file <- all.files[ grep( ".sav" , all.files , fixed = TRUE ) ]
+
+			# double-check that there's only one `.sav`
+			if ( length( spss.file ) > 1 ) stop( "should only be one sav per zip" )
+			
+			# read the spss file into an R data.frame
+			x <- 
+				read.spss( 
+					spss.file , 
+					to.data.frame = TRUE , 
+					use.value.labels = FALSE 
+				)
+		
+		}
+		
 		# convert all column names to lowercase
 		names( x ) <- tolower( names( x ) )
 		
