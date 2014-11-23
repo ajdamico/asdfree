@@ -154,7 +154,7 @@ for ( vid in versids ){
 	dls <- GET( download.page )
 
 	# figure out if the table is NA (which has a specific length)
-	if( dls$headers$`content-length` == 7692 ){
+	if( !is.null( dls$headers$`content-length`) && dls$headers$`content-length` == 7692 ){
 	
 		# store the content to a temporary file..
 		writeBin( dls$content , tf )
