@@ -15,7 +15,7 @@
 # # # # # # # # # # # # # # #
 
 # this r script will replicate the massive table in the folder "Programs 2011\SAS\2011 Integrated Mean and SE.lst" inside the bls documentation
-# ftp://ftp.bls.gov/pub/special.requests/ce/pumd/documentation/documentation11.zip
+# http://www.bls.gov/cex/pumd/documentation/documentation11.zip
 
 
 # if you have never used the r language before,
@@ -39,7 +39,7 @@
 # prior to running this replication script, all ces 2011 public use microdata files must be loaded as R data      #
 # files (.rda) on the local machine. running the "2010-2011 ces - download.R" script will create these files.     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Consumer%20Expenditure%20Survey/2010-2011%20ces%20-%20download.R  #
+# https://github.com/ajdamico/usgsd/blob/master/Consumer%20Expenditure%20Survey/download%20all%20microdata.R      #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/CES/2011/ (or the working directory was chosen) #
 ###################################################################################################################
