@@ -165,6 +165,8 @@ for ( vid in versids ){
 		# remove the tails.. that's the distribution set numbers.
 		ds <- unlist( sapply( strsplit( dln , '\\"' ) , '[[' , 1 ) ) 
 	
+		fne <- NULL
+		
 	} else {
 		
 		#############################################################################
