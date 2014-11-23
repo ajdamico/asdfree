@@ -160,7 +160,7 @@ for ( vid in versids ){
 		writeBin( dls$content , tf )
 		
 		# extract the download numbers
-		dln <- strsplit( paste( readLines( tf ) , collapse = "" ) , "filedownload2\\.php\\?d=" )[[1]][-1]
+		dln <- strsplit( paste( readLines( tf , encoding = 'UTF-8' ) , collapse = "" ) , "filedownload2\\.php\\?d=" )[[1]][-1]
 		
 		# remove the tails.. that's the distribution set numbers.
 		ds <- unlist( sapply( strsplit( dln , '\\"' ) , '[[' , 1 ) ) 
