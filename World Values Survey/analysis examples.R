@@ -78,7 +78,7 @@ library(foreign) 	# load foreign package (converts data files into R)
 # since the download script has already run
 
 # load the united states wave six (2011) data.frame object
-load( "./wave 6/United States 2011/WV6_Data_United_States_2011_spss_v_2014_04_28.rda" )
+load( "./wave 6/United States 2011/WV6_Data_United_States_2011_spss_v_2014_11-07.rda" )
 
 # display the number of rows in the wave six data set
 nrow( x )
