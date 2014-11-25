@@ -164,7 +164,7 @@ for ( i in rev( seq( nrow( studies.by.year ) ) ) ){
 	resp <- GET(download, query = values)
 
 	# if the above GET() only logged in but did not download the file
-	if ( length( resp ) == 8 ){
+	if ( length( resp ) == 9 ){
 
 		# actually download the file (this will take a while)
 		resp <- GET(download, query = values)
