@@ -97,7 +97,7 @@ KeepVars <-
 		
 		"cigtry" , 		# age when first smoked a cigarette
 
-		"pden" ,		# population density variable
+		"pden00" ,		# population density variable
 		
 		"health"		# self-reported health status
 	)
@@ -278,7 +278,7 @@ svyby(
 y.city <-
 	subset(
 		y ,
-		pden == 1
+		pden00 == 1
 	)
 # now any of the above commands can be re-run
 # using the y.city object
