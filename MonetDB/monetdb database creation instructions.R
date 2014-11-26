@@ -67,7 +67,7 @@ batfile
 # you will need to note the location of the batfile for future MonetDB analyses!
 
 # in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/MonetDB/test.bat"
+# batfile <- "C:/My Directory/MonetDB/test.bat"		# # note for mac and *nix users: `test.bat` might be `test.sh` instead
 # obviously, without the `#` comment character
 
 # hold on to that line for future scripts.
@@ -92,7 +92,7 @@ dbport <- 50000
 # lines of code to hold on to for all other `test` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/MonetDB/test.bat"
+batfile <- "C:/My Directory/MonetDB/test.bat"		# # note for mac and *nix users: `test.bat` might be `test.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

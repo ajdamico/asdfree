@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
-# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
+# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"		# # note for mac and *nix users: `acs.bat` might be `acs.sh` instead
 # load( 'C:/My Directory/ACS/acs2011_1yr.rda' )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/replicate%20census%20estimates%20-%202011.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -81,7 +81,7 @@ library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"
+# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"		# # note for mac and *nix users: `acs.bat` might be `acs.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

@@ -20,7 +20,7 @@ library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 # lines of code to hold on to for all other `test` monetdb analyses #
 
 # first: specify your batfile.  again, mine looks like this:
-batfile <- "C:/My Directory/MonetDB/test.bat"
+batfile <- "C:/My Directory/MonetDB/test.bat"		# # note for mac and *nix users: `test.bat` might be `test.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

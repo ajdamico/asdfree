@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
-# batfile <- "C:/My Directory/HMDA/MonetDB/hmda.bat"
+# batfile <- "C:/My Directory/HMDA/MonetDB/hmda.bat"		# # note for mac and *nix users: `hmda.bat` might be `hmda.sh` instead
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/replicate%20ffiec%20publications.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -77,7 +77,7 @@ library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/HMDA/MonetDB/hmda.bat"
+# batfile <- "C:/My Directory/HMDA/MonetDB/hmda.bat"		# # note for mac and *nix users: `hmda.bat` might be `hmda.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

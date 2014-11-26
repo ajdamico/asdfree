@@ -149,7 +149,7 @@ batfile
 # you will need to note the location of the batfile for future MonetDB analyses!
 
 # in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"
+# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"		# # note for mac and *nix users: `seer.bat` might be `seer.sh` instead
 # obviously, without the `#` comment character
 
 # hold on to that line for future scripts.
@@ -176,7 +176,7 @@ dbport <- 50008
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"
+# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"		# # note for mac and *nix users: `seer.bat` might be `seer.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -369,7 +369,7 @@ monetdb.server.stop( pid )
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"
+# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"		# # note for mac and *nix users: `seer.bat` might be `seer.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

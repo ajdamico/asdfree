@@ -180,7 +180,7 @@ batfile
 # you will need to note the location of the batfile for future MonetDB analyses!
 
 # in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"
+# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 # obviously, without the `#` comment character
 
 # hold on to that line for future scripts.
@@ -207,7 +207,7 @@ dbport <- 50012
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"
+# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -1004,7 +1004,7 @@ Sys.sleep( 10 )
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"
+# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

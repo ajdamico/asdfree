@@ -299,7 +299,7 @@ options( survey.lonely.psu = "remove" )
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"
+# batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"		# # note for mac and *nix users: `censo_demografico.bat` might be `censo_demografico.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"
+# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Vital%20Statistics%20System/replicate%20age-adjusted%20death%20rate.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -80,7 +80,7 @@ library(sqldf)		# load the sqldf package (enables sql queries on data frames)
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"
+# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )

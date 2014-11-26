@@ -8,7 +8,7 @@
 # options( "monetdb.sequential" = TRUE )
 # library(downloader)
 # setwd( "C:/My Directory/NVSS/" )
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"
+# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Vital%20Statistics%20System/replicate%20cdc%20tabulations.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -85,7 +85,7 @@ library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"
+# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
