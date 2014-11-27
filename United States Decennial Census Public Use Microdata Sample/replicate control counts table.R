@@ -6,7 +6,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"		# # note for mac and *nix users: `pums.bat` might be `pums.sh` instead
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/replicate%20control%20counts%20table.R" , prompt = FALSE , echo = TRUE )
@@ -43,7 +43,7 @@
 # to large amounts of ram will often benefit from
 # the following option, available as of MonetDB.R 0.9.2 --
 # remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # -- whenever connecting to a monetdb server,
 # this option triggers sequential server processing
 # in other words: single-threading.

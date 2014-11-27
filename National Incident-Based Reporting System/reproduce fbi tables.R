@@ -5,7 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # batfile <- "C:/My Directory/NIBRS/MonetDB/nibrs.bat"		# # note for mac and *nix users: `nibrs.bat` might be `nibrs.sh` instead
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Incident-Based%20Reporting%20System/reproduce%20fbi%20tables.R" , prompt = FALSE , echo = TRUE )
@@ -71,7 +71,7 @@
 # to large amounts of ram will often benefit from
 # the following option, available as of MonetDB.R 0.9.2 --
 # remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # -- whenever connecting to a monetdb server,
 # this option triggers sequential server processing
 # in other words: single-threading.

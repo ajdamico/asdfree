@@ -10,7 +10,7 @@
 # setwd( "C:/My Directory/NIBRS/" )
 # your.username <- 'your@login.com'
 # your.password <- 'yourpassword'
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # rm( studies.to.download ) # or pick a few # studies.to.download <- c( "2012 Extract Files" , "2004" , "2009 Uniform Crime Reporting" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Incident-Based%20Reporting%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -77,7 +77,7 @@
 # to large amounts of ram will often benefit from
 # the following option, available as of MonetDB.R 0.9.2 --
 # remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # -- whenever connecting to a monetdb server,
 # this option triggers sequential server processing
 # in other words: single-threading.

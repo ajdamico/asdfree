@@ -48,7 +48,7 @@
 # to large amounts of ram will often benefit from
 # the following option, available as of MonetDB.R 0.9.2 --
 # remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # -- whenever connecting to a monetdb server,
 # this option triggers sequential server processing
 # in other words: single-threading.
