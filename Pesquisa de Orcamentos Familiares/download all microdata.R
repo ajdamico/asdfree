@@ -9,7 +9,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/POF/" )
 # years.to.download <- c( 2009 , 2003 )
-# path.to.7z <- normalizePath( "C:/Program Files/7-zip/7z.exe" )		# # this is probably the correct line for windows
+# path.to.7z <- normalizePath( "C:/Program Files (x86)/7-zip/7z.exe" )		# # this is probably the correct line for windows
 # path.to.7z <- "7za"													# # this is probably the correct line for macintosh and *nix
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20de%20Orcamentos%20Familiares/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -41,7 +41,7 @@
 # prior to running this script, you must have the program 7-zip installed on your computer. it's a free. go to http://www.7-zip.org/download.html   #
 # this code has only been tested in a microsoft windows environment, tell us what modifications are needed for other operating systems! cool thanx  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# path.to.7z <- normalizePath( "C:/Program Files/7-zip/7z.exe" )		# # this is probably the correct line for windows
+# path.to.7z <- normalizePath( "C:/Program Files (x86)/7-zip/7z.exe" )		# # this is probably the correct line for windows
 # path.to.7z <- "7za"													# # this is probably the correct line for macintosh and *nix
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # the line above sets the location of the 7-zip program on your local computer. uncomment it by removing the `#` and change the directory if ya did #
