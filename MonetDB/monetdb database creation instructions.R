@@ -17,6 +17,9 @@
 library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 
 
+# set your working directory
+# setwd( "C:/My Directory/" )
+
 
 # configure a test monetdb database on windows #
 
@@ -29,7 +32,7 @@ batfile <-
 	monetdb.server.setup(
 					
 					# set the path to the directory where the initialization batch file and all data will be stored
-					database.directory = "C:/My Directory/MonetDB" ,
+					database.directory = paste0( getwd() , "/MonetDB" ) ,
 					# must be empty or not exist
 
 					# find the main path to the monetdb installation program
