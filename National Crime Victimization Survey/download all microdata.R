@@ -230,7 +230,7 @@ for ( i in numbers.to.download ){
 			paste0(
 				"terms2\\?study=" ,
 				study.numbers[ i ] ,
-				"&amp;ds=[0-9]&amp;bundle=ascsas&amp;path=NACJD"
+				"&ds=[0-9]&bundle=ascsas&path=NACJD"
 			) , 
 			study.homepage 
 		)
@@ -341,7 +341,7 @@ for ( i in numbers.to.download ){
 			beginline <- 1
 			
 			# ..but hardcode the beginline for a few scripts
-			if ( j == "terms2?study=4429&amp;ds=1&amp;bundle=ascsas&amp;path=NACJD" & study.names[ i ] == "2005 School Crime Supplement" ) beginline <- 794
+			if ( j == "terms2?study=4429&ds=1&bundle=ascsas&path=NACJD" & study.names[ i ] == "2005 School Crime Supplement" ) beginline <- 794
 			# end of hardcoding
 			
 			# read the data file into an r sqlite database
