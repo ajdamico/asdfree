@@ -123,6 +123,9 @@ for ( year in years.to.download ){
 	# into the temporary directory
 	z <- unzip( local.zip , exdir = td )
 
+	# manually set the encoding of the unziped files so they don't break things.
+	Encoding( z ) <- 'latin1'
+
 	# does the zipped file contain any more zipped files?
 	other.zips <- z[ grep( '\\.zip$' , tolower( z ) ) ]
 	
@@ -181,6 +184,8 @@ for ( year in years.to.download ){
 	# confirm each sas file matches a text file and vice versa
 	stopifnot ( all( gsub( "\\.txt$" , "" , tolower( basename( text.files ) ) ) %in% gsub( "i[m|n]put_sas_(.*)\\.sas$" , "\\1" , tolower( basename( sas.files ) ) ) ) ) 
 
+	Encoding( sas.files ) <- ''
+	
 	# loop through each available sas importation file..
 	for ( i in sas.files ){
 		
