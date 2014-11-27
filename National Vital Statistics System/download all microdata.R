@@ -5,6 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( encoding = "windows-1252" )			# # only macintosh and *nix users need this line
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NVSS/" )
@@ -13,7 +14,8 @@
 # cohortlinked.sets.to.download <- 2007:1995
 # mortality.sets.to.download <- 2010:2000
 # fetaldeath.sets.to.download <- 2012:2005
-# path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )
+# path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )		# # this is probably the correct line for windows
+# path.to.winrar <- "/usr/bin/rar/rar"											# # this is probably the correct line for macintosh and *nix
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Vital%20Statistics%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -46,7 +48,8 @@
 # prior to running this script you must have the program winrar installed on your computer. it's a free. go to http://www.win-rar.com/download.html #
 # this code has only been tested in a microsoft windows environment, tell us what modifications are needed for other operating systems! cool thanx  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )
+# path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )		# # this is probably the correct line for windows
+# path.to.winrar <- "/usr/bin/rar/rar"											# # this is probably the correct line for macintosh and *nix
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # the line above sets the location of the winrar program on your local computer. uncomment it by removing the `#`                                   #
 #####################################################################################################################################################
@@ -129,6 +132,17 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Vital%20Sta
 
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/NVSS/" )
+
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
 
 
 # configure a monetdb database for the nvss on windows #
