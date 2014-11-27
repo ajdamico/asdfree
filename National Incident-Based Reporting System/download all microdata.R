@@ -378,23 +378,23 @@ for ( i in numbers.to.download ){
 	
 	# isolate all of the sas read-in files
 	all.sas_ri <- regmatches( study.homepage , m )[[1]]
-			
-	# initiate a curl handle so the remote server knows it's you.
-	curl = getCurlHandle()
-
-	# set a cookie file on the local disk
-	curlSetOpt(
-		cookiejar = 'cookies.txt' , 
-		followlocation = TRUE , 
-		autoreferer = TRUE , 
-		curl = curl
-	)
 	
 	# confirm there's at least one sas file to download?
 	if ( length( all.sas_ri ) == 0 ) stop( "current study doesn't have any data?" )
 	
 	# loop through all files that need to be downloaded
 	for ( j in all.sas_ri ){
+	
+		# initiate a curl handle so the remote server knows it's you.
+		curl = getCurlHandle()
+
+		# set a cookie file on the local disk
+		curlSetOpt(
+			cookiejar = 'cookies.txt' , 
+			followlocation = TRUE , 
+			autoreferer = TRUE , 
+			curl = curl
+		)
 	
 		# list out the filepath on the server of the file-to-download
 		dp <- paste0( "http://www.icpsr.umich.edu/cgi-bin/bob/" , j )
