@@ -5,6 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/SSAPUMF/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Social%20Security%20Administration%20Public-Use%20Microdata%20Files/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
@@ -37,6 +38,18 @@
 # use forward slashes instead of back slashes
 
 # setwd( "C:/My Directory/SSAPUMF/" )
+
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
+
 
 # initiate two temporary files and a temporary directory
 tf <- tempfile() ; tf2 <- tempfile() ; td <- tempdir()
