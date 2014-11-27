@@ -273,8 +273,11 @@ download.nchs <-
 			
 			# actually run winrar on the downloaded file,
 			# extracting the results to the temporary directory
-			shell( paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , winrar.dir ) )
 			
+			# extract the file, platform-specific
+			dos.command <- paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , winrar.dir )
+			if ( .Platform$OS.type != 'windows' ) system( dos.command ) else shell( dos.command )
+
 			suppressWarnings( while( any( file.remove( tf ) ) ) Sys.sleep( 1 ) )
 			
 			z <- tolower( list.files( winrar.dir , full.names = TRUE ) )
