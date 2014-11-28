@@ -275,12 +275,18 @@ download.nchs <-
 			# extracting the results to the temporary directory
 			
 			# extract the file, platform-specific
-			dos.command <- paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , winrar.dir )
-			if ( .Platform$OS.type != 'windows' ) system( dos.command ) else shell( dos.command )
+			
+			if ( .Platform$OS.type == 'windows' ){
+				dos.command <- paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , winrar.dir )
+				shell( dos.command ) 
+			else {
+				sys.command <- paste( "unzip" , tf , "-d" , winrar.dir )
+				system( paste( "unzip" , tf ) )
+			}
 
 			suppressWarnings( while( any( file.remove( tf ) ) ) Sys.sleep( 1 ) )
 			
-			z <- tolower( list.files( winrar.dir , full.names = TRUE ) )
+			z <- list.files( winrar.dir , full.names = TRUE )
 			
 			if ( y$name %in% c( 'mortality' , 'natality' , 'fetaldeath' ) ){
 				
@@ -317,11 +323,11 @@ download.nchs <-
 				# some years don't have unlinked, so this test is not necessary
 				# stopifnot( any( un <- grepl( 'un' , z ) ) )
 				
-				stopifnot( any( num <- grepl( 'num' , z ) ) )
+				stopifnot( any( num <- grepl( 'num' , tolower( z ) ) ) )
 				
-				stopifnot( any( den <- grepl( 'den' , z ) ) )
+				stopifnot( any( den <- grepl( 'den' , tolower( z ) ) ) )
 			
-				if ( any( un <- grepl( 'un' , z ) ) ){
+				if ( any( un <- grepl( 'un' , tolower( z ) ) ) ){
 				
 					file.copy( z[ un ] , paste( "." , y$name , ifelse( i %in% y$us , "us" , "ps" ) , paste0( "unl" , curYear , ".dat" ) , sep = "/" ) )
 				
