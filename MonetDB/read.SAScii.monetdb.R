@@ -74,10 +74,11 @@ read.SAScii.monetdb <-
 	
 	# read.SAScii.monetdb depends on the SAScii package and the descr package
 	# to install these packages, use the line:
-	# install.packages( c( 'SAScii' , 'descr' , 'downloader' ) )
+	# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'R.utils' ) )
 	library(SAScii)
 	library(descr)
 	library(downloader)
+	library(R.utils)
 	
 	if ( !exists( "download.cache" ) ){
 		# load the download.cache and related functions
@@ -185,7 +186,7 @@ read.SAScii.monetdb <-
 	on.exit( { file.remove( tf2 ) } )
 	
 	# ..and that's the number of lines in the file
-	num.lines <- length(readLines(tf2))
+	num.lines <- countLines( tf2 )
 	
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..

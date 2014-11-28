@@ -93,12 +93,10 @@
 # # # # # # # # #
 
 
-
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-
 
 
 # load the download.cache and related functions

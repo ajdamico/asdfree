@@ -86,14 +86,14 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "descr" , "MonetDB.R" ) )
+# install.packages( c( "SAScii" , "descr" , "MonetDB.R" , "R.utils" ) )
 
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(downloader)		# downloads and then runs the source() function on scripts from github
-
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 # load the `read.SAScii.monetdb` function from my github account.
 source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )

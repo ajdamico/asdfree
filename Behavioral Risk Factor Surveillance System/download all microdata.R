@@ -79,11 +79,12 @@
 # it's running.  don't believe me?  check the working directory (set below) for a new r data file (.rda) every few hours.
 
 
-
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(foreign) 		# load foreign package (converts data files into R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+
 
 # set your BRFSS data directory
 # after downloading and importing

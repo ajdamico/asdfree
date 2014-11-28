@@ -75,7 +75,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RCurl" , "downloader" ) )
+# install.packages( c( "RCurl" , "downloader" , "R.utils" ) )
 
 
 # even if you're only downloading a single year of data and you've got a fast internet connection,
@@ -84,10 +84,12 @@
 # depending on your internet and processor speeds, the entire script should take between two and ten days.
 # it's running.  don't believe me?  check the working directory (set below) for a new r data file (.rda) every few hours.
 
+
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(RCurl)			# load RCurl package (downloads https files)
 library(downloader)		# downloads and then runs the source() function on scripts from github
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 
 # set your censo demografico data directory
