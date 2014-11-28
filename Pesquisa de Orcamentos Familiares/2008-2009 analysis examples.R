@@ -4,6 +4,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# options( encoding = "latin1" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/POF/2009/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20de%20Orcamentos%20Familiares/2008-2009%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
@@ -40,6 +41,18 @@
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/POF/2009/" )
 # ..in order to set your current working directory
+
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# ibge's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="latin1" )
+# ..to turn on latin-style encoding.
+# # # end of non-windows system edits.
+
 
 # remove the `#` in order to run this install.packages line only once
 # install.packages( "survey" )

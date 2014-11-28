@@ -387,13 +387,13 @@ for ( year in years.to.download ){
 		names( x ) <- tolower( names( x ) )
 		
 		# rename the data table appropriately
-		assign( dfn , x )
+		assign( tolower( dfn ) , x )
 		
 		# save the current data.frame
 		# to the appropriate year folder
 		# within the current working directory
 		save( 
-			list = dfn , 
+			list = tolower( dfn ) , 
 			file = tolower( paste0( './' , year , "/" , dfn , ".rda" ) )
 		)
 
