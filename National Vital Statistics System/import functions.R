@@ -281,7 +281,7 @@ download.nchs <-
 				shell( dos.command ) 
 			} else {
 				sys.command <- paste( "unzip" , tf , "-d" , winrar.dir )
-				system( paste( "unzip" , tf ) )
+				system( sys.command )
 			}
 
 			suppressWarnings( while( any( file.remove( tf ) ) ) Sys.sleep( 1 ) )
