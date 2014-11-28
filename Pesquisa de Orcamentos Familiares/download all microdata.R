@@ -336,7 +336,7 @@ for ( year in years.to.download ){
 		if ( dfn == 't_rendimentos' ) {
 			data.file <- files[ which( 't_rendimentos1' == tolower( all.file.basenames ) ) ] 
 		} else {
-			data.file <- files[ which( dfn == all.file.basenames ) ]
+			data.file <- files[ which( tolower( dfn ) == tolower( all.file.basenames ) ) ]
 		}
 	
 	
@@ -372,7 +372,7 @@ for ( year in years.to.download ){
 		}
 		
 		# figure out which beginline position to use
-		cur.beginline <- which( dfn == data.files.to.import )
+		cur.beginline <- which( tolower( dfn ) == tolower( data.files.to.import ) )
 		
 		# import the data file into R
 		x <- 
