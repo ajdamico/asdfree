@@ -444,7 +444,7 @@ for ( i in numbers.to.download ){
 		writeBin( this.sas_ri , paste0( this.dir , "/" , lfn ) )
 	
 		# remove the downloaded file from working memory
-		rm( this.sas_ri )
+		rm( this.sas_ri , curl , h )
 		
 		# clear up RAM
 		gc()
