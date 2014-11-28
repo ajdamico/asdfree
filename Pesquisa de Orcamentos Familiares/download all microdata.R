@@ -333,7 +333,7 @@ for ( year in years.to.download ){
 	for ( dfn in data.files.to.import ){
 
 		# identify which .7z file contains the data	
-		if ( dfn == 't_rendimentos' ) {
+		if ( tolower( dfn ) == 't_rendimentos' ) {
 			data.file <- files[ which( 't_rendimentos1' == tolower( all.file.basenames ) ) ] 
 		} else {
 			data.file <- files[ which( tolower( dfn ) == tolower( all.file.basenames ) ) ]
