@@ -279,7 +279,7 @@ download.nchs <-
 			if ( .Platform$OS.type == 'windows' ){
 				dos.command <- paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , winrar.dir )
 				shell( dos.command ) 
-			else {
+			} else {
 				sys.command <- paste( "unzip" , tf , "-d" , winrar.dir )
 				system( paste( "unzip" , tf ) )
 			}
