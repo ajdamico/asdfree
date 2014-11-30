@@ -425,12 +425,12 @@ for ( year in 2050:2005 ){
 				# extract the file, platform-specific
 				if ( .Platform$OS.type == 'windows' ){
 
-					fn <- unzip( tf , exdir = tempdir() , overwrite = T )
+					fn <- unzip( tf , exdir = tempdir() , overwrite = TRUE )
 
 				} else {
 				
 					# build the string to send to the terminal on non-windows systems
-					dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -o"' , tempdir() , '"' )
+					dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -aoa -o"' , tempdir() , '"' )
 
 					system( dos.command )
 
