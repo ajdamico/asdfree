@@ -7,6 +7,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
+# path.to.7z <- "7za"							# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/ACS/" )
 # single.year.datasets.to.download <- 2005:2013
@@ -38,6 +39,17 @@
 # import each file into a monet database, merge the person and household files      #
 # create a monet database-backed complex sample sqlsurvey design object with r      #
 #####################################################################################
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################################
+# macintosh and *nix users need 7za installed:  http://superuser.com/questions/548349/how-can-i-install-7zip-so-i-can-run-it-from-terminal-on-os-x  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# path.to.7z <- "7za"														# # this is probably the correct line for macintosh and *nix
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# the line above sets the location of the 7-zip program on your local computer. uncomment it by removing the `#` and change the directory if ya did #
+#####################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # # # # # # # # # # # # # # #
@@ -259,8 +271,8 @@ monetdb.server.stop( pid )
 ##################################
 
 						
-#create a temporary file and a temporary directory..
-tf <- tempfile() ; td <- tempdir()
+#create a temporary file..
+tf <- tempfile()
 
 # loop through each possible acs year
 for ( year in 2050:2005 ){
@@ -330,7 +342,7 @@ for ( year in 2050:2005 ){
 				download.command <- download.cache( sas.file.location , tf , mode = "wb" )
 
 				# unzip to a local directory
-				wy <- unzip( tf , exdir = td )
+				wy <- unzip( tf , exdir = tempdir() )
 				
 				wyoming.table <- read.sas7bdat( wy[ grep( 'sas7bdat' , wy ) ] )
 				
@@ -409,8 +421,24 @@ for ( year in 2050:2005 ){
 				# once the download has completed..
 				
 				# unzip the file's contents to the temporary directory
-				fn <- unzip( tf , exdir = td , overwrite = T )
+				# extract the file, platform-specific
+				if ( .Platform$OS.type == 'windows' ){
+
+					fn <- unzip( tf , exdir = tempdir() , overwrite = T )
+
+				} else {
+
+					# clear out the temporary directory
+					unlink( tempdir() , recursive = TRUE )
 				
+					# build the string to send to the terminal on non-windows systems
+					dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -o"' , tempdir() , '"' )
+
+					system( dos.command )
+
+					fn <- list.files( tempdir() , full.names = TRUE )
+
+				}
 				
 				# delete all the files that do not include the text 'csv' in their filename
 				file.remove( fn[ !grepl( 'csv' , fn ) ] )
