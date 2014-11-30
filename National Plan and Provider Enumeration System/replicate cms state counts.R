@@ -5,6 +5,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
+# options( encoding = "windows-1252" )			# # only macintosh and *nix users need this line
 # library(downloader)
 # batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `./nppes.sh` instead
 # source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/replicate%20cms%20state%20counts.R" , prompt = FALSE , echo = TRUE )
@@ -59,6 +60,17 @@
 # https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/download%20and%20import.R  #                                        #
 ###################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
 
 
 # # # # # # # # # # # # # # #
