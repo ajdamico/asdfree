@@ -6,7 +6,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `nppes.sh` instead
+# batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `./nppes.sh` instead
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/merge%20taxonomy%20ids.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -199,7 +199,7 @@ head( w ) ; tail( w )
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `nppes.sh` instead
+# batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `./nppes.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -273,11 +273,15 @@ v <-
 		ftcbs , 
 		w , 
 		by.x = 'healthcare_provider_taxonomy_code_1' , 
-		by.y = 'taxonomy.id' 
+		by.y = 'taxonomy.id' ,
+		all.x = TRUE
 	)
 	
-# confirm that every record has exactly one match
-stopifnot( nrow( ftcbs ) == nrow( v ) )
+# count..
+nrow( subset( v , is.na( title ) ) )
+
+# ..and then look at non-matching records (there are a few)
+table( subset( v , is.na( title ) )$healthcare_provider_taxonomy_code_1 )
 
 
 # look at the first six records
