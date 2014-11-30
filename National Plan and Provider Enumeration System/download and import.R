@@ -150,7 +150,7 @@ if ( .Platform$OS.type == 'windows' ){
 
 	system( dos.command )
 
-	z <- list.files( tempdir() )
+	z <- list.files( tempdir() , full.names = TRUE )
 
 }
 
