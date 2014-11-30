@@ -366,12 +366,7 @@ for ( year in 2050:2005 ){
 				gc()
 				
 				# end of column type determination #
-				
-							
-
-				# clear out the temporary directory
-				unlink( tempdir() , recursive = TRUE )
-
+	
 				
 				# wait ten seconds, just to make sure any previous servers closed
 				# and you don't get a gdk-lock error from opening two-at-once
@@ -810,6 +805,10 @@ for ( year in 2050:2005 ){
 			monetdb.server.stop( pid )
 			
 		}
+		
+		# clear out the temporary directory
+		unlink( tempdir() , recursive = TRUE )
+
 	}
 }
 
