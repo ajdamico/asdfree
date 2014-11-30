@@ -368,7 +368,11 @@ for ( year in 2050:2005 ){
 				# end of column type determination #
 				
 							
-			
+
+				# clear out the temporary directory
+				unlink( tempdir() , recursive = TRUE )
+
+				
 				# wait ten seconds, just to make sure any previous servers closed
 				# and you don't get a gdk-lock error from opening two-at-once
 				Sys.sleep( 10 )
@@ -427,9 +431,6 @@ for ( year in 2050:2005 ){
 					fn <- unzip( tf , exdir = tempdir() , overwrite = T )
 
 				} else {
-
-					# clear out the temporary directory
-					unlink( tempdir() , recursive = TRUE )
 				
 					# build the string to send to the terminal on non-windows systems
 					dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -o"' , tempdir() , '"' )
