@@ -40,7 +40,7 @@
 # setwd( "C:/My Directory/BSAPUF/" )
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "httr" )
+# install.packages( "downloader" )
 
 # no need to edit anything below this line #
 
@@ -50,7 +50,17 @@
 # # # # # # # # #
 
 
-library(httr)		# load httr package (downloads files from the web, with SSL and cookies)
+library(downloader)	# downloads and then runs the source() function on scripts from github
+
+
+# load the download.cache and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
 
 
 # create and set the working directory to a year-specific folder #
@@ -115,37 +125,13 @@ rxp <- "2008_PD_Profiles_PUF.zip"
 # combine all zip file names into a single character vector
 all.files <- c( inpatient , dme , pde , hospice , carrier , hha , outpatient , snf , cc , ipbs , rxp )
 
-# initiate the 'resp' object (just in case the all.files order changes)
-resp <- data.frame( status_code = 1 )
-
 # loop through all zip filenames
 for ( zf in all.files ){
 
-	# attempt two commands, store the result in an object called 'prob'
-	prob <-
-		try( 
-			{
-				# attempt to download the file from the https ftp site..
-				resp <- GET( paste0( ftp.l , zf ) )
-				
-				# ..and save the file as a temporary file
-				writeBin( content( resp , "raw" ) , tf )
-			} , 
-			# silent = TRUE tells the try() function not to crash the loop if the two commands above throw an error
-			silent = TRUE
-		)
+	# attempt two commands
+	attempt.one <- try( download.cache( paste0( ftp.l , zf ) , tf , FUN = download ) , silent = TRUE )
 	
-	if( 
-		
-		# if the two commands above did throw an error, instead attempt this download.file() function,
-		# which attempts to download the same zip file from the other http site
-		class( prob ) == "try-error" | 
-		
-		# or if they didn't throw an error but contains a 404 page not found status code
-		( resp$status_code == 404 )
-		
-		# then try a standard download.file() call, using the normal http:// website
-	) download.file( paste0( ftp.d , zf ) , tf , mode = 'wb' )
+	if( class( attempt.one ) == 'try-error' ) download.cache( paste0( ftp.d , zf ) , tf , FUN = download )
 	
 	# unzip the downloaded zip file into the current working directory
 	unzip( tf )
