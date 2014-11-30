@@ -310,7 +310,7 @@ for ( year in 2050:2005 ){
 			for ( j in c( 'h' , 'p' ) ){
 
 				# clear out the temporary directory
-				unlink( tempdir() , recursive = TRUE )
+				unlink( list.files( tempdir() , full.names = TRUE ) , recursive = TRUE )
 			
 				# determine column types #
 				
