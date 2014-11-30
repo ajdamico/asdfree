@@ -38,11 +38,11 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #####################################################################################################################################################
-# prior to running this script, you must have the program 7-zip installed on your computer. it's a free. go to http://www.7-zip.org/download.html   #
-# this code has only been tested in a microsoft windows environment, tell us what modifications are needed for other operating systems! cool thanx  #
+# prior to running this script, windows users must have 7-zip installed on your computer. it's a free. go to http://www.7-zip.org/download.html     #
+# macintosh and *nix users need 7za installed:  http://superuser.com/questions/548349/how-can-i-install-7zip-so-i-can-run-it-from-terminal-on-os-x  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # path.to.7z <- normalizePath( "C:/Program Files (x86)/7-zip/7z.exe" )		# # this is probably the correct line for windows
-# path.to.7z <- "7za"													# # this is probably the correct line for macintosh and *nix
+# path.to.7z <- "7za"														# # this is probably the correct line for macintosh and *nix
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # the line above sets the location of the 7-zip program on your local computer. uncomment it by removing the `#` and change the directory if ya did #
 #####################################################################################################################################################
