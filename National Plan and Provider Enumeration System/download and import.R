@@ -360,6 +360,8 @@ dbDisconnect( db )
 # and close it using the `pid`
 monetdb.server.stop( pid )
 
+# close any stray file connections that haven't been severed already.
+closeAllConnections()
 
 ####################################################################
 # lines of code to hold on to for all other nppes monetdb analyses #
