@@ -285,7 +285,7 @@ outcon <- file( tf2 , "w" )
 while( length( z <- readLines( incon , n = 50000 ) ) > 0 ){
 
 	# replace all double-backslahses with nothing..
-	z <- gsub( "\\" , "" , z , fixed = TRUE )
+	z <- gsub( "\\\\" , "" , z )
 	
 	# ..and write the resultant lines
 	# to the output file connection
