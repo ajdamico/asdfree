@@ -307,8 +307,10 @@ for ( year in 2050:2005 ){
 			}
 
 			# loop through both household- and person-level files
-			for ( j in c( 'h' , 'p' ) ){			
+			for ( j in c( 'h' , 'p' ) ){
 
+				# clear out the temporary directory
+				unlink( tempdir() , recursive = TRUE )
 			
 				# determine column types #
 				
@@ -805,9 +807,6 @@ for ( year in 2050:2005 ){
 			monetdb.server.stop( pid )
 			
 		}
-		
-		# clear out the temporary directory
-		unlink( tempdir() , recursive = TRUE )
 
 	}
 }
