@@ -51,8 +51,8 @@
 
 SIPP.dbname <- "SIPP08.db"																# choose the name of the database (.db) file on the local disk
 
-sipp.core.waves <- 1:14																	# either choose which core survey waves to download, or set to NULL
-sipp.replicate.waves <- 1:14															# either choose which replicate weight waves to download, or set to NULL
+sipp.core.waves <- 1:15																	# either choose which core survey waves to download, or set to NULL
+sipp.replicate.waves <- 1:15															# either choose which replicate weight waves to download, or set to NULL
 sipp.topical.modules <- c( 1:11 , 13 )													# either choose which topical modules to download, or set to NULL
 sipp.longitudinal.weights <- TRUE														# set to FALSE to prevent download
 sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:4 )							# reads in 2009-2012
