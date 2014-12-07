@@ -125,10 +125,10 @@ all.files <- c( inpatient , dme , pde , hospice , carrier , hha , outpatient , s
 for ( zf in all.files ){
 
 	# try the download.
-	attempt <- download.cache( paste0( ftp.l , zf ) , tf , FUN = download )
+	other.attempt <- try( attempt <- download.cache( paste0( ftp.l , zf ) , tf , FUN = download ) , silent = TRUE )
 	
 	# if there is really nothing in the file..
-	if( length( readLines( tf , n = 10 ) ) == 0 ){
+	if( class( other.attempt ) == 'try-error' || length( readLines( tf , n = 10 ) ) == 0 ){
 	
 		# switch to the other url prefix
 		
