@@ -133,13 +133,13 @@ for ( zf in all.files ){
 		# switch to the other url prefix
 		
 		# so long as the download didn't complete, keep trying.
-		while( is.logical( attempt ) && !attempt ) attempt <- download.cache( paste0( ftp.d , zf ) , tf , FUN = download , attempts = 1 )
+		while( !is.numeric( attempt ) || attempt != 0 ) attempt <- download.cache( paste0( ftp.d , zf ) , tf , FUN = download , attempts = 1 )
 
 	# but if something (an incomplete file) was downloaded..
 	} else {
 
 		# so long as the download didn't complete, keep trying.
-		while( is.logical( attempt ) && !attempt ) attempt <- download.cache( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 1 )
+		while( !is.numeric( attempt ) || attempt != 0 ) attempt <- download.cache( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 1 )
 		
 	}
 	
