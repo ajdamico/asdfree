@@ -125,7 +125,10 @@ all.files <- c( inpatient , dme , pde , hospice , carrier , hha , outpatient , s
 for ( zf in all.files ){
 
 	# try the download.
-	other.attempt <- try( attempt <- download.cache( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 1 ) , silent = TRUE )
+	other.attempt <- try( download.cache( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 1 ) , silent = TRUE )
+	
+	# always trigger the while loops.. it might be cache'd, so no harm done.
+	attempt <- 1
 	
 	# if there is really nothing in the file..
 	if( class( other.attempt ) == 'try-error' || length( readLines( tf , n = 10 ) ) == 0 ){
