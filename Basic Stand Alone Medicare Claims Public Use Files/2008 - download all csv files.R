@@ -144,7 +144,7 @@ for ( zf in all.files ){
 	}
 	
 	# unzip the downloaded zip file into the current working directory
-	unzip( tf , exdir = paste0( "./" , current.year.folder ) )
+	unzip( tf , exdir = current.year.folder )
 	
 	# and delete the temporary zip file from the local disk
 	file.remove( tf )
