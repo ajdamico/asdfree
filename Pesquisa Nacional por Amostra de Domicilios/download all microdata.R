@@ -182,7 +182,7 @@ for ( year in years.to.download ){
 		files <- NULL
 	
 		# loop through each of the files you might need
-		for ( this.file in c( "Dados.zip" , "Dicionarios_e_input.zip" , "Dicionarios.zip" ) ) {
+		for ( this.file in c( "Dados.zip" , "Dicionarios_e_input.zip" ) ) {
 		
 			try({
 				
