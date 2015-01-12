@@ -6,10 +6,10 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
-# library(downloader)
-# setwd( "C:/My Directory/PNAD/" )
-# years.to.download <- c( 2001:2009 , 2011:2013 )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+library(downloader)
+setwd( "D:/PNAD/" )
+years.to.download <- c( 2001:2009 , 2011:2013 )
+source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -40,7 +40,7 @@
 # use forward slashes instead of back slashes
 
 # uncomment this line by removing the `#` at the front..
-# setwd( "C:/My Directory/PNAD/" )
+setwd( "D:/PNAD/" )
 # ..in order to set your current working directory
 
 
@@ -56,7 +56,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" , "stringr" ) )
+install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" , "stringr" ) )
 
 
 # define which years to download #
@@ -66,7 +66,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # years.to.download <- c( 2001:2009 , 2011:2013 )
 
 # uncomment this line to download only a single year
-# years.to.download <- 2011
+years.to.download <- 2013
 
 # uncomment this line to download, for example, 2005 and 2007-2009
 # years.to.download <- c( 2009:2007 , 2005 )
@@ -201,7 +201,7 @@ for ( year in years.to.download ){
 	# manually set the encoding of the unziped files so they don't break things.
 	Encoding( files ) <- 'UTF-8'
 	
-	# remove the UF column and the mistake with "LOCAL ÚLTIMO FURTO"
+	# remove the UF column and the mistake with "LOCAL ÃšLTIMO FURTO"
 	# described in the remove.uf() function that was loaded with source_url as pnad.survey.R
 	dom.sas <- remove.uf( files[ grepl( paste0( 'input[^?]dom' , year , '.txt' ) , tolower( files ) ) ] )
 	pes.sas <- remove.uf( files[ grepl( paste0( 'input[^?]pes' , year , '.txt' ) , tolower( files ) ) ] )
