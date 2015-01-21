@@ -175,7 +175,7 @@ scf.design$designs[[5]]$degf
 # count the total (unweighted) number of records in scf.design #
 scf.MIcombine( with( scf.design , unwtd.count( ~one ) ) )
 # note that the scf.MIcombine() function above does not come with dr. lumley's mitools package
-# this function was specifically written for the survey of consumer finances and downloaded near the top of this here script
+# this function was specifically written for the survey of consumer finances and downloaded near the top of this script
 # for more detail about the regular MIcombine function, load the mitools package and type ?MIcombine into the console
 
 
