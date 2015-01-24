@@ -81,7 +81,7 @@ db <- dbConnect( SQLite() , paste( getwd() , db.name , sep = "/" ) )
 hrsN.file <- paste( getwd() , "download/randnstata/rndhrs_n.dta" , sep = "/" )
 famR.file <- paste( getwd() , "download/rndfamc_stata/StataSE/rndfamr_c.dta" , sep = "/" )
 famK.file <- paste( getwd() , "download/rndfamc_stata/StataSE/rndfamk_c.dta" , sep = "/" )
-cams.file <- paste( getwd() , "download/randcams_b/randcams_b.dta" , sep = "/" )
+cams.file <- paste( getwd() , "download/randcams_c/randcams_c.dta" , sep = "/" )
 
 
 # create a character vector with the four table names
