@@ -71,6 +71,10 @@ library(foreign) 	# load foreign package (converts data files into R)
 
 # create a data frame containing one row per year of scf data,
 # and columns containing the three file names -- main, extract, and replicate weight
+# as of 2013, dollar values in all extract files are inflation-adjusted
+# to 2013 dollars. this does not appear to be the case with main files.
+# (see the survey data page for a particular year, e.g.
+# http://www.federalreserve.gov/econresdata/scf/scf_2010survey.htm)
 downloads <-
 	data.frame(
 		year = 
