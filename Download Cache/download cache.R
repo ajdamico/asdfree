@@ -56,9 +56,11 @@ download.cache <-
 	usecache = getOption( "download.cache.usecache" ) ,
 	
 	# how many attempts should be made with FUN?
-	attempts = 3
+	attempts = 3 ,
 	# just in case of a server timeout or smthn equally annoying
 	
+	# how long should download.cache wait between attempts?
+	sleepsec = 60
   ) {
   
 		# users can set the option to override usedest and usecache globally.
@@ -142,10 +144,10 @@ download.cache <-
 					silent = TRUE 
 				)
 			
-			# if the download did not work, wait 60 seconds and try again.
+			# if the download did not work, wait `sleepsec` seconds and try again.
 			if( class( failed.attempt ) == 'try-error' ){
-				cat( paste( "download issue with" , url ) )
-				Sys.sleep( 60 )
+				cat( paste( "download issue with" , url , "\r\n" ) )
+				Sys.sleep( sleepsec )
 			}
 			
 		}
