@@ -112,11 +112,11 @@ db <- dbConnect( SQLite() , ahs.dbname )
 # connects the current instance of r to the sqlite database
 
 # now simply copy you'd like to recode into a new table
-dbSendQuery( db , "CREATE TABLE recoded_tperson_2011_v14 AS SELECT * FROM tperson_2011_v14" )
-# this action protects the original 'tperson_2011_v14' table from any accidental errors.
+dbSendQuery( db , "CREATE TABLE recoded_tperson_2011_nationalandmetropolitanv14 AS SELECT * FROM tperson_2011_nationalandmetropolitanv14" )
+# this action protects the original 'tperson_2011_nationalandmetropolitanv14' table from any accidental errors.
 # at any point, we can delete this recoded copy of the data table using the command..
-# dbRemoveTable( db , "recoded_tperson_2011_v14" )
-# ..and start fresh by re-copying the pristine file from tperson_2011_v14
+# dbRemoveTable( db , "recoded_tperson_2011_nationalandmetropolitanv14" )
+# ..and start fresh by re-copying the pristine file from tperson_2011_nationalandmetropolitanv14
 
 
 
@@ -124,23 +124,23 @@ dbSendQuery( db , "CREATE TABLE recoded_tperson_2011_v14 AS SELECT * FROM tperso
 # step 2: make all of your recodes at once #
 
 # from this point forward, all commands will only touch the
-# 'recoded_tperson_2011_v14' table.  the 'tperson_2011_v14' is now off-limits.
+# 'recoded_tperson_2011_nationalandmetropolitanv14' table.  the 'tperson_2011_nationalandmetropolitanv14' is now off-limits.
 
 # add a new column.  call it, oh i don't know, adult?
 # since it's actually a categorical variable, make it VARCHAR( 255 )
-dbSendQuery( db , "ALTER TABLE recoded_tperson_2011_v14 ADD COLUMN adult VARCHAR( 255 )" )
+dbSendQuery( db , "ALTER TABLE recoded_tperson_2011_nationalandmetropolitanv14 ADD COLUMN adult VARCHAR( 255 )" )
 
 # if you wanted to create a numeric variable, substitute VARCHAR( 255 ) with DOUBLE PRECISION like this:
-# dbSendQuery( db , "ALTER TABLE recoded_tperson_2011_v14 ADD COLUMN adultx DOUBLE PRECISION" )
+# dbSendQuery( db , "ALTER TABLE recoded_tperson_2011_nationalandmetropolitanv14 ADD COLUMN adultx DOUBLE PRECISION" )
 # ..but then use `SET adult = 1` and `SET adult = 0` instead of 'yes' and 'no' as shown below
 
 # by hand, you could set the values of the adult column
-dbSendQuery( db , "UPDATE recoded_tperson_2011_v14 SET adult = 'yes' WHERE age >= 18" )
-dbSendQuery( db , "UPDATE recoded_tperson_2011_v14 SET adult = 'no' WHERE age < 18" )
+dbSendQuery( db , "UPDATE recoded_tperson_2011_nationalandmetropolitanv14 SET adult = 'yes' WHERE age >= 18" )
+dbSendQuery( db , "UPDATE recoded_tperson_2011_nationalandmetropolitanv14 SET adult = 'no' WHERE age < 18" )
 
 
 # quickly check your work by running a simple SELECT COUNT(*) command with sql
-dbGetQuery( db , "SELECT adult , age , COUNT(*) as number_of_records from recoded_tperson_2011_v14 GROUP BY adult , age ORDER BY age" )
+dbGetQuery( db , "SELECT adult , age , COUNT(*) as number_of_records from recoded_tperson_2011_nationalandmetropolitanv14 GROUP BY adult , age ORDER BY age" )
 # and notice that each value of age has been deposited in the appropriate age category
 
 
@@ -166,13 +166,13 @@ dbSendQuery(
 		avg( adult = 'yes' ) as pct_adults , 
 		sum( age >= 18 ) as num_adults ,
 		sum( CASE WHEN sal < 0 THEN 0 ELSE sal END ) as total_household_salaries
-	FROM recoded_tperson_2011_v14
+	FROM recoded_tperson_2011_nationalandmetropolitanv14
 	GROUP BY control"
 )
 
-# at this point, you're finished with the `recoded_tperson_2011_v14` table,
+# at this point, you're finished with the `recoded_tperson_2011_nationalandmetropolitanv14` table,
 # so it can be stricken from the record if you like.
-dbRemoveTable( db , 'recoded_tperson_2011_v14' )
+dbRemoveTable( db , 'recoded_tperson_2011_nationalandmetropolitanv14' )
 
 # sidenote: this newly-aggregated table on its own is pretty small
 # you can probably read it into ram by itself and have a look
@@ -303,10 +303,10 @@ dbDisconnect( db )
 # step 1: load the files you wanna work with # 
 
 # pull the `tperson` table into memory
-load( "./2011/v1.4/tperson.rda" )
+load( "./2011/national_and_metropolitan_v1.4/tperson.rda" )
 
 # pull the merged `tnewhouse_trepwgt` table into memory
-load( "./2011/v1.4/tnewhouse_trepwgt.rda" )
+load( "./2011/national_and_metropolitan_v1.4/tnewhouse_trepwgt.rda" )
 
 
 ############################################

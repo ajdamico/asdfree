@@ -81,7 +81,7 @@ ahs.svydb <-
 		repweights = "repwgt[1-9]" ,
 		type = "Fay" ,
 		rho = ( 1 - 1 / sqrt( 4 ) ) ,
-		data = "tnewhouse_trepwgt_2009_national" ,
+		data = "tnewhouse_trepwgt_2009_nationalv11" ,
 		dbtype = "SQLite" ,
 		dbname = ahs.dbname
 	)
@@ -100,7 +100,7 @@ svytotal( ~one , subset( ahs.svydb , status == 1 & tenure == 1 ) )
 ##################################################
 
 # load the merged household + replicate weight table
-load( "./2009/national/tnewhouse_trepwgt.rda" )
+load( "./2009/national_v1.1/tnewhouse_trepwgt.rda" )
 
 # create survey design object with AHS design information
 # using existing table of AHS data

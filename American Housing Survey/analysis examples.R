@@ -79,7 +79,7 @@ ahs.design <-
 		repweights = "repwgt[1-9]" ,
 		type = "Fay" ,
 		rho = ( 1 - 1 / sqrt( 4 ) ) ,
-		data = "tnewhouse_trepwgt_2011_v14" ,
+		data = "tnewhouse_trepwgt_2011_nationalandmetropolitanv14" ,
 		dbtype = "SQLite" ,
 		dbname = ahs.dbname
 	)
@@ -92,7 +92,7 @@ ahs.design <-
 # survey design for an in-memory object #
 
 # name of the merged household-level + replicate weights `.rda` file on the local disk
-# load( "./2011/v1.4/tnewhouse_trepwgt.rda" )
+# load( "./2011/national_and_metropolitan_v1.4/tnewhouse_trepwgt.rda" )
 
 # initiation of the replicate-weighted survey design object
 # ahs.design <-
