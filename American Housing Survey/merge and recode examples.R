@@ -146,7 +146,7 @@ dbGetQuery( db , "SELECT adult , age , COUNT(*) as number_of_records from recode
 
 
 ################################################################################################
-# step 3: create a one-record-per-`control` table to be merged onto tnewhouse_trepwgt_2011_v14 #
+# step 3: create a one-record-per-`control` table to be merged onto tnewhouse_trepwgt_2011_nationalandmetropolitanv14 #
 
 # if you are unclear on why this is critical, re-read "note regarding merging and recoding" above
 
@@ -186,7 +186,7 @@ tail( x )
 
 # but this table has fewer records than the table you'll be merging it onto.
 dbGetQuery( db , 'SELECT count(*) FROM aggregated_tperson' )
-dbGetQuery( db , 'SELECT count(*) FROM tnewhouse_trepwgt_2011_v14' )
+dbGetQuery( db , 'SELECT count(*) FROM tnewhouse_trepwgt_2011_nationalandmetropolitanv14' )
 # that's because not every household has people in it!		
 
 
@@ -198,7 +198,7 @@ dbSendQuery(
 	db , 
 	"CREATE TABLE merged_2011 AS 
 	SELECT * 
-	FROM tnewhouse_trepwgt_2011_v14 AS a 
+	FROM tnewhouse_trepwgt_2011_nationalandmetropolitanv14 AS a 
 	LEFT JOIN aggregated_tperson AS b
 	ON a.control = b.control"
 )
@@ -208,9 +208,9 @@ dbSendQuery(
 
 # so now when you look at the record counts..
 dbGetQuery( db , 'SELECT count(*) FROM aggregated_tperson' )
-dbGetQuery( db , 'SELECT count(*) FROM tnewhouse_trepwgt_2011_v14' )
+dbGetQuery( db , 'SELECT count(*) FROM tnewhouse_trepwgt_2011_nationalandmetropolitanv14' )
 dbGetQuery( db , 'SELECT count(*) FROM merged_2011' )
-# the `merged_2011` table should match the `tnewhouse_trepwgt_2011_v14` table.
+# the `merged_2011` table should match the `tnewhouse_trepwgt_2011_nationalandmetropolitanv14` table.
 
 # remember to clean up your toys.
 # here's how to erase the `aggregated_tperson` table
