@@ -1,13 +1,13 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # general social survey
-# 1972-2012 cross-sectional cumulative data (release 1, march 2013)
+# cross-sectional cumulative data
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/GSS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/General%20Social%20Survey/1972-2012%20cumulative%20cross-sectional%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/General%20Social%20Survey/cumulative%20cross-sectional%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -27,9 +27,9 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-##################################################################################################################
-# Analyze the 1972-2012 General Social Survey cross-sectional cumulative data (release 2, feb. 2012) file with R #
-##################################################################################################################
+#################################################################################
+# Analyze the General Social Survey cross-sectional cumulative data file with R #
+#################################################################################
 
 
 # set your working directory.
@@ -71,7 +71,7 @@ library(survey)  # load survey package (analyzes complex design surveys)
 
 # create new character variables containing the full filepath of the file on norc's website
 # that needs to be downloaded and imported into r for analysis
-GSS.2012.CS.file.location <-
+GSS.CS.file.location <-
 	"http://publicdata.norc.org/GSS/DOCUMENTS/OTHR/GSS_spss.zip"
 
 
@@ -83,7 +83,7 @@ tf <- tempfile() ; td <- tempdir()
 # download the file using the filepath specified
 download.file( 
 	# download the file stored in the location designated above
-	GSS.2012.CS.file.location ,
+	GSS.CS.file.location ,
 	# save the file as the temporary file assigned above
 	tf , 
 	# download this as a binary file type
@@ -114,7 +114,7 @@ print( fn[ grep( "sav$" , fn ) ] )
 
 
 # convert the spss (.sav) file saved on the local disk (at 'fn') into an r data frame
-GSS.2012.CS.df <- 
+GSS.CS.df <- 
 	read.spss( 
 		fn[ grep( "sav$" , fn ) ] , 
 		to.data.frame = TRUE , 
@@ -122,16 +122,16 @@ GSS.2012.CS.df <-
 	)
 
 # copy to a different object
-z <- GSS.2012.CS.df
+z <- GSS.CS.df
 
 # remove the original from RAM
-rm( GSS.2012.CS.df )
+rm( GSS.CS.df )
 
 # clear up memory
 gc()
 
 # repeat
-GSS.2012.CS.df <- z
+GSS.CS.df <- z
 
 # repeat
 rm( z )
@@ -144,7 +144,7 @@ gc()
 
 	
 # save the cross-sectional cumulative gss r data frame inside an r data file (.rda)
-save( GSS.2012.CS.df , file = "GSS.2012.CS.rda" )
+save( GSS.CS.df , file = "GSS.CS.rda" )
 
 # note that this .rda file will be stored in the local directory specified
 # with the setwd command at the beginning of the script
@@ -156,15 +156,15 @@ save( GSS.2012.CS.df , file = "GSS.2012.CS.rda" )
 
 # now the r data frame can be loaded directly
 # from your local hard drive.  this is much faster.
-# load( "GSS.2012.CS.rda" )
+# load( "GSS.CS.rda" )
 # remove the `#` on the line above to uncomment.
 
 
 # display the number of rows in the cross-sectional cumulative data set
-nrow( GSS.2012.CS.df )
+nrow( GSS.CS.df )
 
 # display the first six records in the cross-sectional cumulative data set
-head( GSS.2012.CS.df )
+head( GSS.CS.df )
 # note that the data frame contains far too many variables to be viewed conveniently
 
 # create a character vector that will be used to
@@ -191,13 +191,13 @@ KeepVars <-
 	)
 
 
-# limit the r data frame (GSS.2012.CS.df) containing all variables
+# limit the r data frame (GSS.CS.df) containing all variables
 # to a severely-restricted r data frame containing only the seven variables
 # specified in character vector 'KeepVars'
-x <- GSS.2012.CS.df[ , KeepVars ]
+x <- GSS.CS.df[ , KeepVars ]
 
 # to free up RAM, remove the full r data frame
-rm( GSS.2012.CS.df )
+rm( GSS.CS.df )
 
 # garbage collection: clear up RAM
 gc()
