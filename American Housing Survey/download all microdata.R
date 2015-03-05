@@ -195,6 +195,8 @@ for ( fn in precise.files ){
 		download.cache( fn , tf , mode = 'wb' , fun = download )
 	}
 	
+	# import files from largest to smallest
+	tf <- tf[ rev( order( file.info(tf)$size ) ) ]
 
 	# extract the filename (without extension)
 	prefix <- gsub( "\\.(.*)" , "" , basename( fn ) )
