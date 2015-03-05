@@ -1,7 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # health and retirement study
 # longitudinal RAND contributed file
-# 1992 - 2010 public use file (version N)
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -73,8 +72,8 @@ db <- dbConnect( SQLite() , db.name )			# connect to the SQLite database (.db)
 
 # create two new tables called 'temp5resp' and 'temp10resp'
 # which throw out all missing values of the weight column for one particular wave
-dbSendQuery( db , "CREATE TABLE temp10resp AS SELECT * FROM hrsN WHERE r10wtresp >= 0" )
-dbSendQuery( db , "CREATE TABLE temp4resp AS SELECT * FROM hrsN WHERE r4wtresp >= 0" )
+dbSendQuery( db , "CREATE TABLE temp10resp AS SELECT * FROM hrs WHERE r10wtresp >= 0" )
+dbSendQuery( db , "CREATE TABLE temp4resp AS SELECT * FROM hrs WHERE r4wtresp >= 0" )
 
 
 # create two survey design objects with HRS design information #

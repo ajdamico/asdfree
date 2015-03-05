@@ -86,7 +86,7 @@ db <- dbConnect( SQLite() , db.name )			# connect to the SQLite database (.db)
 
 
 # create a new table called 'temp' which throws out all missing values of the weight column
-dbSendQuery( db , "CREATE TABLE temp AS SELECT * FROM hrsN WHERE r6wthh >= 0" )
+dbSendQuery( db , "CREATE TABLE temp AS SELECT * FROM hrs WHERE r6wthh >= 0" )
 
 
 # create survey design object with HRS design information

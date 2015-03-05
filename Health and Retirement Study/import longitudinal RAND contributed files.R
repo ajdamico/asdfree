@@ -1,7 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # health and retirement study
 # RAND contributed files
-# HRS, CAMS, and Family K and F files
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -78,14 +77,14 @@ db <- dbConnect( SQLite() , paste( getwd() , db.name , sep = "/" ) )
 
 
 # figure out the locations of the four RAND longitudinal enhanced files
-hrsN.file <- paste( getwd() , "download/randnstata/rndhrs_n.dta" , sep = "/" )
-famR.file <- paste( getwd() , "download/rndfamc_stata/StataSE/rndfamr_c.dta" , sep = "/" )
-famK.file <- paste( getwd() , "download/rndfamc_stata/StataSE/rndfamk_c.dta" , sep = "/" )
-cams.file <- paste( getwd() , "download/randcams_c/randcams_c.dta" , sep = "/" )
+hrs.file <- grep( "rndhrs(.*)\\.dta$" , list.files( recursive = TRUE , full.names = TRUE ) , value = TRUE )
+famR.file <- grep(  "rndfamr_(.*)\\.dta$" , list.files( recursive = TRUE , full.names = TRUE ) , value = TRUE )
+famK.file <- grep( "rndfamk_(.*)\\.dta$" , list.files( recursive = TRUE , full.names = TRUE ) , value = TRUE )
+cams.file <- grep( "randcams_(.*)\\.dta$" , list.files( recursive = TRUE , full.names = TRUE ) , value = TRUE )
 
 
 # create a character vector with the four table names
-tn <- c( 'hrsN' , 'famR' , 'famK' , 'cams' )
+tn <- c( 'hrs' , 'famR' , 'famK' , 'cams' )
 
 
 # all of these files are large enough to be read into RAM on a 4GB computer
