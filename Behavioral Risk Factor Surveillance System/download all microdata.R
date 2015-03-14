@@ -418,7 +418,7 @@ for ( year in intersect( years.to.download , 2002:2013 ) ){
 	
 		# the zipped filename and sas importation script fit this pattern:
 		fn <- paste0( "ftp://ftp.cdc.gov/pub/data/brfss/cdbrfs" , ifelse( year == 2002 , year , substr( year , 3 , 4 ) ) , "asc.zip" )
-		sas_ri <- paste0( "http://www.cdc.gov/brfss/annual_data/" , year , "/sasout" , substr( year , 3 , 4 ) , ".SAS" )
+		sas_ri <- paste0( "http://www.cdc.gov/brfss/annual_data/" , year , if ( year %in% 2008:2009 ) "/files" , "/sasout" , substr( year , 3 , 4 ) , ".SAS" )
 		
 	}
 
