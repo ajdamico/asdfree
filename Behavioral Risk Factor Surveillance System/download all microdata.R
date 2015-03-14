@@ -470,8 +470,13 @@ for ( year in intersect( years.to.download , 2002:2013 ) ){
 			
 			# remove the stray everythings
 			line <- gsub( "[^[:alnum:]///' \\.]" , " " , line )
-			line <- iconv( line , "" , "ASCII" , sub = " " )
 			
+			# mac/unix converts some weird characters to two digits
+			# while windows convers the to one.  deal with it.
+			line <- iconv( line , "" , "ASCII" , sub = "abcxyz" )
+			line <- gsub( "abcxyzabcxyz" , " " , line )
+			line <- gsub( "abcxyz" , " " , line )
+	
 			# write the result to the output connection
 			writeLines( line , outcon )
 			
