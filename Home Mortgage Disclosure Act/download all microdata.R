@@ -6,6 +6,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
+# path.to.7z <- "7za"							# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/HMDA/" )
 # years.to.download <- 2012:2006
@@ -33,6 +34,16 @@
 # download all 2006 - 2012 microdata for the home mortgage disclosure act with R #
 ##################################################################################
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################################
+# macintosh and *nix users need 7za installed:  http://superuser.com/questions/548349/how-can-i-install-7zip-so-i-can-run-it-from-terminal-on-os-x  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# path.to.7z <- "7za"														# # this is probably the correct line for macintosh and *nix
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# the line above sets the location of the 7-zip program on your local computer. uncomment it by removing the `#` and change the directory if ya did #
+#####################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # # # # # # # # # # # # # # #
@@ -353,9 +364,27 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			# download the url into a temporary file on your local disk
 			download.cache( fn , tf , mode = 'wb' )
 
-			# unzip the csv file
-			csv.file <- unzip( tf , exdir = td )
+			# unzip the file's contents to the temporary directory
+			# extract the file, platform-specific
+			if ( .Platform$OS.type == 'windows' ){
 
+				csv.file <- unzip( tf , exdir = td , overwrite = TRUE )
+
+			} else {
+			
+				# build the string to send to the terminal on non-windows systems
+				dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -aoa -o"' , td , '"' )
+
+				system( dos.command )
+
+				csv.file <- list.files( td , full.names = TRUE )
+
+				csv.file <- csv.file[ grep( "\\.csv$" , tolower( csv.file ) ) ]
+				
+			}
+			
+			
+			
 			# construct the monetdb COPY INTO command
 			sql.copy <- 
 				paste0( 
