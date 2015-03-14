@@ -361,6 +361,9 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			# construct the full url path of the file to download
 			fn <- paste0( "http://www.ffiec.gov/" , pubpriv , "rawdata/" , folder , "/20" , year , pubpriv , rectype , ".zip" )
 
+			# clear out the temporary directory
+			file.remove( list.files( td , full.names = TRUE ) )
+			
 			# download the url into a temporary file on your local disk
 			download.cache( fn , tf , mode = 'wb' )
 
