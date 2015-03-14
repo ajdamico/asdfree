@@ -372,6 +372,8 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 
 			} else {
 			
+				files.before <- list.files( td , full.names = TRUE )
+
 				# build the string to send to the terminal on non-windows systems
 				dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -aoa -o"' , td , '"' )
 
@@ -379,7 +381,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 
 				csv.file <- list.files( td , full.names = TRUE )
 
-				csv.file <- csv.file[ grep( "\\.csv$" , tolower( csv.file ) ) ]
+				csv.file <- csv.file[ !( csv.file %in% files.before ) ]
 				
 			}
 			
