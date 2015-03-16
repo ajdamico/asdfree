@@ -215,6 +215,9 @@ get.tsv <-
 		# remove the pre-tsv file
 		file.remove( tf.person )
 		
+		options( "warn" = previous.warning.setting )
+		options( "encoding" = previous.encoding )
+
 		# return a character vector (of length two) containing the location on the local disk
 		# where the household-level and person-level tsv files have been saved.
 		c( hh.tsv , person.tsv )
