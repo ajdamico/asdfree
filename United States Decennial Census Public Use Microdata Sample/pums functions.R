@@ -12,11 +12,21 @@ get.tsv <-
 		
 		# store the warnings into a variable
 		previous.warning.setting <- getOption( "warn" )
+		
+		# store encoding into a variable
+		previous.encoding <- getOption( "encoding" )
 
 		# at the end of this function, put the warning option
 		# back to its original setting
 		on.exit( options( "warn" = previous.warning.setting ) )
+		on.exit( options( "encoding" = previous.encoding ) )
 
+		
+		# non-windows users should turn off windows-1252 for the indiana script
+		# cuz it's corrupted.
+		if ( fileno == 15 & .Platform$OS.type != 'windows' ) options( "encoding" = "native.enc" )
+		
+		
 		# set warnings to behave like errors, so if a download
 		# does not complete properly, the program re-tries.
 		options( "warn" = 2 )
@@ -88,7 +98,13 @@ get.tsv <-
 
 			if ( line.num > 1 ){
 				# remove goofy special characters (that will break monetdb)
-				line <- gsub( "z" , " " , line , fixed = TRUE )
+				thisline.to.ascii <- try( line <- gsub( "z" , " " , line , fixed = TRUE ) , silent = TRUE )
+				
+				if ( class( thisline.to.ascii ) == 'try-error' ){
+					line <- iconv( line , "" , "ASCII" , sub = " " )		
+					line <- gsub( "z" , " " , line , fixed = TRUE )
+				}
+				
 				line <- gsub( "m99" , " 99" , line , fixed = TRUE )
 				line <- gsub( "j" , " " , line , fixed = TRUE )
 			}

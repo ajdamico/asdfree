@@ -6,7 +6,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )
+# options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PUMS/" )
 # one.percent.files.to.download <- c( 1990 , 2000 )
@@ -47,6 +48,16 @@
 # ..in order to set your current working directory
 
 
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# the cdc's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
+
 
 # # # # # # # # # # # # # # #
 # warning: monetdb required #
@@ -57,7 +68,7 @@
 # to large amounts of ram will often benefit from
 # the following option, available as of MonetDB.R 0.9.2 --
 # remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )
+# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # -- whenever connecting to a monetdb server,
 # this option triggers sequential server processing
 # in other words: single-threading.
@@ -195,7 +206,7 @@ batfile
 # you will need to note the location of the batfile for future MonetDB analyses!
 
 # in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"
+# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"		# # note for mac and *nix users: `pums.bat` might be `pums.sh` instead
 # obviously, without the `#` comment character
 
 # hold on to that line for future scripts.
@@ -222,7 +233,7 @@ dbport <- 50010
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"
+# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"		# # note for mac and *nix users: `pums.bat` might be `pums.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
@@ -655,7 +666,7 @@ if ( 2000 %in% five.percent.files.to.download ){
 
 # first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"
+# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"		# # note for mac and *nix users: `pums.bat` might be `pums.sh` instead
 
 # second: run the MonetDB server
 pid <- monetdb.server.start( batfile )
