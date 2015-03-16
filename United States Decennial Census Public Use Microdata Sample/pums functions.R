@@ -22,9 +22,9 @@ get.tsv <-
 		on.exit( options( "encoding" = previous.encoding ) )
 
 		
-		# non-windows users should turn off windows-1252 for the indiana script
+		# non-windows users should turn off windows-1252 for the indiana and oklahoma script
 		# cuz it's corrupted.
-		if ( fileno == 15 & .Platform$OS.type != 'windows' ) options( "encoding" = "native.enc" )
+		if ( fileno %in% c( 15 , 37 ) & .Platform$OS.type != 'windows' ) options( "encoding" = "native.enc" )
 		
 		
 		# set warnings to behave like errors, so if a download
