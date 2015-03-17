@@ -21,13 +21,6 @@ get.tsv <-
 		on.exit( options( "warn" = previous.warning.setting ) )
 		on.exit( options( "encoding" = previous.encoding ) )
 
-		
-		# non-windows users should turn off windows-1252 for
-		# the indiana, oklahoma, pennsylvania scripts
-		# cuz they're corrupted.
-		if ( fileno %in% c( 15 , 37 , 39 ) & .Platform$OS.type != 'windows' ) options( "encoding" = "native.enc" )
-		
-		
 		# set warnings to behave like errors, so if a download
 		# does not complete properly, the program re-tries.
 		options( "warn" = 2 )
@@ -62,7 +55,11 @@ get.tsv <-
 			download.cache( fp , cur.pums , mode = 'wb' )
 			# since there's no `try` function encapsulating this one,
 			# it will break the whole program if it doesn't work
-		}	
+		}
+		
+		# the warning breakage can end now..
+		options( "warn" = previous.warning.setting )
+		# ..since the file has definitely downloaded properly.
 
 		# if the downloaded file was a zipped file,
 		# unzip it and replace it with its decompressed contents
@@ -216,7 +213,6 @@ get.tsv <-
 		# remove the pre-tsv file
 		file.remove( tf.person )
 		
-		options( "warn" = previous.warning.setting )
 		options( "encoding" = previous.encoding )
 
 		# return a character vector (of length two) containing the location on the local disk
