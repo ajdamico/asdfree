@@ -90,10 +90,6 @@ get.tsv <-
 		# loop through every row of data in the original input file
 		while( length( line <- readLines( incon , 1 , skipNul = TRUE ) ) > 0 ){
 
-			# confirm this is either a household or person record..
-			stopifnot( substr( line , 1 , 1 ) %in% c( 'H' , 'P' ) )
-			# ..otherwise, there's something wrong with the file!
-
 			if ( line.num > 1 ){
 				# remove goofy special characters (that will break monetdb)
 				thisline.to.ascii <- try( line <- gsub( "z" , " " , line , fixed = TRUE ) , silent = TRUE )
