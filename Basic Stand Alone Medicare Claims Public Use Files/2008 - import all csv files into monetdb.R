@@ -251,10 +251,7 @@ monet.read.csv(
 	inpatient , 
 
 	# save the csv file in the monetdb to a data table named 'inpatient08'
-	paste0( 'inpatient' , substr( year , 3 , 4 ) ) , 
-
-	# count the number of records in the csv file(s)
-	nrows = sapply( inpatient , countLines ) 
+	paste0( 'inpatient' , substr( year , 3 , 4 ) )
 )
 
 
@@ -262,64 +259,56 @@ monet.read.csv(
 monet.read.csv( 
 	db , 
 	dme , 
-	paste0( 'dme' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( dme , countLines ) 
+	paste0( 'dme' , substr( year , 3 , 4 ) )
 )
 
 # store the five 2008 prescription drug events tables in the database as a single 'pde08' table
 monet.read.csv( 
 	db , 
 	pde , 
-	paste0( 'pde' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( pde , countLines ) 
+	paste0( 'pde' , substr( year , 3 , 4 ) )
 )
 
 # store the 2008 hospice table in the database as the 'hospice08' table
 monet.read.csv( 
 	db , 
 	hospice , 
-	paste0( 'hospice' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( hospice , countLines ) 
+	paste0( 'hospice' , substr( year , 3 , 4 ) )
 )
 
 # store the seven 2008 carrier line items tables in the database as a single 'carrier08' table
 monet.read.csv( 
 	db , 
 	carrier , 
-	paste0( 'carrier' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( carrier , countLines ) 
+	paste0( 'carrier' , substr( year , 3 , 4 ) )
 )
 
 # store the 2008 home health agency table in the database as the 'hha08' table
 monet.read.csv( 
 	db , 
 	hha , 
-	paste0( 'hha' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( hha , countLines ) 
+	paste0( 'hha' , substr( year , 3 , 4 ) )
 )
 
 # store the three 2008 outpatient claims tables in the database as a single 'outpatient08' table
 monet.read.csv( 
 	db , 
 	outpatient , 
-	paste0( 'outpatient' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( outpatient , countLines ) 
+	paste0( 'outpatient' , substr( year , 3 , 4 ) )
 )
 
 # store the 2008 snf table in the database as the 'snf08' table
 monet.read.csv( 
 	db , 
 	snf , 
-	paste0( 'snf' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( snf , countLines ) 
+	paste0( 'snf' , substr( year , 3 , 4 ) )
 )
 
 # store the 2008 chronic conditions table in the database as the 'cc08' table
 monet.read.csv( 
 	db , 
 	cc , 
-	paste0( 'cc' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( cc , countLines ) 
+	paste0( 'cc' , substr( year , 3 , 4 ) )
 )
 
 
@@ -331,8 +320,7 @@ ipbs.rows <- sapply( ipbs , countLines )
 monet.read.csv( 
 	db , 
 	ipbs , 
-	paste0( 'ipbs' , substr( year , 3 , 4 ) ) , 
-	nrows = ipbs.rows , 
+	paste0( 'ipbs' , substr( year , 3 , 4 ) )
 	nrow.check = ipbs.rows 
 )
 
@@ -340,8 +328,7 @@ monet.read.csv(
 monet.read.csv( 
 	db , 
 	rxp , 
-	paste0( 'rxp' , substr( year , 3 , 4 ) ) , 
-	nrows = sapply( rxp , countLines ) ,
+	paste0( 'rxp' , substr( year , 3 , 4 ) )
 	nrow.check = 10000
 )
 

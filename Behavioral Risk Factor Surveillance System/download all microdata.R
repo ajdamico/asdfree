@@ -308,7 +308,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 	first.attempt <- second.attempt <- NULL
 
 	# first try to read the csv file into the monet database with NAs for NA strings
-	first.attempt <- try( monet.read.csv( db , tf , tablename , nrows = rtctr , na.strings = "NA" , nrow.check = rtctr ) , silent = TRUE )
+	first.attempt <- try( monet.read.csv( db , tf , tablename , na.strings = "NA" , nrow.check = rtctr ) , silent = TRUE )
 	
 	# if the monet.read.csv() function returns an error instead of working properly..
 	if( class( first.attempt ) == "try-error" ) {
@@ -322,7 +322,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		
 		# and re-try reading the csv file directly into the monet database, this time with a different NA string setting
 		second.attempt <-
-			try( monet.read.csv( db , tf , tablename , nrows = rtctr , na.strings = "" , nrow.check = rtctr ) , silent = TRUE )
+			try( monet.read.csv( db , tf , tablename , na.strings = "" , nrow.check = rtctr ) , silent = TRUE )
 	}
 
 	# if that still doesn't work, import the table manually
