@@ -320,7 +320,7 @@ ipbs.rows <- sapply( ipbs , countLines )
 monet.read.csv( 
 	db , 
 	ipbs , 
-	paste0( 'ipbs' , substr( year , 3 , 4 ) )
+	paste0( 'ipbs' , substr( year , 3 , 4 ) ) ,
 	nrow.check = ipbs.rows 
 )
 
@@ -328,7 +328,7 @@ monet.read.csv(
 monet.read.csv( 
 	db , 
 	rxp , 
-	paste0( 'rxp' , substr( year , 3 , 4 ) )
+	paste0( 'rxp' , substr( year , 3 , 4 ) ) ,
 	nrow.check = 10000
 )
 
