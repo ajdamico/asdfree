@@ -238,7 +238,7 @@ for ( j in seq( length( country.numbers ) ) ){
 				hsep <- data.frame( "File Name" = "Supplemental" , "File Size" = NA , "File Format" = NA )
 				names( hsep ) <- c( "File Name" , "File Size" , "File Format" )
 			
-				names( ytab[[k]] ) <- gsub( "File Name(.*)" , "File Name" , names( ytab[[k]] ) )
+				names( ytab[[k]] ) <- gsub( "File Name( *)" , "File Name" , names( ytab[[k]] ) )
 			
 				y <- 
 					rbind( 
