@@ -281,17 +281,15 @@ for ( j in seq( length( country.numbers ) ) ){
 				# figure out the url to download
 				file.url <- all.links[ grep( y[ i , 'File Name' ] , all.links ) ]
 
-				# download the actual microdata file
-				current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) )
+				# download the actual microdata file directly to disk
+				# don't read it into memory.  save it as `tf` immediately (RAM-free)
+				current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( tf , overwrite = TRUE ) )
 
 				# final folder to save it
 				fs <- paste( cur.folder , tolower( gsub( " System file| data" , "" , y[ i , 'File Format' ] ) ) , sep = '/' )
 			
 				# make sure the file-specific folder exists
 				dir.create( fs , showWarnings = FALSE )
-			
-				# write the content of the download to a binary file
-				writeBin( content( current.file , "raw" ) , tf )
 				
 				# unzip the contents of the zipped file
 				z <- unzip( tf , exdir = fs )
