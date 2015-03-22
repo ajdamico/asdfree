@@ -285,7 +285,7 @@ for ( curStudy in seq( length( files.to.download ) ) ){
 	
 		# store the basename of the file,
 		# replacing the extension with `.rda`
-		bn <- gsub( 'sav|por|dta' , 'rda' , basename( fp ) )
+		bn <- gsub( 'sav|por|dta' , 'rda' , basename( fp[ 1 ] ) )
 			
 		# convert all column names in the data.frame to lowercase
 		names( x ) <- tolower( names( x ) )
