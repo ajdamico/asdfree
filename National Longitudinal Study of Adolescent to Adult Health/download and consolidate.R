@@ -114,6 +114,7 @@ curlSetOpt(
 	cookiejar = 'cookies.txt' , 
 	followlocation = TRUE , 
 	autoreferer = TRUE , 
+	ssl.verifypeer = FALSE ,
 	curl = curl
 )
 
