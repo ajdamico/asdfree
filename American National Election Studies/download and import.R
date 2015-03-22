@@ -79,7 +79,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "Hmisc" , "httr" , "stringr" , "memisc" ) )
+# install.packages( c( "Hmisc" , "httr" , "stringr" , "memisc" , "haven" ) )
 
 # no need to edit anything below this line #
 
@@ -94,7 +94,7 @@ library(stringr)	# load stringr package (manipulates character strings easily)
 library(httr)		# load httr package (downloads files from the web, with SSL and cookies)
 library(Hmisc) 		# load Hmisc package (loads spss.get function)
 library(memisc)		# load memisc package (loads spss portable table import functions)
-
+library(haven)		# load stata files after version 12
 
 # construct a list containing the pre-specified login information
 values <- 
@@ -246,7 +246,14 @@ for ( curStudy in seq( length( files.to.download ) ) ){
 			fp <- z[ grep( 'dta' , z ) ]
 		
 			# ..import that puppy
-			x <- read.dta( fp , convert.factors = FALSE )
+			x <- read_dta( fp[ 1 ] )
+			
+			# just check that it's the same file if there's more than
+			# one file included in the zipped file.
+			if( length( fp ) == 2 ) stopifnot( nrow( read_dta( fp[ 2 ] ) ) == nrow( x ) )
+		
+			# also confirm that there's a max of two files in the zipped file.
+			stopifnot( length( fp ) %in% 1:2 )
 		
 		} else {
 		
