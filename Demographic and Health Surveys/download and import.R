@@ -283,7 +283,20 @@ for ( j in seq( length( country.numbers ) ) ){
 
 				# download the actual microdata file directly to disk
 				# don't read it into memory.  save it as `tf` immediately (RAM-free)
-				current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( tf , overwrite = TRUE ) )
+				te <- 
+					try(
+						current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( tf , overwrite = TRUE ) ) ,
+						silent = TRUE
+					)
+				
+				# if a file download breaks, give it a second try
+				if( class( te ) == 'try-error' ){
+				
+					Sys.sleep( 60 )
+					
+					current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( tf , overwrite = TRUE ) )
+				
+				}
 
 				# final folder to save it
 				fs <- paste( cur.folder , tolower( gsub( " System file| data" , "" , y[ i , 'File Format' ] ) ) , sep = '/' )
