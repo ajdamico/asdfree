@@ -281,16 +281,24 @@ for ( j in seq( length( country.numbers ) ) ){
 				# figure out the url to download
 				file.url <- all.links[ grep( y[ i , 'File Name' ] , all.links ) ]
 
+				
 				# download the actual microdata file directly to disk
 				# don't read it into memory.  save it as `tf` immediately (RAM-free)
 				te <- 
-					try(
-						current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( tf , overwrite = TRUE ) ) ,
+					try( {
+						
+						current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) )
+
+						writeBin( content( current.file , "raw" ) , tf )
+
+						,
 						silent = TRUE
 					)
 				
 				# if a file download breaks, give it a second try
 				if( class( te ) == 'try-error' ){
+				
+					gc()
 				
 					Sys.sleep( 60 )
 					
