@@ -290,10 +290,8 @@ for ( j in seq( length( country.numbers ) ) ){
 						current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) )
 
 						writeBin( content( current.file , "raw" ) , tf )
-
-						,
-						silent = TRUE
-					)
+					
+					} , silent = TRUE )
 				
 				# if a file download breaks, give it a second try
 				if( class( te ) == 'try-error' ){
