@@ -296,6 +296,8 @@ for ( j in seq( length( country.numbers ) ) ){
 				# if a file download breaks, give it a second try
 				if( class( te ) == 'try-error' ){
 				
+					handle_reset( paste0( "https://dhsprogram.com" , file.url ) )
+
 					gc()
 				
 					Sys.sleep( 60 )
