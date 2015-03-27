@@ -125,10 +125,7 @@ all.files <- c( inpatient , dme , pde , hospice , carrier , hha , outpatient , s
 for ( zf in all.files ){
 
 	# try the download.
-	other.attempt <- try( download.cache( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 1 ) , silent = TRUE )
-	
-	# always trigger the while loops.. it might be cache'd, so no harm done.
-	attempt <- 1
+	other.attempt <- try( download.cache( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 3 ) , silent = TRUE )
 	
 	# if there is really nothing in the file..
 	if( class( other.attempt ) == 'try-error' || length( readLines( tf , n = 10 ) ) == 0 ){
@@ -136,14 +133,9 @@ for ( zf in all.files ){
 		# switch to the other url prefix
 		
 		# so long as the download didn't complete, keep trying.
-		while( !is.numeric( attempt ) || attempt != 0 ) attempt <- download.cache( paste0( ftp.d , zf ) , tf , FUN = download , attempts = 1 )
+		download.cache( paste0( ftp.d , zf ) , tf , FUN = download , attempts = 3 )
 
 	# but if something (an incomplete file) was downloaded..
-	} else {
-
-		# so long as the download didn't complete, keep trying.
-		while( !is.numeric( attempt ) || attempt != 0 ) attempt <- download.cache( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 1 )
-		
 	}
 	
 	# unzip the downloaded zip file into the current working directory
