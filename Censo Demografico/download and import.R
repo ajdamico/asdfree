@@ -657,6 +657,9 @@ ftp.path <-	"ftp://ftp.ibge.gov.br/Censos/Censo_Demografico_2000/Microdados/"
 # fetch all available files in the ftp site's directory
 all.files <- getURL( ftp.path , dirlistonly = TRUE )
 
+# remove spaces so rio grande do sul isn't broken into two
+all.files <- gsub( " " , "" , all.files )
+
 # those files are separated by newline characters in the code,
 # so simply split them up into a character vector
 # full of individual zipped file strings
