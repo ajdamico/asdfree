@@ -741,7 +741,7 @@ for ( curFile in files.to.download ){
 	
 	stopifnot( sum( sapply( pes.file , countLines ) ) == dbGetQuery( db , paste( "select count(*) from" , pes.curTable ) )[ 1 , 1 ] )
 	
-	file.remove( tdl , dom.file )
+	file.remove( tdl , pes.file )
 	
 	read.SAScii.monetdb (
 		tdl <- ranc( fam.file , 118 ) ,
@@ -753,7 +753,7 @@ for ( curFile in files.to.download ){
 	
 	stopifnot( sum( sapply( fam.file , countLines ) ) == dbGetQuery( db , paste( "select count(*) from" , fam.curTable ) )[ 1 , 1 ] )
 	
-	file.remove( tdl , dom.file )
+	file.remove( tdl , fam.file )
 	
 	
 	file.remove( unzipped.files )
