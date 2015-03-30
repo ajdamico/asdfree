@@ -243,11 +243,7 @@ ranc <-
 			
 			while( length( line <- readLines( incon , 1 , skipNul = TRUE ) ) > 0 ){
 
-				# remove all non-alphanumeric characters
-				# line <- gsub( "[^[:alnum:]///' ]" , " " , line )
-
-				# line <- iconv( line , "" , "ASCII" , sub = " " )
-
+				# add blank spaces on the right side where they're absent.
 				line <- str_pad( line , width , side = "right" , pad = " " )
 				
 				# save the file on the disk
@@ -711,9 +707,11 @@ for ( curFile in files.to.download ){
 	pes.file <- unzipped.files[ grep( 'PES' , unzipped.files , useBytes = TRUE ) ]
 	fam.file <- unzipped.files[ grep( 'FAM' , unzipped.files , useBytes = TRUE ) ]
 	
-	dom.curTable <- gsub( '.zip' , '_dom00' , curFile )
-	pes.curTable <- gsub( '.zip' , '_pes00' , curFile )
-	fam.curTable <- gsub( '.zip' , '_fam00' , curFile )
+	curFile_ns <- gsub( " " , "" , curFile )
+	
+	dom.curTable <- gsub( '.zip' , '_dom00' , curFile_ns )
+	pes.curTable <- gsub( '.zip' , '_pes00' , curFile_ns )
+	fam.curTable <- gsub( '.zip' , '_fam00' , curFile_ns )
 	
 	dom.curTable <- tolower( gsub( '-' , '_' , dom.curTable ) )
 	pes.curTable <- tolower( gsub( '-' , '_' , pes.curTable ) )
