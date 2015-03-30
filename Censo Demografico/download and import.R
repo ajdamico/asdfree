@@ -668,6 +668,9 @@ all.files <- scan( text = all.files , what = "character", quiet = T )
 # remove the two files you don't need to import
 files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' ) ) ]
 
+# rio grande do sul has a space in the filename
+files.to.download <- gsub( "Rio_Grande_do_Sul" , "Rio_Grande _do_Sul" , files.to.download )
+
 # launch the current monet database
 pid <- monetdb.server.start( batfile )
 
