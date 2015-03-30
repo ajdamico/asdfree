@@ -631,9 +631,9 @@ monetdb.server.stop( pid )
 # which utilize these newly-created survey objects
 
 
-# wait ten seconds, just to make sure any previous servers closed
+# wait sixty seconds, just to make sure any previous servers closed
 # and you don't get a gdk-lock error from opening two-at-once
-Sys.sleep( 10 )
+Sys.sleep( 60 )
 
 
 # # # # # # # # # # # # # #
@@ -1105,7 +1105,7 @@ monetdb.server.stop( pid )
 
 # wait ten seconds, just to make sure any previous servers closed
 # and you don't get a gdk-lock error from opening two-at-once
-Sys.sleep( 10 )
+Sys.sleep( 60 )
 
 ##################################################################################
 # lines of code to hold on to for all other `censo_demografico` monetdb analyses #
