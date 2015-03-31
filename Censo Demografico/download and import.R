@@ -910,11 +910,11 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 dbSendQuery( db , 'ALTER TABLE c00_dom ADD COLUMN dom_wgt DOUBLE PRECISION' )
 dbSendQuery( db , 'ALTER TABLE c00_pes ADD COLUMN pes_wgt DOUBLE PRECISION' )
-dbSendQuery( db , 'ALTER TABLE c00_pes ADD COLUMN fam_wgt DOUBLE PRECISION' )
+dbSendQuery( db , 'ALTER TABLE c00_fam ADD COLUMN fam_wgt DOUBLE PRECISION' )
 
 dbSendQuery( db , 'UPDATE c00_dom SET dom_wgt = p001' )
 dbSendQuery( db , 'UPDATE c00_pes SET pes_wgt = p001' )
-dbSendQuery( db , 'UPDATE c00_pes SET fam_wgt = p001' )
+dbSendQuery( db , 'UPDATE c00_fam SET fam_wgt = p001' )
 
 dbSendQuery( db , 'ALTER TABLE c00_dom DROP COLUMN p001' )
 dbSendQuery( db , 'ALTER TABLE c00_pes DROP COLUMN p001' )
