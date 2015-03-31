@@ -246,8 +246,9 @@ ranc <-
 				# add blank spaces on the right side where they're absent.
 				line <- str_pad( line , width , side = "right" , pad = " " )
 				
-				# save the file on the disk
-				writeLines( line , outcon )
+				# save the file on the disk, so long as there's no weird corruption
+				if( !is.na( iconv( line , "" , "ASCII" ) ) ) writeLines( line , outcon )
+				# like line 509,451 and 2,575,789 of the combined 2000 sao paulo file.
 
 				# add to the line counter #
 				line.num <- line.num + 1
@@ -739,7 +740,13 @@ for ( curFile in files.to.download ){
 		connection = db
 	)
 	
-	stopifnot( sum( sapply( pes.file , countLines ) ) == dbGetQuery( db , paste( "select count(*) from" , pes.curTable ) )[ 1 , 1 ] )
+	# skip this check for sao paulo, because that file has a few corrupted lines.
+	if( all( !grepl( "PES35" , pes.file ) ) ){
+		stopifnot( sum( sapply( pes.file , countLines ) ) == dbGetQuery( db , paste( "select count(*) from" , pes.curTable ) )[ 1 , 1 ] )
+	} else {
+		# there are 13 corrupted lines in the sao paulo pes file
+		stopifnot( dbGetQuery( db , paste( "select count(*) from" , pes.curTable ) )[ 1 , 1 ] == 4038187 )
+	}
 	
 	file.remove( tdl , pes.file )
 	
