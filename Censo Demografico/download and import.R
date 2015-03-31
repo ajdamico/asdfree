@@ -1000,7 +1000,7 @@ fam.char <- tolower( fam.all[ fam.all$char , 'varname' ] )
 
 dom.factors <- intersect( dom.fields , dom.char )
 fam.factors <- intersect( fam.fields , fam.char )
-pes.factors <- intersect( pes.fields , c( dom.char , fam.char , pes.char ) )
+pes.factors <- unique( intersect( pes.fields , c( dom.char , fam.char , pes.char ) ) )
 
 # disconnect from the current monet database
 dbDisconnect( db )
