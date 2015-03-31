@@ -1,14 +1,14 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # current population survey 
 # annual social and economic supplement
-# 2005 - 2014
+# 1998 - 2014
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
-# cps.years.to.download <- 2014:2005
+# cps.years.to.download <- 2014:1998
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -30,7 +30,7 @@
 
 
 #########################################################################################################
-# Analyze the 2005 - 2014 Current Population Survey - Annual Social and Economic Supplement file with R #
+# Analyze the 1998 - 2014 Current Population Survey - Annual Social and Economic Supplement file with R #
 #########################################################################################################
 
 
@@ -46,14 +46,14 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" ) )
+# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" , "haven" ) )
 
 
 # define which years to download #
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# cps.years.to.download <- 2014:2005
+# cps.years.to.download <- 2014:1998
 
 # uncomment this line to only download the most current year
 # cps.years.to.download <- 2011
@@ -82,6 +82,11 @@ library(survey)		# load survey package (analyzes complex design surveys)
 library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 		# load the descr package (converts fixed-width files to delimited files)
 library(downloader)	# downloads and then runs the source() function on scripts from github
+library(haven) 		# load the haven package (imports dta files faaaaaast)
+
+
+# fix this issue https://github.com/rstats-db/RSQLite/issues/82
+setOldClass( c( "tbl_df" , "data.frame" ) )
 
 
 # load the download.cache and related functions
@@ -109,15 +114,6 @@ options( survey.replicates.mse = TRUE )
 # R will exactly match Stata without the MSE option results
 
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
-
-# this data frame contains one set of beginline parameters for each year for each file to be read in
-begin.lines <-
-	data.frame(
-		year = 2014:2005 ,
-		household = c( 993 , 993 , 993 , 988 , 964 , 994 , 981 , 994 , 989 , 992 ) ,
-		family = c( 1129 , 1129 , 1129 , 1121 , 1094 , 1137 , 1124 , 1143 , 1138 , 1141 ) ,
-		person = c( 1218 , 1218 , 1218 , 1209 , 1177 , 1221 , 1208 , 1227 , 1222 , 1225 )
-	)
 
 
 # begin looping through every cps year specified
@@ -147,17 +143,30 @@ for ( year in cps.years.to.download ){
 			# ifelse(
 				# year == 2014 ,
 				# "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.zip" ,
-				paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+				ifelse(
+					year %in% 2004:2003 ,
+					paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , ".zip" ) ,
+					ifelse(
+						year %in% 2002:1998 ,
+						paste0( "http://thedataweb.rm.census.gov/pub/cps/march/mar" , substr( year , 3 , 4 ) , "supp.zip" ) ,
+						paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+					)
+				)
 			# )
 		)
 
 	# national bureau of economic research website containing the current population survey's SAS import instructions
 	CPS.ASEC.mar.SAS.read.in.instructions <- 
 			ifelse(
-				year %in% 2013:2014 ,
-				paste0( "http://www.nber.org/data/progs/cps/cpsmar12.sas" ) ,
+				year %in% c( 1987 , 2013:2014 ) ,
+				paste0( "http://www.nber.org/data/progs/cps/cpsmar" , year , ".sas" ) , 
 				paste0( "http://www.nber.org/data/progs/cps/cpsmar" , substr( year , 3 , 4 ) , ".sas" ) 
 			)
+
+	# figure out the household, family, and person begin lines
+	hh_beginline <- grep( "HOUSEHOLD RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
+	fa_beginline <- grep( "FAMILY RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
+	pe_beginline <- grep( "PERSON RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
 
 	# create a temporary file and a temporary directory..
 	tf <- tempfile() ; td <- tempdir()
@@ -166,7 +175,7 @@ for ( year in cps.years.to.download ){
 	download.cache( CPS.ASEC.mar.file.location , tf , mode = "wb" )
 
 	# unzip the file's contents and store the file name within the temporary directory
-	fn <- unzip( tf , exdir = td , overwrite = T )
+	fn <- unzip( tf , exdir = td , overwrite = TRUE )
 
 	# create three more temporary files
 	# to store household-, family-, and person-level records ..and also the crosswalk
@@ -198,9 +207,9 @@ for ( year in cps.years.to.download ){
 	
 	# figure out the ending position for each filetype
 	# take the sum of the absolute value of the width parameter of the parsed-SAScii SAS input file, for household-, family-, and person-files separately
-	end.household <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = begin.lines[ begin.lines$year == year , 'household' ] )$width ) )
-	end.family <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = begin.lines[ begin.lines$year == year , 'family' ] )$width ) )
-	end.person <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = begin.lines[ begin.lines$year == year , 'person' ] )$width ) )
+	end.household <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = hh_beginline )$width ) )
+	end.family <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = fa_beginline )$width ) )
+	end.person <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = pe_beginline )$width ) )
 	
 	
 	# create a while-loop that continues until every line has been examined
@@ -279,8 +288,8 @@ for ( year in cps.years.to.download ){
 	read.SAScii.sqlite ( 
 		tf.household , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
-		beginline = begin.lines[ begin.lines$year == year , 'household' ] , 
-		zipped = F ,
+		beginline = hh_beginline , 
+		zipped = FALSE ,
 		tl = TRUE ,
 		tablename = 'household' ,
 		conn = db
@@ -294,8 +303,8 @@ for ( year in cps.years.to.download ){
 	read.SAScii.sqlite ( 
 		tf.family , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
-		beginline = begin.lines[ begin.lines$year == year , 'family' ] , 
-		zipped = F ,
+		beginline = fa_beginline , 
+		zipped = FALSE ,
 		tl = TRUE ,
 		tablename = 'family' ,
 		conn = db
@@ -309,8 +318,8 @@ for ( year in cps.years.to.download ){
 	read.SAScii.sqlite ( 
 		tf.person , 
 		CPS.ASEC.mar.SAS.read.in.instructions , 
-		beginline = begin.lines[ begin.lines$year == year , 'person' ] , 
-		zipped = F ,
+		beginline = pe_beginline , 
+		zipped = FALSE ,
 		tl = TRUE ,
 		tablename = 'person' ,
 		conn = db
@@ -322,12 +331,12 @@ for ( year in cps.years.to.download ){
 
 	# create a fake sas input script for the crosswalk..
 	xwalk.sas <-
-	"INPUT
-		@1 h_seq 5.
-		@6 ffpos 2.
-		@8 pppos 2.
-	;"
-	
+		"INPUT
+			@1 h_seq 5.
+			@6 ffpos 2.
+			@8 pppos 2.
+		;"
+		
 	# save it to the local disk
 	xwalk.sas.tf <- tempfile()
 	writeLines ( xwalk.sas , con = xwalk.sas.tf )
@@ -337,7 +346,7 @@ for ( year in cps.years.to.download ){
 	read.SAScii.sqlite ( 
 		tf.xwalk , 
 		xwalk.sas.tf , 
-		zipped = F ,
+		zipped = FALSE ,
 		tl = TRUE ,
 		tablename = 'xwalk' ,
 		conn = db
@@ -346,11 +355,6 @@ for ( year in cps.years.to.download ){
 	# create an index to speed up the merge
 	dbSendQuery( db , "CREATE INDEX xwalk_index ON xwalk ( h_seq , ffpos , pppos )" )
 
-		
-	# reset the database (.db)
-	# dbBeginTransaction( db )
-	# dbCommit( db )
-	
 	# clear up RAM
 	gc()
 
@@ -361,63 +365,67 @@ for ( year in cps.years.to.download ){
 	dbSendQuery( db , "create table hfp as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
 	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
 
+	if( year > 2004 ){
+		
+
+		# confirm that the number of records in the 2011 cps asec merged file
+		# matches the number of records in the person file
+		stopifnot( dbGetQuery( db , "select count(*) as count from hfp" ) == dbGetQuery( db , "select count(*) as count from person" ) )
+
+
+		# # # # # # # # # # # # # # # # # #
+		# load the replicate weight file  #
+		# # # # # # # # # # # # # # # # # #
+				
+		# this process is also slow.
+		# the CPS ASEC 2011 replicate weight file has 204,983 person-records.
+
+		# census.gov website containing the current population survey's replicate weights file
+		CPS.replicate.weight.file.location <- 
+			paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".zip" )
+			
+		# census.gov website containing the current population survey's SAS import instructions
+		CPS.replicate.weight.SAS.read.in.instructions <- 
+			paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".SAS" )
+
+		# store the CPS ASEC march 2011 replicate weight file as an R data frame
+		read.SAScii.sqlite ( 
+			CPS.replicate.weight.file.location , 
+			CPS.replicate.weight.SAS.read.in.instructions , 
+			zipped = TRUE , 
+			tl = TRUE ,
+			tablename = 'rw' ,
+			conn = db
+		)
+
+		# create an index to speed up the merge
+		dbSendQuery( db , "CREATE INDEX rw_index ON rw ( h_seq , pppos )" )
+
+
+		###################################################
+		# merge cps asec file with replicate weights file #
+		###################################################
+
+		sql <- paste( "create table" , cps.tablename , "as select * from hfp as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" )
+		
+		dbSendQuery( db , sql )
+
+	} else {
+	
+		dbSendQuery( db , paste( "create table" , cps.tablename , "as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" ) )
+			
+	}
+		
+	# confirm that the number of records in the 2011 person file
+	# matches the number of records in the merged file
+	stopifnot( dbGetQuery( db , paste( "select count(*) as count from " , cps.tablename ) ) == dbGetQuery( db , "select count(*) as count from person" ) )
 
 	# drop unnecessary tables
 	dbSendQuery( db , "drop table h_xwalk" )
 	dbSendQuery( db , "drop table h_f_xwalk" )
 	dbSendQuery( db , "drop table xwalk" )
-
-
-	# confirm that the number of records in the 2011 cps asec merged file
-	# matches the number of records in the person file
-	stopifnot( dbGetQuery( db , "select count(*) as count from hfp" ) == dbGetQuery( db , "select count(*) as count from person" ) )
-
-
-	# # # # # # # # # # # # # # # # # #
-	# load the replicate weight file  #
-	# # # # # # # # # # # # # # # # # #
-			
-	# this process is also slow.
-	# the CPS ASEC 2011 replicate weight file has 204,983 person-records.
-
-	# census.gov website containing the current population survey's replicate weights file
-	CPS.replicate.weight.file.location <- 
-		paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".zip" )
-		
-	# census.gov website containing the current population survey's SAS import instructions
-	CPS.replicate.weight.SAS.read.in.instructions <- 
-		paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".SAS" )
-
-	# store the CPS ASEC march 2011 replicate weight file as an R data frame
-	read.SAScii.sqlite ( 
-		CPS.replicate.weight.file.location , 
-		CPS.replicate.weight.SAS.read.in.instructions , 
-		zipped = T , 
-		tl = TRUE ,
-		tablename = 'rw' ,
-		conn = db
-	)
-
-	# create an index to speed up the merge
-	dbSendQuery( db , "CREATE INDEX rw_index ON rw ( h_seq , pppos )" )
-
-
-	###################################################
-	# merge cps asec file with replicate weights file #
-	###################################################
-
-	sql <- paste( "create table" , cps.tablename , "as select * from hfp as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" )
-	
-	dbSendQuery( db , sql )
-	
-	# confirm that the number of records in the 2011 person file
-	# matches the number of records in the merged file
-	stopifnot( dbGetQuery( db , paste( "select count(*) as count from " , cps.tablename ) ) == dbGetQuery( db , "select count(*) as count from person" ) )
-
-
-	# drop unnecessary tables
 	dbSendQuery( db , "drop table hfp" )
-	dbSendQuery( db , "drop table rw" )
+	try( dbSendQuery( db , "drop table rw" ) , silent = TRUE )
 	dbSendQuery( db , "drop table household" )
 	dbSendQuery( db , "drop table family" )
 	dbSendQuery( db , "drop table person" )
@@ -427,6 +435,55 @@ for ( year in cps.years.to.download ){
 	dbSendQuery( db , paste( "ALTER TABLE" , cps.tablename , "ADD one REAL" ) )
 	dbSendQuery( db , paste( "UPDATE" , cps.tablename , "SET one = 1" ) )
 
+	# # # # # # # # # # # # # # # # # # # # # # # # # #
+	# import the supplemental poverty research files  #
+	# # # # # # # # # # # # # # # # # # # # # # # # # #
+	
+	overlapping.spm.fields <- c( "gestfips" , "fpovcut" , "ftotval" , "marsupwt" )
+	
+	if( year > 2009 ){
+
+		sp.url <- 
+			paste0( 
+			"http://www.census.gov/housing/povmeas/spmresearch/spmresearch" , 
+			year - 1 , 
+			if ( year != 2014 ) "new" ,
+			".sas7bdat" 
+		)
+		
+		download.cache( sp.url , tf , mode = 'wb' )
+		
+		sp <- read_sas( tf )
+	
+		names( sp ) <- tolower( names( sp ) )
+
+		sp <- sp[ , !( names( sp ) %in% overlapping.spm.fields ) ]
+
+		dbWriteTable( db , paste0( cps.tablename , "_sp" ) , sp )
+		
+		rm( sp ) ; gc()
+	
+		dbSendQuery( db , paste( 'create table temp as select * from' , cps.tablename ) )
+		
+		dbRemoveTable( db , cps.tablename )
+		
+		dbSendQuery( 
+			db , 
+			paste0( 
+				"create table " , 
+				cps.tablename , 
+				" as select * from temp as a inner join " ,
+				cps.tablename , 
+				"_sp as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" 
+			) 
+		)
+
+		stopifnot( dbGetQuery( db , paste( "select count(*) as count from " , cps.tablename ) ) == dbGetQuery( db , "select count(*) as count from temp" ) )
+	
+		dbRemoveTable( db , 'temp' )
+				
+	}
+	
 	# disconnect from the current database
 	dbDisconnect( db )
 	
