@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # medicare current beneficiary survey
-# 1997-2010
+# 1997-2011
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -75,11 +75,11 @@ if ( !i.understand ){
 
 # what are the years of cost & use data do you have to import? #
 
-# this defaults to 1997 thru 2010, but only if you haven't defined this variable already
-if( !exists( 'consolidated.files.to.create' ) ) consolidated.files.to.create <- 1997:2010
+# this defaults to 1997 thru 2011, but only if you haven't defined this variable already
+if( !exists( 'consolidated.files.to.create' ) ) consolidated.files.to.create <- 1997:2011
 
-# maybe you just have 2010
-# consolidated.files.to.create <- 2010
+# maybe you just have 2011
+# consolidated.files.to.create <- 2011
 
 # maybe you have 2003 thru 2006 and also 2009
 # consolidated.files.to.create <- c( 2003:2006 , 2009 )
@@ -114,8 +114,8 @@ if( !exists( 'consolidated.files.to.create' ) ) consolidated.files.to.create <- 
 # do you want to import any individual .dat files as .rda files? #
 
 # individual file-years to import
-# this defaults to 2007 thru 2010, but only if you haven't defined this variable already
-if ( !exists( 'years.to.import.all.files' ) ) years.to.import.all.files <- 2007:2010
+# this defaults to 2007 thru 2011, but only if you haven't defined this variable already
+if ( !exists( 'years.to.import.all.files' ) ) years.to.import.all.files <- 2007:2011
 
 # there are errors with the SAS importation script before 2007
 # (at least 2006 didn't work for me)
