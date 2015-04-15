@@ -589,11 +589,13 @@ for ( year in consolidated.files.to.create ){
 	# # # # # # #
 	# row check #
 	
-	# the ricx file should have the same number of records
-	# as the final `x` object
-	ricx.fn <- paste0( ff.directory , '/ricx.dat' )
-	
-	stopifnot( nrow( x ) == countLines( ricx.fn ) )
+	stopifnot( nrow( x ) == nrow( ricx ) )
+
+	if( year < 2001 ){
+		stopifnot( sum( x$cs1yrwgt ) == sum( ricx[ , paste0( 'c' , substr( year , 3 , 4 ) , 'wgt' ) ] ) )
+	} else {
+		stopifnot( sum( x$cs1yrwgt ) == sum( ricx$cs1yrwgt ) )
+	}
 	
 	# end of row check  #
 	# # # # # # # # # # #
