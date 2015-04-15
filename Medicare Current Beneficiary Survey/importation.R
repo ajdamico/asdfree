@@ -201,7 +201,7 @@ for ( year in consolidated.files.to.create ){
 		# always throw out `ricn` and `ricn2` files..
 		# these will never be imported by this program
 		remaining.ric.names.to.import <-
-			remaining.ric.names.to.import[ !( remaining.ric.names.to.import %in% c( 'ricn' , 'ricn2' ) ) ]
+			remaining.ric.names.to.import[ !( tolower( remaining.ric.names.to.import ) %in% c( 'ricn' , 'ricn2' ) ) ]
 		
 		# add them into the `rics_a` vector to be imported into RAM
 		rics_a <- c( remaining.ric.names.to.import , rics_a )
