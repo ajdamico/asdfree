@@ -2,7 +2,7 @@
 # survey of income and program participation
 # 2008 panel
 # 16 core waves, 16 wave-specific replicate weights, 12 topical modules, 
-# 4 panel year replicate weights, 4 calendar year replicate weights, 1 longitudinal weights
+# 5 panel year replicate weights, 5 calendar year replicate weights, 1 longitudinal weights
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -55,8 +55,8 @@ sipp.core.waves <- 1:16																	# either choose which core survey waves 
 sipp.replicate.waves <- 1:16															# either choose which replicate weight waves to download, or set to NULL
 sipp.topical.modules <- c( 1:11 , 13 )													# either choose which topical modules to download, or set to NULL
 sipp.longitudinal.weights <- TRUE														# set to FALSE to prevent download
-sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:4 )							# reads in 2009-2012
-sipp.pnl.longitudinal.replicate.weights <- paste0( 'pn' , 1:4 )							# reads in 2009-2012
+sipp.cy.longitudinal.replicate.weights <- paste0( 'cy' , 1:5 )							# reads in 2009-2013
+sipp.pnl.longitudinal.replicate.weights <- paste0( 'pn' , 1:5 )							# reads in 2009-2013
 
 ############################################
 # no need to edit anything below this line #
@@ -225,12 +225,12 @@ if ( sipp.longitudinal.weights ){
 
 	# add the longitudinal weights to the database in a table 'wgtw14'
 	read.SAScii.sqlite(
-		"http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w14.zip" ,
-		chop.suid( fix.ct( "http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w14.sas" ) ) ,
+		"http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w16.zip" ,
+		chop.suid( fix.ct( "http://thedataweb.rm.census.gov/pub/sipp/2008/lgtwgt2008w16.sas" ) ) ,
 		beginline = 5 ,
 		zipped = T ,
 		tl = TRUE ,
-		tablename = "wgtw14" ,
+		tablename = "wgtw16" ,
 		conn = db
 	)
 }
