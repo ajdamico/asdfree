@@ -23,7 +23,7 @@ monet.read.tsv <-
 	
 		# otherwise, determine headers yourself
 		
-		headers <- lapply(files, read.table, header = header , sep = '\t' , na.strings = "NA", nrows = nrow.check)
+		headers <- lapply(files, read.table, header = header , sep = '\t' , na.strings = na.strings , nrows = nrow.check)
 		
 		if (length(files) > 1) {
 			nn <- sapply(headers, ncol)
