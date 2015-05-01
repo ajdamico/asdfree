@@ -11,7 +11,8 @@ monet.read.tsv <-
 		locked = FALSE , 
 		na.strings = "" , 
 		nrow.check = 500 ,
-		structure = NULL
+		structure = NULL ,
+		delimiters = "'\t'"
 	) {
     
 	if (length(na.strings) > 1) stop("na.strings must be of length 1")
@@ -51,7 +52,9 @@ monet.read.tsv <-
 					tablename, 
 					"from", 
 					paste("'", thefile, "'", sep = ""), 
-					"using delimiters '\t' NULL as", 
+					"using delimiters" ,
+					delimiters ,
+					"NULL as", 
 					paste("'", na.strings[1], "'", sep = ""), 
 					if (locked) "LOCKED"
 				)
@@ -67,7 +70,9 @@ monet.read.tsv <-
 					tablename, 
 					"from", 
 					paste("'", thefile, "'", sep = ""), 
-					"using delimiters '\t' NULL as ", 
+					"using delimiters" ,
+					delimiters ,
+					"NULL as ", 
 					paste("'", na.strings[1], "'", sep = ""), 
 					if (locked)"LOCKED"
 				)
