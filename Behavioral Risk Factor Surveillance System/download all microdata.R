@@ -520,7 +520,7 @@ for ( year in intersect( years.to.download , 2002:2013 ) ){
 survey.vars <-
 	data.frame(
 		year = 1984:2013 ,
-		weight = c( rep( 'x_finalwt' , 10 ) , rep( 'xfinalwt' , 17 ) , rep( 'xllcpwt' , 3 ) ) ,
+		weight = c( rep( 'x_finalwt' , 18 ) , rep( 'xfinalwt' , 9 ) , rep( 'xllcpwt' , 3 ) ) ,
 		psu = c( rep( 'x_psu' , 18 ) , rep( 'xpsu' , 12 ) ) ,
 		strata = c( rep( 'x_ststr' , 18 ) , rep( 'xststr' , 12 ) )
 	)
