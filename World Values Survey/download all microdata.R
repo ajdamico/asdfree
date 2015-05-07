@@ -145,7 +145,7 @@ for ( this.wave in waves.to.download ){
 	dir.create( this.dir , showWarnings = FALSE )
 	
 	# append a few bits of information required by the website, including the wave number
-	values$SAID <- ""
+	values$SAID <- ifelse( this.wave == -1 , -1 , "" )
 	values$DOID <- ""
 	values$CndWAVE <- this.wave
 
