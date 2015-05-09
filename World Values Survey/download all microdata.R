@@ -183,6 +183,13 @@ for ( this.wave in waves.to.download ){
 
 		# extract the filename from the website's response header
 		fn <- gsub( "attachment; filename=\"|\"" , "" , x$headers$`content-disposition` )
+
+		# correct filenames for WVS longitudinal documents as of 2015-05-09
+		if(this.wave == -1 & fn == "")
+			fn = "WVS_EVS_Integrated_Dictionary_Codebook v_2014_09_22.xls"
+
+		if(this.wave == -1 & fn == "04-25.xls")
+			fn = "WVS_Values Surveys Integrated Dictionary_TimeSeries_v_2014-04-25.xls"
 		
 		# delete the object `x` from RAM
 		rm( x )
