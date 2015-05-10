@@ -7,7 +7,7 @@
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PNADC/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20do%20Domicilios%20Continua/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios%20Continua/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -139,38 +139,42 @@ for ( i in seq_along( zip.filenames ) ){
 		download.cache( current.zipfile , tf , mode = 'wb' )
 		
 	}
+		
+	# unzip all text files to the temporary directory..
+	cur.textfiles <- unzip( tf , exdir = td )
+
+	for ( txt in grep( "\\.txt$" , cur.textfiles , value = TRUE ) ){
+
+		month <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.txt" , "\\2" , txt )
+		year <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.txt" , "\\3" , txt )
+	
+		# construct the full `.rda` path to the save-location on your local disk
+		current.savefile <-	paste0( 'pnadc ' , year , ' ' , month , '.rda' )
 			
-	yyyymm <- gsub( "(.*)_([0-9]*)\\.zip" , "\\2" , zip.filenames[ i ] )
-	year <- substr( yyyymm , 1 , 4 )
-	month <- substr( yyyymm , 5 , 6 )
+		# ..and read that text file directly into an R data.frame
+		# using the sas importation script downloaded before this big fat loop
+		x <- read.SAScii( txt , sasfile )
 
-	# construct the full `.rda` path to the save-location on your local disk
-	current.savefile <-	paste0( 'pnadc ' , year , ' ' , month , '.rda' )
+		# convert all column names to lowercase
+		names( x ) <- tolower( names( x ) )
+		
+		# save the data.frame object to the local disk
+		save( x , file = current.savefile )
+		
+		# clear the `x` data.frame object from working memory
+		rm( x )
+		
+		# clear up RAM
+		gc()
 	
-	# unzip the current text file to the temporary directory..
-	cur.textfile <- unzip( tf , exdir = td )
+	}
+	
+	# remove the temporary file
+	file.remove( tf )
 
-	# ..and read that text file directly into an R data.frame
-	# using the sas importation script downloaded before this big fat loop
-	x <- read.SAScii( cur.textfile , sasfile )
-
-	# convert all column names to lowercase
-	names( x ) <- tolower( names( x ) )
-	
-	# save the data.frame object to the local disk
-	save( x , file = current.savefile )
-	
-	# clear the `x` data.frame object from working memory
-	rm( x )
-	
-	# clear up RAM
-	gc()
-	
 }
 
-# remove the temporary file..
-file.remove( tf )
-# ..and the contents of the temporary directory
+# remove the contents of the temporary directory
 unlink( td , recursive = TRUE )
 # from your local disk
 
