@@ -109,23 +109,23 @@ svyby( ~ one , ~ idcntry , asg_ash_design , svytotal )
 svymean( ~ asbhela , asg_ash_design , na.rm = TRUE )
 
 # by country
-svyby( ~ asbhela , ~ idcntry , asg_ash_design , svymean , na.rm = TRUE )
+svyby( ~ asbhela , ~ idcntry , asg_ash_design , svymean , na.rm = TRUE , na.rm.all = TRUE )
 
 
 # calculate the distribution of a categorical variable #
 
-# sex should be treated as a factor (categorical) variable
+# birth year should be treated as a factor (categorical) variable
 # instead of a numeric (linear) variable
 # this update statement converts it.
 # the commands below will not give distributions without this
-asg_ash_design <- update( asg_ash_design , itsex = factor( itsex ) )
+asg_ash_design <- update( asg_ash_design , itbirthy = factor( itbirthy ) )
 
 
-# percent of respondent males vs. females - nationwide
-svymean( ~ itsex , asg_ash_design , )
+# percent of respondent by year of birth - nationwide
+svymean( ~ itbirthy , asg_ash_design , na.rm = TRUE )
 
 # by country
-svyby( ~ itsex , ~ idcntry , asg_ash_design , svymean )
+svyby( ~ itbirthy , ~ idcntry , asg_ash_design , svymean , na.rm = TRUE , na.rm.all = TRUE )
 
 
 # calculate the median and other percentiles #
@@ -141,16 +141,17 @@ svyquantile(
 	na.rm = TRUE
 )
 
-# by sex 
+# by year of birth
 svyby( 
 	~ asbhela , 
-	~ itsex , 
+	~ itbirthy , 
 	asg_ash_design ,
 	svyquantile , 
 	c( 0 , .25 , .5 , .75 , 1 ) , 
 	method = 'constant' , 
 	interval.type = 'quantile' ,
-	na.rm = TRUE
+	na.rm = TRUE ,
+	na.rm.all = TRUE
 ) 
 
 
