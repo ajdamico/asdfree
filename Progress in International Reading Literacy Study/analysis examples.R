@@ -234,10 +234,10 @@ asg_design <- update( asg_design , itsex = factor( itsex ) )
 
 
 # percent of respondent males vs. females - nationwide
-scf.MIcombine( with( asg_design , svymean( ~ itsex ) ) )
+scf.MIcombine( with( asg_design , svymean( ~ itsex , na.rm = TRUE ) ) )
 
 # by country
-scf.MIcombine( with( asg_design , svyby( ~ itsex , ~ idcntry , svymean ) ) )
+scf.MIcombine( with( asg_design , svyby( ~ itsex , ~ idcntry , svymean , na.rm = TRUE , na.rm.all = TRUE ) ) )
 
 
 # calculate the median and other percentiles #
@@ -268,7 +268,9 @@ scf.MIcombine(
 			svyquantile , 
 			c( 0 , .25 , .5 , .75 , 1 ) , 
 			method = 'constant' , 
-			interval.type = 'quantile'
+			interval.type = 'quantile' ,
+			na.rm = TRUE ,
+			na.rm.all = TRUE
 		) 
 	) 
 )
