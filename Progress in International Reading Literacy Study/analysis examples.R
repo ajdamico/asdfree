@@ -224,22 +224,6 @@ scf.MIcombine( with( asg_design , svymean( ~ asrrea ) ) )
 scf.MIcombine( with( asg_design , svyby( ~ asrrea , ~ idcntry , svymean ) ) )
 
 
-# calculate the distribution of a categorical variable #
-
-# sex should be treated as a factor (categorical) variable
-# instead of a numeric (linear) variable
-# this update statement converts it.
-# the commands below will not give distributions without this
-asg_design <- update( asg_design , itsex = factor( itsex ) )
-
-
-# percent of respondent males vs. females - nationwide
-scf.MIcombine( with( asg_design , svymean( ~ itsex , na.rm = TRUE ) ) )
-
-# by country
-scf.MIcombine( with( asg_design , svyby( ~ itsex , ~ idcntry , svymean , na.rm = TRUE , na.rm.all = TRUE ) ) )
-
-
 # calculate the median and other percentiles #
 
 # minimum, 25th, 50th, 75th, maximum
