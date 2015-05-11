@@ -106,10 +106,10 @@ svyby( ~ one , ~ idcntry , asg_ash_design , svytotal )
 # calculate the mean of a linear variable #
 
 # average contextual scale scores - across all individuals in the data set
-svymean( ~ asbhela , asg_ash_design )
+svymean( ~ asbhela , asg_ash_design , na.rm = TRUE )
 
 # by country
-svyby( ~ asbhela , ~ idcntry , asg_ash_design , svymean )
+svyby( ~ asbhela , ~ idcntry , asg_ash_design , svymean , na.rm = TRUE )
 
 
 # calculate the distribution of a categorical variable #
@@ -137,7 +137,8 @@ svyquantile(
 	asg_ash_design ,
 	c( 0 , .25 , .5 , .75 , 1 )  , 
 	method = 'constant' , 
-	interval.type = 'quantile' 
+	interval.type = 'quantile' ,
+	na.rm = TRUE
 )
 
 # by sex 
@@ -148,7 +149,8 @@ svyby(
 	svyquantile , 
 	c( 0 , .25 , .5 , .75 , 1 ) , 
 	method = 'constant' , 
-	interval.type = 'quantile'
+	interval.type = 'quantile' ,
+	na.rm = TRUE
 ) 
 
 
@@ -167,7 +169,7 @@ aust_design <- subset( asg_ash_design , idcntry == 36 )
 
 # average reading achievement - nationwide, 
 # restricted to australia
-svymean( ~ asbhela , aust_design )
+svymean( ~ asbhela , aust_design , na.rm = TRUE )
 
 # remove both designs to clear up memory
 rm( aust_design , asg_ash_design )
