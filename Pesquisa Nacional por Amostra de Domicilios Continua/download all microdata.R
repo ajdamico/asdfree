@@ -145,11 +145,11 @@ for ( i in seq_along( zip.filenames ) ){
 
 	for ( txt in grep( "\\.txt$" , cur.textfiles , value = TRUE ) ){
 
-		month <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.txt" , "\\2" , txt )
+		quarter <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.txt" , "\\2" , txt )
 		year <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.txt" , "\\3" , txt )
 	
 		# construct the full `.rda` path to the save-location on your local disk
-		current.savefile <-	paste0( 'pnadc ' , year , ' ' , month , '.rda' )
+		current.savefile <-	paste0( 'pnadc ' , year , ' ' , quarter , '.rda' )
 			
 		# ..and read that text file directly into an R data.frame
 		# using the sas importation script downloaded before this big fat loop
