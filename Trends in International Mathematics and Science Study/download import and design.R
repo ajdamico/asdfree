@@ -276,8 +276,8 @@ for ( this.year in years ){
 					# make all column names lowercase
 					names( y ) <- tolower( names( y ) )
 					
-					# some earlier files have `jkindic` instead of `jkzone.  fix that.
-					if( 'jkindic' %in% names( y ) & !( 'jkzone' %in% names( y ) ) ) names( y ) <- gsub( 'jkindic' , 'jkzone' , names( y ) )
+					# some earlier files have `jkindic` instead of `jkrep`.  fix that.
+					if( 'jkindic' %in% names( y ) & !( 'jkrep' %in% names( y ) ) ) names( y ) <- gsub( 'jkindic' , 'jkrep' , names( y ) )
 					
 					# save the stacked file as the prefix
 					assign( paste0( p , s ) , y )
