@@ -306,7 +306,7 @@ for ( this.year in years ){
 	# open the connection to a new sqlite database
 	db <- dbConnect( SQLite() , db.name )
 
-	for ( rdas in list.files( paste0( './' , this.year ) , full.names = TRUE ) ){
+	for ( rdas in rev( list.files( paste0( './' , this.year ) , full.names = TRUE ) ) ){
 	
 		print( paste( "current designing" , rdas ) )
 	
@@ -371,7 +371,16 @@ for ( this.year in years ){
 			}
 
 			z <- z[ , paste0( 'rw' , 1:75 ) ]
-			
+		
+			# clear up space just in case you're close to the RAM limit.
+			if( object.size( z ) > 100000000 ){
+				save( z , file = 'temp.rda' )
+				rm( z )
+				gc()
+				load( 'temp.rda' )
+				unlink( 'temp.rda' )
+			}
+				
 			# where there any imputed variables?
 			if( length( pv ) > 0 ){
 			
