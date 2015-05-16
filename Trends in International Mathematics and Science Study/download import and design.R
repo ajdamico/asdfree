@@ -372,16 +372,41 @@ for ( this.year in years ){
 
 			z <- z[ , paste0( 'rw' , 1:75 ) ]
 			
-			design <- 
-				svrepdesign( 
-					weights = as.formula( paste( "~" , wgt ) )  , 
-					repweights = z , 
-					data = imputationList( datasets = as.list( paste0( df , 1:5 ) ) , dbtype = "SQLite" ) , 
-					type = "other" ,
-					combined.weights = TRUE , 
-					dbname = db.name
-				)
-
+			# where there any imputed variables?
+			if( length( pv ) > 0 ){
+			
+				# if so, construct a multiply-imputed,
+				# database-backed, replicate-weighted
+				# complex sample survey design.
+				design <- 
+					svrepdesign( 
+						weights = as.formula( paste( "~" , wgt ) )  , 
+						repweights = z , 
+						data = imputationList( datasets = as.list( paste0( df , 1:5 ) ) , dbtype = "SQLite" ) , 
+						type = "other" ,
+						combined.weights = TRUE , 
+						dbname = db.name
+					)
+					
+			} else {
+			
+				# otherwise, construct a
+				# database-backed, replicate-weighted
+				# complex sample survey design
+				# without the multiple imputation.
+				design <- 
+					svrepdesign( 
+						weights = as.formula( paste( "~" , wgt ) )  , 
+						repweights = z , 
+						data = df , 
+						dbtype = "SQLite" ,
+						type = "other" ,
+						combined.weights = TRUE , 
+						dbname = db.name
+					)
+					
+			}
+				
 			rm( z ) ; gc()
 			
 			assign( paste0( df , "_design" ) , design )
