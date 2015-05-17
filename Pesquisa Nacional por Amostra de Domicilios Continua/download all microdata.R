@@ -102,7 +102,7 @@ year.ftp <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_A
 
 # read the text of the microdata ftp into working memory
 # download the contents of the ftp directory for all microdata
-year.listing <- readLines( textConnection( getURL( full.ftp ) ) )
+year.listing <- readLines( textConnection( getURL( year.ftp ) ) )
 
 # extract all years
 year.lines <- gsub( "(.*)([0-9][0-9][0-9][0-9])" , "\\2" , year.listing )
@@ -115,7 +115,7 @@ zip.filenames <- NULL
 for ( this.year in year.lines ){
 
 	# find the zipped files in the year-specific folder
-	ftp.listing <- readLines( textConnection( getURL( paste0( full.ftp , this.year , "/" ) ) ) )
+	ftp.listing <- readLines( textConnection( getURL( paste0( year.ftp , this.year , "/" ) ) ) )
 
 	# break up the string based on the ending extension
 	zip.lines <- grep( "\\.zip$" , ftp.listing , value = TRUE )
@@ -134,7 +134,7 @@ for ( i in seq_along( zip.filenames ) ){
 	# construct the full ftp path to the current zipped file
 	current.zipfile <-
 		paste0(
-			full.ftp ,
+			year.ftp ,
 			year , 
 			"/" ,
 			zip.filenames[ i ]
