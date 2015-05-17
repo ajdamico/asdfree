@@ -85,27 +85,8 @@ source_url(
 # create a temporary file and a temporary directory..
 tf <- tempfile() ; td <- tempdir()
 
-# initiate the full ftp path
-full.ftp <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Microdados/"
-
-# read the text of the microdata ftp into working memory
-# download the contents of the ftp directory for all microdata
-ftp.listing <- readLines( textConnection( getURL( full.ftp ) ) )
-
-# break up the string based on the ending extension
-zip.lines <- grep( "\\.zip$" , ftp.listing , value = TRUE )
-
-# extract the precise filename of the `.zip` file
-zip.filenames <- gsub( '(.*) (.*)' , "\\2" , zip.lines )
-
-# identify the `input` zipped file
-input.filename <- grep( "input" , zip.filenames , value = TRUE )
-
-# append the full ftp path to the front
-input.fullname <- paste0( full.ftp , input.filename )
-
-# remove the input file from the vector of zipped files to download
-zip.filenames <- zip.filenames[ !grepl( "input" , zip.filenames ) ]
+# designate the position of the input file
+input.fullname <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/Dicionario_e_input.zip"
 
 # download the input file immediately
 download.cache( input.fullname , tf , mode = 'wb' )
@@ -116,15 +97,48 @@ z <- unzip( tf , exdir = td )
 # identify and store the sas file
 sasfile <- grep( "\\.sas$" , z , value = TRUE )
 
+# initiate the full ftp path
+year.ftp <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/"
+
+# read the text of the microdata ftp into working memory
+# download the contents of the ftp directory for all microdata
+year.listing <- readLines( textConnection( getURL( full.ftp ) ) )
+
+# extract all years
+year.lines <- gsub( "(.*)([0-9][0-9][0-9][0-9])" , "\\2" , year.listing )
+year.lines <- year.lines[ !is.na( as.numeric( year.lines ) ) ]
+
+# initiate an empty vector
+zip.filenames <- NULL
+
+# loop through every year
+for ( this.year in year.lines ){
+
+	# find the zipped files in the year-specific folder
+	ftp.listing <- readLines( textConnection( getURL( paste0( full.ftp , this.year , "/" ) ) ) )
+
+	# break up the string based on the ending extension
+	zip.lines <- grep( "\\.zip$" , ftp.listing , value = TRUE )
+
+	# extract the precise filename of the `.zip` file,
+	# and add it to the zip filenames vector.
+	zip.filenames <- c( zip.filenames , gsub( '(.*) (.*)' , "\\2" , zip.lines ) )
+}
+
 # loop through the `zip.filenames` character vector..
 for ( i in seq_along( zip.filenames ) ){
+
+	quarter <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.(zip|ZIP)" , "\\2" , zip.filenames[ i ] )
+	year <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.(zip|ZIP)" , "\\3" , zip.filenames[ i ] )
 
 	# construct the full ftp path to the current zipped file
 	current.zipfile <-
 		paste0(
 			full.ftp ,
+			year , 
+			"/" ,
 			zip.filenames[ i ]
-		)	
+		)
 	
 
 	# try to download the zipped file..
@@ -139,14 +153,11 @@ for ( i in seq_along( zip.filenames ) ){
 		download.cache( current.zipfile , tf , mode = 'wb' )
 		
 	}
-		
+
 	# unzip all text files to the temporary directory..
 	cur.textfiles <- unzip( tf , exdir = td )
 
 	for ( txt in grep( "\\.txt$" , cur.textfiles , value = TRUE ) ){
-
-		quarter <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.txt" , "\\2" , txt )
-		year <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.txt" , "\\3" , txt )
 	
 		# construct the full `.rda` path to the save-location on your local disk
 		current.savefile <-	paste0( 'pnadc ' , year , ' ' , quarter , '.rda' )
