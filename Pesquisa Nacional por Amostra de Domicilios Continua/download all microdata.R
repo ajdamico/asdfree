@@ -158,6 +158,9 @@ for ( i in seq_along( zip.filenames ) ){
 		# convert all column names to lowercase
 		names( x ) <- tolower( names( x ) )
 		
+		# immediately make every field numeric
+		for( i in names( x ) ) x[ , i ] <- as.numeric( as.character( x[ , i ] ) )
+
 		# save the data.frame object to the local disk
 		save( x , file = current.savefile )
 		
