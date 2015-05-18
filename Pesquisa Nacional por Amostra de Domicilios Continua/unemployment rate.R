@@ -187,8 +187,8 @@ part.rate <- svyratio( ~ vd4001 == 1 , ~ pia , w , na.rm = TRUE )
 
 # print the coefficient to the screen
 coef( part.rate )
-# 1 = pessoas na forca de trabalho
-# 2 = pessoas fora da forca de trabalho
+# 1 = individuals in the labor force (pessoas na forca de trabalho)
+# 2 = individuals not in the labor force (pessoas fora da forca de trabalho)
 
 
 # occupation status
@@ -196,8 +196,8 @@ ocupacao.total <- svytotal( ~ factor( vd4002 ) , w , na.rm = TRUE )
 
 # print the coefficient to the screen
 coef( ocupacao.total )
-# 1 = pessoas ocupadas 
-# 2 = pessoas desocupadas 
+# 1 = workers (pessoas ocupadas)
+# 2 = non-workers (pessoas desocupadas)
 
 
 # unemployment rate (among those in the labor force)
