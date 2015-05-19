@@ -192,6 +192,15 @@ for ( this.study in study.names ){
 		# remove any negative ones, since those are not rnums themselves
 		all.option.values <- all.option.values[ all.option.values != "-1" ]
 
+                ## get list of already download files (in case you've had to start and then stop)
+                already.stored <- lapply(list.files(this.dir), FUN = function(x) strsplit(x, split = '\\.')[[1]][1])
+
+                ## unlist
+                already.stored <- unlist(already.stored)
+
+                ## subset so we only download what hasn't already been downloaded
+                all.option.values <- all.option.values[!(all.option.values %in% already.stored)]
+
 		# loop through each available rnum extract
 		for ( option.value in all.option.values ){
 
