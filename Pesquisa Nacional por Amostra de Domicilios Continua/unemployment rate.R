@@ -64,8 +64,6 @@ options( survey.lonely.psu = "adjust" )
 # SAS uses "remove" instead of "adjust" by default,
 # the table target replication was generated with SAS,
 # so if you want to get closer to that, use "remove"
-# remember: you will not hit the IBGE excel file exactly,
-# because the public use file rounds the weights.  sorry 'bout that
 
 
 # in the current working directory,
