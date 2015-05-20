@@ -124,11 +124,11 @@ uf <-
 	42L, 43L, 50L, 51L, 52L, 53L), V2 = structure(c(22L, 1L, 4L, 
 	23L, 14L, 3L, 27L, 10L, 18L, 6L, 20L, 15L, 17L, 2L, 26L, 5L, 
 	13L, 8L, 19L, 25L, 16L, 24L, 21L, 12L, 11L, 9L, 7L), .Label = c("Acre", 
-	"Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Distrito Federal", 
-	"Espírito Santo", "Goiás", "Maranhão", "Mato Grosso", "Mato Grosso do Sul", 
-	"Minas Gerais", "Pará", "Paraíba", "Paraná", "Pernambuco", "Piauí", 
+	"Alagoas", "Amapa", "Amazonas", "Bahia", "Ceara", "Distrito Federal", 
+	"Espirito Santo", "Goias", "Maranhao", "Mato Grosso", "Mato Grosso do Sul", 
+	"Minas Gerais", "Para", "Paraiba", "Parana", "Pernambuco", "Piaui", 
 	"Rio de Janeiro", "Rio Grande do Norte", "Rio Grande do Sul", 
-	"Rondônia", "Roraima", "Santa Catarina", "São Paulo", "Sergipe", 
+	"Rondonia", "Roraima", "Santa Catarina", "Sao Paulo", "Sergipe", 
 	"Tocantins"), class = "factor")), .Names = c("uf", "uf_name"), class = "data.frame", row.names = c(NA, 
 	-27L))
 
