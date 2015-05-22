@@ -260,7 +260,7 @@ desocup.rate.long$year.month <-
 		sep = "/"
 	)
 
-# construct a plot with this newly-rehshaped ata
+# construct a plot with this newly-rehshaped data
 desocup.plot <- 
 	ggplot(
 		desocup.rate.long , 
