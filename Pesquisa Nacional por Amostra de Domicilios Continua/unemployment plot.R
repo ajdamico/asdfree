@@ -273,6 +273,24 @@ pstate <-
 pstate + ggtitle( "unemployment rate for all twenty-seven states during the previous four quarters" )
 
 
+
+# construct a subsetted ggplot2
+psub <- 
+	ggplot( 
+		subset( statewide , uf_name %in% c( 'Nation' , 'Sao Paulo' , 'Rio de Janeiro' ) ) , 
+		aes( 
+			year_quarter , 
+			unemp_rate , 
+			group = uf_name ,
+			colour = uf_name 
+		) 
+	) + geom_line()
+
+# print the result, with title	
+psub + ggtitle( "unemployment rate for only a few states during the previous four quarters" )
+
+
+
 # for more details on how to work with data in r
 # check out my two minute tutorial video site
 # http://www.twotorials.com/
