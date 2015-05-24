@@ -30,9 +30,9 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #############################################################################################################################
 # prior to running this analysis script, the longitudinal RAND-contributed HRS files must be downloaded and unzipped on the #
-# local machine. running the 1992 - 2010 download HRS microdata.R script download all of the necessary files automatically  #
+# local machine. running the download HRS microdata.R script download all of the necessary files automatically              #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/Health%20and%20Retirement%20Study/1992-2010%20download%20HRS%20microdata.R   #
+# https://raw.github.com/ajdamico/usgsd/master/Health%20and%20Retirement%20Study/download%20HRS%20microdata.R               #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will place the HRS files "rndhrs_n.dta" and a few others in the "C:/My Directory/HRS/download" folder         #
 #############################################################################################################################
