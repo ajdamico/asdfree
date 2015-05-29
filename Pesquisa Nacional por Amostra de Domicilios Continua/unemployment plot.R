@@ -4,7 +4,6 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PNADC/" )
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios%20Continua/unemployment%20plot.R" , prompt = FALSE , echo = TRUE )
