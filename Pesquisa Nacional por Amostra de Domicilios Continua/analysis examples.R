@@ -349,7 +349,7 @@ write.csv( female.by.state , "female by state.csv" )
 barplot(
 	female.by.state[ , 2 ] ,
 	main = "Percent Female by State" ,
-	ylim = c( .49 , .53 ) ,
+	ylim = c( 0 , .6 ) ,
 	names.arg = female.by.state[ , 1 ] ,
 	cex.names = 0.5 ,
 	las = 2
