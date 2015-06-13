@@ -17,7 +17,7 @@
 # http://www.screenr.com/Zpd8
 
 # djalma pessoa
-# djalma.pessoa@ibge.gov.br
+# pessoad@gmail.com
 
 # anthony joseph damico
 # ajdamico@gmail.com

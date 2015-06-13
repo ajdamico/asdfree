@@ -17,6 +17,9 @@
 # how to run this script from start to finish
 # http://www.screenr.com/Zpd8
 
+# djalma pessoa
+# pessoad@gmail.com
+
 # anthony joseph damico
 # ajdamico@gmail.com
 
