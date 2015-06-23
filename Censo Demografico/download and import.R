@@ -654,19 +654,13 @@ ftp.path <-	"ftp://ftp.ibge.gov.br/Censos/Censo_Demografico_2000/Microdados/"
 # fetch all available files in the ftp site's directory
 all.files <- getURL( ftp.path , dirlistonly = TRUE )
 
-# remove spaces so rio grande do sul isn't broken into two
-all.files <- gsub( " " , "" , all.files )
-
 # those files are separated by newline characters in the code,
 # so simply split them up into a character vector
 # full of individual zipped file strings
 all.files <- scan( text = all.files , what = "character", quiet = T )
 
 # remove the two files you don't need to import
-files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' ) ) ]
-
-# rio grande do sul has a space in the filename
-files.to.download <- gsub( "Rio_Grande_do_Sul" , "Rio_Grande _do_Sul" , files.to.download )
+files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' , '2_Atualizacoes.txt' ) ) ]
 
 # launch the current monet database
 pid <- monetdb.server.start( batfile )
@@ -704,19 +698,15 @@ for ( curFile in files.to.download ){
 		if( i > 5 ) stop( "after five download attempts, i give up." )
 	}
 
-	dom.file <- unzipped.files[ grep( 'DOM' , unzipped.files , useBytes = TRUE ) ]
-	pes.file <- unzipped.files[ grep( 'PES' , unzipped.files , useBytes = TRUE ) ]
-	fam.file <- unzipped.files[ grep( 'FAM' , unzipped.files , useBytes = TRUE ) ]
+	dom.file <- unzipped.files[ grep( 'DOM' , toupper( unzipped.files ) , useBytes = TRUE ) ]
+	pes.file <- unzipped.files[ grep( 'PES' , toupper( unzipped.files ) , useBytes = TRUE ) ]
+	fam.file <- unzipped.files[ grep( 'FAM' , toupper( unzipped.files ) , useBytes = TRUE ) ]
 	
 	curFile_ns <- gsub( " " , "" , curFile )
 	
-	dom.curTable <- gsub( '.zip' , '_dom00' , curFile_ns )
-	pes.curTable <- gsub( '.zip' , '_pes00' , curFile_ns )
-	fam.curTable <- gsub( '.zip' , '_fam00' , curFile_ns )
-	
-	dom.curTable <- tolower( gsub( '-' , '_' , dom.curTable ) )
-	pes.curTable <- tolower( gsub( '-' , '_' , pes.curTable ) )
-	fam.curTable <- tolower( gsub( '-' , '_' , fam.curTable ) )
+	dom.curTable <- gsub( '.zip' , '_dom00' , tolower( curFile_ns ) )
+	pes.curTable <- gsub( '.zip' , '_pes00' , tolower( curFile_ns ) )
+	fam.curTable <- gsub( '.zip' , '_fam00' , tolower( curFile_ns ) )
 	
 	
 	
