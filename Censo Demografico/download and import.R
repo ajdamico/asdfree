@@ -718,7 +718,7 @@ for ( curFile in files.to.download ){
 		connection = db
 	)
 	
-	stopifnot( sum( sapply( dom.file , countLines ) ) == dbGetQuery( db , paste( "select count(*) from" , dom.curTable ) )[ 1 , 1 ] )
+	stopifnot( abs( sum( sapply( dom.file , countLines ) ) - dbGetQuery( db , paste( "select count(*) from" , dom.curTable ) )[ 1 , 1 ] ) < 2 )
 	
 	file.remove( tdl , dom.file )
 	
@@ -730,14 +730,8 @@ for ( curFile in files.to.download ){
 		connection = db
 	)
 	
-	# skip this check for sao paulo, because that file has a few corrupted lines.
-	if( all( !grepl( "PES35" , pes.file ) ) ){
-		stopifnot( sum( sapply( pes.file , countLines ) ) == dbGetQuery( db , paste( "select count(*) from" , pes.curTable ) )[ 1 , 1 ] )
-	} else {
-		# there are 13 corrupted lines in the sao paulo pes file
-		stopifnot( dbGetQuery( db , paste( "select count(*) from" , pes.curTable ) )[ 1 , 1 ] == 4038187 )
-	}
-	
+	stopifnot( abs( sum( sapply( pes.file , countLines ) ) - dbGetQuery( db , paste( "select count(*) from" , pes.curTable ) )[ 1 , 1 ] ) < 2 )
+		
 	file.remove( tdl , pes.file )
 	
 	read.SAScii.monetdb (
@@ -748,7 +742,7 @@ for ( curFile in files.to.download ){
 		connection = db
 	)
 	
-	stopifnot( sum( sapply( fam.file , countLines ) ) == dbGetQuery( db , paste( "select count(*) from" , fam.curTable ) )[ 1 , 1 ] )
+	stopifnot( abs( sum( sapply( fam.file , countLines ) ) - dbGetQuery( db , paste( "select count(*) from" , fam.curTable ) )[ 1 , 1 ] ) < 2 )
 	
 	file.remove( tdl , fam.file )
 	
