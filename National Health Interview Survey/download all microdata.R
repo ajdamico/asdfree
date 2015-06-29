@@ -8,7 +8,7 @@
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NHIS/" )
-# nhis.years.to.download <- 2013:1963
+# nhis.years.to.download <- 2014:1963
 # source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Health%20Interview%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
