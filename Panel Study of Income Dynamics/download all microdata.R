@@ -236,8 +236,8 @@ save.psid <-
 # (note: you may have to be logged in to see those files)
 family <-
 	data.frame(
-		year = c( 1968:1997 , seq( 1999 , 2011 , 2 ) ) ,
-		file = c( 1056 , 1058:1082 , 1047:1051 , 1040 , 1052 , 1132 , 1139 , 1152 , 1156 )
+		year = c( 1968:1997 , seq( 1999 , 2013 , 2 ) ) ,
+		file = c( 1056 , 1058:1082 , 1047:1051 , 1040 , 1052 , 1132 , 1139 , 1152 , 1156 , 1164 )
 	)
 
 # loop through each record in the `family` file..
