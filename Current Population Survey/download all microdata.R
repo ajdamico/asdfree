@@ -447,7 +447,8 @@ for ( year in cps.years.to.download ){
 			paste0( 
 			"http://www.census.gov/housing/povmeas/spmresearch/spmresearch" , 
 			year - 1 , 
-			if ( year != 2014 ) "new" ,
+			# if ( year != 2014 ) "new" ,
+			"new" ,
 			".sas7bdat" 
 		)
 		
