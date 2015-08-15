@@ -1,13 +1,12 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # american time use survey
-# 2003 - 2013
+# all available years
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/ATUS/" )
-# years.to.download <- c( 2003:2013 , "0312" , "0313" )
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/American%20Time%20Use%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -28,13 +27,13 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-################################################################
-# Analyze the 2003 - 2013 American Time Use Survey file with R #
-################################################################
+####################################################
+# Analyze the American Time Use Survey file with R #
+####################################################
 
 
 # set your working directory.
-# the ATUS 2003 - 2013 data files will be stored here
+# the ATUS data files will be stored here
 # after downloading and importing them.
 # use forward slashes instead of back slashes
 
@@ -42,20 +41,6 @@
 # setwd( "C:/My Directory/ATUS/" )
 # ..in order to set your current working directory
 
-
-
-# define which years to download #
-
-# uncomment this line to download all available data sets
-# uncomment this line by removing the `#` at the front
-# years.to.download <- c( 2003:2013 , "0312" , "0313" )
-
-# uncomment this line to only download 2010
-# years.to.download <- 2010
-
-# uncomment this line to download, for example,
-# 2005 and 2009-2011 and the '03-'12 multi-year file
-# years.to.download <- c( 2005 , 2009:2011 , "0312" )
 
 
 # remove the # in order to run this install.packages line only once
@@ -86,6 +71,21 @@ source_url(
 	prompt = FALSE , 
 	echo = FALSE 
 )
+
+
+# figure out which years are available to download
+years.to.download <-
+	unique( 
+		gsub( 
+			"(.*)/datafiles_([0-9][0-9][0-9][0-9]).htm(.*)" , 
+			"\\2" , 
+			grep( 
+				"/datafiles_([0-9][0-9][0-9][0-9]).htm" , 
+				readLines( "http://www.bls.gov/tus/" ) , 
+				value = TRUE 
+			) 
+		) 
+	)
 
 
 # begin looping through every atus year
