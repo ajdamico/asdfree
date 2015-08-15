@@ -9,7 +9,7 @@
 # your.password <- "password"
 # library(downloader)
 # setwd( "C:/My Directory/SEER/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Surveillance%20Epidemiology%20and%20End%20Results/download.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Surveillance%20Epidemiology%20and%20End%20Results/download.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

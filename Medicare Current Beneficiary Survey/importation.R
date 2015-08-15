@@ -10,7 +10,7 @@
 # setwd( "C:/My Directory/MCBS/temp/" )
 # input.directory <- "C:/My Directory/MCBS/"
 # output.directory <- "C:/My Directory/MCBS/cau/"
-# source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/Medicare%20Current%20Beneficiary%20Survey/importation.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Medicare%20Current%20Beneficiary%20Survey/importation.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -162,7 +162,7 @@ if( any( !( years.to.import.all.files %in% consolidated.files.to.create ) ) ) st
 rics <- c( 'ricx' , 'ric1' , 'ric2' , 'ric2f' , 'rick' , 'ric4' , 'ric5' , 'ricps' , 'ricss' , 'ric8' )
 
 # load an R file containing mcbs-specific functions
-source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/Medicare%20Current%20Beneficiary%20Survey/ric.R" , prompt = FALSE , echo = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Medicare%20Current%20Beneficiary%20Survey/ric.R" , prompt = FALSE , echo = FALSE )
 
 
 # loop through every year to import

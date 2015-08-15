@@ -10,7 +10,7 @@
 # library(downloader)
 # batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"		# # note for mac and *nix users: `censo_demografico.bat` might be `censo_demografico.sh` instead
 # load( 'C:/My Directory/CENSO/dom 2010 design.rda' )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Censo%20Demografico/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -38,7 +38,7 @@
 # prior to running this analysis script, the 2010 censo demografico must be loaded as a monet #
 # database-backed sqlsurvey object on the local machine. running this script will do it.      #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/Censo%20Demografico/download%20and%20import.R  #
+# https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/download%20and%20import.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "pes 2010 design.rda" in C:/My Directory/CENSO or wherever.  #
 ###############################################################################################

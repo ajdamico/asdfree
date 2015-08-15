@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/HPSA/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Health%20Professional%20Shortage%20Areas/download%20current%20hpsa%20table.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Health%20Professional%20Shortage%20Areas/download%20current%20hpsa%20table.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

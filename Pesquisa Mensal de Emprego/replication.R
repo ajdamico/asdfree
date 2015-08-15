@@ -6,7 +6,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PME/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Pesquisa%20Mensal%20de%20Emprego/replication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa%20Mensal%20de%20Emprego/replication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -31,7 +31,7 @@
 
 ################################################################################################################################################################################
 # this script matches the output sent to Djalma by Fabiane at COREN, the IBGE department responsible for the PME.  IBGE is the brazilian census bureau/stats agency.           #
-# email: https://github.com/ajdamico/usgsd/blob/master/Pesquisa%20Mensal%20de%20Emprego/pme%202013%2003%20differences%20based%20on%20weight%20variable%20rounding.pdf?raw=true #
+# email: https://github.com/ajdamico/asdfree/blob/master/Pesquisa%20Mensal%20de%20Emprego/pme%202013%2003%20differences%20based%20on%20weight%20variable%20rounding.pdf?raw=true #
 ################################################################################################################################################################################
 # beyond that specific example, the full table created by this replication script comes very close to the IBGE-produced statistics and coefficients of variation in this file: #
 # ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Mensal_de_Emprego/Tabelas/2013/tab001112013.xls                                                                         #
@@ -45,7 +45,7 @@
 # prior to running this analysis script, all pme files must be loaded on the local machine.  running the      #
 # download all microdata script will create the series of data files (.rda) in the current working directory. #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Pesquisa%20Mensal%20de%20Emprego/download%20all%20microdata.R #
+# https://github.com/ajdamico/asdfree/blob/master/Pesquisa%20Mensal%20de%20Emprego/download%20all%20microdata.R #
 ###############################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

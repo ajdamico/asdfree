@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NLS/" )
-# source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/National%20Longitudinal%20Surveys/replication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Longitudinal%20Surveys/replication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -37,7 +37,7 @@
 #############################################################################################################################
 # prior to running this analysis script, the complete NLS microdata for your study must be loaded on your local machine     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.githubusercontent.com/ajdamico/usgsd/master/National%20Longitudinal%20Surveys/download%20all%20microdata.R    #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Longitudinal%20Surveys/download%20all%20microdata.R    #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will a bunch of R data files (.rda) within the "C:/My Directory/NLS/" folder (or specified working directory) #
 #############################################################################################################################
@@ -73,7 +73,7 @@ vfta <- c( 'T5206900' , 'R9829600' , 'R0536300' , 'Z9061800' , 'T6657200' , 'R12
 
 # load the custom weights function to easily & automatically pull
 # the weights you need for your specific analysis into R
-source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/National%20Longitudinal%20Surveys/custom%20weight%20download%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Longitudinal%20Surveys/custom%20weight%20download%20functions.R" , prompt = FALSE )
 # you can read more about longitudinal weights here
 # http://www.nlsinfo.org/weights
 

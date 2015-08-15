@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/MEPS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Medical%20Expenditure%20Panel%20Survey/2010%20consolidated%20-%20analyze%20with%20tsl.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Medical%20Expenditure%20Panel%20Survey/2010%20consolidated%20-%20analyze%20with%20tsl.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -33,7 +33,7 @@
 # prior to running this analysis script, the meps 2010 consolidated file must be loaded as an r data file (.rda) on the local machine.                      #
 # running the 1996-2010 household component - download all microdata.R script will create this R data file (.rda)                                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/Medical%20Expenditure%20Panel%20Survey/1996-2010%20household%20component%20-%20download%20all%20microdata.R  #
+# https://raw.github.com/ajdamico/asdfree/master/Medical%20Expenditure%20Panel%20Survey/1996-2010%20household%20component%20-%20download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "2010 - consolidated.rda" in C:/My Directory/MEPS (or wherever the working directory was chosen)                           #
 #############################################################################################################################################################

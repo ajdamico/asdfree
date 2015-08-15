@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SBO/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/recode%20and%20replicate.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Business%20Owners/recode%20and%20replicate.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -34,7 +34,7 @@
 # prior to running this analysis script, the sbo 2007 file must be loaded as a database (.db) on the      #
 # local machine.  running the 2007 download all microdata script will create this database file.          #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/download%20and%20import.R  #
+# https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Business%20Owners/download%20and%20import.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "sbo07.db" with 'y' in C:/My Directory/SBO or wherever you put it.       #
 ###########################################################################################################
@@ -43,9 +43,9 @@
 
 #############################################################################################################################################
 # this script matches the results of the SAS code sent to me by the superstar Annie Leung at the united states census bureau.  thanx a zil. #
-# email: https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Business%20Owners/census%20emails%20regarding%20SBO%20PUMS.pdf         #
-#   csv: https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Business%20Owners/PUMS_MIN_FINAL.CSV                                   #
-#  code: https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Business%20Owners/pums%20code.sas                                      #
+# email: https://github.com/ajdamico/asdfree/blob/master/Survey%20of%20Business%20Owners/census%20emails%20regarding%20SBO%20PUMS.pdf         #
+#   csv: https://github.com/ajdamico/asdfree/blob/master/Survey%20of%20Business%20Owners/PUMS_MIN_FINAL.CSV                                   #
+#  code: https://github.com/ajdamico/asdfree/blob/master/Survey%20of%20Business%20Owners/pums%20code.sas                                      #
 #############################################################################################################################################
 
 
@@ -63,7 +63,7 @@ library(downloader)			# downloads and then runs the source() function on scripts
 
 
 # load sbo-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)
-source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/sbosvy%20functions.R" , prompt = FALSE )
+source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Business%20Owners/sbosvy%20functions.R" , prompt = FALSE )
 
 
 # set R to produce conservative standard errors instead of crashing

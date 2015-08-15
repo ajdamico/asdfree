@@ -9,7 +9,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SCF/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/replicate%20FRB%20SAS%20output.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Consumer%20Finances/replicate%20FRB%20SAS%20output.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -23,9 +23,9 @@
 
 # to confirm that the methodology below is correct,
 # analysts at the federal reserve provided me with statistics and standard errors generated using the public use file (puf)
-# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Consumer%20Finances/SCF%20PUF%20Net%20Worth%20Statistics%20and%20Standard%20Errors%20from%20FRB.pdf?raw=true
+# https://github.com/ajdamico/asdfree/blob/master/Survey%20of%20Consumer%20Finances/SCF%20PUF%20Net%20Worth%20Statistics%20and%20Standard%20Errors%20from%20FRB.pdf?raw=true
 # and
-# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Consumer%20Finances/SCF%20PUF%20Net%20Worth%20SAS%20output%20from%20FRB.pdf?raw=true
+# https://github.com/ajdamico/asdfree/blob/master/Survey%20of%20Consumer%20Finances/SCF%20PUF%20Net%20Worth%20SAS%20output%20from%20FRB.pdf?raw=true
 # this r script will replicate each of the statistics from that custom run of the survey of consumer finances (scf) exactly
 
 
@@ -50,7 +50,7 @@
 # prior to running this replication script, the 2010 scf public use microdata files must be loaded as R data files (.rda)   #
 # on the local machine. running the "1989-2010 download all microdata.R" script will create this file for you.              #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Consumer%20Finances/1989-2010%20download%20all%20microdata.R  #
+# https://github.com/ajdamico/asdfree/blob/master/Survey%20of%20Consumer%20Finances/1989-2010%20download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/SCF/ (or the working directory was chosen)                #
 #############################################################################################################################
@@ -120,7 +120,7 @@ options( scipen = 20 )
 
 
 # load two svyttest functions (one to conduct a df-adjusted t-test and one to conduct a multiply-imputed t-test)
-source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/scf.survey.R" , prompt = FALSE )
+source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Consumer%20Finances/scf.survey.R" , prompt = FALSE )
 # now that this function has been loaded into r, you can view its source code by uncommenting the line below
 # scf.MIcombine
 # scf.svyttest
@@ -241,7 +241,7 @@ rwd <- sapply( rw[ , -1 ] , swd )
 # produced above, but this time use the   #
 # r survey package to show that other     #
 # analysis commands can be run the same   #
-# way as all the other data sets on usgsd #
+# way as all the other data sets on asdfree #
 # # # # # # # # # # # # # # # # # # # # # #
 
 

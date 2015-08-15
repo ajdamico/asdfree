@@ -10,7 +10,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/HMDA/" )
 # years.to.download <- 2012:2006
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -70,7 +70,7 @@
 ###################################################################################################################################
 # prior to running this analysis script, monetdb must be installed on the local machine.  follow each step outlined on this page: #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/MonetDB/monetdb%20installation%20instructions.R                                   #
+# https://github.com/ajdamico/asdfree/blob/master/MonetDB/monetdb%20installation%20instructions.R                                   #
 ###################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -113,7 +113,7 @@ library(SAScii) 		# load the SAScii package (imports ascii data with a SAS scrip
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )
@@ -122,15 +122,15 @@ source_url(
 # load the read.SAScii.monetdb() function,
 # which imports ASCII (fixed-width) data files directly into a monet database
 # using only a SAS importation script
-source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
+source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 # create five temporary files and also a temporary directory on the local disk
 tf <- tempfile() ; tf2 <- tempfile() ; tf3 <- tempfile() ; tf4 <- tempfile() ; tf5 <- tempfile() ; td <- tempdir()
 
 
 # download the layout files for the loan applications received (lar) and institutional records (ins) data tables
-download_cached( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/lar_str.csv" , tf , FUN = download )
-download_cached( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/ins_str.csv" , tf2 , FUN = download )
+download_cached( "https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/lar_str.csv" , tf , FUN = download )
+download_cached( "https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/ins_str.csv" , tf2 , FUN = download )
 
 
 # configure a monetdb database for the hmda on windows #
@@ -272,9 +272,9 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			
 			# the 2007, 2008, and 2009 reporter panel sas importation scripts are different from post-2009
 			if ( as.numeric( year ) < 10 ){
-				sas_ri <- "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/Reporter%20Panel%20Pre-2010.sas"
+				sas_ri <- "https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/Reporter%20Panel%20Pre-2010.sas"
 			} else {
-				sas_ri <- "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/Reporter%20Panel%202010.sas"
+				sas_ri <- "https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/Reporter%20Panel%202010.sas"
 			}
 		
 			# download the sas importation instructions to a temporary file on the local disk

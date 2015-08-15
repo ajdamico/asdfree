@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # load( "C:/My Directory/YRBSS/yrbs2009.rda" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Youth%20Risk%20Behavior%20Surveillance%20System/replicate%20cdc%20software%20for%20analysis%20of%20yrbs%20data%20publication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Youth%20Risk%20Behavior%20Surveillance%20System/replicate%20cdc%20software%20for%20analysis%20of%20yrbs%20data%20publication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -42,7 +42,7 @@
 # prior to running this replication script, the yrbss 2009 single-year file must be loaded as an r data file (.rda)                             #
 # on the local machine. running the 1991 - 2011 download automation script will create the appropriate files for your pleasurable convenience   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Youth%20Risk%20Behavior%20Surveillance%20System/1991%20-%202011%20download%20all%20microdata.R  #
+# https://github.com/ajdamico/asdfree/blob/master/Youth%20Risk%20Behavior%20Surveillance%20System/1991%20-%202011%20download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "yrbs2009.rda" in C:/My Directory/YRBSS or wherever the working directory was set for the program              #
 #################################################################################################################################################
@@ -110,7 +110,7 @@ SE( heroin )
 # output published by the CDC, but i only perform this exercise to prove understanding this complex sample survey data set, and not really as   #
 # an analysis example.  replicating STATA precisely requires the creation of a new survey design object for every single statistic, which is    #
 # unwieldy and kind of unnecessary.  instead of starting your analysis from the code in this file, use please the `analysis examples` syntax at #
-# https://github.com/ajdamico/usgsd/blob/master/Youth%20Risk%20Behavior%20Surveillance%20System/2011%20single-year%20-%20analysis%20examples.R  #
+# https://github.com/ajdamico/asdfree/blob/master/Youth%20Risk%20Behavior%20Surveillance%20System/2011%20single-year%20-%20analysis%20examples.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 

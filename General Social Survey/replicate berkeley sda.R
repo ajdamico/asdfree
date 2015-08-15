@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/GSS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/General%20Social%20Survey/replicate%20berkeley%20sda.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/General%20Social%20Survey/replicate%20berkeley%20sda.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -17,7 +17,7 @@
 # the berkeley survey documentation and analysis project at http://sda.berkeley.edu
 # since quick tables currently available on their website use the release #1 version of the gss data,
 # analysts at sda created release #2-specific tables to be matched, available as a pdf here:
-# https://github.com/ajdamico/usgsd/blob/master/General%20Social%20Survey/GSS%201972-2010%20Polviews%20by%20Sex%20from%20Berkeley%20SDA.pdf?raw=true
+# https://github.com/ajdamico/asdfree/blob/master/General%20Social%20Survey/GSS%201972-2010%20Polviews%20by%20Sex%20from%20Berkeley%20SDA.pdf?raw=true
 
 # note that these statistics come very close to the quick table results available at
 # http://sda.berkeley.edu/quicktables/quicksetoptions.do?reportKey=gss10%3A0
@@ -26,7 +26,7 @@
 
 
 # this r script will replicate each of the statistics from the custom gss run exactly
-# https://github.com/ajdamico/usgsd/blob/master/General%20Social%20Survey/GSS%201972-2010%20Polviews%20by%20Sex%20from%20Berkeley%20SDA.pdf?raw=true
+# https://github.com/ajdamico/asdfree/blob/master/General%20Social%20Survey/GSS%201972-2010%20Polviews%20by%20Sex%20from%20Berkeley%20SDA.pdf?raw=true
 
 
 # if you have never used the r language before,
@@ -285,7 +285,7 @@ y <- subset( gss.design , !is.na( polviews ) )
 # print the exact contents of the sda document to the screen #
 ##############################################################
 
-# https://github.com/ajdamico/usgsd/blob/master/General%20Social%20Survey/GSS%201972-2010%20Polviews%20by%20Sex%20from%20Berkeley%20SDA.pdf?raw=true #
+# https://github.com/ajdamico/asdfree/blob/master/General%20Social%20Survey/GSS%201972-2010%20Polviews%20by%20Sex%20from%20Berkeley%20SDA.pdf?raw=true #
 
 # print the total number of cases in the original data set
 nrow( x )

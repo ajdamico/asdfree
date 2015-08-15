@@ -8,7 +8,7 @@
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # batfile <- "C:/My Directory/HMDA/MonetDB/hmda.bat"		# # note for mac and *nix users: `hmda.bat` might be `hmda.sh` instead
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/replicate%20ffiec%20publications.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/replicate%20ffiec%20publications.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -37,7 +37,7 @@
 #####################################################################################################################################################
 # prior to running this analysis script, the hmda public use files must be imported into a monet database on the local machine. you must run this:  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/download%20all%20microdata.R                                      #
+# https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/download%20all%20microdata.R                                      #
 #####################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -256,7 +256,7 @@ dbGetQuery( db , 'select ethnicity , count(*) from hmda_11 where actiontype = 1 
 
 
 # if you really really care why it's off by a few records, here's the sas script from the ffiec.  have fun!
-# https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/bulletin_macros_postbob.sas
+# https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/bulletin_macros_postbob.sas
 
 
 # race/ethnicity replication counts #

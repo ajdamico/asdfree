@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SEER/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Surveillance%20Epidemiology%20and%20End%20Results/import%20all%20tables%20into%20rda.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Surveillance%20Epidemiology%20and%20End%20Results/import%20all%20tables%20into%20rda.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -37,7 +37,7 @@
 ###############################################################################################################
 # prior to running this importation script, the seer text file must be loaded on the local machine with:      #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Surveillance%20Epidemiology%20and%20End%20Results/download.R  #
+# https://github.com/ajdamico/asdfree/blob/master/Surveillance%20Epidemiology%20and%20End%20Results/download.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a 'SEER_1973_2011_TEXTDATA' directory in C:/My Directory/SEER (or the cw directory) #
 ###############################################################################################################

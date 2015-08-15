@@ -9,7 +9,7 @@
 # library(downloader)
 # batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"		# # note for mac and *nix users: `acs.bat` might be `acs.sh` instead
 # load( 'C:/My Directory/ACS/acs2011_1yr.rda' )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20Community%20Survey/2011%20single-year%20-%20variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/American%20Community%20Survey/2011%20single-year%20-%20variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -34,7 +34,7 @@
 # prior to running this analysis script, the acs 2011 single-year file must be loaded as a monet database-backed sqlsurvey object   #
 # on the local machine. running the 2005-2011 download and create database script will create a monet database containing this file #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/American%20Community%20Survey/download%20all%20microdata.R                          #
+# https://github.com/ajdamico/asdfree/blob/master/American%20Community%20Survey/download%20all%20microdata.R                          #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "acs2011_1yr.rda" in C:/My Directory/ACS or wherever the working directory was set for the program #
 #####################################################################################################################################

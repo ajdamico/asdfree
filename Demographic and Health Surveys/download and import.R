@@ -11,7 +11,7 @@
 # your.project <- "project"
 # library(downloader)
 # setwd( "C:/My Directory/DHS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Demographic%20and%20Health%20Surveys/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Demographic%20and%20Health%20Surveys/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

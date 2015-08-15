@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/ANES/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20National%20Election%20Studies/replicate%20table%20two.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/American%20National%20Election%20Studies/replicate%20table%20two.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -38,7 +38,7 @@
 # prior to running this replication script, all anes public use microdata files must be loaded as R data            #
 # files (.rda) on the local machine. running the "download and import.R" script will create these files.            #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/American%20National%20Election%20Studies/download%20and%20import.R  #
+# https://github.com/ajdamico/asdfree/blob/master/American%20National%20Election%20Studies/download%20and%20import.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/ANES/ (or the working directory was chosen)       #
 #####################################################################################################################
@@ -230,7 +230,7 @@ summary( svy.logit )
 # so i ran the stata code included in this document here myself:
 # http://www.electionstudies.org/resources/papers/nes012492.pdf#page=28
 # and stata produced this output for me:
-# https://github.com/ajdamico/usgsd/blob/master/American%20National%20Election%20Studies/stata%20code%20and%20output%20almost%20matching%20table%20two.txt
+# https://github.com/ajdamico/asdfree/blob/master/American%20National%20Election%20Studies/stata%20code%20and%20output%20almost%20matching%20table%20two.txt
 # and - if you're looking ultra-carefully - you'll see my r output matches
 # what happens when i re-run their stata code myself exactly..
 # so i think there are just a few typos in their official pdf ;)

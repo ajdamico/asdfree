@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NIS" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Immunization%20Survey/replication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Immunization%20Survey/replication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -40,7 +40,7 @@
 # prior to running this analysis script, the nis main 2011 single-year file must be loaded as an r data file (.rda) #
 # on the local machine. running the download all microdata script will download and import this file nicely for ya  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/National%20Immunization%20Survey/download%20all%20microdata.R        #
+# https://raw.github.com/ajdamico/asdfree/master/National%20Immunization%20Survey/download%20all%20microdata.R        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "nis2011.rda" in C:/My Directory/NIS or wherever the working directory was set.    #
 #####################################################################################################################

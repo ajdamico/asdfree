@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SIPP/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Income%20and%20Program%20Participation/replicate%20census%20poverty%20statistics.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/replicate%20census%20poverty%20statistics.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -20,7 +20,7 @@
 
 # to confirm that the methodology below is correct, analysts at the census bureau
 # provided me with statistics and standard errors generated using the public use file (puf)
-# https://github.com/ajdamico/usgsd/blob/master/Survey%20of%20Income%20and%20Program%20Participation/SIPP%20PUF%20Poverty%20Statistics%20from%20Census.pdf?raw=true
+# https://github.com/ajdamico/asdfree/blob/master/Survey%20of%20Income%20and%20Program%20Participation/SIPP%20PUF%20Poverty%20Statistics%20from%20Census.pdf?raw=true
 # this r script will replicate each of the statistics from that custom run
 # of the survey of income and program participation (sipp) exactly
 
@@ -46,7 +46,7 @@
 # prior to running this analysis script, the survey of income and program participation 2008 panel must be loaded as a database (.db) on the local machine. #
 # running the "2008 panel - download and create database" script will create this database file                                                             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20download%20and%20create%20database.R #
+# https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20download%20and%20create%20database.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "SIPP08.db" in C:/My Directory/SIPP or wherever the working directory was set for the program                              #
 #############################################################################################################################################################

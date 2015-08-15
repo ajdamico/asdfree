@@ -11,7 +11,7 @@
 # your.username <- 'your@login.com'
 # your.password <- 'yourpassword'
 # rm( studies.to.download ) # or pick a few # studies.to.download <- c( "2003 Record-Type Files" , "2012 Identity Theft Supplement" , "1995 School Crime Supplement" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Crime%20Victimization%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Crime%20Victimization%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -101,7 +101,7 @@ tf <- tempfile()
 
 
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/usgsd/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
+source_url( "https://raw.github.com/ajdamico/asdfree/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
 
 # download the contents of the webpage hosting all ncvs data files
 all.ncvs.studies <- getURL( "http://www.icpsr.umich.edu/icpsrweb/NACJD/series/95/studies?archive=NACJD&q=&paging.rows=10000&sortBy=7" )

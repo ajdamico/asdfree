@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/ATUS/2007/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20Time%20Use%20Survey/replicate%20bls%20standard%20error%20-%202007.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/American%20Time%20Use%20Survey/replicate%20bls%20standard%20error%20-%202007.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -42,7 +42,7 @@
 # prior to running this analysis script, the atus 2007 file must be loaded onto the local machine.  running #
 # the download all microdata script below will import the respondent- and activity-level files needed.      #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/American%20Time%20Use%20Survey/download%20all%20microdata.R  #
+# https://raw.github.com/ajdamico/asdfree/master/American%20Time%20Use%20Survey/download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will files in the C:/My Directory/ATUS directory or wherever the working directory was set.   #
 #############################################################################################################

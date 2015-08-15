@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/ESS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/European%20Social%20Survey/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/European%20Social%20Survey/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -41,7 +41,7 @@
 # prior to running this replication script, the 2010 ESS microdata files must be loaded as R data files (.rda)        #
 # on the local machine. running the "download all microdata.R" script will create this file for you with zero hassle. #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/European%20Social%20Survey/download%20all%20microdata.R                #
+# https://raw.github.com/ajdamico/asdfree/master/European%20Social%20Survey/download%20all%20microdata.R                #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/ESS/ (or the working directory was chosen)          #
 #######################################################################################################################

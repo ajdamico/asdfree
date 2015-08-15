@@ -42,7 +42,7 @@ read.SAScii.sqlite <-
 		# load the download_cached and related functions
 		# to prevent re-downloading of files once they've been downloaded.
 		source_url( 
-			"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+			"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 			prompt = FALSE , 
 			echo = FALSE 
 		)

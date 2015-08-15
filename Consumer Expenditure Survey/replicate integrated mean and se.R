@@ -9,7 +9,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CES/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Consumer%20Expenditure%20Survey/replicate%20integrated%20mean%20and%20se.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Consumer%20Expenditure%20Survey/replicate%20integrated%20mean%20and%20se.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -39,7 +39,7 @@
 # prior to running this replication script, all ces 2011 public use microdata files must be loaded as R data      #
 # files (.rda) on the local machine. running the "2010-2011 ces - download.R" script will create these files.     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Consumer%20Expenditure%20Survey/download%20all%20microdata.R      #
+# https://github.com/ajdamico/asdfree/blob/master/Consumer%20Expenditure%20Survey/download%20all%20microdata.R      #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/CES/2011/ (or the working directory was chosen) #
 ###################################################################################################################

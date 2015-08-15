@@ -13,7 +13,7 @@
 # do.you.agree <- FALSE
 # library(downloader)
 # setwd( "C:/My Directory/WVS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/World%20Values%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/World%20Values%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

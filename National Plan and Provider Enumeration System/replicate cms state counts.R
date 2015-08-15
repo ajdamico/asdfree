@@ -8,7 +8,7 @@
 # options( encoding = "windows-1252" )			# # only macintosh and *nix users need this line
 # library(downloader)
 # batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `./nppes.sh` instead
-# source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/replicate%20cms%20state%20counts.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Plan%20and%20Provider%20Enumeration%20System/replicate%20cms%20state%20counts.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -29,11 +29,11 @@
 
 
 # this r script will create the state x count table available at:
-# https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/replication%20of%20CMS-provided%20state%20counts%20from%20PUF.csv
+# https://raw.github.com/ajdamico/asdfree/master/National%20Plan%20and%20Provider%20Enumeration%20System/replication%20of%20CMS-provided%20state%20counts%20from%20PUF.csv
 
 # which replicated the "May 2013" counts table provided to me by
 # the centers for medicare and medicaid services (cms), available at:
-# https://github.com/ajdamico/usgsd/blob/master/National%20Plan%20and%20Provider%20Enumeration%20System/Public%20File%20May%202013.xlsx?raw=true
+# https://github.com/ajdamico/asdfree/blob/master/National%20Plan%20and%20Provider%20Enumeration%20System/Public%20File%20May%202013.xlsx?raw=true
 
 # here's some additional detail from the folks at cms regarding this file:
 #
@@ -57,7 +57,7 @@
 # prior to running this analysis script, the national plan and provider enumeration system must be imported into a monet database #
 # on the local machine. you must run this:                                                                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/download%20and%20import.R  #                                        #
+# https://raw.github.com/ajdamico/asdfree/master/National%20Plan%20and%20Provider%20Enumeration%20System/download%20and%20import.R  #                                        #
 ###################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

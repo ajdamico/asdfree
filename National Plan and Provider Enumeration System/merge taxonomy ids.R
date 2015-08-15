@@ -7,7 +7,7 @@
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `./nppes.sh` instead
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/merge%20taxonomy%20ids.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Plan%20and%20Provider%20Enumeration%20System/merge%20taxonomy%20ids.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -28,7 +28,7 @@
 
 
 # this r script will merge the taxonomy id (specialty code) table available at:
-# https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/taxonomy%20id%20table.txt
+# https://raw.github.com/ajdamico/asdfree/master/National%20Plan%20and%20Provider%20Enumeration%20System/taxonomy%20id%20table.txt
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -36,7 +36,7 @@
 # prior to running this analysis script, the national plan and provider enumeration system must be imported into a monet database #
 # on the local machine. you must run this:                                                                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/download%20and%20import.R  #
+# https://raw.github.com/ajdamico/asdfree/master/National%20Plan%20and%20Provider%20Enumeration%20System/download%20and%20import.R  #
 ###################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -76,7 +76,7 @@ tf <- tempfile()
 
 # write the taxonomy id table to that temporary file
 download( 
-	"https://raw.github.com/ajdamico/usgsd/master/National%20Plan%20and%20Provider%20Enumeration%20System/taxonomy%20id%20table.txt" ,
+	"https://raw.github.com/ajdamico/asdfree/master/National%20Plan%20and%20Provider%20Enumeration%20System/taxonomy%20id%20table.txt" ,
 	tf
 )
 

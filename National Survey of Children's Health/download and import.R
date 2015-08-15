@@ -9,7 +9,7 @@
 # library(downloader)
 # years.to.download <- c( 2003 , 2007 , 2012 )
 # setwd( "C:/My Directory/NSCH/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Survey%20of%20Children%27s%20Health/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20Children%27s%20Health/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -80,7 +80,7 @@ library(downloader)	# downloads and then runs the source() function on scripts f
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )

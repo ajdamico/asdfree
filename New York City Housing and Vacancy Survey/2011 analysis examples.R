@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NYCHVS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/2011%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/2011%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -31,7 +31,7 @@
 #########################################################################################################################################################
 # prior to running this analysis script, the `occ` `vac` `per` `ni` data.frames for the current year must be available on the local machine. running..  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# https://raw.github.com/ajdamico/usgsd/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/download%20all%20microdata.R  #
+# https://raw.github.com/ajdamico/asdfree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # ..that script will place a 'nychvs##.rda' file with for each year downloaded into the "C:/My Directory/NYCHVS/" folder (the working directory)        #
 #########################################################################################################################################################
@@ -65,7 +65,7 @@
 # due to geo-coding and confidentiality concerns, so it is impossible to re-construct
 # a taylor-series linearization R survey object design that will match the census bureau CIs
 # in the excel file above exactly.  for further discussion of this, take a look at this e-mail from NYCHVS administrators
-# https://github.com/ajdamico/usgsd/tree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/the%20census%20bureau%20and%20the%20impossible%20to%20reproduce%20SEs.pdf?raw=TRUE
+# https://github.com/ajdamico/asdfree/tree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/the%20census%20bureau%20and%20the%20impossible%20to%20reproduce%20SEs.pdf?raw=TRUE
 
 
 
@@ -134,7 +134,7 @@ occ$borough <- factor( occ$borough )
 
 # standard errors, confidence intervals, and variances from this survey design object
 # should * not * be * used without modifications.  for a more complete discussion of the issue, view:
-# https://github.com/ajdamico/usgsd/blob/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/replicate%20contract%20items%202008.R
+# https://github.com/ajdamico/asdfree/blob/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/replicate%20contract%20items%202008.R
 
 
 

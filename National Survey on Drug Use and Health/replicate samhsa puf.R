@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NSDUH/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Survey%20on%20Drug%20Use%20and%20Health/replicate%20samhsa%20puf.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20on%20Drug%20Use%20and%20Health/replicate%20samhsa%20puf.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -21,7 +21,7 @@
 
 
 # to confirm that the methodology below is correct, analysts at samhsa provided me with the same tables generated using the public use file (puf)
-# https://github.com/ajdamico/usgsd/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/NSDUH%20PUF_Table_1.19B_D%20from%20SAMHSA.pdf?raw=true
+# https://github.com/ajdamico/asdfree/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/NSDUH%20PUF_Table_1.19B_D%20from%20SAMHSA.pdf?raw=true
 # this r script will replicate each of the statistics from that custom run of the national survey on drug use and health (nsduh) exactly
 
 
@@ -45,7 +45,7 @@
 # prior to running this replication script, all nsduh 2011 public use microdata files must be loaded as R data                                  #
 # files (.rda) on the local machine. running the "1979-2010 - download all microdata.R" script will create these files.                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/1979-2010%20-%20download%20all%20microdata.R #
+# https://github.com/ajdamico/asdfree/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/1979-2010%20-%20download%20all%20microdata.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/NSDUH/2010/ (or the working directory chosen)                                 #
 #################################################################################################################################################
@@ -198,7 +198,7 @@ y <-
 # print the exact contents of the samhsa document to the screen #
 #################################################################
 
-# https://github.com/ajdamico/usgsd/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/NSDUH%20PUF_Table_1.19B_D%20from%20SAMHSA.pdf?raw=true #
+# https://github.com/ajdamico/asdfree/blob/master/National%20Survey%20on%20Drug%20Use%20and%20Health/NSDUH%20PUF_Table_1.19B_D%20from%20SAMHSA.pdf?raw=true #
 
 
 # unweighted counts #

@@ -51,7 +51,7 @@ head( apistrat )
 # there are many permutations of linearized designs.
 # you can find well-documented examples of tsl design setups
 # by searching for the text `svydesign` here:
-# https://github.com/ajdamico/usgsd/search?q=svydesign&ref=cmdform
+# https://github.com/ajdamico/asdfree/search?q=svydesign&ref=cmdform
 
 
 # does your tsl design have a strata argument? #
@@ -431,7 +431,7 @@ head( y )
 # there are many permutations of replication-based designs.
 # you can find well-documented examples of replicate weighted design setups
 # by searching for the text `svrepdesign` here:
-# https://github.com/ajdamico/usgsd/search?q=svrepdesign&type=Code
+# https://github.com/ajdamico/asdfree/search?q=svrepdesign&type=Code
 
 
 # for the object `y` built above,

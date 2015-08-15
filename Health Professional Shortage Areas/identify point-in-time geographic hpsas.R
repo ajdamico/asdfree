@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/HPSA/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Health%20Professional%20Shortage%20Areas/identify%20point-in-time%20geographic%20hpsas.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Health%20Professional%20Shortage%20Areas/identify%20point-in-time%20geographic%20hpsas.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -33,7 +33,7 @@
 # prior to running this analysis script, the most current primary care physician health professional shortage area file must  #
 # be loaded on the local machine. running the download current hpsa table script will create an r data file (.rda) with this. #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Health%20Professional%20Shortage%20Areas/download%20current%20hpsa%20table.R  #
+# https://github.com/ajdamico/asdfree/blob/master/Health%20Professional%20Shortage%20Areas/download%20current%20hpsa%20table.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create "HPSA_PC.rda" in C:/My Directory/HPSA or wherever the working directory was set for the program     #
 ###############################################################################################################################

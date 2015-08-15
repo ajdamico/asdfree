@@ -9,7 +9,7 @@
 # library(downloader)
 # batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"	# # note for mac and *nix users: `nhts.bat` might be `nhts.sh` instead"
 # load( 'C:/My Directory/NHTS/2009 designs.rda' )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Household%20Travel%20Survey/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -34,7 +34,7 @@
 # prior to running this analysis script, the nhts 2009 file must be loaded as a monet database-backed sqlsurvey object  #
 # on the local machine. running the download and import script will create a monet database containing this file.       #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw2.github.com/ajdamico/usgsd/master/National%20Household%20Travel%20Survey/download%20and%20import.R        #
+# https://raw2.github.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/download%20and%20import.R        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "2009 designs.rda" in C:/My Directory/NHTS or wherever the working directory was set.  #
 #########################################################################################################################

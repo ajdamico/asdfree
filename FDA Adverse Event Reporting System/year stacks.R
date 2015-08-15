@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/FAERS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/FDA%20Adverse%20Event%20Reporting%20System/year%20stacks.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/FDA%20Adverse%20Event%20Reporting%20System/year%20stacks.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -37,7 +37,7 @@
 #######################################################################################################################
 # prior to running this stacking script, the faers tables must be loaded as single rda files on the local disk        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# "https://raw.github.com/ajdamico/usgsd/master/FDA%20Adverse%20Event%20Reporting%20System/download%20and%20import.R" #
+# "https://raw.github.com/ajdamico/asdfree/master/FDA%20Adverse%20Event%20Reporting%20System/download%20and%20import.R" #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will download and import rda files to C:/My Directory/FAERS or wherever the working directory was set.  #
 #######################################################################################################################

@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NSCH/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Survey%20of%20Children%27s%20Health/replication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20Children%27s%20Health/replication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -36,7 +36,7 @@
 # prior to running this replication script, the 2011-2012 public use microdata files must be loaded as R data files (.rda)  #
 # on the local machine. running the "download all microdata.R" script will create this file for you.                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/National%20Survey%20of%20Children%27s%20Health/download%20and%20import.R     #
+# https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20Children%27s%20Health/download%20and%20import.R     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/NSCH/ (or the working directory was chosen)               #
 #############################################################################################################################

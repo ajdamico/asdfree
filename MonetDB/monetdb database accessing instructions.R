@@ -6,7 +6,7 @@
 #################################################################################################################################
 # prior to running this analysis script, a monetdb database should already be created.  follow each step outlined on this page: #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/MonetDB/monetdb%20database%20creation%20instructions.R                          #
+# https://github.com/ajdamico/asdfree/blob/master/MonetDB/monetdb%20database%20creation%20instructions.R                          #
 #################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

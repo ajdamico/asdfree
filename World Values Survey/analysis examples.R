@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/WVS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/World%20Values%20Survey/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/World%20Values%20Survey/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -33,7 +33,7 @@
 # prior to running this replication script, all wvs public use microdata files must be loaded as R data
 # files (.rda) on the local machine. running the "download all microdata.R" script will save these
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/World%20Values%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/World%20Values%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save R data (.rda) files in C:/My Directory/WVS/ (or the working directory chosen)
 #######################################################################################################

@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/ESS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/European%20Social%20Survey/replication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/European%20Social%20Survey/replication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -42,7 +42,7 @@
 # prior to running this replication script, the 2004 and 2010 ess microdata files must be loaded as R data files (.rda) #
 # on the local machine. running the "download all microdata.R" script will create this file for you with zero hassle.   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/European%20Social%20Survey/download%20all%20microdata.R                  #
+# https://raw.github.com/ajdamico/asdfree/master/European%20Social%20Survey/download%20all%20microdata.R                  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will save a number of .rda files in C:/My Directory/ESS/ (or the working directory was chosen)            #
 #########################################################################################################################
@@ -92,7 +92,7 @@ options( survey.lonely.psu = "adjust" )
 
 
 # here's a basic regression from the 2010 (5th round) edition 3 nesstar webview: http://nesstar.ess.nsd.uib.no/    #
-# https://github.com/ajdamico/usgsd/blob/master/European%20Social%20Survey/nesstar%20example%20output.pdf?raw=true #
+# https://github.com/ajdamico/asdfree/blob/master/European%20Social%20Survey/nesstar%20example%20output.pdf?raw=true #
 
 
 # load the 2010 integrated survey data into memory

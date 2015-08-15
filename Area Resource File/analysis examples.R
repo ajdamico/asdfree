@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/ARF/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Area%20Resource%20File/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Area%20Resource%20File/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -33,7 +33,7 @@
 # prior to running this analysis script, the arf must be loaded as an R data file #
 # on the local machine.  running the download script will create this .rda        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/usgsd/blob/master/Area%20Resource%20File/download.R #
+# https://github.com/ajdamico/asdfree/blob/master/Area%20Resource%20File/download.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "arf2013.rda" with 'arf' in C:/My Directory/ARF  #
 ###################################################################################

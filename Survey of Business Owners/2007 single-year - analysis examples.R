@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SBO/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/2007%20single-year%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Business%20Owners/2007%20single-year%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -34,7 +34,7 @@
 # prior to running this analysis script, the sbo 2007 file must be loaded as a database (.db) on the      #
 # local machine.  running the 2007 download all microdata script will create this database file.          #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/download%20and%20import.R  #
+# https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Business%20Owners/download%20and%20import.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "sbo07.db" with 'y' in C:/My Directory/SBO or wherever you put it.       #
 ###########################################################################################################
@@ -60,7 +60,7 @@ library(downloader)			# downloads and then runs the source() function on scripts
 
 
 # load sbo-specific functions (a specially-designed series of multiply-imputed, hybrid-survey-object setup to match the census bureau's tech docs)
-source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/sbosvy%20functions.R" , prompt = FALSE )
+source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Business%20Owners/sbosvy%20functions.R" , prompt = FALSE )
 
 
 # set R to produce conservative standard errors instead of crashing
@@ -122,7 +122,7 @@ dbSendQuery( db , "CREATE TABLE x AS SELECT * FROM y" )
 # no recodes for me this time around.
 # if you need examples of how to recode,
 # check out the recode 'n' replication script
-# https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Business%20Owners/recode%20and%20replicate.R
+# https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Business%20Owners/recode%20and%20replicate.R
 
 
 # # # # # # # # # #

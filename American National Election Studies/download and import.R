@@ -10,7 +10,7 @@
 # your.password <- "password"
 # library(downloader)
 # setwd( "C:/My Directory/ANES/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/American%20National%20Election%20Studies/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/American%20National%20Election%20Studies/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

@@ -9,7 +9,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/NSDUH/" )
 # # you'll need the `terms` line below.  better read the script carefully. #
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/National%20Survey%20on%20Drug%20Use%20and%20Health/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20on%20Drug%20Use%20and%20Health/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
