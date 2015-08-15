@@ -121,9 +121,15 @@ for ( f.l in c( "faers" , "legacy" ) ){
 
 	# extract the four-digit year from the remaining filenames
 	ascii.years <- gsub( "(.*)ASCII_([0-9]*)q(.*)" , "\\2" , ascii.names )
+	ascii.years <- gsub( "(.*)ASCII ([0-9]*) Q(.*)" , "\\2" , ascii.years )
+	ascii.years <- gsub( "(.*)ASCII_([0-9]*) Q(.*)" , "\\2" , ascii.years )
+	ascii.years <- gsub( "(.*)ASCII_([0-9]*)Q(.*)" , "\\2" , ascii.years )
 
 	# extract the one-digit quarter from the remaining filenames
 	ascii.quarter <- gsub( "(.*)([0-9]*)q([0-9])(.*)" , "\\3" , ascii.names )
+	ascii.quarter <- gsub( "(.*)([0-9]*)Q([0-9])(.*)" , "\\3" , ascii.quarter )
+	ascii.quarter <- gsub( "(.*)([0-9]*) q([0-9])(.*)" , "\\3" , ascii.quarter )
+	ascii.quarter <- gsub( "(.*)([0-9]*) Q([0-9])(.*)" , "\\3" , ascii.quarter )
 
 	# confirm all years are 2004 or later
 	stopifnot( ascii.years %in% 2004:3000 )
