@@ -175,9 +175,9 @@ files.to.download <-
 # .sav files only
 files.to.download[[ "ANES 2010-2012 Evaluations of Government and Society Study" ]] <-
 	c(
-		"../data/2010_2012EGSS/ANES_EGSS4_preliminary_release_sav.zip" ,
-		"../data/2010_2012EGSS/ANES_EGSS3_preliminary_release_sav.zip" ,
-		"../data/2010_2012EGSS/ANES_EGSS2_preliminary_release_sav.zip" ,
+		"../data/2010_2012EGSS/anes_specialstudies_2012egss4_sav.zip" ,
+		"../data/2010_2012EGSS/anes_specialstudies_2011egss3_sav.zip" ,
+		"../data/2010_2012EGSS/anes2010_2012egss2_sav.zip" ,
 		"../data/2010_2012EGSS/anes2010_2012egss1por.zip"
 	)
 
