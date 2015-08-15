@@ -8,7 +8,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/NYCHVS/" )
 # years.to.download <- c( 2002 , 2005 , 2008 , 2011 , 2014 )
-# source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/2002%20-%202011%20-%20download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/usgsd/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
