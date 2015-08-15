@@ -1,13 +1,12 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # consumer expenditure survey
-# 1996-2013
+# all available years
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CES/" )
-# years.to.download <- 2013:1996
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Consumer%20Expenditure%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -48,16 +47,21 @@
 library(foreign) 	# load foreign package (converts data files into R)
 
 
-# uncomment this line to download all available data sets
-# uncomment this line by removing the `#` at the front
-# years.to.download <- 2013:1996
-
-# uncomment to only download the most current available year
-# years.to.download <- 2013
-# but why not just download them all?  ;)
-
-
-
+# figure out which years are available to download
+years.to.download <-
+	unique( 
+		gsub( 
+			"(.*)/pumd_([0-9][0-9][0-9][0-9]).htm(.*)" , 
+			"\\2" , 
+			grep( 
+				"/pumd_([0-9][0-9][0-9][0-9]).htm" , 
+				readLines( "http://www.bls.gov/cex/pumdhome.htm" ) , 
+				value = TRUE 
+			) 
+		) 
+	)
+	
+	
 # conversion options #
 
 # it's recommended you keep a version of the .rda files,
