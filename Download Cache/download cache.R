@@ -1,5 +1,7 @@
 # written by http://hannes.muehleisen.org/
 
+library(digest)
+
 # from http://stackoverflow.com/questions/16474696/read-system-tmp-dir-in-r
 gettmpdir <- 
 	function() {
@@ -11,25 +13,6 @@ gettmpdir <-
 		  Sys.getenv('R_USER')
 		else '/tmp'
 	}
-
-# http://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64#R
-base64encode <- function(sobj) {
-	sstr <- as.character(sobj)
-	stopifnot(length(sstr) == 1) # we only like 1-entry string vectors for now
-	if (nchar(sstr) == 0) return("")
-	b64c <- "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-	shfts <- c(18,12,6,0)
-	sand <- function(n,s) bitwAnd(bitwShiftR(n,s),63)+1
-	slft <- function(p,n) bitwShiftL(as.integer(p),n)
-	subs <- function(s,n) substring(s,n,n)
-	sbit <- charToRaw(sstr)  
-	npad <- ( 3 - length(sbit) %% 3) %% 3 # yeah.
-	sbit <- c(sbit,as.raw(rep(0,npad)))
-	pces <- lapply(seq(1,length(sbit),by=3),function(ii) sbit[ii:(ii+2)])
-	encv <- paste0(sapply(pces,function(p) paste0(sapply(shfts,function(s)(subs(b64c,sand(slft(p[1],16)+slft(p[2],8)+slft(p[3],0),s)))))),collapse="")
-	if (npad > 0) substr(encv,nchar(encv)-npad+1,nchar(encv)) <- paste0(rep("=",npad),collapse="")
-	return(encv)
-}
 
 
 download_cached <- 
@@ -95,7 +78,7 @@ download_cached <-
 			paste0(
 				gsub( "\\" , "/" , gettmpdir() , fixed = TRUE ) , 
 				"/" ,
-				base64encode( url ) , 
+				digest( url ) , 
 				".Rdownloadercache"
 			)
 		
