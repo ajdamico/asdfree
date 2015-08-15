@@ -269,7 +269,7 @@ download.nchs <-
 			if ( curYear < 50 ) curYear <- curYear + 2000
 			if ( curYear > 50 & curYear < 100 ) curYear <- curYear + 1900
 			
-			download.cache( i , tf , mode = 'wb' )
+			download_cached( i , tf , mode = 'wb' )
 			
 			# actually run winrar on the downloaded file,
 			# extracting the results to the temporary directory
@@ -349,12 +349,12 @@ download.nchs <-
 			# wait one minute before each download
 			Sys.sleep( 60 )
 				
-			attempt.one <- try( download.cache( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
+			attempt.one <- try( download_cached( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' ) , silent = TRUE )
 			
 			if ( class( attempt.one ) == 'try-error' ) {
 				Sys.sleep( 60 )
 				
-				download.cache( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' )
+				download_cached( i , paste( "." , y$name , basename( i ) , sep = "/" ) , mode = 'wb' )
 			}
 		}
 			

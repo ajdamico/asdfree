@@ -50,7 +50,7 @@
 library(downloader)			# downloads and then runs the source() function on scripts from github
 library(httr)				# load httr package (downloads files from the web, with SSL and cookies)
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -257,7 +257,7 @@ for ( year in all.years ){
 		if ( !( serviceid %in% 1:9 ) ) stop( 'unexpected serviceid' )
 		
 		# download the zipped csv's file to a temporary directory
-		download.cache( csv.fn , tf , mode = 'wb' )
+		download_cached( csv.fn , tf , mode = 'wb' )
 		
 		# unzip the temporary file into the temporary directory
 		z <- unzip( tf , exdir = td )

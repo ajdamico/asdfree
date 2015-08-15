@@ -79,7 +79,7 @@ http.dir <- "http://www.bls.gov/tus/special.requests/"
 tf <- tempfile()
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -106,7 +106,7 @@ for ( year in years.to.download ){
 
 	# download the contents of the website
 	# to the temporary file
-	download.cache( http.page , tf )
+	download_cached( http.page , tf )
 
 	# read the contents of that temporary file
 	# into working memory (a character object called `txt`)
@@ -144,7 +144,7 @@ for ( year in years.to.download ){
 		fn <- paste0( http.dir , curFile , ".zip" )
 		
 		# download the file
-		download.cache( fn , tf , mode = 'wb' )
+		download_cached( fn , tf , mode = 'wb' )
 		
 		# extract the contents of the zipped file
 		# into the current year-specific directory

@@ -77,7 +77,7 @@ library(sas7bdat)	# loads files ending in .sas7bdat directly into r as data.fram
 library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -113,7 +113,7 @@ for ( year in years.to.download ){
 	}
 		
 	# download the main file
-	download.cache( puf.fp , tf , mode = 'wb' )
+	download_cached( puf.fp , tf , mode = 'wb' )
 
 	# unzip the main file to the temporary directory
 	z <- unzip( tf , exdir = td )
@@ -141,7 +141,7 @@ for ( year in years.to.download ){
 	x$one <- 1
 
 	# download the multiply-imputed poverty data.frame
-	download.cache( mi.fp , tf , mode = 'wb' )
+	download_cached( mi.fp , tf , mode = 'wb' )
 
 	# unzip yet another file
 	z <- unzip( tf , exdir = td )

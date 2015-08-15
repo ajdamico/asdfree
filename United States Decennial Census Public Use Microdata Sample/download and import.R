@@ -143,7 +143,7 @@ source_url( "https://raw.github.com/ajdamico/usgsd/master/MonetDB/monet.read.tsv
 # this is a modification of the SAScii package's read.SAScii function
 # that imports tab-separated value files directly into MonetDB
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -317,7 +317,7 @@ if ( 1990 %in% c( one.percent.files.to.download , five.percent.files.to.download
 	tf <- tempfile()
 	
 	# download the pums sas script provided by the census bureau
-	download.cache( "http://www2.census.gov/census_1990/1990_PUMS_A/TOOLS/sas/PUMS.SAS" , tf )
+	download_cached( "http://www2.census.gov/census_1990/1990_PUMS_A/TOOLS/sas/PUMS.SAS" , tf )
 	
 	# read the script into working memory
 	sas.90 <- readLines( tf )
@@ -370,7 +370,7 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 	pums.layout <- tempfile()
 
 	# download the layout excel file
-	download.cache( "http://www2.census.gov/census_2000/datasets/PUMS/FivePercent/5%25_PUMS_record_layout.xls" ,	pums.layout , mode = 'wb' )
+	download_cached( "http://www2.census.gov/census_2000/datasets/PUMS/FivePercent/5%25_PUMS_record_layout.xls" ,	pums.layout , mode = 'wb' )
 
 	# initiate a quick layout read-in function #
 	code.str <-

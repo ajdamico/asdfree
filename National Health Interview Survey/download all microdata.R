@@ -115,7 +115,7 @@ tf <- tempfile() ; td <- tempdir()
 # main NHIS ftp site
 main.nhis.ftp <- "ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/"
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -163,7 +163,7 @@ for ( year in nhis.years.to.download ){
 			
 			# attempt #1:
 			# simply download the file into the local directory
-			attempt1 <- try( download.cache( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' ) , silent = TRUE )
+			attempt1 <- try( download_cached( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' ) , silent = TRUE )
 			
 			# if the attempt to download the file resulted in an error..
 			if ( class( attempt1 ) == 'try-error' ){
@@ -176,7 +176,7 @@ for ( year in nhis.years.to.download ){
 				# and try again!
 				
 				# simply download the file into the local directory
-				download.cache( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
+				download_cached( paste0( doc.nhis.ftp , fn ) , destfile = paste0( docs.output.directory , fn ) , mode = 'wb' )
 				
 			}
 
@@ -336,7 +336,7 @@ for ( year in nhis.years.to.download ){
 			
 			# attempt #1:
 			# simply download the file into the local directory
-			try.error <- try( download.cache( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' ) , silent = TRUE )
+			try.error <- try( download_cached( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' ) , silent = TRUE )
 			
 			# if the attempt to download the file resulted in an error..
 			if ( class( try.error ) == 'try-error' ){
@@ -349,7 +349,7 @@ for ( year in nhis.years.to.download ){
 				# and try again!
 				
 				# simply download the file into the local directory
-				download.cache( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' )
+				download_cached( efl , destfile = paste0( output.directory , fn ) , mode = 'wb' )
 				
 			}
 						
@@ -470,7 +470,7 @@ for ( year in nhis.years.to.download ){
 			efl <- paste0( year.nhis.ftp , i )
 	
 			# ..and simply download the file into the local directory
-			download.cache( efl , destfile = paste0( output.directory , i ) , mode = 'wb' )
+			download_cached( efl , destfile = paste0( output.directory , i ) , mode = 'wb' )
 			
 		}
 		
@@ -507,8 +507,8 @@ for ( year in nhis.years.to.download ){
 		
 		# download the compressed file from the nhis ftp site
 		# and save it to a temporary file on your local disk
-		# ..but just save this download.cache into an error-handling expression
-		dfeh <- expression( download.cache( efl , tf , mode = "wb" ) )
+		# ..but just save this download_cached into an error-handling expression
+		dfeh <- expression( download_cached( efl , tf , mode = "wb" ) )
 	
 		
 		# start of error-handling

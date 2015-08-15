@@ -71,7 +71,7 @@ library(RCurl)		# load RCurl package (downloads https files)
 library(stringr) 	# load stringr package (manipulates character strings easily)
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -188,11 +188,11 @@ for ( fn in precise.files ){
 	tf <- tempfile() 
 	
 	# download the exact file to the local disk
-	attempt.one <- try( download.cache( fn , tf , mode = 'wb' ) , silent = TRUE )
+	attempt.one <- try( download_cached( fn , tf , mode = 'wb' ) , silent = TRUE )
 	
 	if( class( attempt.one ) == 'try-error' ){
 		Sys.sleep( 60 )
-		download.cache( fn , tf , mode = 'wb' , fun = download )
+		download_cached( fn , tf , mode = 'wb' , fun = download )
 	}
 	
 	# import files from largest to smallest
@@ -246,7 +246,7 @@ for ( fn in precise.files ){
 	
 			# re-try the download, this time forcing a download
 			# (just in case the cache'd file was incomplete or corrupted)
-			download.cache( fn , tf , mode = 'wb' , usecache = FALSE )
+			download_cached( fn , tf , mode = 'wb' , usecache = FALSE )
 			
 			# unzip it once again
 			tf <- unzip( tf , exdir = td )

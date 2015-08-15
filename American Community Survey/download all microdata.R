@@ -105,7 +105,7 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -341,7 +341,7 @@ for ( year in 2050:2005 ){
 				}
 							
 				# store a command: "download the sas zipped file to the temporary file location"
-				download.command <- download.cache( sas.file.location , tf , mode = "wb" )
+				download.command <- download_cached( sas.file.location , tf , mode = "wb" )
 
 				# unzip to a local directory
 				wy <- unzip( tf , exdir = tempdir() )
@@ -392,7 +392,7 @@ for ( year in 2050:2005 ){
 				# try downloading the file three times before breaking
 				
 				# store a command: "download the ACS zipped file to the temporary file location"
-				download.command <- expression( download.cache( ACS.file.location , tf , mode = "wb" ) )
+				download.command <- expression( download_cached( ACS.file.location , tf , mode = "wb" ) )
 
 				# try the download immediately.
 				# run the above command, using error-handling.

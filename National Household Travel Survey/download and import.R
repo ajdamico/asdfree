@@ -216,7 +216,7 @@ library(R.utils)			# load the R.utils package (counts the number of lines in a f
 # create a temporary file and a temporary directory..
 tf <- tempfile() ; td <- tempdir()
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -357,7 +357,7 @@ for ( year in years.to.download ){
 
 		# download the main four data sets
 		# zipped file to the temporary file on your local disk
-		download.cache( 
+		download_cached( 
 			url = paste0( "http://nhts.ornl.gov/" , year , "/download/Xpt.zip" ) , 
 			destfile = tf , 
 			mode = 'wb' 
@@ -411,7 +411,7 @@ for ( year in years.to.download ){
 
 		# download the main four data sets
 		# zipped file to the temporary file on your local disk
-		download.cache( 
+		download_cached( 
 			url = paste0( "http://nhts.ornl.gov/" , year , "/download/Ascii.zip" ) , 
 			destfile = tf , 
 			mode = 'wb' 
@@ -589,7 +589,7 @@ for ( year in years.to.download ){
 			if ( year > 2001 ){
 			
 				# roster file import #
-				download.cache( 
+				download_cached( 
 					url = paste0( 'http://nhts.ornl.gov/' , year , '/download/roster.zip' ) , 
 					destfile = tf , 
 					mode = 'wb' 
@@ -645,13 +645,13 @@ for ( year in years.to.download ){
 				# download the person and household replicate weights
 				# zipped file to the temporary file on your local disk
 				if ( year == 2001 ){
-					download.cache( 
+					download_cached( 
 						url = "http://nhts.ornl.gov/2001/download/replicates_ascii.zip" , 
 						destfile = tf , 
 						mode = 'wb' 
 					)
 				} else {
-					download.cache( 
+					download_cached( 
 						url = paste0( "http://nhts.ornl.gov/" , year , "/download/ReplicatesASCII.zip" ) , 
 						destfile = tf , 
 						mode = 'wb' 

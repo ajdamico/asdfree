@@ -32,7 +32,7 @@ get.tsv <-
 		cur.pums <- tempfile()
 
 		# try to download the text file
-		attempt1 <- try( download.cache( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
+		attempt1 <- try( download_cached( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
 		
 		# if the first attempt returned an error..
 		if ( class( attempt1 ) == 'try-error' ) {
@@ -41,7 +41,7 @@ get.tsv <-
 			Sys.sleep( 60 )
 			
 			# and try again
-			attempt2 <- try( download.cache( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
+			attempt2 <- try( download_cached( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
 			
 		}	
 		
@@ -52,7 +52,7 @@ get.tsv <-
 			Sys.sleep( 120 )
 			
 			# and try one last time.
-			download.cache( fp , cur.pums , mode = 'wb' )
+			download_cached( fp , cur.pums , mode = 'wb' )
 			# since there's no `try` function encapsulating this one,
 			# it will break the whole program if it doesn't work
 		}

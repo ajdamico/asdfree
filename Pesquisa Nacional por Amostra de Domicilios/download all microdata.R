@@ -96,7 +96,7 @@ library(descr) 		# load the descr package (converts fixed-width files to delimit
 library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -165,7 +165,7 @@ for ( year in years.to.download ){
 			)
 
 		# download the data and sas importation instructions all at once..
-		download.cache( ftp.path , tf , mode = "wb" )
+		download_cached( ftp.path , tf , mode = "wb" )
 		
 		# ..then also unzip them into the temporary directory
 		files <- unzip( tf , exdir = td )
@@ -190,7 +190,7 @@ for ( year in years.to.download ){
 			try({
 				
 				# give downloading 'em a shot
-				download.cache( paste0( ftp.path , this.file ) , tf , mode = 'wb' )
+				download_cached( paste0( ftp.path , this.file ) , tf , mode = 'wb' )
 				
 				# unzip them into the same place
 				files <- c( files , unzip( tf , exdir = td ) )

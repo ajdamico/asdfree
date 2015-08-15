@@ -82,7 +82,7 @@ library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -133,7 +133,7 @@ fn <-
 	)
 
 # download the file to the temporary file on the local disk
-download.cache( fn , tf , mode = 'wb' )
+download_cached( fn , tf , mode = 'wb' )
 
 # after downloading the file successfully,
 # unzip the temporary file to the temporary folder..

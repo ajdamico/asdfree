@@ -106,7 +106,7 @@ library(gdata) 				# load the gdata package (imports excel [.xls] files into R)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -155,13 +155,13 @@ for ( year in years.to.download ){
 	}
 	
 	# download the household and person ascii data files to the local computer..
-	download.cache( data.file , tf , mode = "wb" )
+	download_cached( data.file , tf , mode = "wb" )
 
 	# ..then unzip them into the temporary directory
 	files <- unzip( tf , exdir = td )
 
 	# download the sas importation instructions inside the same FTP directory..
-	download.cache( sas.input.instructions , tf , mode = "wb" )
+	download_cached( sas.input.instructions , tf , mode = "wb" )
 
 	# ..then also unzip them into the temporary directory
 	files <- c( files , unzip( tf , exdir = td ) )
@@ -172,7 +172,7 @@ for ( year in years.to.download ){
 		alimentacao.file <- paste0( ftp.path , "tradutores.zip" )
 		
 		# download the alimentacao file inside the same FTP directory..
-		download.cache( alimentacao.file , tf , mode = 'wb' )
+		download_cached( alimentacao.file , tf , mode = 'wb' )
 		
 		# ..then also unzip them into the temporary directory
 		files <- c( files , unzip( tf , exdir = td ) )

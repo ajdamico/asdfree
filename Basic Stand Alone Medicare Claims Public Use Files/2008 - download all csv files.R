@@ -53,7 +53,7 @@
 library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -125,7 +125,7 @@ all.files <- c( inpatient , dme , pde , hospice , carrier , hha , outpatient , s
 for ( zf in all.files ){
 
 	# try the download.
-	other.attempt <- try( download.cache( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 3 ) , silent = TRUE )
+	other.attempt <- try( download_cached( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 3 ) , silent = TRUE )
 	
 	# if there is really nothing in the file..
 	if( class( other.attempt ) == 'try-error' || length( readLines( tf , n = 10 ) ) == 0 ){
@@ -133,7 +133,7 @@ for ( zf in all.files ){
 		# switch to the other url prefix
 		
 		# so long as the download didn't complete, keep trying.
-		download.cache( paste0( ftp.d , zf ) , tf , FUN = download , attempts = 3 )
+		download_cached( paste0( ftp.d , zf ) , tf , FUN = download , attempts = 3 )
 
 	# but if something (an incomplete file) was downloaded..
 	}

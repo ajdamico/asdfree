@@ -110,7 +110,7 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -129,8 +129,8 @@ tf <- tempfile() ; tf2 <- tempfile() ; tf3 <- tempfile() ; tf4 <- tempfile() ; t
 
 
 # download the layout files for the loan applications received (lar) and institutional records (ins) data tables
-download.cache( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/lar_str.csv" , tf , FUN = download )
-download.cache( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/ins_str.csv" , tf2 , FUN = download )
+download_cached( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/lar_str.csv" , tf , FUN = download )
+download_cached( "https://raw.github.com/ajdamico/usgsd/master/Home%20Mortgage%20Disclosure%20Act/ins_str.csv" , tf2 , FUN = download )
 
 
 # configure a monetdb database for the hmda on windows #
@@ -278,7 +278,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			}
 		
 			# download the sas importation instructions to a temporary file on the local disk
-			download.cache( sas_ri , tf3 , FUN = download )
+			download_cached( sas_ri , tf3 , FUN = download )
 
 
 			# construct the url of the current `ReporterPanel.zip` to download
@@ -300,7 +300,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			fn <- paste0( "http://www.ffiec.gov/" , pubpriv , "rawdata/OTHER/20" , year , pubpriv , "MSAOffice.zip" )
 			
 			# download that file..
-			download.cache( fn , tf5 , mode = 'wb' )
+			download_cached( fn , tf5 , mode = 'wb' )
 			
 			# ..and extract it to the temporary directory
 			z <- unzip( tf5 , exdir = td )
@@ -365,7 +365,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			file.remove( list.files( td , full.names = TRUE ) )
 			
 			# download the url into a temporary file on your local disk
-			download.cache( fn , tf , mode = 'wb' )
+			download_cached( fn , tf , mode = 'wb' )
 
 			# unzip the file's contents to the temporary directory
 			# extract the file, platform-specific

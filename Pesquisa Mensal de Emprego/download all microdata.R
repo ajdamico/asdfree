@@ -78,7 +78,7 @@ library(downloader)	# downloads and then runs the source() function on scripts f
 library(RCurl)		# load RCurl package (downloads https files)
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -204,7 +204,7 @@ for ( year in available.years ){
 			)
 		
 		# try to download the zipped file..
-		attempt.one <- try( download.cache( current.zipfile , tf , mode = 'wb' ) , silent = TRUE )
+		attempt.one <- try( download_cached( current.zipfile , tf , mode = 'wb' ) , silent = TRUE )
 		
 		# ..but if the first attempt fails,
 		# wait for three minutes and try again.
@@ -212,7 +212,7 @@ for ( year in available.years ){
 
 			Sys.sleep( 180 )
 			
-			download.cache( current.zipfile , tf , mode = 'wb' )
+			download_cached( current.zipfile , tf , mode = 'wb' )
 			
 		}
 			

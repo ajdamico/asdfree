@@ -68,7 +68,7 @@ library(survey) 			# load survey package (analyzes complex design surveys)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -86,7 +86,7 @@ tf <- tempfile() ; td <- tempdir()
 
 # download the 2007 public use microdata sample (pums)
 # zipped file to the temporary file on your local disk
-download.cache( "http://www2.census.gov/econ/sbo/07/pums/pums_csv.zip" , tf , mode = 'wb' )
+download_cached( "http://www2.census.gov/econ/sbo/07/pums/pums_csv.zip" , tf , mode = 'wb' )
 
 # unzip the temporary (zipped) file into the temporary directory
 # and store the filepath of the unzipped file(s) into a character vector `z`

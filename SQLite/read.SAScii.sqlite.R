@@ -38,8 +38,8 @@ read.SAScii.sqlite <-
 	library(downloader)
 	
 	
-	if ( !exists( "download.cache" ) ){
-		# load the download.cache and related functions
+	if ( !exists( "download_cached" ) ){
+		# load the download_cached and related functions
 		# to prevent re-downloading of files once they've been downloaded.
 		source_url( 
 			"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -83,7 +83,7 @@ read.SAScii.sqlite <-
 		#create a temporary file and a temporary directory..
 		tf <- tempfile() ; td <- tempdir()
 		#download the CPS repwgts zipped file
-		download.cache( fn , tf , mode = "wb" )
+		download_cached( fn , tf , mode = "wb" )
 		#unzip the file's contents and store the file name within the temporary directory
 		fn <- unzip( tf , exdir = td , overwrite = T )
 	}

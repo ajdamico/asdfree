@@ -89,7 +89,7 @@ library(haven) 		# load the haven package (imports dta files faaaaaast)
 setOldClass( c( "tbl_df" , "data.frame" ) )
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -172,7 +172,7 @@ for ( year in cps.years.to.download ){
 	tf <- tempfile() ; td <- tempdir()
 
 	# download the CPS repwgts zipped file to the local computer
-	download.cache( CPS.ASEC.mar.file.location , tf , mode = "wb" )
+	download_cached( CPS.ASEC.mar.file.location , tf , mode = "wb" )
 
 	# unzip the file's contents and store the file name within the temporary directory
 	fn <- unzip( tf , exdir = td , overwrite = TRUE )
@@ -452,7 +452,7 @@ for ( year in cps.years.to.download ){
 			".sas7bdat" 
 		)
 		
-		download.cache( sp.url , tf , mode = 'wb' )
+		download_cached( sp.url , tf , mode = 'wb' )
 		
 		sp <- read_sas( tf )
 	

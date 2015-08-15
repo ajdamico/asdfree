@@ -59,7 +59,7 @@ library(XML)		# load XML (parses through html code to extract links)
 library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url(
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" ,
@@ -141,7 +141,7 @@ for ( f.l in c( "faers" , "legacy" ) ){
 		fn <- paste0( "downloads/" , fp , '.zip' )
 	
 		# attempt to download the current link, save it within the `downloads` folder
-		download.cache( 
+		download_cached( 
 			paste0( "http://www.fda.gov" , ascii.links[[ i ]] ) , 
 			fn
 		)

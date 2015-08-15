@@ -103,7 +103,7 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 

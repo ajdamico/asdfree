@@ -82,7 +82,7 @@ years.to.download <- c( 1995 , 1997 , 1999 , 2001 , 2003 , 2005 , 2011 )
 
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url(
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" ,
@@ -113,7 +113,7 @@ for ( year in years.to.download ){
 
 	# download the current file.  if it's been downloaded in the past,
 	# simply pull it from your computer's cache instead.
-	download.cache( file.to.download , local.zip )
+	download_cached( file.to.download , local.zip )
 
 	# specify the directory of the current year
 	year.directory <- paste0( "./" , year )

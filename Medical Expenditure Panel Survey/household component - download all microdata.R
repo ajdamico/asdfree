@@ -52,7 +52,7 @@ library(RCurl)				# load RCurl package (downloads files from the web)
 library(foreign) 			# load foreign package (converts data files into R)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -165,7 +165,7 @@ tf <- tempfile(); td <- tempdir()
 
 
 # download brr / linkage files
-download.cache( lf , tf )
+download_cached( lf , tf )
 zc <- unzip( tf , exdir = td )
 
 # read the file in as an R data frame
@@ -182,8 +182,8 @@ rm( brr ) ; gc()
 
 
 # download the documentation and codebook as well
-download.cache( lf.cb , "linkage - brr cb.pdf" , mode="wb" , cacheOK=F , method="internal" )
-download.cache( lf.doc  , "linkage - brr doc.pdf" , mode="wb" , cacheOK=F , method="internal" )
+download_cached( lf.cb , "linkage - brr cb.pdf" , mode="wb" , cacheOK=F , method="internal" )
+download_cached( lf.doc  , "linkage - brr doc.pdf" , mode="wb" , cacheOK=F , method="internal" )
 
 
 
@@ -228,7 +228,7 @@ for ( i in nrow( mm ):1 ) {
 				# then there should be an f1 and an f2 file (sometimes more)
 				
 				# download the ..f1ssp.zip file to the temporary file on your local computer
-				download.cache( sub( "ssp.zip" , "f1ssp.zip" , u ) , tf ) 
+				download_cached( sub( "ssp.zip" , "f1ssp.zip" , u ) , tf ) 
 				
 				# unzip the ..f1ssp.zip to the temporary directory
 				zc <- unzip( tf , exdir = td )
@@ -259,7 +259,7 @@ for ( i in nrow( mm ):1 ) {
 				Sys.sleep( 60 )
 				
 				# download the ..f2ssp.zip file to the temporary file on your local computer
-				download.cache( sub( "ssp.zip" , "f2ssp.zip" , u ) , tf ) 
+				download_cached( sub( "ssp.zip" , "f2ssp.zip" , u ) , tf ) 
 				
 				# unzip the ..f2ssp.zip to the temporary directory
 				zc <- unzip( tf , exdir = td )
@@ -302,7 +302,7 @@ for ( i in nrow( mm ):1 ) {
 				attempt.one <-
 					try({
 						# download the ..ssp.zip file to the temporary file on your local computer
-						download.cache( u , tf )
+						download_cached( u , tf )
 					
 						# unzip the ..ssp.zip to the temporary directory
 						zc <- unzip( tf , exdir = td )
@@ -319,7 +319,7 @@ for ( i in nrow( mm ):1 ) {
 							Sys.sleep( 60 )
 							
 							# download the ..ssp.zip file to the temporary file on your local computer
-							download.cache( u , tf )
+							download_cached( u , tf )
 						
 							# unzip the ..ssp.zip to the temporary directory
 							zc <- unzip( tf , exdir = td )
@@ -376,12 +376,12 @@ for ( i in nrow( mm ):1 ) {
 			attempt1 <- NULL
 			
 			# if it does, download it
-			if (! class(err) == "try-error" ) attempt1 <- try( download.cache(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" ) , silent = TRUE )
+			if (! class(err) == "try-error" ) attempt1 <- try( download_cached(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" ) , silent = TRUE )
 			
 			# if the first documentation download broke, wait 60 seconds and try again
 			if ( class( attempt1 ) == 'try-error' ){
 				Sys.sleep( 60 )
-				download.cache(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" )
+				download_cached(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
@@ -406,13 +406,13 @@ for ( i in nrow( mm ):1 ) {
 			
 			# if it does, download it
 			if (! class(err) == "try-error" ){
-				attempt1 <- try( download.cache(  docsite , docname , mode="wb" , cacheOK=F , method="internal" ) , silent = TRUE )
+				attempt1 <- try( download_cached(  docsite , docname , mode="wb" , cacheOK=F , method="internal" ) , silent = TRUE )
 			}
 			
 			# if the first documentation download broke, wait 60 seconds and try again
 			if ( class( attempt1 ) == 'try-error' ){
 				Sys.sleep( 60 )
-				download.cache(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
+				download_cached(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)

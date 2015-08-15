@@ -63,7 +63,7 @@ library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -110,7 +110,7 @@ for ( i in csv.fns ){
 	csv.filepath <- paste0( oecd.csv.website , i , ".csv" )
 
 	# save the current csv file to the temporary location on the local disk
-	download.cache( csv.filepath , tf , mode = 'wb' )
+	download_cached( csv.filepath , tf , mode = 'wb' )
 
 	# import the csv file into working memory
 	x <- read.csv( tf , stringsAsFactors = FALSE )

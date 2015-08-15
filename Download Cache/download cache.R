@@ -32,7 +32,7 @@ base64encode <- function(sobj) {
 }
 
 
-download.cache <- 
+download_cached <- 
   function (
 	url ,
 	
@@ -48,18 +48,18 @@ download.cache <-
 	# if usedest is TRUE, then 
 	# the program checks whether the destination file is present and contains at least one byte
 	# and if so, doesn't do anything.
-    usedest = getOption( "download.cache.usedest" ) , 
+    usedest = getOption( "download_cached.usedest" ) , 
 	
     # if usecache is TRUE, then
 	# it checks the temporary directory for a file that has already been downloaded,
 	# and if so, copies the cached file to the destination file *instead* of downloading.
-	usecache = getOption( "download.cache.usecache" ) ,
+	usecache = getOption( "download_cached.usecache" ) ,
 	
 	# how many attempts should be made with FUN?
 	attempts = 3 ,
 	# just in case of a server timeout or smthn equally annoying
 	
-	# how long should download.cache wait between attempts?
+	# how long should download_cached wait between attempts?
 	sleepsec = 60
   ) {
   
@@ -69,8 +69,8 @@ download.cache <-
 		if( is.null( usecache ) ) usecache <- TRUE
 		# you could set these *outside* of this function
 		# with lines like
-		# options( "download.cache.usedest" = FALSE )
-		# options( "download.cache.usecache" = TRUE )
+		# options( "download_cached.usedest" = FALSE )
+		# options( "download_cached.usecache" = TRUE )
     		
 			
 		cat(

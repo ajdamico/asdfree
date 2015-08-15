@@ -107,7 +107,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # end of non-windows system edits.
 
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -276,7 +276,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		) 
 		
 	# download the file from the cdc's ftp site
-	download.cache( fn , tf , mode = 'wb' )
+	download_cached( fn , tf , mode = 'wb' )
 	
 	# unzip it within the temporary directory on your local hard drive and
 	# store the location it's been unzipped into a new character string variable called local.fn
@@ -456,7 +456,7 @@ for ( year in intersect( years.to.download , 2002:2013 ) ){
 	writeLines( z , tf )
 
 	# download the zipped file
-	download.cache( fn , zf , mode = 'wb' )
+	download_cached( fn , zf , mode = 'wb' )
 	
 	#unzip the file's contents and store the file name within the temporary directory
 	local.fn <- unzip( zf , exdir = 'download' , overwrite = T )
