@@ -44,7 +44,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "mitools" , "downloader" ) )
+# install.packages( c( "survey" , "RSQLite" , "mitools" , "downloader" , "digest" ) )
 
 
 # name the database (.db) file to be saved in the working directory

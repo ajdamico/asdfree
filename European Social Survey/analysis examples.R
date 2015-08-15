@@ -58,7 +58,7 @@
 # ..in order to set your current working directory
 
 
-# install.packages( c( 'survey' , 'downloader' ) )
+# install.packages( c( 'survey' , 'downloader' , 'digest' ) )
 
 
 library(survey)		# load survey package (analyzes complex design surveys)

@@ -123,7 +123,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "RCurl" , "descr" , "downloader" , "R.utils" , "stringr" ) )
+# install.packages( c( "SAScii" , "RCurl" , "descr" , "downloader" , "digest" , "R.utils" , "stringr" ) )
 
 
 

@@ -44,7 +44,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' , 'downloader' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' , 'downloader' , 'digest' ) )
 
 
 

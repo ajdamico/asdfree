@@ -59,7 +59,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "downloader" )
+# install.packages( "downloader" , "digest" )
 
 
 ############################################

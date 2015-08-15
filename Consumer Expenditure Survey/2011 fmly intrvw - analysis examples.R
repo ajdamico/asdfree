@@ -67,7 +67,7 @@ options( scipen = 20 )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "mitools" , "stringr" , "plyr" , "survey" , "downloader" ) )
+# install.packages( c( "RSQLite" , "mitools" , "stringr" , "plyr" , "survey" , "downloader" , "digest" ) )
 
 
 library(RSQLite) 	# load RSQLite package (creates database files in R)

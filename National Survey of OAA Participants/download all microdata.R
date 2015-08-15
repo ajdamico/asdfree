@@ -37,7 +37,7 @@
 # ..in order to set your current working directory
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "httr" , "downloader" ) )
+# install.packages( c( "httr" , "downloader" , "digest" ) )
 
 
 ############################################

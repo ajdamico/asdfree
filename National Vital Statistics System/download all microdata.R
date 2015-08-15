@@ -94,7 +94,7 @@
 # depending on your internet and processor speeds, the entire script should take between one and three days.
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "SAScii" , "downloader" , "R.utils" ) )
+# install.packages( c( "MonetDB.R" , "SAScii" , "downloader" , "digest" , "R.utils" ) )
 
 
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)

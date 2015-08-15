@@ -31,7 +31,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'SAScii' , 'stringr' , 'downloader' ) )
+# install.packages( c( 'SAScii' , 'stringr' , 'downloader' , 'digest' ) )
 
 
 library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)

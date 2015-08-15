@@ -45,7 +45,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RCurl" , "downloader" ) )
+# install.packages( c( "RCurl" , "downloader" , "digest" ) )
 
 
 library(RCurl)				# load RCurl package (downloads files from the web)

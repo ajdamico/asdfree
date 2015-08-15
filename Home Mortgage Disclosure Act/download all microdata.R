@@ -84,7 +84,7 @@
 # setwd( "C:/My Directory/HMDA/" )
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "R.utils" , "MonetDB.R" , "downloader" ) )
+# install.packages( c( "SAScii" , "R.utils" , "MonetDB.R" , "downloader" , "digest" ) )
 
 
 # choose which hmda data sets to download

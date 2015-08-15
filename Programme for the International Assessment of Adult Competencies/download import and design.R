@@ -36,7 +36,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "mitools" , "downloader" ) )
+# install.packages( c( "survey" , "mitools" , "downloader" , "digest" ) )
 
 
 # set your PIAAC data directory

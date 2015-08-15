@@ -77,7 +77,7 @@ options( digits = 8 )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "survey" , "downloader" )
+# install.packages( "survey" , "downloader" , "digest" )
 
 
 library(foreign) # load foreign package (converts data files into R)

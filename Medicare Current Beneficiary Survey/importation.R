@@ -133,7 +133,7 @@ if ( !exists( 'export.sas.file' ) ) export.sas.file <- FALSE
 	
 	
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'SAScii' , 'sas7bdat' , 'plyr' , 'stringr' , 'R.utils' , 'downloader' ) )
+# install.packages( c( 'SAScii' , 'sas7bdat' , 'plyr' , 'stringr' , 'R.utils' , 'downloader' , 'digest' ) )
 
 
 # no need to edit anything below this line #

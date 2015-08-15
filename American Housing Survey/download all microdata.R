@@ -44,7 +44,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "RCurl" , "sas7bdat" , "downloader" , "stringr" ) )
+# install.packages( c( "RSQLite" , "RCurl" , "sas7bdat" , "downloader" , "digest" , "stringr" ) )
 
 
 # name the database (.db) file to be saved in the working directory

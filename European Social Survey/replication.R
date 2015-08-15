@@ -60,7 +60,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'lme4' , 'survey' , 'downloader' ) )
+# install.packages( c( 'lme4' , 'survey' , 'downloader' , 'digest' ) )
 
 
 library(lme4)		# allows random effects modeling

@@ -74,7 +74,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "R.utils" , "downloader" ) )
+# install.packages( c( "R.utils" , "downloader" , "digest" ) )
 
 
 library(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)

@@ -72,7 +72,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'mitools' , 'survey' , 'Hmisc' , 'downloader' ) )
+# install.packages( c( 'mitools' , 'survey' , 'Hmisc' , 'downloader' , 'digest' ) )
 
 
 library(mitools)	# allows analysis of multiply-imputed survey data

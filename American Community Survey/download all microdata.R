@@ -95,7 +95,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "R.utils" , "downloader" , "sas7bdat" ) )
+# install.packages( c( "R.utils" , "downloader" , "digest" , "sas7bdat" ) )
 
 
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)

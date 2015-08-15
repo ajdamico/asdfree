@@ -31,7 +31,7 @@ read.SAScii.sqlite <-
 	
 	# read.SAScii.sqlite depends on three packages
 	# to install these packages, use the line:
-	# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' , 'downloader' ) )
+	# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' , 'downloader' , 'digest' ) )
 	library(SAScii)
 	library(descr)
 	library(RSQLite)

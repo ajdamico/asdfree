@@ -47,7 +47,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "SAScii" , "descr" , "downloader" ) )
+# install.packages( c( "RSQLite" , "SAScii" , "descr" , "downloader" , "digest" ) )
 
 
 SIPP.dbname <- "SIPP01.db"											# choose the name of the database (.db) file on the local disk

@@ -62,7 +62,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'sas7bdat' , "downloader" ) )
+# install.packages( c( 'sas7bdat' , "downloader" , "digest" ) )
 
 
 # no need to edit anything below this line #

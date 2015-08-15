@@ -76,7 +76,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RCurl" , "downloader" , "R.utils" , "stringr" ) )
+# install.packages( c( "RCurl" , "downloader" , "digest" , "R.utils" , "stringr" ) )
 
 
 # even if you're only downloading a single year of data and you've got a fast internet connection,

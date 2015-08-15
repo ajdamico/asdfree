@@ -62,7 +62,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "downloader" , "RCurl" ) )
+# install.packages( c( "SAScii" , "downloader" , "digest" , "RCurl" ) )
 
 
 ############################################

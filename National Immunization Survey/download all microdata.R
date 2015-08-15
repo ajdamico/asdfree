@@ -49,7 +49,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "downloader" ) )
+# install.packages( c( "SAScii" , "downloader" , "digest" ) )
 
 
 # choose which files to download and import #

@@ -46,7 +46,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" , "haven" ) )
+# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" , "digest" , "haven" ) )
 
 
 # define which years to download #
