@@ -65,7 +65,7 @@ library(haven) 				# load the haven package (imports dta files faaaaaast)
 # should calculate their variances by using the average of the replicates.
 options( "survey.replicates.mse" = TRUE )
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -109,7 +109,7 @@ for ( i in ftd ){
 	dir.create( this.year , showWarnings = FALSE )
 	
 	# download the damn file
-	download.cache( i , tf , mode = 'wb' )
+	download_cached( i , tf , mode = 'wb' )
 	
 	# unzip the damn file
 	z <- unzip( tf , exdir = tempdir() )
