@@ -67,7 +67,7 @@ library(SAScii) 			# load the SAScii package (imports ascii data with a SAS scri
 # should calculate their variances by using the average of the replicates.
 options( "survey.replicates.mse" = TRUE )
 
-# load the download.cache and related functions
+# load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
 	"https://raw.github.com/ajdamico/usgsd/master/Download%20Cache/download%20cache.R" , 
@@ -108,15 +108,15 @@ ftd <-
 tf <- tempfile() ; td <- tempdir()
 
 # download the 1999 sas import scripts
-download.cache( 'http://timss.bc.edu/timss1999i/data/bm2_progs.zip' , tf , mode = 'wb' )
+download_cached( 'http://timss.bc.edu/timss1999i/data/bm2_progs.zip' , tf , mode = 'wb' )
 s99 <- unzip( tf , exdir = tempdir() )
 
 # download the 1995 sas import scripts
-download.cache( 'http://timss.bc.edu/timss1995i/database/pop1/POP1PGRM.ZIP' , tf , mode = 'wb' )
+download_cached( 'http://timss.bc.edu/timss1995i/database/pop1/POP1PGRM.ZIP' , tf , mode = 'wb' )
 s95_1 <- unzip( tf , exdir = tempdir() )
-download.cache( 'http://timss.bc.edu/timss1995i/database/pop2/POP2PGRM.ZIP' , tf , mode = 'wb' )
+download_cached( 'http://timss.bc.edu/timss1995i/database/pop2/POP2PGRM.ZIP' , tf , mode = 'wb' )
 s95_2 <- unzip( tf , exdir = tempdir() )
-download.cache( 'http://timss.bc.edu/timss1995i/database/pop3/POP3PGRM.ZIP' , tf , mode = 'wb' )
+download_cached( 'http://timss.bc.edu/timss1995i/database/pop3/POP3PGRM.ZIP' , tf , mode = 'wb' )
 s95_3 <- unzip( tf , exdir = tempdir() )
 s95 <- c( s95_1 , s95_2 , s95_3 )
 
@@ -136,7 +136,7 @@ for ( i in ftd ){
 	dir.create( this.year , showWarnings = FALSE )
 	
 	# download the damn file
-	download.cache( i , tf , mode = 'wb' )
+	download_cached( i , tf , mode = 'wb' )
 	
 	# unzip the damn file
 	z <- unzip( tf , exdir = tempdir() )
