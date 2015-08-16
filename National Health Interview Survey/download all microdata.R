@@ -60,7 +60,7 @@ if ( .Platform$OS.type == 'windows' ) print( 'windows users: read this block' )
 # however, if you have already downloaded anything
 # in the same console, the `setInternet2( TRUE )`
 # setting will be unchangeable in that R session
-# so make sure you are using a fresh console/instance
+# so make sure you are using a fresh instance
 # of your windows R console before designating
 # setInternet2( FALSE )
 

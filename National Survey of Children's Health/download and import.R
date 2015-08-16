@@ -6,6 +6,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# setInternet2( FALSE )						# # only windows users need this line
 # library(downloader)
 # years.to.download <- c( 2003 , 2007 , 2012 )
 # setwd( "C:/My Directory/NSCH/" )
@@ -36,6 +37,20 @@
 # download every file from every year of the National Survey of Children's Health with R #
 # then save every file as an R data frame (.rda) so future analyses can be rapid-fire.   #
 ##########################################################################################
+
+
+# # # are you on a windows system? # # #
+if ( .Platform$OS.type == 'windows' ) print( 'windows users: read this block' )
+# you might need to change your internet connectivity settings
+# using this next line -
+# setInternet2( FALSE )
+# - will change the download method of your R console
+# however, if you have already downloaded anything
+# in the same console, the `setInternet2( TRUE )`
+# setting will be unchangeable in that R session
+# so make sure you are using a fresh instance
+# of your windows R console before designating
+# setInternet2( FALSE )
 
 
 # define which years to download #

@@ -6,6 +6,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# setInternet2( FALSE )						# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NHANES/" )
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Health%20and%20Nutrition%20Examination%20Survey/replicate%202005-2008%20pooled%20cdc%20oral%20examination%20figure.R" , prompt = FALSE , echo = TRUE )
@@ -37,6 +38,20 @@
 ###############################################################################################################################################
 # Analyze the 2005-2006 and 2007-2008 National Health and Nutrition Examination Survey demographics, laboratory, and examination files with R #
 ###############################################################################################################################################
+
+
+# # # are you on a windows system? # # #
+if ( .Platform$OS.type == 'windows' ) print( 'windows users: read this block' )
+# you might need to change your internet connectivity settings
+# using this next line -
+# setInternet2( FALSE )
+# - will change the download method of your R console
+# however, if you have already downloaded anything
+# in the same console, the `setInternet2( TRUE )`
+# setting will be unchangeable in that R session
+# so make sure you are using a fresh instance
+# of your windows R console before designating
+# setInternet2( FALSE )
 
 
 # set your working directory.
