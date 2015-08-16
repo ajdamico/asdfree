@@ -1,7 +1,7 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # national immunization survey
-# 1995-2011 main files
-# 2008-2011 teen files
+# 1995-2013 main files
+# 2008-2013 teen files
 # 2009 h1n1 flu file
 
 # # # # # # # # # # # # # # # # #
@@ -54,12 +54,12 @@
 
 # choose which files to download and import #
 
-nis.years.to.download <- 1995:2011							# reads in all available main nis files
+nis.years.to.download <- 1995:2013							# reads in all available main nis files
 # nis.years.to.download <- c( 1998:2003 , 2006 )			# reads in the 1998-2003 and 2006 main nis files
 # nis.years.to.download <- NULL								# skips the main nis files entirely
 
-nis.teen.years.to.download <- 2008:2011						# reads in all available teen nis files
-# nis.teen.years.to.download <- c( 2008, 2009 , 2011 )		# reads in the 2008, 2009, and 2011 teen nis files
+nis.teen.years.to.download <- 2008:2013						# reads in all available teen nis files
+# nis.teen.years.to.download <- c( 2008, 2009 , 2013 )		# reads in the 2008, 2009, and 2013 teen nis files
 # nis.teen.years.to.download <- NULL						# skips the teen nis files entirely
 
 nhfs.download <- TRUE										# reads in the 2009 h1n1 file
