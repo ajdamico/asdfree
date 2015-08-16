@@ -116,7 +116,7 @@ source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/read.SAScii.
 
 # # # are you on a non-windows system? # # #
 if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
-# the cdc's ftp site has a few SAS importation
+# acer's ftp site has a few SAS importation
 # scripts in a non-standard format
 # if so, before running this whole download program,
 # you might need to run this line..

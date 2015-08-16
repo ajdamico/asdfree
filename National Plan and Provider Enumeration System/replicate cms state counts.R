@@ -62,17 +62,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-# # # are you on a non-windows system? # # #
-if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
-# the cdc's ftp site has a few SAS importation
-# scripts in a non-standard format
-# if so, before running this whole download program,
-# you might need to run this line..
-# options( encoding="windows-1252" )
-# ..to turn on windows-style encoding.
-# # # end of non-windows system edits.
-
-
 # # # # # # # # # # # # # # #
 # warning: monetdb required #
 # # # # # # # # # # # # # # #

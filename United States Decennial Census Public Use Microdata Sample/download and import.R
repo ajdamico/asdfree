@@ -50,7 +50,7 @@
 
 # # # are you on a non-windows system? # # #
 if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
-# the cdc's ftp site has a few SAS importation
+# the census bureau's ftp site has a few SAS importation
 # scripts in a non-standard format
 # if so, before running this whole download program,
 # you might need to run this line..
