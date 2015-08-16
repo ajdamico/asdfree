@@ -160,7 +160,7 @@ for ( year in years.to.download ){
 		ftp.path <-
 			paste0(
 				"ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_anual/microdados/reponderacao_2001_2012/PNAD_reponderado_" ,
-				year ,
+				year , if( year %in% c( 2003 , 2007 , 2009:2012 ) ) "_20150814" ,
 				".zip"
 			)
 
