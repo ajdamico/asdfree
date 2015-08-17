@@ -149,6 +149,10 @@ precise.files <- precise.files[ !grepl( 'flat' , tolower( precise.files ) ) ]
 precise.files <-
 	precise.files[ precise.files != "http://www2.census.gov/programs-surveys/ahs/2011/AHS_2011_PUF_v1.4_SAS.zip" ]
 
+# remove the 1983 sas file, which isn't there.
+precise.files <-
+	precise.files[ precise.files != 'http://www2.census.gov/programs-surveys/ahs/1983/AHS_1983/AHS_1983_Metro_PUF_SAS.zip' ]
+	
 # remove duplicates
 precise.files <- unique( precise.files )
 	
