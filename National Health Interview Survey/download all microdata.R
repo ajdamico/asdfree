@@ -112,7 +112,7 @@ csv <- FALSE
 # no need to edit anything below this line #
 
 
-if ( 2014 %in% nhis.years.to.download ) message( "2014 imputed income not yet available" )
+if ( 2015 %in% nhis.years.to.download ) message( "2015 imputed income not yet available" )
 
 
 # # # # # # # # #
@@ -464,7 +464,7 @@ for ( year in nhis.years.to.download ){
 	
 	# if the year is after 1996, then download the imputed income files
 	# if ( year > 1996 ){
-	if ( year %in% 1997:2013 ){
+	if ( year %in% 1997:2014 ){
 		
 		# imputed income files must be downloaded using a different method #
 	
