@@ -207,10 +207,10 @@ for ( this.wave in waves.to.download ){
 			stopifnot ( length( z ) == 1 | !( grepl( 'stata_dta|spss|rdata' , fn ) ) ) 
 
 			# if it's a stata file, import with `read.dta`
-			if( grepl( 'stata_dta' , tolower( fn ) ) ) x <- read.dta( z , convert.factors = FALSE )
+			if( grepl( 'stata_dta' , tolower( fn ) ) ) try( x <- read.dta( z , convert.factors = FALSE ) , silent = TRUE )
 			
 			# if it's an spss file, import with `read.spss`
-			if( grepl( 'spss' , tolower( fn ) ) ) x <- read.spss( z , to.data.frame = TRUE , use.value.labels = FALSE )
+			if( grepl( 'spss' , tolower( fn ) ) ) try( x <- read.spss( z , to.data.frame = TRUE , use.value.labels = FALSE ) , silent = TRUE )
 			
 			# if it's an r data file, hey the work has been done for you!
 			if( grepl( 'rdata' , tolower( fn ) ) ){
