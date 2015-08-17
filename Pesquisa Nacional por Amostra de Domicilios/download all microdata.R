@@ -187,6 +187,8 @@ for ( year in years.to.download ){
 		# loop through each of the files you might need
 		for ( this.file in c( "Dados.zip" , "Dicionarios_e_input.zip" ) ) {
 		
+			if ( year == 2013 & this.file == "Dicionarios_e_input.zip" ) this.file <- "Dicionarios_e_input_20150814.zip"
+		
 			try({
 				
 				# give downloading 'em a shot
