@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # home mortgage disclosure act
-# 2006 - 2012 files
+# 2006 - 2013 files
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -9,7 +9,7 @@
 # path.to.7z <- "7za"							# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/HMDA/" )
-# years.to.download <- 2012:2006
+# years.to.download <- 2013:2006
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -31,7 +31,7 @@
 
 
 ##################################################################################
-# download all 2006 - 2012 microdata for the home mortgage disclosure act with R #
+# download all 2006 - 2013 microdata for the home mortgage disclosure act with R #
 ##################################################################################
 
 
@@ -76,7 +76,7 @@
 
 
 
-# all 2006-2012 HMDA data files will be stored
+# all 2006-2013 HMDA data files will be stored
 # in a your current working directory
 # use forward slashes instead of back slashes
 
@@ -90,7 +90,7 @@
 # choose which hmda data sets to download
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- 2012:2006
+# years.to.download <- 2013:2006
 # if you have a big hard drive, hey why not download them all?
 
 # remove the `#` in order to just download 2011
