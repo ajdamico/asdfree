@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PIRLS/" )
-# source_url( "https://raw.github.com/ajdamico/usgsd/master/Progress%20in%20International%20Reading%20Literacy%20Study/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.github.com/ajdamico/asdfree/master/Progress%20in%20International%20Reading%20Literacy%20Study/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -32,7 +32,7 @@
 # prior to running this analysis script, the piaac multiply-imputed tables must be loaded as a replicate-weighted survey object on the    #
 # local machine. running the download, import, and design script will create an r data file (.rda) with whatcha need.                     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# "https://raw.github.com/ajdamico/usgsd/master/Progress%20in%20International%20Reading%20Literacy%20Study/download%20import%20and%20design.R"  ###
+# "https://raw.github.com/ajdamico/asdfree/master/Progress%20in%20International%20Reading%20Literacy%20Study/download%20import%20and%20design.R"  ###
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create the files "asg_ash_design.rda" and "asg_design.rda" in C:/My Directory/PIRLS or wherever the working directory was set. #
 ###################################################################################################################################################
@@ -49,7 +49,7 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 
 # load the multiply-imputed design combination alteration function (scf.MIcombine)
 # from the survey of consumer finances directory.  that function's algorithm is what pirls uses.
-source_url( "https://raw.github.com/ajdamico/usgsd/master/Survey%20of%20Consumer%20Finances/scf.survey.R" , prompt = FALSE )
+source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Consumer%20Finances/scf.survey.R" , prompt = FALSE )
 
 
 # the pirls directory contains two types of survey design objects:
