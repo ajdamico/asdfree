@@ -85,7 +85,7 @@ files <- unzip( tf , exdir = getwd() )
 # into the current working directory -- including the ARF documentation 
 
 
-# identify ascii file on your locak disk
+# identify ascii file on your local disk
 fn <- files[ grep( '\\.asc' , files ) ]
 
 
