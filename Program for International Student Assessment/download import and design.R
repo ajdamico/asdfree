@@ -633,7 +633,7 @@ if ( 2000 %in% years.to.download ){
 			write.csv( ism , tf , row.names = FALSE )
 			
 			# read that csv file directly into monetdb
-			monet.read.csv( db , tf , curFile , nrow.check = 20000 , na.strings = "NA" )
+			monet.read.csv( db , tf , curFile , nrow.check = 20000 , na.strings = "NA" , lower.case.names = TRUE )
 
 			# remove the `ism` object from working memory
 			rm( ism )

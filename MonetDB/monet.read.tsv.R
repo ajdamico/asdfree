@@ -12,14 +12,19 @@ monet.read.tsv <-
 		na.strings = "" , 
 		nrow.check = 500 ,
 		structure = NULL ,
-		delimiters = "'\t'"
+		delimiters = "'\t'" ,
+		lower.case.names = FALSE
 	) {
     
 	if (length(na.strings) > 1) stop("na.strings must be of length 1")
 
 	# if a structure file is passed in
 	if ( !is.null( structure ) ){
+		
+		if( lower.case.names ) names( structure ) <- tolower( names( structure ) )
+		
 		dbWriteTable(conn, tablename, structure[FALSE, ])
+		
 	} else {
 	
 		# otherwise, determine headers yourself
@@ -35,6 +40,8 @@ monet.read.tsv <-
 			if (!all(types == types[, 1])) stop("Files have different variable types")
 		}
 	
+		if( lower.case.names ) names( headers ) <- tolower( names( headers ) )
+		
 		dbWriteTable(conn, tablename, headers[[1]][FALSE, ])
 	}
 	

@@ -254,7 +254,8 @@ pums.import.merge.design <-
 			hh.tn ,
 			nrows = hh.lines ,
 			structure = hh.h ,
-			nrow.check = 10000
+			nrow.check = 10000 ,
+			lower.case.names = TRUE
 		)
 
 		# use the monet.read.tsv function
@@ -265,7 +266,8 @@ pums.import.merge.design <-
 			person.tn ,
 			nrows = person.lines ,
 			structure = person.h ,
-			nrow.check = 10000
+			nrow.check = 10000 ,
+			lower.case.names = TRUE
 		)
 		
 		# remove blank_# fields in the monetdb household table

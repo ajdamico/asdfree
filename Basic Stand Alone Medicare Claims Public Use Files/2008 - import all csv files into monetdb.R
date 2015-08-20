@@ -251,7 +251,10 @@ monet.read.csv(
 	inpatient , 
 
 	# save the csv file in the monetdb to a data table named 'inpatient08'
-	paste0( 'inpatient' , substr( year , 3 , 4 ) )
+	paste0( 'inpatient' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
 
 
@@ -259,57 +262,86 @@ monet.read.csv(
 monet.read.csv( 
 	db , 
 	dme , 
-	paste0( 'dme' , substr( year , 3 , 4 ) )
+	paste0( 'dme' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
 
 # store the five 2008 prescription drug events tables in the database as a single 'pde08' table
 monet.read.csv( 
 	db , 
 	pde , 
-	paste0( 'pde' , substr( year , 3 , 4 ) )
+	paste0( 'pde' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
 
 # store the 2008 hospice table in the database as the 'hospice08' table
 monet.read.csv( 
 	db , 
 	hospice , 
-	paste0( 'hospice' , substr( year , 3 , 4 ) )
+	paste0( 'hospice' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
 
 # store the seven 2008 carrier line items tables in the database as a single 'carrier08' table
 monet.read.csv( 
 	db , 
 	carrier , 
-	paste0( 'carrier' , substr( year , 3 , 4 ) )
+	paste0( 'carrier' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
+
 
 # store the 2008 home health agency table in the database as the 'hha08' table
 monet.read.csv( 
 	db , 
 	hha , 
-	paste0( 'hha' , substr( year , 3 , 4 ) )
+	paste0( 'hha' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
+
 
 # store the three 2008 outpatient claims tables in the database as a single 'outpatient08' table
 monet.read.csv( 
 	db , 
 	outpatient , 
-	paste0( 'outpatient' , substr( year , 3 , 4 ) )
+	paste0( 'outpatient' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
+
 
 # store the 2008 snf table in the database as the 'snf08' table
 monet.read.csv( 
 	db , 
 	snf , 
-	paste0( 'snf' , substr( year , 3 , 4 ) )
+	paste0( 'snf' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
+
 
 # store the 2008 chronic conditions table in the database as the 'cc08' table
 monet.read.csv( 
 	db , 
 	cc , 
-	paste0( 'cc' , substr( year , 3 , 4 ) )
+	paste0( 'cc' , substr( year , 3 , 4 ) ) ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
+
 
 
 # count the number of rows in the institutional provider & beneficiary summary table
@@ -321,16 +353,24 @@ monet.read.csv(
 	db , 
 	ipbs , 
 	paste0( 'ipbs' , substr( year , 3 , 4 ) ) ,
-	nrow.check = ipbs.rows 
+	nrow.check = ipbs.rows ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
+
 
 # store the 2008 prescription drug profile table in the database as the 'rxp08' table
 monet.read.csv( 
 	db , 
 	rxp , 
 	paste0( 'rxp' , substr( year , 3 , 4 ) ) ,
-	nrow.check = 10000
+	nrow.check = 10000 ,
+	
+	# force all column names to be lowercase
+	lower.case.names = TRUE
 )
+
 
 
 # the current monet database folder should now
