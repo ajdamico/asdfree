@@ -316,6 +316,8 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 					col.names = office.names
 				)
 				
+			names( msa_ofc ) <- tolower( names( msa_ofc ) )
+				
 			# write the `msa` table into the database directly
 			dbWriteTable( db , paste( pubpriv , 'msa' , year , sep = "_" ) , msa_ofc )
 			

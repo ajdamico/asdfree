@@ -598,6 +598,8 @@ for ( i in numbers.to.download ){
 					# remove the current data table from the database
 					dbRemoveTable( db , tablename )
 					
+					names( x ) <- tolower( names( x ) )
+					
 					# ..and overwrite it with the data.frame object
 					# that you've just blessedly cleaned up
 					dbWriteTable( db , tablename , x )

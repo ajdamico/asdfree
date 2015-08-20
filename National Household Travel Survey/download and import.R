@@ -387,8 +387,10 @@ for ( year in years.to.download ){
 			# there are a couple of illegal names.  change them.
 			for ( j in toupper( illegal.names ) ) names( x )[ names( x ) == j ] <- paste0( j , '_' )
 						
+			names( x ) <- tolower( names( x ) )			
+			
 			# read the data.frame `x`
-			# directly into the rsqlite database you just created.
+			# directly into the monet database you just created.
 			dbWriteTable( db , tablename , x , header = TRUE , row.names = FALSE )
 			# yes.  you did all that.  nice work.
 
@@ -426,7 +428,6 @@ for ( year in years.to.download ){
 
 		
 		# if it's 1995, there's a special structure to the tables
-		# that need read.SAScii.sqlite..
 		if ( year == 1995 ){
 
 			# isolate .lsc files
@@ -493,8 +494,10 @@ for ( year in years.to.download ){
 						colClasses = ifelse( txt.type == 'Numeric' , 'numeric' , 'character' )
 					)
 
+				names( x ) <- tolower( names( x ) )
+					
 				# read the data.frame `x`
-				# directly into the rsqlite database you just created.
+				# directly into the monet database you just created.
 				dbWriteTable( db , tablename , x , header = TRUE , row.names = FALSE )
 
 				# delete the csv file from your local disk,
@@ -616,6 +619,8 @@ for ( year in years.to.download ){
 					# import the current sas7bdat file into working memory
 					x <- read.sas7bdat( i )
 
+					names( x ) <- tolower( names( x ) )
+					
 					# read the data.frame `x`
 					# directly into the rsqlite database you just created.
 					dbWriteTable( db , tablename , x , header = TRUE , row.names = FALSE )
