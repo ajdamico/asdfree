@@ -134,7 +134,7 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 
 
 # load the `get.tsv` and `pums.import.and.merge` functions from my github account.
-source_url( "https://raw.github.com/ajdamico/asdfree/master/United States Decennial Census Public Use Microdata Sample/pums functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/pums%20functions.R" , prompt = FALSE )
 # these are two sets of commands that will be used repeatedly in the importation code below.
 
 
