@@ -6,6 +6,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )	# # only windows users need this line
+# setInternet2( FALSE )						# # only windows users need this line
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/BRFSS/" )
@@ -58,6 +59,21 @@
 # dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
 # restore default behavior -- or just restart instead
 # dbSendQuery(db,"set optimizer = 'default_pipe';")
+
+
+# # # are you on a windows system? # # #
+if ( .Platform$OS.type == 'windows' ) print( 'windows users: read this block' )
+# you might need to change your internet connectivity settings
+# using this next line -
+# setInternet2( FALSE )
+# - will change the download method of your R console
+# however, if you have already downloaded anything
+# in the same console, the `setInternet2( TRUE )`
+# setting will be unchangeable in that R session
+# so make sure you are using a fresh instance
+# of your windows R console before designating
+# setInternet2( FALSE )
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ###################################################################################################################################
