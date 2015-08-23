@@ -659,9 +659,9 @@ Sys.sleep( 60 )
 
 
 # download the sas importation scripts (for use with SAScii) to load the census files directly into MonetDB
-download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE DOMIC.sas" , tf2 )
-download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE PESSOAS.sas" , tf3 )
-download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE FAMILIAS.sas" , tf4 )
+download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20DOMIC.sas" , tf2 )
+download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20PESSOAS.sas" , tf3 )
+download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20FAMILIAS.sas" , tf4 )
 
 
 # designate the location of the 2000 general sample microdata files
