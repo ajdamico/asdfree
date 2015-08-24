@@ -333,15 +333,10 @@ monet.read.csv(
 
 
 # store the 2008 chronic conditions table in the database as the 'cc08' table
-monet.read.csv( 
-	db , 
-	cc , 
-	paste0( 'cc' , substr( year , 3 , 4 ) ) ,
-	
-	# force all column names to be lowercase
-	lower.case.names = TRUE
-)
-
+cc_df <- read.csv( cc , stringsAsFactors = FALSE )
+cc_df <- tolower( names( cc_df ) )
+dbWriteTable( db , paste0( 'cc' , substr( year , 3 , 4 ) ) , cc_df )
+rm( cc_df ) ; gc()
 
 
 # count the number of rows in the institutional provider & beneficiary summary table
