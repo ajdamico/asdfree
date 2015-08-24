@@ -476,7 +476,7 @@ for ( year in years.to.download ){
 
 				# make the tablename the first three letters of the filename,
 				# remove any numbers, also any underscores
-				tablename <- paste0( gsub( "_" , "" , gsub( "[0-9]+" , "" , fn.before.dot ) , fixed = TRUE ) , year )
+				tablename <- tolower( paste0( gsub( "_" , "" , gsub( "[0-9]+" , "" , fn.before.dot ) , fixed = TRUE ) , year ) )
 				
 				# there are a couple of illegal names.  change them.
 				for ( j in illegal.names ) txt.field <- gsub( j , paste0( j , "_" ) , txt.field )
@@ -543,7 +543,7 @@ for ( year in years.to.download ){
 
 				# make the tablename the first three letters of the filename,
 				# remove any numbers, also any underscores
-				tablename <- paste0( gsub( "_" , "" , gsub( "[0-9]+" , "" , fn.before.dot ) , fixed = TRUE ) , year )
+				tablename <- tolower( paste0( gsub( "_" , "" , gsub( "[0-9]+" , "" , fn.before.dot ) , fixed = TRUE ) , year ) )
 				
 				# print the current import progress to the screen
 				cat( "currently importing" , basename( i ) , '\n\r' )
