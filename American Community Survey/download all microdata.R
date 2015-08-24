@@ -370,9 +370,9 @@ for ( year in 2050:2005 ){
 				# end of column type determination #
 	
 				
-				# wait ten seconds, just to make sure any previous servers closed
+				# wait thirty seconds, just to make sure any previous servers closed
 				# and you don't get a gdk-lock error from opening two-at-once
-				Sys.sleep( 10 )
+				Sys.sleep( 30 )
 			
 				# launch the current monet database
 				pid <- monetdb.server.start( batfile )
@@ -564,9 +564,9 @@ for ( year in 2050:2005 ){
 						# and close it using the `pid`
 						monetdb.server.stop( pid )
 						
-						# wait ten seconds, just to make sure any previous servers closed
+						# wait thirty seconds, just to make sure any previous servers closed
 						# and you don't get a gdk-lock error from opening two-at-once
-						Sys.sleep( 10 )
+						Sys.sleep( 30 )
 					
 						# launch the current monet database
 						pid <- monetdb.server.start( batfile )
@@ -668,9 +668,9 @@ for ( year in 2050:2005 ){
 				
 			}
 		
-			# wait ten seconds, just to make sure any previous servers closed
+			# wait thirty seconds, just to make sure any previous servers closed
 			# and you don't get a gdk-lock error from opening two-at-once
-			Sys.sleep( 10 )
+			Sys.sleep( 30 )
 
 			# launch the current monet database
 			pid <- monetdb.server.start( batfile )
@@ -822,9 +822,9 @@ for ( year in 2050:2005 ){
 # which utilize these newly-created survey objects
 
 
-# wait ten seconds, just to make sure any previous servers closed
+# wait thirty seconds, just to make sure any previous servers closed
 # and you don't get a gdk-lock error from opening two-at-once
-Sys.sleep( 10 )
+Sys.sleep( 30 )
 
 ####################################################################
 # lines of code to hold on to for all other `acs` monetdb analyses #
