@@ -450,19 +450,18 @@ for ( year in years.to.download ){
 				
 				# identify the `field` row
 				first.field <- min( grep( 'field' , lst.file ) )
-			
-				# use these hardcoded file widths
-				w <- c( 5 , 10 , 15 , 10 , 2 , 12 , 3 , 9 )
-				# w <- c( 5 , 14 , 16 , 11 , 12 , 3 , 9 )
+
+				lf <- readLines( lst.filepath )
+				lf <- lf[ ( first.field + 1 ):length( lf ) ]
+				while( any( grepl( "   " , lf ) ) ) lf <- gsub( "   " , "  " , lf )
+				lf <- gsub( "^  " , "" , lf )
+				lf <- lf[ lf != '' ]
+				lf <- gsub( "([0-9])  ([0-9])" , "\\1.\\2" , lf )
+				lf <- gsub( "  " , "," , lf )
+				lf.tf <- tempfile()
+				writeLines( lf , lf.tf )
+				stru <- read.csv( lf.tf , h = F )
 				
-				# import the structure
-				stru <- 
-					read.fwf( 
-						lst.filepath , 
-						widths = w ,
-						skip = first.field
-					)
-			
 				stru[ , 1 ] <- as.character( stru[ , 1 ] )
 			
 				# remove any blank fields at the end
@@ -491,12 +490,17 @@ for ( year in years.to.download ){
 				x <- 
 					read.fwf( 
 						i , 
-						widths = as.numeric( txt.w ) ,
+						widths = floor( as.numeric( txt.w ) ) ,
 						col.names = txt.field ,
 						colClasses = ifelse( txt.type == 'Numeric' , 'numeric' , 'character' )
 					)
 
 				names( x ) <- tolower( names( x ) )
+					
+				# deal with decimals
+				decimals <- gsub( "(.*)\\." , "" , ifelse( grepl( "\\." , txt.w ) , txt.w , "0" ) )
+
+				for ( j in seq( txt.w ) ) if( decimals[ j ] > 0 ) x[ , j ] <- x[ , j ] / ( 10^as.numeric( decimals[j] ) )
 					
 				# read the data.frame `x`
 				# directly into the monet database you just created.
