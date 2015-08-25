@@ -334,14 +334,14 @@ monet.read.csv(
 
 # store the 2008 chronic conditions table in the database as the 'cc08' table
 cc_df <- read.csv( cc , stringsAsFactors = FALSE )
-cc_df <- tolower( names( cc_df ) )
+names( cc_df ) <- tolower( names( cc_df ) )
 dbWriteTable( db , paste0( 'cc' , substr( year , 3 , 4 ) ) , cc_df )
 rm( cc_df ) ; gc()
 
 
 # store the 2008 ipbs table in the database as the 'ipbs08' table
 ipbs_df <- read.csv( ipbs , stringsAsFactors = FALSE )
-ipbs_df <- tolower( names( ipbs_df ) )
+names( ipbs_df ) <- tolower( names( ipbs_df ) )
 dbWriteTable( db , paste0( 'ipbs' , substr( year , 3 , 4 ) ) , ipbs_df )
 rm( ipbs_df ) ; gc()
 
