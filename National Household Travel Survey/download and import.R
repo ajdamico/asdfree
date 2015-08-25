@@ -452,8 +452,8 @@ for ( year in years.to.download ){
 				first.field <- min( grep( 'field' , lst.file ) )
 			
 				# use these hardcoded file widths
-				# w <- c( 5 , 20 , 9 , 12 , 12 , 3 , 9 )
-				w <- c( 5 , 14 , 16 , 11 , 12 , 3 , 9 )
+				w <- c( 5 , 10 , 15 , 10 , 2 , 12 , 3 , 9 )
+				# w <- c( 5 , 14 , 16 , 11 , 12 , 3 , 9 )
 				
 				# import the structure
 				stru <- 
@@ -462,6 +462,8 @@ for ( year in years.to.download ){
 						widths = w ,
 						skip = first.field
 					)
+			
+				stru[ , 1 ] <- as.character( stru[ , 1 ] )
 			
 				# remove any blank fields at the end
 				stru <- stru[ !is.na( as.numeric( stru[ , 1 ] ) ) , ]
