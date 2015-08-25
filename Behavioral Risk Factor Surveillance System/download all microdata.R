@@ -304,6 +304,9 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 	# convert all column names in the table to all lowercase
 	names( x ) <- tolower( names( x ) )
 	
+	# do not allow this illegal sql column name
+	names( x )[ names( x ) == 'level' ] <- 'level_'
+	
 	# immediately export the data table to a comma separated value (.csv) file,
 	# also stored on the local hard drive
 	write.csv( x , tf , row.names = FALSE )
