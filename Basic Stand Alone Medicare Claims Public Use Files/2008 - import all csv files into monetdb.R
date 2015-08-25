@@ -339,20 +339,11 @@ dbWriteTable( db , paste0( 'cc' , substr( year , 3 , 4 ) ) , cc_df )
 rm( cc_df ) ; gc()
 
 
-# count the number of rows in the institutional provider & beneficiary summary table
-# just once, since it will be used twice in the monet.read.csv() function
-ipbs.rows <- sapply( ipbs , countLines )
-
 # store the 2008 ipbs table in the database as the 'ipbs08' table
-monet.read.csv( 
-	db , 
-	ipbs , 
-	paste0( 'ipbs' , substr( year , 3 , 4 ) ) ,
-	nrow.check = ipbs.rows ,
-	
-	# force all column names to be lowercase
-	lower.case.names = TRUE
-)
+ipbs_df <- read.csv( ipbs , stringsAsFactors = FALSE )
+ipbs_df <- tolower( names( ipbs_df ) )
+dbWriteTable( db , paste0( 'ipbs' , substr( year , 3 , 4 ) ) , ipbs_df )
+rm( ipbs_df ) ; gc()
 
 
 # store the 2008 prescription drug profile table in the database as the 'rxp08' table
