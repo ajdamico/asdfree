@@ -533,9 +533,8 @@ for ( year in cps.years.to.download ){
 		sp.url <- 
 			paste0( 
 			"http://www.census.gov/housing/povmeas/spmresearch/spmresearch" , 
-			year - 1 , 
-			# if ( year != 2014 ) "new" ,
-			"new" ,
+			floor( year - 1 ) , 
+			if ( year == 2014.5 ) "_redes" else "new" ,
 			".sas7bdat" 
 		)
 		
