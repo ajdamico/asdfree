@@ -455,7 +455,7 @@ for ( year in cps.years.to.download ){
 			
 		# census.gov website containing the current population survey's SAS import instructions
 		CPS.replicate.weight.SAS.read.in.instructions <- 
-			paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".SAS" )
+			paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , floor( year ) , ".SAS" )
 
 		# store the CPS ASEC march 2011 replicate weight file as an R data frame
 		read.SAScii.sqlite ( 
