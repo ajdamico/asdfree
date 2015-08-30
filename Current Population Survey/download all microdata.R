@@ -454,8 +454,26 @@ for ( year in cps.years.to.download ){
 			)
 			
 		# census.gov website containing the current population survey's SAS import instructions
-		CPS.replicate.weight.SAS.read.in.instructions <- 
-			paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , floor( year ) , ".SAS" )
+		if( year == 2014.5 ){
+		
+			CPS.replicate.weight.SAS.read.in.instructions <- tempfile()
+
+			writeLines(
+				paste(
+					"INPUT" ,
+					paste0( "pwwgt" , 0:160 , " " , seq( 1 , 1601 , 10 ) , "-" , seq( 10 , 1610 , 10 ) , " 0.2" , collapse = "\n" ) ,
+					paste( "h_seq 1611 - 1615" , "pppos 1616-1617" , ";" , collapse = "\n" ) ,
+					sep = "\n"
+				) , 
+				CPS.replicate.weight.SAS.read.in.instructions 
+			)
+			
+		} else {
+			
+			CPS.replicate.weight.SAS.read.in.instructions <- 
+				paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , floor( year ) , ".SAS" )
+				
+		}
 
 		# store the CPS ASEC march 2011 replicate weight file as an R data frame
 		read.SAScii.sqlite ( 
