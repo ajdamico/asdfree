@@ -471,7 +471,7 @@ for ( year in cps.years.to.download ){
 		} else {
 			
 			CPS.replicate.weight.SAS.read.in.instructions <- 
-				paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , floor( year ) , ".SAS" )
+				paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".SAS" )
 				
 		}
 
