@@ -133,7 +133,7 @@ for ( year in cps.years.to.download ){
 	cps.tablename <- paste0( "asec" , substr( year , 3 , 4 ) )
 
 	# overwrite 2014.5 with three-eights
-	cps.tablename <- gsub( "\\.5" , "_3x8" )
+	cps.tablename <- gsub( "\\.5" , "_3x8" , cps.tablename )
 
 	# # # # # # # # # # # #
 	# load the main file  #
