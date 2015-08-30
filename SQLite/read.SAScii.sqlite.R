@@ -9,7 +9,7 @@
 read.SAScii.sqlite <-
 	function( 
 		fn ,
-		sas_ri , 
+		sas_ri = NULL , 
 		beginline = 1 , 
 		zipped = F , 
 		# n = -1 , 			# no n parameter available for this - you must read in the entire table!
@@ -18,10 +18,14 @@ read.SAScii.sqlite <-
 		tl = F ,			# convert all column names to lowercase?
 		tablename ,
 		overwrite = FALSE ,	# overwrite existing table?
-		conn				# database connection object -- read.SAScii.sql requires that dbConnect()
+		conn ,				# database connection object -- read.SAScii.sql requires that dbConnect()
 							# already be run before this function begins.
+		sas_stru = NULL
 	) {
 
+	if( is.null( sas_ri ) & is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified" )
+	if( !is.null( sas_ri ) & !is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified, but not both" )
+	
 	# scientific notation contains a decimal point when converted to a character string..
 	# so store the user's current value and get rid of it.
 	user.defined.scipen <- getOption( 'scipen' )
@@ -48,9 +52,15 @@ read.SAScii.sqlite <-
 		)
 	}
 
-
+	if( !is.null( sas_ri ) ){
 	
-	x <- parse.SAScii( sas_ri , beginline , lrecl )
+		x <- parse.SAScii( sas_ri , beginline , lrecl )
+	
+	} else {
+	
+		x <- sas_stru
+		
+	}
 	
 	if( tl ) x$varname <- tolower( x$varname )
 	

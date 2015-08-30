@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
-# cps.years.to.download <- 2014:1998
+# cps.years.to.download <- c( 2014.5 , 2014:1998 )
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -53,7 +53,7 @@
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# cps.years.to.download <- 2014:1998
+# cps.years.to.download <- c( 2014.5 , 2014:1998 )
 
 # uncomment this line to only download the most current year
 # cps.years.to.download <- 2011
@@ -97,6 +97,14 @@ source_url(
 	echo = FALSE 
 )
 
+# load the dd_parser function to disentangle census bureau-provided import scripts
+# for any march extracts that haven't been provided by nber
+source_url( 
+	"https://raw.github.com/ajdamico/asdfree/master/Current%20Population%20Survey/dd_parser.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
 source_url( "https://raw.github.com/ajdamico/asdfree/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
 
@@ -124,6 +132,8 @@ for ( year in cps.years.to.download ){
 	# this default setup will name the tables asec05, asec06, asec07 and so on
 	cps.tablename <- paste0( "asec" , substr( year , 3 , 4 ) )
 
+	# overwrite 2014.5 with three-eights
+	cps.tablename <- gsub( "\\.5" , "_3x8" )
 
 	# # # # # # # # # # # #
 	# load the main file  #
@@ -149,25 +159,45 @@ for ( year in cps.years.to.download ){
 					ifelse(
 						year %in% 2002:1998 ,
 						paste0( "http://thedataweb.rm.census.gov/pub/cps/march/mar" , substr( year , 3 , 4 ) , "supp.zip" ) ,
-						paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+						ifelse(
+							year == 2014 ,
+							"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_tax_fix_5x8.zip" ,
+							ifelse( 
+								year == 2014.5 ,
+								"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun.zip" ,
+								paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+							)
+						)
 					)
 				)
 			# )
 		)
 
-	# national bureau of economic research website containing the current population survey's SAS import instructions
-	CPS.ASEC.mar.SAS.read.in.instructions <- 
-			ifelse(
-				year %in% c( 1987 , 2013:2014 ) ,
-				paste0( "http://www.nber.org/data/progs/cps/cpsmar" , year , ".sas" ) , 
-				paste0( "http://www.nber.org/data/progs/cps/cpsmar" , substr( year , 3 , 4 ) , ".sas" ) 
-			)
+	if( year < 2011 ){
+		
+		# national bureau of economic research website containing the current population survey's SAS import instructions
+		CPS.ASEC.mar.SAS.read.in.instructions <- 
+				ifelse(
+					year %in% c( 1987 , 2013:2014 ) ,
+					paste0( "http://www.nber.org/data/progs/cps/cpsmar" , year , ".sas" ) , 
+					paste0( "http://www.nber.org/data/progs/cps/cpsmar" , substr( year , 3 , 4 ) , ".sas" ) 
+				)
 
-	# figure out the household, family, and person begin lines
-	hh_beginline <- grep( "HOUSEHOLD RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
-	fa_beginline <- grep( "FAMILY RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
-	pe_beginline <- grep( "PERSON RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
+		# figure out the household, family, and person begin lines
+		hh_beginline <- grep( "HOUSEHOLD RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
+		fa_beginline <- grep( "FAMILY RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
+		pe_beginline <- grep( "PERSON RECORDS" , readLines( CPS.ASEC.mar.SAS.read.in.instructions ) )
 
+	} else {
+		
+		if( year == 2014.5 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec20141_pubuse.txt" )
+		if( year == 2014 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
+		if( year == 2013 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2013early_pubuse.dd.txt" )
+		if( year == 2012 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2012early_pubuse.dd.txt" )
+		if( year == 2011 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2011_pubuse.dd.txt" )
+
+	}
+		
 	# create a temporary file and a temporary directory..
 	tf <- tempfile() ; td <- tempdir()
 
@@ -207,10 +237,15 @@ for ( year in cps.years.to.download ){
 	
 	# figure out the ending position for each filetype
 	# take the sum of the absolute value of the width parameter of the parsed-SAScii SAS input file, for household-, family-, and person-files separately
-	end.household <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = hh_beginline )$width ) )
-	end.family <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = fa_beginline )$width ) )
-	end.person <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = pe_beginline )$width ) )
-	
+	if( year < 2011 ){
+		end.household <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = hh_beginline )$width ) )
+		end.family <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = fa_beginline )$width ) )
+		end.person <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = pe_beginline )$width ) )
+	} else {
+		end.household <- sum( abs( sas_strus[[1]]$width ) )
+		end.family <- sum( abs( sas_strus[[2]]$width ) )
+		end.person <- sum( abs( sas_strus[[3]]$width ) )
+	}
 	
 	# create a while-loop that continues until every line has been examined
 	# cycle through every line in the downloaded CPS ASEC 20## file..
@@ -284,46 +319,76 @@ for ( year in cps.years.to.download ){
 	# so skip SAS import instruction lines before that.
 	# NOTE that this 'beginline' parameters of 988, 1121, and 1209 will change for different years.
 
-	# store CPS ASEC march household records as a SQLite database
-	read.SAScii.sqlite ( 
-		tf.household , 
-		CPS.ASEC.mar.SAS.read.in.instructions , 
-		beginline = hh_beginline , 
-		zipped = FALSE ,
-		tl = TRUE ,
-		tablename = 'household' ,
-		conn = db
-	)
+	if( year < 2011 ){
+		# store CPS ASEC march household records as a SQLite database
+		read.SAScii.sqlite ( 
+			tf.household , 
+			CPS.ASEC.mar.SAS.read.in.instructions , 
+			beginline = hh_beginline , 
+			zipped = FALSE ,
+			tl = TRUE ,
+			tablename = 'household' ,
+			conn = db
+		)
+
+		# store CPS ASEC march family records as a SQLite database
+		read.SAScii.sqlite ( 
+			tf.family , 
+			CPS.ASEC.mar.SAS.read.in.instructions , 
+			beginline = fa_beginline , 
+			zipped = FALSE ,
+			tl = TRUE ,
+			tablename = 'family' ,
+			conn = db
+		)
+
+		# store CPS ASEC march person records as a SQLite database
+		read.SAScii.sqlite ( 
+			tf.person , 
+			CPS.ASEC.mar.SAS.read.in.instructions , 
+			beginline = pe_beginline , 
+			zipped = FALSE ,
+			tl = TRUE ,
+			tablename = 'person' ,
+			conn = db
+		)
+	} else {
+		# store CPS ASEC march household records as a SQLite database
+		read.SAScii.sqlite ( 
+			tf.household , 
+			sas_stru = sas_strus[[1]] ,
+			zipped = FALSE ,
+			tl = TRUE ,
+			tablename = 'household' ,
+			conn = db
+		)
+
+		# store CPS ASEC march family records as a SQLite database
+		read.SAScii.sqlite ( 
+			tf.family , 
+			sas_stru = sas_strus[[2]] ,
+			zipped = FALSE ,
+			tl = TRUE ,
+			tablename = 'family' ,
+			conn = db
+		)
+
+		# store CPS ASEC march person records as a SQLite database
+		read.SAScii.sqlite ( 
+			tf.person , 
+			sas_stru = sas_strus[[3]] ,
+			zipped = FALSE ,
+			tl = TRUE ,
+			tablename = 'person' ,
+			conn = db
+		)
+	}
 	
 	# create an index to speed up the merge
 	dbSendQuery( db , "CREATE INDEX household_index ON household ( h_seq )" )
 
-
-	# store CPS ASEC march family records as a SQLite database
-	read.SAScii.sqlite ( 
-		tf.family , 
-		CPS.ASEC.mar.SAS.read.in.instructions , 
-		beginline = fa_beginline , 
-		zipped = FALSE ,
-		tl = TRUE ,
-		tablename = 'family' ,
-		conn = db
-	)
-
 	# create an index to speed up the merge
 	dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
-
-
-	# store CPS ASEC march person records as a SQLite database
-	read.SAScii.sqlite ( 
-		tf.person , 
-		CPS.ASEC.mar.SAS.read.in.instructions , 
-		beginline = pe_beginline , 
-		zipped = FALSE ,
-		tl = TRUE ,
-		tablename = 'person' ,
-		conn = db
-	)
 
 	# create an index to speed up the merge
 	dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
@@ -382,7 +447,11 @@ for ( year in cps.years.to.download ){
 
 		# census.gov website containing the current population survey's replicate weights file
 		CPS.replicate.weight.file.location <- 
-			paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".zip" )
+			ifelse(
+				year == 2014.5 ,
+				"http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_2014_3x8_run5.zip" ,
+				paste0( "http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , year , ".zip" )
+			)
 			
 		# census.gov website containing the current population survey's SAS import instructions
 		CPS.replicate.weight.SAS.read.in.instructions <- 
