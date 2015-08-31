@@ -456,6 +456,8 @@ for ( year in cps.years.to.download ){
 		dbRemoveTable( db , 'ac' )
 		
 		dbRemoveTable( db , 'hfp_pac' )
+		
+		file.remove( tf )
 	
 	} else {
 	
