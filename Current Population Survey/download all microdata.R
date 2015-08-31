@@ -435,9 +435,9 @@ for ( year in cps.years.to.download ){
 		
 		stopifnot( year %in% c( 2014 , 2014.5 ) )
 		
-		if( year == 2014 ) ace <- "http://www.census.gov/hhes/www/hlthins/data/incpovhlth/2013/ASEC14_NOW_ANYCOV.txt"
+		if( year == 2014 ) ace <- "http://www.census.gov/hhes/www/hlthins/data/incpovhlth/2013/asec14_now_anycov.dat"
 		
-		if( year == 2014.5 ) ace <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/ASEC14_NOW_ANYCOV_redes.txt"
+		if( year == 2014.5 ) ace <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec14_now_anycov_redes.dat"
 		
 		download_cached( ace , tf , mode = "wb" )	
 
