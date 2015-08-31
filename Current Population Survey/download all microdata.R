@@ -427,8 +427,44 @@ for ( year in cps.years.to.download ){
 	# create the merged file
 	dbSendQuery( db , "create table h_xwalk as select * from xwalk as a inner join household as b on a.h_seq = b.h_seq" )
 	dbSendQuery( db , "create table h_f_xwalk as select * from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq AND a.ffpos = b.ffpos" )
-	dbSendQuery( db , "create table hfp as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
+	
+	# tack on _anycov_ variables
+	if( year > 2013 ){
+		
+		dbSendQuery( db , "create table hfp_pac as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
+		
+		stopifnot( year %in% c( 2014 , 2014.5 ) )
+		
+		if( year == 2014 ) ace <- "http://www.census.gov/hhes/www/hlthins/data/incpovhlth/2013/ASEC14_NOW_ANYCOV.txt"
+		
+		if( year == 2014.5 ) ace <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/ASEC14_NOW_ANYCOV_redes.txt"
+		
+		download_cached( ace , tf , mode = "wb" )	
+
+		ac <- read.fwf( tf , c( 5 , 2 , 1 ) )
+		
+		names( ac ) <- c( 'ph_seq' , 'ppposold' , 'census_anycov' )
+		
+		ac[ ac$census_anycov == 2 , 'census_anycov' ] <- 0
+		
+		dbWriteTable( db , 'ac' , ac )
+		
+		dbSendQuery( db , "create table hfp as select * from hfp_pac as a inner join ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" )
+		
+		stopifnot( dbGetQuery( db , 'select count(*) from hfp' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from hfp_pac' )[ 1 , 1 ] )
+		
+		dbRemoveTable( db , 'ac' )
+		
+		dbRemoveTable( db , 'hfp_pac' )
+	
+	} else {
+	
+		dbSendQuery( db , "create table hfp as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
+		
+	}
+	
 	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
+	
 
 	if( year > 2004 ){
 		
