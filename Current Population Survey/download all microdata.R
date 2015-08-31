@@ -130,7 +130,7 @@ for ( year in cps.years.to.download ){
 
 	# name the final data table to be saved in the working directory
 	# this default setup will name the tables asec05, asec06, asec07 and so on
-	cps.tablename <- paste0( "asec" , substr( year , 3 , 4 ) )
+	cps.tablename <- paste0( "asec" , substr( year , 3 , nchar( year ) ) )
 
 	# overwrite 2014.5 with three-eights
 	cps.tablename <- gsub( "\\.5" , "_3x8" , cps.tablename )
