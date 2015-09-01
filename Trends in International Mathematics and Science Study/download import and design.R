@@ -196,7 +196,7 @@ for ( this.year in years ){
 				}
 										
 				# stack it
-				y <- rbind( y , x ) ; rm( x )
+				y <- rbind( y , x ) ; rm( x ) ; gc()
 				
 				# remove the original file from the disk
 				unlink( this.file )
@@ -213,7 +213,7 @@ for ( this.year in years ){
 			save( list = p , file = paste0( './' , this.year , '/' , p , '.rda' ) )
 			
 			# remove all those now-unnecessary objects from RAM
-			rm( list = c( p , "y" ) )
+			rm( list = c( p , "y" ) ) ; gc()
 		}
 		
 	} else {
@@ -264,7 +264,7 @@ for ( this.year in years ){
 					x <- as.data.frame.matrix( x )
 					
 					# stack it
-					y <- rbind( y , x ) ; rm( x )
+					y <- rbind( y , x ) ; rm( x ) ; gc()
 					
 					# remove the original file from the disk
 					unlink( this.file )
@@ -286,7 +286,7 @@ for ( this.year in years ){
 					save( list = paste0( p , s ) , file = paste0( './' , this.year , '/' , p , s , '.rda' ) )
 					
 					# remove all those now-unnecessary objects from RAM
-					rm( list = c( paste0( p , s ) , "y" ) )
+					rm( list = c( paste0( p , s ) , "y" ) ) ; gc()
 				}
 			}
 		}
@@ -345,7 +345,7 @@ for ( this.year in years ){
 				# save the implicate
 				dbWriteTable( db , paste0( df , i ) , y )
 				
-				rm( y ) ; gc
+				rm( y ) ; gc()
 				
 			}
 			
