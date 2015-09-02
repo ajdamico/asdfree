@@ -155,7 +155,7 @@ for ( i in ftd ){
 # # # # # # # # # # #
 
 # loop through each year of timss data available
-for ( this.year in years ){
+for ( this.year in rev( years ) ){
 
 	# construct a vector with all downloaded files
 	files <- list.files( this.year , full.names = TRUE )
@@ -299,7 +299,7 @@ for ( this.year in years ){
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # loop through each year of data
-for ( this.year in years ){
+for ( this.year in rev( years ) ){
 	
 	db.name <- paste0( './TIMSS' , this.year , '.db' )
 	
@@ -308,7 +308,7 @@ for ( this.year in years ){
 
 	for ( rdas in rev( list.files( paste0( './' , this.year ) , full.names = TRUE ) ) ){
 	
-		print( paste( "current designing" , rdas ) )
+		print( paste( "currently designing" , rdas ) )
 	
 		df <- load( rdas )
 		
