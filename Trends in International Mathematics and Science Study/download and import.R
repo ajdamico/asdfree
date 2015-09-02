@@ -35,7 +35,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "downloader" , "haven" , "SAScii" , "RSQLite" ) )
+# install.packages( c( "downloader" , "haven" , "SAScii" ) )
 
 
 # set your TIMSS data directory
@@ -54,7 +54,6 @@
 # program start #
 # # # # # # # # #
 
-library(RSQLite) 			# load RSQLite package (creates database files in R)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 library(haven) 				# load the haven package (imports dta files faaaaaast)
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)

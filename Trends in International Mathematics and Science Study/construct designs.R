@@ -34,7 +34,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "mitools" ) )
+# install.packages( c( "survey" , "mitools" , "RSQLite" ) )
 
 
 # set your TIMSS data directory
@@ -65,7 +65,7 @@ options( "survey.replicates.mse" = TRUE )
 
 
 # figure out which years are available by creating the `years` vector with only numbers in the directory
-years <- list.files()[ as.character( as.numeric( list.files() ) ) == list.files() ]
+years <- list.files()[ as.character( as.numeric( list.files() ) ) %in% list.files() ]
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
