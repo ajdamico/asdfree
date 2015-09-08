@@ -27,16 +27,16 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#################################################################################################################################################
-# prior to running this analysis script, the yrbss 2011 single-year file must be loaded as an r data file (.rda)                                #
-# on the local machine. running the 1991 - 2011 download automation script will create the appropriate files for your pleasurable convenience   #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/asdfree/blob/master/Youth%20Risk%20Behavior%20Surveillance%20System/1991%20-%202011%20download%20all%20microdata.R  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "yrbs2011.rda" in C:/My Directory/YRBSS or wherever the working directory was set for the program              #
-#################################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###################################################################################################################################
+# prior to running this replication script, the yrbss 2009 single-year file must be loaded as an r data file (.rda)               #
+# on the local machine. running the download automation script will create the appropriate files for your pleasurable convenience #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://github.com/ajdamico/asdfree/blob/master/Youth%20Risk%20Behavior%20Surveillance%20System/download%20all%20microdata.R    #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "yrbs2009.rda" in C:/My Directory/YRBSS or wherever the working directory was set                #
+###################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # remove the # in order to run this install.packages line only once
