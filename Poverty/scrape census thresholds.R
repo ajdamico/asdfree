@@ -131,7 +131,7 @@ for ( year in ya ){
 }
 
 all_thresholds$year <- as.numeric( all_thresholds$year )
-all_thresholds$thresholds <- as.numeric( all_thresholds$thresholds )
+all_thresholds$threshold <- as.numeric( all_thresholds$threshold )
 all_thresholds$num_kids <- as.numeric( as.character( all_thresholds$num_kids ) )
 
 # toss the records missing thresholds
