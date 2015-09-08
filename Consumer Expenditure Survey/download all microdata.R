@@ -52,7 +52,7 @@ library(downloader)	# downloads and then runs the source() function on scripts f
 
 
 # load the census bureau's poverty thresholds
-source_url( "https://raw.github.com/ajdamico/asdfree/master/Poverty/scrape census thresholds.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Poverty/scrape%20census%20thresholds.R" , prompt = FALSE )
 # now you have an object `all_thresholds` that goes back as far as 1990
 
 
