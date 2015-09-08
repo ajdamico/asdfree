@@ -54,7 +54,7 @@ library(downloader)	# downloads and then runs the source() function on scripts f
 # load the census bureau's poverty thresholds
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Poverty/scrape%20census%20thresholds.R" , prompt = FALSE )
 # now you have an object `all_thresholds` that goes back as far as 1990
-
+names( all_thresholds ) <- gsub( "year" , "this_year" , names( all_thresholds ) )
 
 # figure out which years are available to download
 years.to.download <-
@@ -155,14 +155,17 @@ for ( year in years.to.download ){
 			if( grepl( "fmli" , df.name ) ){
 			
 				# subset the complete threshold data down to only the current year
-				thresh_merge <- subset( all_thresholds , year == year )
+				thresh_merge <- subset( all_thresholds , this_year == year )
 				
 				# remove the `year` column
-				thresh_merge$year <- NULL
+				thresh_merge$this_year <- NULL
 				
 				# rename fields so they merge cleanly
-				names( thresh_merge ) <- c( 'family_type' , 'perslt18' , 'poverty_threshold' )
+				names( thresh_merge ) <- c( 'family_type' , 'num_kids' , 'poverty_threshold' )
 			
+				x$num_kids <- ifelse( x$perslt18 > 8 , 8 , x$perslt18 )
+				x$num_kids <- ifelse( x$num_kids == x$fam_size , x$fam_size - 1 , x$num_kids )
+				
 				# re-categorize family sizes to match census groups
 				x$family_type <-
 					ifelse( x$fam_size == 1 & x$age_ref < 65 , "Under 65 years" ,
@@ -175,7 +178,7 @@ for ( year in years.to.download ){
 					ifelse( x$fam_size == 6 , "Six people" , 
 					ifelse( x$fam_size == 7 , "Seven people" , 
 					ifelse( x$fam_size == 8 , "Eight people" , 
-					ifelse( x$fam_size >= 9 , "Three people" , NA ) ) ) ) ) ) ) ) ) ) )
+					ifelse( x$fam_size >= 9 , "Nine people or more" , NA ) ) ) ) ) ) ) ) ) ) )
 				
 				# merge on the `poverty_threshold` variable while
 				# confirming no records were tossed
