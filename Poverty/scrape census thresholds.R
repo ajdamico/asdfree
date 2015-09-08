@@ -66,6 +66,8 @@ for ( year in 1990:2009 ){
 # remove all commas and convert the columns to numeric
 all_thresholds$threshold <- as.numeric( gsub( "," , "" , all_thresholds$threshold ) )
 
+stop()
+
 # find all excel files on the census poverty webpage
 excel_locations <-
 	grep( 
