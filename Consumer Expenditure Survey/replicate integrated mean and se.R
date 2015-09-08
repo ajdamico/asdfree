@@ -69,7 +69,7 @@ options( scipen = 20 )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "stringr" , "reshape2" , "sqldf" , "RSQLite" ) )
+# install.packages( c( "sqldf" , "RSQLite" ) )
 
 
 library(stringr) 	# load stringr package (manipulates character strings easily)

@@ -43,8 +43,17 @@
 # ..in order to set your current working directory
 
 
+# remove the # in order to run this install.packages line only once
+# install.packages( c( "readxl" , "stringr" , "reshape2" , "XML" , "downloader" ) )
+
 
 library(foreign) 	# load foreign package (converts data files into R)
+library(downloader)	# downloads and then runs the source() function on scripts from github
+
+
+# load the census bureau's poverty thresholds
+source_url( "https://raw.github.com/ajdamico/asdfree/master/Poverty/scrape census thresholds.R" , prompt = FALSE )
+# now you have an object `all_thresholds` that goes back as far as 1990
 
 
 # figure out which years are available to download
@@ -61,25 +70,6 @@ years.to.download <-
 		) 
 	)
 	
-	
-# conversion options #
-
-# it's recommended you keep a version of the .rda files,
-# since they work with all subsequent scripts
-
-# do you want to save an R data file (.rda) to the working directory?
-rda <- TRUE
-
-# do you want to save a stata-readable file (.dta) to the working directory?
-dta <- FALSE
-
-# do you want to save a comma-separated values file (.csv) to the working directory?
-csv <- FALSE
-
-# end of conversion options #
-
-
-
 
 ############################################
 # no need to edit anything below this line #
@@ -108,11 +98,16 @@ for ( year in years.to.download ){
 	diary.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/diary" , substr( year , 3 , 4 ) , ".zip" )
 	docs.ftp <- paste0( "http://www.bls.gov/cex/pumd/documentation/documentation" , substr( year , 3 , 4 ) , ".zip" )
 	
+	
+	# in 2014, the public use microdata stopped being shipped with a separate `expn` file.
+	if( year < 2014 ) ttd <- c( "intrvw" , "expn" , "diary" , "docs" ) else ttd <- c( "intrvw" , "diary" , "docs" )
+	
+	
 	# loop through the interview, expenditure, diary, and documentation files and..
 	# download each to a temporary file
 	# unzip each to a directory within the current working directory
 	# save in each of the requested formats
-	for ( fn in c( "intrvw" , "expn" , "diary" , "docs" ) ){
+	for ( fn in ttd ){
 	
 		# filetype-specific output directory
 		output.directory <- paste0( getwd() , "/" , year , "/" , fn )
@@ -153,31 +148,59 @@ for ( year in years.to.download ){
 			# use that to figure out the filename (without the directory or the extension)
 			df.name <- substr( i , sl + 1 , dp - 1 )
 
-			# if the user requests that the file be converted to an R data file (.rda) or comma separated value file (.csv)
-			# then the file must be read into r
-			if ( rda | csv ){
+			# read the current stata-readable (.dta) file into R
+			x <- read.dta( i )
+			
+			# if the data.frame is a family file, tack on poverty thresholds
+			if( grepl( "fmli" , df.name ) ){
+			
+				# subset the complete threshold data down to only the current year
+				thresh_merge <- subset( all_thresholds , year == year )
 				
-				# read the current stata-readable (.dta) file into R
-				# save it to an object named by what's contained in the df.name character string
-				assign( df.name , read.dta( i ) )
-		
-				# if the user requests saving the file as an R data file (.rda), save it immediately
-				if ( rda ) save( list = df.name , file = paste0( output.directory , "/" , df.name , ".rda" ) )
+				# remove the `year` column
+				thresh_merge$year <- NULL
 				
-				# if the user requests saving the file as a comma separated value file (.csv), save it immediately
-				if ( csv ) write.csv( get( df.name ) , , file = paste0( output.directory , "/" , df.name , ".csv" ) )
-
-				# since the file has been read into RAM, it should be deleted as well
-				rm( list = df.name )
+				# rename fields so they merge cleanly
+				names( thresh_merge ) <- c( 'family_type' , 'perslt18' , 'poverty_threshold' )
+			
+				# re-categorize family sizes to match census groups
+				x$family_type <-
+					ifelse( fam_size == 1 & age_ref < 65 , "Under 65 years" ,
+					ifelse( fam_size == 1 & age_ref >= 65 , "65 years and over" ,
+					ifelse( fam_size == 2 & age_ref < 65 , "Householder under 65 years" ,
+					ifelse( fam_size == 2 & age_ref >= 65 , "Householder 65 years and over" ,
+					ifelse( fam_size == 3 , "Three people" , 
+					ifelse( fam_size == 4 , "Four people" , 
+					ifelse( fam_size == 5 , "Five people" , 
+					ifelse( fam_size == 6 , "Six people" , 
+					ifelse( fam_size == 7 , "Seven people" , 
+					ifelse( fam_size == 8 , "Eight people" , 
+					ifelse( fam_size >= 9 , "Three people" , NA ) ) ) ) ) ) ) ) ) ) )
 				
-				# clear up RAM
-				gc()
+				# merge on the `poverty_threshold` variable while
+				# confirming no records were tossed
+				before_nrow <- nrow( x )
 				
+				x <- merge( x , thresh_merge )
+				
+				stopifnot( nrow( x ) == before_nrow )
+			
 			}
 			
-			# if the user did not request that the file be stored as a stata-readable file (.dta),
+			# save it to an object named by what's contained in the df.name character string
+			assign( df.name , x )
+		
+			# save the file as an R data file (.rda) immediately
+			save( list = df.name , file = paste0( output.directory , "/" , df.name , ".rda" ) )
+				
+			# since the file has been read into RAM, it should be deleted as well
+			rm( list = df.name ) ; rm( x )
+			
+			# clear up RAM
+			gc()
+			
 			# then delete the original file from the local disk
-			if ( !dta ) file.remove( i )
+			file.remove( i )
 			
 		}
 	}
