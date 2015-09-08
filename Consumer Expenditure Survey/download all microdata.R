@@ -165,17 +165,17 @@ for ( year in years.to.download ){
 			
 				# re-categorize family sizes to match census groups
 				x$family_type <-
-					ifelse( fam_size == 1 & age_ref < 65 , "Under 65 years" ,
-					ifelse( fam_size == 1 & age_ref >= 65 , "65 years and over" ,
-					ifelse( fam_size == 2 & age_ref < 65 , "Householder under 65 years" ,
-					ifelse( fam_size == 2 & age_ref >= 65 , "Householder 65 years and over" ,
-					ifelse( fam_size == 3 , "Three people" , 
-					ifelse( fam_size == 4 , "Four people" , 
-					ifelse( fam_size == 5 , "Five people" , 
-					ifelse( fam_size == 6 , "Six people" , 
-					ifelse( fam_size == 7 , "Seven people" , 
-					ifelse( fam_size == 8 , "Eight people" , 
-					ifelse( fam_size >= 9 , "Three people" , NA ) ) ) ) ) ) ) ) ) ) )
+					ifelse( x$fam_size == 1 & x$age_ref < 65 , "Under 65 years" ,
+					ifelse( x$fam_size == 1 & x$age_ref >= 65 , "65 years and over" ,
+					ifelse( x$fam_size == 2 & x$age_ref < 65 , "Householder under 65 years" ,
+					ifelse( x$fam_size == 2 & x$age_ref >= 65 , "Householder 65 years and over" ,
+					ifelse( x$fam_size == 3 , "Three people" , 
+					ifelse( x$fam_size == 4 , "Four people" , 
+					ifelse( x$fam_size == 5 , "Five people" , 
+					ifelse( x$fam_size == 6 , "Six people" , 
+					ifelse( x$fam_size == 7 , "Seven people" , 
+					ifelse( x$fam_size == 8 , "Eight people" , 
+					ifelse( x$fam_size >= 9 , "Three people" , NA ) ) ) ) ) ) ) ) ) ) )
 				
 				# merge on the `poverty_threshold` variable while
 				# confirming no records were tossed
