@@ -104,7 +104,7 @@ for ( year in ya ){
 	this_thresh <- this_thresh[ !is.na( this_thresh[ , 2 ] ) , ]
 	
 	# remove crap at the beginning and end
-	this_thresh[ , 1 ] <- str_trim( gsub( "Â  " , "" , iconv( as.character( this_thresh[ , 1 ] ) , to = "ASCII" , sub = " " ) ) )
+	this_thresh[ , 1 ] <- str_trim( gsub( "Â " , "" , iconv( as.character( this_thresh[ , 1 ] ) , to = "ASCII" , sub = " " ) ) )
 	this_thresh[ , 1 ] <- str_trim( gsub( "\\." , "" , as.character( this_thresh[ , 1 ] ) ) )
 	
 	# keep only rows where a `family_type` matches something we've already found
