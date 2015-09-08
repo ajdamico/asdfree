@@ -22,8 +22,11 @@ for ( year in 1990:2009 ){
 	# scrape the table from the web
 	this_thresh <- readHTMLTable( this_html )[[ 1 ]]
 	
+	# remove goofy characters
+	this_thresh[ , 1 ] <- iconv( this_thresh[ , 1 ] , to = "ASCII" , sub = "_" )
+	
 	# remove rows where the first column contains missing or just the weird A
-	this_thresh <- this_thresh[ !( this_thresh[ , 1 ] %in% c( "Â" , NA ) ) , ]
+	this_thresh <- this_thresh[ !( this_thresh[ , 1 ] %in% c( "_" , NA ) ) , ]
 	
 	# remove the second column, universally
 	this_thresh$V2 <- NULL
@@ -38,10 +41,10 @@ for ( year in 1990:2009 ){
 	this_thresh <- this_thresh[ -1:-2 , ]
 	
 	# remove rows where the second column is the weird A
-	this_thresh <- this_thresh[ this_thresh[ , 2 ] != 'Â' , ]
+	this_thresh <- this_thresh[ iconv( this_thresh[ , 2 ] , to = 'ASCII' , sub = "_" ) != '_' , ]
 	
 	# remove weird A space text from the first column
-	this_thresh$V1 <- gsub( "Â  " , "" , as.character( this_thresh$V1 ) , fixed = TRUE )
+	this_thresh$V1 <- gsub( "_" , "" , as.character( this_thresh$V1 ) , fixed = TRUE )
 	
 	# remove dots in the first column
 	this_thresh$V1 <- str_trim( gsub( "." , "" , as.character( this_thresh$V1 ) , fixed = TRUE ) )
@@ -65,8 +68,6 @@ for ( year in 1990:2009 ){
 
 # remove all commas and convert the columns to numeric
 all_thresholds$threshold <- as.numeric( gsub( "," , "" , all_thresholds$threshold ) )
-
-stop()
 
 # find all excel files on the census poverty webpage
 excel_locations <-
@@ -106,7 +107,7 @@ for ( year in ya ){
 	this_thresh <- this_thresh[ !is.na( this_thresh[ , 2 ] ) , ]
 	
 	# remove crap at the beginning and end
-	this_thresh[ , 1 ] <- str_trim( gsub( "Â " , "" , iconv( as.character( this_thresh[ , 1 ] ) , to = "ASCII" , sub = " " ) ) )
+	this_thresh[ , 1 ] <- str_trim( iconv( as.character( this_thresh[ , 1 ] ) , to = "ASCII" , sub = " " ) )
 	this_thresh[ , 1 ] <- str_trim( gsub( "\\." , "" , as.character( this_thresh[ , 1 ] ) ) )
 	
 	# keep only rows where a `family_type` matches something we've already found
