@@ -676,7 +676,8 @@ for ( year in cps.years.to.download ){
 	try( dbSendQuery( db , "drop table xwalk" ) , silent = TRUE )
 	dbSendQuery( db , "drop table hfp" )
 	try( dbSendQuery( db , "drop table rw" ) , silent = TRUE )
-	dbSendQuery( db , "drop table household" )
+	try( dbSendQuery( db , "drop table household" ) , silent = TRUE )
+	try( dbSendQuery( db , "drop table hhld" ) , silent = TRUE )
 	dbSendQuery( db , "drop table family" )
 	dbSendQuery( db , "drop table person" )
 
