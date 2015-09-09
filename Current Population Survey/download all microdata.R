@@ -553,6 +553,8 @@ for ( year in cps.years.to.download ){
 	
 		dbSendQuery( db , "create table hfp as select * from hfpz" )
 		
+		dbRemoveTable( db , 'hfpz' )
+		
 	}
 	
 	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
@@ -669,9 +671,9 @@ for ( year in cps.years.to.download ){
 	stopifnot( dbGetQuery( db , paste( "select count(*) as count from " , cps.tablename ) ) == dbGetQuery( db , "select count(*) as count from person" ) )
 
 	# drop unnecessary tables
-	dbSendQuery( db , "drop table h_xwalk" )
-	dbSendQuery( db , "drop table h_f_xwalk" )
-	dbSendQuery( db , "drop table xwalk" )
+	try( dbSendQuery( db , "drop table h_xwalk" ) , silent = TRUE )
+	try( dbSendQuery( db , "drop table h_f_xwalk" ) , silent = TRUE )
+	try( dbSendQuery( db , "drop table xwalk" ) , silent = TRUE )
 	dbSendQuery( db , "drop table hfp" )
 	try( dbSendQuery( db , "drop table rw" ) , silent = TRUE )
 	dbSendQuery( db , "drop table household" )
@@ -703,11 +705,26 @@ for ( year in cps.years.to.download ){
 		
 		sp <- read_sas( tf )
 	
+		if ( year == 2014 ){
+			
+			sp.url <- "http://www.census.gov/housing/povmeas/spmresearch/spmresearch2013_redes.sas7bdat"
+				
+			download_cached( sp.url , tf , mode = 'wb' )
+			
+			sp2 <- read_sas( tf )
+		
+			sp <- rbind( sp , sp2 )
+			
+			rm( sp2 ) ; gc()
+			
+		} 
+		
 		names( sp ) <- tolower( names( sp ) )
 
 		sp <- sp[ , !( names( sp ) %in% overlapping.spm.fields ) ]
 
 		dbWriteTable( db , paste0( cps.tablename , "_sp" ) , sp )
+		
 		
 		rm( sp ) ; gc()
 	
