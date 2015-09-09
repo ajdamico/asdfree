@@ -203,9 +203,9 @@ for ( year in cps.years.to.download ){
 
 		dbSendQuery( db , "create table f_p as select * from family as a inner join person as b on a.fh_seq = b.ph_seq AND a.ffpos = b.phf_seq" )
 	
-		dbSendQuery( db , "create table hfp as select * from hhld as a inner join f_p as b on a.h_seq = b.ph_seq" )
+		dbSendQuery( db , "create table hfpz as select * from hhld as a inner join f_p as b on a.h_seq = b.ph_seq" )
 
-		stopifnot( dbGetQuery( db , 'select count(*) from hfp' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from person' )[ 1 , 1 ] )
+		stopifnot( dbGetQuery( db , 'select count(*) from hfpz' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from person' )[ 1 , 1 ] )
 
 		dbRemoveTable( db , 'f_p' )
 		
@@ -498,16 +498,16 @@ for ( year in cps.years.to.download ){
 		# create the merged file
 		dbSendQuery( db , "create table h_xwalk as select * from xwalk as a inner join household as b on a.h_seq = b.h_seq" )
 		dbSendQuery( db , "create table h_f_xwalk as select * from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq AND a.ffpos = b.ffpos" )
-		dbSendQuery( db , "create table hfp as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
+		dbSendQuery( db , "create table hfpz as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
 	
 	}
 		
 	# tack on _anycov_ variables
 	if( year > 2013 ){
 		
-		dbSendQuery( db , "create table hfp_pac as select * from hfp" )
+		dbSendQuery( db , "create table hfp_pac as select * from hfpz" )
 		
-		dbRemoveTable( db , 'hfp' )
+		dbRemoveTable( db , 'hfpz' )
 		
 		stopifnot( year %in% c( 2014.58 , 2014.38 , 2014 ) )
 		
@@ -536,7 +536,7 @@ for ( year in cps.years.to.download ){
 		names( ac ) <- c( 'ph_seq' , 'ppposold' , 'census_anycov' )
 		
 		ac[ ac$census_anycov == 2 , 'census_anycov' ] <- 0
-		
+				
 		dbWriteTable( db , 'ac' , ac )
 		
 		dbSendQuery( db , "create table hfp as select * from hfp_pac as a inner join ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" )
@@ -549,6 +549,10 @@ for ( year in cps.years.to.download ){
 		
 		file.remove( tf )
 	
+	} else {
+	
+		dbSendQuery( db , "create table hfp as select * from hfpz" )
+		
 	}
 	
 	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
