@@ -539,6 +539,8 @@ for ( year in cps.years.to.download ){
 				
 		dbWriteTable( db , 'ac' , ac )
 		
+		rm( ac ) ; gc()
+		
 		dbSendQuery( db , "create table hfp as select * from hfp_pac as a inner join ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" )
 		
 		stopifnot( dbGetQuery( db , 'select count(*) from hfp' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from hfp_pac' )[ 1 , 1 ] )
