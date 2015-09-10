@@ -502,6 +502,8 @@ for ( year in cps.years.to.download ){
 		
 		stopifnot( year %in% c( 2014.58 , 2014.38 , 2014 ) )
 		
+		tf <- tempfile()
+		
 		ac <- NULL
 		
 		if( year %in% c( 2014 , 2014.58 ) ){
