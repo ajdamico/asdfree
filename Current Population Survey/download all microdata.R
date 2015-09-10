@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
-# cps.years.to.download <- c( 2014.58 , 2014.38 , 2014:1998 )
+# cps.years.to.download <- c( 2014 , 2014.58 , 2014.38 , 2013:1998 )
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -170,25 +170,16 @@ for ( year in cps.years.to.download ){
 
 		hhld <- read.sas7bdat.parso( tf1 )
 		names( hhld ) <- tolower( names( hhld ) )
-		if( all( sapply( hhld , class ) %in% c( 'numeric' , 'integer' ) ) ){
-			hhld[ , ] <- sapply( hhld[ , ] , as.numeric )
-		} else stop( "something non-numeric" )
 		dbWriteTable( db , 'hhld' , hhld )
 		rm( hhld ) ; gc() ; file.remove( tf1 )
 		
 		family <- read.sas7bdat.parso( tf2 )
 		names( family ) <- tolower( names( family ) )
-		if( all( sapply( family , class ) %in% c( 'numeric' , 'integer' ) ) ){
-			family[ , ] <- sapply( family[ , ] , as.numeric )
-		} else stop( "something non-numeric" )
 		dbWriteTable( db , 'family' , family )
 		rm( family ) ; gc() ; file.remove( tf2 )
 		
 		person <- read.sas7bdat.parso( tf3 )
 		names( person ) <- tolower( names( person ) )
-		if( all( sapply( person , class ) %in% c( 'numeric' , 'integer' ) ) ){
-			person[ , ] <- sapply( person[ , ] , as.numeric )
-		} else stop( "something non-numeric" )
 		dbWriteTable( db , 'person' , person )
 		rm( person ) ; gc() ; file.remove( tf3 )
 
