@@ -33,12 +33,11 @@ read.SAScii.sqlite <-
 	# set scientific notation to something impossibly high.  Inf doesn't work.
 	options( scipen = 1000000 )
 	
-	# read.SAScii.sqlite depends on three packages
+	# read.SAScii.sqlite depends on these packages
 	# to install these packages, use the line:
 	# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' , 'downloader' , 'digest' ) )
 	library(SAScii)
 	library(descr)
-	library(RSQLite)
 	library(downloader)
 	
 	
