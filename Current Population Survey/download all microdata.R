@@ -184,13 +184,13 @@ for ( year in cps.years.to.download ){
 		rm( person ) ; gc() ; file.remove( tf3 )
 
 		# create an index to speed up the merge
-		# dbSendQuery( db , "CREATE INDEX household_index ON hhld ( h_seq )" )
+		dbSendQuery( db , "CREATE INDEX household_index ON hhld ( h_seq )" )
 
 		# create an index to speed up the merge
-		# dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
+		dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
 
 		# create an index to speed up the merge
-		# dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
+		dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
 
 		dbSendQuery( db , "create table f_p as select * from family as a inner join person as b on a.fh_seq = b.ph_seq AND a.ffpos = b.phf_seq" )
 	
@@ -447,13 +447,13 @@ for ( year in cps.years.to.download ){
 		
 			
 		# create an index to speed up the merge
-		# dbSendQuery( db , "CREATE INDEX household_index ON household ( h_seq )" )
+		dbSendQuery( db , "CREATE INDEX household_index ON household ( h_seq )" )
 
 		# create an index to speed up the merge
-		# dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
+		dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
 
 		# create an index to speed up the merge
-		# dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
+		dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
 
 
 		# create a fake sas input script for the crosswalk..
@@ -480,7 +480,7 @@ for ( year in cps.years.to.download ){
 		)
 
 		# create an index to speed up the merge
-		# dbSendQuery( db , "CREATE INDEX xwalk_index ON xwalk ( h_seq , ffpos , pppos )" )
+		dbSendQuery( db , "CREATE INDEX xwalk_index ON xwalk ( h_seq , ffpos , pppos )" )
 
 		# clear up RAM
 		gc()
@@ -552,7 +552,7 @@ for ( year in cps.years.to.download ){
 		
 	}
 	
-	# dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
+	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
 	
 
 	if( year > 2004 ){
@@ -644,7 +644,7 @@ for ( year in cps.years.to.download ){
 		
 		
 		# create an index to speed up the merge
-		# dbSendQuery( db , "CREATE INDEX rw_index ON rw ( h_seq , pppos )" )
+		dbSendQuery( db , "CREATE INDEX rw_index ON rw ( h_seq , pppos )" )
 
 
 		###################################################
