@@ -170,16 +170,19 @@ for ( year in cps.years.to.download ){
 
 		hhld <- read.sas7bdat.parso( tf1 )
 		names( hhld ) <- tolower( names( hhld ) )
+		for ( i in names( hhld ) ) hhld[ , i ] <- as.numeric( hhld[ , i ] )
 		dbWriteTable( db , 'hhld' , hhld )
 		rm( hhld ) ; gc() ; file.remove( tf1 )
 		
 		family <- read.sas7bdat.parso( tf2 )
 		names( family ) <- tolower( names( family ) )
+		for ( i in names( family ) ) family[ , i ] <- as.numeric( family[ , i ] )
 		dbWriteTable( db , 'family' , family )
 		rm( family ) ; gc() ; file.remove( tf2 )
 		
 		person <- read.sas7bdat.parso( tf3 )
 		names( person ) <- tolower( names( person ) )
+		for ( i in names( person ) ) person[ , i ] <- as.numeric( person[ , i ] )
 		dbWriteTable( db , 'person' , person )
 		rm( person ) ; gc() ; file.remove( tf3 )
 
@@ -590,7 +593,7 @@ for ( year in cps.years.to.download ){
 			writeLines(
 				paste(
 					"INPUT" ,
-					paste0( "pwwgt" , 0:160 , " " , seq( 1 , 1601 , 10 ) , "-" , seq( 10 , 1610 , 10 ) , " 0.2" , collapse = "\n" ) ,
+					paste0( "pwwgt" , 0:160 , " " , seq( 1 , 1601 , 10 ) , "-" , seq( 10 , 1610 , 10 ) , " 0.4" , collapse = "\n" ) ,
 					paste( "h_seq 1611 - 1615" , "pppos 1616-1617" , ";" , collapse = "\n" ) ,
 					sep = "\n"
 				) , 
