@@ -618,12 +618,27 @@ for ( year in cps.years.to.download ){
 
 		}
 
+		zip_file <- 
+			tolower( 
+				substr( 
+					CPS.replicate.weight.file.location , 
+					nchar( CPS.replicate.weight.file.location ) - 2 , 
+					nchar( CPS.replicate.weight.file.location ) 
+				)
+			) == 'zip'
+
+			
+		if( !zip_file ){
+			rw_tf <- tempfile()
+			download_cached( CPS.replicate.weight.file.location , rw_tf , mode = 'wb' )
+			CPS.replicate.weight.file.location <- rw_tf
+		}
 		
 		# store the CPS ASEC march 2011 replicate weight file as an R data frame
 		read.SAScii.sqlite ( 
 			CPS.replicate.weight.file.location , 
 			CPS.replicate.weight.SAS.read.in.instructions , 
-			zipped = TRUE , 
+			zipped = zip_file , 
 			tl = TRUE ,
 			tablename = 'rw' ,
 			conn = db
