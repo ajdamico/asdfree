@@ -171,18 +171,21 @@ for ( year in cps.years.to.download ){
 		hhld <- read.sas7bdat.parso( tf1 )
 		names( hhld ) <- tolower( names( hhld ) )
 		for ( i in names( hhld ) ) hhld[ , i ] <- as.numeric( hhld[ , i ] )
+		hhld$hsup_wgt <- hhld$hsup_wgt / 100
 		dbWriteTable( db , 'hhld' , hhld )
 		rm( hhld ) ; gc() ; file.remove( tf1 )
 		
 		family <- read.sas7bdat.parso( tf2 )
 		names( family ) <- tolower( names( family ) )
 		for ( i in names( family ) ) family[ , i ] <- as.numeric( family[ , i ] )
+		family$fsup_wgt <- family$fsup_wgt / 100
 		dbWriteTable( db , 'family' , family )
 		rm( family ) ; gc() ; file.remove( tf2 )
 		
 		person <- read.sas7bdat.parso( tf3 )
 		names( person ) <- tolower( names( person ) )
 		for ( i in names( person ) ) person[ , i ] <- as.numeric( person[ , i ] )
+		for ( i in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) person[ , i ] <- person[ , i ] / 100
 		dbWriteTable( db , 'person' , person )
 		rm( person ) ; gc() ; file.remove( tf3 )
 
@@ -576,17 +579,21 @@ for ( year in cps.years.to.download ){
 		# census.gov website containing the current population survey's replicate weights file
 		CPS.replicate.weight.file.location <- 
 			ifelse(
-				year %in% c( 2014 , 2014.38 ) ,
+				year == 2014.38 ,
 				"http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_2014_3x8_run5.zip" ,
-				paste0( 
-					"http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , 
-					substr( year , 1 , 4 ) , 
-					".zip" 
+				ifelse(
+					year == 2014 ,
+					"http://www.census.gov/housing/extract_files/weights/CPS_ASEC_ASCII_REPWGT_2014_FULLSAMPLE.DAT" ,
+					paste0( 
+						"http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_" , 
+						substr( year , 1 , 4 ) , 
+						".zip" 
+					)
 				)
 			)
 			
 		# census.gov website containing the current population survey's SAS import instructions
-		if( year %in% c( 2014 , 2014.38 ) ){
+		if( year %in% 2014.38 ){
 		
 			CPS.replicate.weight.SAS.read.in.instructions <- tempfile()
 
@@ -621,29 +628,6 @@ for ( year in cps.years.to.download ){
 			tablename = 'rw' ,
 			conn = db
 		)
-		
-		# for the 2014 income-consistent file, stack the replicate weights
-		if( year == 2014 ){
-			
-			read.SAScii.sqlite ( 
-				"http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_2014.zip" , 
-				"http://thedataweb.rm.census.gov/pub/cps/march/CPS_ASEC_ASCII_REPWGT_2014.SAS" , 
-				zipped = TRUE , 
-				tl = TRUE ,
-				tablename = 'rw2' ,
-				conn = db
-			)
-			
-			dbSendQuery( db , 'CREATE TABLE rw1 AS SELECT * FROM rw' )
-			
-			dbRemoveTable( db , 'rw' )
-			
-			dbSendQuery( db , 'CREATE TABLE rw AS SELECT * FROM rw1 UNION ALL SELECT * FROM rw2' )
-			
-			dbRemoveTable( db , 'rw1' )
-			dbRemoveTable( db , 'rw2' )
-			
-		}
 		
 		
 		# create an index to speed up the merge
