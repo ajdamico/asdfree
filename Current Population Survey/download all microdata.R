@@ -1,14 +1,14 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # current population survey 
 # annual social and economic supplement
-# 1998 - 2014
+# 1998 - 2015
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
-# cps.years.to.download <- c( 2014 , 2014.58 , 2014.38 , 2013:1998 )
+# cps.years.to.download <- c( 2015 , 2014 , 2014.58 , 2014.38 , 2013:1998 )
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -64,7 +64,7 @@ library(devtools)
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# cps.years.to.download <- c( 2014.58 , 2014.38 , 2014:1998 )
+# cps.years.to.download <- c( 2015 , 2014.58 , 2014.38 , 2014:1998 )
 
 # uncomment this line to only download the most current year
 # cps.years.to.download <- 2011
@@ -231,7 +231,10 @@ for ( year in cps.years.to.download ){
 								ifelse( 
 									year == 2014.38 ,
 									"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun.zip" ,
-									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+									ifelse( year == 2015 ,
+										paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "early_pubuse.zip" ) ,
+										paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+									)
 								)
 							)
 						)
@@ -244,7 +247,7 @@ for ( year in cps.years.to.download ){
 			# national bureau of economic research website containing the current population survey's SAS import instructions
 			CPS.ASEC.mar.SAS.read.in.instructions <- 
 					ifelse(
-						year %in% c( 1987 , 2013:2014 ) ,
+						year %in% 1987 ,
 						paste0( "http://www.nber.org/data/progs/cps/cpsmar" , year , ".sas" ) , 
 						paste0( "http://www.nber.org/data/progs/cps/cpsmar" , substr( year , 3 , 4 ) , ".sas" ) 
 					)
@@ -256,6 +259,7 @@ for ( year in cps.years.to.download ){
 
 		} else {
 			
+			if( year == 2015 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015_pubuse.txt" )
 			if( year == 2014.38 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec20141_pubuse.txt" )
 			if( year == 2014.58 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
 			if( year == 2013 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2013early_pubuse.dd.txt" )
@@ -500,17 +504,20 @@ for ( year in cps.years.to.download ){
 	}
 		
 	# tack on _anycov_ variables
+	# tack on _outtyp_ variables
 	if( year > 2013 ){
 		
 		dbSendQuery( db , "create table hfp_pac as select * from hfpz" )
 		
 		dbRemoveTable( db , 'hfpz' )
 		
-		stopifnot( year %in% c( 2014.58 , 2014.38 , 2014 ) )
+		stopifnot( year %in% c( 2015 , 2014.58 , 2014.38 , 2014 ) )
 		
 		tf <- tempfile()
 		
 		ac <- NULL
+		
+		ot <- NULL
 		
 		if( year %in% c( 2014 , 2014.58 ) ){
 			
@@ -532,19 +539,50 @@ for ( year in cps.years.to.download ){
 			
 		}
 		
+		if ( year %in% c( 2014 , 2014.38 , 2014.58 ) ){
+		
+			ote <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec14_outtyp_full.dat"
+			
+			download_cached( ote , tf , mode = 'wb' )
+			
+			ot <- read.fwf( tf , c( 5 , 2 , 2 , 1 ) )
+			
+		}
+		
+		
+		if ( year %in% 2015 ){
+		
+			ote <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec15_outtyp.dat"
+		
+			download_cached( ote , tf , mode = 'wb' )
+			
+			ot <- read.fwf( tf , c( 5 , 2 , 2 , 1 ) )
+			
+			ace <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec15_currcov_extract.dat"
+		
+			download_cached( ace , tf , mode = 'wb' )
+			
+			ac <- read.fwf( tf , c( 5 , 2 , 1 ) ) 
+		
+		}
+		
+		names( ot ) <- c( 'ph_seq' , 'ppposold' , 'outtyp' , 'i_outtyp' )
+		
 		names( ac ) <- c( 'ph_seq' , 'ppposold' , 'census_anycov' )
 		
 		ac[ ac$census_anycov == 2 , 'census_anycov' ] <- 0
-				
-		dbWriteTable( db , 'ac' , ac )
 		
-		rm( ac ) ; gc()
+		ot_ac <- merge( ot , ac )
 		
-		dbSendQuery( db , "create table hfp as select * from hfp_pac as a inner join ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" )
+		dbWriteTable( db , 'ot_ac' , ot_ac )
+		
+		rm( ot , ac , ot_ac ) ; gc()
+		
+		dbSendQuery( db , "create table hfp as select * from hfp_pac as a inner join ot_ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" )
 		
 		stopifnot( dbGetQuery( db , 'select count(*) from hfp' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from hfp_pac' )[ 1 , 1 ] )
 		
-		dbRemoveTable( db , 'ac' )
+		dbRemoveTable( db , 'ot_ac' )
 		
 		dbRemoveTable( db , 'hfp_pac' )
 		
@@ -557,6 +595,9 @@ for ( year in cps.years.to.download ){
 		dbRemoveTable( db , 'hfpz' )
 		
 	}
+	
+	
+	
 	
 	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
 	
@@ -689,7 +730,7 @@ for ( year in cps.years.to.download ){
 	
 	overlapping.spm.fields <- c( "gestfips" , "fpovcut" , "ftotval" , "marsupwt" )
 	
-	if( year > 2009 ){
+	if( year %in% c( 2009:2014 , 2014.38 , 2014.58 ) ){
 
 		sp.url <- 
 			paste0( 
@@ -746,6 +787,19 @@ for ( year in cps.years.to.download ){
 		dbRemoveTable( db , 'temp' )
 				
 	}
+	
+	
+	# remove redundant colon fields
+	ftk <- dbListFields( db , cps.tablename )[ !grepl( ":" , dbListFields( db , cps.tablename ) ) ]
+	
+	# copy over the fields-to-keep into a new table
+	dbSendQuery( db , paste( "CREATE TABLE temp AS SELECT" , paste( ftk , collapse = "," ) , "FROM" , cps.tablename ) )
+	
+	# drop the original
+	dbSendQuery( db , paste( "DROP TABLE" , cps.tablename ) )
+	
+	# rename the temporary table
+	dbSendQuery( db , paste( "ALTER TABLE temp RENAME TO" , cps.tablename ) )
 	
 	# disconnect from the current database
 	dbDisconnect( db )
