@@ -66,11 +66,15 @@ dd_parser <-
 			stopifnot( cumsum( j$width )[ nrow( j ) - 1 ] == j[ nrow( j ) , 'position' ] - 1 )
 
 			# confirm that the last variable is filler and can be tossed
-			stopifnot( j[ nrow( j ) , 'varname' ] == 'FILLER' )
+			if ( year != 2015 ){
 			
-			# toss it.
-			j <- j[ -nrow( j ) , ]
+				stopifnot( j[ nrow( j ) , 'varname' ] == 'FILLER' )
 			
+				# toss it.
+				j <- j[ -nrow( j ) , ]
+				
+			}
+				
 			# find the position of each variable name in the original file
 			pos <- lapply( paste0( "^D " , j[ , 'varname' ] , " " ) , grep , k )
 			
