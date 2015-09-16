@@ -207,23 +207,27 @@ read.SAScii.monetdb <-
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #1 broke, trying method #2' , "\r" )
+		print( te )
 		te <- try( sql.copy.into( " NULL AS ' '" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #2 broke, trying method #3' , "\r"  )
+		print( te )
 		te <- try( sql.copy.into( "" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 	
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #3 broke, trying method #4' , "\r"  )
+		print( te )
 		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #4 broke, trying method #5' , "\r" )
+		print( te )
 		# this time without error-handling.
 		sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) 
 	}
