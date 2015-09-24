@@ -229,6 +229,7 @@ read.SAScii.monetdb <-
 		cat( 'attempt #4 broke, trying method #5' , "\r" )
 		print( te )
 		# this time without error-handling.
+		# do you want to try the BEST EFFORT flag for COPY INTO?
 		sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) 
 	}
 	
