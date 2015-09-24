@@ -259,8 +259,8 @@ for ( year in cps.years.to.download ){
 
 		} else {
 			
-			if( year == 2015 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015_pubuse.txt" )
-			if( year == 2014.38 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec20141_pubuse.txt" )
+			if( year == 2015 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015early_pubuse.dd.txt" )
+			if( year == 2014.38 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec20141_pubuse.dd.txt" )
 			if( year == 2014.58 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
 			if( year == 2013 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2013early_pubuse.dd.txt" )
 			if( year == 2012 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2012early_pubuse.dd.txt" )
