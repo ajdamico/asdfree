@@ -165,7 +165,7 @@ tf <- tempfile(); td <- tempdir()
 
 
 # download brr / linkage files
-download_cached( lf , tf )
+download_cached( lf , tf , mode = 'wb' )
 zc <- unzip( tf , exdir = td )
 
 # read the file in as an R data frame
@@ -228,7 +228,7 @@ for ( i in nrow( mm ):1 ) {
 				# then there should be an f1 and an f2 file (sometimes more)
 				
 				# download the ..f1ssp.zip file to the temporary file on your local computer
-				download_cached( sub( "ssp.zip" , "f1ssp.zip" , u ) , tf ) 
+				download_cached( sub( "ssp.zip" , "f1ssp.zip" , u ) , tf , mode = 'wb' ) 
 				
 				# unzip the ..f1ssp.zip to the temporary directory
 				zc <- unzip( tf , exdir = td )
@@ -259,7 +259,7 @@ for ( i in nrow( mm ):1 ) {
 				Sys.sleep( 60 )
 				
 				# download the ..f2ssp.zip file to the temporary file on your local computer
-				download_cached( sub( "ssp.zip" , "f2ssp.zip" , u ) , tf ) 
+				download_cached( sub( "ssp.zip" , "f2ssp.zip" , u ) , tf , mode = 'wb' )
 				
 				# unzip the ..f2ssp.zip to the temporary directory
 				zc <- unzip( tf , exdir = td )
@@ -302,7 +302,7 @@ for ( i in nrow( mm ):1 ) {
 				attempt.one <-
 					try({
 						# download the ..ssp.zip file to the temporary file on your local computer
-						download_cached( u , tf )
+						download_cached( u , tf , mode = 'wb' )
 					
 						# unzip the ..ssp.zip to the temporary directory
 						zc <- unzip( tf , exdir = td )
@@ -319,7 +319,7 @@ for ( i in nrow( mm ):1 ) {
 							Sys.sleep( 60 )
 							
 							# download the ..ssp.zip file to the temporary file on your local computer
-							download_cached( u , tf )
+							download_cached( u , tf , mode = 'wb' )
 						
 							# unzip the ..ssp.zip to the temporary directory
 							zc <- unzip( tf , exdir = td )
