@@ -119,17 +119,20 @@ source_url(
 tf <- tempfile() ; tf2 <- tempfile() ; td <- tempdir()
 
 # read in the whole NPI files page
-npi.datapage <- readLines( "http://nppes.viva-it.com/NPI_Files.html" )
+npi.datapage <- readLines( "http://download.cms.gov/nppes/NPI_Files.html" )
 
 # find the first line containing the data dissemination link
-npi.dataline <- npi.datapage[ grep( "http://nppes.viva-it.com/NPPES_Data_Dissemination_" , npi.datapage ) ][1]
+npi.dataline <- npi.datapage[ grep( "NPPES_Data_Dissemination_Sept_" , npi.datapage ) ][1]
 
 # pull out the zipped file's name from that line
 fn <- 
-	gsub(
-		"(.*a href=\\\")(http://nppes.viva-it.com/NPPES_Data_Dissemination_.*\\.zip)(.*)$" , 
-		"\\2" , 
-		npi.dataline
+	paste0(
+		"http://download.cms.gov/nppes/" ,
+		gsub(
+			"(.*)(NPPES_Data_Dissemination_.*\\.zip)(.*)$" , 
+			"\\2" , 
+			npi.dataline
+		)
 	)
 
 # download the file to the temporary file on the local disk
