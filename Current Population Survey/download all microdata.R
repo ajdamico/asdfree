@@ -230,7 +230,7 @@ for ( year in cps.years.to.download ){
 								"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_tax_fix_5x8.zip" ,
 								ifelse( 
 									year == 2014.38 ,
-									"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun.zip" ,
+									"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun_v2.zip" ,
 									ifelse( year == 2015 ,
 										paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "early_pubuse.zip" ) ,
 										paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
