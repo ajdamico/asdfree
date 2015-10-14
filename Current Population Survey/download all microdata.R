@@ -730,13 +730,13 @@ for ( year in cps.years.to.download ){
 	
 	overlapping.spm.fields <- c( "gestfips" , "fpovcut" , "ftotval" , "marsupwt" )
 	
-	if( year %in% c( 2010:2014 , 2014.38 , 2014.58 ) ){
+	if( year %in% c( 2010:2015 , 2014.38 , 2014.58 ) ){
 
 		sp.url <- 
 			paste0( 
 			"http://www.census.gov/housing/povmeas/spmresearch/spmresearch" , 
 			floor( year - 1 ) , 
-			if ( year == 2014.38 ) "_redes" else "new" ,
+			if ( year == 2014.38 ) "_redes" else if ( year == 2014 ) "" else "new" ,
 			".sas7bdat" 
 		)
 		
