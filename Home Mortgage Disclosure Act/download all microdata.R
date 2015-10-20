@@ -262,7 +262,7 @@ office.names <- tolower( parse.SAScii( tf4 )$varname )
 # loop through each of the years to download..
 for ( year in substr( years.to.download , 3 , 4 ) ){
 
-	if( year == 2014 ) one_two <- 'hmda' else one_two <- c( 'hmda' , 'pmic' )
+	if( year == "14" ) one_two <- 'hmda' else one_two <- c( 'hmda' , 'pmic' )
 
 	# loop through both the public (hmda) and private (pmic) data files..
 	for ( pubpriv in one_two ){
