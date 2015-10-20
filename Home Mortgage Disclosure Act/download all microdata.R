@@ -298,7 +298,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			)
 
 			# construct the url of the current `MSAOffice.zip`
-			fn <- paste0( "http://www.ffiec.gov/" , pubpriv , "rawdata/OTHER/20" , year , pubpriv , "MSAOffice.zip" )
+			fn <- paste0( "https://www.ffiec.gov/" , pubpriv , "rawdata/OTHER/20" , year , toupper( pubpriv ) , "MSAOffice.zip" )
 			
 			# download that file..
 			download_cached( fn , tf5 , mode = 'wb' )
@@ -362,7 +362,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			}
 						
 			# construct the full url path of the file to download
-			fn <- paste0( "http://www.ffiec.gov/" , pubpriv , "rawdata/" , folder , "/20" , year , pubpriv , rectype , ".zip" )
+			fn <- paste0( "https://www.ffiec.gov/" , pubpriv , "rawdata/" , folder , "/20" , year , toupper( pubpriv ) , rectype , ".zip" )
 
 			# clear out the temporary directory
 			file.remove( list.files( td , full.names = TRUE ) )
