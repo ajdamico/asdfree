@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # home mortgage disclosure act
-# 2006 - 2013 files
+# 2006 - 2014 files
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -9,7 +9,7 @@
 # path.to.7z <- "7za"							# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/HMDA/" )
-# years.to.download <- 2013:2006
+# years.to.download <- 2014:2006
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Home%20Mortgage%20Disclosure%20Act/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -31,7 +31,7 @@
 
 
 ##################################################################################
-# download all 2006 - 2013 microdata for the home mortgage disclosure act with R #
+# download all 2006 - 2014 microdata for the home mortgage disclosure act with R #
 ##################################################################################
 
 
@@ -76,7 +76,7 @@
 
 
 
-# all 2006-2013 HMDA data files will be stored
+# all 2006-2014 HMDA data files will be stored
 # in a your current working directory
 # use forward slashes instead of back slashes
 
@@ -90,7 +90,7 @@
 # choose which hmda data sets to download
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- 2013:2006
+# years.to.download <- 2014:2006
 # if you have a big hard drive, hey why not download them all?
 
 # remove the `#` in order to just download 2011
@@ -280,9 +280,8 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			# download the sas importation instructions to a temporary file on the local disk
 			download_cached( sas_ri , tf3 , FUN = download )
 
-
 			# construct the url of the current `ReporterPanel.zip` to download
-			fn <- paste0( "http://www.ffiec.gov/" , pubpriv , "rawdata/OTHER/20" , year , pubpriv , "ReporterPanel.zip" )
+			fn <- paste0( "https://www.ffiec.gov/" , pubpriv , "rawdata/OTHER/20" , year , toupper( pubpriv ) , "ReporterPanel.zip" )
 
 			
 			# read that temporary file directly into MonetDB,
@@ -290,7 +289,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			read.SAScii.monetdb (
 				fn ,			# the url of the file to download
 				tf3 ,			# the 
-				zipped = T ,	# the ascii file is stored in a zipped file
+				zipped = TRUE ,	# the ascii file is stored in a zipped file
 				tl = TRUE ,		# convert all column names to lowercase
 				tablename = paste( pubpriv , 'rep' , year , sep = "_" ) ,
 				connection = db
