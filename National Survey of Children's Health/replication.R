@@ -15,7 +15,7 @@
 # if you have never used the r language before,
 # watch this two minute video i made outlining
 # how to run this script from start to finish
-# http://www.screenr.com/Zpd8
+# https://www.youtube.com/watch?v=JLt9JfaAxUg
 
 # emily rowe
 # eprowe@gmail.com
