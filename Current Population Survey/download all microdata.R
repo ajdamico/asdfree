@@ -216,30 +216,26 @@ for ( year in cps.years.to.download ){
 				# if the year to download is 2007, the filename doesn't match the others..
 				year == 2007 ,
 				"http://thedataweb.rm.census.gov/pub/cps/march/asec2007_pubuse_tax2.zip" ,
-				# ifelse(
-					# year == 2014 ,
-					# "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.zip" ,
+				ifelse(
+					year %in% 2004:2003 ,
+					paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , ".zip" ) ,
 					ifelse(
-						year %in% 2004:2003 ,
-						paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , ".zip" ) ,
+						year %in% 2002:1998 ,
+						paste0( "http://thedataweb.rm.census.gov/pub/cps/march/mar" , substr( year , 3 , 4 ) , "supp.zip" ) ,
 						ifelse(
-							year %in% 2002:1998 ,
-							paste0( "http://thedataweb.rm.census.gov/pub/cps/march/mar" , substr( year , 3 , 4 ) , "supp.zip" ) ,
-							ifelse(
-								year == 2014.58 ,
-								"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_tax_fix_5x8.zip" ,
-								ifelse( 
-									year == 2014.38 ,
-									"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun_v2.zip" ,
-									ifelse( year == 2015 ,
-										paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "early_pubuse.zip" ) ,
-										paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
-									)
-								)
+							year == 2014.58 ,
+							"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_tax_fix_5x8.zip" ,
+							ifelse( 
+								year == 2014.38 ,
+								"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun_v2.zip" ,
+								# ifelse( year == 2015 ,
+									# paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "early_pubuse.zip" ) ,
+									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
+								# )
 							)
 						)
 					)
-				# )
+				)
 			)
 
 		if( year < 2011 ){
