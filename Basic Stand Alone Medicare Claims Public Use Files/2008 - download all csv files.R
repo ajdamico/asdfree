@@ -128,7 +128,7 @@ for ( zf in all.files ){
 	other.attempt <- try( download_cached( paste0( ftp.l , zf ) , tf , FUN = download , attempts = 3 ) , silent = TRUE )
 	
 	# if there is really nothing in the file..
-	if( class( other.attempt ) == 'try-error' ||  any( grepl( "Page Not Found" , readLines( tf , n = 10 ) )  ) ){
+	if( class( other.attempt ) == 'try-error' ||  any( grepl( "Page Not Found" , readLines( tf , n = 100 ) )  ) ){
 	
 		# switch to the other url prefix
 		
