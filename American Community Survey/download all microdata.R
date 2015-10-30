@@ -293,19 +293,8 @@ for ( year in 2050:2005 ){
 			# construct the database name
 			k <- paste0( "acs" , year , "_" , size , "yr" )
 			
-			# construct the path on the census ftp site containing the state tables
-			if ( year < 2007 ){
+			ftp.path <- paste0( "http://www2.census.gov/programs-surveys/acs/data/pums/" , year , "/" , size , "-Year/" )
 			
-				# 2005 - 2006 files were stored somewhere..
-				ftp.path <- paste0( 'http://www2.census.gov/acs/downloads/pums/' , year , '/' )
-				
-			} else {
-			
-				# 2007+ files were stored somewhere else..
-				ftp.path <- paste0( "http://www2.census.gov/" , k , "/pums/" )
-				
-			}
-
 			# loop through both household- and person-level files
 			for ( j in c( 'h' , 'p' ) ){
 
@@ -319,11 +308,7 @@ for ( year in 2050:2005 ){
 					# the 2007 single-year wyoming file does not read in with read.sas7bdat correctly,
 					# so manually download the 2006 wyoming file..
 					sas.file.location <-
-						paste0( 
-							'http://www2.census.gov/acs/downloads/pums/2006/unix_' ,
-							j ,
-							"wy.zip"
-						)
+						paste0( "http://www2.census.gov/programs-surveys/acs/data/pums/2006/unix_" , j , "wy.zip" )
 					# ..because (and i confirmed this):
 					# the 2007 and 2006 single-year files have the exact same columns.
 				
