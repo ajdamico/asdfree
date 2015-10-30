@@ -122,7 +122,7 @@ tf <- tempfile() ; tf2 <- tempfile() ; td <- tempdir()
 npi.datapage <- readLines( "http://download.cms.gov/nppes/NPI_Files.html" )
 
 # find the first line containing the data dissemination link
-npi.dataline <- npi.datapage[ grep( "NPPES_Data_Dissemination_Sept_" , npi.datapage ) ][1]
+npi.dataline <- npi.datapage[ grep( "NPPES_Data_Dissemination_" , npi.datapage ) ][1]
 
 # pull out the zipped file's name from that line
 fn <- 
