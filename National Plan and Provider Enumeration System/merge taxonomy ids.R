@@ -5,6 +5,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
+# options( encoding = "windows-1252" )			# # only macintosh and *nix users need this line
 # library(downloader)
 # batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `./nppes.sh` instead
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Plan%20and%20Provider%20Enumeration%20System/merge%20taxonomy%20ids.R" , prompt = FALSE , echo = TRUE )
@@ -60,6 +61,18 @@
 # dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
 # restore default behavior -- or just restart instead
 # dbSendQuery(db,"set optimizer = 'default_pipe';")
+
+
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# ibge's ftp site has a few SAS importation
+# scripts in a non-standard format
+# if so, before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
 
 
 # remove the # in order to run this install.packages line only once
