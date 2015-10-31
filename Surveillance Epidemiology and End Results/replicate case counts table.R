@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat	# # note for mac and *nix users: `seer.bat` might be `seer.sh` instead
+# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"	# # note for mac and *nix users: `seer.bat` might be `seer.sh` instead
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Surveillance%20Epidemiology%20and%20End%20Results/replicate%20case%20counts%20table.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
