@@ -55,13 +55,13 @@
 tf <- tempfile() ; td <- tempdir()
 
 # read the `data_files` page contents to a local character vector
-pls.page <- readLines( "http://www.imls.gov/research/pls_data_files.aspx" )
+pls.page <- readLines( "https://www.imls.gov/research-evaluation/data-collection/public-libraries-united-states-survey/public-libraries-united" )
 
 # restrict this page to only the records that contain `_csv` links
 pls.links <- pls.page[ grep( '_csv' , pls.page ) ]
 
 # re-name these zipped-file-links to only the pre-csv filepath
-pls.files <- gsub( "(.*)AssetManager/(.*)_csv\\.zip(.*)" , "\\2" , pls.links )
+pls.files <- gsub( "(.*)files/(.*)_csv\\.zip(.*)" , "\\2" , pls.links )
 
 # loop through each of the pls files
 for ( this.file in pls.files ){
@@ -74,7 +74,7 @@ for ( this.file in pls.files ){
 	if ( this.year < 90 ) this.year <- this.year + 2000 else this.year <- this.year + 1900
 	
 	# construct the full http location
-	this.location <- paste0( "http://www.imls.gov/assets/1/AssetManager/" , this.file , "_csv.zip" )
+	this.location <- paste0( "https://www.imls.gov/sites/default/files/" , this.file , "_csv.zip" )
 	
 	# download the zipped file to the local disk
 	download.file( this.location , tf , mode = 'wb' )
