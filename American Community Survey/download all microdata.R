@@ -549,10 +549,20 @@ for ( year in 2050:2005 ){
 						# and close it using the `pid`
 						monetdb.server.stop( pid )
 						
-						# wait thirty seconds, just to make sure any previous servers closed
-						# and you don't get a gdk-lock error from opening two-at-once
-						Sys.sleep( 30 )
-					
+
+						# get rid of any comma-space-comma values.
+						incon <- file( csvpath , "r") 
+						tf_out <- tempfile()
+						outcon <- file( tf_out , "w") 
+						while( length( line <- readLines( incon , 1 ) ) > 0 ){
+							# remove all whitespace
+							line <-  gsub( ", ," , ",," , gsub( ",( +)," , ",," , line ) )
+							writeLines( line , outcon )
+						}
+						
+						close( outcon )
+						close( incon , add = TRUE )
+		
 						# launch the current monet database
 						pid <- monetdb.server.start( batfile )
 						
@@ -570,7 +580,7 @@ for ( year in 2050:2005 ){
 										" offset 2 records into " , 
 										tablename , 
 										" from '" , 
-										normalizePath( csvpath ) , 
+										normalizePath( tf_out ) , 
 										"' using delimiters ',','\\n','\"'  NULL AS ''" 
 									) 
 								) 
