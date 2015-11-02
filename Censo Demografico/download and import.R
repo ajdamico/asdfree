@@ -676,7 +676,7 @@ all.files <- getURL( ftp.path , dirlistonly = TRUE )
 all.files <- scan( text = all.files , what = "character", quiet = T )
 
 # remove the two files you don't need to import
-files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' , '2_Atualizacoes.txt' ) ) ]
+files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' , '2_Atualizacoes.txt' , '1_Documentacao_velho.zip' ) ) ]
 
 # launch the current monet database
 pid <- monetdb.server.start( batfile )
