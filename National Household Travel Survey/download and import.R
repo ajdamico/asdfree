@@ -75,7 +75,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "stringr" , "sas7bdat" , "MonetDB.R" , "downloader" , "digest" , "R.utils" ) )
+# install.packages( c( "stringr" , "sas7bdat" , "MonetDB.R" , "downloader" , "digest" , "R.utils" , 'readr' ) )
 
 
 # define which years to download #
@@ -211,6 +211,7 @@ library(downloader)			# downloads and then runs the source() function on scripts
 library(sas7bdat)			# loads files ending in .sas7bdat directly into r as data.frame objects
 library(foreign) 			# load foreign package (converts data files into R)
 library(R.utils)			# load the R.utils package (counts the number of lines in a file quickly)
+library(readr)				# load the readr package (reads fixed-width files a little easier)
 
 
 # create a temporary file and a temporary directory..
@@ -488,13 +489,13 @@ for ( year in years.to.download ){
 
 				# import the actual text file into working memory
 				x <- 
-					read.fwf( 
+					read_fwf( 
 						i , 
-						widths = floor( as.numeric( txt.w ) ) ,
-						col.names = txt.field ,
-						colClasses = ifelse( txt.type == 'Numeric' , 'numeric' , 'character' )
+						col_positions = fwf_widths( floor( as.numeric( txt.w ) ) , col_names = txt.field ) ,
+						na = c( 'NA' , '' , ' ' ) ,
+						col_types = paste( ifelse( txt.type == 'Numeric' , 'd' , 'c' ) , collapse = "" )
 					)
-
+				
 				names( x ) <- tolower( names( x ) )
 					
 				# deal with decimals
