@@ -557,9 +557,8 @@ for ( year in years.to.download ){
 
 				# read the comma separated value (csv) file you just downloaded
 				# directly into the monet database you just created.
-				monet.read.csv( db , i , tablename , header = TRUE , nrow.check = 250000 , lower.case.names = TRUE )
+				monet.read.csv( db , i , tablename , header = TRUE , nrow.check = 250000 , lower.case.names = TRUE , newline = '\\r\\n' )
 				# yes.  you did all that.  nice work.
-
 				
 				# clear up RAM
 				gc()
