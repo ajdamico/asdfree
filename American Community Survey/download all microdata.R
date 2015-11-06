@@ -293,7 +293,11 @@ for ( year in 2050:2005 ){
 			# construct the database name
 			k <- paste0( "acs" , year , "_" , size , "yr" )
 			
-			ftp.path <- paste0( "http://www2.census.gov/programs-surveys/acs/data/pums/" , year , "/" , size , "-Year/" )
+			if( year == 2006 ){
+				ftp.path <- paste0( "http://www2.census.gov/programs-surveys/acs/data/pums/" , year , "/" )
+			} else {
+				ftp.path <- paste0( "http://www2.census.gov/programs-surveys/acs/data/pums/" , year , "/" , size , "-Year/" )
+			}
 			
 			# loop through both household- and person-level files
 			for ( j in c( 'h' , 'p' ) ){
@@ -303,7 +307,7 @@ for ( year in 2050:2005 ){
 			
 				# determine column types #
 				
-				if ( year == 2007 & size == 1 ){
+				if ( year %in% 2006:2007 & size == 1 ){
 				
 					# the 2007 single-year wyoming file does not read in with read.sas7bdat correctly,
 					# so manually download the 2006 wyoming file..
