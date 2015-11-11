@@ -293,7 +293,7 @@ for ( year in 2050:2005 ){
 			# construct the database name
 			k <- paste0( "acs" , year , "_" , size , "yr" )
 			
-			if( year == 2006 ){
+			if( year <= 2006 ){
 				ftp.path <- paste0( "http://www2.census.gov/programs-surveys/acs/data/pums/" , year , "/" )
 			} else {
 				ftp.path <- paste0( "http://www2.census.gov/programs-surveys/acs/data/pums/" , year , "/" , size , "-Year/" )
