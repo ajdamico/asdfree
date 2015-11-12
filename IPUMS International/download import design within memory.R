@@ -49,6 +49,10 @@ csv_file_decimals <- decimals_ipumsi( this_extract , username , password )
 # figure out which whether columns are character or numeric
 csv_file_structure <- structure_ipumsi( this_extract , username , password )
 
+# simple check that the stored csv file matches the loaded structure
+if( !( length( csv_file_structure ) == ncol( read.csv( csv_file_location , nrow = 10 ) ) ) ) stop( "number of columns in final csv file does not match ipums structure xml file" )
+
+		
 this_df <- 
 	read.csv( 
 		csv_file_location , 

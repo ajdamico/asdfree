@@ -31,8 +31,6 @@ download_ipumsi <-
 		# store the file to the local disk
 		gunzip( basename( url ) , file )
 		
-		if( !( length( stru ) == ncol( read.csv( file , nrow = 10 ) ) ) ) stop( "number of columns in final csv file does not match ipums structure xml file" )
-		
 		file
 	}
 	
