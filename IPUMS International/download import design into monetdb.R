@@ -63,9 +63,12 @@
 # # # and you must use monetdb to analyze ipums-international with R.
 # # # but on the other hand, just because you can load your needed extracts into working memory
 # # # you might still benefit from using a monetdb-backed sqlsurvey design.
-# # # monetdb-backed designs work much better interactively just because they process so much faster.  no waiting.
+# # # monetdb-backed designs work much better interactively just because individual analysis commands run so much faster.  no waiting.
 
-# # # # # continue using this guide if you have chosen to use monetdb # # # # #
+# # # continue using this guide if you have chosen to use monetdb # # #
+
+# # # if you would prefer to load your ipums extract directly into active working memory (ram),
+# # # then follow the guide `download import design within memory.R` within this syntax directory instead
 
 
 # # # # # # # # # # # # # # #
@@ -397,6 +400,8 @@ dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column idkey int au
 # # # # figure out which variables should be treated as factors (categorical) and which should be treated as numeric (linear) # # # #
 # this is one of the drawbacks of sqlsurvey.  you must specify this information within the survey design object, not on the fly     #
 
+# this is one of the big drawbacks of monetdb-backed designs.  you cannot easily construct variables on the fly.
+
 # look at the columns available in your database..
 dbListFields( db , tablename )
 
@@ -434,7 +439,7 @@ these_factors <- c( 'rectype' , 'country' , 'sex' , 'empstat' , 'empstatd' )
 # # # construct your monetdb-backed complex sample survey design object # # #
 
 # create a sqlsurvey complex sample design object
-this_design <-
+this_sqlsurvey_design <-
 	sqlsurvey(
 		weight = "perwt" ,									# weight variable column
 		nest = TRUE ,										# whether or not psus are nested within strata
@@ -455,7 +460,7 @@ this_design <-
 
 
 # run your first sqlsurvey-based mean of a linear variable.
-svymean( ~ age , this_design , se = TRUE )
+svymean( ~ age , this_sqlsurvey_design , se = TRUE )
 # voila!
 
 # you now have a
@@ -467,7 +472,7 @@ svymean( ~ age , this_design , se = TRUE )
 # save the survey design object
 # into a single r data file (.rda) that can now be
 # analyzed quicker than anything else.
-save( this_design , these_factors , file = 'sqlsurvey design in monetdb.rda' )
+save( this_sqlsurvey_design , these_factors , file = 'sqlsurvey design in monetdb.rda' )
 # be sure to save the `these_factors` vector as well,
 # just in case you do any recoding in the future
 
@@ -476,8 +481,3 @@ dbDisconnect( db )
 
 # shut it down
 monetdb.server.stop( pid )
-
-# unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
-message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
-
-message( "got that? monetdb directories should not be set read-only." )
