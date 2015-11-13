@@ -61,7 +61,7 @@ library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surv
 
 
 # after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all behavioral risk factor surveillance system tables
+# to initiate and connect to the monet database containing all ipums international tables
 # run them now.  mine look like this:
 
 
