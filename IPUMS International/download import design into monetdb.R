@@ -290,6 +290,7 @@ this_design <-
 		driver = MonetDB.R()
 	)
 
+svymean( ~ age , this_design , se = TRUE )
 
 # save the complex sample survey design
 # into a single r data file (.rda) that can now be
