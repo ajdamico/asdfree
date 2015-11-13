@@ -7,7 +7,7 @@
 
 # # # there are tradeoffs to this processing speed. # # #
 
-# # # strengths
+# # # strengths:
 # # # data set does not need to fit into working active memory
 # # # computations run much faster than data loaded into memory
 # # # since squeezing data set into active memory does not matter,
