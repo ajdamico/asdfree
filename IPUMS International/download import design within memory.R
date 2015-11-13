@@ -172,7 +172,7 @@ this_df <- this_df[ , !( names( this_df ) %in% c( 'country' , 'year' , 'sample' 
 
 # unfortunately, there is no easily-accessible missingness indicator within the ipums-international documentation.
 # if you would like invalid values to be treated as missings, then you will have to review the ipums variable codebooks manually.
-# let's blank out two variables' missing values by hand:
+# let's blank out three variables' missing values by hand:
 
 # https://international.ipums.org/international-action/variables/EMPSTAT#codes_section
 # EMPSTAT = 0 is "not in universe"
@@ -182,16 +182,20 @@ this_df <- this_df[ , !( names( this_df ) %in% c( 'country' , 'year' , 'sample' 
 # INCWAGE = 9999998 is "unknown/missing"
 # INCWAGE = 9999999 is "not in universe"
 
+# https://international.ipums.org/international-action/variables/SEX#codes_section
+# SEX = 9 is "unknown"
+
 # here's a simple loop construction #
 
-# the two variables that have values to blank into a single character vector
-vars_to_blank <- c( 'empstat' , 'incwage' )
+# the three variables that have values to blank into a single character vector
+vars_to_blank <- c( 'empstat' , 'incwage' , 'sex' )
 
-# the two sets of values to blank out, each nested within a list
+# the three sets of values to blank out, each nested within a list
 vals_to_blank <- 
 	list(
 		c( 0 , 9 ) ,
-		c( 9999998 , 9999999 )
+		c( 9999998 , 9999999 ) ,
+		9
 	)
 
 # confirm that you have one variable for each vector of values to blank
