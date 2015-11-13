@@ -123,7 +123,7 @@ svyby(
 # minimum, 25th, 50th, 75th, maximum ages across the country of your extract
 svyquantile(
 	~ age ,
-	design = this_esign ,
+	design = this_design ,
 	c( 0 , .25 , .5 , .75 , 1 )
 )
 
