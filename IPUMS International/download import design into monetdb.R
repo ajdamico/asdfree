@@ -333,32 +333,28 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
 # unfortunately, there is no easily-accessible missingness indicator within the ipums-international documentation.
 # if you would like invalid values to be treated as missings, then you will have to review the ipums variable codebooks manually.
-# let's blank out three variables' missing values by hand:
+# let's blank out only one variable's missing values by hand:
 
-# https://international.ipums.org/international-action/variables/EMPSTAT#codes_section
-# EMPSTAT = 0 is "not in universe"
-# EMPSTAT = 9 is "unknown/missing"
+# # note that this is different from the "in memory" guide, where three variables were blanked.
+# # i recommend not blanking out *categorical* variable values in sqlsurvey designs,
+# # because they can trigger finnickyness/bugs.  it is safer to only blank out linear variable missing values.
 
 # https://international.ipums.org/international-action/variables/INCWAGE#codes_section
 # INCWAGE = 9999998 is "unknown/missing"
 # INCWAGE = 9999999 is "not in universe"
 
-# https://international.ipums.org/international-action/variables/SEX#codes_section
-# SEX = 9 is "unknown"
-
 # here's a simple loop construction #
 
-# the three variables that have values to blank into a single character vector
-vars_to_blank <- c( 'empstat' , 'incwage' , 'sex' )
+# store one variable that has values to blank into a single character vector
+vars_to_blank <- c( 'incwage' )
 
-# the three sets of values to blank out, each nested within a list
+# one set of values to blank out, nested within a list just like the "in memory" guide
 vals_to_blank <- 
 	list(
-		c( 0 , 9 ) ,
-		c( 9999998 , 9999999 ) ,
-		9
+		c( 9999998 , 9999999 )
 	)
 
+	
 # confirm that you have one variable for each vector of values to blank
 if( length( vars_to_blank ) != length( vals_to_blank ) ) stop( "these lengths must be the same." )
 
