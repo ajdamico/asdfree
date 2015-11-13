@@ -165,9 +165,6 @@ tablename <- gsub( "\\.(.*)" , "" , csv_file_location )
 # tablename <- 'any_other_name'
 
 
-
-
-
 # create a monetdb executable (.bat) file for the ipums international
 batfile <-
 	monetdb.server.setup(
