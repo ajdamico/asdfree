@@ -106,7 +106,8 @@ svyby(
 # percent male versus female
 svymean(
 	~ factor( sex ) ,
-	design = this_design
+	design = this_design ,
+	na.rm = TRUE
 )
 
 # by employment status
@@ -215,7 +216,7 @@ write.csv( sex_by_employment_status , "sex by employment status.csv" )
 # here's the "percent female" by employment status,
 # with accompanying standard errors
 female_employment_status <-
-	sex_by_employment_status[ , c( "empstat" , "factor.sex.2" , "se2" ) ]
+	sex_by_employment_status[ , c( "empstat" , "factor.sex.2" , "se.factor.sex.2" ) ]
 
 
 # print the new results to the screen
@@ -234,4 +235,3 @@ barplot(
 )
 # labels from
 # https://international.ipums.org/international-action/variables/EMPSTAT#codes_section
-
