@@ -16,6 +16,10 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
+# this is a guide, it is not a one-size-fits-all set of commands:
+# edit this code heavily for your own analysis, otherwise you are doing something wrong.
+
+
 ######################################################################################
 # download a single year and single country census microdata extract csv file from   #
 # the minnesota population center's ipums-international online repository.  prior to #
@@ -31,9 +35,8 @@
 # # uncomment and edit the following three lines of code # #
 # username <- 'your_email'
 # password <- 'your_password'
-# url <- "https://international.ipums.org/international-action/downloads/extract_files/[your_projectname]_[your_extract_number].csv.gz"
+# this_extract <- "https://international.ipums.org/international-action/downloads/extract_files/[[your_projectname]]_[[your_extract_number]].csv.gz"
 # # uncomment and edit the previous three lines of code # #
-
 
 
 # # # # # choose whether to use monetdb or active working memory # # # # #
