@@ -121,6 +121,10 @@ library(R.utils)		# load the R.utils package (counts the number of lines in a fi
 # setwd( "C:/My Directory/IPUMSI/" )
 
 
+# remove the # in order to run this install.packages line only once
+# install.packages( c( "httr" , "XML" ) )
+
+
 # load the download_ipumsi and related functions
 # to programmatically authenticate and download
 source_url( 

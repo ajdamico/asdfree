@@ -70,7 +70,7 @@
 # # # then follow the guide `download import design into monetdb.R` within this syntax directory instead
 
 
-library(survey)		# load survey package (analyzes complex design surveys)
+library(survey)			# load survey package (analyzes complex design surveys)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
@@ -82,6 +82,10 @@ library(R.utils)		# load the R.utils package (counts the number of lines in a fi
 
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/IPUMSI/" )
+
+
+# remove the # in order to run this install.packages line only once
+# install.packages( c( "httr" , "XML" ) )
 
 
 # load the download_ipumsi and related functions
