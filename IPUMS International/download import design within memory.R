@@ -43,9 +43,6 @@ csv_file_location <- download_ipumsi( this_extract , username , password )
 # note: use the `download_ipumsi` file= parameter in order to
 # store the download resultant csv file elsewhere
 
-# figure out which numeric variables have implied decimals
-csv_file_decimals <- decimals_ipumsi( this_extract , username , password )
-
 # figure out which whether columns are character or numeric
 csv_file_structure <- structure_ipumsi( this_extract , username , password )
 
@@ -59,15 +56,6 @@ this_df <-
 		colClasses = csv_file_structure , 
 		stringsAsFactors = FALSE 
 	)
-
-# immediately after read-in,
-# divide any columns with implied decimals by 10^(# of implied decimals)
-stop( 'is this necessary? e-mailed lara' )
-# for ( this_col in seq( ncol( this_df ) ) ) {
-	# if( !( csv_file_decimals[ this_col ] == 0 ) ) {
-		# this_df[ , this_col ] <- ( this_df[ , this_col ] / 10^( csv_file_decimals[ this_col ] ) )
-	# }
-# }
 
 # almost immediately afterward,
 # make every column lowercase	
