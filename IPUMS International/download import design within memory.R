@@ -162,7 +162,7 @@ this_df$rectype <- NULL
 # personally, i also generally never use the ipums-international country identifier
 # or the year of the census
 # or the ipums-international unique sample identification number..
-this_df <- this_df[ , !( names( this_df ) %in% c( 'country' , 'year' , 'sample' ) ]
+this_df <- this_df[ , !( names( this_df ) %in% c( 'country' , 'year' , 'sample' ) ) ]
 # ..and throwing out as many columns as possible while you've got a data.frame
 # in active working memory will make your processing move faster.
 
@@ -201,6 +201,10 @@ if( length( vars_to_blank ) != length( vals_to_blank ) ) stop( "these lengths mu
 for ( this_col in seq( vars_to_blank ) ) this_df[ this_df[ , vars_to_blank[ this_col ] ] %in% vals_to_blank[[ this_col ]] , vars_to_blank[ this_col ] ] <- NA
 
 # # # end of manual variable blanking # # #
+
+
+# add a column of all ones
+this_df$one <- 1
 
 
 # create a complex sample design object
