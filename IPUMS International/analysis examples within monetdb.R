@@ -247,7 +247,7 @@ write.csv( sex_by_employment_status , "sex by employment status.csv" )
 # here's the "percent female" by employment status,
 # with accompanying standard errors
 female_employment_status <-
-	sex_by_employment_status[ seq( 2 , nrow( sex_by_employment_status ) , 2 ) , 1 ]
+	coef( sex_by_employment_status ) [ seq( 2 , length( coef( sex_by_employment_status ) ) , by = 2 ) ]
 
 
 # print the new results to the screen
