@@ -219,7 +219,7 @@ this_sqlsurvey_d_female <- subset( this_sqlsurvey_d , sex == 2 )
 # calculate the distribution of a categorical variable #
 
 # average age - nationwide, restricted to females
-svymean( ~ age , this_sqlsurvey_d_female )
+svymean( ~ age , this_sqlsurvey_d_female , se = TRUE )
 
 
 ###################
@@ -231,7 +231,7 @@ svymean( ~ age , this_sqlsurvey_d_female )
 
 # store the results into a new object
 
-sex_by_employment_status <- svymean( ~ sex , this_sqlsurvey_d , byvar = ~ empstatd , se = TRUE , na.rm = TRUE )
+sex_by_employment_status <- svymean( ~ sex , this_sqlsurvey_d , byvar = ~ empstat , se = TRUE , na.rm = TRUE )
 
 # print the results to the screen
 sex_by_employment_status
