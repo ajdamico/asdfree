@@ -261,7 +261,7 @@ write.csv( female_employment_status , "female by employment status.csv" )
 barplot(
 	female_employment_status ,
 	main = "Percent Female By Employment Status" ,
-	names.arg = c( "Not In Universe" , "Employed" , "Unemployed" , "Inactive" , "Unknown/Missing" ) ,
+	names.arg = c( "Not In Universe" , "Employed" , "Unemployed" , "Inactive" ) ,
 	ylim = c( 0 , .75 )
 )
 # labels from
