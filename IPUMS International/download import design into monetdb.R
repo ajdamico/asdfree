@@ -480,6 +480,11 @@ save( this_sqlsurvey_design , these_factors , file = 'sqlsurvey design in monetd
 # be sure to save the `these_factors` vector as well,
 # just in case you do any recoding in the future
 
+
+# set every table you've just created as read-only inside the database.
+for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
+
+
 # disconnect from the database
 dbDisconnect( db )
 

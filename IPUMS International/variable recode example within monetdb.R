@@ -230,6 +230,10 @@ save( recoded_sqlsurvey_design , recoded_factors , file = 'recoded sqlsurvey des
 # just in case you do any recoding in the future
 
 
+# set every table you've just created as read-only inside the database.
+for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
+
+
 # disconnect from the current monet database
 dbDisconnect( db )
 

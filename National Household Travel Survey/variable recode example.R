@@ -34,7 +34,7 @@
 # prior to running this analysis script, the nhts 2009 file must be loaded as a monet database-backed sqlsurvey object  #
 # on the local machine. running the download and import script will create a monet database containing this file.       #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw2.github.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/download%20and%20import.R        #
+# https://raw2.github.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/download%20and%20import.R      #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "2009 designs.rda" in C:/My Directory/NHTS or wherever the working directory was set.  #
 #########################################################################################################################
@@ -314,6 +314,10 @@ svytotal( ~agecat2 , recoded.nhts.per.design )
 
 # close the connection to the recoded sqlrepsurvey design object
 close( recoded.nhts.per.design )
+
+
+# set every table you've just created as read-only inside the database.
+for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
 
 
 # disconnect from the current monet database

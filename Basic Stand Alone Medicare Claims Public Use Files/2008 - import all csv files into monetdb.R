@@ -371,6 +371,8 @@ dbListTables( db )		# print the tables stored in the current monet database to t
 dbGetQuery( db , "select * from pde08 limit 6" )
 # additional analysis examples are stored in the other scripts
 
+# set every table you've just created as read-only inside the database.
+for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
 
 # disconnect from the current monet database
 dbDisconnect( db )

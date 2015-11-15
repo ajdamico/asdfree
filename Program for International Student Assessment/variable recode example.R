@@ -365,6 +365,10 @@ pisa.imp <- svyMDBdesign( imp.list )
 MIcombine( with( pisa.imp , svymean( ~progcat ) ) )
 
 
+# set every table you've just created as read-only inside the database.
+for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
+
+
 # are we done here?  yep, we're done.
 
 # disconnect from the current monet database

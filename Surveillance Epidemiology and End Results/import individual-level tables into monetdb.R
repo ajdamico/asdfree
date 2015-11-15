@@ -353,6 +353,10 @@ dbGetQuery( db , 'select count(*) from x' )
 # take a look at the other seer importation script in this directory
 
 
+# set every table you've just created as read-only inside the database.
+for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
+
+
 # disconnect from the current monet database
 dbDisconnect( db )
 

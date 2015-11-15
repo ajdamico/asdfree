@@ -403,6 +403,10 @@ column.pct + qnorm( 0.975 ) * se.column.pct
 close( brfss.r )
 
 
+# set every table you've just created as read-only inside the database.
+for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
+
+
 # disconnect from the current monet database
 dbDisconnect( db )
 

@@ -1114,6 +1114,22 @@ monetdb.server.stop( pid )
 # and you don't get a gdk-lock error from opening two-at-once
 Sys.sleep( 60 )
 
+
+# one more quick re-connection
+pid <- monetdb.server.start( batfile )
+
+db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# set every table you've just created as read-only inside the database.
+for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
+
+# disconnect from the current monet database
+dbDisconnect( db )
+
+# and close it using the `pid`
+monetdb.server.stop( pid )
+
+
 ##################################################################################
 # lines of code to hold on to for all other `censo_demografico` monetdb analyses #
 
