@@ -42,7 +42,8 @@ read.SAScii.monetdb <-
 										# this option is useful for keeping protected data off of random temporary folders on your computer--
 										# specifying this option creates the temporary file inside the folder specified
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
-		sleep.between.col.updates = 0
+		sleep.between.col.updates = 0 ,
+		varchar = TRUE					# import character strings as type VARCHAR(255)?  use FALSE to import them as clob
 		
 	) {
 
@@ -151,7 +152,11 @@ read.SAScii.monetdb <-
 	
 	fields <- y$varname
 
-	colTypes <- ifelse( !y[ , 'char' ] , 'DOUBLE PRECISION' , 'VARCHAR(255)' )
+	if( varchar ){
+		colTypes <- ifelse( !y[ , 'char' ] , 'DOUBLE PRECISION' , 'VARCHAR(255)' )
+	} else {
+		colTypes <- ifelse( !y[ , 'char' ] , 'DOUBLE PRECISION' , 'clob' )
+	}
 	
 
 	colDecl <- paste( fields , colTypes )
