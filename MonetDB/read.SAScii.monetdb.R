@@ -31,7 +31,6 @@ read.SAScii.monetdb <-
 		sas_ri , 
 		beginline = 1 , 
 		zipped = F , 
-		# n = -1 , 						# no n parameter available for this - you must read in the entire table!
 		lrecl = NULL , 
 		skip.decimal.division = FALSE , # skipping decimal division defaults to FALSE for this function!
 		tl = F ,						# convert all column names to lowercase?
@@ -43,7 +42,8 @@ read.SAScii.monetdb <-
 										# specifying this option creates the temporary file inside the folder specified
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
 		sleep.between.col.updates = 0 ,
-		varchar = TRUE					# import character strings as type VARCHAR(255)?  use FALSE to import them as clob
+		varchar = TRUE ,				# import character strings as type VARCHAR(255)?  use FALSE to import them as clob
+		n_max = -1
 		
 	) {
 
@@ -191,7 +191,7 @@ read.SAScii.monetdb <-
 	on.exit( { file.remove( tf2 ) } )
 	
 	# ..and that's the number of lines in the file
-	num.lines <- countLines( tf2 )
+	if( n_max == -1 ) num.lines <- countLines( tf2 ) else num.lines <- n_max
 	
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
