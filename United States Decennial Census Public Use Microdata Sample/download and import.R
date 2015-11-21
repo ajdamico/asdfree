@@ -109,7 +109,18 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'R.utils' , 'stringr' , 'descr' , 'downloader' , 'digest' , 'SAScii' , 'readxl' ) )
+# install.packages( c( 'R.utils' , 'stringr' , 'descr' , 'downloader' , 'digest' , 'SAScii' ) )
+
+
+# # # # # # # # # # # # # #
+# warning: perl required! #
+# # # # # # # # # # # # # #
+
+# if you do not have perl installed, this two-minute video
+# walks through how to get it (for free): http://www.screenr.com/QiN8
+
+# remove the # in order to run this install.packages line only once
+# install.packages('gdata')
 
 
 
@@ -122,7 +133,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-library(readxl) 		# imports excel [.xls] and [.xlsx] files into R
+library(gdata) 			# load the gdata package (imports excel [.xls] files into R)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(stringr)		# load stringr package (manipulates character strings easily)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
@@ -374,7 +385,7 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 		function( fn , sheet ){
 
 			# read the sheet (specified as a function input) to an object `stru
-			stru <- read_excel( fn , sheet = sheet , skip = 1 )
+			stru <- read.xls( fn , sheet = sheet , skip = 1 )
 			
 			# make all column names of the `stru` data.frame lowercase
 			names( stru ) <- tolower( names( stru ) )
@@ -431,14 +442,14 @@ if ( 2010 %in% ten.percent.files.to.download ){
 	pums.layout <- tempfile()
 
 	# download the layout excel file
-	download_cached( "http://www2.census.gov/census_2010/12-Stateside_PUMS/2010%20PUMS%20Record%20Layout.xlsx" , pums.layout , mode = 'wb' )
+	download_cached( "http://www2.census.gov/census_2010/12-Stateside_PUMS/2010%20PUMS%20Record%20Layout.xlsx" ,	pums.layout , mode = 'wb' )
 
 	# initiate a quick layout read-in function #
 	code.str <-
 		function( fn , sheet ){
 
 			# read the sheet (specified as a function input) to an object `stru
-			stru <- read_excel( fn , sheet = sheet , skip = 1 )
+			stru <- read.xls( fn , sheet = sheet , skip = 1 )
 			
 			# make all column names of the `stru` data.frame lowercase
 			names( stru ) <- tolower( names( stru ) )
