@@ -1,7 +1,7 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # united states decennial census
 # public use microdata sample
-# 1990 , 2000
+# 1990 , 2000, 2010
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -12,6 +12,7 @@
 # setwd( "C:/My Directory/PUMS/" )
 # one.percent.files.to.download <- c( 1990 , 2000 )
 # five.percent.files.to.download <- c( 1990 , 2000 )
+# ten.percent.files.to.download <- 2010
 # exclude.puerto.rico <- TRUE
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -33,13 +34,13 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-#################################################################################################
-# analyze the 1990 and 2000 United States Decennial Census - Public Use Microdata Sample with R #
-#################################################################################################
+####################################################################################################
+# analyze the 1990, 2000, 2010 United States Decennial Census - Public Use Microdata Sample with R #
+####################################################################################################
 
 
 # set your working directory.
-# the PUMS 1990 , 2000 data files will be stored here
+# the PUMS 1990 , 2000 , 2010 data files will be stored here
 # after downloading and importing them.
 # use forward slashes instead of back slashes
 
@@ -90,9 +91,16 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 # define which years to download #
 
-# uncomment these two lines to download all available data sets
+# uncomment these three lines to download all available data sets
 # one.percent.files.to.download <- c( 1990 , 2000 )
 # five.percent.files.to.download <- c( 1990 , 2000 )
+# ten.percent.files.to.download <- 2010
+# uncomment a line by removing the `#` at the front
+
+# uncomment these three lines to just download 2010, for example
+# one.percent.files.to.download <- NULL
+# five.percent.files.to.download <- NULL
+# ten.percent.files.to.download <- 2010
 # uncomment a line by removing the `#` at the front
 
 # uncomment this line if you do not want puerto rico included in the downloaded microdata
@@ -425,6 +433,67 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 }
 
 
+# # # # # # 2010 # # # # # #
+
+# if 2010 was requested in the 10% files..
+if ( 2010 %in% ten.percent.files.to.download ){
+
+	# create a temporary file on the local disk
+	pums.layout <- tempfile()
+
+	# download the layout excel file
+	download_cached( "http://www2.census.gov/census_2010/12-Stateside_PUMS/2010%20PUMS%20Record%20Layout.xlsx" ,	pums.layout , mode = 'wb' )
+
+	# initiate a quick layout read-in function #
+	code.str <-
+		function( fn , sheet ){
+
+			# read the sheet (specified as a function input) to an object `stru
+			stru <- read.xls( fn , sheet = sheet , skip = 1 )
+			
+			# make all column names of the `stru` data.frame lowercase
+			names( stru ) <- tolower( names( stru ) )
+			
+			# remove leading and trailing whitespace, and convert everything to lowercase
+			# in the `variable` column of the `stru` table
+			stru$variable <- str_trim( tolower( stru$variable ) )
+			
+			# keep only four columns, and only unique records from the `stru` table
+			stru <- unique( stru[ , c( 'beg' , 'end' , 'a.n' , 'variable' ) ] )
+			
+			# throw out records missing a beginning position
+			stru <- stru[ !is.na( stru$beg ) , ]
+			
+			# calculate the width of each field
+			stru <- transform( stru , width = end - beg + 1 )
+
+			# remove racedet duplicate
+			stru <- stru[ !is.na( stru$beg ) , ]
+			
+			# remove fields that are invalid in monetdb
+			stru[ stru$variable == "sample" , 'variable' ] <- 'sample_'
+	
+			hardcoded.numeric.columns <-
+				c( "serialno" , "hweight" , "persons" , "elec" , "gas" , "water" , "oil" , "rent" , "mrt1amt" , "mrt2amt" , "taxamt" , "insamt" , "condfee" , "mhcost" , "smoc" , "smocapi" , "grent" , "grapi" , "hinc" , "finc" , "pweight" , "age" , "ancfrst5" , "ancscnd5" , "yr2us" , "trvtime" , "weeks" , "hours" , "incws" , "incse" , "incint" , "incss" , "incssi" , "incpa" , "incret" , "incoth" , "inctot" , "earns" , "poverty" )
+	
+			# add a logical `char` field to both of these data.frames
+			stru$char <- ( stru$a.n %in% 'A' & !( stru$variable %in% hardcoded.numeric.columns ) )
+						
+			# since this is the last line of the function `code.str`
+			# whatever this object `stru` is at the end of the function
+			# will be _returned_ by the function
+			stru
+		}
+
+	# read in the household file structure from excel sheet 1
+	hh.00.structure <- code.str( pums.layout , 1 )
+
+	# read in the person file structure from excel sheet 2
+	person.00.structure <- code.str( pums.layout , 2 )
+	
+}
+
+
 # # # # # # # #
 # importation #
 # # # # # # # #
@@ -658,6 +727,68 @@ if ( 2000 %in% five.percent.files.to.download ){
 	monetdb.server.stop( pid )
 		
 }
+
+
+# if the user specified the download of this data set..
+if ( 2010 %in% ten.percent.files.to.download ){
+
+	# construct a character vector containing one `zip` file's url for each state
+	# the character vector contains the full http:// filepath to all of the census microdata
+	fp.10.10 <- 
+		paste0( 
+			"http://www2.census.gov/census_2010/12-Stateside_PUMS/" ,
+			st[ , 'state.name' ] ,
+			"/" ,
+			tolower( st[ , 'state.abb' ] ) ,
+			".2010.pums." ,
+			st[ , 'state.fips' ] ,
+			".txt"
+		)
+
+	# run the `get.tsv` function on each of the files specified in the character vector (created above)
+	# and provide a corresponding file number parameter for each character string.
+	tsv.10.10 <-
+		mapply(
+			get.tsv ,
+			fp.10.10 ,
+			fileno = seq( nrow( st ) ) ,
+			MoreArgs = 
+				list(
+					zipped = FALSE ,
+					hh.stru = hh.10.structure ,
+					person.stru = person.10.structure 
+				)
+		)
+
+	# run the MonetDB server, determine the server path, connect to the server
+	pid <- monetdb.server.start( batfile )
+	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
+	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+	# using the monetdb connection, import each of the household- and person-level tab-separated value files
+	# into the database, naming the household, person, and also merged file with these character strings
+	pums.m.design <-
+		pums.import.merge.design(
+			db = db , monet.url = monet.url ,
+			fn = tsv.10.1 , 
+			merged.tn = "pums_2010_10_m" , 
+			hh.tn = "pums_2010_10_h" , 
+			person.tn = "pums_2010_10_p" ,
+			hh.stru = hh.10.structure ,
+			person.stru = person.10.structure
+		)
+
+	# save the monetdb-backed complex sample survey design object to the local disk
+	save( pums.m.design , file = "pums_2010_10_m.rda" )
+
+	# disconnect from the current monet database..
+	dbDisconnect( db )
+	# and close it using the `pid`
+	monetdb.server.stop( pid )
+
+}
+
+
 
 
 # one more quick re-connection
