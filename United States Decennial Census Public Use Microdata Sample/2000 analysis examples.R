@@ -65,6 +65,8 @@
 # to calculate error terms / confidence intervals the census-approved way, the only current option is to follow this
 # hellishly-cumbersome document where you have to multiply stuff by hand and calculate SEs for each and every statistic.
 # it. is. a. nightmare.
+# here's the 2010 version:
+# http://www2.census.gov/census_2010/12-Stateside_PUMS/0TECH_DOC/
 # here's the year 2000 version:
 # http://www.census.gov/prod/cen2000/doc/pums.pdf#page=18
 # here's the 1990 census version:
@@ -79,7 +81,7 @@
 # but that would involve merging on their STRATA and CLUSTER variable from their extracts.
 # https://usa.ipums.org/usa/complex_survey_vars/strata_historical.shtml
 
-# case and point: for the 1990 and 2000 united states decennial census public use microdata samples,
+# case and point: for the united states decennial census public use microdata samples,
 # you cannot _automate_ the calculation of standard errors if you want to use the _official_ census method.  sowwy.
 
 # one more note: you can generally add standard errors to sqlsurvey output by adding the se = TRUE parameter
@@ -142,6 +144,7 @@ db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # load( 'C:/My Directory/PUMS/pums_1990_5_m.rda' )	# analyze the 1990 5% pums file
 # load( 'C:/My Directory/PUMS/pums_2000_1_m.rda' )	# analyze the 2000 1% pums file
 # load( 'C:/My Directory/PUMS/pums_2000_5_m.rda' )	# analyze the 2000 5% pums file
+# load( 'C:/My Directory/PUMS/pums_2010_10_m.rda' )	# analyze the 2010 10% pums file
 
 # note: this r data file should already contain the 2000 5% design
 
