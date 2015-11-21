@@ -740,9 +740,7 @@ if ( 2010 %in% ten.percent.files.to.download ){
 			st[ , 'state.name' ] ,
 			"/" ,
 			tolower( st[ , 'state.abb' ] ) ,
-			".2010.pums." ,
-			st[ , 'state.fips' ] ,
-			".txt"
+			".2010.pums.01.txt"
 		)
 
 	# run the `get.tsv` function on each of the files specified in the character vector (created above)
