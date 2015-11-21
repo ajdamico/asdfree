@@ -368,12 +368,7 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 
 	# download the layout excel file
 	download_cached( "http://www2.census.gov/census_2000/datasets/PUMS/FivePercent/5%25_PUMS_record_layout.xls" ,	pums.layout , mode = 'wb' )
-	
-	
-	file.rename( pums.layout , paste0( pums.layout , '.xls' ) )
-	
-	pums.layout <- paste0( pums.layout , '.xls' )
-	
+
 	# initiate a quick layout read-in function #
 	code.str <-
 		function( fn , sheet ){
@@ -438,10 +433,6 @@ if ( 2010 %in% ten.percent.files.to.download ){
 	# download the layout excel file
 	download_cached( "http://www2.census.gov/census_2010/12-Stateside_PUMS/2010%20PUMS%20Record%20Layout.xlsx" , pums.layout , mode = 'wb' )
 
-	file.rename( pums.layout , paste0( pums.layout , '.xlsx' ) )
-	
-	pums.layout <- paste0( pums.layout , '.xlsx' )
-	
 	# initiate a quick layout read-in function #
 	code.str <-
 		function( fn , sheet ){
