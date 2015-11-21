@@ -486,10 +486,10 @@ if ( 2010 %in% ten.percent.files.to.download ){
 		}
 
 	# read in the household file structure from excel sheet 1
-	hh.00.structure <- code.str( pums.layout , 1 )
+	hh.10.structure <- code.str( pums.layout , 1 )
 
 	# read in the person file structure from excel sheet 2
-	person.00.structure <- code.str( pums.layout , 2 )
+	person.10.structure <- code.str( pums.layout , 2 )
 	
 }
 
