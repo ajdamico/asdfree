@@ -141,7 +141,7 @@ read.SAScii.monetdb <-
 	
 		file.remove( fn )
 		
-		write.table.ffdf( infile , file = fn )
+		write.table.ffdf( infile , file = fn , col.names = FALSE , row.names = FALSE )
 		
 		rm( infile )
 	
