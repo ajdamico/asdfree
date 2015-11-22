@@ -75,11 +75,12 @@ read.SAScii.monetdb <-
 	
 	# read.SAScii.monetdb depends on the SAScii package and the descr package
 	# to install these packages, use the line:
-	# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'R.utils' ) )
+	# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'R.utils' , 'ff' ) )
 	library(SAScii)
 	library(descr)
 	library(downloader)
 	library(R.utils)
+	library(ff)
 	
 	if ( !exists( "download_cached" ) ){
 		# load the download_cached and related functions
@@ -131,6 +132,18 @@ read.SAScii.monetdb <-
 		on.exit( file.remove( tf ) )
 	}
 
+	# improve speed of `n_max` by limiting the file
+	if( n_max != -1 ) {
+	
+		infile <- read.table.ffdf( file = fn , nrows = n_max )
+	
+		file.remove( fn )
+		
+		write.table.ffdf( infile )
+		
+		rm( infile )
+	
+	}
 	
 	
 	# if the overwrite flag is TRUE, then check if the table is in the database..
