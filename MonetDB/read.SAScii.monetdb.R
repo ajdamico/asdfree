@@ -135,7 +135,9 @@ read.SAScii.monetdb <-
 	# improve speed of `n_max` by limiting the file
 	if( n_max != -1 ) {
 	
-		infile <- read.table.ffdf( file = fn , nrows = n_max )
+		warning( "when using the `n_max=` your file cannot contain `~` characters" )
+	
+		infile <- read.table.ffdf( file = fn , nrows = n_max , header = FALSE , sep = "~" )
 	
 		file.remove( fn )
 		
