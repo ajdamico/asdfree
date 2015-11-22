@@ -19,8 +19,8 @@ sql.copy.into <-
 # 	um well a whole lot faster
 # 	no RAM issues
 # 	decimal division must be TRUE/FALSE (as opposed to NULL - the user must decide)
-# 	must read in the entire table
-#	requires RMonetDB and a few other packages
+# 	can read in only part of the table with `n_max=`
+#	requires MonetDB.R and a few other packages
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 read.SAScii.monetdb <-
