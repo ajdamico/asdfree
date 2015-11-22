@@ -768,7 +768,7 @@ if ( 2010 %in% ten.percent.files.to.download ){
 	pums.m.design <-
 		pums.import.merge.design(
 			db = db , monet.url = monet.url ,
-			fn = tsv.10.1 , 
+			fn = tsv.10.10 , 
 			merged.tn = "pums_2010_10_m" , 
 			hh.tn = "pums_2010_10_h" , 
 			person.tn = "pums_2010_10_p" ,
