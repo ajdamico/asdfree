@@ -109,7 +109,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'R.utils' , 'stringr' , 'descr' , 'downloader' , 'digest' , 'SAScii' ) )
+# install.packages( c( 'R.utils' , 'stringr' , 'descr' , 'downloader' , 'digest' , 'SAScii' , 'xlsx' ) )
 
 
 # # # # # # # # # # # # # #
@@ -139,7 +139,7 @@ library(stringr)		# load stringr package (manipulates character strings easily)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 library(downloader)		# downloads and then runs the source() function on scripts from github
-
+library(xlsx)			# imports excel .xlsx files cleanly
 
 # load the `get.tsv` and `pums.import.and.merge` functions from my github account.
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/pums%20functions.R" , prompt = FALSE )
@@ -449,7 +449,7 @@ if ( 2010 %in% ten.percent.files.to.download ){
 		function( fn , sheet ){
 
 			# read the sheet (specified as a function input) to an object `stru
-			stru <- read.xls( fn , sheet = sheet , skip = 1 )
+			stru <- read.xlsx( fn , sheetIndex = sheet , startRow = 2 )
 			
 			# make all column names of the `stru` data.frame lowercase
 			names( stru ) <- tolower( names( stru ) )
