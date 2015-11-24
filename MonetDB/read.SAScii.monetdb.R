@@ -1,4 +1,14 @@
 
+# read.SAScii.monetdb depends on the SAScii package and the descr package
+# to install these packages, use the line:
+# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'R.utils' , 'ff' ) )
+library(SAScii)
+library(descr)
+library(downloader)
+library(R.utils)
+library(ff)
+
+
 # create importation function
 # to use different 'NULL AS <something>' options for the actual command that imports
 # lines into monetdb: COPY <stuff> INTO <tablename> ...
@@ -72,15 +82,6 @@ read.SAScii.monetdb <-
 	# set scientific notation to something impossibly high.  Inf doesn't work.
 	options( scipen = 1000000 )
 	
-	
-	# read.SAScii.monetdb depends on the SAScii package and the descr package
-	# to install these packages, use the line:
-	# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'R.utils' , 'ff' ) )
-	library(SAScii)
-	library(descr)
-	library(downloader)
-	library(R.utils)
-	library(ff)
 	
 	if ( !exists( "download_cached" ) ){
 		# load the download_cached and related functions
