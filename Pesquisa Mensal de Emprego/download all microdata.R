@@ -4,6 +4,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
+# setInternet2( FALSE )						# # only windows users need this line
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PME/" )
@@ -51,6 +52,20 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # options( encoding="windows-1252" )
 # ..to turn on windows-style encoding.
 # # # end of non-windows system edits.
+
+
+# # # are you on a windows system? # # #
+if ( .Platform$OS.type == 'windows' ) print( 'windows users: read this block' )
+# you might need to change your internet connectivity settings
+# using this next line -
+# setInternet2( FALSE )
+# - will change the download method of your R console
+# however, if you have already downloaded anything
+# in the same console, the `setInternet2( TRUE )`
+# setting will be unchangeable in that R session
+# so make sure you are using a fresh instance
+# of your windows R console before designating
+# setInternet2( FALSE )
 
 
 # if you want to overwrite previously-download files
