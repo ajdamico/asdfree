@@ -204,7 +204,7 @@ dbport <- 50007
 # batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -213,6 +213,9 @@ dbport <- 50007
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # disconnect from the current monet database
@@ -267,9 +270,11 @@ http.mid <- ".acer.edu.au/downloads/"
 if ( 2012 %in% years.to.download ){
 
 	# launch the monetdb server..
-	pid <- monetdb.server.start( batfile )
-	# ..wait for it to load, then immediately connect.
+	monetdb.server.start( batfile )
+	# ..wait for it to load, then immediately connect..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_STU12_DEC03", "INT_SCQ12_DEC03" ,  "INT_PAQ12_DEC03" , "INT_COG12_DEC03" , "INT_COG12_S_DEC03" )
@@ -328,9 +333,11 @@ if ( 2012 %in% years.to.download ){
 if ( 2009 %in% years.to.download ){
 
 	# launch the monetdb server..
-	pid <- monetdb.server.start( batfile )
-	# ..wait for it to load, then immediately connect.
+	monetdb.server.start( batfile )
+	# ..wait for it to load, then immediately connect..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_STQ09_DEC11" , "INT_SCQ09_Dec11" , "INT_PAR09_DEC11" , "INT_COG09_TD_DEC11" , "INT_COG09_S_DEC11" )
@@ -419,9 +426,11 @@ if ( 2009 %in% years.to.download ){
 if ( 2006 %in% years.to.download ){
 
 	# launch the monetdb server..
-	pid <- monetdb.server.start( batfile )
-	# ..wait for it to load, then immediately connect.
+	monetdb.server.start( batfile )
+	# ..wait for it to load, then immediately connect..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_Stu06_Dec07" , "INT_Sch06_Dec07" , "INT_Par06_Dec07" , "INT_Cogn06_T_Dec07" , "INT_Cogn06_S_Dec07" )
@@ -491,9 +500,11 @@ if ( 2006 %in% years.to.download ){
 if ( 2003 %in% years.to.download ){
 
 	# launch the monetdb server..
-	pid <- monetdb.server.start( batfile )
-	# ..wait for it to load, then immediately connect.
+	monetdb.server.start( batfile )
+	# ..wait for it to load, then immediately connect..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_cogn_2003" , "INT_stui_2003_v2" , "INT_schi_2003" )
@@ -593,9 +604,11 @@ if ( 2003 %in% years.to.download ){
 if ( 2000 %in% years.to.download ){
 
 	# launch the monetdb server..
-	pid <- monetdb.server.start( batfile )
-	# ..wait for it to load, then immediately connect.
+	monetdb.server.start( batfile )
+	# ..wait for it to load, then immediately connect..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "intcogn_v3" , "intscho" , "intstud_math" , "intstud_read" , "intstud_scie" )
@@ -766,9 +779,11 @@ Sys.sleep( 10 )
 
 
 # one more quick re-connection
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # set every table you've just created as read-only inside the database.
 for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
@@ -789,7 +804,7 @@ monetdb.server.stop( pid )
 # batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -798,6 +813,9 @@ dbport <- 50007
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # # # # run your analysis commands # # # #

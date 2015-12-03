@@ -238,7 +238,7 @@ dbport <- 50015
 # batfile <- "C:/My Directory/IPUMSI/MonetDB/ipumsi.bat"		# # note for mac and *nix users: `ipumsi.bat` might be `ipumsi.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -247,6 +247,9 @@ dbport <- 50015
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # disconnect from the current monet database
@@ -260,10 +263,14 @@ monetdb.server.stop( pid )
 
 
 # re-initiate the same monetdb server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# re-connecto to the same monetdb server
+# re-connecto to the same monetdb server..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
+
 
 # decide whether column types should be character or numeric
 colTypes <- ifelse( csv_file_structure == 'character' , 'VARCHAR(255)' , 'DOUBLE PRECISION' )
@@ -323,10 +330,13 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # re-initiate the same monetdb server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # re-connecto to the same monetdb server
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # # # manual variable blanking # # #
@@ -388,10 +398,13 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # re-initiate the same monetdb server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# re-connecto to the same monetdb server
+# re-connecto to the same monetdb server..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # add a column containing all ones to the current table
 dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column one int' ) )

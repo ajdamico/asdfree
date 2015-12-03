@@ -204,7 +204,7 @@ dbport <- 50011
 # batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"		# # note for mac and *nix users: `censo_demografico.bat` might be `censo_demografico.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -213,6 +213,9 @@ dbport <- 50011
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # disconnect from the current monet database
@@ -307,10 +310,13 @@ all.files <- scan( text = all.files , what = "character", quiet = T )
 files.to.download <- all.files[ !( all.files %in% c( 'Atualizacoes.txt' , 'Documentacao.zip' ) ) ]
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # loop through each of the files to be downloaded..
@@ -386,11 +392,13 @@ monetdb.server.stop( pid )
 
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # at this point, all tables need to be merged and then rectangulated!
@@ -429,10 +437,14 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
+
 
 dom.fpc.create <-
 	'create table c10_dom_fpc as (select v0011 , sum( v0010 ) as sum_v0010 from c10_dom_pre_fpc group by v0011) WITH DATA'
@@ -451,10 +463,13 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 dom.count.create <-
 	'create table c10_dom_count_pes as (select v0001 , v0300 , count(*) as dom_count_pes from c10_pes_pre_fpc group by v0001 , v0300 ) WITH DATA'
@@ -468,10 +483,12 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 dom.fpc.merge <-
 	'create table c10_dom as ( select a1.* , b1.dom_count_pes from (select a2.* , b2.sum_v0010 as dom_fpc from c10_dom_pre_fpc as a2 inner join c10_dom_fpc as b2 on a2.v0011 = b2.v0011) as a1 inner join c10_dom_count_pes as b1 on a1.v0001 = b1.v0001 AND a1.v0300 = b1.v0300 ) WITH DATA'
@@ -490,10 +507,12 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 dbSendQuery( db , 'ALTER TABLE c10_dom ADD COLUMN dom_wgt DOUBLE PRECISION' )
 dbSendQuery( db , 'ALTER TABLE c10_pes ADD COLUMN pes_wgt DOUBLE PRECISION' )
@@ -570,10 +589,12 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 #################################################
@@ -679,10 +700,12 @@ all.files <- scan( text = all.files , what = "character", quiet = T )
 files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' , '2_Atualizacoes.txt' , '1_Documentacao_velho.zip' ) ) ]
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # loop through each of the files to be downloaded..
@@ -778,10 +801,12 @@ monetdb.server.stop( pid )
 
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 
@@ -832,10 +857,12 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 dom.fpc.create <-
 	'create table c00_dom_fpc as (select areap , sum( p001 ) as sum_p001 from c00_dom_pre_fpc group by areap) WITH DATA'
@@ -859,10 +886,12 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 dom.count.create <-
 	'create table c00_dom_count_pes as (select v0102 , v0300 , count(*) as dom_count_pes from c00_pes_pre_fpc group by v0102 , v0300 ) WITH DATA'
@@ -876,10 +905,12 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 dom.fpc.merge <-
 	'create table c00_dom as ( select a1.* , b1.dom_count_pes from (select a2.* , b2.sum_p001 as dom_fpc from c00_dom_pre_fpc as a2 inner join c00_dom_fpc as b2 on a2.areap = b2.areap) as a1 inner join c00_dom_count_pes as b1 on a1.v0102 = b1.v0102 AND a1.v0300 = b1.v0300 ) WITH DATA'
@@ -903,10 +934,12 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 dbSendQuery( db , 'ALTER TABLE c00_dom ADD COLUMN dom_wgt DOUBLE PRECISION' )
 dbSendQuery( db , 'ALTER TABLE c00_pes ADD COLUMN pes_wgt DOUBLE PRECISION' )
@@ -1009,10 +1042,12 @@ dbDisconnect( db )
 monetdb.server.stop( pid )
 
 # launch the current monet database
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
-# immediately connect to it
+# immediately connect to it..
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+# ..and store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 #################################################
@@ -1116,9 +1151,9 @@ Sys.sleep( 60 )
 
 
 # one more quick re-connection
-pid <- monetdb.server.start( batfile )
-
+monetdb.server.start( batfile )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # set every table you've just created as read-only inside the database.
 for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
@@ -1138,7 +1173,7 @@ monetdb.server.stop( pid )
 # batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"		# # note for mac and *nix users: `censo_demografico.bat` might be `censo_demografico.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -1147,6 +1182,9 @@ dbport <- 50011
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # # # # run your analysis commands # # # #

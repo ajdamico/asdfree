@@ -80,7 +80,7 @@ library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
 # batfile <- "C:/My Directory/BSAPUF/MonetDB/bsapuf.bat"		# # note for mac and *nix users: `bsapuf.bat` might be `bsapuf.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -89,6 +89,10 @@ dbport <- 50003
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
+
 
 # end of lines of code to hold on to for all other bsa puf monetdb analyses #
 #############################################################################

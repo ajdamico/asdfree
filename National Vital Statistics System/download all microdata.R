@@ -222,7 +222,7 @@ dbport <- 50012
 # batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -232,6 +232,8 @@ dbport <- 50012
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # disconnect from the current monet database
 dbDisconnect( db )
@@ -342,13 +344,16 @@ files <- z[ grep( 'ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/' , z ) ]
 
 
 # run the monetdb server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # loop through every year specified by the user
 for ( year in natality.sets.to.download ){
 
-	# connect to the now-initialized monetdb server
+	# connect to the now-initialized monetdb server..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current natality file you're workin' on.
@@ -495,14 +500,16 @@ if ( !is.null( periodlinked.sets.to.download ) ){
 
 
 # run the monetdb server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # loop through every year specified by the user
 for ( year in periodlinked.sets.to.download ){
 
-	# connect to the now-initialized monetdb server
+	# connect to the now-initialized monetdb server..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current period-linked file you're workin' on.
@@ -684,13 +691,16 @@ monetdb.server.stop( pid )
 
 
 # run the monetdb server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # loop through every year specified by the user
 for ( year in cohortlinked.sets.to.download ){
 
-	# connect to the now-initialized monetdb server
+	# connect to the now-initialized monetdb server..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current cohort-linked file you're workin' on.
@@ -828,13 +838,16 @@ monetdb.server.stop( pid )
 
 
 # run the monetdb server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # loop through every year specified by the user
 for ( year in mortality.sets.to.download ){
 
-	# connect to the now-initialized monetdb server
+	# connect to the now-initialized monetdb server..
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+	# ..and store the process id
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current mortality file you're workin' on.
@@ -1013,9 +1026,11 @@ Sys.sleep( 10 )
 
 
 # one more quick re-connection
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # set every table you've just created as read-only inside the database.
 for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
@@ -1035,7 +1050,7 @@ monetdb.server.stop( pid )
 # batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -1044,6 +1059,9 @@ dbport <- 50012
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # # # # run your analysis commands # # # #

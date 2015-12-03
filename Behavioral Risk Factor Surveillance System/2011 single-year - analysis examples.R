@@ -84,7 +84,7 @@ library(stringr) 		# load stringr package (manipulates character strings easily)
 # batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"		# # note for mac and *nix users: `brfss.bat` might be `brfss.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -93,6 +93,9 @@ dbport <- 50004
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # # # # run your analysis commands # # # #

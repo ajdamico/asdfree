@@ -224,9 +224,7 @@ dbport <- 50006
 
 
 # hey try running it now!  a shell window should pop up.
-pid <- monetdb.server.start( batfile )
-# store the result into another variable, which stands for process id
-# this `pid` variable will allow the MonetDB server to be terminated from within R automagically.
+monetdb.server.start( batfile )
 
 
 # when the monetdb server runs, my computer shows:
@@ -250,6 +248,10 @@ monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 # now put everything together and create a connection to the monetdb server.
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 # from now on, the 'db' object will be used for r to connect with the monetdb server
+
+# store the result into another variable, which stands for process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
+# this `pid` variable will allow the MonetDB server to be terminated from within R automagically.
 
 
 # note: slow. slow. slow. #
@@ -380,7 +382,7 @@ Sys.sleep( 10 )
 # batfile <- "C:/My Directory/NPPES/nppes.bat"		# # note for mac and *nix users: `nppes.bat` might be `nppes.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -389,6 +391,10 @@ dbport <- 50006
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
+
 
 # # # # run your analysis commands # # # #
 

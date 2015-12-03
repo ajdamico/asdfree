@@ -216,7 +216,7 @@ dbport <- 50014
 # batfile <- "C:/My Directory/NIBRS/MonetDB/nibrs.bat"		# # note for mac and *nix users: `nibrs.bat` might be `nibrs.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -226,6 +226,8 @@ dbport <- 50014
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
 
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # disconnect from the current monet database
 dbDisconnect( db )
@@ -489,10 +491,13 @@ for ( i in numbers.to.download ){
 		# it should be x[study number]_[dataset number]
 		
 		# launch the current monet database
-		pid <- monetdb.server.start( batfile )
+		monetdb.server.start( batfile )
 		
 		# immediately connect to it
 		db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+		# ..and store the process id
+		pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 		# in most cases, the sas importation script should start right at the beginning..
 		beginline <- 1
@@ -695,9 +700,11 @@ Sys.sleep( 10 )
 
 
 # one more quick re-connection
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # set every table you've just created as read-only inside the database.
 for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
@@ -717,7 +724,7 @@ monetdb.server.stop( pid )
 # batfile <- "C:/My Directory/NIBRS/MonetDB/nibrs.bat"		# # note for mac and *nix users: `nibrs.bat` might be `nibrs.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -726,6 +733,9 @@ dbport <- 50014
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # # # # run your analysis commands # # # #

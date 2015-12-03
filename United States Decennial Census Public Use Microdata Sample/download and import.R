@@ -244,7 +244,7 @@ dbport <- 50010
 # batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"		# # note for mac and *nix users: `pums.bat` might be `pums.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -253,6 +253,9 @@ dbport <- 50010
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # # # # but the lines of code below will re-start the server
@@ -526,9 +529,10 @@ if ( 1990 %in% one.percent.files.to.download ){
 		)
 
 	# run the MonetDB server, determine the server path, connect to the server
-	pid <- monetdb.server.start( batfile )
+	monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -587,9 +591,10 @@ if ( 1990 %in% five.percent.files.to.download ){
 		)
 
 	# run the MonetDB server, determine the server path, connect to the server
-	pid <- monetdb.server.start( batfile )
+	monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -644,9 +649,10 @@ if ( 2000 %in% one.percent.files.to.download ){
 		)
 
 	# run the MonetDB server, determine the server path, connect to the server
-	pid <- monetdb.server.start( batfile )
+	monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -701,9 +707,10 @@ if ( 2000 %in% five.percent.files.to.download ){
 		)
 
 	# run the MonetDB server, determine the server path, connect to the server
-	pid <- monetdb.server.start( batfile )
+	monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -759,9 +766,10 @@ if ( 2010 %in% ten.percent.files.to.download ){
 		)
 
 	# run the MonetDB server, determine the server path, connect to the server
-	pid <- monetdb.server.start( batfile )
+	monetdb.server.start( batfile )
 	monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# using the monetdb connection, import each of the household- and person-level tab-separated value files
 	# into the database, naming the household, person, and also merged file with these character strings
@@ -790,9 +798,11 @@ if ( 2010 %in% ten.percent.files.to.download ){
 
 
 # one more quick re-connection
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # set every table you've just created as read-only inside the database.
 for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
@@ -812,7 +822,7 @@ monetdb.server.stop( pid )
 # batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"		# # note for mac and *nix users: `pums.bat` might be `pums.sh` instead
 
 # second: run the MonetDB server
-pid <- monetdb.server.start( batfile )
+monetdb.server.start( batfile )
 
 # third: your five lines to make a monet database connection.
 # just like above, mine look like this:
@@ -821,6 +831,9 @@ dbport <- 50010
 
 monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
 db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
+
+# fourth: store the process id
+pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # # # # run your analysis commands # # # #
