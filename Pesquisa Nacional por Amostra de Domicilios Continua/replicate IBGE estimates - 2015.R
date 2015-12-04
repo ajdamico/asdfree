@@ -197,6 +197,14 @@ regional_ocupacao <- svyby( ~ factor( vd4002 ) , ~ region , w , svytotal , na.rm
 # excel tab "Tabela 1.1.1" and tab "Tabela 1.1.1_CV"
 # column 2015 - "3º Trimestre"
 
+
+# # # to obtain the precise rounded numbers, you might use
+round( coef( nationwide_pop ) * 100 , 1 )
+round( cv( nationwide_pop ) * 100 , 1 )
+# # # however all of the numbers below also match the table precisely,
+# # # they are simply pre-rounded numbers.
+
+
 # Brasil
 nationwide_pop
 cv( nationwide_pop )
