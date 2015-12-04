@@ -108,26 +108,32 @@ for ( this_rda in mrfq ){
 
 	# end of recoding #
 	# # # # # # # # # #
-
 		
+
 	###############################
 	# survey design for the pnadc #
 	###############################
 
-	warning( "ibge has not yet released information to calculate a confidence interval" )
-	warning( "this survey design will produce incorrect standard errors, variances, coefficients of variation" )
-
-	w <-
+	# preliminary survey design
+	pre_w <-
 		svydesign(
 			ids = ~ upa , 
-			strata = ~ uf , 
-			weights = ~ v1028 , 
+			strata = ~ estrato , 
+			weights = ~ v1027 , 
 			data = x ,
 			nest = TRUE
 		)
-		
-	# remove the `x` data.frame object
-	rm( x )
+	# warning: do not use `pre_w` in your analyses!
+	# you must use the `w` object created below.
+
+	# post-stratification targets
+	df_pos <- data.frame( posest = unique( x$posest ) , Freq = unique( x$v1029 ) )
+
+	# final survey design object
+	w <- postStratify( pre_w , ~posest , df_pos )
+
+	# remove the `x` data.frame object and the `pre_w` design before stratification
+	rm( x , pre_w )
 
 	#################################
 	# end of survey design creation #
