@@ -58,7 +58,7 @@ db.name <- 'RAND.db'
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "RSQLite" )
+# install.packages( c( "RSQLite" , "readstata13" ) )
 
 # no need to edit anything below this line #
 
@@ -68,8 +68,8 @@ db.name <- 'RAND.db'
 # # # # # # # # #
 
 
-library(foreign) 	# load foreign package (converts data files into R)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(readstata13)	# load readstata13 package (imports stata version 13+ data files into R)
+library(RSQLite) 		# load RSQLite package (creates database files in R)
 
 
 # create a new RAND database in the main working folder
@@ -100,7 +100,7 @@ for ( j in tn ){
 	fn <- get( paste0( j , '.file' ) )
 
 	# read the current file into RAM
-	x <- read.dta( fn , convert.factors = FALSE )
+	x <- read.dta13( fn , convert.factors = FALSE )
 
 	# determine each chunk size
 	starts.stops <- floor( seq( 1 , nrow( x ) , length.out = chunks ) )
