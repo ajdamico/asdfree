@@ -335,7 +335,7 @@ for ( curFile in files.to.download ){
 	while( length( unzipped.files ) == 0 ){
 	
 		# download the current brazilian census file
-		download.file( data.file , tf , mode = "wb" )
+		download_cached( data.file , tf , mode = "wb" )
 		
 		# unzip that pup
 		unzipped.files <- unzip( tf , exdir = td )
