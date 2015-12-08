@@ -124,6 +124,10 @@ library(stringr) 		# load stringr package (manipulates character strings easily)
 # using only a SAS importation script
 source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
+# load the download_cached and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( "https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE )
+
 
 # configure a monetdb database for the censo demografico on windows #
 
