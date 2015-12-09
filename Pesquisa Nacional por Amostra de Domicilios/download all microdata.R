@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # pesquisa nacional por amostra de domicilios
-# 2001 - 2013
+# 2001 - 2014
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -9,7 +9,7 @@
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PNAD/" )
-# years.to.download <- c( 2001:2009 , 2011:2013 )
+# years.to.download <- c( 2001:2009 , 2011:2014 )
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -34,12 +34,12 @@
 
 
 ###################################################################################
-# Analyze the 2001 - 2013 Pesquisa Nacional por Amostra de Domicilios file with R #
+# Analyze the 2001 - 2014 Pesquisa Nacional por Amostra de Domicilios file with R #
 ###################################################################################
 
 
 # set your working directory.
-# the PNAD 2001 - 2013 data files will be stored here
+# the PNAD 2001 - 2014 data files will be stored here
 # after downloading and importing them.
 # use forward slashes instead of back slashes
 
@@ -81,7 +81,7 @@ if ( .Platform$OS.type == 'windows' ) print( 'windows users: read this block' )
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- c( 2001:2009 , 2011:2013 )
+# years.to.download <- c( 2001:2009 , 2011:2014 )
 
 # uncomment this line to download only a single year
 # years.to.download <- 2011
