@@ -238,7 +238,22 @@ monetdb.server.stop( pid )
 # end of lines of code to hold on to for all other `nibrs` monetdb analyses #
 #############################################################################
 
+# some download caching
+downloader::source_url( "https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE)
 
+download_get_filename <- function(url, curl=getCurlHandle(), ...) {
+	h <- RCurl::basicHeaderGatherer()
+	RCurl::curlSetOpt(nobody=T, curl=curl)
+	RCurl::getURL(url, headerfunction = h$update, curl=curl, ...)
+	gsub( '(.*)\\"(.*)\\"' , "\\2" , h$value()[["Content-Type"]])
+}
+
+download_to_filename <- function(url, dlfile, curl=getCurlHandle(), ...) {
+	RCurl::curlSetOpt(nobody=F, httpget=T, curl=curl)
+	writeBin(RCurl::getBinaryURL(url = url, curl=curl, ...), dlfile)
+	0L
+}
+# end download caching
 
 
 # follow the authentication technique described on this stackoverflow post
@@ -346,25 +361,9 @@ for ( i in numbers.to.download ){
 	
 	# loop through each of the documentation files
 	for ( j in all.docs ){
-	
-		# write out the name of the documentation filepath
 		dp <- paste0( "http://www.icpsr.umich.edu/cgi-bin/" , j )
-		
-		# download the current document
-		this.doc <- getBinaryURL( dp )
-	
-		# initiate a header
-		h <- basicHeaderGatherer()
-		
-		# pull the filename off of the server
-		try( doc <- getURI( dp , headerfunction = h$update ) , silent = TRUE )
-		
-		# extract the name from that `h` object
-		lfn <- gsub( '(.*)\\"(.*)\\"' , "\\2" , h$value()[["Content-Type"]] )
-		
-		# save the actual downloaded-file to the filepath specified on the local disk
-		writeBin( this.doc , paste0( this.dir , "/" , lfn ) )
-	
+		download_cached(dp, paste0(this.dir, "/", 
+			download_get_filename(dp)), usecache=T, FUN=download_to_filename)
 	}
 	
 	# determine which files on the study homepage are sas importation files
@@ -429,28 +428,10 @@ for ( i in numbers.to.download ){
 				style = "POST" ,
 				curl = curl
 			)
-	
-		# download the current sas file onto the local disk
-		this.sas_ri <- getBinaryURL( dp , curl = curl )
+		
+		lfn <- download_get_filename(dp, curl=curl)
+		download_cached(dp, paste0(this.dir, "/", lfn), usecache=T, FUN=download_to_filename, curl=curl)
 
-		# initiate a heading object
-		h <- basicHeaderGatherer()
-
-		# pull the filename off of the server
-		try( doc <- getURI( dp , headerfunction = h$update , curl = curl ) , silent = TRUE )
-		
-		# extract the name from that `h` object
-		lfn <- gsub( '(.*)\\"(.*)\\"' , "\\2" , h$value()[["Content-Type"]] )
-		
-		# save the actual downloaded-file to the filepath specified on the local disk
-		writeBin( this.sas_ri , paste0( this.dir , "/" , lfn ) )
-	
-		# remove the downloaded file from working memory
-		rm( this.sas_ri , curl , h )
-		
-		# clear up RAM
-		gc()
-	
 		# unzip the downloaded file within the local drive
 		z <- unzip( paste0( this.dir , "/" , lfn ) , exdir = this.dir )
 
