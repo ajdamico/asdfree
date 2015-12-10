@@ -129,7 +129,7 @@ download_cached <-
 			
 			# if the download did not work, wait `sleepsec` seconds and try again.
 			if( class( failed.attempt ) == 'try-error' ){
-				cat( paste( "download issue with" , url , "\r\n" ) )
+				cat( paste( "download issue with" , url , "\n" ) )
 				Sys.sleep( sleepsec )
 			}
 			
@@ -138,7 +138,7 @@ download_cached <-
 		# double-check that the `success` object exists.. it might not if `attempts` was set to zero.
 		if ( exists( 'success' ) ){
 			if (success && usecache) file.copy( destfile , cachefile , overwrite = TRUE )
-		
+			cat("\n")
 			return( invisible( success ) )
 		
 		# otherwise break.
