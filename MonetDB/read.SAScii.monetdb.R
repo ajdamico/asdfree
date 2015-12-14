@@ -249,7 +249,19 @@ read.SAScii.monetdb <-
 		print( te )
 		# this time without error-handling.
 		# do you want to try the BEST EFFORT flag for COPY INTO?
-		sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) 
+		te <- try( sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) , silent = TRUE )
+	}
+	
+	
+	if( class( te ) == 'try-error' ){
+	
+		if( !try_best_effort ) stop( "ran out if import ideas" ) else{
+		
+			sql.update <- paste0( "copy " , num.lines , " BEST EFFORT offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters ) 
+			dbSendQuery( connection , sql.update )
+		
+		}
+		
 	}
 	
 	# end importation attempts #
