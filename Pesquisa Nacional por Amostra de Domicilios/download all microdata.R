@@ -117,7 +117,7 @@ source_url(
 
 
 # load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
+source_url( "https://raw.github.com/ajdamico/asdfree/pnadlite/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 # load pnad-specific functions (to remove invalid SAS input script fields and postStratify a database-backed survey object)
 source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa Nacional por Amostra de Domicilios/pnad.survey.R" , prompt = FALSE )
