@@ -71,13 +71,15 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # end of non-windows system edits.
 
 
-# name the database (.db) file that should have been saved in the working directory
-pnad.dbname <- "pnad.db"
+# name the database files in the "MonetDB" folder of the current working directory
+pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
 
-library(downloader)	# downloads and then runs the source() function on scripts from github
-library(survey)		# load survey package (analyzes complex design surveys)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
-library(stringr) 	# load stringr package (manipulates character strings easily)
+
+library(downloader)		# downloads and then runs the source() function on scripts from github
+library(survey)			# load survey package (analyzes complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+library(stringr) 		# load stringr package (manipulates character strings easily)
 
 # set R to produce conservative standard errors instead of crashing
 # http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
@@ -97,7 +99,7 @@ source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa Nacional po
 # x <- dbGetQuery( db , 'select v4618 , v4617 , pre_wgt , v4609 , ... from pnad2011' )        #
 # at which point, the `?transform` function can be used to make recodes on the `x` data.frame #
 # finally, the survey object declaration `svydesign` should not include the parameters        #
-# `dbtype = "SQLite"` or `dbname = "pnad.db"`, and the data parameter should be `data = x`    #
+# `dbtype = "MonetDBLite"` `dbname = pnad.dbfolder` or the data parameter should be `data = x`#
 # and then, once the svydesign has been created, since this won't be a database-backed object #
 # simply use postStratify() instead of pnad.postStratify() to post-stratify the final design  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -110,8 +112,8 @@ source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa Nacional po
 # then make a copy so you don't lose the pristine original.   #
 
 # the command 
-db <- dbConnect( SQLite() , pnad.dbname )
-# connects the current instance of r to the sqlite database
+db <- dbConnect( MonetDBLite() , pnad.dbfolder )
+# connects the current instance of r to the monetdblite database
 
 # now simply copy you'd like to recode into a new table
 dbSendQuery( db , "CREATE TABLE recoded_pnad2011 AS SELECT * FROM pnad2011" )
@@ -171,7 +173,7 @@ agebounds <- c( 0 , 5 , 10 , 15 , 20 , 25 , 40 , 60 , 200 )
 # start at the value '0' and end at the value '200'.
 for ( i in 1:( length( agebounds ) - 1 ) ){
 
-	# build the sql string to pass to sqlite
+	# build the sql string to pass to monetdblite
 	update.sql.string <- paste0( "UPDATE recoded_pnad2011 SET agecat2 = '" , str_pad( i , 2 , pad = '0' ) , "' WHERE v8005 >= " , agebounds[ i ] , " AND v8005 < " , agebounds[ i + 1 ] )
 		
 	# take a look at the update.sql.string you've just built.  familiar?  ;)
@@ -194,7 +196,7 @@ dbGetQuery( db , "SELECT agecat , agecat2 , COUNT(*) as number_of_records from r
 # to initiate a new complex sample survey design on the data table
 # that's been recoded to include 'agecat"
 # simply re-run the svydesign() and pnad.postStratify() functions and update the table.name =
-# argument so it now points to the recoded_ table in the sqlite database
+# argument so it now points to the recoded_ table in the monetdblite database
 
 ##############################################
 # survey design for a database-backed object #
@@ -209,8 +211,8 @@ sample.pnad <-
 		data = "recoded_pnad2011" ,		# notice that this line now points to the recoded_pnad2011
 		weights = ~pre_wgt ,
 		nest = TRUE ,
-		dbtype = "SQLite" ,
-		dbname = "pnad.db"
+		dbtype = "MonetDBLite" ,
+		dbname = pnad.dbfolder
 	)
 # note that the above object has been given the unwieldy name of `sample.pnad`
 # so that it's not accidentally used in analysis commands.

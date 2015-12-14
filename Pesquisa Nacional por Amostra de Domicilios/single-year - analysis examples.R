@@ -72,12 +72,15 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # end of non-windows system edits.
 
 
-# name the database (.db) file that should have been saved in the working directory
-pnad.dbname <- "pnad.db"
+# name the database files in the "MonetDB" folder of the current working directory
+pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
 
-library(downloader)	# downloads and then runs the source() function on scripts from github
-library(survey)		# load survey package (analyzes complex design surveys)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
+
+library(downloader)		# downloads and then runs the source() function on scripts from github
+library(survey)			# load survey package (analyzes complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+
 
 # set R to produce conservative standard errors instead of crashing
 # http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
@@ -101,8 +104,8 @@ sample.pnad <-
 		data = paste0( "pnad" , year.to.analyze ) ,
 		weights = ~pre_wgt ,
 		nest = TRUE ,
-		dbtype = "SQLite" ,
-		dbname = "pnad.db"
+		dbtype = "MonetDBLite" ,
+		dbname = pnad.dbfolder
 	)
 # note that the above object has been given the unwieldy name of `sample.pnad`
 # so that it's not accidentally used in analysis commands.
