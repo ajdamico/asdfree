@@ -53,9 +53,9 @@ pnad.postStratify <-
 				paste(
 					'select' ,
 					strata.col ,
-					"," ,
+					", CAST( " ,
 					strata.col ,
-					'as newwgt , sum( ' ,
+					' AS DOUBLE ) as newwgt , sum( ' ,
 					oldwgt ,
 					' ) as oldwgt from ' ,
 					tablename , 
