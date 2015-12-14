@@ -127,7 +127,7 @@ source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa Nacional po
 # create a temporary file and a temporary directory..
 tf <- tempfile() ; td <- tempdir()
 
-# open the connection to the sqlite database
+# open the connection to the monetdblite database
 db <- dbConnect( MonetDBLite() , pnad.dbfolder )
 
 
@@ -332,7 +332,7 @@ for ( year in years.to.download ){
 			# also add a new column "one" that simply contains the number 1 for every record in the data set
 			# also add a new column "uf" that contains the state code, since these were thrown out of the SAS script
 			# also add a new column "region" that contains the larger region, since these are shown in the tables
-			# NOTE: the substr() function luckily works in SQLite() databases, but may not work if you change SQL database engines to something else.
+			# NOTE: the substr() function luckily works in MonetDBLite() databases, but may not work if you change SQL database engines to something else.
 			" as select a.* , " ,
 			paste( b_fields , collapse = "," ) ,
 			" , 1 as one , substr( a.v0102 , 1 , 2 ) as uf , substr( a.v0102 , 1 , 1 ) as region from pes" , 
@@ -371,7 +371,7 @@ for ( year in years.to.download ){
 	
 }
 
-# take a look at all the new data tables that have been added to your RAM-free SQLite database
+# take a look at all the new data tables that have been added to your RAM-free MonetDBLite database
 dbListTables( db )
 
 # disconnect from the current database
