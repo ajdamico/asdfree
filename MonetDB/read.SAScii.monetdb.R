@@ -53,7 +53,8 @@ read.SAScii.monetdb <-
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
 		sleep.between.col.updates = 0 ,
 		varchar = TRUE ,				# import character strings as type VARCHAR(255)?  use FALSE to import them as clob
-		n_max = -1
+		n_max = -1 ,
+		try_best_effort = FALSE
 		
 	) {
 

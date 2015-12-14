@@ -235,7 +235,8 @@ for ( year in years.to.download ){
 		tl = TRUE ,
 		# this default table naming setup will name the household-level tables dom2001, dom2002, dom2003 and so on
 		tablename = paste0( 'dom' , year ) ,
-		conn = db
+		conn = db ,
+		try_best_effort = TRUE
 	)
 	
 	# store the PNAD person records as a MonetDBLite database
@@ -246,7 +247,8 @@ for ( year in years.to.download ){
 		tl = TRUE ,
 		# this default table naming setup will name the person-level tables pes2001, pes2002, pes2003 and so on
 		tablename = paste0( 'pes' , year ) ,
-		conn = db
+		conn = db ,
+		try_best_effort = TRUE
 	)
 
 	# the ASCII and SAS importation instructions stored in temporary files
