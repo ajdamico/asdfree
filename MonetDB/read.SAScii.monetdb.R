@@ -258,7 +258,7 @@ read.SAScii.monetdb <-
 	
 		if( !try_best_effort ) stop( "ran out if import ideas" ) else{
 		
-			sql.update <- paste0( "copy " , num.lines , " BEST EFFORT offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters ) 
+			sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
 			dbSendQuery( connection , sql.update )
 		
 		}
