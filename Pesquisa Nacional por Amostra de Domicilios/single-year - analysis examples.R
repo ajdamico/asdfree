@@ -9,7 +9,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/PNAD/" )
 # year.to.analyze <- 2012
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/single-year%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/single-year%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -72,15 +72,12 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # end of non-windows system edits.
 
 
-# name the database files in the "MonetDB" folder of the current working directory
-pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
+# name the database (.db) file that should have been saved in the working directory
+pnad.dbname <- "pnad.db"
 
-
-library(downloader)		# downloads and then runs the source() function on scripts from github
-library(survey)			# load survey package (analyzes complex design surveys)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
-
+library(downloader)	# downloads and then runs the source() function on scripts from github
+library(survey)		# load survey package (analyzes complex design surveys)
+library(RSQLite) 	# load RSQLite package (creates database files in R)
 
 # set R to produce conservative standard errors instead of crashing
 # http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
@@ -88,7 +85,7 @@ options( survey.lonely.psu = "adjust" )
 # this setting matches the MISSUNIT option in SUDAAN
 
 # load pnad-specific functions (to remove invalid SAS input script fields and postStratify a database-backed survey object)
-source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa Nacional por Amostra de Domicilios/pnad.survey.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/pnad.survey.R" , prompt = FALSE )
 
 
 ##############################################
@@ -104,8 +101,8 @@ sample.pnad <-
 		data = paste0( "pnad" , year.to.analyze ) ,
 		weights = ~pre_wgt ,
 		nest = TRUE ,
-		dbtype = "MonetDBLite" ,
-		dbname = pnad.dbfolder
+		dbtype = "SQLite" ,
+		dbname = "pnad.db"
 	)
 # note that the above object has been given the unwieldy name of `sample.pnad`
 # so that it's not accidentally used in analysis commands.
