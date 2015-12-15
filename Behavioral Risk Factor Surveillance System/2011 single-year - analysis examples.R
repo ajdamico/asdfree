@@ -5,10 +5,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"		# # note for mac and *nix users: `brfss.bat` might be `brfss.sh` instead
-# load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year brfss
+# setwd( "C:/My Directory/BRFSS/" )
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Behavioral%20Risk%20Factor%20Surveillance%20System/2011%20single-year%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -34,144 +32,46 @@
 # prior to running this analysis script, the brfss 2011 single-year file must be loaded as a monet database-backed sqlsurvey object     #
 # on the local machine. running the 1984-2011 download and create database script will create a monet database containing this file     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/asdfree/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/download%20all%20microdata.R         #
+# https://github.com/ajdamico/asdfree/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/download%20all%20microdata.R       #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "b2011 design.rda" in C:/My Directory/BRFSS or wherever the working directory was set for the program  #
 #########################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-
 # remove the # in order to run this install.packages line only once
 # install.packages( "stringr" )
 
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/BRFSS/" )
 
-library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+
+library(survey)			# load survey package (analyzes complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(stringr) 		# load stringr package (manipulates character strings easily)
 
 
-# after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all behavioral risk factor surveillance system tables
-# run them now.  mine look like this:
 
+# uncomment one of these lines by removing the `#` at the front..
+# load( 'b2010 design.rda' )	# analyze the 2010 single-year acs
+load( 'b2011 design.rda' )	# analyze the 2011 single-year acs
+# load( 'b2009 design.rda' )	# analyze the 2009 single-year acs
+# load( 'b1984 design.rda' )	# analyze the 1984 single-year acs
 
-######################################################################
-# lines of code to hold on to for all other `brfss` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/BRFSS/MonetDB/brfss.bat"		# # note for mac and *nix users: `brfss.bat` might be `brfss.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "brfss"
-dbport <- 50004
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
-
-
-# the behavioral risk factor surveillance system download and importation script
-# has already created a monet database-backed survey design object
-# connected to the 2011 single-year table
-
-# sqlite database-backed survey objects are described here: 
-# http://r-survey.r-forge.r-project.org/survey/svy-dbi.html
-# monet database-backed survey objects are similar, but:
-# the database engine is, well, blazingly faster
-# the setup is kinda more complicated (but all done for you)
-
-# since this script only loads one file off of the local drive,
-# there's no need to set the working directory.
-# instead, simply use the full filepath to the r data file (.rda)
-# as shown in the load() examples below.
-
-
-# choose which single-year file in your BRFSS directory to analyze
-# this script replicates the 2011 single-year estimates,
-# so leave that line uncommented and the other three choices commented out.
-
-# load the desired behavioral risk factor surveillance system monet database-backed complex sample design objects
-
-# note: this r data file should already contain the 2011 single-year design
-
-
-# if the column classes are already correct, you could use this line -
 
 # connect the complex sample designs to the monet database #
-# brfss.d <- open( brfss.design , driver = MonetDB.R() , wait = TRUE )	# single-year design
+brfss.d <- open( brfss.design , driver = MonetDB.R() )	# single-year design
+
 
 # - but they're not (at least for these analysis examples),
 # so you have to run three quick recodes
-
-
-################################################################################################
-# create a new survey design object with the variables you're going to use as character/factor #
-
-# this process runs much faster if you create a character vector containing all non-numeric columns
-# otherwise, just set `check.factors = 10` within the sqlsurvey function and it take a guess at which columns
-# are character strings or factor variables and which columns should be treated as numbers
-
-# step 1: load the pre-recoded (previous) design 
-
-# uncomment this line by removing the `#` at the front..
-# load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year brfss
-
-# step 2: extract the character columns
-all.classes <- sapply( brfss.design$zdata , class )
-factor.columns <- names( all.classes[ !( all.classes %in% c( 'integer' , 'numeric' ) ) ] )
-
-# since we're going to use the uninsured, medical cost, and sex variables in this analysis
-# and the cdc's sas code has these variables listed as numeric not character strings..
-# http://www.cdc.gov/brfss/annual_data/2011/SASOUT11_LLCP.SAS
-# ..they need to be converted over to character
-factor.columns <- c( factor.columns , 'hlthpln1' , 'sex' , 'medcost' )
-
-# step 3: re-create a sqlsurvey complex sample design object
-
-brfss.d <-
-	sqlsurvey(
-		weight = brfss.design$weight ,
-		nest = TRUE ,
-		strata = brfss.design$strata ,
-		id = brfss.design$id ,
-		table.name = brfss.design$table ,						
-		key = brfss.design$key ,
-		check.factors = factor.columns ,			# specify which columns are non-numeric.. or remove this parameter and sqlsurvey() will guess for you.
-		database = monet.url ,
-		driver = MonetDB.R()
+brfss.d <- 
+	update( 
+		brfss.d ,
+		hlthpln1 = factor( hlthpln1 ) ,
+		sex = factor( sex ) ,
+		medcost = factor( medcost )
 	)
-
 
 
 ################################################
@@ -183,12 +83,18 @@ brfss.d <-
 # simply use the nrow function..
 nrow( brfss.d )
 
-# ..on the sqlsurvey design object
+# ..on the survey design object
 class( brfss.d )
 
 
 # since the brfss gets loaded as a monet database-backed survey object instead of a data frame,
 # the number of unweighted records cannot be calculated by running the nrow() function on a data frame.
+
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 # running the nrow() function on the database connection object
 # simply produces an error..
@@ -229,49 +135,31 @@ dbGetQuery( db , "SELECT xstate , SUM( xllcpwt ) AS sum_weights FROM b2011 group
 # calculate the mean of a linear variable #
 
 # average age - nationwide
-svymean( ~age , brfss.d )
+svymean( ~age , brfss.d , na.rm = TRUE )
 
 # by state
-svymean( ~age , brfss.d , byvar = ~xstate )
+svyby( ~age , ~ xstate , brfss.d , svymean , na.rm = TRUE )
 
 
 # calculate the distribution of a categorical variable #
-
-# HLTHPLN1 has been converted to a factor (categorical) variable
-# instead of a numeric (linear) variable,
-# because it only contains the values 1, 2, 7, and 9
-# when the brfss.d object was created with the function sqlrepdesign()
-# the check.factors parameter was left at the default of ten,
-# meaning all numeric columns with ten or fewer distinct values
-# would be automatically converted to factors
 
 # percent uninsured - nationwide
 svymean( ~hlthpln1 , brfss.d )
 
 # by state
-svymean( ~hlthpln1 , brfss.d , byvar = ~xstate )
+svyby( ~hlthpln1 , ~xstate , brfss.d , svymean )
 
 
 # calculate the median and other percentiles #
 
 # median age of residents of the united states
-svyquantile( ~age , brfss.d , quantiles = 0.5 )
+svyquantile( ~age , brfss.d , 0.5 , na.rm = TRUE )
 # note: quantile standard errors cannot be computed with taylor-series linearization designs
-# this is true in both the survey and sqlsurvey packages
-
-# note two additional differences between the sqlsurvey and survey packages..
-
-# ..sqlsurvey designs do not allow multiple quantiles.  instead, 
-# loop through and print or save multiple quantiles, simply use a for loop
-
-# loop through the median and 99th percentiles and print both results to the screen
-for ( i in c( .5 , .99 ) ) print( svyquantile( ~age , brfss.d , quantiles = i ) )
 
 
+# print the median and 99th percentiles
+svyquantile( ~age , brfss.d , c( 0.5 , 0.99 ) , na.rm = TRUE )
 
-# ..sqlsurvey designs do not allow byvar arguments, meaning the only way to 
-# calculate quantiles by state would be by creating subsets for each subpopulation
-# and calculating the quantiles for them independently:
 
 ######################
 # subsetting example #
@@ -300,7 +188,7 @@ svymean( ~hlthpln1 , brfss.d.female )
 
 # store the results into a new object
 
-cost.problems.by.coverage <- svymean( ~medcost , brfss.d , byvar = ~hlthpln1 )
+cost.problems.by.coverage <- svyby( ~medcost , ~hlthpln1 , brfss.d , svymean )
 
 # print the results to the screen 
 cost.problems.by.coverage
@@ -316,7 +204,7 @@ write.csv( cost.problems.by.coverage , "cost problems by coverage.csv" )
 # here's the cost problem percentage broken out by insurance status, 
 # with accompanying standard errors
 cost.problems.by.insurance.status <-
-	data.frame( cost.problems.by.coverage )[ 1:2 , 1 ]
+	cost.problems.by.coverage[ 1:2 , c( 2 , 6 ) ]
 
 
 # print the new results to the screen
@@ -328,7 +216,7 @@ write.csv( cost.problems.by.insurance.status , "cost problems by insurance statu
 
 # ..or directly made into a bar plot
 barplot(
-	cost.problems.by.insurance.status ,
+	cost.problems.by.insurance.status[ , 1 ] ,
 	main = "Any Cost-Related Access Problems By Insurance Status" ,
 	names.arg = c( "Insured" , "Uninsured" ) ,
 	ylim = c( 0 , .60 )
@@ -346,12 +234,6 @@ close( brfss.d )
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `brfss` monetdb analyses #
-#############################################################################
 
 
 # for more details on how to work with data in r
