@@ -6,7 +6,6 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # path.to.7z <- "7za"							# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/ACS/" )
@@ -37,7 +36,7 @@
 #####################################################################################
 # download all available american community survey files from the census bureau ftp #
 # import each file into a monet database, merge the person and household files      #
-# create a monet database-backed complex sample sqlsurvey design object with r      #
+# create a monet database-backed complex sample survey design object with r         #
 #####################################################################################
 
 
@@ -51,34 +50,6 @@
 #####################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################
-# prior to running this analysis script, monetdb must be installed on the local machine.  follow each step outlined on this page: #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/asdfree/blob/master/MonetDB/monetdb%20installation%20instructions.R                                   #
-###################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # # # # # # # # # # # # # # # #
@@ -95,11 +66,12 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "R.utils" , "downloader" , "digest" , "sas7bdat" ) )
+# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "sas7bdat" , "R.utils" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(sas7bdat)		# loads files ending in .sas7bdat directly into r as data.frame objects
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
@@ -124,107 +96,11 @@ source_url(
 # setwd( "C:/My Directory/ACS/" )
 
 
-# configure a monetdb database for the acs on windows #
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
-# note: only run this command once.  this creates an executable (.bat) file
-# in the appropriate directory on your local disk.
-# when adding new files or adding a new year of data, this script does not need to be re-run.
-
-# create a monetdb executable (.bat) file for the american community survey
-batfile <-
-	monetdb.server.setup(
-					
-					# set the path to the directory where the initialization batch file and all data will be stored
-					database.directory = paste0( getwd() , "/MonetDB" ) ,
-					# must be empty or not exist
-					
-					# find the main path to the monetdb installation program
-					monetdb.program.path = 
-						ifelse( 
-							.Platform$OS.type == "windows" , 
-							"C:/Program Files/MonetDB/MonetDB5" , 
-							"" 
-						) ,
-					# note: for windows, monetdb usually gets stored in the program files directory
-					# for other operating systems, it's usually part of the PATH and therefore can simply be left blank.
-										
-					# choose a database name
-					dbname = "acs" ,
-					
-					# choose a database port
-					# this port should not conflict with other monetdb databases
-					# on your local computer.  two databases with the same port number
-					# cannot be accessed at the same time
-					dbport = 50001
-	)
-
-	
-# this next step is so very important.
-
-# store a line of code that will make it easy to open up the monetdb server in the future.
-# this should contain the same file path as the batfile created above,
-# you're best bet is to actually look at your local disk to find the full filepath of the executable (.bat) file.
-# if you ran this script without changes, the batfile will get stored in C:\My Directory\ACS\MonetDB\acs.bat
-
-# here's the batfile location:
-batfile
-
-# note that since you only run the `monetdb.server.setup()` function the first time this script is run,
-# you will need to note the location of the batfile for future MonetDB analyses!
-
-# in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"		# # note for mac and *nix users: `acs.bat` might be `acs.sh` instead
-# obviously, without the `#` comment character
-
-# hold on to that line for future scripts.
-# you need to run this line *every time* you access
-# the american community survey files with monetdb.
-# this is the monetdb server.
-
-# two other things you need: the database name and the database port.
-# store them now for later in this script, but hold on to them for other scripts as well
-dbname <- "acs"
-dbport <- 50001
-
-# now the local windows machine contains a new executable program at "c:\my directory\acs\monetdb\acs.bat"
-
-
-
-
-# it's recommended that after you've _created_ the monetdb server,
-# you create a block of code like the one below to _access_ the monetdb server
-
-
-####################################################################
-# lines of code to hold on to for all other `acs` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"		# # note for mac and *nix users: `acs.bat` might be `acs.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "acs"
-dbport <- 50001
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `acs` monetdb analyses #
-###########################################################################
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 
@@ -361,20 +237,7 @@ for ( year in 2050:2005 ){
 				
 				# end of column type determination #
 	
-				
-				# wait thirty seconds, just to make sure any previous servers closed
-				# and you don't get a gdk-lock error from opening two-at-once
-				Sys.sleep( 30 )
 			
-				# launch the current monet database
-				monetdb.server.start( batfile )
-				
-				# immediately connect to it..
-				db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-			
-				# ..and store the process id
-				pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
 				# create a character string containing the http location of the zipped csv file to be downloaded
 				ACS.file.location <-
 					paste0( 
@@ -551,14 +414,6 @@ for ( year in 2050:2005 ){
 					# if the first.attempt did not work..
 					if ( class( first.attempt ) == 'try-error' ){
 
-						# try rebooting the server #
-						
-						# disconnect from the current monet database
-						dbDisconnect( db )
-
-						# and close it using the `pid`
-						monetdb.server.stop( pid )
-						
 
 						# get rid of any comma-space-comma values.
 						incon <- file( csvpath , "r") 
@@ -573,15 +428,6 @@ for ( year in 2050:2005 ){
 						close( outcon )
 						close( incon , add = TRUE )
 		
-						# launch the current monet database
-						monetdb.server.start( batfile )
-						
-						# immediately connect to it..
-						db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-						# ..and store the process id
-						pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
 						# and run the exact same command again.
 						second.attempt <-
 							try( {
@@ -666,29 +512,8 @@ for ( year in 2050:2005 ){
 						
 				}
 				
-				
-				# disconnect from the current monet database
-				dbDisconnect( db )
-
-				# and close it using the `pid`
-				monetdb.server.stop( pid )
-			
-				
 			}
 		
-			# wait thirty seconds, just to make sure any previous servers closed
-			# and you don't get a gdk-lock error from opening two-at-once
-			Sys.sleep( 30 )
-
-			# launch the current monet database
-			monetdb.server.start( batfile )
-			
-			# immediately connect to it..
-			db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-			# ..and store the process id
-			pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
 			
 			############################################
 			# create a merged (household+person) table #
@@ -764,36 +589,30 @@ for ( year in 2050:2005 ){
 			# using the merged (household+person) table
 			
 			acs.m.design <- 									# name the survey object
-				sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
-					weight = 'pwgtp' , 							# person-level weights are stored in column "pwgtp"
-					repweights = paste0( 'pwgtp' , 1:80 ) ,		# the acs contains 80 replicate weights, pwgtp1 - pwgtp80.  this [0-9] format captures all numeric values
+				svrepdesign(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+					weight = ~pwgtp , 							# person-level weights are stored in column "pwgtp"
+					repweights = 'pwgtp[0-9]+' ,				# the acs contains 80 replicate weights, pwgtp1 - pwgtp80.  this [0-9] format captures all numeric values
 					scale = 4 / 80 ,
 					rscales = rep( 1 , 80 ) ,
 					mse = TRUE ,
-					table.name = paste0( k , '_m' ) , 			# use the person-household-merge data table
-					key = "idkey" ,
-					# check.factors = 10 by default.. uncommenting this next line would compute column classes based on `headers.m` instead
-					check.factors = headers.m ,					# use `headers.m` to determine the column types
-					database = monet.url ,
-					driver = MonetDB.R()
+					data = paste0( k , '_m' ) , 				# use the person-household-merge data table
+					dbtype = "MonetDBLite" ,
+					dbname = dbfolder
 				)
 
 			# create a sqlrepsurvey complex sample design object
 			# using the household-level table
 
 			acs.h.design <- 									# name the survey object
-				sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
-					weight = 'wgtp' , 							# household-level weights are stored in column "wgtp"
-					repweights = paste0( 'wgtp' , 1:80 ) ,		# the acs contains 80 replicate weights, wgtp1 - wgtp80.  this [0-9] format captures all numeric values
+				svrepdesign(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+					weight = ~wgtp , 							# household-level weights are stored in column "wgtp"
+					repweights = 'wgtp[0-9]+' ,					# the acs contains 80 replicate weights, wgtp1 - wgtp80.  this [0-9] format captures all numeric values
 					scale = 4 / 80 ,
 					rscales = rep( 1 , 80 ) ,
 					mse = TRUE ,
-					table.name = paste0( k , '_h' ) , 			# use the household-level data table
-					key = "idkey" ,
-					# check.factors = 10 by default.. uncommenting this next line would compute column classes based on `headers.m` instead
-					check.factors = headers.h ,					# use `headers.h` to determine the column types
-					database = monet.url ,
-					driver = MonetDB.R()
+					data = paste0( k , '_h' ) , 				# use the household-level data table
+					dbtype = "MonetDBLite" ,
+					dbname = dbfolder
 				)
 
 			# save both complex sample survey designs
@@ -811,12 +630,6 @@ for ( year in 2050:2005 ){
 			# clear up RAM
 			gc()
 			
-			# disconnect from the current monet database
-			dbDisconnect( db )
-
-			# and close it using the `pid`
-			monetdb.server.stop( pid )
-			
 		}
 
 	}
@@ -833,67 +646,11 @@ for ( year in 2050:2005 ){
 # which utilize these newly-created survey objects
 
 
-# wait thirty seconds, just to make sure any previous servers closed
-# and you don't get a gdk-lock error from opening two-at-once
-Sys.sleep( 30 )
-
-
-# one more quick re-connection
-monetdb.server.start( batfile )
-
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
 # set every table you've just created as read-only inside the database.
 for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-
-####################################################################
-# lines of code to hold on to for all other `acs` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"		# # note for mac and *nix users: `acs.bat` might be `acs.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "acs"
-dbport <- 50001
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `acs` monetdb analyses #
-###########################################################################
-
-
-# unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
-message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
-
-message( "got that? monetdb directories should not be set read-only." )
 
 
 # for more details on how to work with data in r
