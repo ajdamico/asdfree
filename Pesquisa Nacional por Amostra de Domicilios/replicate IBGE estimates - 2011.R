@@ -31,25 +31,25 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-##################################################################################################################################################################
-# this script matches the results of the SAS-SUDAAN code sent to me by Marcos Paulo Soares de Freitas at IBGE.  IBGE is the brazilian census bureau/stats agency #
+####################################################################################################################################################################
+# this script matches the results of the SAS-SUDAAN code sent to me by Marcos Paulo Soares de Freitas at IBGE.  IBGE is the brazilian census bureau/stats agency   #
 # email: https://github.com/ajdamico/asdfree/blob/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/2011%20PNAD%20SAS-SUDAAN%20e-mail%20from%20IBGE.pdf #
 # excel: https://github.com/ajdamico/asdfree/blob/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/ESTIMATES%20from%20IBGE.XLS                         #
 #  code: https://github.com/ajdamico/asdfree/blob/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/SAS-SUDAAN%20code%20from%20IBGE.sas                 #
-##################################################################################################################################################################
+####################################################################################################################################################################
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#####################################################################################################################################
-# prior to running this analysis script, the pnad 2011 file must be loaded as a database (.db) on the local machine.                #
-# running the 2011 download all microdata script will create this database file                                                     #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#######################################################################################################################################
+# prior to running this analysis script, the pnad 2011 file must be loaded as a database (.db) on the local machine.                  #
+# running the 2011 download all microdata script will create this database file                                                       #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/asdfree/blob/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/download%20all%20microdata.R  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "pnad.db" with 'pnad2011' in C:/My Directory/PNAD or wherever the working directory was set        #
-#####################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "pnad.db" with 'pnad2011' in C:/My Directory/PNAD or wherever the working directory was set          #
+#######################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
@@ -69,12 +69,15 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # end of non-windows system edits.
 
 
-# name the database (.db) file that should have been saved in the working directory
-pnad.dbname <- "pnad.db"
+# name the database files in the "MonetDB" folder of the current working directory
+pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
 
-library(downloader)	# downloads and then runs the source() function on scripts from github
-library(survey)		# load survey package (analyzes complex design surveys)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
+
+library(downloader)		# downloads and then runs the source() function on scripts from github
+library(survey)			# load survey package (analyzes complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+
 
 # set R to produce conservative standard errors instead of crashing
 # http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
@@ -98,8 +101,8 @@ sample.pnad <-
 		data = "pnad2011" ,
 		weights = ~pre_wgt ,
 		nest = TRUE ,
-		dbtype = "SQLite" ,
-		dbname = "pnad.db"
+		dbtype = "MonetDBLite" ,
+		dbname = pnad.dbfolder
 	)
 # note that the above object has been given the unwieldy name of `sample.pnad`
 # so that it's not accidentally used in analysis commands.

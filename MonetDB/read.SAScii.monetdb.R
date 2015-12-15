@@ -53,7 +53,8 @@ read.SAScii.monetdb <-
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
 		sleep.between.col.updates = 0 ,
 		varchar = TRUE ,				# import character strings as type VARCHAR(255)?  use FALSE to import them as clob
-		n_max = -1
+		n_max = -1 ,
+		try_best_effort = FALSE
 		
 	) {
 
@@ -249,7 +250,19 @@ read.SAScii.monetdb <-
 		print( te )
 		# this time without error-handling.
 		# do you want to try the BEST EFFORT flag for COPY INTO?
-		sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) 
+		te <- try( sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) , silent = TRUE )
+	}
+	
+	
+	if( class( te ) == 'try-error' ){
+	
+		if( !try_best_effort ) stop( "ran out if import ideas" ) else{
+		
+			sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
+			dbSendQuery( connection , sql.update )
+		
+		}
+		
 	}
 	
 	# end importation attempts #
