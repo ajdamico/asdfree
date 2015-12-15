@@ -51,19 +51,19 @@ library(stringr) 		# load stringr package (manipulates character strings easily)
 
 
 
+# uncomment one of these lines by removing the `#` at the front..
+# load( 'b2010 design.rda' )	# analyze the 2010 single-year acs
+load( 'b2011 design.rda' )	# analyze the 2011 single-year acs
+# load( 'b2009 design.rda' )	# analyze the 2009 single-year acs
+# load( 'b1984 design.rda' )	# analyze the 1984 single-year acs
+
+
 # name the database files in the "MonetDB" folder of the current working directory
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 # open the connection to the monetdblite database
 db <- dbConnect( MonetDBLite() , dbfolder )
-
-
-# uncomment one of these lines by removing the `#` at the front..
-# load( 'b2010 design.rda' )	# analyze the 2010 single-year acs
-load( 'b2011 design.rda' )	# analyze the 2011 single-year acs
-# load( 'b2009 design.rda' )	# analyze the 2009 single-year acs
-# load( 'b1984 design.rda' )	# analyze the 1984 single-year acs
 
 
 # connect the complex sample designs to the monet database #
