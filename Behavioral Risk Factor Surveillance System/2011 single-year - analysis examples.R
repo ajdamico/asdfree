@@ -41,6 +41,9 @@
 # remove the # in order to run this install.packages line only once
 # install.packages( "stringr" )
 
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/BRFSS/" )
+
 
 library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
