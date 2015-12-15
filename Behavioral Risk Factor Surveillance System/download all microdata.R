@@ -468,9 +468,6 @@ for ( year in years.to.download ){
 	dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column one int' ) )
 	dbSendQuery( db , paste0( 'UPDATE ' , tablename , ' SET one = 1' ) )
 	
-	# add a column containing the record (row) number
-	dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column idkey int auto_increment' ) )
-
 	# create a database-backed complex sample design object
 	brfss.design <-
 		svydesign(
@@ -478,7 +475,7 @@ for ( year in years.to.download ){
 			nest = TRUE ,										# whether or not psus are nested within strata
 			strata = strata ,									# stratification variable column (defined in the character string above)
 			id = psu ,											# sampling unit column (defined in the character string above)
-			table.name = tablename ,							# table name within the monet database (defined in the character string above)
+			data = tablename ,									# table name within the monet database (defined in the character string above)
 			dbtype = "MonetDBLite" ,
 			dbname = dbfolder
 		)
