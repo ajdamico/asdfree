@@ -58,14 +58,6 @@ load( 'b2011 design.rda' )	# analyze the 2011 single-year acs
 # load( 'b1984 design.rda' )	# analyze the 1984 single-year acs
 
 
-# name the database files in the "MonetDB" folder of the current working directory
-dbfolder <- paste0( getwd() , "/MonetDB" )
-
-
-# open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
-
-
 # connect the complex sample designs to the monet database #
 brfss.d <- open( brfss.design , driver = MonetDB.R() , wait = TRUE )	# single-year design
 
@@ -95,6 +87,12 @@ class( brfss.d )
 
 # since the brfss gets loaded as a monet database-backed survey object instead of a data frame,
 # the number of unweighted records cannot be calculated by running the nrow() function on a data frame.
+
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 # running the nrow() function on the database connection object
 # simply produces an error..
