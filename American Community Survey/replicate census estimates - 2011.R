@@ -133,13 +133,13 @@ svytotal( ~I( type_ == 1 ) , acs.h )						# total housing units
 svytotal( ~I( ten %in% 1:4 ) , acs.h )						# occupied units
 svytotal( ~I( ten %in% 1:2 ) , acs.h )						# owner-occupied units
 svytotal( ~I( ten %in% 3:4 ) , acs.h )						# renter-occupied units
-svytotal( ~I( ten == 1 ) , acs.h )							# owned with mortgage
-svytotal( ~I( ten == 2 ) , acs.h )							# owned free and clear
-svytotal( ~I( ten == 3 ) , acs.h )							# rented for cash
-svytotal( ~I( ten == 4 ) , acs.h )							# no cash rent
+svytotal( ~I( ten == 1 ) , acs.h , na.rm = TRUE )			# owned with mortgage
+svytotal( ~I( ten == 2 ) , acs.h , na.rm = TRUE )			# owned free and clear
+svytotal( ~I( ten == 3 ) , acs.h , na.rm = TRUE )			# rented for cash
+svytotal( ~I( ten == 4 ) , acs.h , na.rm = TRUE )			# no cash rent
 svytotal( ~I( vacs %in% 1:7 ) , acs.h )						# total vacant units
-svytotal( ~I( vacs == 1 ) , acs.h )							# for rent
-svytotal( ~I( vacs == 3 ) , acs.h )							# for sale only
+svytotal( ~I( vacs == 1 ) , acs.h , na.rm = TRUE )			# for rent
+svytotal( ~I( vacs == 3 ) , acs.h , na.rm = TRUE )			# for sale only
 svytotal( ~I( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.h )	# all other vacant
 
 
