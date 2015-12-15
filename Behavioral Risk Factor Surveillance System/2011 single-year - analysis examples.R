@@ -204,7 +204,7 @@ write.csv( cost.problems.by.coverage , "cost problems by coverage.csv" )
 # here's the cost problem percentage broken out by insurance status, 
 # with accompanying standard errors
 cost.problems.by.insurance.status <-
-	data.frame( cost.problems.by.coverage )[ 1:2 , 1 ]
+	cost.problems.by.coverage[ 1:2 , c( 2 , 6 ) ]
 
 
 # print the new results to the screen
@@ -216,7 +216,7 @@ write.csv( cost.problems.by.insurance.status , "cost problems by insurance statu
 
 # ..or directly made into a bar plot
 barplot(
-	cost.problems.by.insurance.status ,
+	cost.problems.by.insurance.status[ , 1 ] ,
 	main = "Any Cost-Related Access Problems By Insurance Status" ,
 	names.arg = c( "Insured" , "Uninsured" ) ,
 	ylim = c( 0 , .60 )
