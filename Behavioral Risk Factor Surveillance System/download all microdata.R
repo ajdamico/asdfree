@@ -5,7 +5,6 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )	# # only windows users need this line
 # setInternet2( FALSE )						# # only windows users need this line
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
