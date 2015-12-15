@@ -58,6 +58,8 @@ library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 # name the database files in the "MonetDB" folder of the current working directory
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # the behavioral risk factor surveillance system download and importation script
