@@ -55,13 +55,6 @@ library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 # setwd( "C:/My Directory/BRFSS/" )
 
 
-# name the database files in the "MonetDB" folder of the current working directory
-dbfolder <- paste0( getwd() , "/MonetDB" )
-
-# open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
-
-
 # the behavioral risk factor surveillance system download and importation script
 # has already created a monet database-backed survey design object
 # connected to the 2010 single-year table
@@ -106,6 +99,14 @@ brfss.d <- update( brfss.d , xasthmst = factor( xasthmst ) )
 #############################################################################
 
 # https://github.com/ajdamico/asdfree/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/WEAT%202010%20Asthma%20Status%20-%20Crosstab%20Analysis%20Results.pdf?raw=true #
+
+
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 	
 # calculate unweighted sample size column #
