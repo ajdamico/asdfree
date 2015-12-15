@@ -6,7 +6,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
-# load( 'C:/My Directory/BRFSS/b2010 design.rda' )	# analyze the 2010 single-year brfss
+# setwd( "C:/My Directory/BRFSS/" )
 # source_url( "https://raw.github.com/ajdamico/asdfree/master/Behavioral%20Risk%20Factor%20Surveillance%20System/replicate%20cdc%20weat%20-%202010.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -51,6 +51,10 @@ library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/BRFSS/" )
+
+
 # name the database files in the "MonetDB" folder of the current working directory
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
@@ -72,10 +76,10 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 # load the desired behavioral risk factor surveillance system monet database-backed complex sample design objects
 
 # uncomment one of these lines by removing the `#` at the front..
-# load( 'C:/My Directory/BRFSS/b2010 design.rda' )	# analyze the 2010 single-year acs
-# load( 'C:/My Directory/BRFSS/b2011 design.rda' )	# analyze the 2011 single-year acs
-# load( 'C:/My Directory/BRFSS/b2009 design.rda' )	# analyze the 2009 single-year acs
-# load( 'C:/My Directory/BRFSS/b1984 design.rda' )	# analyze the 1984 single-year acs
+load( 'b2010 design.rda' )	# analyze the 2010 single-year acs
+# load( 'b2011 design.rda' )	# analyze the 2011 single-year acs
+# load( 'b2009 design.rda' )	# analyze the 2009 single-year acs
+# load( 'b1984 design.rda' )	# analyze the 1984 single-year acs
 
 # note: this r data file should already contain the 2010 single-year design
 
