@@ -132,10 +132,10 @@ dbGetQuery( db , "SELECT xstate , SUM( xllcpwt ) AS sum_weights FROM b2011 group
 # calculate the mean of a linear variable #
 
 # average age - nationwide
-svymean( ~age , brfss.d )
+svymean( ~age , brfss.d , na.rm = TRUE )
 
 # by state
-svyby( ~age , ~ xstate , brfss.d , svymean )
+svyby( ~age , ~ xstate , brfss.d , svymean , na.rm = TRUE )
 
 
 # calculate the distribution of a categorical variable #
@@ -150,12 +150,12 @@ svyby( ~hlthpln1 , ~xstate , brfss.d , svymean )
 # calculate the median and other percentiles #
 
 # median age of residents of the united states
-svyquantile( ~age , brfss.d , 0.5 )
+svyquantile( ~age , brfss.d , 0.5 , na.rm = TRUE )
 # note: quantile standard errors cannot be computed with taylor-series linearization designs
 
 
 # print the median and 99th percentiles
-svyquantile( ~age , brfss.d , c( 0.5 , 0.99 ) )
+svyquantile( ~age , brfss.d , c( 0.5 , 0.99 ) , na.rm = TRUE )
 
 
 ######################
