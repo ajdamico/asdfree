@@ -155,7 +155,7 @@ svyquantile( ~age , brfss.d , 0.5 )
 
 
 # print the median and 99th percentiles
-svyquantile( ~age , brfss.d , c( 0.5 , 0.99 ) ) )
+svyquantile( ~age , brfss.d , c( 0.5 , 0.99 ) )
 
 
 ######################
