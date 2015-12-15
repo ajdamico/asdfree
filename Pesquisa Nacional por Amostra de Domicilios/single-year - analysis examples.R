@@ -121,7 +121,18 @@ y <-
 		strata.col = 'v4609' ,
 		oldwgt = 'pre_wgt'
 	)
+	
+	
+###########################
+# variable recode example #
+###########################
 
+
+# construct a new age category variable in the dataset: 0-4, 5-9, 10-14...55-59, 60+
+y <- update( y , agecat = 1 + findInterval( v8005 , seq( 5 , 60 , 5 ) ) )
+
+# print the distribution of that age category
+svymean( ~ factor( agecat ) , y )
 
 	
 #####################
