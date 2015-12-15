@@ -22,6 +22,14 @@ remove.uf <-
 				fixed = TRUE
 			)
 		
+		# fix the duplicate column names in 2007
+		sas_lines <-
+			gsub(
+				"00965  V9993" ,
+				"00965  V9993A" ,
+				sas_lines ,
+			)
+		
 		# create a temporary file
 		tf <- tempfile()
 
@@ -53,9 +61,9 @@ pnad.postStratify <-
 				paste(
 					'select' ,
 					strata.col ,
-					"," ,
+					", CAST( " ,
 					strata.col ,
-					'as newwgt , sum( ' ,
+					' AS DOUBLE ) as newwgt , sum( ' ,
 					oldwgt ,
 					' ) as oldwgt from ' ,
 					tablename , 
