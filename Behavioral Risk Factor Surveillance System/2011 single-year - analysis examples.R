@@ -45,8 +45,9 @@
 # setwd( "C:/My Directory/BRFSS/" )
 
 
-library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(survey)			# load survey package (analyzes complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(stringr) 		# load stringr package (manipulates character strings easily)
 
 
@@ -59,7 +60,8 @@ load( 'b2011 design.rda' )	# analyze the 2011 single-year acs
 
 
 # connect the complex sample designs to the monet database #
-brfss.d <- open( brfss.design , driver = MonetDB.R() , wait = TRUE )	# single-year design
+brfss.d <- open( brfss.design , driver = MonetDB.R() )	# single-year design
+
 
 # - but they're not (at least for these analysis examples),
 # so you have to run three quick recodes
