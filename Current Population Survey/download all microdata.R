@@ -51,7 +51,8 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" ) )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "devtools" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/") )
+
 
 # load the `devtools` library
 library(devtools)
@@ -73,8 +74,9 @@ library(devtools)
 # cps.years.to.download <- c( 2011:2009 , 2005 )
 
 
-# name the database (.db) file to be saved in the working directory
-cps.dbname <- "cps.asec.db"
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
 
 
 ############################################
@@ -84,11 +86,9 @@ cps.dbname <- "cps.asec.db"
 # program start #
 # # # # # # # # #
 
-# if the cps database file already exists in the current working directory, print a warning
-if ( file.exists( paste( getwd() , cps.dbname , sep = "/" ) ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the cps.dbname in the settings above." )
 
-
-library(RSQLite) 			# load RSQLite package (creates database files in R)
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(survey)				# load survey package (analyzes complex design surveys)
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 				# load the descr package (converts fixed-width files to delimited files)
@@ -117,14 +117,8 @@ source_url(
 	echo = FALSE 
 )
 
-# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/asdfree/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
-
-
-# set R to produce conservative standard errors instead of crashing
-# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
-options( survey.lonely.psu = "adjust" )
-# this setting matches the MISSUNIT option in SUDAAN
+# load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
+source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 
 # if this option is set to TRUE
@@ -160,8 +154,9 @@ for ( year in cps.years.to.download ){
 	# for the 2014 cps, load the income-consistent file as the full-year extract
 	if ( year == 2014 ){
 		
-		db <- dbConnect( SQLite() , cps.dbname )
-		
+		# open the connection to the monetdblite database
+		db <- dbConnect( MonetDBLite() , dbfolder )
+
 		tf1 <- tempfile() ; tf2 <- tempfile() ; tf3 <- tempfile()
 	
 		download_cached( "http://www.census.gov/housing/extract_files/data%20extracts/cpsasec14/hhld.sas7bdat" , tf1 , mode = 'wb' )
@@ -376,8 +371,8 @@ for ( year in cps.years.to.download ){
 		close( incon , add = T )
 
 
-		# open the connection to the sqlite database
-		db <- dbConnect( SQLite() , cps.dbname )
+		# open the connection to the monetdblite database
+		db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 		# the 2011 SAS file produced by the National Bureau of Economic Research (NBER)
@@ -386,8 +381,8 @@ for ( year in cps.years.to.download ){
 		# NOTE that this 'beginline' parameters of 988, 1121, and 1209 will change for different years.
 
 		if( year < 2011 ){
-			# store CPS ASEC march household records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march household records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.household , 
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = hh_beginline , 
@@ -397,8 +392,8 @@ for ( year in cps.years.to.download ){
 				conn = db
 			)
 
-			# store CPS ASEC march family records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march family records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.family , 
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = fa_beginline , 
@@ -408,8 +403,8 @@ for ( year in cps.years.to.download ){
 				conn = db
 			)
 
-			# store CPS ASEC march person records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march person records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.person , 
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = pe_beginline , 
@@ -419,8 +414,8 @@ for ( year in cps.years.to.download ){
 				conn = db
 			)
 		} else {
-			# store CPS ASEC march household records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march household records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.household , 
 				sas_stru = sas_strus[[1]] ,
 				zipped = FALSE ,
@@ -429,8 +424,8 @@ for ( year in cps.years.to.download ){
 				conn = db
 			)
 
-			# store CPS ASEC march family records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march family records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.family , 
 				sas_stru = sas_strus[[2]] ,
 				zipped = FALSE ,
@@ -439,8 +434,8 @@ for ( year in cps.years.to.download ){
 				conn = db
 			)
 
-			# store CPS ASEC march person records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march person records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.person , 
 				sas_stru = sas_strus[[3]] ,
 				zipped = FALSE ,
@@ -451,16 +446,6 @@ for ( year in cps.years.to.download ){
 		}
 
 		
-			
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX household_index ON household ( h_seq )" )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
-
 
 		# create a fake sas input script for the crosswalk..
 		xwalk.sas <-
@@ -475,8 +460,8 @@ for ( year in cps.years.to.download ){
 		writeLines ( xwalk.sas , con = xwalk.sas.tf )
 
 		
-		# store CPS ASEC march xwalk records as a SQLite database
-		read.SAScii.sqlite ( 
+		# store CPS ASEC march xwalk records as a MonetDB database
+		read.SAScii.monetdb ( 
 			tf.xwalk , 
 			xwalk.sas.tf , 
 			zipped = FALSE ,
@@ -484,10 +469,7 @@ for ( year in cps.years.to.download ){
 			tablename = 'xwalk' ,
 			conn = db
 		)
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX xwalk_index ON xwalk ( h_seq , ffpos , pppos )" )
-
+		
 		# clear up RAM
 		gc()
 
@@ -593,10 +575,6 @@ for ( year in cps.years.to.download ){
 	}
 	
 	
-	
-	
-	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
-	
 
 	if( year > 2004 ){
 		
@@ -680,10 +658,6 @@ for ( year in cps.years.to.download ){
 			tablename = 'rw' ,
 			conn = db
 		)
-		
-		
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX rw_index ON rw ( h_seq , pppos )" )
 
 
 		###################################################
@@ -801,10 +775,6 @@ for ( year in cps.years.to.download ){
 	dbDisconnect( db )
 	
 }
-
-
-# print a reminder: set the directory you just saved everything to as read-only!
-message( paste0( "all done.  you should set the file " , file.path( getwd() , cps.dbname ) , " read-only so you don't accidentally alter these tables." ) )
 
 
 # for more details on how to work with data in r
