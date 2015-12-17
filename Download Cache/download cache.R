@@ -66,7 +66,7 @@ download_cached <-
 		if( is.null( usecache ) ) usecache <- TRUE
 		if( is.null( savecache ) ) savecache <- usecache
 
-		if( usecache & !savecache ) warning( "usecache=FALSE and savecache=TRUE does not do anything" )
+		if( usecache & !savecache ) warning( "usecache=TRUE and savecache=FALSE does not do anything" )
 		
 			
 		cat(
