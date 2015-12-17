@@ -61,19 +61,9 @@
 # ..in order to set your current working directory
 
 
-
-# remove the # in order to run this install.packages line only once
-# install.packages( c ( "survey" , "RSQLite" ) )
-
-
 library(survey)		# load survey package (analyzes complex design surveys)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
-
-# set R to produce conservative standard errors instead of crashing
-# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
-options( survey.lonely.psu = "adjust" )
-# this setting matches the MISSUNIT option in SUDAAN
-
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # if this option is set to TRUE
@@ -83,6 +73,10 @@ options( survey.replicates.mse = TRUE )
 # R will exactly match Stata without the MSE option results
 
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
+
+
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 #######################################
@@ -99,9 +93,10 @@ y <-
 		rho = (1-1/sqrt(4)),
 		data = "asec11" ,
 		combined.weights = T ,
-		dbtype = "SQLite" ,
-		dbname = "cps.asec.db"
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
 	)
+
 
 #############################################################################################################
 # these commands replicate the results of the SAS, SUDAAN, and WesVar code presented in                     #  
