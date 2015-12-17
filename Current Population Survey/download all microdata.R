@@ -473,9 +473,13 @@ for ( year in cps.years.to.download ){
 
 		
 		# create the merged file
-		dbSendQuery( db , "create table h_xwalk as select * from xwalk as a inner join household as b on a.h_seq = b.h_seq" )
-		dbSendQuery( db , "create table h_f_xwalk as select * from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq AND a.ffpos = b.ffpos" )
-		dbSendQuery( db , "create table hfpz as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
+		dbSendQuery( db , "create table h_xwalk as select a.ffpos , a.pppos , b.* from xwalk as a inner join household as b on a.h_seq = b.h_seq" )
+		
+		mmf <- dbListFields( db , 'family' )[ !( dbListFields( db , 'family' ) %in% dbListFields( db , 'h_xwalk' ) ) ]
+		dbSendQuery( db , paste( "create table h_f_xwalk as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq AND a.ffpos = b.ffpos" ) )
+	
+		mmf <- dbListFields( db , 'person' )[ !( dbListFields( db , 'person' ) %in% dbListFields( db , 'h_f_xwalk' ) ) ]
+		dbSendQuery( db , paste( "create table hfpz as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" ) )
 	
 	}
 		
@@ -554,7 +558,16 @@ for ( year in cps.years.to.download ){
 		
 		rm( ot , ac , ot_ac ) ; gc()
 		
-		dbSendQuery( db , "create table hfp as select * from hfp_pac as a inner join ot_ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" )
+		
+		mmf <- dbListFields( db , 'ot_ac' )[ !( dbListFields( db , 'ot_ac' ) %in% dbListFields( db , 'hfp_pac' ) ) ]
+		dbSendQuery( 
+			db , 
+			paste( 
+				"create table hfp as select a.* , " , 
+				paste( "b." , mmf , sep = "" , collapse = "," ) , 
+				" from hfp_pac as a inner join ot_ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" 
+			)
+		)
 		
 		stopifnot( dbGetQuery( db , 'select count(*) from hfp' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from hfp_pac' )[ 1 , 1 ] )
 		
@@ -662,13 +675,15 @@ for ( year in cps.years.to.download ){
 		# merge cps asec file with replicate weights file #
 		###################################################
 
-		sql <- paste( "create table" , cps.tablename , "as select * from hfp as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" )
+		mmf <- dbListFields( db , 'rw' )[ !( dbListFields( db , 'rw' ) %in% dbListFields( db , 'hfp' ) ) ]
+		sql <- paste( "create table" , cps.tablename , "as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from hfp as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" )
 		
 		dbSendQuery( db , sql )
 
 	} else {
 	
-		dbSendQuery( db , paste( "create table" , cps.tablename , "as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" ) )
+		mmf <- dbListFields( db , 'person' )[ !( dbListFields( db , 'person' ) %in% dbListFields( db , 'h_f_xwalk' ) ) ]
+		dbSendQuery( db , paste( "create table" , cps.tablename , "as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" ) )
 			
 	}
 		
@@ -739,12 +754,14 @@ for ( year in cps.years.to.download ){
 		
 		dbRemoveTable( db , cps.tablename )
 		
+		mmf <- dbListFields( db , paste0( cps.tablename , '_sp' ) )[ !( dbListFields( db , paste0( cps.tablename , '_sp' ) ) %in% dbListFields( db , 'hfp' ) ) ]
+		
 		dbSendQuery( 
 			db , 
 			paste0( 
 				"create table " , 
 				cps.tablename , 
-				" as select * from temp as a inner join " ,
+				" as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from temp as a inner join " ,
 				cps.tablename , 
 				"_sp as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" 
 			) 
