@@ -1,3 +1,12 @@
+# # # user note:
+# # # if you think you've got a corrupted download,
+# # # then try setting these two options in your console before re-running
+
+# options( "download_cached.usecache" = FALSE )
+# options( "download_cached.savecache" = TRUE )
+
+
+
 # written by http://hannes.muehleisen.org/
 
 library(digest)
@@ -38,6 +47,11 @@ download_cached <-
 	# and if so, copies the cached file to the destination file *instead* of downloading.
 	usecache = getOption( "download_cached.usecache" ) ,
 	
+    # if savecache is TRUE, then
+	# overwrite the cache file.
+	# (this is useful when a cached file did not download completely)
+	savecache = getOption( "download_cached.savecache" ) ,
+
 	# how many attempts should be made with FUN?
 	attempts = 3 ,
 	# just in case of a server timeout or smthn equally annoying
@@ -50,11 +64,10 @@ download_cached <-
 		# however, if they're not set, they will default to FALSE and TRUE, respectively
 		if( is.null( usedest ) ) usedest <- FALSE
 		if( is.null( usecache ) ) usecache <- TRUE
-		# you could set these *outside* of this function
-		# with lines like
-		# options( "download_cached.usedest" = FALSE )
-		# options( "download_cached.usecache" = TRUE )
-    		
+		if( is.null( savecache ) ) savecache <- usecache
+
+		if( usecache & !savecache ) warning( "usecache=FALSE and savecache=TRUE does not do anything" )
+		
 			
 		cat(
 			paste0(
@@ -137,7 +150,7 @@ download_cached <-
 		
 		# double-check that the `success` object exists.. it might not if `attempts` was set to zero.
 		if ( exists( 'success' ) ){
-			if (success && usecache) file.copy( destfile , cachefile , overwrite = TRUE )
+			if (success && savecache) file.copy( destfile , cachefile , overwrite = TRUE )
 			cat("\n")
 			return( invisible( success ) )
 		
