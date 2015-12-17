@@ -250,12 +250,12 @@ for ( year in cps.years.to.download ){
 
 		} else {
 			
-			if( year == 2015 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015early_pubuse.dd.txt" )
-			if( year == 2014.38 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014R_pubuse.dd.txt" )
-			if( year == 2014.58 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
-			if( year == 2013 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2013early_pubuse.dd.txt" )
-			if( year == 2012 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2012early_pubuse.dd.txt" )
-			if( year == 2011 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2011_pubuse.dd.txt" )
+			if( year == 2015 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015early_pubuse.dd.txt" )
+			if( year == 2014.38 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014R_pubuse.dd.txt" )
+			if( year == 2014.58 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
+			if( year == 2013 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2013early_pubuse.dd.txt" )
+			if( year == 2012 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2012early_pubuse.dd.txt" )
+			if( year == 2011 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2011_pubuse.dd.txt" )
 
 		}
 			
@@ -303,9 +303,9 @@ for ( year in cps.years.to.download ){
 			end.family <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = fa_beginline )$width ) )
 			end.person <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = pe_beginline )$width ) )
 		} else {
-			end.household <- sum( abs( sas_strus[[1]]$width ) )
-			end.family <- sum( abs( sas_strus[[2]]$width ) )
-			end.person <- sum( abs( sas_strus[[3]]$width ) )
+			end.household <- sum( abs( sas_ris[[1]]$width ) )
+			end.family <- sum( abs( sas_ris[[2]]$width ) )
+			end.person <- sum( abs( sas_ris[[3]]$width ) )
 		}
 		
 		# create a while-loop that continues until every line has been examined
@@ -417,7 +417,7 @@ for ( year in cps.years.to.download ){
 			# store CPS ASEC march household records as a MonetDB database
 			read.SAScii.monetdb ( 
 				tf.household , 
-				sas_stru = sas_strus[[1]] ,
+				sas_ri = sas_ris[[1]] ,
 				zipped = FALSE ,
 				tl = TRUE ,
 				tablename = 'household' ,
@@ -427,7 +427,7 @@ for ( year in cps.years.to.download ){
 			# store CPS ASEC march family records as a MonetDB database
 			read.SAScii.monetdb ( 
 				tf.family , 
-				sas_stru = sas_strus[[2]] ,
+				sas_ri = sas_ris[[2]] ,
 				zipped = FALSE ,
 				tl = TRUE ,
 				tablename = 'family' ,
@@ -437,7 +437,7 @@ for ( year in cps.years.to.download ){
 			# store CPS ASEC march person records as a MonetDB database
 			read.SAScii.monetdb ( 
 				tf.person , 
-				sas_stru = sas_strus[[3]] ,
+				sas_ri = sas_ris[[3]] ,
 				zipped = FALSE ,
 				tl = TRUE ,
 				tablename = 'person' ,
