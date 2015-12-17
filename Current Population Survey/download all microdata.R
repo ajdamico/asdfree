@@ -675,6 +675,7 @@ for ( year in cps.years.to.download ){
 		###################################################
 
 		mmf <- dbListFields( db , 'rw' )[ !( dbListFields( db , 'rw' ) %in% dbListFields( db , 'hfp' ) ) ]
+		
 		sql <- paste( "create table" , cps.tablename , "as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from hfp as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" )
 		
 		dbSendQuery( db , sql )
@@ -682,7 +683,10 @@ for ( year in cps.years.to.download ){
 	} else {
 	
 		mmf <- dbListFields( db , 'person' )[ !( dbListFields( db , 'person' ) %in% dbListFields( db , 'h_f_xwalk' ) ) ]
-		dbSendQuery( db , paste( "create table" , cps.tablename , "as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" ) )
+		
+		sql <- paste( "create table" , cps.tablename , "as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
+		
+		dbSendQuery( db , sql )
 			
 	}
 		
