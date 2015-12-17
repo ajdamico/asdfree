@@ -751,7 +751,7 @@ for ( year in cps.years.to.download ){
 		
 		dbRemoveTable( db , cps.tablename )
 		
-		mmf <- dbListFields( db , paste0( cps.tablename , '_sp' ) )[ !( dbListFields( db , paste0( cps.tablename , '_sp' ) ) %in% dbListFields( db , 'hfp' ) ) ]
+		mmf <- dbListFields( db , paste0( cps.tablename , '_sp' ) )[ !( dbListFields( db , paste0( cps.tablename , '_sp' ) ) %in% dbListFields( db , 'temp' ) ) ]
 		
 		dbSendQuery( 
 			db , 
