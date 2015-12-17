@@ -180,9 +180,11 @@ for ( year in cps.years.to.download ){
 		dbWriteTable( db , 'person' , person )
 		rm( person ) ; gc() ; file.remove( tf3 )
 
-		dbSendQuery( db , "create table f_p as select * from family as a inner join person as b on a.fh_seq = b.ph_seq AND a.ffpos = b.phf_seq" )
+		mmf <- dbListFields( db , 'person' )[ !( dbListFields( db , 'person' ) %in% dbListFields( db , 'family' ) ) ]
+		dbSendQuery( db , paste( "create table f_p as select a.* ," , paste( "b." , mmf , sep = "" , collapse = "," ) , "from family as a inner join person as b on a.fh_seq = b.ph_seq AND a.ffpos = b.phf_seq" ) )
 	
-		dbSendQuery( db , "create table hfpz as select * from hhld as a inner join f_p as b on a.h_seq = b.ph_seq" )
+		mmf <- dbListFields( db , 'f_p' )[ !( dbListFields( db , 'f_p' ) %in% dbListFields( db , 'hhld' ) ) ]
+		dbSendQuery( db , paste( "create table hfpz as select a.* ," , paste( "b." , mmf , sep = "" , collapse = "," ) , "from hhld as a inner join f_p as b on a.h_seq = b.ph_seq" ) )
 
 		stopifnot( dbGetQuery( db , 'select count(*) from hfpz' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from person' )[ 1 , 1 ] )
 
