@@ -38,7 +38,7 @@ read.SAScii.monetdb <-
 		# differences between parameters for read.SAScii() (from the R SAScii package)
 		# and read.SAScii.monetdb() documented here --
 		fn ,
-		sas_ri , 
+		sas_ri = NULL , 
 		beginline = 1 , 
 		zipped = F , 
 		lrecl = NULL , 
@@ -54,10 +54,16 @@ read.SAScii.monetdb <-
 		sleep.between.col.updates = 0 ,
 		varchar = TRUE ,				# import character strings as type VARCHAR(255)?  use FALSE to import them as clob
 		n_max = -1 ,
-		try_best_effort = FALSE
+		try_best_effort = FALSE ,
+		sas_stru = NULL
 		
 	) {
 
+	
+		if( is.null( sas_ri ) & is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified" )
+		if( !is.null( sas_ri ) & !is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified, but not both" )
+
+	
 	# before anything else, create the temporary files needed for this function to run
 	# if the user doesn't specify that the temporary files get stored in a temporary directory
 	# just put them anywhere..
@@ -94,9 +100,16 @@ read.SAScii.monetdb <-
 		)
 	}
 
+	if( !is.null( sas_ri ) ){
 	
+		x <- parse.SAScii( sas_ri , beginline , lrecl )
 	
-	x <- parse.SAScii( sas_ri , beginline , lrecl )
+	} else {
+	
+		x <- sas_stru
+		
+	}
+	
 	
 	if( tl ) x$varname <- tolower( x$varname )
 	

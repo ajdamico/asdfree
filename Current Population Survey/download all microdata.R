@@ -9,7 +9,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
 # cps.years.to.download <- c( 2015 , 2014 , 2014.58 , 2014.38 , 2013:1998 )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -183,15 +183,6 @@ for ( year in cps.years.to.download ){
 		for ( i in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) person[ , i ] <- person[ , i ] / 100
 		dbWriteTable( db , 'person' , person )
 		rm( person ) ; gc() ; file.remove( tf3 )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX household_index ON hhld ( h_seq )" )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
 
 		dbSendQuery( db , "create table f_p as select * from family as a inner join person as b on a.fh_seq = b.ph_seq AND a.ffpos = b.phf_seq" )
 	
@@ -417,7 +408,7 @@ for ( year in cps.years.to.download ){
 			# store CPS ASEC march household records as a MonetDB database
 			read.SAScii.monetdb ( 
 				tf.household , 
-				sas_ri = sas_ris[[1]] ,
+				sas_stru = sas_ris[[1]] ,
 				zipped = FALSE ,
 				tl = TRUE ,
 				tablename = 'household' ,
@@ -427,7 +418,7 @@ for ( year in cps.years.to.download ){
 			# store CPS ASEC march family records as a MonetDB database
 			read.SAScii.monetdb ( 
 				tf.family , 
-				sas_ri = sas_ris[[2]] ,
+				sas_stru = sas_ris[[2]] ,
 				zipped = FALSE ,
 				tl = TRUE ,
 				tablename = 'family' ,
@@ -437,7 +428,7 @@ for ( year in cps.years.to.download ){
 			# store CPS ASEC march person records as a MonetDB database
 			read.SAScii.monetdb ( 
 				tf.person , 
-				sas_ri = sas_ris[[3]] ,
+				sas_stru = sas_ris[[3]] ,
 				zipped = FALSE ,
 				tl = TRUE ,
 				tablename = 'person' ,
