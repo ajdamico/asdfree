@@ -585,6 +585,28 @@ for ( year in 2050:2005 ){
 			)
 			
 			
+			# special exception for the 2009 3-year file..  too many missings in the weights.
+			if( year == 2009 & size == 3 ){
+			
+				# determine all weight columns in all tables
+				for( this_table in c( "acs2009_3yr_h" , "acs2009_3yr_m" , "acs2009_3yr_p" ) ){
+			
+					# identify all weight columns
+					wgt_cols <- grep( "wgt" , dbListFields( db , this_table ) , value = TRUE )
+					
+					# loop through all weight columns
+					for ( this_column in wgt_cols ){
+					
+						# set missing values to zeroes
+						dbSendQuery( db , paste( "UPDATE" , this_table , "SET" , this_column , "=0 WHERE" , this_column , "IS NULL" ) )
+					
+					}
+					
+				}
+			
+			}
+			
+			
 			# create a sqlrepsurvey complex sample design object
 			# using the merged (household+person) table
 			
