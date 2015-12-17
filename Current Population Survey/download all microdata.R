@@ -781,7 +781,8 @@ for ( year in cps.years.to.download ){
 	dbSendQuery( db , paste( "DROP TABLE" , cps.tablename ) )
 	
 	# rename the temporary table
-	dbSendQuery( db , paste( "ALTER TABLE temp RENAME TO" , cps.tablename ) )
+	dbSendQuery( db , paste( "CREATE TABLE" , cps.tablename , "AS SELECT * FROM temp WITH DATA" ) )
+	dbRemoveTable( db , "temp" )
 	
 	# disconnect from the current database
 	dbDisconnect( db )
