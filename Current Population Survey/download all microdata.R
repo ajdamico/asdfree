@@ -97,10 +97,6 @@ library(haven) 				# load the haven package (imports dta files faaaaaast)
 library(sas7bdat.parso) 	# load the sas7bdat.parso (imports binary/compressed sas7bdat files)
 
 
-# fix this issue https://github.com/rstats-db/RSQLite/issues/82
-setOldClass( c( "tbl_df" , "data.frame" ) )
-
-
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
@@ -661,13 +657,14 @@ for ( year in cps.years.to.download ){
 		}
 		
 		# store the CPS ASEC march 2011 replicate weight file as an R data frame
-		read.SAScii.sqlite ( 
+		read.SAScii.monetdb ( 
 			CPS.replicate.weight.file.location , 
 			CPS.replicate.weight.SAS.read.in.instructions , 
 			zipped = zip_file , 
 			tl = TRUE ,
 			tablename = 'rw' ,
-			conn = db
+			conn = db ,
+			varchar = FALSE
 		)
 
 
