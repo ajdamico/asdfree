@@ -239,11 +239,11 @@ if ( sipp.household.extract ){
 	sas.import.with.at.signs <-
 		"INPUT
 			@1   SSUID   12.
-			@13   UHOWLGMT   2.
-			@15   UHOWLGYR   4.
-			@19   UWHNAPMT   2.
-			@21   UWHNAPYR   4.
-			@25   UWAITLST   1.
+			@13   UHOWLGMT  $ 2.
+			@15   UHOWLGYR  $ 4.
+			@19   UWHNAPMT  $ 2.
+			@21   UWHNAPYR  $ 4.
+			@25   UWAITLST  $ 1.
 		;"
 		
 	# create a temporary file
@@ -261,8 +261,11 @@ if ( sipp.household.extract ){
 		zipped = T ,
 		tl = TRUE ,
 		tablename = "hh" ,
-		conn = db
+		conn = db ,
+		varchar = FALSE ,
+		try_best_effort = TRUE
 	)
+	
 }
 	
 # if the welfare reform module flag has been set to TRUE above..
