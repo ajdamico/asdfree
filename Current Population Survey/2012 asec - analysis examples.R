@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Current%20Population%20Survey/2012%20asec%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Current%20Population%20Survey/2012%20asec%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -38,16 +38,16 @@
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################
-# prior to running this analysis script, the cps march 2012 file must be loaded as a database (.db) on the local machine.         #
-# running the 2012 download all microdata script will create this database file                                                   #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/asdfree/blob/master/Current%20Population%20Survey/2005-2012%20asec%20-%20download%20all%20microdata.R #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "cps.asec.db" with 'asec12' in C:/My Directory/ACS or wherever the working directory was set     #
-###################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################
+# prior to running this analysis script, the cps march 2012 file must be loaded as a database (.db) on the local machine.           #
+# running the 2012 download all microdata script will create this database file                                                     #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R              #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "cps.asec.db" with 'asec12' in C:/My Directory/ACS or wherever the working directory was set       #
+#####################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # set your working directory.
@@ -61,18 +61,9 @@
 
 
 
-# remove the # in order to run this install.packages line only once
-# install.packages( c ( "survey" , "RSQLite" ) )
-
-
-library(survey)		# load survey package (analyzes complex design surveys)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
-
-# set R to produce conservative standard errors instead of crashing
-# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
-options( survey.lonely.psu = "adjust" )
-# this setting matches the MISSUNIT option in SUDAAN
-
+library(survey)				# load survey package (analyzes complex design surveys)
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 
 
 # if this option is set to TRUE
@@ -82,6 +73,10 @@ options( survey.replicates.mse = TRUE )
 # R will exactly match Stata without the MSE option results
 
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
+
+
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 #######################################
@@ -98,9 +93,10 @@ y <-
 		rho = (1-1/sqrt(4)),
 		data = "asec12" ,
 		combined.weights = T ,
-		dbtype = "SQLite" ,
-		dbname = "cps.asec.db"
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
 	)
+
 
 	
 #####################
@@ -130,7 +126,7 @@ svytotal(
 # note that this is exactly equivalent to summing up the weight variable
 # from the original cps data frame
 
-db <- dbConnect( SQLite() , "cps.asec.db" )			# connect to the SQLite database (.db)
+db <- dbConnect( MonetDBLite() , dbfolder )			# connect to the SQLite database (.db)
 dbGetQuery( db , 'select sum( marsupwt ) from asec12' )	# run a single query, summing the person-weight
 dbDisconnect( db )									# disconnect from the database
 

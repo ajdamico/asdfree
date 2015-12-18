@@ -9,7 +9,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
 # cps.years.to.download <- c( 2015 , 2014 , 2014.58 , 2014.38 , 2013:1998 )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -51,7 +51,8 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" ) )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "devtools" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/") )
+
 
 # load the `devtools` library
 library(devtools)
@@ -73,8 +74,9 @@ library(devtools)
 # cps.years.to.download <- c( 2011:2009 , 2005 )
 
 
-# name the database (.db) file to be saved in the working directory
-cps.dbname <- "cps.asec.db"
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
 
 
 ############################################
@@ -84,11 +86,9 @@ cps.dbname <- "cps.asec.db"
 # program start #
 # # # # # # # # #
 
-# if the cps database file already exists in the current working directory, print a warning
-if ( file.exists( paste( getwd() , cps.dbname , sep = "/" ) ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the cps.dbname in the settings above." )
 
-
-library(RSQLite) 			# load RSQLite package (creates database files in R)
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(survey)				# load survey package (analyzes complex design surveys)
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 				# load the descr package (converts fixed-width files to delimited files)
@@ -97,14 +97,10 @@ library(haven) 				# load the haven package (imports dta files faaaaaast)
 library(sas7bdat.parso) 	# load the sas7bdat.parso (imports binary/compressed sas7bdat files)
 
 
-# fix this issue https://github.com/rstats-db/RSQLite/issues/82
-setOldClass( c( "tbl_df" , "data.frame" ) )
-
-
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )
@@ -112,19 +108,13 @@ source_url(
 # load the dd_parser function to disentangle census bureau-provided import scripts
 # for any march extracts that haven't been provided by nber
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/Current%20Population%20Survey/dd_parser.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Current%20Population%20Survey/dd_parser.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )
 
-# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/asdfree/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
-
-
-# set R to produce conservative standard errors instead of crashing
-# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
-options( survey.lonely.psu = "adjust" )
-# this setting matches the MISSUNIT option in SUDAAN
+# load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 
 # if this option is set to TRUE
@@ -160,8 +150,9 @@ for ( year in cps.years.to.download ){
 	# for the 2014 cps, load the income-consistent file as the full-year extract
 	if ( year == 2014 ){
 		
-		db <- dbConnect( SQLite() , cps.dbname )
-		
+		# open the connection to the monetdblite database
+		db <- dbConnect( MonetDBLite() , dbfolder )
+
 		tf1 <- tempfile() ; tf2 <- tempfile() ; tf3 <- tempfile()
 	
 		download_cached( "http://www.census.gov/housing/extract_files/data%20extracts/cpsasec14/hhld.sas7bdat" , tf1 , mode = 'wb' )
@@ -189,18 +180,11 @@ for ( year in cps.years.to.download ){
 		dbWriteTable( db , 'person' , person )
 		rm( person ) ; gc() ; file.remove( tf3 )
 
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX household_index ON hhld ( h_seq )" )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
-
-		dbSendQuery( db , "create table f_p as select * from family as a inner join person as b on a.fh_seq = b.ph_seq AND a.ffpos = b.phf_seq" )
+		mmf <- dbListFields( db , 'person' )[ !( dbListFields( db , 'person' ) %in% dbListFields( db , 'family' ) ) ]
+		dbSendQuery( db , paste( "create table f_p as select a.* ," , paste( "b." , mmf , sep = "" , collapse = "," ) , "from family as a inner join person as b on a.fh_seq = b.ph_seq AND a.ffpos = b.phf_seq" ) )
 	
-		dbSendQuery( db , "create table hfpz as select * from hhld as a inner join f_p as b on a.h_seq = b.ph_seq" )
+		mmf <- dbListFields( db , 'f_p' )[ !( dbListFields( db , 'f_p' ) %in% dbListFields( db , 'hhld' ) ) ]
+		dbSendQuery( db , paste( "create table hfpz as select a.* ," , paste( "b." , mmf , sep = "" , collapse = "," ) , "from hhld as a inner join f_p as b on a.h_seq = b.ph_seq" ) )
 
 		stopifnot( dbGetQuery( db , 'select count(*) from hfpz' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from person' )[ 1 , 1 ] )
 
@@ -255,12 +239,12 @@ for ( year in cps.years.to.download ){
 
 		} else {
 			
-			if( year == 2015 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015early_pubuse.dd.txt" )
-			if( year == 2014.38 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014R_pubuse.dd.txt" )
-			if( year == 2014.58 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
-			if( year == 2013 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2013early_pubuse.dd.txt" )
-			if( year == 2012 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2012early_pubuse.dd.txt" )
-			if( year == 2011 ) sas_strus <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2011_pubuse.dd.txt" )
+			if( year == 2015 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015early_pubuse.dd.txt" )
+			if( year == 2014.38 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014R_pubuse.dd.txt" )
+			if( year == 2014.58 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
+			if( year == 2013 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2013early_pubuse.dd.txt" )
+			if( year == 2012 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2012early_pubuse.dd.txt" )
+			if( year == 2011 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2011_pubuse.dd.txt" )
 
 		}
 			
@@ -308,9 +292,9 @@ for ( year in cps.years.to.download ){
 			end.family <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = fa_beginline )$width ) )
 			end.person <- sum( abs( parse.SAScii( CPS.ASEC.mar.SAS.read.in.instructions , beginline = pe_beginline )$width ) )
 		} else {
-			end.household <- sum( abs( sas_strus[[1]]$width ) )
-			end.family <- sum( abs( sas_strus[[2]]$width ) )
-			end.person <- sum( abs( sas_strus[[3]]$width ) )
+			end.household <- sum( abs( sas_ris[[1]]$width ) )
+			end.family <- sum( abs( sas_ris[[2]]$width ) )
+			end.person <- sum( abs( sas_ris[[3]]$width ) )
 		}
 		
 		# create a while-loop that continues until every line has been examined
@@ -376,8 +360,8 @@ for ( year in cps.years.to.download ){
 		close( incon , add = T )
 
 
-		# open the connection to the sqlite database
-		db <- dbConnect( SQLite() , cps.dbname )
+		# open the connection to the monetdblite database
+		db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 		# the 2011 SAS file produced by the National Bureau of Economic Research (NBER)
@@ -386,64 +370,70 @@ for ( year in cps.years.to.download ){
 		# NOTE that this 'beginline' parameters of 988, 1121, and 1209 will change for different years.
 
 		if( year < 2011 ){
-			# store CPS ASEC march household records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march household records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.household , 
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = hh_beginline , 
 				zipped = FALSE ,
+				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'household' ,
 				conn = db
 			)
 
-			# store CPS ASEC march family records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march family records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.family , 
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = fa_beginline , 
 				zipped = FALSE ,
+				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'family' ,
 				conn = db
 			)
 
-			# store CPS ASEC march person records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march person records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.person , 
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = pe_beginline , 
 				zipped = FALSE ,
+				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'person' ,
 				conn = db
 			)
 		} else {
-			# store CPS ASEC march household records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march household records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.household , 
-				sas_stru = sas_strus[[1]] ,
+				sas_stru = sas_ris[[1]] ,
 				zipped = FALSE ,
+				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'household' ,
 				conn = db
 			)
 
-			# store CPS ASEC march family records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march family records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.family , 
-				sas_stru = sas_strus[[2]] ,
+				sas_stru = sas_ris[[2]] ,
 				zipped = FALSE ,
+				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'family' ,
 				conn = db
 			)
 
-			# store CPS ASEC march person records as a SQLite database
-			read.SAScii.sqlite ( 
+			# store CPS ASEC march person records as a MonetDB database
+			read.SAScii.monetdb ( 
 				tf.person , 
-				sas_stru = sas_strus[[3]] ,
+				sas_stru = sas_ris[[3]] ,
 				zipped = FALSE ,
+				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'person' ,
 				conn = db
@@ -451,16 +441,6 @@ for ( year in cps.years.to.download ){
 		}
 
 		
-			
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX household_index ON household ( h_seq )" )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX family_index ON family ( fh_seq , ffpos )" )
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX person_index ON person ( ph_seq , pppos )" )
-
 
 		# create a fake sas input script for the crosswalk..
 		xwalk.sas <-
@@ -475,27 +455,29 @@ for ( year in cps.years.to.download ){
 		writeLines ( xwalk.sas , con = xwalk.sas.tf )
 
 		
-		# store CPS ASEC march xwalk records as a SQLite database
-		read.SAScii.sqlite ( 
+		# store CPS ASEC march xwalk records as a MonetDB database
+		read.SAScii.monetdb ( 
 			tf.xwalk , 
 			xwalk.sas.tf , 
 			zipped = FALSE ,
+			varchar = FALSE ,
 			tl = TRUE ,
 			tablename = 'xwalk' ,
 			conn = db
 		)
-
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX xwalk_index ON xwalk ( h_seq , ffpos , pppos )" )
-
+		
 		# clear up RAM
 		gc()
 
 		
 		# create the merged file
-		dbSendQuery( db , "create table h_xwalk as select * from xwalk as a inner join household as b on a.h_seq = b.h_seq" )
-		dbSendQuery( db , "create table h_f_xwalk as select * from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq AND a.ffpos = b.ffpos" )
-		dbSendQuery( db , "create table hfpz as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
+		dbSendQuery( db , "create table h_xwalk as select a.ffpos , a.pppos , b.* from xwalk as a inner join household as b on a.h_seq = b.h_seq" )
+		
+		mmf <- dbListFields( db , 'family' )[ !( dbListFields( db , 'family' ) %in% dbListFields( db , 'h_xwalk' ) ) ]
+		dbSendQuery( db , paste( "create table h_f_xwalk as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from h_xwalk as a inner join family as b on a.h_seq = b.fh_seq AND a.ffpos = b.ffpos" ) )
+	
+		mmf <- dbListFields( db , 'person' )[ !( dbListFields( db , 'person' ) %in% dbListFields( db , 'h_f_xwalk' ) ) ]
+		dbSendQuery( db , paste( "create table hfpz as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" ) )
 	
 	}
 		
@@ -574,7 +556,16 @@ for ( year in cps.years.to.download ){
 		
 		rm( ot , ac , ot_ac ) ; gc()
 		
-		dbSendQuery( db , "create table hfp as select * from hfp_pac as a inner join ot_ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" )
+		
+		mmf <- dbListFields( db , 'ot_ac' )[ !( dbListFields( db , 'ot_ac' ) %in% dbListFields( db , 'hfp_pac' ) ) ]
+		dbSendQuery( 
+			db , 
+			paste( 
+				"create table hfp as select a.* , " , 
+				paste( "b." , mmf , sep = "" , collapse = "," ) , 
+				" from hfp_pac as a inner join ot_ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" 
+			)
+		)
 		
 		stopifnot( dbGetQuery( db , 'select count(*) from hfp' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from hfp_pac' )[ 1 , 1 ] )
 		
@@ -592,10 +583,6 @@ for ( year in cps.years.to.download ){
 		
 	}
 	
-	
-	
-	
-	dbSendQuery( db , "CREATE INDEX hfp_index ON hfp ( h_seq , ffpos , pppos )" )
 	
 
 	if( year > 2004 ){
@@ -672,31 +659,34 @@ for ( year in cps.years.to.download ){
 		}
 		
 		# store the CPS ASEC march 2011 replicate weight file as an R data frame
-		read.SAScii.sqlite ( 
+		read.SAScii.monetdb ( 
 			CPS.replicate.weight.file.location , 
 			CPS.replicate.weight.SAS.read.in.instructions , 
 			zipped = zip_file , 
 			tl = TRUE ,
 			tablename = 'rw' ,
-			conn = db
+			conn = db ,
+			varchar = FALSE
 		)
-		
-		
-		# create an index to speed up the merge
-		dbSendQuery( db , "CREATE INDEX rw_index ON rw ( h_seq , pppos )" )
 
 
 		###################################################
 		# merge cps asec file with replicate weights file #
 		###################################################
 
-		sql <- paste( "create table" , cps.tablename , "as select * from hfp as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" )
+		mmf <- dbListFields( db , 'rw' )[ !( dbListFields( db , 'rw' ) %in% dbListFields( db , 'hfp' ) ) ]
+		
+		sql <- paste( "create table" , cps.tablename , "as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from hfp as a inner join rw as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" )
 		
 		dbSendQuery( db , sql )
 
 	} else {
 	
-		dbSendQuery( db , paste( "create table" , cps.tablename , "as select * from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" ) )
+		mmf <- dbListFields( db , 'person' )[ !( dbListFields( db , 'person' ) %in% dbListFields( db , 'h_f_xwalk' ) ) ]
+		
+		sql <- paste( "create table" , cps.tablename , "as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from h_f_xwalk as a inner join person as b on a.h_seq = b.ph_seq AND a.pppos = b.pppos" )
+		
+		dbSendQuery( db , sql )
 			
 	}
 		
@@ -767,12 +757,14 @@ for ( year in cps.years.to.download ){
 		
 		dbRemoveTable( db , cps.tablename )
 		
+		mmf <- dbListFields( db , paste0( cps.tablename , '_sp' ) )[ !( dbListFields( db , paste0( cps.tablename , '_sp' ) ) %in% dbListFields( db , 'temp' ) ) ]
+		
 		dbSendQuery( 
 			db , 
 			paste0( 
 				"create table " , 
 				cps.tablename , 
-				" as select * from temp as a inner join " ,
+				" as select a.* , " , paste( "b." , mmf , sep = "" , collapse = "," ) , " from temp as a inner join " ,
 				cps.tablename , 
 				"_sp as b on a.h_seq = b.h_seq AND a.pppos = b.pppos" 
 			) 
@@ -795,16 +787,13 @@ for ( year in cps.years.to.download ){
 	dbSendQuery( db , paste( "DROP TABLE" , cps.tablename ) )
 	
 	# rename the temporary table
-	dbSendQuery( db , paste( "ALTER TABLE temp RENAME TO" , cps.tablename ) )
+	dbSendQuery( db , paste( "CREATE TABLE" , cps.tablename , "AS SELECT * FROM temp WITH DATA" ) )
+	dbRemoveTable( db , "temp" )
 	
 	# disconnect from the current database
 	dbDisconnect( db )
 	
 }
-
-
-# print a reminder: set the directory you just saved everything to as read-only!
-message( paste0( "all done.  you should set the file " , file.path( getwd() , cps.dbname ) , " read-only so you don't accidentally alter these tables." ) )
 
 
 # for more details on how to work with data in r
