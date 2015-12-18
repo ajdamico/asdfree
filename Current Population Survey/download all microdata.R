@@ -9,7 +9,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
 # cps.years.to.download <- c( 2015 , 2014 , 2014.58 , 2014.38 , 2013:1998 )
-# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/cpslite/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -100,7 +100,7 @@ library(sas7bdat.parso) 	# load the sas7bdat.parso (imports binary/compressed sa
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/cpslite/Download%20Cache/download%20cache.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )
@@ -108,13 +108,13 @@ source_url(
 # load the dd_parser function to disentangle census bureau-provided import scripts
 # for any march extracts that haven't been provided by nber
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/cpslite/Current%20Population%20Survey/dd_parser.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Current%20Population%20Survey/dd_parser.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )
 
 # load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/asdfree/cpslite/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 
 # if this option is set to TRUE
