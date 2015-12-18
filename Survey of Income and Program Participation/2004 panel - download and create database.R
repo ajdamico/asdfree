@@ -101,7 +101,7 @@ fix.ct <-
 		sas_lines <- readLines( sasfile )
 
 		# ssuid should always be numeric (it's occasionally character)
-		sas_lines <- gsub( "SSUID $" , "SSUID" , sas_lines )
+		sas_lines <- gsub( "SSUID \\$" , "SSUID" , sas_lines )
 		
 		# ctl_date and lgtwttyp contain strings not numbers
 		sas_lines <- gsub( "CTL_DATE" , "CTL_DATE $" , sas_lines )
