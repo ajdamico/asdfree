@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SIPP/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/replicate%20census%20poverty%20statistics.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/replicate%20census%20poverty%20statistics.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -46,7 +46,7 @@
 # prior to running this analysis script, the survey of income and program participation 2008 panel must be loaded as a database (.db) on the local machine. #
 # running the "2008 panel - download and create database" script will create this database file                                                             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20download%20and%20create%20database.R #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20download%20and%20create%20database.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "SIPP08.db" in C:/My Directory/SIPP or wherever the working directory was set for the program                              #
 #############################################################################################################################################################
@@ -65,11 +65,12 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" ) )
+# install.packages( "survey" )
 
 
-library(survey)		# load survey package (analyzes complex design surveys)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(survey)				# load survey package (analyzes complex design surveys)
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 
 
 # increase size at which numbers are presented in scientific notation
@@ -86,10 +87,11 @@ options( survey.replicates.mse = TRUE )
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
 
 
-# immediately connect to the SQLite database
-# this connection will be stored in the object 'db'
-db <- dbConnect( SQLite() , "SIPP08.db" )
+# name the database files in the "SIPP08" folder of the current working directory
+dbfolder <- paste0( getwd() , "/SIPP08" )
 
+# connect to the MonetDBLite database (.db)
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # make a character vector containing the variables that should be kept from the core file (core keep variables)

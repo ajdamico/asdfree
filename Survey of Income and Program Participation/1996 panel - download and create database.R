@@ -9,7 +9,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SIPP/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/1996%20panel%20-%20download%20and%20create%20database.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/1996%20panel%20-%20download%20and%20create%20database.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -46,10 +46,9 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "SAScii" , "descr" , "downloader" , "digest" ) )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/") )
 
-
-SIPP.dbname <- "SIPP96.db"											# choose the name of the database (.db) file on the local disk
+SIPP.dbname <- "SIPP96"												# choose the name of the database folder on the local disk
 
 sipp.core.waves <- 1:12												# either choose which core survey waves to download, or set to NULL
 sipp.replicate.waves <- 1:12										# either choose which replicate weight waves to download, or set to NULL
@@ -66,13 +65,18 @@ sipp.pnl.longitudinal.replicate.weights <- 'pnl'					# set to NULL to prevent do
 # # # # # # # # #
 
 
-library(RSQLite) 	# load RSQLite package (creates database files in R)
-library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-library(downloader)	# downloads and then runs the source() function on scripts from github
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
+library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
+library(downloader)			# downloads and then runs the source() function on scripts from github
 
 
-# open the connection to the sqlite database
-db <- dbConnect( SQLite() , SIPP.dbname )
+
+# name the database files in the "SIPP08" folder of the current working directory
+dbfolder <- paste0( getwd() , SIPP.dbname )
+
+# connect to the MonetDBLite database (.db)
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 ##############################################################################
@@ -208,8 +212,8 @@ chop.suid <-
 
 
 
-# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/asdfree/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
+# load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 # set the locations of the data files on the ftp site
 SIPP.core.sas <-
@@ -251,10 +255,10 @@ if ( sipp.longitudinal.weights ){
 	# end of fake SAS input script creation #
 	
 	# add the longitudinal weights to the database in a table 'w12'
-	read.SAScii.sqlite(
+	read.SAScii.monetdb(
 		"http://thedataweb.rm.census.gov/pub/sipp/1996/ctl_fer.zip" ,
 		chop.suid( fix.ct( sas.import.with.at.signs.tf ) ) ,
-		# note no beginline = parameter in this read.SAScii.sqlite() call
+		# note no beginline = parameter in this read.SAScii.monetdb() call
 		zipped = T ,
 		tl = TRUE ,
 		tablename = "wgtw12" ,
@@ -270,7 +274,7 @@ for ( i in sipp.core.waves ){
 		paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/l96puw" , i , ".zip" )
 
 	# add the core wave to the database in a table w#
-	read.SAScii.sqlite (
+	read.SAScii.monetdb (
 			SIPP.core ,
 			chop.suid( fix.ct( SIPP.core.sas ) ) ,
 			beginline = 5 ,
@@ -289,7 +293,7 @@ for ( i in sipp.replicate.waves ){
 		paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/rw96w" , i , ".zip" )
 
 	# add the wave-specific replicate weight to the database in a table rw#
-	read.SAScii.sqlite (
+	read.SAScii.monetdb (
 			SIPP.rw ,
 			chop.suid( fix.ct( fix.repwgt( SIPP.replicate.sas ) ) ) ,
 			beginline = 7 ,
@@ -316,7 +320,7 @@ for ( i in sipp.topical.modules ){
 		paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/p96putm" , i , ".sas" )
 		
 	# add each topical module to the database in a table tm#
-	read.SAScii.sqlite (
+	read.SAScii.monetdb (
 			SIPP.tm ,
 			chop.suid( fix.ct( SIPP.tm.sas ) ) ,
 			beginline = 5 ,
@@ -335,7 +339,7 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 		paste0( "http://thedataweb.rm.census.gov/pub/sipp/1996/lrw96" , i , ".zip" )
 		
 	# add each longitudinal replicate weight file to the database in a table cy1-4 or pnl
-	read.SAScii.sqlite (
+	read.SAScii.monetdb (
 			SIPP.lrw ,
 			chop.suid( fix.repwgt( SIPP.longitudinal.replicate.sas ) ) ,
 			beginline = 7 ,
@@ -349,7 +353,7 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 
 
 # database goodwill check!
-# does every table in this sqlite database have *at least* one record?
+# does every table in this MonetDB database have *at least* one record?
 for ( tablename in dbListTables( db ) ){
 	stopifnot( dbGetQuery( db , paste( 'select count(*) from' , tablename ) ) > 0 )
 }
