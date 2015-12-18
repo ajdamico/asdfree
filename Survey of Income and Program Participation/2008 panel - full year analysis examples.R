@@ -191,9 +191,9 @@ for ( i in 1:12 ){
 				) , 
 				waves , 
 				paste0( 
-					" where rhcalmn == " ,
+					" where rhcalmn = " ,
 					i ,
-					" AND rhcalyr == " , 
+					" AND rhcalyr = " , 
 					year 
 				) , 
 				collapse = " union all " 
@@ -228,7 +228,7 @@ for ( i in 1:12 ){
 				paste0( "b." , no.se.core.kv , collapse = "," ) , 
 				" from sy" ,
 				i - 1 ,
-				" as a left join sm as b on a.ssuid == b.ssuid AND a.epppnum == b.epppnum" 
+				" as a left join sm as b on a.ssuid = b.ssuid AND a.epppnum = b.epppnum" 
 			)
 		)
 		

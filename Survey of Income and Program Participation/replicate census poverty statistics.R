@@ -114,7 +114,7 @@ core.kv <-
 
 # # # # # # # # # # # # #
 # calendar month access #
-# if an analysis requires specific a specific month on the calendar, instead of 'srefmon == 4' use 'rhcalmn == #' where # is 1 through 12
+# if an analysis requires specific a specific month on the calendar, instead of 'srefmon = 4' use 'rhcalmn = #' where # is 1 through 12
 # this alternative is not as desirable, however, because:
 	# a) only one of the four rotation groups will have been interviewed in the month of the calendar (the other three will be more prone to memory-bias)
 	# b) questions and variables available only in the topical modules (not the core files) reflect the month prior to the interview, and will not be available at other time periods
@@ -125,10 +125,10 @@ core.kv <-
 			# paste( 
 				# "select" , 
 				# paste( core.kv , collapse = "," ) , 
-				# "from w2 where rhcalyr == 2009 AND rhcalmn == 2" ,
+				# "from w2 where rhcalyr = 2009 AND rhcalmn = 2" ,
 				# "union select" , 
 				# paste( core.kv , collapse = "," ) , 
-				# "from w3 where rhcalyr == 2009 AND rhcalmn == 2" 
+				# "from w3 where rhcalyr = 2009 AND rhcalmn = 2" 
 			# )
 			
 		# and make your tablename variable something else, since it's no longer just w2 or w3.
@@ -141,7 +141,7 @@ core.kv <-
 		paste( 
 			"select" , 
 			paste( core.kv , collapse = "," ) , 
-			"from w1 where rhcalyr == 2008 AND rhcalmn == 8" 
+			"from w1 where rhcalyr = 2008 AND rhcalmn = 8" 
 		)
 		
 	# and make your tablename variable something else, since it's no longer just w2 or w3.
