@@ -101,11 +101,11 @@ core.kv <-
 	
 # each core wave data file contains data at the person-month level.  in general, there are four records per respondent in each core wave data set.
 # for most point-in-time analyses, use the fourth (most current) month,
-# specifically isolated below by the 'srefmon == 4' command
+# specifically isolated below by the 'srefmon = 4' command
 
 # create a sql string containing the select command used to pull only a defined number of columns 
 # and records containing the fourth reference month from the full core data file
-sql.string <- paste0( "select " , paste( core.kv , collapse = "," ) , " from w" , wave , " where srefmon == 4" )
+sql.string <- paste0( "select " , paste( core.kv , collapse = "," ) , " from w" , wave , " where srefmon = 4" )
 # note: this yields point-in-time data collected over a four month period.
 
 # run the sql query constructed above, save the resulting table in a new data frame called 'x' that will now be stored in RAM
@@ -119,7 +119,7 @@ head( x )
 # access the appropriate replicate weight data #
 
 # create a sql string containing the select command used to pull the fourth reference month from the replicate weights data file
-sql.string <- paste0( "select * from rw" , wave , " where srefmon == 4" )
+sql.string <- paste0( "select * from rw" , wave , " where srefmon = 4" )
 # note: this yields point-in-time data collected over a four month period.
 
 # run the sql query constructed above, save the resulting table in a new data frame called 'rw' that will now be stored in RAM
@@ -164,7 +164,7 @@ tm.kv <-
 
 
 # each topical module data file contains data at the person-level.  in general, there is one record per respondent in each topical module data set.
-# topical module data corresponds with the month prior to the interview, so using the 'srefmon == 4' filter on the core file will correspond with that wave's topical module
+# topical module data corresponds with the month prior to the interview, so using the 'srefmon = 4' filter on the core file will correspond with that wave's topical module
 
 # create a sql string containing the select command used to pull only a defined number of columns 
 sql.string <- paste0( "select " , paste( tm.kv , collapse = "," ) , " from tm" , wave )
