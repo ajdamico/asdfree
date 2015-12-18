@@ -76,7 +76,7 @@ library(downloader)			# downloads and then runs the source() function on scripts
 
 
 # name the database files in the "SIPP08" folder of the current working directory
-dbfolder <- paste0( getwd() , SIPP.dbname )
+dbfolder <- paste0( getwd() , "/" , SIPP.dbname )
 
 # connect to the MonetDBLite database (.db)
 db <- dbConnect( MonetDBLite() , dbfolder )
