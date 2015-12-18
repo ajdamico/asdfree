@@ -338,7 +338,8 @@ for ( i in c( sipp.cy.longitudinal.replicate.weights , sipp.pnl.longitudinal.rep
 			zipped = T ,
 			tl = TRUE ,
 			tablename = i ,
-			conn = db
+			conn = db ,
+			try_best_effort = ( i == "cy3" )
 		)
 }
 # the current working directory should now contain one database (.db) file
