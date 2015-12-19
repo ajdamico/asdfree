@@ -44,11 +44,11 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" , "mitools" , "downloader" , "digest" ) )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "mitools" , "downloader" , "digest" , "survey" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/") )
 
 
-# name the database (.db) file to be saved in the working directory
-sbo.dbname <- "sbo07.db"
+# name the database folder to be saved in the working directory
+SBO.dbname <- "sbo"
 
 
 ############################################
@@ -58,11 +58,9 @@ sbo.dbname <- "sbo07.db"
 # program start #
 # # # # # # # # #
 
-# if the sbo database file already exists in the current working directory, print a warning
-if ( file.exists( paste( getwd() , sbo.dbname , sep = "/" ) ) ) warning( "the database file already exists in your working directory.\nyou might encounter an error if you are running the same year as before or did not allow the program to complete.\ntry changing the sbo.dbname in the settings above." )
 
-
-library(RSQLite) 			# load RSQLite package (creates database files in R)
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(mitools) 			# load mitools package (analyzes multiply-imputed data)
 library(survey) 			# load survey package (analyzes complex design surveys)
 library(downloader)			# downloads and then runs the source() function on scripts from github
@@ -92,34 +90,16 @@ download_cached( "http://www2.census.gov/econ/sbo/07/pums/pums_csv.zip" , tf , m
 # and store the filepath of the unzipped file(s) into a character vector `z`
 z <- unzip( tf , exdir = td )
 
-# connect to an rsqlite database on the local disk
-db <- dbConnect( SQLite() , sbo.dbname )
+# name the database files in the "SIPP08" folder of the current working directory
+dbfolder <- paste0( getwd() , "/" , SBO.dbname )
 
-# load the mathematical functions in the r package RSQLite.extfuns
-initExtension(db)
+# connect to the MonetDBLite database (.db)
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 # read the comma separated value (csv) file you just downloaded
-# directly into the rsqlite database you just created.
-dbWriteTable( db , 'z' , z , sep = "," , header = TRUE )
+# directly into the monetdb database you just created.
+dbWriteTable( db , 'y' , z , sep = "," , header = TRUE , lower.case.names = TRUE )
 # yes.  you did all that.  nice work.
-
-# re-write the same table, but with lowercase column names	
-dbSendQuery( 
-	db , 
-	paste(
-		'CREATE TABLE y AS SELECT' ,
-		paste( 
-			dbListFields( db , 'z' ) , 
-			tolower( dbListFields( db , 'z' ) ) , 
-			collapse = ', ' , 
-			sep = ' as '
-		) ,
-		"FROM z"
-	)
-)
-# and since the data table `z` has a bunch of messy capital-letter column names
-dbRemoveTable( db , 'z' )
-# delete it from the rsqlite database
 
 # add a new numeric column called `one` to the `y` data table
 dbSendQuery( db , 'ALTER TABLE y ADD COLUMN one DOUBLE PRECISION' )
@@ -133,7 +113,7 @@ dbSendQuery( db , 'ALTER TABLE y ADD COLUMN newwgt DOUBLE PRECISION' )
 dbSendQuery( db , 'UPDATE y SET newwgt = 10 * tabwgt * SQRT( 1 - 1 / tabwgt )' )
 # http://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=7
 
-# take a look at all the new data tables that have been added to your RAM-free SQLite database
+# take a look at all the new data tables that have been added to your RAM-free monetdb database
 dbListTables( db )
 
 # disconnect from the current database
@@ -144,9 +124,6 @@ file.remove( tf )
 
 # delete the whole temporary directory
 unlink( td , recursive = TRUE )
-
-# print a reminder: set the directory you just saved everything to as read-only!
-message( paste0( "all done.  you should set the file " , file.path( getwd() , sbo.dbname ) , " read-only so you don't accidentally alter these tables." ) )
 
 
 # for more details on how to work with data in r

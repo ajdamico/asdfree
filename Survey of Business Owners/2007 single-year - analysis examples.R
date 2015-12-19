@@ -45,10 +45,12 @@
 # setwd( "C:/My Directory/SBO/" )
 # ..in order to set your current working directory
 
-# name the database (.db) file that should have been saved in the working directory
-sbo.dbname <- "sbo07.db"
+# name the database folder that should have been saved in the working directory
+SBO.dbname <- "sbo"
 
-library(RSQLite) 			# load RSQLite package (creates database files in R)
+
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(mitools) 			# load mitools package (analyzes multiply-imputed data)
 library(survey) 			# load survey package (analyzes complex design surveys)
 library(downloader)			# downloads and then runs the source() function on scripts from github
@@ -88,12 +90,11 @@ options( survey.lonely.psu = "adjust" )
 # step 1: connect to the sbo data table you'd like to recode # 
 # then make a copy so you don't lose the pristine original.  #
 
-# the command 
-db <- dbConnect( SQLite() , sbo.dbname )
-# connects the current instance of r to the sqlite database
+# name the database files in the "SIPP08" folder of the current working directory
+dbfolder <- paste0( getwd() , "/" , SBO.dbname )
 
-# load the mathematical functions in the r package RSQLite.extfuns
-initExtension(db)
+# connect to the MonetDBLite database (.db)
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 # now simply copy you'd like to recode into a new table
 dbSendQuery( db , "CREATE TABLE x AS SELECT * FROM y" )
@@ -178,8 +179,8 @@ sbo.coef <-
 		id = ~1 ,
 		weight = ~tabwgt ,
 		data = 'x' ,
-		dbname = sbo.dbname ,
-		dbtype = "SQLite"
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
 	)
 # this one just uses the original table `x`
 
@@ -190,9 +191,10 @@ sbo.var <-
 		id = ~1 ,
 		weight = ~newwgt ,
 		data = imputationList( datasets = as.list( paste0( 'x' , 1:10 ) ) ) ,
-		dbname = sbo.dbname ,
-		dbtype = "SQLite"
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
 	)
+
 # this one uses the ten `x1` thru `x10` tables you just made.
 
 
@@ -253,10 +255,10 @@ MIcombine( with( sbo.svy , svyby( ~receipts_noisy , ~n07_employer , svytotal ) )
 # calculate the distribution of a categorical variable #
 
 # offer health insurance
-MIcombine( with( sbo.svy , svymean( ~factor( healthins ) ) ) )
+MIcombine( with( sbo.svy , svymean( ~factor( healthins ) , na.rm = TRUE ) ) )
 
 # by state
-MIcombine( with( sbo.svy , svyby( ~factor( healthins ) , ~fipst , svymean ) ) )
+MIcombine( with( sbo.svy , svyby( ~factor( healthins ) , ~fipst , svymean , na.rm = TRUE ) ) )
 
 
 # calculate the median and other percentiles #
@@ -365,6 +367,13 @@ barplot(
 	names.arg = c( "Not Reported" , "Joint Husband-Wife" , "Primarily Husband" , "Primarily Wife" , "Not Husband-Wife" ) ,
 	ylim = c( 0 , 700 )
 )
+
+
+# note! big note!
+# you can delete these eleven tables you just created easily,
+# with this easy, easy, easy loop:
+dbRemoveTable( db , 'x' )
+for ( i in 1:10 ) dbRemoveTable( db , paste0( 'x' , i ) )
 
 
 # for more details on how to work with data in r
