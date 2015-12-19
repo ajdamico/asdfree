@@ -5,9 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 # setwd( "C:/My Directory/PISA/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/extract%20specific%20countries.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -48,35 +46,14 @@ library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
-
-# after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all program for international student assessment tables
-# run them now.  mine look like this:
-
-
-#####################################################################
-# lines of code to hold on to for all other `pisa` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
+# setwd( "C:/My Directory/PISA/" )
 
-# second: run the MonetDB server
-monetdb.server.start( batfile )
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "pisa"
-dbport <- 50007
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # the program for international student assessment download and importation script
@@ -126,12 +103,6 @@ for ( i in 1:5 ){
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `pisa` monetdb analyses #
-############################################################################
 
 
 # R will exactly match SUDAAN results and Stata with the MSE option results
