@@ -255,10 +255,10 @@ MIcombine( with( sbo.svy , svyby( ~receipts_noisy , ~n07_employer , svytotal ) )
 # calculate the distribution of a categorical variable #
 
 # offer health insurance
-MIcombine( with( sbo.svy , svymean( ~factor( healthins ) ) ) )
+MIcombine( with( sbo.svy , svymean( ~factor( healthins ) , na.rm = TRUE ) ) )
 
 # by state
-MIcombine( with( sbo.svy , svyby( ~factor( healthins ) , ~fipst , svymean ) ) )
+MIcombine( with( sbo.svy , svyby( ~factor( healthins ) , ~fipst , svymean , na.rm = TRUE ) ) )
 
 
 # calculate the median and other percentiles #
