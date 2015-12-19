@@ -5,7 +5,6 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # setwd( 'C:/My Directory/PISA/' )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
