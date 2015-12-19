@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PISA/" )
-# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/extract%20specific%20countries.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/extract%20specific%20countries.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -27,16 +27,16 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###########################################################################################################################################
-# prior to running this analysis script, the pisa 2009 multiply-imputed tables must be loaded as a monet-backed sqlsurvey object on the   #
-# local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R"  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "2009 int_stq09_dec11.rda" in C:/My Directory/PISA or wherever the working directory was set.            #
-###########################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#######################################################################################################################################################
+# prior to running this analysis script, the pisa 2009 multiply-imputed tables must be loaded as a monet-backed survey object on the                  #
+# local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need             #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "2009 int_stq09_dec11.rda" in C:/My Directory/PISA or wherever the working directory was set.                        #
+#######################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 library(downloader)		# downloads and then runs the source() function on scripts from github
@@ -158,14 +158,14 @@ svycontrast(
 # ..precisely matches the statistics and standard errors for `BRA` (brazil)
 # shown in the lower lower right corner of powerpoint slide 20 in the oecd-produced 2009
 # technical documentation, saved here:
-# https://github.com/ajdamico/asdfree/blob/pisalite/Program%20for%20International%20Student%20Assessment/4_SE_differences.pptx?raw=true
+# https://github.com/ajdamico/asdfree/blob/master/Program%20for%20International%20Student%20Assessment/4_SE_differences.pptx?raw=true
 
 
 # `brazil.2009.design` is a multiply-imputed (but no longer monetdb-backed) replicate-weighted survey design object
 # that you can analyze using syntax similar to the national health interview survey's multiply-imputed survey objects (found here)
-# https://github.com/ajdamico/asdfree/blob/pisalite/National%20Health%20Interview%20Survey/2011%20personsx%20plus%20samadult%20with%20multiple%20imputation%20-%20analyze.R
+# https://github.com/ajdamico/asdfree/blob/master/National%20Health%20Interview%20Survey/2011%20personsx%20plus%20samadult%20with%20multiple%20imputation%20-%20analyze.R
 # or the consumer expenditure survey's multiply-imputed survey objects (found here)
-# https://github.com/ajdamico/asdfree/blob/pisalite/Consumer%20Expenditure%20Survey/2011%20fmly%20intrvw%20-%20analysis%20examples.R
+# https://github.com/ajdamico/asdfree/blob/master/Consumer%20Expenditure%20Survey/2011%20fmly%20intrvw%20-%20analysis%20examples.R
 
 # this pisa extraction script does not contain a full set of analysis examples for this non-monetdb-backed object
 # but you can review syntax examples for multiply-imputed objects in those other scripts.  please and thank you.

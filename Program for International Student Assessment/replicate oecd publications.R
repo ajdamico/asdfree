@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PISA/" )
-# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/replicate%20oecd%20publications.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/replicate%20oecd%20publications.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -30,9 +30,9 @@
 ###########################################
 # this script matches the oecd statistics #######################################################
 # they've published at this url..  http://www.oecd.org/pisa/pisaproducts/4_SE_differences.pptx  #########################
-# ..but just in case they decide to up and change it, i've saved a copy of the original file with all the methods here: #############
-# https://github.com/ajdamico/asdfree/blob/pisalite/Program%20for%20International%20Student%20Assessment/4_SE_differences.pptx?raw=true #
-#####################################################################################################################################
+# ..but just in case they decide to up and change it, i've saved a copy of the original file with all the methods here: ###############
+# https://github.com/ajdamico/asdfree/blob/master/Program%20for%20International%20Student%20Assessment/4_SE_differences.pptx?raw=true #
+#######################################################################################################################################
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -40,7 +40,7 @@
 # prior to running this analysis script, the pisa 2009 multiply-imputed tables must be loaded as a monet-backed survey object on the                  #
 # local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" #
+# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "2009 int_stq09_dec11.rda" in C:/My Directory/PISA or wherever the working directory was set.                        #
 #######################################################################################################################################################
@@ -60,7 +60,7 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
 
 
 # name the database files in the "MonetDB" folder of the current working directory

@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( 'C:/My Directory/PISA/' )
-# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -32,7 +32,7 @@
 # prior to running this analysis script, the pisa 2012 multiply-imputed tables must be loaded as a monet-backed sqlsurvey object on the               #
 # local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" #
+# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "2012 int_stu12_dec03.rda" in C:/My Directory/PISA or wherever the working directory was set.                        #
 #######################################################################################################################################################
@@ -47,7 +47,7 @@ library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
 
 
 # name the database files in the "MonetDB" folder of the current working directory
