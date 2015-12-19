@@ -214,7 +214,7 @@ for ( i in 1:12 ){
 		dbSendQuery( db , "create table sy1 as select * from sm with data" )
 		
 		# check out the record count
-		dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) )
+		print( dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) ) )
 		
 		# ..and drop the current month table.
 		dbRemoveTable( db , "sm" )
@@ -236,11 +236,14 @@ for ( i in 1:12 ){
 			)
 		)
 		
+		# check out the record count
+		print( dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) ) )
+		
 		# drop the current month table
 		dbRemoveTable( db , "sm" )
 	
 		# check out the record count
-		dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) )
+		print( dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) ) )
 		
 		# ..and drop the prior-month table
 		dbRemoveTable( db , paste0( "sy" , i - 1 ) )
