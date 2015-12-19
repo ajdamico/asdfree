@@ -156,7 +156,7 @@ pisa.svyttest( readz ~ st04q01 , oecd.imp )
 # quantile time #
 
 # hey how about we run the reading score for each of those quantiles.
-print( MIcombine( with( oecd.imp , svyby( ~readz , ~one , c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) , svyquantile ) ) ) )
+MIcombine( with( oecd.imp , svyby( ~readz , ~one , svyquantile , c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) ) ) )
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #

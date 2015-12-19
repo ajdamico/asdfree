@@ -154,6 +154,7 @@ MIcombine( with( this_design , svyby( ~scie , ~cnt , svymean ) ) )
 
 # force it to be categorical first
 this_design <- update( this_design , ic01q04 = factor( ic01q04 ) )
+this_design <- update( this_design , cnt = factor( cnt ) )
 
 # percent with an internet connection:
 # 1) yes, and i use it
@@ -163,7 +164,7 @@ this_design <- update( this_design , ic01q04 = factor( ic01q04 ) )
 MIcombine( with( this_design , svymean( ~ ic01q04 , na.rm = TRUE ) ) )
 
 # by country
-MIcombine( with( this_design , svyby( ~ ic01q04 , ~cnt , svymean , na.rm = TRUE ) ) )
+MIcombine( with( this_design , svyby( ~ ic01q04 , ~cnt , svymean , na.rm.by = TRUE , na.rm.all = TRUE , na.rm = TRUE ) ) )
 
 # oh!  and fun fact.  do you know why..
 # in compendium file..
