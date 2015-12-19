@@ -7,7 +7,6 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PISA/" )
 # years.to.download <- c( 2000 , 2003 , 2006 , 2009 , 2012 )
