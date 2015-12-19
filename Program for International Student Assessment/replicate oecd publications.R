@@ -5,10 +5,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
-# load( 'C:/My Directory/PISA/2009 int_stq09_dec11.rda' )
+# setwd( "C:/My Directory/PISA/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/replicate%20oecd%20publications.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -57,6 +55,9 @@ library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/PISA/" )
+
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
@@ -87,27 +88,11 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # load the desired program for international student assessment monet database-backed complex sample design objects
 
 # uncomment one this line by removing the `#` at the front..
-# load( 'C:/My Directory/PISA/2009 int_stq09_dec11.rda' )	# analyze the 2009 student questionnaire
+load( '2009 int_stq09_dec11.rda' )	# analyze the 2009 student questionnaire
 
 
-# note: this r data file should contain five sqlrepdesign objects ending with `imp1` - `imp5`
-# you can check 'em out by running the `ls()` function to see what's available in working memory.
-ls()
-# see them?
-# they should be named something like this..
-paste0( 'int_stq09_dec11_imp' , 1:5 )
-
-# now use `mget` to take a character vector,
-# look for objects with the same names,
-# and smush 'em all together into a list
-imp.list <- mget( paste0( 'int_stq09_dec11_imp' , 1:5 ) )
-
-# now take a deep breath because this next part might scare you.
-
-# use the custom-made `svyMDBdesign` function to put
-# those five database-backed tables (already smushed into a list object)
-# into a new and sexy object type - a monetdb-backed, multiply-imputed svrepdesign object.
-pisa.imp <- svyMDBdesign( imp.list )
+# open the survey design object's connection
+pisa.imp <- svyMDBdesign( this_design )
 # note to database-connection buffs out there: this function does the port `open`ing for you.
 
 

@@ -74,16 +74,6 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # load the desired program for international student assessment monet database-backed complex sample design objects
 
 
-# uncomment this line by removing the `#` at the front..
-# setwd( "C:/My Directory/PISA/" )
-# ..in order to set your current working directory
-
-
-
-# uncomment one this line by removing the `#` at the front..
-load( '2009 int_stq09_dec11.rda' )	# analyze the 2009 student questionnaire
-
-
 # create a character vector with all five of the tablenames
 five.imps <- paste0( 'int_stq09_dec11_imp' , 1:5 )
 
