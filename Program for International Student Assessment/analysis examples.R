@@ -93,7 +93,7 @@ this_design <- svyMDBdesign( this_design )
 this_design <- update( this_design , progcat = ifelse( st49q07 %in% 1:2 , 'always, almost always, or often' , ifelse( st49q07 %in% 3:4 , 'sometimes, rarely, or never' , NA ) ) )
 
 # print the distribution of that category
-svymean( ~ progcat , this_design )
+MIcombine( with( this_design , svymean( ~ progcat , na.rm = TRUE ) ) )
 
 
 ################################################
@@ -157,10 +157,10 @@ MIcombine( with( this_design , svyby( ~scie , ~cnt , svymean ) ) )
 # 2) yes, but i don't use it
 # 3) no
 
-MIcombine( with( this_design , svymean( ~factor( ic01q04 ) ) ) )
+MIcombine( with( this_design , svymean( ~factor( ic01q04 ) , na.rm = TRUE ) ) )
 
 # by country
-MIcombine( with( this_design , svyby( ~factor( ic01q04 ) , ~cnt , svymean ) ) )
+MIcombine( with( this_design , svyby( ~factor( ic01q04 ) , ~cnt , svymean , na.rm = TRUE ) ) )
 
 # oh!  and fun fact.  do you know why..
 # in compendium file..
