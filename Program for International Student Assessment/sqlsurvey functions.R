@@ -8,14 +8,28 @@
 # combine five sqlrepsurvey designs
 # into a single monetdb-backed multiply-imputed replicate-weighted list
 svyMDBdesign <-
-	function( five.designs ){
+	function( my_design ){
 	
 		# open each of those design connections with MonetDB hooray
-		this_design$designs <- lapply( this_design$designs , open , MonetDB.R() )
+		my_design$designs <- lapply( my_design$designs , open , MonetDB.R() )
+	
+		my_design
+	}
 
-		class( this_design ) <- 'svyDBimputationList'
+pisa.update <-
+	function( my_design , ... ){
+	
+		my_design$designs <- lapply( my_design$designs , update , ... )
+	
+		my_design
+	}
+
+pisa.subset <-
+	function( my_design , ... ){
 		
-		this_design
+		my_design$designs <- lapply( my_designs$designs , subset , ... )
+		
+		my_design
 	}
 
 

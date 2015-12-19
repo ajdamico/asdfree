@@ -90,7 +90,7 @@ this_design <- svyMDBdesign( this_design )
 
 
 # construct a new category variable in the dataset
-this_design <- update( this_design , progcat = ifelse( st49q07 %in% 1:2 , 'always, almost always, or often' , ifelse( st49q07 %in% 3:4 , 'sometimes, rarely, or never' , NA ) ) )
+this_design <- pisa.update( this_design , progcat = ifelse( st49q07 %in% 1:2 , 'always, almost always, or often' , ifelse( st49q07 %in% 3:4 , 'sometimes, rarely, or never' , NA ) ) )
 
 # print the distribution of that category
 MIcombine( with( this_design , svymean( ~ progcat , na.rm = TRUE ) ) )
@@ -197,7 +197,7 @@ MIcombine( with( this_design , svyby( ~scie , ~one , svyquantile , c( 0.05 , 0.1
 ######################
 
 # restrict the this_design object to females only
-this_design.female <- subset( this_design , st04q01 == 2 )
+this_design.female <- pisa.subset( this_design , st04q01 == 2 )
 
 # now any of the above commands can be re-run
 # using the this_design.female object
