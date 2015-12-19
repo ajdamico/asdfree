@@ -219,13 +219,6 @@ for ( i in 1:10 ){
 }
 
 
-# note! big note!
-# you can delete these ten tables you just created easily,
-# with this easy, easy, easy loop:
-# for ( i in 1:10 ) dbRemoveTable( db , paste0( 'x' , i ) )
-# of course it didn't run if you didn't uncomment it ;)
-
-
 #############################################################################
 # step 4: create a new survey design object connecting to the recoded table #
 
@@ -318,6 +311,13 @@ out <- out[ order( out$fipst ) , ]
 # that matches the `PUMS_MIN_FINAL.CSV` file precisely.
 
 # and that is a beautiful thing.
+
+
+# note! big note!
+# you can delete these eleven tables you just created easily,
+# with this easy, easy, easy loop:
+dbRemoveTable( db , 'x' )
+for ( i in 1:10 ) dbRemoveTable( db , paste0( 'x' , i ) )
 
 	
 # for more details on how to work with data in r

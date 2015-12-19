@@ -369,6 +369,13 @@ barplot(
 )
 
 
+# note! big note!
+# you can delete these eleven tables you just created easily,
+# with this easy, easy, easy loop:
+dbRemoveTable( db , 'x' )
+for ( i in 1:10 ) dbRemoveTable( db , paste0( 'x' , i ) )
+
+
 # for more details on how to work with data in r
 # check out my two minute tutorial video site
 # http://www.twotorials.com/
