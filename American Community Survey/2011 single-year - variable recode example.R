@@ -9,7 +9,7 @@
 # library(downloader)
 # batfile <- "C:/My Directory/ACS/MonetDB/acs.bat"		# # note for mac and *nix users: `acs.bat` might be `acs.sh` instead
 # load( 'C:/My Directory/ACS/acs2011_1yr.rda' )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/American%20Community%20Survey/2011%20single-year%20-%20variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/American%20Community%20Survey/2011%20single-year%20-%20variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

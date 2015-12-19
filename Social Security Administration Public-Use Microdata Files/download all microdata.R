@@ -8,7 +8,7 @@
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/SSAPUMF/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Social%20Security%20Administration%20Public-Use%20Microdata%20Files/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Social%20Security%20Administration%20Public-Use%20Microdata%20Files/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

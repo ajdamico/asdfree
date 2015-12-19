@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PIAAC/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Programme%20for%20the%20International%20Assessment%20of%20Adult%20Competencies/replication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Programme%20for%20the%20International%20Assessment%20of%20Adult%20Competencies/replication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -32,7 +32,7 @@
 # prior to running this analysis script, the piaac multiply-imputed tables must be loaded as a replicate-weighted survey object on the    #
 # local machine. running the download, import, and design script will create an r data file (.rda) with whatcha need.                     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# "https://raw.github.com/ajdamico/asdfree/master/Programme%20for%20the%20International%20Assessment%20of%20Adult%20Competencies/download%20import%20and%20design.R"  #
+# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Programme%20for%20the%20International%20Assessment%20of%20Adult%20Competencies/download%20import%20and%20design.R"  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create the files "prgautp1.rda" and "prgbelp1.rda" in C:/My Directory/PIAAC or wherever the working directory was set. #
 ###########################################################################################################################################

@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/ATUS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/American%20Time%20Use%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/American%20Time%20Use%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -67,7 +67,7 @@ tf <- tempfile()
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )

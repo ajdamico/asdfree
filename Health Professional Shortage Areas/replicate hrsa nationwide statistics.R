@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/HPSA/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Health%20Professional%20Shortage%20Areas/replicate%20hrsa%20nationwide%20statistics.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Health%20Professional%20Shortage%20Areas/replicate%20hrsa%20nationwide%20statistics.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

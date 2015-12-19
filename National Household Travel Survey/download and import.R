@@ -9,7 +9,7 @@
 # library(downloader)
 # setwd( "C:/My Directory/NHTS/" )
 # years.to.download <- c( 1983 , 1990 , 1995 , 2001 , 2009 )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -220,7 +220,7 @@ tf <- tempfile() ; td <- tempdir()
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )

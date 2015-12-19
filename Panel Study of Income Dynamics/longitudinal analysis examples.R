@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PSID/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/longitudinal%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/longitudinal%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -19,7 +19,7 @@
 # in the actual values for some of the records of those remaining 1,633, so your answers still will not match.
 # in short: you'll have to trust that my modern version of their tutorials is accurate.
 # tutorial #3 - http://psidonline.isr.umich.edu/Guide/tutorials/tutorial3/balanced_panel.pdf
-# psid e-mail - https://raw.github.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/different%20record%20counts%20in%20tutorial%203.pdf?raw=TRUE
+# psid e-mail - https://raw.githubusercontent.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/different%20record%20counts%20in%20tutorial%203.pdf?raw=TRUE
 # hope that works for you. if it doesn't, e-mail psidhelp@umich.edu and ask for their tutorials to be updated. ;)
 # and yes, tutorial #1 is more current, but it doesn't use the panel.  using the panel is the whole point of this survey.
 
@@ -44,7 +44,7 @@
 #####################################################################################################################
 # prior to running this analysis script, the umich individual cross-year file must be downloaded to your local disk #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/download%20all%20microdata.R  #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will place all necessary psid files whever you specified, probably the "C:/My Directory/PSID/" folder #
 #####################################################################################################################
@@ -192,7 +192,7 @@ y <-
 # start of cheating detour #
 
 # # only use the commands inside this cheating detour if you're interested in getting closer to the 1,633 records described in
-# # https://raw.github.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/different%20record%20counts%20in%20tutorial%203.pdf?raw=TRUE
+# # https://raw.githubusercontent.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/different%20record%20counts%20in%20tutorial%203.pdf?raw=TRUE
 
 # # pull the excel file
 

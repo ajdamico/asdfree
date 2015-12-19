@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/TIMSS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Trends%20in%20International%20Mathematics%20and%20Science%20Study/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Trends%20in%20International%20Mathematics%20and%20Science%20Study/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -62,7 +62,7 @@ library(SAScii) 			# load the SAScii package (imports ascii data with a SAS scri
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )

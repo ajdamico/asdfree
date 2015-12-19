@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/HPSA/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Health%20Professional%20Shortage%20Areas/identify%20point-in-time%20geographic%20hpsas.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Health%20Professional%20Shortage%20Areas/identify%20point-in-time%20geographic%20hpsas.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

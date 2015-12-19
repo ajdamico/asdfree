@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PSID/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/replicate%20umich.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/replicate%20umich.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -16,12 +16,12 @@
 # so i asked one of the authors of this paper -
 # http://psidonline.isr.umich.edu/Publications/Papers/tsp/2011-05_Heeringa_Berglung_Khan.pdf
 # - to provide me with example sas output that i could precisely match.  they did.  here it is:
-# https://raw.github.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/umich%20output.pdf?raw=TRUE
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/umich%20output.pdf?raw=TRUE
 # and this script matches those results exactly.  but it only works exactly on the 1968-2009 individual cross-year file.
 # the 1968-2009 individual cross-year file is already obsolete, so if you run this script,
 # you'll get every-so-slightly different numbers.  to assuage your concerns, i've run the whole script on the 1968-2009 file
 # and saved the output here:
-# https://raw.github.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/replication%20output.pdf?raw=TRUE
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/replication%20output.pdf?raw=TRUE
 # hope that works for you.  if it doesn't, e-mail psidhelp@umich.edu and ask for the 1968-2009 file yourself ;)
 
 # if you have never used the r language before,
@@ -43,7 +43,7 @@
 #####################################################################################################################
 # prior to running this analysis script, the umich individual cross-year file must be downloaded to your local disk #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/download%20all%20microdata.R  #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Panel%20Study%20of%20Income%20Dynamics/download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will place all necessary psid files whever you specified, probably the "C:/My Directory/PSID/" folder #
 #####################################################################################################################

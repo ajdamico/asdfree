@@ -8,7 +8,7 @@
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/SAEB/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Sistema%20de%20Avaliacao%20da%20Educacao%20Basica/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Sistema%20de%20Avaliacao%20da%20Educacao%20Basica/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -85,7 +85,7 @@ years.to.download <- c( 1995 , 1997 , 1999 , 2001 , 2003 , 2005 , 2011 )
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url(
-	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" ,
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" ,
 	prompt = FALSE ,
 	echo = FALSE
 )

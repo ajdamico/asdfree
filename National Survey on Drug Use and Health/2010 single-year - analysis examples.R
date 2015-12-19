@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NSDUH/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20on%20Drug%20Use%20and%20Health/2010%20single-year%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20on%20Drug%20Use%20and%20Health/2010%20single-year%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

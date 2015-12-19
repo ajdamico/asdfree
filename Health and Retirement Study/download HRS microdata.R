@@ -10,7 +10,7 @@
 # your.password <- "password"
 # library(downloader)
 # setwd( "C:/My Directory/HRS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/download%20HRS%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/download%20HRS%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

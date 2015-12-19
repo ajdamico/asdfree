@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PIRLS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Progress%20in%20International%20Reading%20Literacy%20Study/download%20import%20and%20design.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Progress%20in%20International%20Reading%20Literacy%20Study/download%20import%20and%20design.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -68,13 +68,13 @@ options( "survey.replicates.mse" = TRUE )
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )
 
 # load two pirls-specific replicate weighted survey design construction functions.
-source_url( "https://raw.github.com/ajdamico/asdfree/master/Progress%20in%20International%20Reading%20Literacy%20Study/design%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Progress%20in%20International%20Reading%20Literacy%20Study/design%20functions.R" , prompt = FALSE )
 
 
 # # # # # # # # # # # #

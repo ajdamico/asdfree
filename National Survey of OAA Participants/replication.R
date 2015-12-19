@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NPS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/replication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/replication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -29,9 +29,9 @@
 
 ############################################################
 # this script matches every statistic and standard error pulled from agidnet at:
-# https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/agidnet%202003%20caregiver%20-%20respite%20care.png
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/agidnet%202003%20caregiver%20-%20respite%20care.png
 # and
-# https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/agidnet%202012%20home%20delivered%20meals%20-%20past%20year%20hospital%20and%20nursing%20home.png
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/agidnet%202012%20home%20delivered%20meals%20-%20past%20year%20hospital%20and%20nursing%20home.png
 ############################################################
 
 
@@ -40,7 +40,7 @@
 # prior to running this analysis script, the 2003 caregiver and 2012 home delivered meals files must be loaded onto the #
 # local machine.  running the download all microdata script below will import all of the files that are needed.         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/download%20all%20microdata.R #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/download%20all%20microdata.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will files in the C:/My Directory/NPS directory or wherever the working directory was set.                #
 #########################################################################################################################
@@ -65,7 +65,7 @@ library(survey)		# load survey package (analyzes complex design surveys)
 
 # # # # # # # # # # # # # # # # # # # # # # #
 # precisely match the 2003 caregiver output #
-# https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/agidnet%202003%20caregiver%20-%20respite%20care.png
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/agidnet%202003%20caregiver%20-%20respite%20care.png
 
 # load the 2003 caregiver file into working memory
 load( "./2003/caregiver.rda" )
@@ -114,7 +114,7 @@ gc()
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # precisely match the 2012 home delivered meals output  #
-# https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/agidnet%202012%20home%20delivered%20meals%20-%20past%20year%20hospital%20and%20nursing%20home.png
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/agidnet%202012%20home%20delivered%20meals%20-%20past%20year%20hospital%20and%20nursing%20home.png
 
 # load the 2012 home delivered meals file into working memory
 load( "./2012/home delivered meals.rda" )

@@ -162,7 +162,7 @@ for ( year in years.to.download ){
 			# massive thanx to http://furmancenter.org for providing these.
 			furman.sas.import.script <- 
 				paste( 
-					'https://raw.github.com/ajdamico/asdfree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/NYU%20Furman%20Center%20SAS%20code/hvs' , 
+					'https://raw.githubusercontent.com/ajdamico/asdfree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/NYU%20Furman%20Center%20SAS%20code/hvs' , 
 					subyear , 
 					filetype , 
 					'load.sas' , 

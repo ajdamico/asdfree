@@ -12,7 +12,7 @@
 # your.password <- 'yourpassword'
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # rm( studies.to.download ) # or pick a few # studies.to.download <- c( "2012 Extract Files" , "2004" , "2009 Uniform Crime Reporting" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Incident-Based%20Reporting%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Incident-Based%20Reporting%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -239,7 +239,7 @@ monetdb.server.stop( pid )
 #############################################################################
 
 # some download caching
-downloader::source_url( "https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE)
+downloader::source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE)
 
 download_get_filename <- function(url, curl=getCurlHandle(), ...) {
 	h <- RCurl::basicHeaderGatherer()
@@ -262,7 +262,7 @@ download_to_filename <- function(url, dlfile, curl=getCurlHandle(), ...) {
 
 
 # load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 # download the contents of the webpage hosting all nibrs data files
 all.nibrs.studies <- getURL( "http://www.icpsr.umich.edu/icpsrweb/NACJD/series/00128/studies?archive=NACJD&q=&paging.rows=10000&sortBy=7" )

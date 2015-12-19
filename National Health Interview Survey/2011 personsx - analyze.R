@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NHIS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Health%20Interview%20Survey/2011%20personsx%20-%20analyze.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Health%20Interview%20Survey/2011%20personsx%20-%20analyze.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NHIS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Health%20Interview%20Survey/replicate%20cdc%20tecdoc%20-%202000%20multiple%20imputation.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Health%20Interview%20Survey/replicate%20cdc%20tecdoc%20-%202000%20multiple%20imputation.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

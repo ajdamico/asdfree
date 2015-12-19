@@ -8,7 +8,7 @@
 # options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # batfile <- "C:/My Directory/NIBRS/MonetDB/nibrs.bat"		# # note for mac and *nix users: `nibrs.bat` might be `nibrs.sh` instead
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Incident-Based%20Reporting%20System/reproduce%20fbi%20tables.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Incident-Based%20Reporting%20System/reproduce%20fbi%20tables.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -34,7 +34,7 @@
 # prior to running this analysis script, the 2012 national incident-based reporting system files must be imported into a    #
 # a monet database on the local machine. before running the dbGetQuery commands below, you must load the data with this:    #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/National%20Incident-Based%20Reporting%20System/download%20all%20microdata.R  #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Incident-Based%20Reporting%20System/download%20all%20microdata.R  #
 #############################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

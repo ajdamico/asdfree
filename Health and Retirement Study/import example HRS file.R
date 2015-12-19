@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/HRS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/import%20example%20HRS%20file.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/import%20example%20HRS%20file.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -33,7 +33,7 @@
 # prior to running this analysis script, the 1992 Core Distribution HRS files must be downloaded and unzipped on the        #
 # local machine. running the 1992 - 2010 download HRS microdata.R script download all of the necessary files automatically  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/1992-2010%20download%20HRS%20microdata.R   #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/1992-2010%20download%20HRS%20microdata.R   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will place the HRS file "HOUSEHLD.DA" and many others in the "C:/My Directory/HRS/download/" folder           #
 #############################################################################################################################

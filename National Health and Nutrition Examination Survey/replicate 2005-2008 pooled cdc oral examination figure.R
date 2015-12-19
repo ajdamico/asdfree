@@ -9,7 +9,7 @@
 # setInternet2( FALSE )						# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NHANES/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Health%20and%20Nutrition%20Examination%20Survey/replicate%202005-2008%20pooled%20cdc%20oral%20examination%20figure.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Health%20and%20Nutrition%20Examination%20Survey/replicate%202005-2008%20pooled%20cdc%20oral%20examination%20figure.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

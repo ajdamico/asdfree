@@ -11,7 +11,7 @@
 # options( encoding = "latin1" )			# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/CENSO/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -122,11 +122,11 @@ library(stringr) 		# load stringr package (manipulates character strings easily)
 # load the read.SAScii.monetdb() function,
 # which imports ASCII (fixed-width) data files directly into a monet database
 # using only a SAS importation script
-source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
-source_url( "https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE )
 
 
 # configure a monetdb database for the censo demografico on windows #
@@ -295,8 +295,8 @@ ranc <-
 tf <- tempfile() ; td <- tempdir() ; tf2 <- tempfile() ; tf3 <- tempfile() ; tf4 <- tempfile()
 
 # download the sas importation scripts (for use with SAScii) to load the census files directly into MonetDB
-download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/SASinputDom.txt" , tf2 )
-download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/SASinputPes.txt" , tf3 )
+download( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/SASinputDom.txt" , tf2 )
+download( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/SASinputPes.txt" , tf3 )
 
 
 # designate the location of the 2010 general sample microdata files
@@ -684,9 +684,9 @@ Sys.sleep( 60 )
 
 
 # download the sas importation scripts (for use with SAScii) to load the census files directly into MonetDB
-download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20DOMIC.sas" , tf2 )
-download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20PESSOAS.sas" , tf3 )
-download( "https://raw.github.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20FAMILIAS.sas" , tf4 )
+download( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20DOMIC.sas" , tf2 )
+download( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20PESSOAS.sas" , tf3 )
+download( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/LE%20FAMILIAS.sas" , tf4 )
 
 
 # designate the location of the 2000 general sample microdata files

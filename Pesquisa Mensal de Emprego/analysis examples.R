@@ -6,7 +6,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PME/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa%20Mensal%20de%20Emprego/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Pesquisa%20Mensal%20de%20Emprego/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

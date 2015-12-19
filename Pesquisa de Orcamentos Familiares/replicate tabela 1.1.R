@@ -7,7 +7,7 @@
 # options( encoding = "latin1" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/POF/2009/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Pesquisa%20de%20Orcamentos%20Familiares/replicate%20tabela%201.1.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Pesquisa%20de%20Orcamentos%20Familiares/replicate%20tabela%201.1.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -41,7 +41,7 @@
 #####################################################################################################################
 # prior to running this analysis script, the 2008-2009 pof files must be loaded on the local machine.               #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/Pesquisa%20de%20Orcamentos%20Familiares/download%20all%20microdata.R #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Pesquisa%20de%20Orcamentos%20Familiares/download%20all%20microdata.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # running the download all microdata script for 2009 will place the files you need into a 2009-specific directory   #
 #####################################################################################################################

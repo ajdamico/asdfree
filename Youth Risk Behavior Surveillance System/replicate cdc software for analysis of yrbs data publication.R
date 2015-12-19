@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # load( "C:/My Directory/YRBSS/yrbs2009.rda" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Youth%20Risk%20Behavior%20Surveillance%20System/replicate%20cdc%20software%20for%20analysis%20of%20yrbs%20data%20publication.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Youth%20Risk%20Behavior%20Surveillance%20System/replicate%20cdc%20software%20for%20analysis%20of%20yrbs%20data%20publication.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/MLCES/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Medical%20Large%20Claims%20Experience%20Study/replicate%20soa%20publications.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Medical%20Large%20Claims%20Experience%20Study/replicate%20soa%20publications.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

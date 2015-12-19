@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NPS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -32,7 +32,7 @@
 # prior to running this analysis script, the 2012 transportation file must be loaded onto the local machine.  running   #
 # the download all microdata script below will import all of the files that are needed.                                 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/download%20all%20microdata.R #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Survey%20of%20OAA%20Participants/download%20all%20microdata.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will files in the C:/My Directory/NPS directory or wherever the working directory was set.                #
 #########################################################################################################################

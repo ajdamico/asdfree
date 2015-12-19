@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SCF/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Consumer%20Finances/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Consumer%20Finances/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -97,7 +97,7 @@ options( scipen = 20 )
 
 
 # load two svyttest functions (one to conduct a df-adjusted t-test and one to conduct a multiply-imputed t-test)
-source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Consumer%20Finances/scf.survey.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Consumer%20Finances/scf.survey.R" , prompt = FALSE )
 # now that this function has been loaded into r, you can view its source code by uncommenting the line below
 # scf.MIcombine
 # scf.svyttest

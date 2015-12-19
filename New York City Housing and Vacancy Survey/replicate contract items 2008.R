@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/NYCHVS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/replicate%20contract%20items%202008.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/replicate%20contract%20items%202008.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -31,7 +31,7 @@
 #########################################################################################################################################################
 # prior to running this analysis script, the `occ` `vac` `per` `ni` data.frames for the current year must be available on the local machine. running..  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# https://raw.github.com/ajdamico/asdfree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/download%20all%20microdata.R  #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/New%20York%20City%20Housing%20and%20Vacancy%20Survey/download%20all%20microdata.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # ..that script will place a 'nychvs##.rda' file with for each year downloaded into the "C:/My Directory/NYCHVS/" folder (the working directory)        #
 #########################################################################################################################################################

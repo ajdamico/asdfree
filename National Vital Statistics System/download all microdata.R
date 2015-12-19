@@ -15,7 +15,7 @@
 # mortality.sets.to.download <- 2012:2000
 # fetaldeath.sets.to.download <- 2012:2005
 # path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )		# # only windows users need this line
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -106,7 +106,7 @@ library(R.utils)		# load the R.utils package (counts the number of lines in a fi
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )
@@ -115,11 +115,11 @@ source_url(
 # load the read.SAScii.monetdb() function,
 # which imports ASCII (fixed-width) data files directly into a monet database
 # using only a SAS importation script
-source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 
 # load various functions used to clean up the raw nvss posted on the cdc's ftp site before importation into monetdb
-source_url( "https://raw.github.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/import%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/import%20functions.R" , prompt = FALSE )
 
 
 # set your NVSS data directory
@@ -458,7 +458,7 @@ monetdb.server.stop( pid )
 if ( !is.null( periodlinked.sets.to.download ) ){
 
 	# point to the period-linked sas file stored on github
-	sas_ri <- "https://raw.github.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/nchs%20period%20linked.sas"
+	sas_ri <- "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/nchs%20period%20linked.sas"
 
 	# create two temporary files
 	pl.tf <- tempfile() ; den.tf <- tempfile()
@@ -478,7 +478,7 @@ if ( !is.null( periodlinked.sets.to.download ) ){
 	writeLines( pl.den , den.tf )
 	
 	# point to the period-linked 2003 sas file stored on github
-	sas_ri <- "https://raw.github.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/nchs%20period%20linked%202003.sas"
+	sas_ri <- "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/nchs%20period%20linked%202003.sas"
 
 	# create two temporary files
 	pl03.tf <- tempfile() ; den03.tf <- tempfile()
@@ -949,8 +949,8 @@ for ( year in fetaldeath.sets.to.download ){
 	sas_ri <-
 		ifelse(
 			year >= 2007 ,
-			"https://raw.github.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/nchs%20fetal%20death%202007.sas" ,
-			"https://raw.github.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/nchs%20fetal%20death%202006.sas"
+			"https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/nchs%20fetal%20death%202007.sas" ,
+			"https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/nchs%20fetal%20death%202006.sas"
 		)
 
 	# create a temporary file

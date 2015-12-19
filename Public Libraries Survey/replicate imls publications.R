@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PLS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Public%20Libraries%20Survey/replicate%20imls%20publications.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Public%20Libraries%20Survey/replicate%20imls%20publications.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #

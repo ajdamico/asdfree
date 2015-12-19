@@ -14,7 +14,7 @@
 # five.percent.files.to.download <- c( 1990 , 2000 )
 # ten.percent.files.to.download <- 2010
 # exclude.puerto.rico <- TRUE
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -147,14 +147,14 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20
 
 
 # load the `monet.read.tsv` function from my github account.
-source_url( "https://raw.github.com/ajdamico/asdfree/master/MonetDB/monet.read.tsv.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/monet.read.tsv.R" , prompt = FALSE )
 # this is a modification of the SAScii package's read.SAScii function
 # that imports tab-separated value files directly into MonetDB
 
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )

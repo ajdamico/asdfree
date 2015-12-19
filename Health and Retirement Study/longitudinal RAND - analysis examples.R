@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/HRS/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/longitudinal%20RAND%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/longitudinal%20RAND%20-%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -33,7 +33,7 @@
 # prior to running this analysis script, the longitudinal RAND-contributed HRS files must be imported into a SQLite database on the     #
 # local machine. running the import longitudinal RAND contributed files.R script to create the database automatically                   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/import%20longitudinal%20RAND%20contributed%20files.R   #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Health%20and%20Retirement%20Study/import%20longitudinal%20RAND%20contributed%20files.R   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will place the four RAND HRS files into a database "RAND.db" in the "C:/My Directory/HRS/" folder (the working directory) #
 #########################################################################################################################################

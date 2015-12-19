@@ -95,7 +95,7 @@ library(R.utils)		# load the R.utils package (counts the number of lines in a fi
 # load the download_ipumsi and related functions
 # to programmatically authenticate and download
 source_url( 
-	"https://raw.github.com/ajdamico/asdfree/master/IPUMS%20International/ipumsi%20functions.R" , 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/IPUMS%20International/ipumsi%20functions.R" , 
 	prompt = FALSE , 
 	echo = FALSE 
 )
