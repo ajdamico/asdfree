@@ -89,8 +89,6 @@ construct.pisa.sqlsurvey.designs <-
 
 			implicate.name <- paste0( table.name , "_imp" , i )
 			
-			all.implicates <- c( all.implicates , implicate.name )
-			
 			# build a sql string to create all five implicates
 			sql <-
 				paste(
