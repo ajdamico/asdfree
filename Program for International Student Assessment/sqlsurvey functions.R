@@ -27,7 +27,7 @@ pisa.update <-
 pisa.subset <-
 	function( my_design , ... ){
 		
-		my_design$designs <- lapply( my_designs$designs , subset , ... )
+		my_design$designs <- lapply( my_design$designs , subset , ... )
 		
 		my_design
 	}
@@ -39,7 +39,7 @@ pisa.svyttest <-
 	function( formula , design ){
 
 		# the MIcombine function runs differently than a normal svylm() call
-		m <- eval(bquote(MIcombine( with( design , svylm(formula))) ) )
+		m <- eval(bquote(MIcombine( with( design , svyglm(formula))) ) )
 
 		rval <-
 			list(

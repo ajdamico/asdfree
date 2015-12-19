@@ -114,7 +114,7 @@ MIcombine( with( pisa.imp , svymean( ~readz ) ) )
 # (first column with statistics)
 
 # break out `pisa.imp` by oecd- and non-oecd students.
-MIcombine( with( pisa.imp , svymean( ~readz , byvar = ~oecd ) ) )
+MIcombine( with( pisa.imp , svyby( ~readz , ~oecd , svymean ) ) )
 # boom!  matches precisely.
 
 
@@ -128,11 +128,11 @@ MIcombine( with( oecd.imp , svymean( ~readz ) ) )
 # ..and it exactly matches again, hooray!
 
 # break out the oecd students' reading scores by gender
-MIcombine( with( oecd.imp , svymean( ~readz , byvar = ~st04q01 ) ) )
+MIcombine( with( oecd.imp , svyby( ~readz , ~st04q01 , svymean ) ) )
 # exactly match.  nice.
 
 # let's run that same command as above, but store the results into a `oecd.boygirl` object
-oecd.boygirl <- MIcombine( with( oecd.imp , svymean( ~readz , byvar = ~st04q01 ) ) )
+oecd.boygirl <- MIcombine( with( oecd.imp , svyby( ~readz , ~st04q01 , svymean ) ) )
 
 # now the `survey` package's `svycontrast` function can be used.
 # note oecd.boygirl has three levels: NA, 1, and 2.
@@ -155,23 +155,9 @@ pisa.svyttest( readz ~ st04q01 , oecd.imp )
 #################
 # quantile time #
 
+# hey how about we run the reading score for each of those quantiles.
+print( MIcombine( with( oecd.imp , svyby( ~readz , ~one , c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) , svyquantile ) ) ) )
 
-# quantiles require a bit of extra work in monetdb-backed multiply-imputed designs
-# here's an example of how to calculate the median reading score
-MIcombine( with( oecd.imp , svyquantile( ~readz , 0.5 , se = TRUE ) ) )
-# the `MIcombine` function does not work on (svyquantile x sqlrepdesign) output
-# so i've written a custom function `MIcombine` that does.  kewl?
-
-
-# hey how about we loop through the six quantiles shown on the powerpoint's slide two..
-for ( qtile in c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) ){
-
-	# ..and run the reading score for each of those quantiles.
-	print( MIcombine( with( oecd.imp , svyquantile( ~readz , qtile , se = TRUE ) ) ) )
-	# compared to the powerpoint, the coefficients match exactly..however the standard errors are not exactly the same
-	# why not?  because there's an element of randomness in quantile calculations using big big big data.
-	
-}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # quantile standard error difference explanation  #
@@ -216,10 +202,10 @@ for ( qtile in c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) ){
 MIcombine( with( oecd.imp , svymean( ~readz ) ) )
 
 # regression with the `escs` column
-MIcombine( with( oecd.imp , svylm( readz ~ escs ) ) )
+MIcombine( with( oecd.imp , svyglm( readz ~ escs ) ) )
 
 # mean and standard errors for all countries
-MIcombine( with( pisa.imp , svymean( ~readz , byvar = ~cnt ) ) )
+MIcombine( with( pisa.imp , svyby( ~readz , ~cnt , svymean ) ) )
 
 
 ####################
@@ -242,7 +228,7 @@ MIcombine( with( subset( pisa.imp , cnt == 'USA' ) , svylm( readz ~ escs ) ) )
 
 albania <- subset( pisa.imp , cnt == 'ALB' )
 
-alb.jr <- MIcombine( with( albania , svymean( ~joyread , byvar = ~immig ) ) )
+alb.jr <- MIcombine( with( albania , svyby( ~joyread , ~immig , svymean ) ) )
 
 alb.jr
 
@@ -261,7 +247,7 @@ pisa.svyttest( joyread ~ immig , subset( albania , immig %in% c( 2 , 3 ) ) )
 
 argentina <- subset( pisa.imp , cnt == 'ARG' )
 
-arg.jr <- MIcombine( with( argentina , svymean( ~joyread , byvar = ~immig ) ) )
+arg.jr <- MIcombine( with( argentina , svyby( ~joyread , ~immig , svymean ) ) )
 
 arg.jr
 
@@ -274,7 +260,7 @@ svycontrast( arg.jr , list( diff = c( 0 , 0 , 1 , -1 ) ) )
 
 australia <- subset( pisa.imp , cnt == 'AUS' )
 
-aus.jr <- MIcombine( with( australia , svymean( ~joyread , byvar = ~immig ) ) )
+aus.jr <- MIcombine( with( australia , svyby( ~joyread , ~immig , svymean ) ) )
 
 aus.jr
 
@@ -288,7 +274,7 @@ svycontrast( aus.jr , list( diff = c( 0 , 0 , 1 , -1 ) ) )
 
 # # # # albania # # # #
 
-alb.read <- MIcombine( with( albania , svymean( ~readz , byvar = ~immig ) ) )
+alb.read <- MIcombine( with( albania , svyby( ~readz , ~immig , svymean ) ) )
 
 svycontrast( alb.read , list( diff = c( 0 , 1 , -1 , 0 ) ) )
 
@@ -297,7 +283,7 @@ svycontrast( alb.read , list( diff = c( 0 , 1 , -1 , 0 ) ) )
 
 brazil <- subset( pisa.imp , cnt == 'BRA' )
 
-bra.read <- MIcombine( with( brazil , svymean( ~readz , byvar = ~immig ) ) )
+bra.read <- MIcombine( with( brazil , svyby( ~readz , ~immig , svymean ) ) )
 
 svycontrast( bra.read , list( diff = c( 0 , 1 , -1 , 0 ) ) )
 
