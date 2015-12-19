@@ -233,9 +233,11 @@ for ( i in 1:12 ){
 			)
 		)
 		
-		# ..and drop the current month table.
-		dbRemoveTable( db , paste0( "sy" , i -1 ) )
+		# drop the prior-month table..
+		dbRemoveTable( db , paste0( "sy" , i - 1 ) )
 		
+		# ..and drop the current month table.
+		dbRemoveTable( db , "sm" )
 		
 	
 	}
