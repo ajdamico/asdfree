@@ -227,7 +227,7 @@ MIcombine( with( this_design.female , svyquantile( ~scie , 0.5 ) ) )
 
 # store the results into a new object
 
-internet.by.oecd <- MIcombine( with( this_design , svyby( ~ic01q04 , ~oecd , svymean ) ) )
+internet.by.oecd <- MIcombine( with( this_design , svyby( ~ic01q04 , ~oecd , svymean , na.rm = TRUE ) ) )
 
 # print the results to the screen 
 internet.by.oecd
@@ -252,7 +252,7 @@ write.csv( internet.by.oecd , "internet by oecd membership.csv" )
 # ..or trimmed to only contain the values you need.
 # here's the percentage without internet access at home, by oecd nation vs. all others in the data
 no.internet.access.by.oecd <-
-	internet.by.oecd[ substr( rownames( internet.by.oecd ) , 1 , 2 ) == "3:" , ]
+	internet.by.oecd[ 5:6 , ]
 
 
 # print the new results to the screen

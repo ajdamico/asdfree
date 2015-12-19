@@ -135,12 +135,11 @@ MIcombine( with( oecd.imp , svyby( ~readz , ~st04q01 , svymean ) ) )
 oecd.boygirl <- MIcombine( with( oecd.imp , svyby( ~readz , ~st04q01 , svymean ) ) )
 
 # now the `survey` package's `svycontrast` function can be used.
-# note oecd.boygirl has three levels: NA, 1, and 2.
-# NA is first in the list, so that's a zero.
-# boys are next, and we want to compare them to girls, so make them negative one
-# and girls (the third level) a positive one.  again, that's (zero, negative one, positive one)
+# note oecd.boygirl has two levels: 1, and 2.
+# boys are first, and we want to compare them to girls, so make them negative one
+# and girls (the second level) a positive one.  again, that's (zero, negative one, positive one)
 # put it into the diff= position inside a list in the second position of `svycontrast`
-svycontrast( oecd.boygirl , list( diff = c( 0 , -1 , 1 ) ) )
+svycontrast( oecd.boygirl , list( diff = c( -1 , 1 ) ) )
 # and boo-yah, you have just replicated the powerpoint slide's difference boy minus girl and also standard error.
 
 # was that too much for you?  if you've only got two levels,
