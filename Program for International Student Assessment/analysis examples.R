@@ -139,7 +139,7 @@ dbGetQuery( db , "SELECT SUM( one ) AS sum_weights FROM int_stu12_dec03_imp1" )
 
 # weighted country population, for all countries in the data set
 # by country
-MIcombine( with( this_design , svytotal( ~one , byvar = ~cnt ) ) )
+MIcombine( with( this_design , svyby( ~one , ~cnt , svytotal ) ) )
 # note: the above command is one example of how the r survey package differs from the r sqlsurvey package
 
 
@@ -149,19 +149,8 @@ MIcombine( with( this_design , svytotal( ~one , byvar = ~cnt ) ) )
 MIcombine( with( this_design , svymean( ~scie ) ) )
 
 # by country
-MIcombine( with( this_design , svymean( ~scie , byvar = ~cnt ) ) )
+MIcombine( with( this_design , svyby( ~scie , ~cnt , svymean ) ) )
 
-
-# create a categorical variable #
-
-numeric.variable.to.make.categorical <- 'ic01q04'
-
-for ( i in 1:5 ){
-
-	this_design$designs[[ i ]]$zdata[ , numeric.variable.to.make.categorical ] <- 
-		as.character( this_design$designs[[ i ]]$zdata[ , numeric.variable.to.make.categorical ] )
-
-}
 
 # calculate the distribution of a categorical variable #
 
@@ -170,10 +159,10 @@ for ( i in 1:5 ){
 # 2) yes, but i don't use it
 # 3) no
 
-MIcombine( with( this_design , svymean( ~ic01q04 ) ) )
+MIcombine( with( this_design , svymean( ~factor( ic01q04 ) ) ) )
 
 # by country
-MIcombine( with( this_design , svymean( ~ic01q04 , byvar = ~cnt ) ) )
+MIcombine( with( this_design , svyby( ~factor( ic01q04 ) , ~cnt , svymean ) ) )
 
 # oh!  and fun fact.  do you know why..
 # in compendium file..
@@ -202,26 +191,8 @@ MIcombine( with( this_design , svymean( ~ic01q04 , byvar = ~cnt ) ) )
 
 
 # calculate the median and other percentiles #
-
-# quantiles require a bit of extra work in monetdb-backed multiply-imputed designs
-# here's an example of how to calculate the median science score
-MIcombine( with( this_design , svyquantile( ~scie , 0.5 , se = TRUE ) ) )
-# the `MIcombine` function does not work on (svyquantile x sqlrepdesign) output
-# so i've written a custom function `MIcombine` that does.  kewl?
-
-
-# hey how about we loop through the six quantiles?  would you like that?
-for ( qtile in c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) ){
-
-	# ..and run the science score for each of those quantiles.
-	print( MIcombine( with( this_design , svyquantile( ~scie , qtile , se = TRUE ) ) ) )
+MIcombine( with( this_design , svyby( ~scie , ~one , svyquantile , c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) ) ) )
 	
-}
-
-
-# ..sqlrepsurvey designs do not allow byvar arguments, meaning the only way to 
-# calculate quantiles by country would be by creating subsets for each subpopulation
-# and calculating the quantiles for them independently:
 
 ######################
 # subsetting example #
@@ -241,7 +212,7 @@ this_design.female <- subset( this_design , st04q01 == 2 )
 MIcombine( with( this_design.female , svymean( ~scie ) ) )
 
 # median science score - restricted to females
-MIcombine( with( this_design.female , svyquantile( ~scie , qtile , se = TRUE ) ) )
+MIcombine( with( this_design.female , svyquantile( ~scie , 0.5 ) ) )
 
 
 
@@ -254,7 +225,7 @@ MIcombine( with( this_design.female , svyquantile( ~scie , qtile , se = TRUE ) )
 
 # store the results into a new object
 
-internet.by.oecd <- MIcombine( with( this_design , svymean( ~ic01q04 , byvar = ~oecd ) ) )
+internet.by.oecd <- MIcombine( with( this_design , svyby( ~ic01q04 , ~oecd , svymean ) ) )
 
 # print the results to the screen 
 internet.by.oecd
@@ -305,12 +276,6 @@ barplot(
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `pisa` monetdb analyses #
-############################################################################
 
 
 # for more details on how to work with data in r
