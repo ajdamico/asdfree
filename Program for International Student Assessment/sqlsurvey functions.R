@@ -22,19 +22,25 @@ svyMDBdesign <-
 # need to copy over the `with` method
 with.svyMDBimputationList <- survey:::with.svyimputationList
 	
-svyMDBimputationList.update <-
+update.svyMDBimputationList <-
 	function( my_design , ... ){
 	
-		my_design$designs <- lapply( my_design$designs , update , ... )
+		z <- my_design
 	
-		my_design
+		z$designs <- lapply( my_design$designs , update , ... )
+	
+		z$call <- sys.call(-1)
+		
+		z
 	}
 
 
 # and create a new subset method for MDB imputation lists.
 subset.svyMDBimputationList <-
 	function( x , ... ){
+		
 		z <- x
+		
 		z$designs <- lapply( x$designs , subset , ... )
 		
 		z$call <- sys.call(-1)

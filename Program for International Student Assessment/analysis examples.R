@@ -90,7 +90,7 @@ this_design <- svyMDBdesign( this_design )
 
 
 # construct a new category variable in the dataset
-this_design <- pisa.update( this_design , progcat = ifelse( st49q07 %in% 1:2 , 'always, almost always, or often' , ifelse( st49q07 %in% 3:4 , 'sometimes, rarely, or never' , NA ) ) )
+this_design <- update( this_design , progcat = ifelse( st49q07 %in% 1:2 , 'always, almost always, or often' , ifelse( st49q07 %in% 3:4 , 'sometimes, rarely, or never' , NA ) ) )
 
 # print the distribution of that category
 MIcombine( with( this_design , svymean( ~ progcat , na.rm = TRUE ) ) )
@@ -153,7 +153,7 @@ MIcombine( with( this_design , svyby( ~scie , ~cnt , svymean ) ) )
 # calculate the distribution of a categorical variable #
 
 # force it to be categorical first
-this_design <- pisa.update( this_design , ic01q04 = factor( ic01q04 ) )
+this_design <- update( this_design , ic01q04 = factor( ic01q04 ) )
 
 # percent with an internet connection:
 # 1) yes, and i use it
