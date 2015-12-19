@@ -12,11 +12,17 @@ svyMDBdesign <-
 	
 		# open each of those design connections with MonetDB hooray
 		my_design$designs <- lapply( my_design$designs , open , MonetDB.R() )
-	
+
+		class( my_design ) <- 'svyMDBimputationList'
+		
 		my_design
 	}
 
-pisa.update <-
+
+# need to copy over the `with` method
+with.svyMDBimputationList <- survey:::with.svyimputationList
+	
+svyMDBimputationList.update <-
 	function( my_design , ... ){
 	
 		my_design$designs <- lapply( my_design$designs , update , ... )
@@ -24,13 +30,19 @@ pisa.update <-
 		my_design
 	}
 
-pisa.subset <-
-	function( my_design , ... ){
+
+# and create a new subset method for MDB imputation lists.
+subset.svyMDBimputationList <-
+	function( x , ... ){
+		z <- x
+		z$designs <- lapply( x$designs , subset , ... )
 		
-		my_design$designs <- lapply( my_design$designs , subset , ... )
+		z$call <- sys.call(-1)
 		
-		my_design
+		z
 	}
+# thanks.
+# http://stackoverflow.com/questions/17407852/how-to-pass-an-expression-through-a-function-for-the-subset-function-to-evaluate
 
 
 # initiate a pisa-specific survey design-adjusted t-test

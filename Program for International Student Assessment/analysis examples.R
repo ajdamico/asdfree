@@ -200,7 +200,7 @@ MIcombine( with( this_design , svyby( ~scie , ~one , svyquantile , c( 0.05 , 0.1
 ######################
 
 # restrict the this_design object to females only
-this_design.female <- pisa.subset( this_design , st04q01 == 2 )
+this_design.female <- subset( this_design , st04q01 == 2 )
 
 # now any of the above commands can be re-run
 # using the this_design.female object
