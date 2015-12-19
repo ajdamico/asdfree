@@ -98,26 +98,8 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 
 # read the comma separated value (csv) file you just downloaded
 # directly into the monetdb database you just created.
-dbWriteTable( db , 'z' , z , sep = "," , header = TRUE )
+dbWriteTable( db , 'y' , z , sep = "," , header = TRUE , lower.case.names = TRUE )
 # yes.  you did all that.  nice work.
-
-# re-write the same table, but with lowercase column names	
-dbSendQuery( 
-	db , 
-	paste(
-		'CREATE TABLE y AS SELECT' ,
-		paste( 
-			dbListFields( db , 'z' ) , 
-			tolower( dbListFields( db , 'z' ) ) , 
-			collapse = ', ' , 
-			sep = ' as '
-		) ,
-		"FROM z"
-	)
-)
-# and since the data table `z` has a bunch of messy capital-letter column names
-dbRemoveTable( db , 'z' )
-# delete it from the monetdb database
 
 # add a new numeric column called `one` to the `y` data table
 dbSendQuery( db , 'ALTER TABLE y ADD COLUMN one DOUBLE PRECISION' )
@@ -142,9 +124,6 @@ file.remove( tf )
 
 # delete the whole temporary directory
 unlink( td , recursive = TRUE )
-
-# print a reminder: set the directory you just saved everything to as read-only!
-message( paste0( "all done.  you should set the file " , file.path( getwd() , sbo.dbname ) , " read-only so you don't accidentally alter these tables." ) )
 
 
 # for more details on how to work with data in r
