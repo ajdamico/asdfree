@@ -213,6 +213,9 @@ for ( i in 1:12 ){
 		# create the single year (sy1) table from the january table..
 		dbSendQuery( db , "create table sy1 as select * from sm with data" )
 		
+		# check out the record count
+		dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) )
+		
 		# ..and drop the current month table.
 		dbRemoveTable( db , "sm" )
 	
@@ -232,6 +235,9 @@ for ( i in 1:12 ){
 				" as a left join sm as b on a.ssuid = b.ssuid AND a.epppnum = b.epppnum with data" 
 			)
 		)
+		
+		# check out the record count
+		dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) )
 		
 		# drop the current month table
 		dbRemoveTable( db , "sm" )
