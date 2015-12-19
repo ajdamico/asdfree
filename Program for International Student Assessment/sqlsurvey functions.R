@@ -172,10 +172,10 @@ construct.pisa.sqlsurvey.designs <-
 		ofn <- paste0( year , " " , table.name , ".rda" )
 		
 		# save all of the database design objects as r data files
-		save( list = this_design , file = ofn )
+		save( this_design , file = ofn )
 
 		# remove them from RAM
-		rm( list = this_design )
+		rm( this_design )
 
 		# clear up RAM
 		gc()
