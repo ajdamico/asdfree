@@ -10,21 +10,10 @@
 svyMDBdesign <-
 	function( five.designs ){
 	
-		# start with an empty object
-		rval <- NULL
-		# load in the five designs
-		rval$designs <- five.designs
-		
-		# store the call where it all began
-		rval$call <- sys.call()
-
 		# open each of those design connections with MonetDB hooray
-		rval$designs <- lapply( rval$designs , open , MonetDB.R() )
+		this_design$designs <- lapply( this_design$designs , open , MonetDB.R() )
 
-		# class it.  that way other functions below will recognize this object as very very special.
-		class( rval ) <- "svyimputationList"
-
-		rval
+		this_design
 	}
 
 
