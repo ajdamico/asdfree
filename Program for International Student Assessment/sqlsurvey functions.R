@@ -5,6 +5,15 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
+pisa.update <-
+	function( my_design , ... ){
+	
+		my_design$designs <- lapply( my_design$designs , update , ... )
+		
+		my_design
+	}
+	
+
 # combine five sqlrepsurvey designs
 # into a single monetdb-backed multiply-imputed replicate-weighted list
 svyMDBdesign <-

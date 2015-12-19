@@ -93,7 +93,7 @@ this_design <- svyMDBdesign( this_design )
 this_design <- update( this_design , progcat = ifelse( st49q07 %in% 1:2 , 'always, almost always, or often' , ifelse( st49q07 %in% 3:4 , 'sometimes, rarely, or never' , NA ) ) )
 
 # print the distribution of that category
-svymean( ~ factor( progcat ) , acs.m )
+svymean( ~ progcat , this_design )
 
 
 ################################################
@@ -139,7 +139,6 @@ dbGetQuery( db , "SELECT SUM( one ) AS sum_weights FROM int_stu12_dec03_imp1" )
 # weighted country population, for all countries in the data set
 # by country
 MIcombine( with( this_design , svyby( ~one , ~cnt , svytotal ) ) )
-# note: the above command is one example of how the r survey package differs from the r sqlsurvey package
 
 
 # calculate the mean of a linear variable #
