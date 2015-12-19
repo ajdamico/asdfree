@@ -10,7 +10,7 @@
 # batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 # setwd( "C:/My Directory/PISA/" )
 # load( '2012 int_stu12_dec03.rda' )
-# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/variable%20recode%20example.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -35,7 +35,7 @@
 # prior to running this analysis script, the pisa 2012 multiply-imputed tables must be loaded as a monet-backed sqlsurvey object on the   #
 # local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R"  #
+# "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R"  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "2012 int_stu12_dec03.rda" in C:/My Directory/PISA or wherever the working directory was set.            #
 ###########################################################################################################################################
@@ -77,10 +77,10 @@ library(R.utils)		# load the R.utils package (counts the number of lines in a fi
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
 
 # load a couple of functions that will ease the importation process
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20and%20importation%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/download%20and%20importation%20functions.R" , prompt = FALSE )
 
 
 # set your working directory on your local disk.
@@ -255,7 +255,7 @@ imp.list <- mget( paste0( 'int_stu12_dec03_imp' , 1:5 ) )
 # use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 # then _re_-construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
 reconstruct.pisa.sqlsurvey.designs(
-	monet.url , 
+	db , 
 	year = 2012 ,
 	table.name = 'recoded_int_stu12_dec03' ,
 	previous.list = imp.list ,
@@ -295,7 +295,7 @@ library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/pisalite/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
 
 
 # set your working directory on your local disk.

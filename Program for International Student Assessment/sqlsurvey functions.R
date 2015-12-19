@@ -22,46 +22,10 @@ svyMDBdesign <-
 		rval$designs <- lapply( rval$designs , open , MonetDB.R() )
 
 		# class it.  that way other functions below will recognize this object as very very special.
-		class( rval ) <- "svyMDBimputationList"
+		class( rval ) <- "svyimputationList"
 
 		rval
 	}
-
-	
-# svyquantile functions run on a multiply-imputed sqlrepsurvey design
-# do not include a variance-covariance matrix.
-# therefore, the standard errors need to be extracted manually
-# and passed in as a separate variance object for `MIcombine` to work its magic.
-sqlquantile.MIcombine <-
-	function( x ){
-		
-		# extract the standard errors from the multiply-imputed svyquantile call
-		se <- lapply( lapply( x , attr , 'ci' ) , '[' , 3 )
-		
-		# square the standard errors to get the variances
-		var <- lapply( se , function( y ) y^2 )
-	
-		# call `MIcombine` and return those results.
-		MIcombine( x , var )
-	}
-
-# need to copy over the `with` method
-with.svyMDBimputationList <- survey:::with.svyimputationList
-# monetdb-backed objects should work the exact same as sqlite-backed ones
-
-
-# and create a new subset method for MDB imputation lists.
-subset.svyMDBimputationList <-
-	function( x , ... ){
-		z <- x
-		z$designs <- lapply( x$designs , subset , ... )
-		
-		z$call <- sys.call(-1)
-		
-		z
-	}
-# thanks.
-# http://stackoverflow.com/questions/17407852/how-to-pass-an-expression-through-a-function-for-the-subset-function-to-evaluate
 
 
 # initiate a pisa-specific survey design-adjusted t-test
@@ -105,7 +69,7 @@ pisa.svyttest <-
 
 
 construct.pisa.sqlsurvey.designs <-
-	function( monet.url , year , table.name , pv.vars , sas_ri , additional.factors = NULL ){
+	function( conn , year , table.name , pv.vars , sas_ri , additional.factors = NULL ){
 
 		# step one - find all character columns #
 		sascii <- parse.SAScii( sas_ri )
@@ -117,8 +81,6 @@ construct.pisa.sqlsurvey.designs <-
 		factor.vars <- c( factor.vars , additional.factors )
 		# end of finding all character columns #
 		
-		conn <- dbConnect( MonetDB.R() , monet.url )
-
 		# identify all variables that are multiply-imputed
 		pv.colnames <- paste0( "pv" , outer( 1:5 , pv.vars , paste0 ) )
 
@@ -207,16 +169,15 @@ construct.pisa.sqlsurvey.designs <-
 			# replicate-weighted survey design.
 			assign(
 				implicate.name ,
-				sqlrepsurvey( 	
-					weights = "w_fstuwt" , 
+				svrepdesign( 	
+					weights = ~w_fstuwt , 
 					repweights = "w_fstr[1-9]" , 
 					scale = 4 / 80 ,
 					rscales = rep( 1 , 80 ) ,
-					driver = MonetDB.R() , 
-					check.factors = factor.vars ,
-					database = monet.url ,
 					mse = TRUE ,
-					table.name = implicate.name
+					table.name = implicate.name ,
+					dbtype = "MonetDBLite" ,
+					dbname = dbfolder
 				)
 			)
 			
@@ -234,9 +195,6 @@ construct.pisa.sqlsurvey.designs <-
 		# clear up RAM
 		gc()
 
-		# disconnect from the monet database
-		dbDisconnect( conn )
-		
 		# return the name of the file that has already been saved to the disk,
 		# just for fun.
 		ofn
