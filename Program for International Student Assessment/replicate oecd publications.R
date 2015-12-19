@@ -212,7 +212,7 @@ MIcombine( with( pisa.imp , svyby( ~readz , ~cnt , svymean ) ) )
 
 MIcombine( with( subset( oecd.imp , cnt == 'USA' ) , svymean( ~readz ) ) )
 
-MIcombine( with( subset( pisa.imp , cnt == 'USA' ) , svylm( readz ~ escs ) ) )
+MIcombine( with( subset( pisa.imp , cnt == 'USA' ) , svyglm( readz ~ escs ) ) )
 
 
 
@@ -227,13 +227,13 @@ MIcombine( with( subset( pisa.imp , cnt == 'USA' ) , svylm( readz ~ escs ) ) )
 
 albania <- subset( pisa.imp , cnt == 'ALB' )
 
-alb.jr <- MIcombine( with( albania , svyby( ~joyread , ~immig , svymean ) ) )
+alb.jr <- MIcombine( with( albania , svyby( ~joyread , ~immig , svymean , na.rm = TRUE ) ) )
 
 alb.jr
 
-svycontrast( alb.jr , list( diff = c( 0 , 1 , -1 , 0 ) ) )
-svycontrast( alb.jr , list( diff = c( 0 , 1 , 0 , -1 ) ) )
-svycontrast( alb.jr , list( diff = c( 0 , 0 , 1 , -1 ) ) )
+svycontrast( alb.jr , list( diff = c( 1 , -1 , 0 ) ) )
+svycontrast( alb.jr , list( diff = c( 1 , 0 , -1 ) ) )
+svycontrast( alb.jr , list( diff = c( 0 , 1 , -1 ) ) )
 
 # but really, why not make it a survey design-adjusted t-test?
 # subset your design to only the groups you're comparing,
@@ -246,26 +246,26 @@ pisa.svyttest( joyread ~ immig , subset( albania , immig %in% c( 2 , 3 ) ) )
 
 argentina <- subset( pisa.imp , cnt == 'ARG' )
 
-arg.jr <- MIcombine( with( argentina , svyby( ~joyread , ~immig , svymean ) ) )
+arg.jr <- MIcombine( with( argentina , svyby( ~joyread , ~immig , svymean , na.rm = TRUE ) ) )
 
 arg.jr
 
-svycontrast( arg.jr , list( diff = c( 0 , 1 , -1 , 0 ) ) )
-svycontrast( arg.jr , list( diff = c( 0 , 1 , 0 , -1 ) ) )
-svycontrast( arg.jr , list( diff = c( 0 , 0 , 1 , -1 ) ) )
+svycontrast( arg.jr , list( diff = c( 1 , -1 , 0 ) ) )
+svycontrast( arg.jr , list( diff = c( 1 , 0 , -1 ) ) )
+svycontrast( arg.jr , list( diff = c( 0 , 1 , -1 ) ) )
 
 
 # # # # australia # # # #
 
 australia <- subset( pisa.imp , cnt == 'AUS' )
 
-aus.jr <- MIcombine( with( australia , svyby( ~joyread , ~immig , svymean ) ) )
+aus.jr <- MIcombine( with( australia , svyby( ~joyread , ~immig , svymean , na.rm = TRUE ) ) )
 
 aus.jr
 
-svycontrast( aus.jr , list( diff = c( 0 , 1 , -1 , 0 ) ) )
-svycontrast( aus.jr , list( diff = c( 0 , 1 , 0 , -1 ) ) )
-svycontrast( aus.jr , list( diff = c( 0 , 0 , 1 , -1 ) ) )
+svycontrast( aus.jr , list( diff = c( 1 , -1 , 0 ) ) )
+svycontrast( aus.jr , list( diff = c( 1 , 0 , -1 ) ) )
+svycontrast( aus.jr , list( diff = c( 0 , 1 , -1 ) ) )
 
 
 # right side contrasts
@@ -273,18 +273,18 @@ svycontrast( aus.jr , list( diff = c( 0 , 0 , 1 , -1 ) ) )
 
 # # # # albania # # # #
 
-alb.read <- MIcombine( with( albania , svyby( ~readz , ~immig , svymean ) ) )
+alb.read <- MIcombine( with( albania , svyby( ~readz , ~immig , svymean , na.rm = TRUE ) ) )
 
-svycontrast( alb.read , list( diff = c( 0 , 1 , -1 , 0 ) ) )
+svycontrast( alb.read , list( diff = c( 1 , -1 , 0 ) ) )
 
 
 # # # # brazil # # # #
 
 brazil <- subset( pisa.imp , cnt == 'BRA' )
 
-bra.read <- MIcombine( with( brazil , svyby( ~readz , ~immig , svymean ) ) )
+bra.read <- MIcombine( with( brazil , svyby( ~readz , ~immig , svymean , na.rm = TRUE ) ) )
 
-svycontrast( bra.read , list( diff = c( 0 , 1 , -1 , 0 ) ) )
+svycontrast( bra.read , list( diff = c( 1 , -1 , 0 ) ) )
 
 
 
@@ -295,12 +295,6 @@ svycontrast( bra.read , list( diff = c( 0 , 1 , -1 , 0 ) ) )
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `pisa` monetdb analyses #
-############################################################################
 
 
 # for more details on how to work with data in r

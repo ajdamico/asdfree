@@ -56,7 +56,7 @@ subset.svyMDBimputationList <-
 pisa.svyttest <-
 	function( formula , design ){
 
-		# the MIcombine function runs differently than a normal svylm() call
+		# the MIcombine function runs differently than a normal svyglm() call
 		m <- eval(bquote(MIcombine( with( design , svyglm(formula))) ) )
 
 		rval <-
