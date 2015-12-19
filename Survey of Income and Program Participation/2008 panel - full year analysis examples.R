@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SIPP/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20full%20year%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20full%20year%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -33,7 +33,7 @@
 # prior to running this analysis script, the survey of income and program participation 2008 panel must be loaded as a database (.db) on the local machine. #
 # running the "2008 panel - download and create database" script will create this database file                                                             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20download%20and%20create%20database.R #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20download%20and%20create%20database.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # that script will create a file "SIPP08.db" in C:/My Directory/SIPP or wherever the working directory was set for the program                              #
 #############################################################################################################################################################
@@ -52,11 +52,12 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" ) )
+# install.packages( "survey" )
 
 
-library(survey)		# load survey package (analyzes complex design surveys)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(survey)				# load survey package (analyzes complex design surveys)
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 
 
 # increase size at which numbers are presented in scientific notation
@@ -73,9 +74,11 @@ options( survey.replicates.mse = TRUE )
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
 
 
-# immediately connect to the SQLite database
-# this connection will be stored in the object 'db'
-db <- dbConnect( SQLite() , "SIPP08.db" )
+# name the database files in the "SIPP08" folder of the current working directory
+dbfolder <- paste0( getwd() , "/SIPP08" )
+
+# connect to the MonetDBLite database (.db)
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 #############################################
@@ -167,12 +170,12 @@ for ( i in 1:12 ){
 	sql.string <- 
 		# this outermost paste0 just specifies the temporary table to create
 		paste0(
-			"create temp table sm as " ,
+			"create table sm as ( " ,
 			# this paste0 combines all of the strings contained inside it,
 			# separating each of them by "union all" -- actively querying multiple waves at once
 			paste0( 
 				paste0( 
-					"select " , 
+					"( select " , 
 					# this paste command collapses all of the old + new variable names together,
 					# separating them by a comma
 					paste( 
@@ -188,13 +191,14 @@ for ( i in 1:12 ){
 				) , 
 				waves , 
 				paste0( 
-					" where rhcalmn == " ,
+					" where rhcalmn = " ,
 					i ,
-					" AND rhcalyr == " , 
+					" AND rhcalyr = " , 
 					year 
 				) , 
-				collapse = " union all " 
-			)
+				collapse = ") union all " 
+			) ,
+			") ) with data"
 		)
 
 	# take a look at the full query if you like..
@@ -207,7 +211,10 @@ for ( i in 1:12 ){
 	if ( i == 1 ){
 	
 		# create the single year (sy1) table from the january table..
-		dbSendQuery( db , "create temp table sy1 as select * from sm" )
+		dbSendQuery( db , "create table sy1 as select * from sm with data" )
+		
+		# check out the record count
+		print( dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) ) )
 		
 		# ..and drop the current month table.
 		dbRemoveTable( db , "sm" )
@@ -219,19 +226,28 @@ for ( i in 1:12 ){
 		dbSendQuery( 
 			db , 
 			paste0( 
-				"create temp table sy" , 
+				"create table sy" , 
 				i , 
 				" as select a.* , " ,
 				paste0( "b." , no.se.core.kv , collapse = "," ) , 
 				" from sy" ,
 				i - 1 ,
-				" as a left join sm as b on a.ssuid == b.ssuid AND a.epppnum == b.epppnum" 
+				" as a left join sm as b on a.ssuid = b.ssuid AND a.epppnum = b.epppnum with data" 
 			)
 		)
 		
-		# ..and drop the current month table.
+		# check out the record count
+		print( dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) ) )
+		
+		# drop the current month table
 		dbRemoveTable( db , "sm" )
 	
+		# check out the record count
+		print( dbGetQuery( db , paste0( "SELECT COUNT(*) FROM sy" , i ) ) )
+		
+		# ..and drop the prior-month table
+		dbRemoveTable( db , paste0( "sy" , i - 1 ) )
+		
 	}
 
 }
@@ -241,9 +257,11 @@ for ( i in 1:12 ){
 Sys.time() - start.time
 
 
-# once the single year (sy) table has information from all twelve months, extract it from the rsqlite database
+# once the single year (sy) table has information from all twelve months, extract it from the monetdblite database
 x <- dbGetQuery( db , "select * from sy12" )
 
+# toss the sy12 table as well
+dbRemoveTable( db , 'sy12' )
 
 # look at the first six records of x
 head( x )

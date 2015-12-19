@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/SIPP/" )
-# source_url( "https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20point-in-time%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
+# source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20point-in-time%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
@@ -28,16 +28,16 @@
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#############################################################################################################################################################
-# prior to running this analysis script, the survey of income and program participation 2008 panel must be loaded as a database (.db) on the local machine. #
-# running the "2008 panel - download and create database" script will create this database file                                                             #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.github.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20download%20and%20create%20database.R #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "SIPP08.db" in C:/My Directory/SIPP or wherever the working directory was set for the program                              #
-#############################################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###############################################################################################################################################################
+# prior to running this analysis script, the survey of income and program participation 2008 panel must be loaded as a database (.db) on the local machine.   #
+# running the "2008 panel - download and create database" script will create this database file                                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Survey%20of%20Income%20and%20Program%20Participation/2008%20panel%20-%20download%20and%20create%20database.R #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "SIPP08.db" in C:/My Directory/SIPP or wherever the working directory was set for the program                                #
+###############################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # set your working directory.
@@ -52,11 +52,12 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "RSQLite" ) )
+# install.packages( "survey" )
 
 
-library(survey)		# load survey package (analyzes complex design surveys)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(survey)				# load survey package (analyzes complex design surveys)
+library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 
 
 
@@ -69,9 +70,11 @@ options( survey.replicates.mse = TRUE )
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
 
 
-# immediately connect to the SQLite database
-# this connection will be stored in the object 'db'
-db <- dbConnect( SQLite() , "SIPP08.db" )
+# name the database files in the "SIPP08" folder of the current working directory
+dbfolder <- paste0( getwd() , "/SIPP08" )
+
+# connect to the MonetDBLite database (.db)
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 #########################################
@@ -98,16 +101,16 @@ core.kv <-
 
 # each core wave data file contains data at the person-month level.  in general, there are four records per respondent in each core wave data set.
 # for most point-in-time analyses, use the fourth (most current) month,
-# specifically isolated below by the 'srefmon == 4' command
+# specifically isolated below by the 'srefmon = 4' command
 
 # create a sql string containing the select command used to pull only a defined number of columns 
 # and records containing the fourth reference month from the full core data file
-sql.string <- paste0( "select " , paste( core.kv , collapse = "," ) , " from w" , wave , " where srefmon == 4" )
+sql.string <- paste0( "select " , paste( core.kv , collapse = "," ) , " from w" , wave , " where srefmon = 4" )
 # note: this yields point-in-time data collected over a four month period.
 
 # # # # # # # # # # # # # # # #
 # calendar month alternative: #
-# if an analysis requires specific a specific month on the calendar, instead of 'srefmon == 4' use 'rhcalmn == #' where # is 1 through 12
+# if an analysis requires specific a specific month on the calendar, instead of 'srefmon = 4' use 'rhcalmn = #' where # is 1 through 12
 # this alternative is not as desirable, however, because:
 	# a) only one of the four rotation groups will have been interviewed in the month of the calendar (the other three will be more prone to memory-bias)
 	# b) questions and variables available only in the topical modules (not the core files) reflect the month prior to the interview, and will not be available at other time periods
@@ -118,10 +121,10 @@ sql.string <- paste0( "select " , paste( core.kv , collapse = "," ) , " from w" 
 			# paste( 
 				# "select" , 
 				# paste( core.kv , collapse = "," ) , 
-				# "from w2 where rhcalyr == 2009 AND rhcalmn == 2" ,
+				# "from w2 where rhcalyr = 2009 AND rhcalmn = 2" ,
 				# "union select" , 
 				# paste( core.kv , collapse = "," ) , 
-				# "from w3 where rhcalyr == 2009 AND rhcalmn == 2" 
+				# "from w3 where rhcalyr = 2009 AND rhcalmn = 2" 
 			# )
 			
 		# and make your tablename variable something else, since it's no longer just w2 or w3.
@@ -141,7 +144,7 @@ head( x )
 # access the appropriate replicate weight data #
 
 # create a sql string containing the select command used to pull the fourth reference month from the replicate weights data file
-sql.string <- paste0( "select * from rw" , wave , " where srefmon == 4" )
+sql.string <- paste0( "select * from rw" , wave , " where srefmon = 4" )
 # note: this yields point-in-time data collected over a four month period.
 
 # run the sql query constructed above, save the resulting table in a new data frame called 'rw' that will now be stored in RAM
@@ -186,7 +189,7 @@ tm.kv <-
 
 
 # each topical module data file contains data at the person-level.  in general, there is one record per respondent in each topical module data set.
-# topical module data corresponds with the month prior to the interview, so using the 'srefmon == 4' filter on the core file will correspond with that wave's topical module
+# topical module data corresponds with the month prior to the interview, so using the 'srefmon = 4' filter on the core file will correspond with that wave's topical module
 
 # create a sql string containing the select command used to pull only a defined number of columns 
 sql.string <- paste0( "select " , paste( tm.kv , collapse = "," ) , " from tm" , wave )
