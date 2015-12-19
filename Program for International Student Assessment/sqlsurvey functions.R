@@ -69,18 +69,8 @@ pisa.svyttest <-
 
 
 construct.pisa.sqlsurvey.designs <-
-	function( conn , year , table.name , pv.vars , sas_ri , additional.factors = NULL ){
+	function( conn , year , table.name , pv.vars ){
 
-		# step one - find all character columns #
-		sascii <- parse.SAScii( sas_ri )
-		
-		factor.vars <- tolower( sascii[ sascii$char %in% TRUE , 'varname' ] )
-
-		factor.vars <- factor.vars[ !( factor.vars %in% 'toss_0' ) ]
-		
-		factor.vars <- c( factor.vars , additional.factors )
-		# end of finding all character columns #
-		
 		# identify all variables that are multiply-imputed
 		pv.colnames <- paste0( "pv" , outer( 1:5 , pv.vars , paste0 ) )
 
@@ -91,8 +81,6 @@ construct.pisa.sqlsurvey.designs <-
 
 		# 'read' is not a valid column name in monetdb.
 		nr.pv.vars <- gsub( "read" , "readZ" , pv.vars )
-
-		all.implicates <- NULL
 
 		# loop through each of the five variables..
 		for ( i in 1:5 ){
@@ -165,32 +153,31 @@ construct.pisa.sqlsurvey.designs <-
 			)
 			
 			
-			# construct the actual monetdb-backed,
-			# replicate-weighted survey design.
-			assign(
-				implicate.name ,
-				svrepdesign( 	
-					weights = ~w_fstuwt , 
-					repweights = "w_fstr[1-9]" , 
-					scale = 4 / 80 ,
-					rscales = rep( 1 , 80 ) ,
-					mse = TRUE ,
-					table.name = implicate.name ,
-					dbtype = "MonetDBLite" ,
-					dbname = dbfolder
-				)
-			)
-			
 		}
 
+		
+		# construct the actual monetdb-backed,
+		# replicate-weighted survey design.
+		this_design <-
+			svrepdesign( 	
+				weights = ~w_fstuwt , 
+				repweights = "w_fstr[1-9]" , 
+				scale = 4 / 80 ,
+				rscales = rep( 1 , 80 ) ,
+				mse = TRUE ,
+				data = imputationList( datasets = as.list( paste0( table.name , "_imp" , 1:5 ) ) , dbtype = "MonetDBLite" ) ,
+				dbtype = "MonetDBLite" ,
+				dbname = dbfolder
+			)
+		
 		# output file name
 		ofn <- paste0( year , " " , table.name , ".rda" )
 		
 		# save all of the database design objects as r data files
-		save( list = all.implicates , file = ofn )
+		save( list = this_design , file = ofn )
 
 		# remove them from RAM
-		rm( list = all.implicates )
+		rm( list = this_design )
 
 		# clear up RAM
 		gc()
@@ -199,70 +186,3 @@ construct.pisa.sqlsurvey.designs <-
 		# just for fun.
 		ofn
 	}
-
-
-	
-	
-reconstruct.pisa.sqlsurvey.designs <-
-	function( monet.url , year , table.name , previous.list , additional.factors = NULL ){
-
-		conn <- dbConnect( MonetDB.R() , monet.url )
-	
-		all.implicates <- NULL
-	
-		# loop through each of the five variables..
-		for ( i in 1:5 ){
-		
-			print( paste( 'currently working on implicate' , i , 'from table' , table.name ) )
-
-				
-			# step one - find all character columns #
-			factor.vars <- sapply( previous.list[[ i ]]$zdata , class )[ !( sapply( previous.list$designs[[ i ]]$zdata , class ) %in% c( 'numeric' , 'integer' ) ) ]
-			
-			factor.vars <- c( factor.vars , additional.factors )
-			# end of finding all character columns #
-			
-			
-			implicate.name <- paste0( table.name , "_imp" , i )
-			
-			all.implicates <- c( all.implicates , implicate.name )
-			
-			# construct the actual monetdb-backed,
-			# replicate-weighted survey design.
-			assign(
-				implicate.name ,
-				sqlrepsurvey( 	
-					weights = "w_fstuwt" , 
-					repweights = "w_fstr[1-9]" , 
-					scale = 4 / 80 ,
-					rscales = rep( 1 , 80 ) ,
-					driver = MonetDB.R() , 
-					check.factors = factor.vars ,
-					database = monet.url ,
-					mse = TRUE ,
-					table.name = implicate.name
-				)
-			)
-			
-		}
-
-		# output file name
-		ofn <- paste0( year , " " , table.name , ".rda" )
-		
-		# save all of the database design objects as r data files
-		save( list = all.implicates , file = ofn )
-
-		# remove them from RAM
-		rm( list = all.implicates )
-
-		# clear up RAM
-		gc()
-
-		# disconnect from the monet database
-		dbDisconnect( conn )
-		
-		# return the name of the file that has already been saved to the disk,
-		# just for fun.
-		ofn
-	}
-

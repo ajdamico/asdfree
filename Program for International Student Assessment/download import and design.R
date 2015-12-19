@@ -63,6 +63,7 @@ library(survey) 		# load survey package (analyzes complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
@@ -186,11 +187,10 @@ if ( 2012 %in% years.to.download ){
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
 	construct.pisa.sqlsurvey.designs(
-		monet.url , 
+		db , 
 		year = 2012 ,
 		table.name = 'int_stu12_dec03' ,
-		pv.vars = c( 'math' , 'macc' , 'macq' , 'macs' , 'macu' , 'mape' , 'mapf' , 'mapi' , 'read' , 'scie' ) ,
-		sas_ri = remove.fakecnt.lines( find.chars( add.decimals( "http://pisa2012.acer.edu.au/downloads/INT_STU12_SAS.sas" , precise = TRUE ) ) )
+		pv.vars = c( 'math' , 'macc' , 'macq' , 'macs' , 'macu' , 'mape' , 'mapf' , 'mapi' , 'read' , 'scie' )
 	)
 
 }
@@ -270,8 +270,7 @@ if ( 2009 %in% years.to.download ){
 		db , 
 		year = 2009 ,
 		table.name = 'int_stq09_dec11' ,
-		pv.vars = c( 'math' , 'read' , 'scie' , 'read1' , 'read2' , 'read3' , 'read4' , 'read5' ) ,
-		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2009.acer.edu.au/downloads/INT_STQ09_SAS_DEC11.sas" ) ) )
+		pv.vars = c( 'math' , 'read' , 'scie' , 'read1' , 'read2' , 'read3' , 'read4' , 'read5' )
 	)
 	
 }
@@ -332,8 +331,7 @@ if ( 2006 %in% years.to.download ){
 		db , 
 		year = 2006 ,
 		table.name = 'int_stu06_dec07' ,
-		pv.vars = c( 'math' , 'read' , 'scie' , 'intr' , 'supp' , 'eps' , 'isi' , 'use' ) ,
-		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2006.acer.edu.au/downloads/INT_Stu06_SAS_Dec07.sas" ) ) )
+		pv.vars = c( 'math' , 'read' , 'scie' , 'intr' , 'supp' , 'eps' , 'isi' , 'use' )
 	)
 	
 }
@@ -424,8 +422,7 @@ if ( 2003 %in% years.to.download ){
 		db , 
 		year = 2003 ,
 		table.name = 'int_stui_2003_v2' ,
-		pv.vars = c( 'math' , 'math1' , 'math2' , 'math3' , 'math4' , 'read' , 'scie' , 'prob' ) ,
-		sas_ri = find.chars( add.decimals( remove.tabs( "http://pisa2003.acer.edu.au/downloads/Read_stuI_2003_v2.sas" ) ) )
+		pv.vars = c( 'math' , 'math1' , 'math2' , 'math3' , 'math4' , 'read' , 'scie' , 'prob' )
 	)
 
 }
@@ -555,8 +552,7 @@ if ( 2000 %in% years.to.download ){
 		db , 
 		year = 2000 ,
 		table.name = 'intstud_math' ,
-		pv.vars = c( 'math' , 'math1' , 'math2' , 'read' , 'read1' , 'read2' , 'read3' ) ,
-		sas_ri = find.chars( add.decimals( add.sdt( remove.tabs( stupid.sas( "http://pisa2000.acer.edu.au/downloads/intstud_math.sas" ) ) ) ) )
+		pv.vars = c( 'math' , 'math1' , 'math2' , 'read' , 'read1' , 'read2' , 'read3' )
 	)
 
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
@@ -565,8 +561,7 @@ if ( 2000 %in% years.to.download ){
 		db , 
 		year = 2000 ,
 		table.name = 'intstud_read' ,
-		pv.vars = c( 'read' , 'read1' , 'read2' , 'read3' ) ,
-		sas_ri = sas.is.quite.evil( find.chars( add.decimals( add.sdt( remove.tabs( "http://pisa2000.acer.edu.au/downloads/intstud_read.sas" ) ) ) ) )
+		pv.vars = c( 'read' , 'read1' , 'read2' , 'read3' )
 	)
 	
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
@@ -575,8 +570,7 @@ if ( 2000 %in% years.to.download ){
 		db , 
 		year = 2000 ,
 		table.name = 'intstud_scie' ,
-		pv.vars = c( 'read' , 'read1' , 'read2' , 'read3' , 'scie' ) ,
-		sas_ri = sas.is.quite.evil( find.chars( add.decimals( add.sdt( remove.tabs( "http://pisa2000.acer.edu.au/downloads/intstud_scie.sas" ) ) ) ) )
+		pv.vars = c( 'read' , 'read1' , 'read2' , 'read3' , 'scie' )
 	)
 	
 }
