@@ -5,9 +5,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
 # setwd( "C:/My Directory/PISA/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/extract%20specific%20countries.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -29,78 +27,33 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###########################################################################################################################################
-# prior to running this analysis script, the pisa 2009 multiply-imputed tables must be loaded as a monet-backed sqlsurvey object on the   #
-# local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R"  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "2009 int_stq09_dec11.rda" in C:/My Directory/PISA or wherever the working directory was set.            #
-###########################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-
-# remove the # in order to run this install.packages line only once
-# install.packages( "mitools" )
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#######################################################################################################################################################
+# prior to running this analysis script, the pisa 2009 multiply-imputed tables must be loaded as a monet-backed survey object on the                  #
+# local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need             #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "2009 int_stq09_dec11.rda" in C:/My Directory/PISA or wherever the working directory was set.                        #
+#######################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 library(downloader)		# downloads and then runs the source() function on scripts from github
+library(survey) 		# load survey package (analyzes complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(mitools) 		# load mitools package (analyzes multiply-imputed data)
-library(survey)			# load survey package (analyzes complex design surveys)
 
 
-
-# after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all program for international student assessment tables
-# run them now.  mine look like this:
-
-
-#####################################################################
-# lines of code to hold on to for all other `pisa` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
 # uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
+# setwd( "C:/My Directory/PISA/" )
 
-# second: run the MonetDB server
-monetdb.server.start( batfile )
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "pisa"
-dbport <- 50007
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # the program for international student assessment download and importation script
@@ -119,16 +72,6 @@ pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet
 # as shown in the load() examples below.
 
 # load the desired program for international student assessment monet database-backed complex sample design objects
-
-
-# uncomment this line by removing the `#` at the front..
-# setwd( "C:/My Directory/PISA/" )
-# ..in order to set your current working directory
-
-
-
-# uncomment one this line by removing the `#` at the front..
-load( '2009 int_stq09_dec11.rda' )	# analyze the 2009 student questionnaire
 
 
 # create a character vector with all five of the tablenames
@@ -150,12 +93,6 @@ for ( i in 1:5 ){
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `pisa` monetdb analyses #
-############################################################################
 
 
 # R will exactly match SUDAAN results and Stata with the MSE option results

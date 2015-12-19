@@ -8,52 +8,39 @@
 # combine five sqlrepsurvey designs
 # into a single monetdb-backed multiply-imputed replicate-weighted list
 svyMDBdesign <-
-	function( five.designs ){
+	function( my_design ){
 	
-		# start with an empty object
-		rval <- NULL
-		# load in the five designs
-		rval$designs <- five.designs
-		
-		# store the call where it all began
-		rval$call <- sys.call()
-
 		# open each of those design connections with MonetDB hooray
-		rval$designs <- lapply( rval$designs , open , MonetDB.R() )
+		my_design$designs <- lapply( my_design$designs , open , MonetDB.R() )
 
-		# class it.  that way other functions below will recognize this object as very very special.
-		class( rval ) <- "svyMDBimputationList"
-
-		rval
+		class( my_design ) <- 'svyMDBimputationList'
+		
+		my_design
 	}
 
-	
-# svyquantile functions run on a multiply-imputed sqlrepsurvey design
-# do not include a variance-covariance matrix.
-# therefore, the standard errors need to be extracted manually
-# and passed in as a separate variance object for `MIcombine` to work its magic.
-sqlquantile.MIcombine <-
-	function( x ){
-		
-		# extract the standard errors from the multiply-imputed svyquantile call
-		se <- lapply( lapply( x , attr , 'ci' ) , '[' , 3 )
-		
-		# square the standard errors to get the variances
-		var <- lapply( se , function( y ) y^2 )
-	
-		# call `MIcombine` and return those results.
-		MIcombine( x , var )
-	}
 
 # need to copy over the `with` method
 with.svyMDBimputationList <- survey:::with.svyimputationList
-# monetdb-backed objects should work the exact same as sqlite-backed ones
+	
+update.svyMDBimputationList <-
+	function( my_design , ... ){
+	
+		z <- my_design
+	
+		z$designs <- lapply( my_design$designs , update , ... )
+	
+		z$call <- sys.call(-1)
+		
+		z
+	}
 
 
 # and create a new subset method for MDB imputation lists.
 subset.svyMDBimputationList <-
 	function( x , ... ){
+		
 		z <- x
+		
 		z$designs <- lapply( x$designs , subset , ... )
 		
 		z$call <- sys.call(-1)
@@ -69,8 +56,8 @@ subset.svyMDBimputationList <-
 pisa.svyttest <-
 	function( formula , design ){
 
-		# the MIcombine function runs differently than a normal svylm() call
-		m <- eval(bquote(MIcombine( with( design , svylm(formula))) ) )
+		# the MIcombine function runs differently than a normal svyglm() call
+		m <- eval(bquote(MIcombine( with( design , svyglm(formula))) ) )
 
 		rval <-
 			list(
@@ -105,19 +92,7 @@ pisa.svyttest <-
 
 
 construct.pisa.sqlsurvey.designs <-
-	function( monet.url , year , table.name , pv.vars , sas_ri , additional.factors = NULL ){
-
-		# step one - find all character columns #
-		sascii <- parse.SAScii( sas_ri )
-		
-		factor.vars <- tolower( sascii[ sascii$char %in% TRUE , 'varname' ] )
-
-		factor.vars <- factor.vars[ !( factor.vars %in% 'toss_0' ) ]
-		
-		factor.vars <- c( factor.vars , additional.factors )
-		# end of finding all character columns #
-		
-		conn <- dbConnect( MonetDB.R() , monet.url )
+	function( conn , year , table.name , pv.vars ){
 
 		# identify all variables that are multiply-imputed
 		pv.colnames <- paste0( "pv" , outer( 1:5 , pv.vars , paste0 ) )
@@ -130,16 +105,12 @@ construct.pisa.sqlsurvey.designs <-
 		# 'read' is not a valid column name in monetdb.
 		nr.pv.vars <- gsub( "read" , "readZ" , pv.vars )
 
-		all.implicates <- NULL
-
 		# loop through each of the five variables..
 		for ( i in 1:5 ){
 
 			print( paste( 'currently working on implicate' , i , 'from table' , table.name ) )
 
 			implicate.name <- paste0( table.name , "_imp" , i )
-			
-			all.implicates <- c( all.implicates , implicate.name )
 			
 			# build a sql string to create all five implicates
 			sql <-
@@ -203,108 +174,36 @@ construct.pisa.sqlsurvey.designs <-
 			)
 			
 			
-			# construct the actual monetdb-backed,
-			# replicate-weighted survey design.
-			assign(
-				implicate.name ,
-				sqlrepsurvey( 	
-					weights = "w_fstuwt" , 
-					repweights = "w_fstr[1-9]" , 
-					scale = 4 / 80 ,
-					rscales = rep( 1 , 80 ) ,
-					driver = MonetDB.R() , 
-					check.factors = factor.vars ,
-					database = monet.url ,
-					mse = TRUE ,
-					table.name = implicate.name
-				)
-			)
-			
 		}
 
+		
+		# construct the actual monetdb-backed,
+		# replicate-weighted survey design.
+		this_design <-
+			svrepdesign( 	
+				weights = ~w_fstuwt , 
+				repweights = "w_fstr[1-9]" , 
+				scale = 4 / 80 ,
+				rscales = rep( 1 , 80 ) ,
+				mse = TRUE ,
+				data = imputationList( datasets = as.list( paste0( table.name , "_imp" , 1:5 ) ) , dbtype = "MonetDBLite" ) ,
+				dbtype = "MonetDBLite" ,
+				dbname = dbfolder
+			)
+		
 		# output file name
 		ofn <- paste0( year , " " , table.name , ".rda" )
 		
 		# save all of the database design objects as r data files
-		save( list = all.implicates , file = ofn )
+		save( this_design , file = ofn )
 
 		# remove them from RAM
-		rm( list = all.implicates )
+		rm( this_design )
 
 		# clear up RAM
 		gc()
 
-		# disconnect from the monet database
-		dbDisconnect( conn )
-		
 		# return the name of the file that has already been saved to the disk,
 		# just for fun.
 		ofn
 	}
-
-
-	
-	
-reconstruct.pisa.sqlsurvey.designs <-
-	function( monet.url , year , table.name , previous.list , additional.factors = NULL ){
-
-		conn <- dbConnect( MonetDB.R() , monet.url )
-	
-		all.implicates <- NULL
-	
-		# loop through each of the five variables..
-		for ( i in 1:5 ){
-		
-			print( paste( 'currently working on implicate' , i , 'from table' , table.name ) )
-
-				
-			# step one - find all character columns #
-			factor.vars <- sapply( previous.list[[ i ]]$zdata , class )[ !( sapply( previous.list$designs[[ i ]]$zdata , class ) %in% c( 'numeric' , 'integer' ) ) ]
-			
-			factor.vars <- c( factor.vars , additional.factors )
-			# end of finding all character columns #
-			
-			
-			implicate.name <- paste0( table.name , "_imp" , i )
-			
-			all.implicates <- c( all.implicates , implicate.name )
-			
-			# construct the actual monetdb-backed,
-			# replicate-weighted survey design.
-			assign(
-				implicate.name ,
-				sqlrepsurvey( 	
-					weights = "w_fstuwt" , 
-					repweights = "w_fstr[1-9]" , 
-					scale = 4 / 80 ,
-					rscales = rep( 1 , 80 ) ,
-					driver = MonetDB.R() , 
-					check.factors = factor.vars ,
-					database = monet.url ,
-					mse = TRUE ,
-					table.name = implicate.name
-				)
-			)
-			
-		}
-
-		# output file name
-		ofn <- paste0( year , " " , table.name , ".rda" )
-		
-		# save all of the database design objects as r data files
-		save( list = all.implicates , file = ofn )
-
-		# remove them from RAM
-		rm( list = all.implicates )
-
-		# clear up RAM
-		gc()
-
-		# disconnect from the monet database
-		dbDisconnect( conn )
-		
-		# return the name of the file that has already been saved to the disk,
-		# just for fun.
-		ofn
-	}
-

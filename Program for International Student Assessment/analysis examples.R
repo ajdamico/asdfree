@@ -5,10 +5,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
-# load( 'C:/My Directory/PISA/2012 int_stu12_dec03.rda' )
+# setwd( 'C:/My Directory/PISA/' )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -29,46 +27,22 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###########################################################################################################################################
-# prior to running this analysis script, the pisa 2012 multiply-imputed tables must be loaded as a monet-backed sqlsurvey object on the   #
-# local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R"  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "2012 int_stu12_dec03.rda" in C:/My Directory/PISA or wherever the working directory was set.            #
-###########################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-
-# remove the # in order to run this install.packages line only once
-# install.packages( "mitools" )
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#######################################################################################################################################################
+# prior to running this analysis script, the pisa 2012 multiply-imputed tables must be loaded as a monet-backed sqlsurvey object on the               #
+# local machine. running the download, import, and design script will create a monetdb-backed multiply-imputed database with whatcha need             #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "2012 int_stu12_dec03.rda" in C:/My Directory/PISA or wherever the working directory was set.                        #
+#######################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 library(downloader)		# downloads and then runs the source() function on scripts from github
-library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(survey) 		# load survey package (analyzes complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
@@ -76,34 +50,11 @@ library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
 
 
-# after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all program for international student assessment tables
-# run them now.  mine look like this:
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
-
-#####################################################################
-# lines of code to hold on to for all other `pisa` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PISA/MonetDB/pisa.bat"		# # note for mac and *nix users: `pisa.bat` might be `pisa.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "pisa"
-dbport <- 50007
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # the program for international student assessment download and importation script
@@ -124,31 +75,25 @@ pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet
 # load the desired program for international student assessment monet database-backed complex sample design objects
 
 # uncomment one this line by removing the `#` at the front..
-# load( 'C:/My Directory/PISA/2012 int_stu12_dec03.rda' )	# analyze the 2012 student questionnaire
+load( '2012 int_stu12_dec03.rda' )	# analyze the 2012 student questionnaire
+
+# connect the complex sample designs to the monet database #
+this_design <- svyMDBdesign( this_design )
 
 
-# note: this r data file should contain five sqlrepdesign objects ending with `imp1` - `imp5`
-# you can check 'em out by running the `ls()` function to see what's available in working memory.
-ls()
-# see them?
-# they should be named something like this..
-paste0( 'int_stu12_dec03_imp' , 1:5 )
-
-# now use `mget` to take a character vector,
-# look for objects with the same names,
-# and smush 'em all together into a list
-imp.list <- mget( paste0( 'int_stu12_dec03_imp' , 1:5 ) )
-
-# now take a deep breath because this next part might scare you.
-
-# use the custom-made `svyMDBdesign` function to put
-# those five database-backed tables (already smushed into a list object)
-# into a new and sexy object type - a monetdb-backed, multiply-imputed svrepdesign object.
-pisa.imp <- svyMDBdesign( imp.list )
-# note to database-connection buffs out there: this function does the port `open`ing for you.
+# for the most part, `this_design` can be used like a hybrid multiply-imputed, database-backed svrepdesign object.
 
 
-# for the most part, `pisa.imp` can be used like a hybrid multiply-imputed, sqlrepsurvey object.
+###########################
+# variable recode example #
+###########################
+
+
+# construct a new category variable in the dataset
+this_design <- update( this_design , progcat = ifelse( st49q07 %in% 1:2 , 'always, almost always, or often' , ifelse( st49q07 %in% 3:4 , 'sometimes, rarely, or never' , NA ) ) )
+
+# print the distribution of that category
+MIcombine( with( this_design , svymean( ~ progcat , na.rm = TRUE ) ) )
 
 
 ################################################
@@ -183,7 +128,7 @@ dbGetQuery( db , "SELECT cnt , COUNT(*) as num_records FROM int_stu12_dec03_imp1
 
 
 # count the weighted number of students *worldwide* that pisa data represents #
-MIcombine( with( pisa.imp , svytotal( ~one ) ) )
+MIcombine( with( this_design , svytotal( ~one ) ) )
 
 # note that this is exactly equivalent to summing up the weight variable
 # from the original database (.db) file connection
@@ -193,41 +138,33 @@ dbGetQuery( db , "SELECT SUM( one ) AS sum_weights FROM int_stu12_dec03_imp1" )
 
 # weighted country population, for all countries in the data set
 # by country
-MIcombine( with( pisa.imp , svytotal( ~one , byvar = ~cnt ) ) )
-# note: the above command is one example of how the r survey package differs from the r sqlsurvey package
+MIcombine( with( this_design , svyby( ~one , ~cnt , svytotal ) ) )
 
 
 # calculate the mean of a linear variable #
 
 # average science score - across all individuals in the data set
-MIcombine( with( pisa.imp , svymean( ~scie ) ) )
+MIcombine( with( this_design , svymean( ~scie ) ) )
 
 # by country
-MIcombine( with( pisa.imp , svymean( ~scie , byvar = ~cnt ) ) )
+MIcombine( with( this_design , svyby( ~scie , ~cnt , svymean ) ) )
 
-
-# create a categorical variable #
-
-numeric.variable.to.make.categorical <- 'ic01q04'
-
-for ( i in 1:5 ){
-
-	pisa.imp$designs[[ i ]]$zdata[ , numeric.variable.to.make.categorical ] <- 
-		as.character( pisa.imp$designs[[ i ]]$zdata[ , numeric.variable.to.make.categorical ] )
-
-}
 
 # calculate the distribution of a categorical variable #
+
+# force it to be categorical first
+this_design <- update( this_design , ic01q04 = factor( ic01q04 ) )
+this_design <- update( this_design , cnt = factor( cnt ) )
 
 # percent with an internet connection:
 # 1) yes, and i use it
 # 2) yes, but i don't use it
 # 3) no
 
-MIcombine( with( pisa.imp , svymean( ~ic01q04 ) ) )
+MIcombine( with( this_design , svymean( ~ ic01q04 , na.rm = TRUE ) ) )
 
 # by country
-MIcombine( with( pisa.imp , svymean( ~ic01q04 , byvar = ~cnt ) ) )
+MIcombine( with( this_design , svyby( ~ ic01q04 , ~cnt , svymean , na.rm.by = TRUE , na.rm.all = TRUE , na.rm = TRUE ) ) )
 
 # oh!  and fun fact.  do you know why..
 # in compendium file..
@@ -256,46 +193,28 @@ MIcombine( with( pisa.imp , svymean( ~ic01q04 , byvar = ~cnt ) ) )
 
 
 # calculate the median and other percentiles #
-
-# quantiles require a bit of extra work in monetdb-backed multiply-imputed designs
-# here's an example of how to calculate the median science score
-sqlquantile.MIcombine( with( pisa.imp , svyquantile( ~scie , 0.5 , se = TRUE ) ) )
-# the `MIcombine` function does not work on (svyquantile x sqlrepdesign) output
-# so i've written a custom function `sqlquantile.MIcombine` that does.  kewl?
-
-
-# hey how about we loop through the six quantiles?  would you like that?
-for ( qtile in c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) ){
-
-	# ..and run the science score for each of those quantiles.
-	print( sqlquantile.MIcombine( with( pisa.imp , svyquantile( ~scie , qtile , se = TRUE ) ) ) )
+MIcombine( with( this_design , svyby( ~scie , ~one , svyquantile , c( 0.05 , 0.1 , 0.25 , 0.75 , 0.9 , 0.95 ) ) ) )
 	
-}
-
-
-# ..sqlrepsurvey designs do not allow byvar arguments, meaning the only way to 
-# calculate quantiles by country would be by creating subsets for each subpopulation
-# and calculating the quantiles for them independently:
 
 ######################
 # subsetting example #
 ######################
 
-# restrict the pisa.imp object to females only
-pisa.imp.female <- subset( pisa.imp , st04q01 == 2 )
+# restrict the this_design object to females only
+this_design.female <- subset( this_design , st04q01 == 2 )
 
 # now any of the above commands can be re-run
-# using the pisa.imp.female object
-# instead of the pisa.imp object
+# using the this_design.female object
+# instead of the this_design object
 # in order to analyze females only
 	
 # calculate the mean of a linear variable #
 
 # average science score - nationwide, restricted to females
-MIcombine( with( pisa.imp.female , svymean( ~scie ) ) )
+MIcombine( with( this_design.female , svymean( ~scie ) ) )
 
 # median science score - restricted to females
-sqlquantile.MIcombine( with( pisa.imp.female , svyquantile( ~scie , qtile , se = TRUE ) ) )
+MIcombine( with( this_design.female , svyquantile( ~scie , 0.5 ) ) )
 
 
 
@@ -308,7 +227,7 @@ sqlquantile.MIcombine( with( pisa.imp.female , svyquantile( ~scie , qtile , se =
 
 # store the results into a new object
 
-internet.by.oecd <- MIcombine( with( pisa.imp , svymean( ~ic01q04 , byvar = ~oecd ) ) )
+internet.by.oecd <- MIcombine( with( this_design , svyby( ~ic01q04 , ~oecd , svymean , na.rm = TRUE ) ) )
 
 # print the results to the screen 
 internet.by.oecd
@@ -333,7 +252,7 @@ write.csv( internet.by.oecd , "internet by oecd membership.csv" )
 # ..or trimmed to only contain the values you need.
 # here's the percentage without internet access at home, by oecd nation vs. all others in the data
 no.internet.access.by.oecd <-
-	internet.by.oecd[ substr( rownames( internet.by.oecd ) , 1 , 2 ) == "3:" , ]
+	internet.by.oecd[ 5:6 , ]
 
 
 # print the new results to the screen
@@ -359,12 +278,6 @@ barplot(
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `pisa` monetdb analyses #
-############################################################################
 
 
 # for more details on how to work with data in r
