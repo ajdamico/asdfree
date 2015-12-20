@@ -6,10 +6,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"		# # note for mac and *nix users: `censo_demografico.bat` might be `censo_demografico.sh` instead
-# load( 'C:/My Directory/CENSO/pes 2010 design.rda' )
+# setwd( "C:/My Directory/CENSO/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -36,30 +34,14 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/CENSO/" )
 
 
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-
-
-library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(survey) 		# load survey package (analyzes complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+
 
 # remove certainty units
 options( survey.lonely.psu = "remove" )
@@ -67,47 +49,14 @@ options( survey.lonely.psu = "remove" )
 # http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
 
 # after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all behavioral risk factor surveillance system tables
-# run them now.  mine look like this:
+# to initiate and connect to the monet database.  run them now.  mine look like this:
 
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
-##################################################################################
-# lines of code to hold on to for all other `censo_demografico` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/CENSO/MonetDB/censo_demografico.bat"		# # note for mac and *nix users: `censo_demografico.bat` might be `censo_demografico.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "censo_demografico"
-dbport <- 50011
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# if you are running windows, you might see a performance improvement
-# by turning off multi-threading with this command:
-if (.Platform$OS.type == "windows") dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# this must be set every time you start the server.
-
-# # # # run your analysis commands # # # #
-
-
-
-# to turn multi-threading back on (this is the default)
-# either shut down and re-start the server
-# with monetdb.server.stop then monetdb.server.start
-# or simply run this line:
-# dbSendQuery( db , "set optimizer = 'default_pipe';" )
 
 
 # the censo demografico download and importation script
@@ -126,13 +75,13 @@ if (.Platform$OS.type == "windows") dbSendQuery( db , "set optimizer = 'sequenti
 
 
 # uncomment this line by removing the `#` to load the person-level table..
-# load( 'C:/My Directory/CENSO/pes 2010 design.rda' )
+load( 'pes 2010 design.rda' )
 # ..and immediately connect the complex sample designs to the monet database #
-pes.d <- open( pes.design , driver = MonetDB.R() , wait = TRUE )
+pes.d <- open( pes.design , driver = MonetDB.R() )
 
 
 # alternatively, open and connect to the household-level design with these two lines instead
-# load( 'C:/My Directory/CENSO/dom 2010 design.rda' )
+# load( 'dom 2010 design.rda' )
 # dom.d <- open( dom.design , driver = MonetDB.R() , wait = TRUE )
 
 
@@ -204,9 +153,6 @@ dbGetQuery( db , 'SELECT SUM( pes_wgt * v6033 ) / SUM( pes_wgt ) AS mean_age FRO
 # using syntax that matches the R survey package:
 svymean( ~v6033 , subset( pes.d , v6033 < 900 ) )
 
-# including the standard error - warning: computationally intensive
-# svymean( ~v6033 , subset( pes.d , v6033 < 900 ) , se = TRUE )
-
 
 # average age - by state, three ways #
 
@@ -214,11 +160,7 @@ svymean( ~v6033 , subset( pes.d , v6033 < 900 ) )
 dbGetQuery( db , 'SELECT v0001 , SUM( pes_wgt * v6033 ) / SUM( pes_wgt ) AS mean_age FROM c10 WHERE v6033 < 900 GROUP BY v0001 ORDER BY v0001' )
 
 # using syntax similar to (but not exactly the same as) the R survey pacakge
-svymean( ~v6033 , subset( pes.d , v6033 < 900 ) , byvar = ~v0001 )
-
-# including the standard error - warning: computationally intensive
-# svymean( ~v6033 , subset( pes.d , v6033 < 900 ) , byvar = ~v0001 , se = TRUE )
-
+svyby( ~v6033 , ~v0001 , subset( pes.d , v6033 < 900 ) , svymean )
 
 
 # calculate the distribution of a categorical variable #
@@ -230,36 +172,16 @@ svymean( ~v6033 , subset( pes.d , v6033 < 900 ) , byvar = ~v0001 )
 # marital status distribution - nationwide
 svymean( ~v0640 , pes.d )
 
-# including the standard error - warning: computationally intensive
-# svymean( ~v0640 , pes.d , se = TRUE )
-
 # marital status distribution - by state
-svymean( ~v0640 , pes.d , byvar = ~v0001 )
-
-# including the standard error - warning: computationally intensive
-# svymean( ~v0640 , pes.d , byvar = ~v0001 , se = TRUE )
+svyby( ~v0640 , ~v0001 , pes.d , svymean )
 
 
 # calculate the median and other percentiles #
 
 # median age of all brazilians
-svyquantile( ~v6033 , subset( pes.d , v6033 < 900 ) , quantiles = 0.5 )
+svyquantile( ~v6033 , subset( pes.d , v6033 < 900 ) , c( 0.5 , 0.99 ) )
 # note: quantile standard errors cannot be computed with taylor-series linearization designs
-# this is true in both the survey and sqlsurvey packages
 
-# note two additional differences between the sqlsurvey and survey packages..
-
-# ..sqlsurvey designs do not allow multiple quantiles.  instead, 
-# loop through and print or save multiple quantiles, simply use a for loop
-
-# loop through the median and 99th percentiles and print both results to the screen
-for ( i in c( .5 , .99 ) ) print( svyquantile( ~v6033 , subset( pes.d , v6033 < 900 ) , quantiles = i ) )
-
-
-
-# ..sqlsurvey designs do not allow byvar arguments, meaning the only way to 
-# calculate quantiles by state would be by creating subsets for each subpopulation
-# and calculating the quantiles for them independently:
 
 ######################
 # subsetting example #
@@ -278,9 +200,6 @@ pes.d.female <- subset( pes.d , v0601 == 2 )
 # marital status distribution - nationwide, restricted to females
 svymean( ~v0640 , pes.d.female )
 
-# including the standard error - warning: computationally intensive
-# svymean( ~v0640 , pes.d.female , se = TRUE )
-
 
 ###################
 # export examples #
@@ -291,10 +210,7 @@ svymean( ~v0640 , pes.d.female )
 
 # store the results into a new object
 
-marital.status.by.urbanrural <- svymean( ~v0640 , pes.d , byvar = ~v1006 )
-
-# including the standard error - warning: computationally intensive
-# marital.status.by.urbanrural <- svymean( ~v0640 , pes.d , byvar = ~v1006 , se = TRUE )
+marital.status.by.urbanrural <- svyby( ~v0640 , ~v1006 , pes.d , svymean )
 
 
 # print the results to the screen 
@@ -339,10 +255,4 @@ close( pes.d )
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `censo_demografico` monetdb analyses #
-#########################################################################################
 
