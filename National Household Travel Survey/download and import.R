@@ -577,6 +577,10 @@ for ( year in years.to.download ){
 		dbSendQuery( db , "UPDATE perpub_2001 SET wtprntl = 0 WHERE wtprntl IS NULL" )
 		dbSendQuery( db , "UPDATE hhpub_2001 SET wthhntl = 0 WHERE wthhntl IS NULL" )
 		
+		for( this_wgt in grep( "wttdfn[0-9]" , dbListFields( db , 'pr50wt_2001' ) , value = TRUE ) ) dbSendQuery( db , paste( "UPDATE pr50wt_2001 SET" , this_wgt , "= 0 WHERE" , this_wgt , "IS NULL" ) )
+		for( this_wgt in grep( "wtpfin[0-9]" , dbListFields( db , 'pr50wt_2001' ) , value = TRUE ) ) dbSendQuery( db , paste( "UPDATE pr50wt_2001 SET" , this_wgt , "= 0 WHERE" , this_wgt , "IS NULL" ) )
+		for( this_wgt in grep( "wthfin[0-9]" , dbListFields( db , 'hh50wt_2001' ) , value = TRUE ) ) dbSendQuery( db , paste( "UPDATE hh50wt_2001 SET" , this_wgt , "= 0 WHERE" , this_wgt , "IS NULL" ) )
+		
 	}
 
 	
