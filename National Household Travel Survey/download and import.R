@@ -657,7 +657,7 @@ for ( year in years.to.download ){
 			# table `ldt_m_YYYY` now available for analysis!
 			nhts.ldt.design <-
 				svrepdesign(
-					weight = ~ldt.wt ,
+					weight = ldt.wt ,
 					repweights = ldt.repwt ,
 					scale = sca ,
 					rscales = rsc ,
