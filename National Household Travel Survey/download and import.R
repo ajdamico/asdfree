@@ -569,6 +569,17 @@ for ( year in years.to.download ){
 
 	}
 
+
+	# remove missing weights in 2001
+	if( year == 2001 ){
+
+		dbSendQuery( db , "UPDATE daypub_2001 SET wttrdntl = 0 WHERE wttrdntl IS NULL" )
+		dbSendQuery( db , "UPDATE perpub_2001 SET wtprntl = 0 WHERE wtprntl IS NULL" )
+		dbSendQuery( db , "UPDATE hhpub_2001 SET wthhntl = 0 WHERE wthhntl IS NULL" )
+		
+	}
+
+	
 	
 	# more stuff that's only available in the years where replicate weights
 	# are freely available as csv files.
