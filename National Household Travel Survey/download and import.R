@@ -602,9 +602,9 @@ for ( year in years.to.download ){
 			
 			# weights and replicate weights
 			ldt.wt <- ~wtptpfin ; ldt.repwt <- 'fptpwt[0-9]'
-			hh.wt <- ~wthhntl ; hh.repwt <- 'fhhwt[0-9]'
-			per.wt <- ~wtprntl ; per.repwt <- 'fperwt[0-9]'
-			day.wt <- ~wttrdntl ; day.repwt <- 'ftrdwt[0-9]'
+			hh.wt <- ~wthhntl ; hh.repwt <- 'wthfin[0-9]'
+			per.wt <- ~wtprntl ; per.repwt <- 'wtpfin[0-9]'
+			day.wt <- ~wttrdntl ; day.repwt <- 'wttdfn[0-9]'
 			
 		} else {
 		
