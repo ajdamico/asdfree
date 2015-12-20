@@ -22,16 +22,16 @@
 # ajdamico@gmail.com
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###############################################################################################
-# prior to running this analysis script, the 2010 censo demografico must be loaded as a monet #
-# database-backed sqlsurvey object on the local machine. running this script will do it.      #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/download%20and%20import.R  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "pes 2010 design.rda" in C:/My Directory/CENSO or wherever.  #
-###############################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###########################################################################################################
+# prior to running this analysis script, the 2010 censo demografico must be loaded as a monet             #
+# database-backed sqlsurvey object on the local machine. running this script will do it.                  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/download%20and%20import.R #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "pes 2010 design.rda" in C:/My Directory/CENSO or wherever.              #
+###########################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # uncomment this line by removing the `#` at the front..
