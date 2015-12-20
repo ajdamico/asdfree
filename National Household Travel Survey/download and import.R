@@ -428,26 +428,6 @@ for ( year in years.to.download ){
 				# clear up RAM
 				gc()
 				
-				# re-read the same file into memory so you can figure out what columns are factor or character
-				this.table <- read.csv( i , nrow = 250000 )
-				
-				# store all factor and character column names into an external object
-				this.header <-
-					names( this.table )[ sapply( this.table , function( z ) class( z ) %in% c( 'factor' , 'character' ) ) ]
-
-				# and name that object the current tablename dot header for future use.
-				assign( 
-					paste0( tolower( tablename ) , '.header' ) , 
-					this.header
-				)
-				
-				# remove the stuff you no longer need
-				rm( this.table , this.header )
-				
-				# clear up RAM once again
-				gc()
-				
-				
 				# delete the csv file from your local disk,
 				# you're not going to use it again, so why not?
 				file.remove( i )
