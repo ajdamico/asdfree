@@ -87,9 +87,9 @@ nhts.per.design <- open( nhts.per.design , driver = MonetDB.R() )	# person-level
 
 # construct a handy function to calculate the margin of error for any formula
 nhts.moe <-
-	function( formula , design , FUN = svytotal ){
+	function( formula , design , FUN = svytotal , na.rm = FALSE ){
 		
-		( coef( FUN( formula , design ) ) - confint( FUN( formula , design ) , df = degf( design ) + 1 ) )[ 1 ]
+		( coef( FUN( formula , design , na.rm = na.rm ) ) - confint( FUN( formula , design , na.rm = na.rm ) , df = degf( design ) + 1 ) )[ 1 ]
 		
 	}
 # end of function creation
@@ -145,22 +145,22 @@ svytotal( ~I( r_age < 16 ) , nhts.per.design )
 nhts.moe( ~I( r_age < 16 ) , nhts.per.design )
 
 # excel cell H27
-svytotal( ~I( driver == 1 ) , nhts.per.design )
+svytotal( ~I( driver == 1 ) , nhts.per.design , na.rm = TRUE )
 
 # excel cell I27
-nhts.moe( ~I( driver == 1 ) , nhts.per.design )
+nhts.moe( ~I( driver == 1 ) , nhts.per.design , na.rm = TRUE )
 
 # excel cell H28
-svytotal( ~I( r_sex == 1 & driver == 1 ) , nhts.per.design )
+svytotal( ~I( r_sex == 1 & driver == 1 ) , nhts.per.design , na.rm = TRUE )
 
 # excel cell I28
-nhts.moe( ~I( r_sex == 1 & driver == 1 ) , nhts.per.design )
+nhts.moe( ~I( r_sex == 1 & driver == 1 ) , nhts.per.design , na.rm = TRUE )
 
 # excel cell H29
-svytotal( ~I( r_sex == 2 & driver == 1 ) , nhts.per.design )
+svytotal( ~I( r_sex == 2 & driver == 1 ) , nhts.per.design , na.rm = TRUE )
 
 # excel cell I29
-nhts.moe( ~I( r_sex == 2 & driver == 1 ) , nhts.per.design )
+nhts.moe( ~I( r_sex == 2 & driver == 1 ) , nhts.per.design , na.rm = TRUE )
 
 # excel cell H31
 svytotal( ~I( worker == 1 ) , nhts.per.design )
