@@ -329,7 +329,7 @@ pums.import.merge.design <-
 		# create a sqlsurvey complex sample design object
 		pums.design <-
 			svydesign(
-				weight = ~pweight ,			# weight variable column
+				weight = if( grepl( "1990" , merged.tn ) ) ~pwgt1 else ~pweight ,			# weight variable column
 				id = ~1 ,					# sampling unit column (defined in the character string above)
 				data = merged.tn ,			# table name within the monet database (defined in the character string above)
 				dbtype = "MonetDBLite" ,
