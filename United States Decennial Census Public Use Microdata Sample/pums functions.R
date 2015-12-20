@@ -222,7 +222,7 @@ get.tsv <-
 # imports them all into monetdb, merges (rectangulates) them into a merged (_m) table,
 # and finally creates a sqlsurvey design object
 pums.import.merge.design <-
-	function( db , monet.url , fn , merged.tn , hh.tn , person.tn , hh.stru , person.stru ){
+	function( db , fn , merged.tn , hh.tn , person.tn , hh.stru , person.stru ){
 		
 		# extract the household tsv file locations
 		hh.tfs <- as.character( fn[ 1 , ] )
@@ -325,39 +325,16 @@ pums.import.merge.design <-
 		dbSendQuery( db , paste0( 'alter table ' , merged.tn , ' add column one int' ) )
 		dbSendQuery( db , paste0( 'UPDATE ' , merged.tn , ' SET one = 1' ) )
 		
-		# add a column containing the record (row) number
-		dbSendQuery( db , paste0( 'alter table ' , merged.tn , ' add column idkey int auto_increment' ) )
-		
-		# store the names of factor/character variables #
-		hh.char <- hh.stru[ hh.stru$char %in% TRUE , 'variable' ]
-		person.char <- person.stru[ person.stru$char %in% TRUE , 'variable' ]
-		
-		# throw in rectype, of course
-		mergefile.factor.variables <- unique( c( hh.char , person.char , 'rectype' ) )
-
-		# finally, restrict the character vector to only columns that are actually in the merged table..
-		mffv <- 
-			intersect( 
-				dbListFields( db , merged.tn ) , 
-				mergefile.factor.variables 
-			)
-		# ..some of the blank_ columns may have been thrown out
-		
-		# end of names of factor/character variable storage #
-
 		
 		# create a sqlsurvey complex sample design object
 		pums.design <-
-			sqlsurvey(
-				weight = 'pweight' ,		# weight variable column
-				id = 1 ,					# sampling unit column (defined in the character string above)
-				table.name = merged.tn ,	# table name within the monet database (defined in the character string above)
-				key = "idkey" ,				# sql primary key column (created with the auto_increment line above)
-				check.factors = mffv ,		# designate all of the mergefile factor variables, in one convenient character vector
-				database = monet.url ,		# monet database location on localhost
-				driver = MonetDB.R()
+			svydesign(
+				weight = ~pweight ,			# weight variable column
+				id = ~1 ,					# sampling unit column (defined in the character string above)
+				data = merged.tn ,			# table name within the monet database (defined in the character string above)
+				dbtype = "MonetDBLite" ,
+				dbname = dbfolder
 			)
-
 		# ..and return that at the end of the function.
 		pums.design
 	}
