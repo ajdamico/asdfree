@@ -25,19 +25,10 @@
 # this r script will replicate each of the statistics from that custom run of the national survey on drug use and health (nsduh) exactly
 
 
-# if you have never used the r language before,
-# watch this two minute video i made outlining
-# how to run this script from start to finish
-# https://www.youtube.com/watch?v=JLt9JfaAxUg
+# contact me directly for free help or for paid consulting work
 
 # anthony joseph damico
 # ajdamico@gmail.com
-
-# if you use this script for a project, please send me a note
-# it's always nice to hear about how people are using this stuff
-
-# for further reading on cross-package comparisons, see:
-# http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

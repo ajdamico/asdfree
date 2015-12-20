@@ -15,22 +15,13 @@
 # # end of auto-run block # #
 # # # # # # # # # # # # # # #
 
-# if you have never used the r language before,
-# watch this two minute video i made outlining
-# how to run this script from start to finish
-# https://www.youtube.com/watch?v=JLt9JfaAxUg
+# contact me directly for free help or for paid consulting work
 
 # emily rowe
 # eprowe@gmail.com
 
 # anthony joseph damico
 # ajdamico@gmail.com
-
-# if you use this script for a project, please send me a note
-# it's always nice to hear about how people are using this stuff
-
-# for further reading on cross-package comparisons, see:
-# http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
 ##########################################################################################
