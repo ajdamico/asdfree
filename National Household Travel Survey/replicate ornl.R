@@ -163,10 +163,10 @@ svytotal( ~I( r_sex == 2 & driver == 1 ) , nhts.per.design , na.rm = TRUE )
 nhts.moe( ~I( r_sex == 2 & driver == 1 ) , nhts.per.design , na.rm = TRUE )
 
 # excel cell H31
-svytotal( ~I( worker == 1 ) , nhts.per.design )
+svytotal( ~I( worker == 1 ) , nhts.per.design , na.rm = TRUE )
 
 # excel cell I31
-nhts.moe( ~I( worker == 1 ) , nhts.per.design )
+nhts.moe( ~I( worker == 1 ) , nhts.per.design , na.rm = TRUE )
 
 
 
@@ -181,10 +181,10 @@ svytotal( ~one , nhts.day.design )
 nhts.moe( ~one , nhts.day.design )
 
 # excel cell H43
-svytotal( ~trpmiles , nhts.day.design )
+svytotal( ~trpmiles , nhts.day.design , na.rm = TRUE )
 
 # excel cell I43
-nhts.moe( ~trpmiles , nhts.day.design )
+nhts.moe( ~trpmiles , nhts.day.design , na.rm = TRUE )
 
 
 ######################
@@ -196,10 +196,6 @@ nhts.moe( ~trpmiles , nhts.day.design )
 close( nhts.hh.design )
 close( nhts.per.design )
 close( nhts.day.design )
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
 
 
 # for more details on how to work with data in r
