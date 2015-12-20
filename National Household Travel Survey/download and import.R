@@ -5,7 +5,6 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NHTS/" )
 # years.to.download <- c( 1983 , 1990 , 1995 , 2001 , 2009 )
@@ -32,36 +31,6 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################
-# prior to running this analysis script, monetdb must be installed on the local machine. follow each step outlined on this page: #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/asdfree/blob/master/MonetDB/monetdb%20installation%20instructions.R #
-###################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-
 
 # set your working directory.
 # the NHTS data files will be stored here
@@ -75,7 +44,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "stringr" , "sas7bdat" , "MonetDB.R" , "downloader" , "digest" , "R.utils" , 'readr' ) )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "sas7bdat" , "R.utils" , "ff" , "readr" ) , repos = c( "http://dev.monetdb.org/Assets/R/" , "http://cran.rstudio.com/" ) )
 
 
 # define which years to download #
@@ -205,8 +174,9 @@ nmf <-
 # # # # # # # # #
 
 library(stringr) 			# load stringr package (manipulates character strings easily)
-library(sqlsurvey)			# load sqlsurvey package (analyzes large complex design surveys)
+library(survey) 			# load survey package (analyzes complex design surveys)
 library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 library(sas7bdat)			# loads files ending in .sas7bdat directly into r as data.frame objects
 library(foreign) 			# load foreign package (converts data files into R)
@@ -226,113 +196,12 @@ source_url(
 )
 
 
-
-
-# configure a monetdb database for the nhts on windows #
-
-# note: only run this command once.  this creates an executable (.bat) file
-# in the appropriate directory on your local disk.
-# when adding new files or adding a new year of data, this script does not need to be re-run.
-
-# create a monetdb executable (.bat) file for the national household travel survey
-batfile <-
-	monetdb.server.setup(
-					
-					# set the path to the directory where the initialization batch file and all data will be stored
-					database.directory = paste0( getwd() , "/MonetDB" ) ,
-					# must be empty or not exist
-					
-					# find the main path to the monetdb installation program
-					monetdb.program.path = 
-						ifelse( 
-							.Platform$OS.type == "windows" , 
-							"C:/Program Files/MonetDB/MonetDB5" , 
-							"" 
-						) ,
-					# note: for windows, monetdb usually gets stored in the program files directory
-					# for other operating systems, it's usually part of the PATH and therefore can simply be left blank.
-					
-					# choose a database name
-					dbname = "nhts" ,
-					
-					# choose a database port
-					# this port should not conflict with other monetdb databases
-					# on your local computer.  two databases with the same port number
-					# cannot be accessed at the same time
-					dbport = 50013
-	)
-
-	
-# this next step is so very important.
-
-# store a line of code that will make it easy to open up the monetdb server in the future.
-# this should contain the same file path as the batfile created above,
-# you're best bet is to actually look at your local disk to find the full filepath of the executable (.bat) file.
-# if you ran this script without changes, the batfile will get stored in C:\My Directory\NHTS\MonetDB\nhts.bat
-
-# here's the batfile location:
-batfile
-
-# note that since you only run the `monetdb.server.setup()` function the first time this script is run,
-# you will need to note the location of the batfile for future MonetDB analyses!
-
-# in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"	# # note for mac and *nix users: `nhts.bat` might be `nhts.sh` instead"
-# obviously, without the `#` comment character
-
-# hold on to that line for future scripts.
-# you need to run this line *every time* you access
-# the national household travel survey files with monetdb.
-# this is the monetdb server.
-
-# two other things you need: the database name and the database port.
-# store them now for later in this script, but hold on to them for other scripts as well
-dbname <- "nhts"
-dbport <- 50013
-
-# now the local windows machine contains a new executable program at "c:\my directory\NHTS\monetdb\nhts.bat"
-
-
-
-
-# it's recommended that after you've _created_ the monetdb server,
-# you create a block of code like the one below to _access_ the monetdb server
-
-
-#####################################################################
-# lines of code to hold on to for all other `nhts` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"	# # note for mac and *nix users: `nhts.bat` might be `nhts.sh` instead"
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "nhts"
-dbport <- 50013
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `nhts` monetdb analyses #
-############################################################################
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 # define which column names are used in nhts tables but illegal in monetdb-sql
-illegal.names <- c( 'serial' , 'month' , 'day' , 'date' , 'work' , 'public' , 'where' , 'chain' )
+illegal.names <- c( 'serial' , 'month' , 'day' , 'date' , 'work' , 'public' , 'where' , 'chain' , 'match' )
 
 
 # loop through and download each year specified by the user
@@ -343,18 +212,9 @@ for ( year in years.to.download ){
 	cat( "now loading" , year , "..." , '\n\r' )
 
 
-	# wait ten seconds, just to make sure any previous servers closed
-	# and you don't get a gdk-lock error from opening two-at-once
-	Sys.sleep( 10 )
+	# immediately connect to the monetdblite folder
+	db <- dbConnect( MonetDBLite() , dbfolder )
 
-	# launch the current monet database
-	monetdb.server.start( batfile )
-	
-	# immediately connect to it..
-	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-	# ..and store the process id
-	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# 1983 is just sas transport files, so import them independently.
 	if ( year == 1983 ){
@@ -746,10 +606,10 @@ for ( year in years.to.download ){
 			rsc <- rep( 1 , 99 )
 			
 			# weights and replicate weights
-			ldt.wt <- 'wtptpfin' ; ldt.repwt <- 'fptpwt[0-9]'
-			hh.wt <- 'wthhntl' ; hh.repwt <- 'fhhwt[0-9]'
-			per.wt <- 'wtprntl' ; per.repwt <- 'fperwt[0-9]'
-			day.wt <- 'wttrdntl' ; day.repwt <- 'ftrdwt[0-9]'
+			ldt.wt <- ~wtptpfin ; ldt.repwt <- 'fptpwt[0-9]'
+			hh.wt <- ~wthhntl ; hh.repwt <- 'fhhwt[0-9]'
+			per.wt <- ~wtprntl ; per.repwt <- 'fperwt[0-9]'
+			day.wt <- ~wttrdntl ; day.repwt <- 'ftrdwt[0-9]'
 			
 		} else {
 		
@@ -764,39 +624,15 @@ for ( year in years.to.download ){
 			
 			# weights and replicate weights
 			ldt.wt <- NULL ; ldt.repwt <- NULL
-			hh.wt <- 'wthhfin' ; hh.repwt <- 'hhwgt[0-9]' 
-			per.wt <- 'wtperfin' ; per.repwt <- 'wtperfin[1-9]' 
-			day.wt <- 'wttrdfin' ; day.repwt <- 'daywgt[1-9]'
+			hh.wt <- ~wthhfin ; hh.repwt <- 'hhwgt[0-9]' 
+			per.wt <- ~wtperfin ; per.repwt <- 'wtperfin[1-9]' 
+			day.wt <- ~wttrdfin ; day.repwt <- 'daywgt[1-9]'
 						
 		}
 	
 
 		if ( year == 2001 ){
 					
-			# kill and re-start the server before every merge #
-
-			# disconnect from the current monet database
-			dbDisconnect( db )
-
-			# and close it using the `pid`
-			monetdb.server.stop( pid )
-
-			# wait ten seconds, just to make sure any previous servers closed
-			# and you don't get a gdk-lock error from opening two-at-once
-			Sys.sleep( 10 )
-
-			# launch the current monet database
-			monetdb.server.start( batfile )
-
-			# immediately connect to it..
-			db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-			# ..and store the process id
-			pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-			# end of mserver death and resurrection #
-
-		
 			# merge the `ldt` table with the ldt weights
 			nonmatching.fields <- nmf( db , 'ldt50wt' , 'ldtpub' , year )
 			
@@ -819,54 +655,24 @@ for ( year in years.to.download ){
 				)
 			)
 			# table `ldt_m_YYYY` now available for analysis!
-		
-			# add the `idkey` column to the merged ldt-level table
-			dbSendQuery( db , paste0( 'alter table ldt_m_' , year , ' add column idkey int auto_increment' ) )
-			
-			# immediately make the person-ldt-level sqlrepsurvey object.
-			nhts.ldt.design <- 									# name the survey object
-				sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
-					weight = ldt.wt , 
+			nhts.ldt.design <-
+				svrepdesign(
+					weight = ldt.wt ,
 					repweights = ldt.repwt ,
 					scale = sca ,
 					rscales = rsc ,
 					degf = 99 ,
 					mse = TRUE ,
-					table.name = paste0( 'ldt_m_' , year ) , 	# use the person-ldt-merge data table
-					key = "idkey" ,
-					# use the `.header` object to determine which columns are character or factor types
-					check.factors = get( paste0( 'ldtpub' , year , '.header' ) ) ,
-					database = monet.url ,
-					driver = MonetDB.R()
+					data = paste0( 'ldt_m_' , year ) , 			# use the person-ldt-merge data table
+					dbtype = "MonetDBLite" ,
+					dbname = dbfolder
 				)
+
+				
 		
 		}
 		
 
-		# kill and re-start the server before every merge #
-
-		# disconnect from the current monet database
-		dbDisconnect( db )
-
-		# and close it using the `pid`
-		monetdb.server.stop( pid )
-
-		# wait ten seconds, just to make sure any previous servers closed
-		# and you don't get a gdk-lock error from opening two-at-once
-		Sys.sleep( 10 )
-
-		# launch the current monet database
-		monetdb.server.start( batfile )
-
-		# immediately connect to it..
-		db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-		# ..and store the process id
-		pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-		# end of mserver death and resurrection #
-
-		
 		# merge the `day` table with the person-level weights
 		nonmatching.fields <- nmf( db , wt.table , day.table , year )
 		
@@ -889,50 +695,20 @@ for ( year in years.to.download ){
 			)
 		)
 		# table `day_m_YYYY` now available for analysis!
-
-		# add the `idkey` column to the merged person-day-level table
-		dbSendQuery( db , paste0( 'alter table day_m_' , year , ' add column idkey int auto_increment' ) )
 		
-		# immediately make the person-day-level sqlrepsurvey object.
-		nhts.day.design <- 									# name the survey object
-			sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+		# immediately make the person-day-level svrepdesign object.
+		nhts.day.design <-
+			svrepdesign(
 				weight = day.wt ,
 				repweights = day.repwt ,
 				scale = sca ,
 				rscales = rsc ,
 				degf = 99 ,
 				mse = TRUE ,
-				table.name = paste0( 'day_m_' , year ) , 	# use the person-day-merge data table
-				key = "idkey" ,
-				# use the `.header` object to determine which columns are character or factor types
-				check.factors = get( paste0( day.table , year , '.header' ) ) ,
-				database = monet.url ,
-				driver = MonetDB.R()
+				data = paste0( 'day_m_' , year ) , 	# use the person-day-merge data table
+				dbtype = "MonetDBLite" ,
+				dbname = dbfolder
 			)
-
-
-		# kill and re-start the server before every merge #
-
-		# disconnect from the current monet database
-		dbDisconnect( db )
-
-		# and close it using the `pid`
-		monetdb.server.stop( pid )
-
-		# wait ten seconds, just to make sure any previous servers closed
-		# and you don't get a gdk-lock error from opening two-at-once
-		Sys.sleep( 10 )
-
-		# launch the current monet database
-		monetdb.server.start( batfile )
-
-		# immediately connect to it..
-		db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-		# ..and store the process id
-		pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-		# end of mserver death and resurrection #
 
 			
 		# merge the person table with the person-level weights
@@ -957,52 +733,22 @@ for ( year in years.to.download ){
 			)
 		)
 		# table `per_m_YYYY` now available for analysis!
-
-		# add the `idkey` column to the merged person-level table
-		dbSendQuery( db , paste0( 'alter table per_m_' , year , ' add column idkey int auto_increment' ) )
 		
-		# immediately make the person-level sqlrepsurvey object.
-		nhts.per.design <- 									# name the survey object
-			sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+		# immediately make the person-level svrepdesign object.
+		nhts.per.design <-
+			svrepdesign(
 				weight = per.wt ,
 				repweights = per.repwt ,
 				scale = sca ,
 				rscales = rsc ,
 				degf = 99 ,
 				mse = TRUE ,
-				table.name = paste0( 'per_m_' , year ) , 	# use the person-merge data table
-				key = "idkey" ,
-				# use the `.header` object to determine which columns are character or factor types
-				check.factors = get( paste0( per.table , year , '.header' ) ) ,
-				database = monet.url ,
-				driver = MonetDB.R()
+				data = paste0( 'per_m_' , year ) , 	# use the person-merge data table
+				dbtype = "MonetDBLite" ,
+				dbname = dbfolder
 			)
 
 	
-		# kill and re-start the server before every merge #
-
-		# disconnect from the current monet database
-		dbDisconnect( db )
-
-		# and close it using the `pid`
-		monetdb.server.stop( pid )
-
-		# wait ten seconds, just to make sure any previous servers closed
-		# and you don't get a gdk-lock error from opening two-at-once
-		Sys.sleep( 10 )
-
-		# launch the current monet database
-		monetdb.server.start( batfile )
-
-		# immediately connect to it..
-		db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-		# ..and store the process id
-		pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-		# end of mserver death and resurrection #
-
-		
 		# merge the household table with the household-level weights
 		nonmatching.fields <- nmf( db , 'hh50wt' , hh.table , year )
 		
@@ -1025,24 +771,18 @@ for ( year in years.to.download ){
 		# table `hh_m_YYYY` now available for analysis!
 
 		
-		# add the `idkey` column to the merged household-level table
-		dbSendQuery( db , paste0( 'alter table hh_m_' , year , ' add column idkey int auto_increment' ) )
-		
-		# immediately make the household-level sqlrepsurvey object.
-		nhts.hh.design <- 									# name the survey object
-			sqlrepsurvey(									# sqlrepdesign function call.. type ?sqlrepdesign for more detail
+		# immediately make the household-level svrepdesign object.
+		nhts.hh.design <-
+			svrepdesign(
 				weight = hh.wt ,
 				repweights = hh.repwt ,
 				scale = sca ,
 				rscales = rsc ,
 				degf = 99 ,
 				mse = TRUE ,
-				table.name = paste0( 'hh_m_' , year ) , 	# use the household-merge data table
-				key = "idkey" ,
-				# use the `.header` object to determine which columns are character or factor types
-				check.factors = get( paste0( hh.table , year , '.header' ) ) ,
-				database = monet.url ,
-				driver = MonetDB.R()
+				data = paste0( 'hh_m_' , year ) , 	# use the household-merge data table
+				dbtype = "MonetDBLite" ,
+				dbname = dbfolder
 			)
 
 
@@ -1069,9 +809,6 @@ for ( year in years.to.download ){
 	# disconnect from the current monet database
 	dbDisconnect( db )
 
-	# and close it using the `pid`
-	monetdb.server.stop( pid )
-
 }
 
 
@@ -1087,74 +824,18 @@ unlink( td , recursive = TRUE )
 # which utilize these newly-created survey objects
 
 
-# wait ten seconds, just to make sure any previous servers closed
-# and you don't get a gdk-lock error from opening two-at-once
-Sys.sleep( 10 )
-
-
-# one more quick re-connection
-monetdb.server.start( batfile )
-
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-# set every table you've just created as read-only inside the database.
-for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-
-#####################################################################
-# lines of code to hold on to for all other `nhts` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"	# # note for mac and *nix users: `nhts.bat` might be `nhts.sh` instead"
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "nhts"
-dbport <- 50013
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
-
 # double-check that all tables have at least one record #
+
+# reconnect to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
+
 # all tables created by this script end in numbers
 tein <- dbListTables( db )[ grep( '(.)*[0-9][0-9][0-9][0-9]' , dbListTables( db ) ) ]
 # loop through all tables with underscores and check
 for ( i in tein ){ stopifnot( dbGetQuery( db , paste( 'select count(*) from' , i ) ) > 0 ) }
 
-# # # # end of all analysis commands # # # #
-
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `nhts` monetdb analyses #
-############################################################################
-
-
-# unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
-message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
-
-message( "got that? monetdb directories should not be set read-only." )
 
 
 # for more details on how to work with data in r
