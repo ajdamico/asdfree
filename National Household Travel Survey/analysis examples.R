@@ -239,7 +239,7 @@ write.csv( rail.by.region , "rail by region.csv" )
 
 # ..or directly made into a bar plot
 barplot(
-	rail.by.region[ , 1 ] ,
+	rail.by.region[ , 3 ] ,
 	main = "Access to Heavy Rail by Region of the Country" ,
 	names.arg = c( "Northeast" , "Midwest" , "South" , "West" ) ,
 	ylim = c( 0 , 1 )
