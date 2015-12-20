@@ -214,7 +214,7 @@ for ( year in substr( years.to.download , 3 , 4 ) ){
 			# clear up RAM
 			gc()
 			
-		}
+		} else z <- tempfile()
 		
 		# cycle through both institutional records and loan applications received microdata files
 		for ( rectype in c( "institutionrecords" , "lar%20-%20National" ) ){
