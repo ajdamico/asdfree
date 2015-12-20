@@ -94,7 +94,7 @@ nhts.per.design <- open( nhts.per.design , driver = MonetDB.R() )	# person-level
 nhts.per.design <- update( nhts.per.design , agecat = factor( 1 + findInterval( r_age , c( seq( 5 , 65 , 5 ) , 75 , 85 ) ) ) )
 
 # print the distribution of that category
-MIcombine( with( nhts.per.design , svymean( ~ agecat , na.rm = TRUE ) ) )
+svymean( ~ agecat , nhts.per.design )
 
 
 ################################################
