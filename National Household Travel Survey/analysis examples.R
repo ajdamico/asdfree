@@ -50,6 +50,14 @@ library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 
+
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+# immediately connect to the monetdblite folder
+db <- dbConnect( MonetDBLite() , dbfolder )
+
+
 # R will exactly match SUDAAN results and Stata with the MSE option results
 options( survey.replicates.mse = TRUE )
 # otherwise if it is commented out or set to FALSE
