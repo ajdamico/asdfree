@@ -6,10 +6,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"		# # note for mac and *nix users: `pums.bat` might be `pums.sh` instead
-# load( 'C:/My Directory/PUMS/pums_2000_5_m.rda' )	# analyze the 2000 5% pums file
+# setwd( "C:/My Directory/PUMS/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/2000%20analysis%20examples.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -30,30 +28,20 @@
 # http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################################
-# prior to running this analysis script, the 1% and 5% public use microdata samples from the 2000 census must be loaded on the local machine with #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/download%20and%20import.R #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# ..that script will place a 'MonetDB' folder on the local drive containing the appropriate data tables for this code to work properly.           #
-###################################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#################################################################################################################################################################
+# prior to running this analysis script, the 1% and 5% public use microdata samples from the 2000 census must be loaded on the local machine with               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/download%20and%20import.R  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# ..that script will place a 'MonetDB' folder on the local drive containing the appropriate data tables for this code to work properly.                         #
+#################################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
+
+# uncomment this line by removing the `#` at the front..
+# setwd( "C:/My Directory/PUMS/" )
+
 
 # # # # # # # # # # # # # #
 # warning warning warning #
@@ -84,42 +72,11 @@
 # case and point: for the united states decennial census public use microdata samples,
 # you cannot _automate_ the calculation of standard errors if you want to use the _official_ census method.  sowwy.
 
-# one more note: you can generally add standard errors to sqlsurvey output by adding the se = TRUE parameter
-# svymean( ~variable , design , se = TRUE )
-# svytotal( ~variable , design , se = TRUE )
 
+library(survey) 		# load survey package (analyzes complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
-library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
-
-
-# after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all public use microdata sample tables
-# run them now.  mine look like this:
-
-
-############################################################################
-# lines of code to hold on to for all other `PUMS` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/PUMS/MonetDB/pums.bat"		# # note for mac and *nix users: `pums.bat` might be `pums.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "pums"
-dbport <- 50010
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
 
 
 # the public use microdata sample download and importation script
@@ -143,19 +100,24 @@ pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet
 # load the desired public use microdata sample monet database-backed complex sample design object
 
 # uncomment the correct line by removing the `#` at the front..
-# load( 'C:/My Directory/PUMS/pums_1990_1_m.rda' )	# analyze the 1990 1% pums file
-# load( 'C:/My Directory/PUMS/pums_1990_5_m.rda' )	# analyze the 1990 5% pums file
-# load( 'C:/My Directory/PUMS/pums_2000_1_m.rda' )	# analyze the 2000 1% pums file
-# load( 'C:/My Directory/PUMS/pums_2000_5_m.rda' )	# analyze the 2000 5% pums file
-# load( 'C:/My Directory/PUMS/pums_2010_10_m.rda' )	# analyze the 2010 10% pums file
+# load( 'pums_1990_1_m.rda' )	# analyze the 1990 1% pums file
+# load( 'pums_1990_5_m.rda' )	# analyze the 1990 5% pums file
+# load( 'pums_2000_1_m.rda' )	# analyze the 2000 1% pums file
+load( 'pums_2000_5_m.rda' )		# analyze the 2000 5% pums file
+# load( 'pums_2010_10_m.rda' )	# analyze the 2010 10% pums file
 
 # note: this r data file should already contain the 2000 5% design
 
 
 # connect the complex sample design to the monet database #
-pums.design <- open( pums.m.design , driver = MonetDB.R() , wait = TRUE )	# merged design
+pums.design <- open( pums.m.design , driver = MonetDB.R() )	# merged design
 
 
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 ################################################
@@ -215,30 +177,8 @@ dbGetQuery( db , "SELECT state , SUM( pweight ) AS sum_weights FROM pums_2000_5_
 # average age - nationwide
 svymean( ~age , pums.design )
 
-# try this by state..
-problem <- try( svymean( ~age , pums.design , byvar = ~state ) , silent = TRUE )
-
-# ..but:
-if( class( problem ) == 'try-error' ) print( "this resulted in an error because it's too big of a query" )
-
-# break it up into smaller queries
-all.states <- dbGetQuery( db , 'select distinct state from pums_2000_5_m' )[ , 1 ]
-
-# loop through each state..
-for ( this.state in all.states ){
-
-	# construct the entire query as a string (this is generally not recommended)
-	svy.string <- 
-		paste( 
-			"svymean( ~ age , subset( pums.design , ( state ==" ,
-			this.state ,
-			") ) )"
-		)
-		
-	# manually evaluate the string
-	print( eval( parse( text = svy.string ) ) )
-
-}
+# average age - by state
+svyby( ~age , ~state , pums.design , svymean )
 
 
 # calculate the distribution of a categorical variable #
@@ -255,49 +195,14 @@ for ( this.state in all.states ){
 svymean( ~marstat , pums.design )
 
 # by state..
-problem <- try( svymean( ~marstat , pums.design , byvar = ~state ) , silent = TRUE )
-
-# ..but:
-if( class( problem ) == 'try-error' ) print( "this resulted in an error because it's too big of a query" )
-
-
-# loop through each state..
-for ( this.state in all.states ){
-
-	# construct the entire query as a string (this is generally not recommended)
-	svy.string <- 
-		paste( 
-			"svymean( ~ marstat , subset( pums.design , ( state ==" ,
-			this.state ,
-			") ) )"
-		)
-		
-	# manually evaluate the string
-	print( eval( parse( text = svy.string ) ) )
-
-}
+svyby( ~marstat , ~state , pums.design , svymean )
 
 
 # calculate the median and other percentiles #
 
 # median age of residents of the united states
-svyquantile( ~age , pums.design , quantiles = 0.5 )
-# note: quantile standard errors cannot be computed with taylor-series linearization designs
-# this is true in both the survey and sqlsurvey packages
+svyquantile( ~age , pums.design , c( 0.5 , 0.99 ) )
 
-# note two additional differences between the sqlsurvey and survey packages..
-
-# ..sqlsurvey designs do not allow multiple quantiles.  instead, 
-# loop through and print or save multiple quantiles, simply use a for loop
-
-# loop through the median and 99th percentiles and print both results to the screen
-for ( i in c( .5 , .99 ) ) print( svyquantile( ~age , pums.design , quantiles = i ) )
-
-
-
-# ..sqlsurvey designs do not allow byvar arguments, meaning the only way to 
-# calculate quantiles by state would be by creating subsets for each subpopulation
-# and calculating the quantiles for them independently:
 
 ######################
 # subsetting example #
@@ -326,7 +231,7 @@ svymean( ~marstat , pums.design.female )
 
 # store the results into a new object
 
-marital.status.by.sex <- svymean( ~marstat , pums.design , byvar = ~sex )
+marital.status.by.sex <- svyby( ~marstat , ~sex , pums.design , svymean )
 
 # immediately convert it to a data.frame
 marital.status.by.sex <- data.frame( marital.status.by.sex )
@@ -369,18 +274,12 @@ barplot(
 ############################
 
 
-# close the connection to the sqlrepsurvey design object
+# close the connection to the svydesign object
 close( pums.design )
 
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `pums` monetdb analyses #
-#############################################################################
 
 
 # for more details on how to work with data in r
