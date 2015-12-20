@@ -586,10 +586,10 @@ for ( year in 2050:2005 ){
 			
 			
 			# special exception for the 2009 3-year file..  too many missings in the weights.
-			if( year == 2009 & size %in% c( 3 , 5 ) ){
+			if( year <= 2009 & size %in% c( 3 , 5 ) ){
 			
 				# determine all weight columns in all tables
-				for( this_table in paste0( "acs2009_" , size , "yr_" , c( 'h' , 'm' , 'p' ) ) ){
+				for( this_table in paste0( "acs" , year , "_" , size , "yr_" , c( 'h' , 'm' , 'p' ) ) ){
 			
 					# identify all weight columns
 					wgt_cols <- grep( "wgt" , dbListFields( db , this_table ) , value = TRUE )
