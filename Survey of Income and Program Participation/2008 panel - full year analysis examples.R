@@ -682,17 +682,3 @@ confint( sipp.median.by( ~q1earn , ~one , z.15p.wearn ) , level = 0.9 )
 # any of the features described on http://r-survey.r-forge.r-project.org/survey/ can be used.
 # all of the analysis examples shown for other survey data sets can be used on a sipp survey design too,
 # so be sure to check out other data sets on http://asdfree.com/ for more thorough examples
-
-# for more details on how to work with data in r
-# check out my two minute tutorial video site
-# http://www.twotorials.com/
-
-# dear everyone: please contribute your script.
-# have you written syntax that precisely matches an official publication?
-message( "if others might benefit, send your code to ajdamico@gmail.com" )
-# http://asdfree.com needs more user contributions
-
-# let's play the which one of these things doesn't belong game:
-# "only you can prevent forest fires" -smokey bear
-# "take a bite out of crime" -mcgruff the crime pooch
-# "plz gimme your statistical programming" -anthony damico

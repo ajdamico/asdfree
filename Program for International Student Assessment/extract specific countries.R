@@ -161,17 +161,3 @@ svycontrast(
 # this pisa extraction script does not contain a full set of analysis examples for this non-monetdb-backed object
 # but you can review syntax examples for multiply-imputed objects in those other scripts.  please and thank you.
 
-
-# for more details on how to work with data in r
-# check out my two minute tutorial video site
-# http://www.twotorials.com/
-
-# dear everyone: please contribute your script.
-# have you written syntax that precisely matches an official publication?
-message( "if others might benefit, send your code to ajdamico@gmail.com" )
-# http://asdfree.com needs more user contributions
-
-# let's play the which one of these things doesn't belong game:
-# "only you can prevent forest fires" -smokey bear
-# "take a bite out of crime" -mcgruff the crime pooch
-# "plz gimme your statistical programming" -anthony damico

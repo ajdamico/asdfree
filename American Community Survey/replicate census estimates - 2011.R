@@ -146,17 +146,3 @@ svytotal( ~I( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.h )	# all other vacant
 close( acs.m )
 close( acs.h )
 
-
-# for more details on how to work with data in r
-# check out my two minute tutorial video site
-# http://www.twotorials.com/
-
-# dear everyone: please contribute your script.
-# have you written syntax that precisely matches an official publication?
-message( "if others might benefit, send your code to ajdamico@gmail.com" )
-# http://asdfree.com needs more user contributions
-
-# let's play the which one of these things doesn't belong game:
-# "only you can prevent forest fires" -smokey bear
-# "take a bite out of crime" -mcgruff the crime pooch
-# "plz gimme your statistical programming" -anthony damico
