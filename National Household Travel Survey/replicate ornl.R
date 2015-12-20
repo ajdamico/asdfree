@@ -5,10 +5,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
-# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"	# # note for mac and *nix users: `nhts.bat` might be `nhts.sh` instead"
-# load( 'C:/My Directory/NHTS/2009 designs.rda' )
+# setwd( "C:/My Directory/NHTS/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/replicate%20ornl.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -34,72 +32,21 @@
 ############################################################################################
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#########################################################################################################################
-# prior to running this analysis script, the nhts 2009 file must be loaded as a monet database-backed sqlsurvey object  #
-# on the local machine. running the download and import script will create a monet database containing this file.       #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw2.github.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/download%20and%20import.R        #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "2009 designs.rda" in C:/My Directory/NHTS or wherever the working directory was set.  #
-#########################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+###############################################################################################################################
+# prior to running this analysis script, the nhts 2009 file must be loaded as a monet database-backed survey object           #
+# on the local machine. running the download and import script will create a monet database containing this file.             #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/download%20and%20import.R  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create a file "2009 designs.rda" in C:/My Directory/NHTS or wherever the working directory was set.        #
+###############################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-
-library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(survey) 		# load survey package (analyzes complex design surveys)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
-
-# after running the r script above, users should have handy a few lines
-# to initiate and connect to the monet database containing all national household travel survey
-# run them now.  mine look like this:
-
-
-#####################################################################
-# lines of code to hold on to for all other `nhts` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NHTS/MonetDB/nhts.bat"	# # note for mac and *nix users: `nhts.bat` might be `nhts.sh` instead"
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "nhts"
-dbport <- 50013
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
-
-
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # R will exactly match SUDAAN results and Stata with the MSE option results
@@ -125,7 +72,7 @@ options( survey.replicates.mse = TRUE )
 # load the desired national household travel survey monet database-backed complex sample design objects
 
 # uncomment this line by removing the `#` at the front..
-# load( 'C:/My Directory/NHTS/2009 designs.rda' )	# analyze the 2009 designs
+load( '2009 designs.rda' )	# analyze the 2009 designs
 
 
 # note: this r data file should already contain all of the designs for this year
@@ -133,9 +80,9 @@ options( survey.replicates.mse = TRUE )
 
 # connect the complex sample designs to the monet database #
 
-nhts.day.design <- open( nhts.day.design , driver = MonetDB.R() , wait = TRUE )	# day-level design
-nhts.hh.design <- open( nhts.hh.design , driver = MonetDB.R() , wait = TRUE )	# household-only design
-nhts.per.design <- open( nhts.per.design , driver = MonetDB.R() , wait = TRUE )	# person-level design
+nhts.day.design <- open( nhts.day.design , driver = MonetDB.R() )	# day-level design
+nhts.hh.design <- open( nhts.hh.design , driver = MonetDB.R() )		# household-only design
+nhts.per.design <- open( nhts.per.design , driver = MonetDB.R() )	# person-level design
 
 
 # construct a handy function to calculate the margin of error for any formula
@@ -253,12 +200,6 @@ close( nhts.day.design )
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `nhts` monetdb analyses #
-############################################################################
 
 
 # for more details on how to work with data in r
