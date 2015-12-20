@@ -5,8 +5,8 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( encoding = "windows-1252" )			# # only macintosh and *nix users need this line
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
+# options( encoding = "windows-1252" )											# # only macintosh and *nix users need this line
+# path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )		# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NVSS/" )
 # natality.sets.to.download <- 2013:1999
@@ -14,7 +14,6 @@
 # cohortlinked.sets.to.download <- 2009:1995
 # mortality.sets.to.download <- 2012:2000
 # fetaldeath.sets.to.download <- 2012:2005
-# path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )		# # only windows users need this line
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -54,36 +53,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################
-# prior to running this analysis script, monetdb must be installed on the local machine.  follow each step outlined on this page: #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/asdfree/blob/master/MonetDB/monetdb%20installation%20instructions.R                                   #
-###################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
 # # # # # # # # # # # # # # # #
 # warning: this takes a while #
 # # # # # # # # # # # # # # # #
@@ -94,10 +63,11 @@
 # depending on your internet and processor speeds, the entire script should take between one and three days.
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "SAScii" , "downloader" , "digest" , "R.utils" ) )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
@@ -143,106 +113,13 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # end of non-windows system edits.
 
 
-# configure a monetdb database for the nvss on windows #
+# configure a monetdb database for the nvss #
 
-# note: only run this command once.  this creates an executable (.bat) file
-# in the appropriate directory on your local disk.
-# when adding new files or adding a new year of data, this script does not need to be re-run.
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
-# create a monetdb executable (.bat) file for the national vital statistics system
-batfile <-
-	monetdb.server.setup(
-					
-					# set the path to the directory where the initialization batch file and all data will be stored
-					database.directory = paste0( getwd() , "/MonetDB" ) ,
-					# must be empty or not exist
-
-					# find the main path to the monetdb installation program
-					monetdb.program.path = 
-						ifelse( 
-							.Platform$OS.type == "windows" , 
-							"C:/Program Files/MonetDB/MonetDB5" , 
-							"" 
-						) ,
-					# note: for windows, monetdb usually gets stored in the program files directory
-					# for other operating systems, it's usually part of the PATH and therefore can simply be left blank.
-					
-					# choose a database name
-					dbname = "nvss" ,
-					
-					# choose a database port
-					# this port should not conflict with other monetdb databases
-					# on your local computer.  two databases with the same port number
-					# cannot be accessed at the same time
-					dbport = 50012
-	)
-
-	
-# this next step is so very important.
-
-# store a line of code that will make it easy to open up the monetdb server in the future.
-# this should contain the same file path as the batfile created above,
-# you're best bet is to actually look at your local disk to find the full filepath of the executable (.bat) file.
-# if you ran this script without changes, the batfile will get stored in C:\My Directory\NVSS\MonetDB\nvss.bat
-
-# here's the batfile location:
-batfile
-
-# note that since you only run the `monetdb.server.setup()` function the first time this script is run,
-# you will need to note the location of the batfile for future MonetDB analyses!
-
-# in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
-# obviously, without the `#` comment character
-
-# hold on to that line for future scripts.
-# you need to run this line *every time* you access
-# the national vital statistics system files with monetdb.
-# this is the monetdb server.
-
-# two other things you need: the database name and the database port.
-# store them now for later in this script, but hold on to them for other scripts as well
-dbname <- "nvss"
-dbport <- 50012
-
-# now the local windows machine contains a new executable program at "c:\my directory\nvss\monetdb\nvss.bat"
-
-
-
-
-# it's recommended that after you've _created_ the monetdb server,
-# you create a block of code like the one below to _access_ the monetdb server
-
-
-#####################################################################
-# lines of code to hold on to for all other `nvss` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "nvss"
-dbport <- 50012
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `nvss` monetdb analyses #
-############################################################################
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 
@@ -343,17 +220,8 @@ files <- z[ grep( 'ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/' , z ) ]
 # this, i'm assuming, points to every file available for download.  cool.
 
 
-# run the monetdb server
-monetdb.server.start( batfile )
-
 # loop through every year specified by the user
 for ( year in natality.sets.to.download ){
-
-	# connect to the now-initialized monetdb server..
-	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-	# ..and store the process id
-	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current natality file you're workin' on.
@@ -443,15 +311,7 @@ for ( year in natality.sets.to.download ){
 	# delete all files in the "/natality/ps" directory (the territories)
 	file.remove( paste0( "./natality/ps/" , list.files( 'natality/ps/' , recursive = T ) ) )
 
-	# disconnect from monetdb
-	dbDisconnect( db )
-	
-	# close any stray file connections that haven't been severed already.
-	closeAllConnections()
 }
-
-# shut down the monetdb server
-monetdb.server.stop( pid )
 
 
 # if any period-linked data sets are queued up to be downloaded..
@@ -499,17 +359,8 @@ if ( !is.null( periodlinked.sets.to.download ) ){
 }
 
 
-# run the monetdb server
-monetdb.server.start( batfile )
-
 # loop through every year specified by the user
 for ( year in periodlinked.sets.to.download ){
-
-	# connect to the now-initialized monetdb server..
-	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-	# ..and store the process id
-	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current period-linked file you're workin' on.
@@ -679,28 +530,11 @@ for ( year in periodlinked.sets.to.download ){
 	# delete all files in the "/periodlinked/ps" directory (the fifty states plus DC)
 	file.remove( paste0( "./periodlinked/ps/" , list.files( 'periodlinked/ps/' , recursive = T ) ) )
 
-	# disconnect from monetdb
-	dbDisconnect( db )
-	
-	# close any stray file connections that haven't been severed already.
-	closeAllConnections()
 }
 
-# shut down the monetdb server
-monetdb.server.stop( pid )
-
-
-# run the monetdb server
-monetdb.server.start( batfile )
 
 # loop through every year specified by the user
 for ( year in cohortlinked.sets.to.download ){
-
-	# connect to the now-initialized monetdb server..
-	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-	# ..and store the process id
-	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current cohort-linked file you're workin' on.
@@ -826,28 +660,11 @@ for ( year in cohortlinked.sets.to.download ){
 	# delete all files in the "/cohortlinked/ps" directory (the fifty states plus DC)
 	file.remove( paste0( "./cohortlinked/ps/" , list.files( 'cohortlinked/ps/' , recursive = T ) ) )
 	
-	# disconnect from monetdb
-	dbDisconnect( db )
-	
-	# close any stray file connections that haven't been severed already.
-	closeAllConnections()
 }
 
-# shut down the monetdb server
-monetdb.server.stop( pid )
-
-
-# run the monetdb server
-monetdb.server.start( batfile )
 
 # loop through every year specified by the user
 for ( year in mortality.sets.to.download ){
-
-	# connect to the now-initialized monetdb server..
-	db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-	# ..and store the process id
-	pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 	# for the current year, use a custom-built `extract.files` function
 	# to determine the ftp location of the current mortality file you're workin' on.
@@ -930,15 +747,7 @@ for ( year in mortality.sets.to.download ){
 	# delete all files in the "/mortality/ps" directory (the fifty states plus DC)
 	file.remove( paste0( "./mortality/ps/" , list.files( 'mortality/ps/' , recursive = T ) ) )
 
-	# disconnect from monetdb
-	dbDisconnect( db )
-	
-	# close any stray file connections that haven't been severed already.
-	closeAllConnections()
 }
-
-# shut down the monetdb server
-monetdb.server.stop( pid )
 
 
 # loop through every year specified by the user
@@ -1020,67 +829,8 @@ for ( year in fetaldeath.sets.to.download ){
 # which utilize these newly-created survey objects
 
 
-# wait ten seconds, just to make sure any previous servers closed
-# and you don't get a gdk-lock error from opening two-at-once
-Sys.sleep( 10 )
-
-
-# one more quick re-connection
-monetdb.server.start( batfile )
-
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-# set every table you've just created as read-only inside the database.
-for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" , this_table , "SET READ ONLY" ) )
-
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-
-#####################################################################
-# lines of code to hold on to for all other `nvss` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/NVSS/MonetDB/nvss.bat"		# # note for mac and *nix users: `nvss.bat` might be `nvss.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "nvss"
-dbport <- 50012
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `nvss` monetdb analyses #
-############################################################################
-
-
-# unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
-message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
-
-message( "got that? monetdb directories should not be set read-only." )
 
 
 # for more details on how to work with data in r
