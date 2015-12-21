@@ -146,7 +146,7 @@ read.in.qs <-
 
 
 # put the monetdblite database in a temporary directory
-dbfolder <- tempfile()
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 # notes from the "Integrated Mean and SE.sas" file about this section: 
