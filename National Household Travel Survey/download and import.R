@@ -464,7 +464,7 @@ for ( year in years.to.download ){
 					names( x ) <- tolower( names( x ) )
 					
 					# read the data.frame `x`
-					# directly into the rsqlite database you just created.
+					# directly into the monetdblite database you just created.
 					dbWriteTable( db , tablename , x , header = TRUE , row.names = FALSE )
 					# yes.  you did all that.  nice work.
 
