@@ -351,31 +351,16 @@ stopifnot(
 	dbGetQuery( db , "select count(*) as count from c10" )
 )
 
-#####################################
-# create the dom and pes headers tables
-dom.fields <- dbListFields( db , 'c10_dom' )
-pes.fields <- dbListFields( db , 'c10' )
-
-dom.all <- parse.SAScii( tf2 )
-pes.all <- parse.SAScii( tf3 )
-
-dom.char <- tolower( dom.all[ dom.all$char , 'varname' ] )
-pes.char <- tolower( pes.all[ pes.all$char , 'varname' ] )
-
-dom.factors <- intersect( dom.fields , c( dom.char , pes.char ) )
-pes.factors <- intersect( pes.fields , c( dom.char , pes.char ) )
-
-
 #################################################
 # create a complex sample design object
 dom.design <-
 	svydesign(
-		weight = ~dom_wgt ,				# weight variable column (defined in the character string)
+		weight = ~dom_wgt ,					# weight variable column (defined in the character string)
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = ~v0011 ,					# stratification variable column (defined in the character string)
 		id = ~v0300 ,						# sampling unit column (defined in the character string)
 		fpc = ~dom_fpc ,					# within-data pre-computed finite population correction for the household
-		table.name = 'c10_dom' ,			# table name within the monet database (defined in the character string)
+		data = 'c10_dom' ,					# table name within the monet database (defined in the character string)
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
 	)
@@ -392,12 +377,12 @@ save( dom.design , file = 'dom 2010 design.rda' )
 # create a complex sample design object
 pes.design <-
 	svydesign(
-		weight = ~pes_wgt ,				# weight variable column (defined in the character string)
+		weight = ~pes_wgt ,					# weight variable column (defined in the character string)
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = ~v0011 ,					# stratification variable column (defined in the character string)
 		id = ~v0300 ,						# sampling unit column (defined in the character string)
 		fpc = ~dom_fpc ,					# within-data pre-computed finite population correction, also for the household
-		table.name = 'c10' ,				# table name within the monet database (defined in the character string)
+		data = 'c10' ,						# table name within the monet database (defined in the character string)
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
 	)
@@ -686,25 +671,6 @@ stopifnot(
 	dbGetQuery( db , "select count(*) as count from c00" )
 )
 
-#####################################
-# create the dom and fam and pes headers tables
-dom.fields <- dbListFields( db , 'c00_dom' )
-fam.fields <- dbListFields( db , 'c00_fam' )
-pes.fields <- dbListFields( db , 'c00' )
-
-dom.all <- parse.SAScii( tf2 )
-pes.all <- parse.SAScii( tf3 )
-fam.all <- parse.SAScii( tf4 )
-
-dom.char <- tolower( dom.all[ dom.all$char , 'varname' ] )
-pes.char <- tolower( pes.all[ pes.all$char , 'varname' ] )
-fam.char <- tolower( fam.all[ fam.all$char , 'varname' ] )
-
-dom.factors <- intersect( dom.fields , dom.char )
-fam.factors <- intersect( fam.fields , fam.char )
-pes.factors <- unique( intersect( pes.fields , c( dom.char , fam.char , pes.char ) ) )
-
-
 #################################################
 # create a complex sample design object
 dom.design <-
@@ -714,7 +680,7 @@ dom.design <-
 		strata = ~areap ,					# stratification variable column (defined in the character string)
 		id = ~v0300 ,						# sampling unit column (defined in the character string)
 		fpc = ~dom_fpc ,					# within-data pre-computed finite population correction for the household
-		table.name = 'c00_dom' ,			# table name within the monet database (defined in the character string)
+		data = 'c00_dom' ,					# table name within the monet database (defined in the character string)
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
 	)
@@ -731,12 +697,12 @@ save( dom.design , file = 'dom 2000 design.rda' )
 # create a complex sample design object
 pes.design <-
 	svydesign(
-		weight = ~pes_wgt ,				# weight variable column (defined in the character string)
+		weight = ~pes_wgt ,					# weight variable column (defined in the character string)
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = ~areap ,					# stratification variable column (defined in the character string)
 		id = ~v0300 ,						# sampling unit column (defined in the character string)
 		fpc = ~dom_fpc ,					# within-data pre-computed finite population correction, also for the household
-		table.name = 'c00' ,				# table name within the monet database (defined in the character string)
+		data = 'c00' ,						# table name within the monet database (defined in the character string)
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
 	)
@@ -751,12 +717,12 @@ save( pes.design , file = 'pes 2000 design.rda' )
 # create a sqlsurvey complex sample design object
 fam.design <-
 	sqlsurvey(
-		weight = ~fam_wgt ,				# weight variable column (defined in the character string)
+		weight = ~fam_wgt ,					# weight variable column (defined in the character string)
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = ~areap ,					# stratification variable column (defined in the character string)
 		id = ~v0300 ,						# sampling unit column (defined in the character string)
 		fpc = ~dom_fpc ,					# within-data pre-computed finite population correction, also for the household
-		table.name = 'c00_fam' ,			# table name within the monet database (defined in the character string)
+		data = 'c00_fam' ,					# table name within the monet database (defined in the character string)
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
 	)
