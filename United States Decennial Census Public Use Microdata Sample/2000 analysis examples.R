@@ -173,14 +173,7 @@ svyby( ~age , ~state , pums.design , svymean )
 
 
 # calculate the distribution of a categorical variable #
-
-# MARSTAT has been converted to a factor (categorical) variable
-# instead of a numeric (linear) variable,
-# because it only contains the values 1-5
-# when the pums.design object was created with the function sqlrepdesign()
-# the check.factors parameter was left at the default of ten,
-# meaning all numeric columns with ten or fewer distinct values
-# would be automatically converted to factors
+pums.design <- update( pums.design , marstat = factor( marstat ) )
 
 # percent married - nationwide
 svymean( ~marstat , pums.design )
