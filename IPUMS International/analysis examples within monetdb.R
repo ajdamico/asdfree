@@ -17,7 +17,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw.githubusercontent.com/ajdamico/asdfree/master/IPUMS%20International/download%20import%20design%20into%20monetdb.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that guide shows how to construct a "survey design in monetdb.rda" that can then be analyzed using syntax below.           #
+# that guide shows how to construct a "survey design in monetdb.rda" that can then be analyzed using syntax below.              #
 #################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

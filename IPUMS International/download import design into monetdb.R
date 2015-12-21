@@ -32,10 +32,6 @@
 
 # # # # # choose whether to use monetdb or active working memory # # # # #
 
-# # # on my personal laptop, this mean of a linear variable -
-# system.time( svymean( ~ age , this_design , se = TRUE ) )
-# # # - requires about one second of processing with a monetdb-backed
-# # # survey design setup, but requires about 40 seconds when loaded in ram
 
 # # # there are tradeoffs to this processing speed. # # #
 
@@ -54,8 +50,8 @@
 # # # the active working memory of your available hardware, then you have no choice
 # # # and you must use monetdb to analyze ipums-international with R.
 # # # but on the other hand, just because you can load your needed extracts into working memory
-# # # you might still benefit from using a monetdb-backed sqlsurvey design.
-# # # monetdb-backed designs work much better interactively just because individual analysis commands run so much faster.  no waiting.
+# # # you might still benefit from using a monetdb-backed survey design.
+# # # monetdb-backed designs work much better interactively just because individual analysis commands run faster.  no waiting.
 
 # # # continue using this guide if you have chosen to use monetdb # # #
 
@@ -193,7 +189,7 @@ stopifnot( csv_lines == dbtable_lines + 1 )
 # let's blank out only one variable's missing values by hand:
 
 # # note that this is different from the "in memory" guide, where three variables were blanked.
-# # i recommend not blanking out *categorical* variable values in sqlsurvey designs,
+# # i recommend not blanking out *categorical* variable values in survey designs,
 # # because they can trigger finnickyness/bugs.  it is safer to only blank out linear variable missing values.
 
 # https://international.ipums.org/international-action/variables/INCWAGE#codes_section
@@ -244,38 +240,18 @@ dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column one int' ) )
 dbSendQuery( db , paste0( 'UPDATE ' , tablename , ' SET one = 1' ) )
 
 
-# # # # figure out which variables should be treated as factors (categorical) and which should be treated as numeric (linear) # # # #
-# this is one of the drawbacks of sqlsurvey.  you must specify this information within the survey design object, not on the fly     #
-
-# this is one of the big drawbacks of monetdb-backed designs.  you cannot easily construct variables on the fly.
-
 # look at the columns available in your database..
 dbListFields( db , tablename )
 
 # ..or look at the variable names and types from ipums
 cbind( cn , colTypes )
 
-# if you like, you can query individual columns to determine how many unique levels they have
-# for example, the `age` column should have approximately 100 distinct values because
-# human beings live to be about 100 years old.
-nrow( dbGetQuery( db , paste( "SELECT DISTINCT age FROM" , tablename ) ) )
-# since 100 distinct values is really a linear variable and not categorical,
-# it should *not* be included in the `these_factors` vector below.
-
-# similarly, you can look at the first five records in your table with
-dbGetQuery( db , paste( "SELECT * FROM" , tablename , "LIMIT 5" ) )
-
-# for my personal extract, i would say that these variables
-# are actually categorical variables, despite being stored as numbers
-these_factors <- c( 'rectype' , 'country' , 'sex' , 'empstat' , 'empstatd' )
-
-
 
 # # # construct your monetdb-backed complex sample survey design object # # #
 
 # create a sqlsurvey complex sample design object
 this_db_design <-
-	sqlsurvey(
+	svydesign(
 		weight = ~perwt ,									# weight variable column
 		nest = TRUE ,										# whether or not psus are nested within strata
 		strata = ~strata ,									# stratification variable column
@@ -299,9 +275,7 @@ svymean( ~ age , this_db_design )
 # save the survey design object
 # into a single r data file (.rda) that can now be
 # analyzed quicker than anything else.
-save( this_db_design , these_factors , file = 'survey design in monetdb.rda' )
-# be sure to save the `these_factors` vector as well,
-# just in case you do any recoding in the future
+save( this_db_design , file = 'survey design in monetdb.rda' )
 
 
 # set every table you've just created as read-only inside the database.
