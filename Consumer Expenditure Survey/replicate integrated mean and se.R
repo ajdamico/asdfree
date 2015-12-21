@@ -483,7 +483,7 @@ expend <- expend[ order( expend$newid ) , ]
 # therefore, the following database (db) commands use sql to avoid memory issues
 
 # create a new connection to the temporary database file (defined above)
-db <- dbConnect( SQLite() , temp.db )
+db <- dbConnect( MonetDBLite() , temp.db )
 
 # store the family data frame in that database
 dbWriteTable( db , 'fmly' , fmly , row.names = FALSE )
