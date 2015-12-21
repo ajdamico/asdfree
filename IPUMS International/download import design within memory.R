@@ -41,7 +41,7 @@
 # # # there are tradeoffs to this processing speed. # # #
 
 # # # strengths:
-# # # the survey package (only usable on data within memory) has a much more complete toolkit than the sqlsurvey package
+# # # the survey package (only usable on data within memory) has a much more complete toolkit than a few database-backed commands
 # # # data import (but not analysis) is often quicker and easier to troubleshoot
 # # # column types (categorical versus linear) are more fluid and faster to modify during analysis commands
 

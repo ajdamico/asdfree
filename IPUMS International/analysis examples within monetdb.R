@@ -17,7 +17,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw.githubusercontent.com/ajdamico/asdfree/master/IPUMS%20International/download%20import%20design%20into%20monetdb.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that guide shows how to construct a "sqlsurvey design in monetdb.rda" that can then be analyzed using syntax below.           #
+# that guide shows how to construct a "survey design in monetdb.rda" that can then be analyzed using syntax below.           #
 #################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -27,28 +27,9 @@
 # ..in order to set your current working directory
 
 
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-
-library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+library(survey) 		# load survey package (analyzes complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # after running the r script above, users should have handy a few lines
@@ -56,23 +37,12 @@ library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surv
 # run them now.  mine look like this:
 
 
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/IPUMSI/MonetDB/ipumsi.bat"		# # note for mac and *nix users: `ipumsi.bat` might be `ipumsi.sh` instead
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
-# second: run the MonetDB server
-monetdb.server.start( batfile )
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "ipumsi"
-dbport <- 50015
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # do you know what tablename was used?  the tablename is one of the tables
@@ -94,16 +64,25 @@ dbListTables( db )
 
 
 # load the desired ipums international monet database-backed complex sample design objects
-load( 'sqlsurvey design in monetdb.rda' )
+load( 'survey design in monetdb.rda' )
 
 # connect the complex sample designs to the monet database #
-this_sqlsurvey_d <- open( this_sqlsurvey_design , driver = MonetDB.R() , wait = TRUE )	# single-year design
+this_db_d <- open( this_db_design , driver = MonetDB.R() )	# single-year design
 
 
 
 # at this point, you have a taylor series linearized,
 # complex sample survey design object
-this_sqlsurvey_d
+this_db_d
+
+	
+##################
+# recode example #
+##################
+	
+this_db_d <- update( this_db_d , age_categories = factor( 1 + findInterval( age , c( 10 , 19 , 35 , 65 ) ) ) )
+
+svymean( ~ age_categories , this_db_d )
 
 	
 #####################
@@ -113,10 +92,10 @@ this_sqlsurvey_d
 # count the total (unweighted) number of records in this extract #
 
 # simply use the nrow function..
-nrow( this_sqlsurvey_d )
+nrow( this_db_d )
 
-# ..on the sqlsurvey design object
-class( this_sqlsurvey_d )
+# ..on the survey design object
+class( this_db_d )
 
 
 # since the current ipums-international extract gets loaded as a monet database-backed survey object instead of a data frame,
@@ -162,58 +141,44 @@ dbGetQuery( db , paste( "SELECT empstat , SUM( perwt ) AS sum_weights FROM" , ta
 # calculate the mean of a linear variable #
 
 # average age across the country
-svymean( ~ age , this_sqlsurvey_d , se = TRUE )
+svymean( ~ age , this_db_d )
 
 # by employment status
-svymean( ~ age , this_sqlsurvey_d , byvar = ~ empstat , se = TRUE , na.rm = TRUE )
+svyby( ~ age , ~ empstat , this_db_d , svymean , na.rm = TRUE )
 
 
 # calculate the distribution of a categorical variable #
 
 # percent male versus female
-svymean( ~ sex , this_sqlsurvey_d , se = TRUE , na.rm = TRUE )
+svymean( ~ sex , this_db_d , na.rm = TRUE )
 
 # by employment status
-svymean( ~ sex , this_sqlsurvey_d , byvar = ~ empstat , se = TRUE , na.rm = TRUE )
+svyby( ~ sex , ~ empstat , this_db_d , svymean , na.rm = TRUE )
 
 
 # calculate the median and other percentiles #
 
-# median age of your extract
-svyquantile( ~ age , this_sqlsurvey_d , quantiles = 0.5 )
+# median and 99th percentile of age of your extract
+svyquantile( ~ age , this_db_d , c( 0.5 , 0.99 ) )
 # note: quantile standard errors cannot be computed with taylor-series linearization designs
-# this is true in both the survey and sqlsurvey packages
-
-# note two additional differences between the sqlsurvey and survey packages..
-
-# ..sqlsurvey designs do not allow multiple quantiles.  instead, 
-# loop through and print or save multiple quantiles, simply use a for loop
-
-# loop through the median and 99th percentiles and print both results to the screen
-for ( i in c( .5 , .99 ) ) print( svyquantile( ~ age , this_sqlsurvey_d , quantiles = i ) )
-
-
-# ..sqlsurvey designs do not allow byvar arguments, meaning the only way to 
-# calculate quantiles by sex would be by creating subsets for each subpopulation
-# and calculating the quantiles for them independently:
 
 
 ######################
 # subsetting example #
 ######################
 
-# restrict the this_sqlsurvey_d object to females only
-this_sqlsurvey_d_female <- subset( this_sqlsurvey_d , sex == 2 )
+# restrict the this_db_d object to females only
+this_db_d_female <- subset( this_db_d , sex == 2 )
 
 # now any of the above commands can be re-run
-# using the this_sqlsurvey_d_female object
-# instead of the this_sqlsurvey_d object
+# using the this_db_d_female object
+# instead of the this_db_d object
 # in order to analyze females only
 
 # calculate the distribution of a categorical variable #
 
 # average age - nationwide, restricted to females
-svymean( ~ age , this_sqlsurvey_d_female , se = TRUE )
+svymean( ~ age , this_db_d_female )
 
 
 ###################
@@ -225,7 +190,7 @@ svymean( ~ age , this_sqlsurvey_d_female , se = TRUE )
 
 # store the results into a new object
 
-sex_by_employment_status <- svymean( ~ sex , this_sqlsurvey_d , byvar = ~ empstat , se = TRUE , na.rm = TRUE )
+sex_by_employment_status <- svyby( ~ sex , ~ empstat , this_db_d , svymean , na.rm = TRUE )
 
 # print the results to the screen
 sex_by_employment_status
@@ -237,33 +202,7 @@ class( sex_by_employment_status )
 # into your current working directory 
 write.csv( sex_by_employment_status , "sex by employment status.csv" )
 
-# ..or trimmed to only contain the values you need.
-# here's the "percent female" by employment status,
-# with accompanying standard errors
-female_employment_status <-
-	coef( sex_by_employment_status ) [ seq( 2 , length( coef( sex_by_employment_status ) ) , by = 2 ) ]
-
-
-# print the new results to the screen
-female_employment_status
-
-# this can also be exported as a comma-separated value file
-# into your current working directory
-write.csv( female_employment_status , "female by employment status.csv" )
-
-# ..or directly made into a bar plot
-barplot(
-	female_employment_status ,
-	main = "Percent Female By Employment Status" ,
-	names.arg = c( "Not In Universe" , "Employed" , "Unemployed" , "Inactive" ) ,
-	ylim = c( 0 , .75 )
-)
-# labels from
-# https://international.ipums.org/international-action/variables/EMPSTAT#codes_section
-
 
 # disconnect from the current monet database
 dbDisconnect( db )
 
-# and close it using the `pid`
-monetdb.server.stop( pid )
