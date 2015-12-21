@@ -8,7 +8,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
-# setwd( "C:/My Directory/CES/2011/" )
+# setwd( "C:/My Directory/CES/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Consumer%20Expenditure%20Survey/replicate%20integrated%20mean%20and%20se.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -46,11 +46,11 @@
 # the CES 2011 R data files (.rda) should have been
 # stored in a year-specific directory within this folder.
 # so if the file "fmli111x.rda" exists in the directory "C:/My Directory/CES/2011/intrvw/" 
-# then the working directory should be set to "C:/My Directory/CES/2011/"
+# then the working directory should be set to "C:/My Directory/CES/"
 # use forward slashes instead of back slashes
 
 # uncomment this line by removing the `#` at the front..
-# setwd( "C:/My Directory/CES/2011/" )
+# setwd( "C:/My Directory/CES/" )
 # ..in order to set your current working directory
 
 
@@ -101,10 +101,10 @@ read.in.qs <-
 
 		# load all four
 		
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "1.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "2.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "3.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "4.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "1.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "2.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "3.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "4.rda" ) )
 
 		# stack them on top of each other into a new data frame called x
 		x <- rbind( 
@@ -119,12 +119,12 @@ read.in.qs <-
 		# load all five
 		
 		# note the first will contain an x in the filename
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "1x.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "2.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "3.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "4.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "1x.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "2.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "3.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "4.rda" ) )
 		# note the fifth will be from the following year's first quarter
-		load( paste0( "./" , filefolder , "/" , filestart , as.numeric( yr ) + 1 , "1.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , as.numeric( yr ) + 1 , "1.rda" ) )
 
 		# stack them on top of each other into a new data frame called x
 		x <- 
@@ -161,7 +161,7 @@ dbfolder <- tempfile()
 
 
 # find the filepath to the IntStubYYYY.txt file
-sf <- paste0( "./docs/Programs " , year , "/IntStub" , year , ".txt" )
+sf <- paste0( "./" , year , "/docs/Programs " , year , "/IntStub" , year , ".txt" )
 
 # create a temporary file on the local disk..
 tf <- tempfile()
@@ -308,11 +308,11 @@ gc()
 # because of the large number of exceptions for these five files
 
 # load all five R data files (.rda)
-load( paste0( "./intrvw/fmli" , yr , "1x.rda" ) )
-load( paste0( "./intrvw/fmli" , yr , "2.rda" ) )
-load( paste0( "./intrvw/fmli" , yr , "3.rda" ) )
-load( paste0( "./intrvw/fmli" , yr , "4.rda" ) )
-load( paste0( "./intrvw/fmli" , as.numeric( yr ) + 1 , "1.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , yr , "1x.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , yr , "2.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , yr , "3.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , yr , "4.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , as.numeric( yr ) + 1 , "1.rda" ) )
 
 # copy the fmliYY1x data frame to another data frame 'x'
 x <- get( paste0( "fmli" , yr , "1x" ) )
@@ -484,14 +484,8 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # store the family data frame in that database
 dbWriteTable( db , 'fmly' , fmly , row.names = FALSE )
 
-# create an index on the fmly table to drastically speed up future queries
-dbSendQuery( db , "CREATE INDEX nsf ON fmly ( newid , source )" )
-
 # store the expenditure data frame in that database as well
 dbWriteTable( db , 'expend' , expend , row.names = FALSE )
-
-# create an index on the expend table to drastically speed up future queries
-dbSendQuery( db , "CREATE INDEX nse ON expend ( newid , source )" )
 
 # create a character vector rcost1 - rcost45
 rcost <- paste0( "rcost" , 1:45 )
@@ -515,9 +509,6 @@ dbSendQuery(
 	sql.line
 )
   
-# create an index on the pubfile table to drastically speed up future queries
-dbSendQuery( db , "CREATE INDEX isu ON pubfile ( inclass , source , ucc )" )
-
 
 # notes from the "Integrated Mean and SE.sas" file about this section: 
 
