@@ -234,7 +234,7 @@ write.csv( marital.status.by.sex , "marital status by sex.csv" )
 # here's male versus female percents now married
 # (excluding separated)
 percent.now.married <-
-	marital.status.by.sex[ , 1 ]
+	marital.status.by.sex[ , 2 ]
 
 
 # print the new results to the screen
