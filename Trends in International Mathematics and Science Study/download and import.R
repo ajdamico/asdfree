@@ -279,7 +279,3 @@ for ( this.year in rev( years ) ){
 # the current working directory should now contain one r data file (.rda)
 # for each original prefixed data.frame objects, all separated by year-specific folders.
 
-
-# print a reminder: *do not* set the directory you just saved everything to as read-only!
-message( paste0( "all done.  *do not* set the directory " , getwd() , " until you run the `construct designs.R script." ) )
-
