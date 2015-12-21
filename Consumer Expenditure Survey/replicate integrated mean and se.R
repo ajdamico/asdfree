@@ -144,13 +144,9 @@ read.in.qs <-
 }
 
 
-# alter the current working directory to include the current analysis year
-# ..instead of "C:/My Directory/CES/" use "C:/My Directory/CES/2011"
-setwd( paste( getwd() , year , sep = "/" ) )
 
-
-# designate a temporary folder to store a temporary database
-temp.db <- tempdir()
+# put the monetdblite database in a temporary directory
+dbfolder <- tempfile()
 
 
 # notes from the "Integrated Mean and SE.sas" file about this section: 
@@ -483,7 +479,7 @@ expend <- expend[ order( expend$newid ) , ]
 # therefore, the following database (db) commands use sql to avoid memory issues
 
 # create a new connection to the temporary database file (defined above)
-db <- dbConnect( MonetDBLite() , temp.db )
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 # store the family data frame in that database
 dbWriteTable( db , 'fmly' , fmly , row.names = FALSE )
@@ -586,7 +582,7 @@ aggright <-
 dbDisconnect( db )
 
 # delete that temporary database file from the local disk
-unlink( temp.db , recursive = TRUE )
+unlink( dbfolder , recursive = TRUE )
 
 # create three character vectors containing every combination of..
 
