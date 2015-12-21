@@ -8,7 +8,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
-# setwd( "C:/My Directory/CES/" )
+# setwd( "C:/My Directory/CES/2011/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Consumer%20Expenditure%20Survey/replicate%20integrated%20mean%20and%20se.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -46,11 +46,11 @@
 # the CES 2011 R data files (.rda) should have been
 # stored in a year-specific directory within this folder.
 # so if the file "fmli111x.rda" exists in the directory "C:/My Directory/CES/2011/intrvw/" 
-# then the working directory should be set to "C:/My Directory/CES/"
+# then the working directory should be set to "C:/My Directory/CES/2011/"
 # use forward slashes instead of back slashes
 
 # uncomment this line by removing the `#` at the front..
-# setwd( "C:/My Directory/CES/" )
+# setwd( "C:/My Directory/CES/2011/" )
 # ..in order to set your current working directory
 
 
