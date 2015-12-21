@@ -31,7 +31,8 @@
 # setwd( "C:/My Directory/BSAPUF/" )
 
 # remove the # in order to run this install.packages line only once
-# install.packages( "downloader" , "digest" )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) , repos = c( "http://dev.monetdb.org/Assets/R/" , "http://cran.rstudio.com/" ) )
+
 
 # no need to edit anything below this line #
 
@@ -144,8 +145,3 @@ for ( zf in all.files ){
 # once complete, this script does not need to be run again for this year of data.
 # instead, use the monetdb importation script to import these .csv files
 # into a lightning-fast database for analysis
-
-
-# print a reminder: set the directory you just saved everything to as read-only!
-message( paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
-
