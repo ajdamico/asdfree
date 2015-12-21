@@ -59,14 +59,11 @@
 options( scipen = 20 )
 
 
-# remove the # in order to run this install.packages line only once
-# install.packages( c( "sqldf" , "RSQLite" ) )
-
-
-library(stringr) 	# load stringr package (manipulates character strings easily)
-library(reshape2)	# load reshape2 package (transposes data frames quickly)
-library(sqldf)		# load the sqldf package (enables sql queries on data frames)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(stringr) 		# load stringr package (manipulates character strings easily)
+library(reshape2)		# load reshape2 package (transposes data frames quickly)
+library(sqldf)			# load the sqldf package (enables sql queries on data frames)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # # # # # # # # # # # # # # # # # # # #
@@ -152,8 +149,8 @@ read.in.qs <-
 setwd( paste( getwd() , year , sep = "/" ) )
 
 
-# designate a temporary file to store a temporary database
-temp.db <- tempfile()
+# designate a temporary folder to store a temporary database
+temp.db <- tempdir()
 
 
 # notes from the "Integrated Mean and SE.sas" file about this section: 
@@ -589,7 +586,7 @@ aggright <-
 dbDisconnect( db )
 
 # delete that temporary database file from the local disk
-file.remove( temp.db )
+unlink( temp.db , recursive = TRUE )
 
 # create three character vectors containing every combination of..
 
