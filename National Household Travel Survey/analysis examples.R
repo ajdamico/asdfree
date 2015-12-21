@@ -20,7 +20,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #########################################################################################################################
-# prior to running this analysis script, the nhts 2009 file must be loaded as a monet database-backed sqlsurvey object  #
+# prior to running this analysis script, the nhts 2009 file must be loaded as a monet database-backed survey object     #
 # on the local machine. running the download and import script will create a monet database containing this file.       #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw2.github.com/ajdamico/asdfree/master/National%20Household%20Travel%20Survey/download%20and%20import.R      #
@@ -147,7 +147,7 @@ dbGetQuery( db , "SELECT SUM( wtperfin ) AS sum_weights FROM per_m_2009" )
 # the over-four population of the united states #
 # by state
 svytotal( ~one , nhts.per.design , byvar = ~hhstate )
-# note: the above command is one example of how the r survey package differs from the r sqlsurvey package
+# note: the above command is one example of how the r survey package differs from the r survey package
 
 
 # calculate the mean of a linear variable #

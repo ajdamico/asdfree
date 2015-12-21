@@ -51,7 +51,7 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/survey%20functions.R" , prompt = FALSE )
 
 
 # name the database files in the "MonetDB" folder of the current working directory

@@ -220,7 +220,7 @@ get.tsv <-
 # construct a function that..
 # takes a character vector full of tab-separated files stored on the local disk
 # imports them all into monetdb, merges (rectangulates) them into a merged (_m) table,
-# and finally creates a sqlsurvey design object
+# and finally creates a survey design object
 pums.import.merge.design <-
 	function( db , fn , merged.tn , hh.tn , person.tn , hh.stru , person.stru ){
 		
@@ -326,7 +326,7 @@ pums.import.merge.design <-
 		dbSendQuery( db , paste0( 'UPDATE ' , merged.tn , ' SET one = 1' ) )
 		
 		
-		# create a sqlsurvey complex sample design object
+		# create a survey complex sample design object
 		pums.design <-
 			svydesign(
 				weight = if( grepl( "1990" , merged.tn ) ) ~pwgt1 else ~pweight ,			# weight variable column

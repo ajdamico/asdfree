@@ -57,7 +57,7 @@ library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/sqlsurvey%20functions.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/survey%20functions.R" , prompt = FALSE )
 
 # load a couple of functions that will ease the importation process
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20and%20importation%20functions.R" , prompt = FALSE )
@@ -176,7 +176,7 @@ if ( 2012 %in% years.to.download ){
 	
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
-	construct.pisa.sqlsurvey.designs(
+	construct.pisa.survey.designs(
 		db , 
 		year = 2012 ,
 		table.name = 'int_stu12_dec03' ,
@@ -256,7 +256,7 @@ if ( 2009 %in% years.to.download ){
 	
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
-	construct.pisa.sqlsurvey.designs(
+	construct.pisa.survey.designs(
 		db , 
 		year = 2009 ,
 		table.name = 'int_stq09_dec11' ,
@@ -317,7 +317,7 @@ if ( 2006 %in% years.to.download ){
 	
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
-	construct.pisa.sqlsurvey.designs(
+	construct.pisa.survey.designs(
 		db , 
 		year = 2006 ,
 		table.name = 'int_stu06_dec07' ,
@@ -408,7 +408,7 @@ if ( 2003 %in% years.to.download ){
 	
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
-	construct.pisa.sqlsurvey.designs(
+	construct.pisa.survey.designs(
 		db , 
 		year = 2003 ,
 		table.name = 'int_stui_2003_v2' ,
@@ -538,7 +538,7 @@ if ( 2000 %in% years.to.download ){
 	
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
-	construct.pisa.sqlsurvey.designs(
+	construct.pisa.survey.designs(
 		db , 
 		year = 2000 ,
 		table.name = 'intstud_math' ,
@@ -547,7 +547,7 @@ if ( 2000 %in% years.to.download ){
 
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.	
-	construct.pisa.sqlsurvey.designs(
+	construct.pisa.survey.designs(
 		db , 
 		year = 2000 ,
 		table.name = 'intstud_read' ,
@@ -556,7 +556,7 @@ if ( 2000 %in% years.to.download ){
 	
 	# use the table (already imported into monetdb) to spawn five different tables (one for each plausible [imputed] value)
 	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
-	construct.pisa.sqlsurvey.designs(
+	construct.pisa.survey.designs(
 		db , 
 		year = 2000 ,
 		table.name = 'intstud_scie' ,

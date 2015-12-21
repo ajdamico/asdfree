@@ -249,7 +249,7 @@ cbind( cn , colTypes )
 
 # # # construct your monetdb-backed complex sample survey design object # # #
 
-# create a sqlsurvey complex sample design object
+# create a survey complex sample design object
 this_db_design <-
 	svydesign(
 		weight = ~perwt ,									# weight variable column

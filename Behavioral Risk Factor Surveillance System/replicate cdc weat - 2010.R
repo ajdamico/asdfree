@@ -27,7 +27,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #########################################################################################################################################
-# prior to running this analysis script, the brfss 2010 single-year file must be loaded as a monet database-backed sqlsurvey object     #
+# prior to running this analysis script, the brfss 2010 single-year file must be loaded as a monet database-backed survey object        #
 # on the local machine. running the 1984-2011 download and create database script will create a monet database containing this file     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/asdfree/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/download%20all%20microdata.R       #
@@ -161,7 +161,7 @@ sample.size - qnorm( 0.975 ) * se.sample.size
 # confidence interval upper bounds for weighted size
 sample.size + qnorm( 0.975 ) * se.sample.size
 
-# close the connection to the two sqlsurvey design object
+# close the connection to the two survey design object
 close( brfss.d )
 
 

@@ -120,7 +120,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # simply use the nrow function..
 nrow( pums.design )
 
-# ..on the sqlsurvey design object
+# ..on the survey design object
 class( pums.design )
 
 
@@ -160,7 +160,7 @@ dbGetQuery( db , "SELECT SUM( pweight ) AS sum_weights FROM pums_2000_5_m" )
 # the population of the united states #
 # by state
 dbGetQuery( db , "SELECT state , SUM( pweight ) AS sum_weights FROM pums_2000_5_m GROUP BY state ORDER BY state" )
-# note: the above command is one example of how the r survey package differs from the r sqlsurvey package
+# note: the above command is one example of how the r survey package differs from the r survey package
 
 
 # calculate the mean of a linear variable #
