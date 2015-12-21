@@ -59,14 +59,11 @@
 options( scipen = 20 )
 
 
-# remove the # in order to run this install.packages line only once
-# install.packages( c( "sqldf" , "RSQLite" ) )
-
-
-library(stringr) 	# load stringr package (manipulates character strings easily)
-library(reshape2)	# load reshape2 package (transposes data frames quickly)
-library(sqldf)		# load the sqldf package (enables sql queries on data frames)
-library(RSQLite) 	# load RSQLite package (creates database files in R)
+library(stringr) 		# load stringr package (manipulates character strings easily)
+library(reshape2)		# load reshape2 package (transposes data frames quickly)
+library(sqldf)			# load the sqldf package (enables sql queries on data frames)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # # # # # # # # # # # # # # # # # # # #
@@ -104,10 +101,10 @@ read.in.qs <-
 
 		# load all four
 		
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "1.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "2.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "3.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "4.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "1.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "2.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "3.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "4.rda" ) )
 
 		# stack them on top of each other into a new data frame called x
 		x <- rbind( 
@@ -122,12 +119,12 @@ read.in.qs <-
 		# load all five
 		
 		# note the first will contain an x in the filename
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "1x.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "2.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "3.rda" ) )
-		load( paste0( "./" , filefolder , "/" , filestart , yr , "4.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "1x.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "2.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "3.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , yr , "4.rda" ) )
 		# note the fifth will be from the following year's first quarter
-		load( paste0( "./" , filefolder , "/" , filestart , as.numeric( yr ) + 1 , "1.rda" ) )
+		load( paste0( "./" , year , "/" , filefolder , "/" , filestart , as.numeric( yr ) + 1 , "1.rda" ) )
 
 		# stack them on top of each other into a new data frame called x
 		x <- 
@@ -147,13 +144,9 @@ read.in.qs <-
 }
 
 
-# alter the current working directory to include the current analysis year
-# ..instead of "C:/My Directory/CES/" use "C:/My Directory/CES/2011"
-setwd( paste( getwd() , year , sep = "/" ) )
 
-
-# designate a temporary file to store a temporary database
-temp.db <- tempfile()
+# put the monetdblite database in a temporary directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 # notes from the "Integrated Mean and SE.sas" file about this section: 
@@ -168,7 +161,7 @@ temp.db <- tempfile()
 
 
 # find the filepath to the IntStubYYYY.txt file
-sf <- paste0( "./docs/Programs " , year , "/IntStub" , year , ".txt" )
+sf <- paste0( "./" , year , "/docs/Programs " , year , "/IntStub" , year , ".txt" )
 
 # create a temporary file on the local disk..
 tf <- tempfile()
@@ -315,11 +308,11 @@ gc()
 # because of the large number of exceptions for these five files
 
 # load all five R data files (.rda)
-load( paste0( "./intrvw/fmli" , yr , "1x.rda" ) )
-load( paste0( "./intrvw/fmli" , yr , "2.rda" ) )
-load( paste0( "./intrvw/fmli" , yr , "3.rda" ) )
-load( paste0( "./intrvw/fmli" , yr , "4.rda" ) )
-load( paste0( "./intrvw/fmli" , as.numeric( yr ) + 1 , "1.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , yr , "1x.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , yr , "2.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , yr , "3.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , yr , "4.rda" ) )
+load( paste0( "./" , year , "/intrvw/fmli" , as.numeric( yr ) + 1 , "1.rda" ) )
 
 # copy the fmliYY1x data frame to another data frame 'x'
 x <- get( paste0( "fmli" , yr , "1x" ) )
@@ -486,19 +479,13 @@ expend <- expend[ order( expend$newid ) , ]
 # therefore, the following database (db) commands use sql to avoid memory issues
 
 # create a new connection to the temporary database file (defined above)
-db <- dbConnect( SQLite() , temp.db )
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 # store the family data frame in that database
 dbWriteTable( db , 'fmly' , fmly , row.names = FALSE )
 
-# create an index on the fmly table to drastically speed up future queries
-dbSendQuery( db , "CREATE INDEX nsf ON fmly ( newid , source )" )
-
 # store the expenditure data frame in that database as well
 dbWriteTable( db , 'expend' , expend , row.names = FALSE )
-
-# create an index on the expend table to drastically speed up future queries
-dbSendQuery( db , "CREATE INDEX nse ON expend ( newid , source )" )
 
 # create a character vector rcost1 - rcost45
 rcost <- paste0( "rcost" , 1:45 )
@@ -522,9 +509,6 @@ dbSendQuery(
 	sql.line
 )
   
-# create an index on the pubfile table to drastically speed up future queries
-dbSendQuery( db , "CREATE INDEX isu ON pubfile ( inclass , source , ucc )" )
-
 
 # notes from the "Integrated Mean and SE.sas" file about this section: 
 
@@ -589,7 +573,7 @@ aggright <-
 dbDisconnect( db )
 
 # delete that temporary database file from the local disk
-file.remove( temp.db )
+unlink( dbfolder , recursive = TRUE )
 
 # create three character vectors containing every combination of..
 
