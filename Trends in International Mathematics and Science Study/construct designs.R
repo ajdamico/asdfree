@@ -111,7 +111,7 @@ for ( this.year in rev( years ) ){
 				}
 				
 				# save the implicate
-				dbWriteTable( db , paste0( df , i ) , y )
+				dbWriteTable( db , paste0( df , this.year , i ) , y )
 				
 				rm( y ) ; gc()
 				
@@ -119,7 +119,7 @@ for ( this.year in rev( years ) ){
 			
 		} else {	
 		
-			dbWriteTable( db , df , get( df ) )
+			dbWriteTable( db , paste0( df , this.year ) , get( df ) )
 		
 		}
 		
@@ -159,7 +159,7 @@ for ( this.year in rev( years ) ){
 					svrepdesign( 
 						weights = as.formula( paste( "~" , wgt ) )  , 
 						repweights = z , 
-						data = imputationList( datasets = as.list( paste0( df , 1:5 ) ) , dbtype = "MonetDBLite" ) , 
+						data = imputationList( datasets = as.list( paste0( df , this.year , 1:5 ) ) , dbtype = "MonetDBLite" ) , 
 						type = "other" ,
 						combined.weights = TRUE , 
 						dbtype = "MonetDBLite" ,
@@ -176,7 +176,7 @@ for ( this.year in rev( years ) ){
 					svrepdesign( 
 						weights = as.formula( paste( "~" , wgt ) )  , 
 						repweights = z , 
-						data = df , 
+						data = paste0( df , this.year ) , 
 						type = "other" ,
 						combined.weights = TRUE ,
 						dbtype = "MonetDBLite" ,
