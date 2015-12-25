@@ -35,8 +35,6 @@ save(pes,file="pes.rda")
 
 ###################################################################################
 
-load("pes.rda")
-
 # design object for people answering the long questionaire
 pes_sel<-subset(pes,!is.na(M001)&M001=="1")
 
@@ -54,11 +52,11 @@ pes_sel$C006<-factor(pes_sel$C006,labels=c("masculino","feminino"))
 
 # UF
 
-estado.names <- c( "Rondônia" , "Acre" , "Amazonas" , "Roraima" , "Pará" , "Amapá" ,
-"Tocantins" , "Maranhão" , "Piauí" , "Ceará" , "Rio Grande do Norte" , "Paraíba" ,
-"Pernambuco" , "Alagoas" , "Sergipe" , "Bahia" , "Minas Gerais" , "Espírito Santo" ,
-"Rio de Janeiro" , "São Paulo" , "Paraná" , "Santa Catarina" , "Rio Grande do Sul" ,
-"Mato Grosso do Sul" , "Mato Grosso" , "Goiás" , "Distrito Federal" )
+estado.names <- c( "RondÃ´nia" , "Acre" , "Amazonas" , "Roraima" , "ParÃ¡" , "AmapÃ¡" ,
+"Tocantins" , "MaranhÃ£o" , "PiauÃ­" , "CearÃ¡" , "Rio Grande do Norte" , "ParaÃ­ba" ,
+"Pernambuco" , "Alagoas" , "Sergipe" , "Bahia" , "Minas Gerais" , "EspÃ­rito Santo" ,
+"Rio de Janeiro" , "SÃ£o Paulo" , "ParanÃ¡" , "Santa Catarina" , "Rio Grande do Sul" ,
+"Mato Grosso do Sul" , "Mato Grosso" , "GoiÃ¡s" , "Distrito Federal" )
 pes_sel$UF<-factor(pes_sel$V0001,labels=estado.names)
 
 # Region
@@ -68,6 +66,11 @@ pes_sel$Region<-factor(pes_sel$Region,labels=region.names)
 table(pes_sel$Region)
 
 ##
+pes_sel$P04101<- as.numeric(pes_sel$P04101)
+pes_sel$P04102<- as.numeric(pes_sel$P04102)
+pes_sel$P04301<- as.numeric(pes_sel$P04301)
+pes_sel$P04302<- as.numeric(pes_sel$P04302)
+
 pes_sel<-transform(pes_sel,tempo_desl_trab=ifelse(is.na(P04101),0,P04101 * 60 + P04102))
 pes_sel<-transform(pes_sel,tempo_desl_athab =ifelse(is.na(P04301),0,P04301 * 60 + P04302))
 pes_sel<-transform(pes_sel,tempo_desl = tempo_desl_trab + tempo_desl_athab)
@@ -164,7 +167,7 @@ cbind(atfiufsex[,1:2],round(100*atfiufsex[,3:5],1))
 
 ###############################################################
 ## Examples for the whole population
-#  match with Gráfico 8 in http://biblioteca.ibge.gov.br/visualizacao/livros/liv94074.pdf
+#  match with GrÃ¡fico 8 in http://biblioteca.ibge.gov.br/visualizacao/livros/liv94074.pdf
 ############################################################
 
 ## Cria variaveis
@@ -173,7 +176,7 @@ cbind(atfiufsex[,1:2],round(100*atfiufsex[,3:5],1))
 pes$C008<-as.numeric(pes$C008)
 pes$age.cat<-cut(pes$C008,c(0,18,30,40,60,150),right=FALSE,include.lowest=TRUE)
 
-# raça:
+# raÃ§a:
 pes$raca<-pes$C009
 pes$raca[pes$raca%in%c("3","5","9")]<-NA
 pes$raca<-factor(pes$raca,labels=c("Branca","Preta","Parda"))
@@ -191,6 +194,7 @@ pes$educ<-factor(pes$educ,labels=c("SinstFundi","FundcMedi","MedcSupi","Supc"))
 # design object for all people
 
 pes.all.des<-svydesign(ids=~UPA_PNS,strata=~V0024,data=pes,weights=~V0028,nest=TRUE)
+
 
 
 ## post-stratification
@@ -265,16 +269,6 @@ ggplot(planraca.res,aes(x=race,y=I0011,fill=race))+
   theme_bw()
 
 
-
-
-
-
-
-
-  
-  
-  
-  
 # Example 1
 
 library(survey)
@@ -284,7 +278,7 @@ pes_sel<-subset(pes,!is.na(M001)&M001=="1")
 ## registers with missing weights
 pes.peso0<-subset(pes_sel,is.na(V0029))
 
-# discard regiters with missing weights
+# discard regiters with missing weights. Not needed, these lines were discarded by IBGE
 pes_sel0<-subset(pes_sel,!is.na(V0029))
 
 ## people with self evalueted health good or very good  
@@ -299,11 +293,11 @@ pes_sel0$C006<-factor(pes_sel0$C006,labels=c("Masculino","Feminino"))
 
 # States
 
-estado.names <- c( "Rondônia" , "Acre" , "Amazonas" , "Roraima" , "Pará" , "Amapá" ,
-"Tocantins" , "Maranhão" , "Piauí" , "Ceará" , "Rio Grande do Norte" , "Paraíba" ,
-"Pernambuco" , "Alagoas" , "Sergipe" , "Bahia" , "Minas Gerais" , "Espírito Santo" ,
-"Rio de Janeiro" , "São Paulo" , "Paraná" , "Santa Catarina" , "Rio Grande do Sul" ,
-"Mato Grosso do Sul" , "Mato Grosso" , "Goiás" , "Distrito Federal" )
+estado.names <- c( "RondÃ´nia" , "Acre" , "Amazonas" , "Roraima" , "ParÃ¡" , "AmapÃ¡" ,
+"Tocantins" , "MaranhÃ£o" , "PiauÃ­" , "CearÃ¡" , "Rio Grande do Norte" , "ParaÃ­ba" ,
+"Pernambuco" , "Alagoas" , "Sergipe" , "Bahia" , "Minas Gerais" , "EspÃ­rito Santo" ,
+"Rio de Janeiro" , "SÃ£o Paulo" , "ParanÃ¡" , "Santa Catarina" , "Rio Grande do Sul" ,
+"Mato Grosso do Sul" , "Mato Grosso" , "GoiÃ¡s" , "Distrito Federal" )
 pes_sel0$V0001<-factor(pes_sel0$V0001,labels=estado.names)
 
 ## this is a separate sample just for a group of people not a domain
@@ -344,11 +338,11 @@ tab5111(tab5.1.1.1_BR_SEXO,"sexo")
 
 # situation (urban, rural)
 tab5.1.1.1_SITU<-svyby(~saude.b.mb,~situ,pes.sel.des.pos,svymean)
-tab5111(tab5.1.1.1_SITU,"situação")
+tab5111(tab5.1.1.1_SITU,"situaÃ§Ã£o")
 
-# situação e sexo
+# situaÃ§Ã£o e sexo
 tab5.1.1.1_SITU_SEXO<-svyby(~saude.b.mb,~situ+C006,pes.sel.des.pos,svymean)
-tab5111(tab5.1.1.1_SITU_SEXO,c("situação","sexo"))
+tab5111(tab5.1.1.1_SITU_SEXO,c("situaÃ§Ã£o","sexo"))
 
 # UF
 tab5.1.1.1_UF<-svyby(~saude.b.mb,~V0001,pes.sel.des.pos,svymean)
@@ -382,22 +376,15 @@ x<-subset(pes.all.des.pos,C008>=5)
 svymean(~VDD004,x) 
 ## this result was not published yet.
 
-
-
-
-
-
-
-
 dom01<-subset(dom,V0015=="01")
 
-# design objec for people answering the long questionaire
+# design object for people answering the long questionaire
 pes_sel<-subset(pes,!is.na(M001)&M001=="1")
 
 ## registers with missing weights
 pes.peso0<-subset(pes_sel,is.na(V0029))
 
-# discard regiters with missing weights
+# discard regiters with missing weights. These registers were discard by IBGE
 pes_sel0<-subset(pes_sel,!is.na(V0029))
 
 ## people with self evalueted health good or very good  
@@ -410,7 +397,7 @@ pes_sel0<-transform(pes_sel0,situ=substring(V0024,7,7))
 library(survey)
 pes.sel.des<-svydesign(ids=~UPA_PNS,strata=~V0024,data=pes_sel0,weights=~V0029,nest=TRUE)
 
-## pós-estratificação do desenho
+## pÃ³s-estratificaÃ§Ã£o do desenho
 
 post.pop<-unique(subset(pes_sel0,select=c(V00293,V00292)))
 names(post.pop)<-c("V00293","Freq")
@@ -433,7 +420,7 @@ tab5.1.1.1_BR_SEXO<-transform(tab5.1.1.1_BR_SEXO,LI=saude.b.mb-2*se,LS=saude.b.m
 cbind(tab5.1.1.1_BR_SEXO[1,1],round(100*tab5.1.1.1_BR_SEXO[1,c(2,4,5)],1))
 ## feminino
 cbind(tab5.1.1.1_BR_SEXO[2,1],round(100*tab5.1.1.1_BR_SEXO[2,c(2,4,5)],1))
-## Situação
+## SituaÃ§Ã£o
 
 ## Rural e urbana
 
@@ -442,10 +429,12 @@ tab5.1.1.1_SITU<-transform(tab5.1.1.1_SITU,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se
 cbind(tab5.1.1.1_SITU[,1],round(100*tab5.1.1.1_SITU[,c(2,4,5)],1))
 
 ## Rural e urbana por sexo
+
 tab5.1.1.1_SITU_SEXO<-svyby(~saude.b.mb,~situ+C006,pes.sel.des.pos,svymean)
+
 tab5.1.1.1_SITU_SEXO<-transform(tab5.1.1.1_SITU_SEXO,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se)
-tab5.1.1.1_SITU_MASC<-subset(tab5.1.1.1_SITU_SEXO,C006==1)
-tab5.1.1.1_SITU_FEM<-subset(tab5.1.1.1_SITU_SEXO,C006==2)
+tab5.1.1.1_SITU_MASC<-subset(tab5.1.1.1_SITU_SEXO,C006=="Masculino")
+tab5.1.1.1_SITU_FEM<-subset(tab5.1.1.1_SITU_SEXO,C006=="Feminino")
 ## SITU, sexo masculino
 cbind(tab5.1.1.1_SITU_MASC[,1],round(100*tab5.1.1.1_SITU_MASC[,c(3,5,6)],1))
 ## SITU, sexo feminino
@@ -456,7 +445,7 @@ cbind(tab5.1.1.1_SITU_FEM[,1],round(100*tab5.1.1.1_SITU_FEM[,c(3,5,6)],1))
 tab5.1.1.1_UF<-svyby(~saude.b.mb,~V0001,pes.sel.des.pos,svymean)
 
 tab5.1.1.1_UF<-transform(tab5.1.1.1_UF,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se)
-cbind(tab5.1.1.1_UF$V0001,round(100*result[,c(2,4,5)],1))
+cbind(tab5.1.1.1_UF$V0001,round(100*tab5.1.1.1_UF[,c(2,4,5)],1))
 
 ## UF x SEXO 
 
@@ -464,11 +453,11 @@ tab5.1.1.1_UF_SEXO<-svyby(~saude.b.mb,~V0001+C006,pes.sel.des.pos,svymean)
 
 tab5.1.1.1_UF_SEXO<-transform(tab5.1.1.1_UF_SEXO,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se)
 ## UF, Sexo masculino
-tab5.1.1.1_UF_MASC<-subset(tab5.1.1.1_UF_SEXO,C006==1)
+tab5.1.1.1_UF_MASC<-subset(tab5.1.1.1_UF_SEXO,C006=="Masculino")
 cbind(tab5.1.1.1_UF_MASC[,1],round(100*tab5.1.1.1_UF_MASC[,c(3,5,6)],1))
 
 ##UF,  Sexo feminino
-tab5.1.1.1_UF_FEM<-subset(tab5.1.1.1_UF_SEXO,C006==2)
+tab5.1.1.1_UF_FEM<-subset(tab5.1.1.1_UF_SEXO,C006=="Feminino")
 cbind(tab5.1.1.1_UF_FEM[,1],round(100*tab5.1.1.1_UF_FEM[,c(3,5,6)],1))
 
 
