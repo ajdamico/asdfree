@@ -716,7 +716,7 @@ save( pes.design , file = 'pes 2000 design.rda' )
 #################################################
 # create a sqlsurvey complex sample design object
 fam.design <-
-	sqlsurvey(
+	svydesign(
 		weight = ~fam_wgt ,					# weight variable column (defined in the character string)
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = ~areap ,					# stratification variable column (defined in the character string)
