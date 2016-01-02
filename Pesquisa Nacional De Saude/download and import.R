@@ -1,5 +1,14 @@
+
+
+install.packages( c( "SAScii" , "downloader" , "survey" ) )
+
+
+library(survey)
 library(downloader)
 library(SAScii)
+
+setwd( "C:/My Directory/PNS/" )
+
 
 
 # load the download_cached and related functions
@@ -11,84 +20,119 @@ source_url(
 )
 
 
-setwd( "C:/My Directory/PNS/" )
-
-
+# initiate a temporary file
 tf <- tempfile()
+
+# download the latest pns microdata
 download_cached( "ftp://ftp.ibge.gov.br/PNS/2013/microdados/pns_2013_microdados_2015_08_21.zip" , tf , mode = 'wb' )
+
+# extract all files to the local disk
 z <- unzip( tf , exdir = tempdir() )
 
-
-# files
-z
-
+# identify household (domicilio) data file
 dd <- grep( "Dados/DOMPNS" , z , value = TRUE )
+
+# identify person data file
 pd <- grep( "Dados/PESPNS" , z , value = TRUE )
+
+# identify household (domicilio) sas import script
 ds <- grep( "DOMPNS(.*)\\.sas" , z , value = TRUE )
+
+# identify person sas import script
 ps <- grep( "PESPNS(.*)\\.sas" , z , value = TRUE )
 
+# create a data.frame object `dom` containing one record per household
 dom <- read.SAScii( dd , ds )
+
+# create a data.frame object `pes` containing one record per person
 pes <- read.SAScii( pd , ps )
 
-save(dom,file="dom.rda")
-save(pes,file="pes.rda")
+# convert all columns to lowercase
+names( dom ) <- tolower( names( dom ) )
+names( pes ) <- tolower( names( pes ) )
+
+
+
+
+
+
+save( dom , file = "dom.rda" )
+
+save( pes , file = "pes.rda" )
+
+
+
+# people with self evaluated health good or very good  
+pes <- transform( pes , saude_b_mb = as.numeric( n001 %in% c( '1' , '2' ) ) )
+
+# urban / rural
+pes <- transform( pes , situ = factor( substr( v0024 , 7 , 7 ) , labels = c( 'urbano' , 'rural' ) )
+
+# sex
+pes <- transform( pes , c006 = factor( c006 , labels = c( 'masculino' , 'feminino' ) ) )
+
+# state names
+estado_names <- 
+	c( "Rondônia" , "Acre" , "Amazonas" , "Roraima" , "Pará" , "Amapá" , "Tocantins" , "Maranhão" , "Piauí" , "Ceará" , "Rio Grande do Norte" , "Paraíba" , "Pernambuco" , "Alagoas" , "Sergipe" , "Bahia" , "Minas Gerais" , "Espírito Santo" , "Rio de Janeiro" , "São Paulo" , "Paraná" , "Santa Catarina" , "Rio Grande do Sul" , "Mato Grosso do Sul" , "Mato Grosso" , "Goiás" , "Distrito Federal" )
+
+pes <- transform( pes , uf = factor( v0001 , labels = estado_names ) )
+
+# region
+pes <- transform( pes , region = factor( substr( v0001 , 1 , 1 ) , labels = c( "Norte" , "Nordeste" , "Sudeste" , "Sul" , "Centro-Oeste" ) )
+
+
+# numeric recodes
+pes[ , c( 'p04101' , 'p04102' , 'p04301' , 'p04302' ) ] <- sapply( pes[ , c( 'p04101' , 'p04102' , 'p04301' , 'p04302' ) ] , as.numeric )
+
+
+# worker recodes
+pes <-
+	transform(
+		pes ,
+		tempo_desl_trab = ifelse( is.na( p04101 ) , 0 , p04101 * 60 + p04102 ) ,
+		tempo_desl_athab = ifelse( is.na( p04301 ) , 0 , p04301 * 60 + p04302 ) ,
+		tempo_desl = tempo_desl_trab + tempo_desl_athab ,
+		atfi04 = as.numeric( tempo_desl >= 30 )
+	)
+
+# column of all ones
+pes$one <- 1                   
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# design object for people answering the long questionnaire #
+pes_sel <- subset( pes , m001 == "1" )
+
+
+# pre-stratified design
+pes_sel_des <-
+	svydesign(
+		id = ~ upa_pns ,
+		strata = ~ v0024 ,
+		data = pes_sel ,
+		weights = ~ v0029 ,
+		nest = TRUE
+	)
+
+# figure out stratification targets
+post_pop <- unique( pes_sel[ c( 'v00293' , 'v00292' ) ] )
+
+names( post_pop ) <- c( "v00293" , "Freq" )
+
+# post-stratified design
+pes_sel_des_pos <- postStratify( pes_sel_des , ~v00293 , post_pop )
+
+
+save( pes_sel_des_pos , file = "2013 survey design.rda" )
+
+# final design object for people answering the long questionnaire #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
 
 ###################################################################################
-
-# design object for people answering the long questionaire
-pes_sel<-subset(pes,!is.na(M001)&M001=="1")
-
-
-## people with self evaluated health good or very good  
-pes_sel<-transform(pes_sel,saude.b.mb=ifelse(N001%in%c("1","2"),1,0))
-
-## urban and rural
-pes_sel<-transform(pes_sel,situ=substring(V0024,7,7))
-pes_sel$situ<-factor(pes_sel$situ,labels=c("urbano","rural"))
-
-# sexo
-
-pes_sel$C006<-factor(pes_sel$C006,labels=c("masculino","feminino"))
-
-# UF
-
-estado.names <- c( "Rondônia" , "Acre" , "Amazonas" , "Roraima" , "Pará" , "Amapá" ,
-"Tocantins" , "Maranhão" , "Piauí" , "Ceará" , "Rio Grande do Norte" , "Paraíba" ,
-"Pernambuco" , "Alagoas" , "Sergipe" , "Bahia" , "Minas Gerais" , "Espírito Santo" ,
-"Rio de Janeiro" , "São Paulo" , "Paraná" , "Santa Catarina" , "Rio Grande do Sul" ,
-"Mato Grosso do Sul" , "Mato Grosso" , "Goiás" , "Distrito Federal" )
-pes_sel$UF<-factor(pes_sel$V0001,labels=estado.names)
-
-# Region
-region.names<-c("Norte","Nordeste","Sudeste","Sul","Centro-Oeste")
-pes_sel$Region<-substring(pes_sel$V0001,1,1)
-pes_sel$Region<-factor(pes_sel$Region,labels=region.names)
-table(pes_sel$Region)
-
-##
-pes_sel$P04101<- as.numeric(pes_sel$P04101)
-pes_sel$P04102<- as.numeric(pes_sel$P04102)
-pes_sel$P04301<- as.numeric(pes_sel$P04301)
-pes_sel$P04302<- as.numeric(pes_sel$P04302)
-
-pes_sel<-transform(pes_sel,tempo_desl_trab=ifelse(is.na(P04101),0,P04101 * 60 + P04102))
-pes_sel<-transform(pes_sel,tempo_desl_athab =ifelse(is.na(P04301),0,P04301 * 60 + P04302))
-pes_sel<-transform(pes_sel,tempo_desl = tempo_desl_trab + tempo_desl_athab)
-pes_sel<-transform(pes_sel,atfi04=ifelse(tempo_desl >= 30,1,0))
-
-# variable 1
-pes_sel$one<-1                   
-
-# survey design
-library(survey)
-pes.sel.des<-svydesign(ids=~UPA_PNS,strata=~V0024,data=pes_sel,weights=~V0029,nest=TRUE)
-
-## post-stratify design
-
-post.pop<-unique(subset(pes_sel,select=c(V00293,V00292)))
-names(post.pop)<-c("V00293","Freq")
-
-pes.sel.des.pos<-postStratify(pes.sel.des,~V00293,post.pop)
 
 
 ############################################################
@@ -97,32 +141,32 @@ pes.sel.des.pos<-postStratify(pes.sel.des,~V00293,post.pop)
 #################################################################
 
 ## Brasil
-saudbr<-svymean(~saude.b.mb, design=pes.sel.des.pos)
+saudbr<-svymean(~saude_b_mb, design=pes_sel_des_pos)
 c(round(100*coef(saudbr),1),round(100*confint(saudbr)[1,],1))
 
 # by sex
 
-saudbrsex<-svyby(~saude.b.mb,~C006, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+saudbrsex<-svyby(~saude_b_mb,~C006, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(saudbrsex[,1],round(100*saudbrsex[,2:4],1))
 ## Situation
 ## by situation (Rural and urban)
 
-saudsitu<-svyby(~saude.b.mb,~situ, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+saudsitu<-svyby(~saude_b_mb,~situ, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(saudsitu[,1],round(100*saudsitu[,2:4],1))
 
 ## situation x sex
 
-saudsitusex<-svyby(~saude.b.mb,~situ+C006, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+saudsitusex<-svyby(~saude_b_mb,~situ+C006, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(saudsitusex[,1:2],round(100*saudsitusex[,3:5],1))
 
 ## by UF
 
-sauduf<-svyby(~saude.b.mb,~UF, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+sauduf<-svyby(~saude_b_mb,~UF, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(sauduf[,1],round(100*sauduf[,2:4],1))
 
 ## UF x SEX 
 
-saudufsex<-svyby(~saude.b.mb,~UF+C006, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+saudufsex<-svyby(~saude_b_mb,~UF+C006, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(saudufsex[,1:2],round(100*saudufsex[,3:5],1))
 
 ###########################################################################################
@@ -136,32 +180,32 @@ cbind(saudufsex[,1:2],round(100*saudufsex[,3:5],1))
 # % of ind. above 18yearsold that practice active travel for > 30minutes
   
 # Brasil    
-atfibr<-svymean(~atfi04, design=pes.sel.des.pos)
-svymean(~atfi04, design=pes.sel.des.pos,vartype="ci",   level = 0.95)
+atfibr<-svymean(~atfi04, design=pes_sel_des_pos)
+svymean(~atfi04, design=pes_sel_des_pos,vartype="ci",   level = 0.95)
 c(round(100*coef(atfibr),1),round(100*confint(atfibr)[1,],1))
 
 
 # by situation (Urban vs Rural) 
-atfisitu<-svyby(~atfi04, ~situ, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean,na.rm=T)
+atfisitu<-svyby(~atfi04, ~situ, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean,na.rm=T)
 cbind(atfisitu[,1],round(100*atfisitu[,2:4],1))
 
 
 #  by Region
-atfireg<-svyby(~atfi04, ~Region, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+atfireg<-svyby(~atfi04, ~Region, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(atfireg[,1],round(100*atfireg[,2:4],1))
 
 #  by Race
-atfirace<-svyby(~atfi04, ~C009, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+atfirace<-svyby(~atfi04, ~C009, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(atfirace[-6,1],round(100*atfirace[-6,2:4],1))
 
 ## by UF
 
-atfiuf<-svyby(~atfi04,~UF, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+atfiuf<-svyby(~atfi04,~UF, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(atfiuf[,1],round(100*atfiuf[,2:4],1))
 
 ## UF x SEX 
 
-atfiufsex<-svyby(~atfi04,~UF+C006, design= pes.sel.des.pos,  vartype="ci",  level = 0.95,  svymean)
+atfiufsex<-svyby(~atfi04,~UF+C006, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
 cbind(atfiufsex[,1:2],round(100*atfiufsex[,3:5],1))
 
 
@@ -200,10 +244,10 @@ pes.all.des<-svydesign(ids=~UPA_PNS,strata=~V0024,data=pes,weights=~V0028,nest=T
 ## post-stratification
 
 
-post.pop.all<-subset(pes,select=c(V00283,V00282))
-post.pop.all<-unique(post.pop.all)
-names(post.pop.all)<-c("V00283","Freq")
-pes.all.des.pos<-postStratify(pes.all.des,~V00283,post.pop.all)
+post_pop.all<-subset(pes,select=c(V00283,V00282))
+post_pop.all<-unique(post_pop.all)
+names(post_pop.all)<-c("V00283","Freq")
+pes.all.des.pos<-postStratify(pes.all.des,~V00283,post_pop.all)
 
 
 # Variable VDD004:
@@ -282,7 +326,7 @@ pes.peso0<-subset(pes_sel,is.na(V0029))
 pes_sel0<-subset(pes_sel,!is.na(V0029))
 
 ## people with self evalueted health good or very good  
-pes_sel0<-transform(pes_sel0,saude.b.mb=ifelse(N001%in%c("1","2"),1,0))
+pes_sel0<-transform(pes_sel0,saude_b_mb=ifelse(N001%in%c("1","2"),1,0))
 
 ## urban and rural
 pes_sel0<-transform(pes_sel0,situ=substring(V0024,7,7))
@@ -307,15 +351,15 @@ pes.sel.des<-svydesign(ids=~UPA_PNS,strata=~V0024,data=pes_sel0,weights=~V0029,n
 
 ## design post-stratification
 
-post.pop<-unique(subset(pes_sel0,select=c(V00293,V00292)))
-names(post.pop)<-c("V00293","Freq")
+post_pop<-unique(subset(pes_sel0,select=c(V00293,V00292)))
+names(post_pop)<-c("V00293","Freq")
 
-pes.sel.des.pos<-postStratify(pes.sel.des,~V00293,post.pop)
+pes_sel_des_pos<-postStratify(pes.sel.des,~V00293,post_pop)
 
 
 ####################Example 1#############################################
 ## Brasil
-tab5.1.1.1.BR<-svymean(~saude.b.mb,pes.sel.des.pos)
+tab5.1.1.1.BR<-svymean(~saude_b_mb,pes_sel_des_pos)
 
 round(100*c(coef(tab5.1.1.1.BR),coef(tab5.1.1.1.BR)-2*SE(tab5.1.1.1.BR),
             coef(tab5.1.1.1.BR)+2*SE(tab5.1.1.1.BR)),1)
@@ -325,7 +369,7 @@ round(100*c(coef(tab5.1.1.1.BR),coef(tab5.1.1.1.BR)-2*SE(tab5.1.1.1.BR),
 tab5111<-function(svyby.obj,nomevar){
   LI<-coef(svyby.obj)-2*SE(svyby.obj)
   LS<-coef(svyby.obj)+2*SE(svyby.obj)
-  result<-data.frame(svyby.obj[,1:length(nomevar)],saude.b.mb=round(100*coef(svyby.obj),1),
+  result<-data.frame(svyby.obj[,1:length(nomevar)],saude_b_mb=round(100*coef(svyby.obj),1),
                      LI=round(100*LI,1),LS=round(100*LS,1))
   names(result)[1:length(nomevar)]<-nomevar
   rownames(result)<-NULL
@@ -333,23 +377,23 @@ tab5111<-function(svyby.obj,nomevar){
 }
 
 # sex
-tab5.1.1.1_BR_SEXO<-svyby(~saude.b.mb,~C006,pes.sel.des.pos,svymean)
+tab5.1.1.1_BR_SEXO<-svyby(~saude_b_mb,~C006,pes_sel_des_pos,svymean)
 tab5111(tab5.1.1.1_BR_SEXO,"sexo")
 
 # situation (urban, rural)
-tab5.1.1.1_SITU<-svyby(~saude.b.mb,~situ,pes.sel.des.pos,svymean)
+tab5.1.1.1_SITU<-svyby(~saude_b_mb,~situ,pes_sel_des_pos,svymean)
 tab5111(tab5.1.1.1_SITU,"situação")
 
 # situação e sexo
-tab5.1.1.1_SITU_SEXO<-svyby(~saude.b.mb,~situ+C006,pes.sel.des.pos,svymean)
+tab5.1.1.1_SITU_SEXO<-svyby(~saude_b_mb,~situ+C006,pes_sel_des_pos,svymean)
 tab5111(tab5.1.1.1_SITU_SEXO,c("situação","sexo"))
 
 # UF
-tab5.1.1.1_UF<-svyby(~saude.b.mb,~V0001,pes.sel.des.pos,svymean)
+tab5.1.1.1_UF<-svyby(~saude_b_mb,~V0001,pes_sel_des_pos,svymean)
 tab5111(tab5.1.1.1_UF,"UF")
 
 # UF X sexo
-tab5.1.1.1_UF_SEXO<-svyby(~saude.b.mb,~V0001+C006,pes.sel.des.pos,svymean)
+tab5.1.1.1_UF_SEXO<-svyby(~saude_b_mb,~V0001+C006,pes_sel_des_pos,svymean)
 tab5111(tab5.1.1.1_UF_SEXO,c("UF","sexo"))
 ###########################End of Example 1 ########################################################3
 
@@ -364,10 +408,10 @@ pes.all.des<-svydesign(ids=~UPA_PNS,strata=~V0024,data=pes,weights=~V0028,nest=T
 ## post-stratification
 
 
-post.pop.all<-subset(pes,select=c(V00283,V00282))
-post.pop.all<-unique(post.pop.all)
-names(post.pop.all)<-c("V00283","Freq")
-pes.all.des.pos<-postStratify(pes.sel.des,~V00283,post.pop.all)
+post_pop.all<-subset(pes,select=c(V00283,V00282))
+post_pop.all<-unique(post_pop.all)
+names(post_pop.all)<-c("V00283","Freq")
+pes.all.des.pos<-postStratify(pes.sel.des,~V00283,post_pop.all)
 
 ## Higher schooling level ( age>=5)
 svymean(~VDD004,pes.all.des.pos)
@@ -388,7 +432,7 @@ pes.peso0<-subset(pes_sel,is.na(V0029))
 pes_sel0<-subset(pes_sel,!is.na(V0029))
 
 ## people with self evalueted health good or very good  
-pes_sel0<-transform(pes_sel0,saude.b.mb=ifelse(N001%in%c("1","2"),1,0))
+pes_sel0<-transform(pes_sel0,saude_b_mb=ifelse(N001%in%c("1","2"),1,0))
 
 ## urban and rural
 pes_sel0<-transform(pes_sel0,situ=substring(V0024,7,7))
@@ -399,23 +443,23 @@ pes.sel.des<-svydesign(ids=~UPA_PNS,strata=~V0024,data=pes_sel0,weights=~V0029,n
 
 ## pós-estratificação do desenho
 
-post.pop<-unique(subset(pes_sel0,select=c(V00293,V00292)))
-names(post.pop)<-c("V00293","Freq")
+post_pop<-unique(subset(pes_sel0,select=c(V00293,V00292)))
+names(post_pop)<-c("V00293","Freq")
 
-pes.sel.des.pos<-postStratify(pes.sel.des,~V00293,post.pop)
+pes_sel_des_pos<-postStratify(pes.sel.des,~V00293,post_pop)
 
 
 
 # calcula estimativas da tabela 5.1.1.1
 
 ## Brasil
-tab5.1.1.1.BR<-svymean(~saude.b.mb,pes.sel.des.pos)
+tab5.1.1.1.BR<-svymean(~saude_b_mb,pes_sel_des_pos)
 class(tab5.1.1.1.BR)
 round(100*c(coef(tab5.1.1.1.BR),coef(tab5.1.1.1.BR)-2*SE(tab5.1.1.1.BR),
             coef(tab5.1.1.1.BR)+2*SE(tab5.1.1.1.BR)),1)
 ## Brasil por sexo
-tab5.1.1.1_BR_SEXO<-svyby(~saude.b.mb,~C006,pes.sel.des.pos,svymean)
-tab5.1.1.1_BR_SEXO<-transform(tab5.1.1.1_BR_SEXO,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se)
+tab5.1.1.1_BR_SEXO<-svyby(~saude_b_mb,~C006,pes_sel_des_pos,svymean)
+tab5.1.1.1_BR_SEXO<-transform(tab5.1.1.1_BR_SEXO,LI=saude_b_mb-2*se,LS=saude_b_mb+2*se)
 ## masculino
 cbind(tab5.1.1.1_BR_SEXO[1,1],round(100*tab5.1.1.1_BR_SEXO[1,c(2,4,5)],1))
 ## feminino
@@ -424,15 +468,15 @@ cbind(tab5.1.1.1_BR_SEXO[2,1],round(100*tab5.1.1.1_BR_SEXO[2,c(2,4,5)],1))
 
 ## Rural e urbana
 
-tab5.1.1.1_SITU<-svyby(~saude.b.mb,~situ,pes.sel.des.pos,svymean)
-tab5.1.1.1_SITU<-transform(tab5.1.1.1_SITU,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se)
+tab5.1.1.1_SITU<-svyby(~saude_b_mb,~situ,pes_sel_des_pos,svymean)
+tab5.1.1.1_SITU<-transform(tab5.1.1.1_SITU,LI=saude_b_mb-2*se,LS=saude_b_mb+2*se)
 cbind(tab5.1.1.1_SITU[,1],round(100*tab5.1.1.1_SITU[,c(2,4,5)],1))
 
 ## Rural e urbana por sexo
 
-tab5.1.1.1_SITU_SEXO<-svyby(~saude.b.mb,~situ+C006,pes.sel.des.pos,svymean)
+tab5.1.1.1_SITU_SEXO<-svyby(~saude_b_mb,~situ+C006,pes_sel_des_pos,svymean)
 
-tab5.1.1.1_SITU_SEXO<-transform(tab5.1.1.1_SITU_SEXO,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se)
+tab5.1.1.1_SITU_SEXO<-transform(tab5.1.1.1_SITU_SEXO,LI=saude_b_mb-2*se,LS=saude_b_mb+2*se)
 tab5.1.1.1_SITU_MASC<-subset(tab5.1.1.1_SITU_SEXO,C006=="Masculino")
 tab5.1.1.1_SITU_FEM<-subset(tab5.1.1.1_SITU_SEXO,C006=="Feminino")
 ## SITU, sexo masculino
@@ -442,16 +486,16 @@ cbind(tab5.1.1.1_SITU_FEM[,1],round(100*tab5.1.1.1_SITU_FEM[,c(3,5,6)],1))
 
 ## UF
 
-tab5.1.1.1_UF<-svyby(~saude.b.mb,~V0001,pes.sel.des.pos,svymean)
+tab5.1.1.1_UF<-svyby(~saude_b_mb,~V0001,pes_sel_des_pos,svymean)
 
-tab5.1.1.1_UF<-transform(tab5.1.1.1_UF,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se)
+tab5.1.1.1_UF<-transform(tab5.1.1.1_UF,LI=saude_b_mb-2*se,LS=saude_b_mb+2*se)
 cbind(tab5.1.1.1_UF$V0001,round(100*tab5.1.1.1_UF[,c(2,4,5)],1))
 
 ## UF x SEXO 
 
-tab5.1.1.1_UF_SEXO<-svyby(~saude.b.mb,~V0001+C006,pes.sel.des.pos,svymean)
+tab5.1.1.1_UF_SEXO<-svyby(~saude_b_mb,~V0001+C006,pes_sel_des_pos,svymean)
 
-tab5.1.1.1_UF_SEXO<-transform(tab5.1.1.1_UF_SEXO,LI=saude.b.mb-2*se,LS=saude.b.mb+2*se)
+tab5.1.1.1_UF_SEXO<-transform(tab5.1.1.1_UF_SEXO,LI=saude_b_mb-2*se,LS=saude_b_mb+2*se)
 ## UF, Sexo masculino
 tab5.1.1.1_UF_MASC<-subset(tab5.1.1.1_UF_SEXO,C006=="Masculino")
 cbind(tab5.1.1.1_UF_MASC[,1],round(100*tab5.1.1.1_UF_MASC[,c(3,5,6)],1))
