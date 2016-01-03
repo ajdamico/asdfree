@@ -278,4 +278,3 @@ for ( this.year in rev( years ) ){
 
 # the current working directory should now contain one r data file (.rda)
 # for each original prefixed data.frame objects, all separated by year-specific folders.
-

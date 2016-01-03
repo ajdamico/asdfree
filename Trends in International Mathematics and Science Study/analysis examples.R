@@ -18,27 +18,29 @@
 # ajdamico@gmail.com
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###############################################################################################################################################
-# prior to running this analysis script, the piaac multiply-imputed tables must be loaded as a replicate-weighted survey object on the        #
-# local machine. running the download, import, and design scripts will create an r data file (.rda) with whatcha need.                        #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://raw.githubusercontent.com/ajdamico/asdfree/master/Trends%20in%20International%20Mathematics%20and%20Science%20Study/download%20and%20import.R  #
-# https://raw.githubusercontent.com/ajdamico/asdfree/master/Trends%20in%20International%20Mathematics%20and%20Science%20Study/construct%20designs.R      #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create the files "asg_design.rda" in C:/My Directory/TIMSS or wherever the working directory was set.                      #
-###############################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#########################################################################################################################################################
+# prior to running this analysis script, the piaac multiply-imputed tables must be loaded as a replicate-weighted survey object on the                  #
+# local machine. running the download, import, and design scripts will create an r data file (.rda) with whatcha need.                                  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Trends%20in%20International%20Mathematics%20and%20Science%20Study/download%20and%20import.R #
+# https://raw.githubusercontent.com/ajdamico/asdfree/master/Trends%20in%20International%20Mathematics%20and%20Science%20Study/construct%20designs.R     #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# that script will create the files "asg_design.rda" in C:/My Directory/TIMSS or wherever the working directory was set.                                #
+#########################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/TIMSS/" )
 
 
-library(survey)			# load survey package (analyzes complex design surveys)
 library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 library(downloader)		# downloads and then runs the source() function on scripts from github
-library(RSQLite) 		# load RSQLite package (creates database files in R)
+library(survey) 		# load survey package (analyzes complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+
 
 # load the multiply-imputed design combination alteration function (scf.MIcombine)
 # from the survey of consumer finances directory.  that function's algorithm is what timss uses.
@@ -58,7 +60,7 @@ load( "./2011/asg_design.rda" )
 class( asg_design )
 
 # establish a connection to the SQLite database
-asg_design$designs <- lapply( asg_design$designs , open )
+asg_design$designs <- lapply( asg_design$designs , open , driver = MonetDB.R() )
 
 # count the total (unweighted) number of records in the imputed design #
 nrow( asg_design )

@@ -25,7 +25,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "survey" , "mitools" , "RSQLite" ) )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "mitools" , "R.utils" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
 # set your TIMSS data directory
@@ -45,8 +45,9 @@
 # program start #
 # # # # # # # # #
 
-library(RSQLite) 			# load RSQLite package (creates database files in R)
-library(survey)				# load survey package (analyzes complex design surveys)
+library(survey) 		# load survey package (analyzes complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(mitools) 			# load mitools package (analyzes multiply-imputed data)
 
 
@@ -59,6 +60,13 @@ options( "survey.replicates.mse" = TRUE )
 years <- list.files()[ as.character( as.numeric( list.files() ) ) %in% list.files() ]
 
 
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # create multiply-imputed, replicate-weighted database-backed complex survey designs  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -66,11 +74,6 @@ years <- list.files()[ as.character( as.numeric( list.files() ) ) %in% list.file
 # loop through each year of data
 for ( this.year in rev( years ) ){
 	
-	db.name <- paste0( './TIMSS' , this.year , '.db' )
-	
-	# open the connection to a new sqlite database
-	db <- dbConnect( SQLite() , db.name )
-
 	for ( rdas in rev( list.files( paste0( './' , this.year ) , full.names = TRUE ) ) ){
 	
 		print( paste( "currently designing" , rdas ) )
@@ -108,7 +111,7 @@ for ( this.year in rev( years ) ){
 				}
 				
 				# save the implicate
-				dbWriteTable( db , paste0( df , i ) , y )
+				dbWriteTable( db , paste0( df , this.year , i ) , y )
 				
 				rm( y ) ; gc()
 				
@@ -116,7 +119,7 @@ for ( this.year in rev( years ) ){
 			
 		} else {	
 		
-			dbWriteTable( db , df , get( df ) )
+			dbWriteTable( db , paste0( df , this.year ) , get( df ) )
 		
 		}
 		
@@ -156,12 +159,13 @@ for ( this.year in rev( years ) ){
 					svrepdesign( 
 						weights = as.formula( paste( "~" , wgt ) )  , 
 						repweights = z , 
-						data = imputationList( datasets = as.list( paste0( df , 1:5 ) ) , dbtype = "SQLite" ) , 
+						data = imputationList( datasets = as.list( paste0( df , this.year , 1:5 ) ) , dbtype = "MonetDBLite" ) , 
 						type = "other" ,
 						combined.weights = TRUE , 
-						dbname = db.name
-					)
-					
+						dbtype = "MonetDBLite" ,
+						dbname = dbfolder
+					)					
+
 			} else {
 			
 				# otherwise, construct a
@@ -172,11 +176,11 @@ for ( this.year in rev( years ) ){
 					svrepdesign( 
 						weights = as.formula( paste( "~" , wgt ) )  , 
 						repweights = z , 
-						data = df , 
-						dbtype = "SQLite" ,
+						data = paste0( df , this.year ) , 
 						type = "other" ,
-						combined.weights = TRUE , 
-						dbname = db.name
+						combined.weights = TRUE ,
+						dbtype = "MonetDBLite" ,
+						dbname = dbfolder
 					)
 					
 			}
@@ -197,9 +201,6 @@ for ( this.year in rev( years ) ){
 		
 	}	
 
-	# close the connection to the sqlite database
-	dbDisconnect( db )
-
 }
 
 # the current working directory should now contain one r data file (.rda)
@@ -207,6 +208,5 @@ for ( this.year in rev( years ) ){
 # plus the original prefixed data.frame objects, all separated by year-specific folders.
 
 
-# print a reminder: set the directory you just saved everything to as read-only!
-message( paste0( "all done.  you should set the directory " , getwd() , " read-only so you don't accidentally alter these tables." ) )
-
+# close the connection to the sqlite database
+dbDisconnect( db )
