@@ -20,7 +20,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #########################################################################################################################################
-# prior to running this analysis script, the brfss 2011 single-year file must be loaded as a monet database-backed sqlsurvey object     #
+# prior to running this analysis script, the brfss 2011 single-year file must be loaded as a monet database-backed survey object        #
 # on the local machine. running the 1984-2011 download and create database script will create a monet database containing this file     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/asdfree/blob/master/Behavioral%20Risk%20Factor%20Surveillance%20System/download%20all%20microdata.R       #
@@ -120,7 +120,7 @@ dbGetQuery( db , "SELECT SUM( xllcpwt ) AS sum_weights FROM b2011" )
 # the adult non-institutionalized population of the united states #
 # by state
 dbGetQuery( db , "SELECT xstate , SUM( xllcpwt ) AS sum_weights FROM b2011 group by xstate" )
-# note: the above command is one example of how the r survey package differs from the r sqlsurvey package
+# note: the above command is one example of how the r survey package differs from the r survey package
 
 
 # calculate the mean of a linear variable #

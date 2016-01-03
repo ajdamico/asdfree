@@ -41,7 +41,7 @@
 # # # there are tradeoffs to this processing speed. # # #
 
 # # # strengths:
-# # # the survey package (only usable on data within memory) has a much more complete toolkit than the sqlsurvey package
+# # # the survey package (only usable on data within memory) has a much more complete toolkit than a few database-backed commands
 # # # data import (but not analysis) is often quicker and easier to troubleshoot
 # # # column types (categorical versus linear) are more fluid and faster to modify during analysis commands
 
@@ -56,7 +56,7 @@
 # # # the active working memory of your available hardware, then you have no choice
 # # # and you must use monetdb to analyze ipums-international with R.
 # # # but on the other hand, just because you can load your needed extracts into working memory
-# # # you might still benefit from using a monetdb-backed sqlsurvey design.
+# # # you might still benefit from using a monetdb-backed survey design.
 # # # monetdb-backed designs work much better interactively just because individual analysis commands run so much faster.  no waiting.
 
 # # # continue using this guide if you have chosen to load your extract directly into active working memory (ram) # # #

@@ -57,16 +57,11 @@
 options( scipen = 20 )
 
 
-# remove the # in order to run this install.packages line only once
-# install.packages( c( "RSQLite" , "mitools" , "plyr" , "survey" , "digest" ) )
-
-
-library(RSQLite) 	# load RSQLite package (creates database files in R)
-library(mitools)	# allows analysis of multiply-imputed survey data
-library(stringr) 	# load stringr package (manipulates character strings easily)
-library(plyr)		# contains the rbind.fill() function, which stacks two data frames even if they don't contain the same columns.  the rbind() function does not do this
-library(survey)		# load survey package (analyzes complex design surveys)
-library(downloader)	# downloads and then runs the source() function on scripts from github
+library(mitools)		# allows analysis of multiply-imputed survey data
+library(stringr) 		# load stringr package (manipulates character strings easily)
+library(plyr)			# contains the rbind.fill() function, which stacks two data frames even if they don't contain the same columns.  the rbind() function does not do this
+library(survey)			# load survey package (analyzes complex design surveys)
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
 # load two svyttest functions (one to conduct a df-adjusted t-test and one to conduct a multiply-imputed t-test)
@@ -79,9 +74,6 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Consumer%
 # set this number to the year you would like to analyze..
 year <- 2011
 
-# choose a database name to be saved in the year-specific working directory.  this defaults to 
-# "ces.fmly.####.db" but can be changed by replacing the paste() function with any character string ending in '.db'
-db.name <- paste( "ces.fmly" , year , "db" , sep = "." )
 
 # r will now take the year you've selected and re-assign the current working directory
 # to the year-specific folder based on what you'd set above
@@ -429,18 +421,12 @@ svyttest.df( fincbtxm ~ factor( bls_urbn ) , fmly.design , df = 45 )	# yes again
 # in table 5, the variable fincbtx5 will be saved as fincbtxmi
 # this pattern (of variables ending with 'mi') will be repeated for each of the multiply-imputed columns in the fmly data table
 
-# in order to conserve memory, these five tables will be stored in a sqlite database (.db) file on the local disk
-# the storage location can be specified by the user near the top of this script.  the current storage location is:
-paste( getwd() , db.name , sep = "/" )
-
 
 # once these five distinct data tables have been saved within the sqlite database (.db),
 # a new object class (an imputationList - type ?imputationList to read about it)
 # will be used to analyze anything involving multiply-imputed variables quickly
 
 
-# open the connection to a new sqlite database
-db <- dbConnect( SQLite() , db.name )
 
 # create a vector containing all of the multiply-imputed variables (leaving the numbers off the end)
 mi.vars <- 
@@ -472,7 +458,7 @@ for ( i in 1:5 ){
 	}
 	
 	# save the current table in the sqlite database as 'imp1' 'imp2' etc.
-	dbWriteTable( db , paste0( 'imp' , i ) , x )
+	assign( paste0( 'imp' , i ) , x )
 
 	# remove the temporary table
 	rm( x )
@@ -489,12 +475,13 @@ fmly.imp <-
 	svrepdesign( 
 		weights = ~finlwt21 , 
 		repweights = "wtrep[0-9]+" , 
-		data = imputationList( datasets = as.list( paste0( 'imp' , 1:5 ) ) , dbtype = "SQLite" ) , 
+		data = imputationList( list( imp1 , imp2 , imp3 , imp4 , imp5 ) ) , 
 		type = "BRR" ,
-		combined.weights = TRUE , 
-		dbname = db.name
+		combined.weights = TRUE
 	)
 
+rm( imp1 , imp2 , imp3 , imp4 , imp5 ) ; gc()
+	
 # this new fmly.imp can be used to do many of the same things as the fmly.design object
 # main advantage: allows analysis of multiply-imputed variables (like these:)
 mi.vars

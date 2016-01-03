@@ -120,7 +120,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # simply use the nrow function..
 nrow( pums.design )
 
-# ..on the sqlsurvey design object
+# ..on the survey design object
 class( pums.design )
 
 
@@ -160,7 +160,7 @@ dbGetQuery( db , "SELECT SUM( pweight ) AS sum_weights FROM pums_2000_5_m" )
 # the population of the united states #
 # by state
 dbGetQuery( db , "SELECT state , SUM( pweight ) AS sum_weights FROM pums_2000_5_m GROUP BY state ORDER BY state" )
-# note: the above command is one example of how the r survey package differs from the r sqlsurvey package
+# note: the above command is one example of how the r survey package differs from the r survey package
 
 
 # calculate the mean of a linear variable #
@@ -173,14 +173,7 @@ svyby( ~age , ~state , pums.design , svymean )
 
 
 # calculate the distribution of a categorical variable #
-
-# MARSTAT has been converted to a factor (categorical) variable
-# instead of a numeric (linear) variable,
-# because it only contains the values 1-5
-# when the pums.design object was created with the function sqlrepdesign()
-# the check.factors parameter was left at the default of ten,
-# meaning all numeric columns with ten or fewer distinct values
-# would be automatically converted to factors
+pums.design <- update( pums.design , marstat = factor( marstat ) )
 
 # percent married - nationwide
 svymean( ~marstat , pums.design )
@@ -241,7 +234,7 @@ write.csv( marital.status.by.sex , "marital status by sex.csv" )
 # here's male versus female percents now married
 # (excluding separated)
 percent.now.married <-
-	marital.status.by.sex[ , 1 ]
+	marital.status.by.sex[ , 2 ]
 
 
 # print the new results to the screen

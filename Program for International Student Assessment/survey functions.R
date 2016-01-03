@@ -1,8 +1,8 @@
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # functions related to sqlsurvey statistical analysis # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # functions related to survey statistical analysis  # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # combine five sqlrepsurvey designs
@@ -84,14 +84,14 @@ pisa.svyttest <-
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # functions related to sqlsurvey design creation  # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # functions related to survey design creation   # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-construct.pisa.sqlsurvey.designs <-
+construct.pisa.survey.designs <-
 	function( conn , year , table.name , pv.vars ){
 
 		# identify all variables that are multiply-imputed

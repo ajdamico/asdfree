@@ -32,10 +32,6 @@
 
 # # # # # choose whether to use monetdb or active working memory # # # # #
 
-# # # on my personal laptop, this mean of a linear variable -
-# system.time( svymean( ~ age , this_design , se = TRUE ) )
-# # # - requires about one second of processing with a monetdb-backed
-# # # survey design setup, but requires about 40 seconds when loaded in ram
 
 # # # there are tradeoffs to this processing speed. # # #
 
@@ -47,17 +43,15 @@
 # # # -- and never repeat the extract creation/download/import process for that census
 
 # # # weaknesses:
-# # # sqlsurvey package does not have complete toolkit available in survey package
-# # # sqlsurvey commands require slightly different syntax for users familiar with survey package
+# # # database-backed commands require slightly different syntax for users familiar with survey package
 # # # loading takes a long time (but you can go do something else)
-# # # column types (categorical versus linear) are guessed sloppily and irritating to change
 
 # # # if the ipums-international extract files that you need to analyze do not fit into
 # # # the active working memory of your available hardware, then you have no choice
 # # # and you must use monetdb to analyze ipums-international with R.
 # # # but on the other hand, just because you can load your needed extracts into working memory
-# # # you might still benefit from using a monetdb-backed sqlsurvey design.
-# # # monetdb-backed designs work much better interactively just because individual analysis commands run so much faster.  no waiting.
+# # # you might still benefit from using a monetdb-backed survey design.
+# # # monetdb-backed designs work much better interactively just because individual analysis commands run faster.  no waiting.
 
 # # # continue using this guide if you have chosen to use monetdb # # #
 
@@ -65,42 +59,17 @@
 # # # then follow the guide `download import design within memory.R` within this syntax directory instead
 
 
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################
-# prior to running this analysis script, monetdb must be installed on the local machine.  follow each step outlined on this page: #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/asdfree/blob/master/MonetDB/monetdb%20installation%20instructions.R                                 #
-###################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
 # # # # # # # # # # # # # # # #
 # warning: this takes a while #
 # # # # # # # # # # # # # # # #
 
+# remove the # in order to run this install.packages line only once
+# install.packages( c( "httr" , "XML" , "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) , repos = c( "http://dev.monetdb.org/Assets/R/" , "http://cran.rstudio.com/" ) )
 
-library(sqlsurvey)		# load sqlsurvey package (analyzes large complex design surveys)
+
+library(survey) 		# load survey package (analyzes complex design surveys)
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
@@ -113,10 +82,6 @@ library(R.utils)		# load the R.utils package (counts the number of lines in a fi
 
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/IPUMSI/" )
-
-
-# remove the # in order to run this install.packages line only once
-# install.packages( c( "httr" , "XML" ) )
 
 
 # load the download_ipumsi and related functions
@@ -156,115 +121,17 @@ tablename <- gsub( "\\.(.*)" , "" , csv_file_location )
 # tablename <- 'any_other_name'
 
 
-# create a monetdb executable (.bat) file for the ipums international
-batfile <-
-	monetdb.server.setup(
-					
-					# set the path to the directory where the initialization batch file and all data will be stored
-					database.directory = paste0( getwd() , "/MonetDB" ) ,
-					# must be empty or not exist
 
-					# find the main path to the monetdb installation program
-					monetdb.program.path = 
-						ifelse( 
-							.Platform$OS.type == "windows" , 
-							"C:/Program Files/MonetDB/MonetDB5" , 
-							"" 
-						) ,
-					# note: for windows, monetdb usually gets stored in the program files directory
-					# for other operating systems, it's usually part of the PATH and therefore can simply be left blank.
-										
-					# choose a database name
-					dbname = "ipumsi" ,
-					
-					# choose a database port
-					# this port should not conflict with other monetdb databases
-					# on your local computer.  two databases with the same port number
-					# cannot be accessed at the same time
-					dbport = 50015
-	)
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
 
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
-# this next step is so very important.
-
-# store a line of code that will make it easy to open up the monetdb server in the future.
-# this should contain the same file path as the batfile created above,
-# you're best bet is to actually look at your local disk to find the full filepath of the executable (.bat) file.
-# if you ran this script without changes, the batfile will get stored in C:\My Directory\IPUMSI\MonetDB\ipumsi.bat
-
-# here's the batfile location:
-batfile
-
-# note that since you only run the `monetdb.server.setup()` function the first time this script is run,
-# you will need to note the location of the batfile for future MonetDB analyses!
-
-# in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/IPUMSI/MonetDB/ipumsi.bat"		# # note for mac and *nix users: `ipumsi.bat` might be `ipumsi.sh` instead
-# obviously, without the `#` comment character
-
-# hold on to that line for future scripts.
-# you need to run this line *every time* you access
-# the ipums international files with monetdb.
-# this is the monetdb server.
-
-# two other things you need: the database name and the database port.
-# store them now for later in this script, but hold on to them for other scripts as well
-dbname <- "ipumsi"
-dbport <- 50015
-
-# now the local windows machine contains a new executable program at "c:\my directory\ipumsi\monetdb\ipumsi.bat"
-
-
-
-
-# it's recommended that after you've _created_ the monetdb server,
-# you create a block of code like the one below to _access_ the monetdb server
-
-
-#######################################################################
-# lines of code to hold on to for all other `ipumsi` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/IPUMSI/MonetDB/ipumsi.bat"		# # note for mac and *nix users: `ipumsi.bat` might be `ipumsi.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "ipumsi"
-dbport <- 50015
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `ipumsi` monetdb analyses #
-##############################################################################
-
-
-# re-initiate the same monetdb server
-monetdb.server.start( batfile )
-
-# re-connecto to the same monetdb server..
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# ..and store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 
 # decide whether column types should be character or numeric
-colTypes <- ifelse( csv_file_structure == 'character' , 'VARCHAR(255)' , 'DOUBLE PRECISION' )
+colTypes <- ifelse( csv_file_structure == 'character' , 'CLOB' , 'DOUBLE PRECISION' )
 
 # determine the column names from the csv file
 cn <- toupper( names( read.csv( csv_file_location , nrow = 1 ) ) )
@@ -314,21 +181,6 @@ dbtable_lines <- dbGetQuery( db , paste( 'SELECT COUNT(*) FROM' , tablename ) )[
 # because the csv file has headers
 stopifnot( csv_lines == dbtable_lines + 1 )
 
-# disconnect from the database
-dbDisconnect( db )
-
-# shut it down
-monetdb.server.stop( pid )
-
-# re-initiate the same monetdb server
-monetdb.server.start( batfile )
-
-# re-connecto to the same monetdb server
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# ..and store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
 
 # # # manual variable blanking # # #
 
@@ -337,7 +189,7 @@ pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet
 # let's blank out only one variable's missing values by hand:
 
 # # note that this is different from the "in memory" guide, where three variables were blanked.
-# # i recommend not blanking out *categorical* variable values in sqlsurvey designs,
+# # i recommend not blanking out *categorical* variable values in survey designs,
 # # because they can trigger finnickyness/bugs.  it is safer to only blank out linear variable missing values.
 
 # https://international.ipums.org/international-action/variables/INCWAGE#codes_section
@@ -382,33 +234,11 @@ for ( this_col in seq( vars_to_blank ) ){
 
 # # # end of manual variable blanking # # #
 
-# disconnect from the database
-dbDisconnect( db )
-
-# shut it down
-monetdb.server.stop( pid )
-
-# re-initiate the same monetdb server
-monetdb.server.start( batfile )
-
-# re-connecto to the same monetdb server..
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# ..and store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
 
 # add a column containing all ones to the current table
 dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column one int' ) )
 dbSendQuery( db , paste0( 'UPDATE ' , tablename , ' SET one = 1' ) )
 
-# add a column containing the record (row) number
-dbSendQuery( db , paste0( 'alter table ' , tablename , ' add column idkey int auto_increment' ) )
-
-
-# # # # figure out which variables should be treated as factors (categorical) and which should be treated as numeric (linear) # # # #
-# this is one of the drawbacks of sqlsurvey.  you must specify this information within the survey design object, not on the fly     #
-
-# this is one of the big drawbacks of monetdb-backed designs.  you cannot easily construct variables on the fly.
 
 # look at the columns available in your database..
 dbListFields( db , tablename )
@@ -416,59 +246,24 @@ dbListFields( db , tablename )
 # ..or look at the variable names and types from ipums
 cbind( cn , colTypes )
 
-# if you like, you can query individual columns to determine how many unique levels they have
-# for example, the `age` column should have approximately 100 distinct values because
-# human beings live to be about 100 years old.
-nrow( dbGetQuery( db , paste( "SELECT DISTINCT age FROM" , tablename ) ) )
-# since 100 distinct values is really a linear variable and not categorical,
-# it should *not* be included in the `these_factors` vector below.
-
-# similarly, you can look at the first five records in your table with
-dbGetQuery( db , paste( "SELECT * FROM" , tablename , "LIMIT 5" ) )
-
-# for my personal extract, i would say that these variables
-# are actually categorical variables, despite being stored as numbers
-these_factors <- c( 'rectype' , 'country' , 'sex' , 'empstat' , 'empstatd' )
-
-
-# # # alternative alternative alternative # # #
-# if you do not provide the `check.factors=` parameter (or if you provide a number)
-# then `sqlsurvey()` will check *every* variable to determine whether each variable has
-# at least x distinct number of levels (x defaults to 10),
-# and if the column does have >= x distinct levels, then the column will be stored as numeric.
-# allowing `sqlsurvey` to calculate this on its own might take some time,
-# but you can go do something else while you wait.
-
-# it is more computationally-intensive to let sqlsurvey guess which variables are categorical and which are numeric,
-# but it takes more of your personal time to provide the `these_factors` object yourself.  so whose time is more valuable?
-
-
 
 # # # construct your monetdb-backed complex sample survey design object # # #
 
-# create a sqlsurvey complex sample design object
-this_sqlsurvey_design <-
-	sqlsurvey(
-		weight = "perwt" ,									# weight variable column
+# create a survey complex sample design object
+this_db_design <-
+	svydesign(
+		weight = ~perwt ,									# weight variable column
 		nest = TRUE ,										# whether or not psus are nested within strata
-		strata = "strata" ,									# stratification variable column
-		id = "serial_" ,									# household clustering column same as "serial"
-		table.name = tablename ,							# table name within the monet database
-		key = "idkey" ,										# sql primary key column (created with the auto_increment line above)
-		
-		check.factors = these_factors ,						# character vector containing all factor columns for this extract
-															# remember that the `check.factors=` parameter is optional
-															# but failing to provide it will make this entire command take much longer
-															# since the server needs to manually check whether or not each column has
-															# at least 10 distinct levels or not.
-															
-		database = monet.url ,								# monet database location on localhost
-		driver = MonetDB.R()
+		strata = ~strata ,									# stratification variable column
+		id = ~serial_ ,										# household clustering column same as "serial"
+		data = tablename ,									# table name within the monet database
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
 	)
 
 
-# run your first sqlsurvey-based mean of a linear variable.
-svymean( ~ age , this_sqlsurvey_design , se = TRUE )
+# run your first mean of a linear variable.
+svymean( ~ age , this_db_design )
 # voila!
 
 # you now have a
@@ -480,9 +275,7 @@ svymean( ~ age , this_sqlsurvey_design , se = TRUE )
 # save the survey design object
 # into a single r data file (.rda) that can now be
 # analyzed quicker than anything else.
-save( this_sqlsurvey_design , these_factors , file = 'sqlsurvey design in monetdb.rda' )
-# be sure to save the `these_factors` vector as well,
-# just in case you do any recoding in the future
+save( this_db_design , file = 'survey design in monetdb.rda' )
 
 
 # set every table you've just created as read-only inside the database.
@@ -492,5 +285,3 @@ for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" 
 # disconnect from the database
 dbDisconnect( db )
 
-# shut it down
-monetdb.server.stop( pid )

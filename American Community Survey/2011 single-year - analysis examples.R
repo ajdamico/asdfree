@@ -110,7 +110,7 @@ dbGetQuery( db , "SELECT SUM( pwgtp ) AS sum_weights FROM acs2011_1yr_m" )
 # the population of the united states #
 # by state
 svytotal( ~one , acs.m , byvar = ~st )
-# note: the above command is one example of how the r survey package differs from the r sqlsurvey package
+# note: the above command is one example of how the r survey package differs from the r survey package
 
 
 # calculate the mean of a linear variable #

@@ -35,7 +35,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "readxl" , "stringr" , "reshape2" , "XML" , "downloader" ) )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "sqldf" , "survey" , "SAScii" , "descr" , "mitools" , "plyr" , "downloader" , "digest" , "readxl" , "stringr" , "reshape2" , "XML" , "R.utils" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
 library(foreign) 	# load foreign package (converts data files into R)
@@ -199,7 +199,3 @@ for ( year in years.to.download ){
 		}
 	}
 }
-
-
-# print a reminder: set the directory you just saved everything to as read-only!
-message( paste( "all done.  you should set" , getwd() , "read-only so you don't accidentally alter these files." ) )
