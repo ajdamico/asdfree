@@ -381,7 +381,7 @@ pes.design <-
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = ~v0011 ,					# stratification variable column (defined in the character string)
 		id = ~v0300 ,						# sampling unit column (defined in the character string)
-		fpc = ~dom_fpc ,					# within-data pre-computed finite population correction, also for the household
+		fpc = ~pes_fpc ,					# within-data pre-computed finite population correction, also for the household
 		data = 'c10' ,						# table name within the monet database (defined in the character string)
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
@@ -701,7 +701,7 @@ pes.design <-
 		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = ~areap ,					# stratification variable column (defined in the character string)
 		id = ~v0300 ,						# sampling unit column (defined in the character string)
-		fpc = ~dom_fpc ,					# within-data pre-computed finite population correction, also for the household
+		fpc = ~pes_fpc ,					# within-data pre-computed finite population correction, also for the household
 		data = 'c00' ,						# table name within the monet database (defined in the character string)
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
