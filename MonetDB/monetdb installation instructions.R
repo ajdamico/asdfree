@@ -1,3 +1,8 @@
+
+
+stop( "these instructions are obsolete.  instead, use https://www.monetdb.org/blog/monetdblite-r" )
+
+
 # some asdfree scripts use a superfast (completely free) database program called monetdb.
 # here's how to install and configure it to work with r in two steps.
 

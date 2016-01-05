@@ -1,3 +1,8 @@
+
+
+stop( "these instructions are obsolete.  instead, use https://www.monetdb.org/blog/monetdblite-r" )
+
+
 # # # # # # # # # # # # # # #
 # warning: monetdb required #
 # # # # # # # # # # # # # # #
