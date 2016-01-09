@@ -183,8 +183,11 @@ svyquantile( ~v6033 , pes.d , c( 0.5 , 0.99 ) )
 # subsetting example #
 ######################
 
+# warning: subsetting is slow on large, linearized designs #
+
 # restrict the pes.d object to females only
-pes.d.female <- subset( pes.d , v0601 == 2 )
+# uncomment the line below by removing the `#` in front of it
+# pes.d.female <- subset( pes.d , v0601 == 2 )
 
 # now any of the above commands can be re-run
 # using the pes.d.female object
@@ -194,7 +197,8 @@ pes.d.female <- subset( pes.d , v0601 == 2 )
 # calculate the distribution of a categorical variable #
 
 # marital status distribution - nationwide, restricted to females
-svymean( ~v0640 , pes.d.female )
+# uncomment the line below by removing the `#` in front of it
+# svymean( ~v0640 , pes.d.female )
 
 
 ###################
