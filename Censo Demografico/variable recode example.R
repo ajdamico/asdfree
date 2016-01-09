@@ -29,7 +29,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/download%20and%20import.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "dom 2010 design.rda" in C:/My Directory/CENSO or wherever.              #
+# that script will create a file "pes 2010 design.rda" in C:/My Directory/CENSO or wherever.              #
 ###########################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -72,11 +72,11 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # uncomment this line by removing the `#` at the front..
-load( "dom 2010 design.rda" )
+load( "pes 2010 design.rda" )
 
 
 # connect the recoded complex sample design to the monet database #
-dom.d <- open( dom.design , driver = MonetDB.R() )	# recoded
+pes.d <- open( pes.design , driver = MonetDB.R() )	# recoded
 
 
 ################################################################
@@ -92,25 +92,24 @@ dom.d <- open( dom.design , driver = MonetDB.R() )	# recoded
 # step 2: make all of your recodes at once #
 
 # add new columns for each poverty line
-dom.d <-
+pes.d <-
 	update(
-		dom.d ,
+		pes.d ,
 		nmorpob1 = 1 * ( v6531 < 70 ) , 
 		nmorpob2 = 1 * ( v6531 < 80 ) , 
 		nmorpob3 = 1 * ( v6531 < 90 ) , 
 		nmorpob4 = 1 * ( v6531 < 100 ) , 
 		nmorpob5 = 1 * ( v6531 < 140 ) , 
-		nmorpob6 = 1 * ( v6531 < 272.50 ) , 
-		mult_nmorpob1 = nmorpob1 * dom_count_pes 
+		nmorpob6 = 1 * ( v6531 < 272.50 ) 
 	)
 
 # ..and now you can calculate poverty rates many different ways
 # with syntax from the R survey package
-svytotal( ~ nmorpob1 + nmorpob2 + nmorpob3 + nmorpob4 + nmorpob5 + nmorpob6 + dom_count_pes , dom.d , na.rm = TRUE )
+svytotal( ~ nmorpob1 + nmorpob2 + nmorpob3 + nmorpob4 + nmorpob5 + nmorpob6 , pes.d , na.rm = TRUE )
 
 
 # by state  #
-wtd.pcts.by.state <- svyby( ~ nmorpob1 , ~v0001 , dom.d , svymean , na.rm = TRUE )
+wtd.pcts.by.state <- svyby( ~ nmorpob1 , ~v0001 , pes.d , svymean , na.rm = TRUE )
 
 # print these results to the screen
 wtd.pcts.by.state
@@ -126,7 +125,7 @@ estado.names <- c( "Rondonia" , "Acre" , "Amazonas" , "Roraima" , "Para" , "Amap
 
 # plot the percentage of households below 70 by state
 barplot(
-	wtd.pcts.by.state$pct_below_70 ,
+	coef( wtd.pcts.by.state ) ,
 	main = "Percent of People in Households With PCI Below 70" ,
 	names.arg = estado.names ,
 	ylim = c( 0 , .25 ) ,
@@ -154,37 +153,6 @@ legend(
 	fill = c( "lightgreen" , "sandybrown" , "palevioletred" , "plum" , "khaki" ) 
 )
 
-
-# plot the percentage of households below 272.5 by state
-barplot(
-	wtd.pcts.by.state$pct_below_272p5 ,
-	main = "Percent of People in Households With PCI Below 272.50" ,
-	names.arg = estado.names ,
-	ylim = c( 0 , .6 ) ,
-	cex.names = 0.7 ,
-	col = c( rep( "lightgreen" , 7 ) , rep( "sandybrown" , 9 ) , rep( "palevioletred" , 4 ) , rep( "plum" , 3 ) , rep( "khaki" , 4 ) ) ,
-	las = 2 ,
-	# do not print the y axis at first
-	yaxt = "n"
-)
-
-# add the y axis..
-axis( 
-	side = 2 , 
-	# from 0 to 0.6, with tick marks every 0.1
-	at = seq( 0 , .6 , .1 ) , 
-	# saying 0%, 5% ..etc.. up to 25%
-	labels = paste0( seq( 0 , 60 , 10 ) , "%" ) , 
-	# turn the numbers rightside-up
-	las = 2 
-)
-
-legend( 
-	"topright" , 
-	c( "North" , "Northeast" , "Southeast" , "South" , "Midwest") , 
-	fill = c( "lightgreen" , "sandybrown" , "palevioletred" , "plum" , "khaki" ) 
-)
-
 # # # # # # # # # # # # # #
 # end of export examples  #
 # # # # # # # # # # # # # #
@@ -196,15 +164,15 @@ legend(
 # # # # # # # # # # # # # # #
 
 # calculate both the numerator and denominator of poverty
-svyratio( ~ mult_nmorpob1  , ~ dom_count_pes , dom.d , na.rm = TRUE )
+svyratio( ~ nmorpob1 , ~ one , pes.d , na.rm = TRUE )
 
 # by state
-svyby( ~ mult_nmorpob1  , denominator = ~ dom_count_pes , by = ~v0001 , design = dom.d , FUN = svyratio , na.rm = TRUE )
+svyby( ~ nmorpob1 , denominator = ~ one , by = ~v0001 , design = pes.d , FUN = svyratio , na.rm = TRUE )
 
 # finito.
 
 # close all connections to the sqlsurvey design object
-close( dom.design , dom.d )
+close( pes.design , pes.d )
 
 
 # disconnect from the current monet database
