@@ -354,28 +354,27 @@ stopifnot(
 #################################################
 # create a complex sample design object
 
-# uncomment this `svydesign` and the `save` line further below to save a
-# household-representative design of the 2010 censo
-# warning: this command requires approximately 12 hours of processing time!
+# save a household-representative design of the 2010 censo
+# warning: this command requires approximately 10 hours of processing time!
 # so leave your computer on overnight.
 
-# dom.design <-
-	# svydesign(
-		# weight = ~dom_wgt ,					# weight variable column (defined in the character string)
-		# nest = TRUE ,							# whether or not psus are nested within strata
-		# strata = ~v0011 ,						# stratification variable column (defined in the character string)
-		# id = ~v0300 ,							# sampling unit column (defined in the character string)
-		# fpc = ~dom_fpc ,						# within-data pre-computed finite population correction for the household
-		# data = 'c10_dom' ,					# table name within the monet database (defined in the character string)
-		# dbtype = "MonetDBLite" ,
-		# dbname = dbfolder
-	# )
+dom.design <-
+	svydesign(
+		weight = ~dom_wgt ,					# weight variable column (defined in the character string)
+		nest = TRUE ,						# whether or not psus are nested within strata
+		strata = ~v0011 ,					# stratification variable column (defined in the character string)
+		id = ~v0300 ,						# sampling unit column (defined in the character string)
+		fpc = ~dom_fpc ,					# within-data pre-computed finite population correction for the household
+		data = 'c10_dom' ,					# table name within the monet database (defined in the character string)
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
+	)
 
 # save the complex sample survey design
 # into a single r data file (.rda) that can now be
 # analyzed quicker than anything else.
 
-# save( dom.design , file = 'dom 2010 design.rda' )
+save( dom.design , file = 'dom 2010 design.rda' )
 
 
 
@@ -384,7 +383,7 @@ stopifnot(
 # create a complex sample design object
 
 # save a person-representative design of the 2010 censo
-# warning: this command requires approximately 12 hours of processing time!
+# warning: this command requires approximately 10 hours of processing time!
 # so leave your computer on overnight.
 
 pes.design <-
@@ -688,7 +687,7 @@ stopifnot(
 
 # uncomment this `svydesign` and the `save` line further below to save a
 # household-representative design of the 2000 censo
-# warning: this command requires approximately 12 hours of processing time!
+# warning: this command requires approximately 10 hours of processing time!
 # so leave your computer on overnight.
 
 # dom.design <-
@@ -718,7 +717,7 @@ stopifnot(
 
 # uncomment this `svydesign` and the `save` line further below to save a
 # person-representative design of the 2000 censo
-# warning: this command requires approximately 12 hours of processing time!
+# warning: this command requires approximately 10 hours of processing time!
 # so leave your computer on overnight.
 
 # pes.design <-
@@ -745,7 +744,7 @@ stopifnot(
 
 # uncomment this `svydesign` and the `save` line further below to save a
 # family-representative design of the 2000 censo
-# warning: this command requires approximately 12 hours of processing time!
+# warning: this command requires approximately 10 hours of processing time!
 # so leave your computer on overnight.
 
 # fam.design <-

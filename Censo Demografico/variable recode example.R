@@ -29,7 +29,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://raw.githubusercontent.com/ajdamico/asdfree/master/Censo%20Demografico/download%20and%20import.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "pes 2010 design.rda" in C:/My Directory/CENSO or wherever.              #
+# that script will create a file "dom 2010 design.rda" in C:/My Directory/CENSO or wherever.              #
 ###########################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -87,20 +87,9 @@ dom.d <- open( dom.design , driver = MonetDB.R() )	# recoded
 # db <- dbConnect( MonetDBLite() , dbfolder )
 # has already connected the current instance of r to the monet database
 
-# now simply copy you'd like to recode into a new table
-dbSendQuery( db , "CREATE TABLE recoded_c10_dom AS SELECT * FROM c10_dom WITH DATA" )
-# this action protects the original 'c10_dom' table from any accidental errors.
-# at any point, we can delete this recoded copy of the data table using the command..
-# dbRemoveTable( db , "recoded_c10_dom" )
-# ..and start fresh by re-copying the pristine file from c10_dom
-
-
 
 ############################################
 # step 2: make all of your recodes at once #
-
-# from this point forward, all commands will only touch the
-# 'recoded_c10_dom' table.  the 'c10_dom' is now off-limits.
 
 # add new columns for each poverty line
 dom.d <-
@@ -115,17 +104,13 @@ dom.d <-
 		mult_nmorpob1 = nmorpob1 * dom_count_pes 
 	)
 
-
-# remove anyone with missing poverty levels
-valid.dom <- subset( dom.d , v6531 >= 0 )
-
 # ..and now you can calculate poverty rates many different ways
 # with syntax from the R survey package
-svytotal( ~ nmorpob1 + nmorpob2 + nmorpob3 + nmorpob4 + nmorpob5 + nmorpob6 + dom_count_pes , valid.dom )
+svytotal( ~ nmorpob1 + nmorpob2 + nmorpob3 + nmorpob4 + nmorpob5 + nmorpob6 + dom_count_pes , dom.d , na.rm = TRUE )
 
 
 # by state  #
-wtd.pcts.by.state <- svyby( ~ nmorpob1 , ~v0001 , valid.dom , svymean )
+wtd.pcts.by.state <- svyby( ~ nmorpob1 , ~v0001 , dom.d , svymean , na.rm = TRUE )
 
 # print these results to the screen
 wtd.pcts.by.state
@@ -211,17 +196,16 @@ legend(
 # # # # # # # # # # # # # # #
 
 # calculate both the numerator and denominator of poverty
-svyratio( ~ mult_nmorpob1  , ~ dom_count_pes , valid.dom )
+svyratio( ~ mult_nmorpob1  , ~ dom_count_pes , dom.d , na.rm = TRUE )
 
 # by state
-svyby( ~ mult_nmorpob1  , denominator = ~ dom_count_pes , by = ~v0001 , design = valid.dom , FUN = svyratio )
+svyby( ~ mult_nmorpob1  , denominator = ~ dom_count_pes , by = ~v0001 , design = dom.d , FUN = svyratio , na.rm = TRUE )
 
 # finito.
 
 # close all connections to the sqlsurvey design object
-close( dom.design , dom.d , valid.dom )
+close( dom.design , dom.d )
 
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
