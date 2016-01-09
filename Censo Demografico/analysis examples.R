@@ -141,17 +141,13 @@ dbGetQuery( db , "SELECT v0001 , SUM( pes_wgt ) AS sum_weights FROM c10 group by
 
 # calculate the mean of a linear variable #
 
-# note that the age variable `v6033` contains missings
-# values above 900 should be excluded from the results.
-
-
 # average age - nationwide, three ways #
 
 # using a direct sql query:
 dbGetQuery( db , 'SELECT SUM( pes_wgt * v6033 ) / SUM( pes_wgt ) AS mean_age FROM c10 WHERE v6033 < 900' )
 
 # using syntax that matches the R survey package:
-svymean( ~v6033 , subset( pes.d , v6033 < 900 ) )
+svymean( ~v6033 , pes.d , na.rm = TRUE )
 
 
 # average age - by state, three ways #
@@ -159,8 +155,8 @@ svymean( ~v6033 , subset( pes.d , v6033 < 900 ) )
 # using a direct sql query:
 dbGetQuery( db , 'SELECT v0001 , SUM( pes_wgt * v6033 ) / SUM( pes_wgt ) AS mean_age FROM c10 WHERE v6033 < 900 GROUP BY v0001 ORDER BY v0001' )
 
-# using syntax similar to (but not exactly the same as) the R survey pacakge
-svyby( ~v6033 , ~v0001 , subset( pes.d , v6033 < 900 ) , svymean )
+# using syntax similar to (but not exactly the same as) the R survey package
+svyby( ~v6033 , ~v0001 , pes.d , svymean , na.rm = TRUE )
 
 
 # calculate the distribution of a categorical variable #
@@ -179,7 +175,7 @@ svyby( ~v0640 , ~v0001 , pes.d , svymean )
 # calculate the median and other percentiles #
 
 # median age of all brazilians
-svyquantile( ~v6033 , subset( pes.d , v6033 < 900 ) , c( 0.5 , 0.99 ) )
+svyquantile( ~v6033 , pes.d , c( 0.5 , 0.99 ) )
 # note: quantile standard errors cannot be computed with taylor-series linearization designs
 
 
