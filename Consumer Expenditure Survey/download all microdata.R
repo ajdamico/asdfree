@@ -48,6 +48,7 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Poverty/s
 names( all_thresholds ) <- gsub( "year" , "this_year" , names( all_thresholds ) )
 
 # figure out which years are available to download
+Sys.setlocale('LC_ALL','C') 
 years.to.download <-
 	unique( 
 		gsub( 
@@ -55,7 +56,7 @@ years.to.download <-
 			"\\2" , 
 			grep( 
 				"/pumd_([0-9][0-9][0-9][0-9]).htm" , 
-				readLines( "http://www.bls.gov/cex/pumdhome.htm" ) , 
+				readLines( "http://www.bls.gov/cex/pumdhome.htm", warn=FALSE) , 
 				value = TRUE 
 			) 
 		) 
