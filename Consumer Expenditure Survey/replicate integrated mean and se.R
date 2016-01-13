@@ -478,6 +478,9 @@ expend <- expend[ order( expend$newid ) , ]
 # note: merging the family and expenditure files will overload RAM on smaller machines
 # therefore, the following database (db) commands use sql to avoid memory issues
 
+# clean up database folder in case someone left one around
+unlink( dbfolder , recursive = TRUE )
+
 # create a new connection to the temporary database file (defined above)
 db <- dbConnect( MonetDBLite() , dbfolder )
 
@@ -573,7 +576,8 @@ aggright <-
 dbDisconnect( db )
 
 # delete that temporary database file from the local disk
-unlink( dbfolder , recursive = TRUE )
+# TODO: shutdown MonetDBLite here
+# unlink( dbfolder , recursive = TRUE )
 
 # create three character vectors containing every combination of..
 
