@@ -362,7 +362,6 @@ stopifnot(
 # dom.design <-
 	# svydesign(
 		# weight = ~dom_wgt ,					# weight variable column (defined in the character string)
-		# nest = TRUE ,						# whether or not psus are nested within strata
 		# strata = ~v0011 ,					# stratification variable column (defined in the character string)
 		# id = ~v0300 ,						# sampling unit column (defined in the character string)
 		# fpc = ~dom_fpc ,					# within-data pre-computed finite population correction for the household
@@ -390,7 +389,6 @@ stopifnot(
 pes.design <-
 	svydesign(
 		weight = ~pes_wgt ,					# weight variable column (defined in the character string)
-		nest = TRUE ,						# whether or not psus are nested within strata
 		strata = ~v0011 ,					# stratification variable column (defined in the character string)
 		id = ~v0300 ,						# sampling unit column (defined in the character string)
 		fpc = ~pes_fpc ,					# within-data pre-computed finite population correction, also for the household
@@ -694,7 +692,6 @@ stopifnot(
 # dom.design <-
 	# svydesign(
 		# weight = ~dom_wgt ,					# weight variable column (defined in the character string)
-		# nest = TRUE ,							# whether or not psus are nested within strata
 		# strata = ~areap ,						# stratification variable column (defined in the character string)
 		# id = ~v0300 ,							# sampling unit column (defined in the character string)
 		# fpc = ~dom_fpc ,						# within-data pre-computed finite population correction for the household
@@ -724,7 +721,6 @@ stopifnot(
 # pes.design <-
 	# svydesign(
 		# weight = ~pes_wgt ,					# weight variable column (defined in the character string)
-		# nest = TRUE ,							# whether or not psus are nested within strata
 		# strata = ~areap ,						# stratification variable column (defined in the character string)
 		# id = ~v0300 ,							# sampling unit column (defined in the character string)
 		# fpc = ~pes_fpc ,						# within-data pre-computed finite population correction, also for the household
