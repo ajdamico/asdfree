@@ -147,7 +147,7 @@ dbGetQuery( db , "SELECT v0001 , SUM( pes_wgt ) AS sum_weights FROM c10 group by
 dbGetQuery( db , 'SELECT SUM( pes_wgt * v6033 ) / SUM( pes_wgt ) AS mean_age FROM c10 WHERE v6033 < 900' )
 
 # using syntax that matches the R survey package:
-svymean( ~v6033 , pes.d , na.rm = TRUE )
+svymean( ~v6033 , subset( pes.d , v6033 < 900 ) , na.rm = TRUE )
 
 
 # average age - by state, three ways #
@@ -156,7 +156,7 @@ svymean( ~v6033 , pes.d , na.rm = TRUE )
 dbGetQuery( db , 'SELECT v0001 , SUM( pes_wgt * v6033 ) / SUM( pes_wgt ) AS mean_age FROM c10 WHERE v6033 < 900 GROUP BY v0001 ORDER BY v0001' )
 
 # using syntax similar to (but not exactly the same as) the R survey package
-svyby( ~v6033 , ~v0001 , pes.d , svymean , na.rm = TRUE )
+svyby( ~v6033 , ~v0001 , subset( pes.d , v6033 < 900 ) , svymean , na.rm = TRUE )
 
 
 # calculate the distribution of a categorical variable #
@@ -175,7 +175,7 @@ svyby( ~v0640 , ~v0001 , pes.d , svymean )
 # calculate the median and other percentiles #
 
 # median age of all brazilians
-svyquantile( ~v6033 , pes.d , c( 0.5 , 0.99 ) )
+svyquantile( ~v6033 , subset( pes.d , v6033 < 900 ) , c( 0.5 , 0.99 ) )
 # note: quantile standard errors cannot be computed with taylor-series linearization designs
 
 
@@ -183,11 +183,8 @@ svyquantile( ~v6033 , pes.d , c( 0.5 , 0.99 ) )
 # subsetting example #
 ######################
 
-# warning: subsetting is slow on large, linearized designs #
-
 # restrict the pes.d object to females only
-# uncomment the line below by removing the `#` in front of it
-# pes.d.female <- subset( pes.d , v0601 == 2 )
+pes.d.female <- subset( pes.d , v0601 == 2 )
 
 # now any of the above commands can be re-run
 # using the pes.d.female object
@@ -197,8 +194,7 @@ svyquantile( ~v6033 , pes.d , c( 0.5 , 0.99 ) )
 # calculate the distribution of a categorical variable #
 
 # marital status distribution - nationwide, restricted to females
-# uncomment the line below by removing the `#` in front of it
-# svymean( ~v0640 , pes.d.female )
+svymean( ~v0640 , pes.d.female )
 
 
 ###################

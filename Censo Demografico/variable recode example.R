@@ -105,11 +105,11 @@ pes.d <-
 
 # ..and now you can calculate poverty rates many different ways
 # with syntax from the R survey package
-svytotal( ~ nmorpob1 + nmorpob2 + nmorpob3 + nmorpob4 + nmorpob5 + nmorpob6 , pes.d , na.rm = TRUE )
+svytotal( ~ nmorpob1 + nmorpob2 + nmorpob3 + nmorpob4 + nmorpob5 + nmorpob6 , subset( pes.d , v6531 >= 0 ) , na.rm = TRUE )
 
 
 # by state  #
-wtd.pcts.by.state <- svyby( ~ nmorpob1 , ~v0001 , pes.d , svymean , na.rm = TRUE )
+wtd.pcts.by.state <- svyby( ~ nmorpob1 , ~v0001 , subset( pes.d , v6531 >= 0 ) , svymean , na.rm = TRUE )
 
 # print these results to the screen
 wtd.pcts.by.state
@@ -164,10 +164,10 @@ legend(
 # # # # # # # # # # # # # # #
 
 # calculate both the numerator and denominator of poverty
-svyratio( ~ nmorpob1 , ~ one , pes.d , na.rm = TRUE )
+svyratio( ~ nmorpob1 , ~ one , subset( pes.d , v6531 >= 0 ) , na.rm = TRUE )
 
 # by state
-svyby( ~ nmorpob1 , denominator = ~ one , by = ~v0001 , design = pes.d , FUN = svyratio , na.rm = TRUE )
+svyby( ~ nmorpob1 , denominator = ~ one , by = ~v0001 , design = subset( pes.d , v6531 >= 0 ) , FUN = svyratio , na.rm = TRUE )
 
 # finito.
 
