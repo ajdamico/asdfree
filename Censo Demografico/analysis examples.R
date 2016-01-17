@@ -161,10 +161,10 @@ svyby( ~v6033 , ~v0001 , subset( pes.d , v6033 < 900 ) , svymean , na.rm = TRUE 
 # it was included in the check.factors= argument of the function sqlsurvey()
 
 # marital status distribution - nationwide
-svymean( ~v0640 , pes.d )
+svymean( ~v0640 , pes.d , na.rm = TRUE )
 
 # marital status distribution - by state
-svyby( ~v0640 , ~v0001 , pes.d , svymean )
+svyby( ~v0640 , ~v0001 , pes.design , svymean , na.rm = TRUE )
 
 
 # calculate the median and other percentiles #
@@ -189,7 +189,7 @@ pes.d.female <- subset( pes.d , v0601 == 2 )
 # calculate the distribution of a categorical variable #
 
 # marital status distribution - nationwide, restricted to females
-svymean( ~v0640 , pes.d.female )
+svymean( ~v0640 , pes.d.female , na.rm = TRUE )
 
 
 ###################
@@ -201,7 +201,7 @@ svymean( ~v0640 , pes.d.female )
 
 # store the results into a new object
 
-marital.status.by.urbanrural <- svyby( ~v0640 , ~v1006 , pes.d , svymean )
+marital.status.by.urbanrural <- svyby( ~v0640 , ~v1006 , pes.d , svymean , na.rm = TRUE )
 
 
 # print the results to the screen 
