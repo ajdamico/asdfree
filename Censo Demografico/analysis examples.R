@@ -43,11 +43,6 @@ library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
-# remove certainty units
-options( survey.lonely.psu = "remove" )
-# for more detail, see
-# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
-
 # after running the r script above, users should have handy a few lines
 # to initiate and connect to the monet database.  run them now.  mine look like this:
 

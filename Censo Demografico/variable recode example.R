@@ -43,12 +43,6 @@ library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
-# remove certainty units
-options( survey.lonely.psu = "remove" )
-# for more detail, see
-# http://r-survey.r-forge.r-project.org/survey/exmample-lonely.html
-
-
 # the censo demografico download and importation script
 # has already created a monet database-backed survey design object
 # connected to the 2010 household-level table
