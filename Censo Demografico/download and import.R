@@ -386,13 +386,21 @@ stopifnot(
 # warning: this command requires approximately 10 hours of processing time!
 # so leave your computer on overnight.
 
+bw <- 
+	bootweights( 
+		dbGetQuery( db , "SELECT v0011 FROM c10" )[ , 1 ] ,
+		dbGetQuery( db , "SELECT v0300 FROM c10" )[ , 1 ] ,
+		fpc = dbGetQuery( db , "SELECT pes_fpc FROM c10" )[ , 1 ]
+	)
+
 pes.design <-
-	svydesign(
-		weight = ~pes_wgt ,					# weight variable column (defined in the character string)
-		strata = ~v0011 ,					# stratification variable column (defined in the character string)
-		id = ~v0300 ,						# sampling unit column (defined in the character string)
-		fpc = ~pes_fpc ,					# within-data pre-computed finite population correction, also for the household
-		data = 'c10' ,						# table name within the monet database (defined in the character string)
+	svrepdesign(
+		weight = ~pes_wgt ,
+		repweights = bw$repweights ,
+		combined.weights = FALSE ,
+		scale = bw$scale ,
+		scales = bw$scales ,
+		data = 'c10' ,
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
 	)
