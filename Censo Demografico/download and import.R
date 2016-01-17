@@ -354,39 +354,48 @@ stopifnot(
 #################################################
 # create a complex sample design object
 
-# uncomment this `svydesign` and the `save` line further below to save a
-# household-representative design of the 2010 censo
-# warning: this command requires approximately 10 hours of processing time!
-# so leave your computer on overnight.
+# save a person-representative design of the 2010 censo
+# warning: this command requires a long time, leave your computer on overnight.
 
-# dom.design <-
-	# svydesign(
-		# weight = ~dom_wgt ,					# weight variable column (defined in the character string)
-		# strata = ~v0011 ,					# stratification variable column (defined in the character string)
-		# id = ~v0300 ,						# sampling unit column (defined in the character string)
-		# fpc = ~dom_fpc ,					# within-data pre-computed finite population correction for the household
-		# data = 'c10_dom' ,					# table name within the monet database (defined in the character string)
-		# dbtype = "MonetDBLite" ,
-		# dbname = dbfolder
-	# )
+bw_dom_10 <- 
+	bootweights( 
+		dbGetQuery( db , "SELECT v0011 FROM c10_dom" )[ , 1 ] ,
+		dbGetQuery( db , "SELECT v0300 FROM c10_dom" )[ , 1 ] ,
+		fpc = dbGetQuery( db , "SELECT dom_fpc FROM c10_dom" )[ , 1 ]
+	)
+
+dom.design <-
+	svrepdesign(
+		weight = ~dom_wgt ,
+		repweights = bw_dom_10$repweights ,
+		combined.weights = FALSE ,
+		scale = bw_dom_10$scale ,
+		rscales = bw_dom_10$rscales ,
+		data = 'c10_dom' ,
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
+	)
 
 # save the complex sample survey design
 # into a single r data file (.rda) that can now be
 # analyzed quicker than anything else.
+save( dom.design , file = 'dom 2010 design.rda' )
 
-# save( dom.design , file = 'dom 2010 design.rda' )
 
+# close the connection
+close( dom.design )
 
+# remove these two objects from memory
+rm( dom.design , bw_dom_10 )
 
 
 #################################################
 # create a complex sample design object
 
 # save a person-representative design of the 2010 censo
-# warning: this command requires approximately 10 hours of processing time!
-# so leave your computer on overnight.
+# warning: this command requires a long time, leave your computer on overnight.
 
-bw <- 
+bw_pes_10 <- 
 	bootweights( 
 		dbGetQuery( db , "SELECT v0011 FROM c10" )[ , 1 ] ,
 		dbGetQuery( db , "SELECT v0300 FROM c10" )[ , 1 ] ,
@@ -396,10 +405,10 @@ bw <-
 pes.design <-
 	svrepdesign(
 		weight = ~pes_wgt ,
-		repweights = bw$repweights ,
+		repweights = bw_pes_10$repweights ,
 		combined.weights = FALSE ,
-		scale = bw$scale ,
-		scales = bw$scales ,
+		scale = bw_pes_10$scale ,
+		rscales = bw_pes_10$rscales ,
 		data = 'c10' ,
 		dbtype = "MonetDBLite" ,
 		dbname = dbfolder
@@ -410,13 +419,12 @@ pes.design <-
 # analyzed quicker than anything else.
 save( pes.design , file = 'pes 2010 design.rda' )
 
-
-# close the connection to the two sqlsurvey design objects
-# close( dom.design )
+# close the connection
 close( pes.design )
 
 # remove these two objects from memory
-rm( dom.design , pes.design )
+rm( pes.design , bw_pes_10 )
+
 
 # clear up RAM
 gc()
@@ -689,95 +697,121 @@ stopifnot(
 	dbGetQuery( db , "select count(*) as count from c00" )
 )
 
-#################################################
-# create a complex sample design object
-
-# uncomment this `svydesign` and the `save` line further below to save a
-# household-representative design of the 2000 censo
-# warning: this command requires approximately 10 hours of processing time!
-# so leave your computer on overnight.
-
-# dom.design <-
-	# svydesign(
-		# weight = ~dom_wgt ,					# weight variable column (defined in the character string)
-		# strata = ~areap ,						# stratification variable column (defined in the character string)
-		# id = ~v0300 ,							# sampling unit column (defined in the character string)
-		# fpc = ~dom_fpc ,						# within-data pre-computed finite population correction for the household
-		# data = 'c00_dom' ,					# table name within the monet database (defined in the character string)
-		# dbtype = "MonetDBLite" ,
-		# dbname = dbfolder
-	# )
-
-# save the complex sample survey design
-# into a single r data file (.rda) that can now be
-# analyzed quicker than anything else.
-
-# save( dom.design , file = 'dom 2000 design.rda' )
-
-
-
 
 #################################################
 # create a complex sample design object
 
+# save a person-representative design of the 2000 censo
+# warning: this command requires a long time, leave your computer on overnight.
 
-# uncomment this `svydesign` and the `save` line further below to save a
-# person-representative design of the 2000 censo
-# warning: this command requires approximately 10 hours of processing time!
-# so leave your computer on overnight.
+bw_dom_00 <- 
+	bootweights( 
+		dbGetQuery( db , "SELECT areap FROM c00_dom" )[ , 1 ] ,
+		dbGetQuery( db , "SELECT v0300 FROM c00_dom" )[ , 1 ] ,
+		fpc = dbGetQuery( db , "SELECT dom_fpc FROM c00_dom" )[ , 1 ]
+	)
 
-# pes.design <-
-	# svydesign(
-		# weight = ~pes_wgt ,					# weight variable column (defined in the character string)
-		# strata = ~areap ,						# stratification variable column (defined in the character string)
-		# id = ~v0300 ,							# sampling unit column (defined in the character string)
-		# fpc = ~pes_fpc ,						# within-data pre-computed finite population correction, also for the household
-		# data = 'c00' ,						# table name within the monet database (defined in the character string)
-		# dbtype = "MonetDBLite" ,
-		# dbname = dbfolder
-	# )
+dom.design <-
+	svrepdesign(
+		weight = ~dom_wgt ,
+		repweights = bw_dom_00$repweights ,
+		combined.weights = FALSE ,
+		scale = bw_dom_00$scale ,
+		rscales = bw_dom_00$rscales ,
+		data = 'c00_dom' ,
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
+	)
 
 # save the complex sample survey design
 # into a single r data file (.rda) that can now be
 # analyzed quicker than anything else.
+save( dom.design , file = 'dom 2000 design.rda' )
 
-# save( pes.design , file = 'pes 2000 design.rda' )
+# close the connection
+close( dom.design )
+
+# remove these two objects from memory
+rm( dom.design , bw_dom_00 )
+
 
 
 #################################################
-# create a sqlsurvey complex sample design object
+# create a complex sample design object
 
-# uncomment this `svydesign` and the `save` line further below to save a
-# family-representative design of the 2000 censo
-# warning: this command requires approximately 10 hours of processing time!
-# so leave your computer on overnight.
+# save a person-representative design of the 2000 censo
+# warning: this command requires a long time, leave your computer on overnight.
 
-# fam.design <-
-	# svydesign(
-		# weight = ~fam_wgt ,				# weight variable column (defined in the character string)
-		# nest = TRUE ,						# whether or not psus are nested within strata
-		# strata = ~areap ,					# stratification variable column (defined in the character string)
-		# id = ~v0300 ,						# sampling unit column (defined in the character string)
-		# fpc = ~fam_fpc ,					# within-data pre-computed finite population correction, also for the household
-		# data = 'c00_fam' ,				# table name within the monet database (defined in the character string)
-		# dbtype = "MonetDBLite" ,
-		# dbname = dbfolder
-	# )
+bw_pes_00 <- 
+	bootweights( 
+		dbGetQuery( db , "SELECT areap FROM c00" )[ , 1 ] ,
+		dbGetQuery( db , "SELECT v0300 FROM c00" )[ , 1 ] ,
+		fpc = dbGetQuery( db , "SELECT pes_fpc FROM c00" )[ , 1 ]
+	)
+
+pes.design <-
+	svrepdesign(
+		weight = ~pes_wgt ,
+		repweights = bw_pes_00$repweights ,
+		combined.weights = FALSE ,
+		scale = bw_pes_00$scale ,
+		rscales = bw_pes_00$rscales ,
+		data = 'c00' ,
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
+	)
 
 # save the complex sample survey design
 # into a single r data file (.rda) that can now be
 # analyzed quicker than anything else.
+save( pes.design , file = 'pes 2000 design.rda' )
 
-# save( fam.design , file = 'fam 2000 design.rda' )
+
+# close the connection
+close( pes.design )
+
+# remove these two objects from memory
+rm( pes.design , bw_pes_00 )
 
 
-# close the connection to the three sqlsurvey design objects
-# close( dom.design )
-# close( pes.design )
-# close( fam.design )
 
-# remove these three objects from memory
-# rm( dom.design , pes.design , fam.design )
+#################################################
+# create a complex sample design object
+
+# save a family-representative design of the 2000 censo
+# warning: this command requires a long time, leave your computer on overnight.
+
+bw_fam_00 <- 
+	bootweights( 
+		dbGetQuery( db , "SELECT areap FROM c00_fam" )[ , 1 ] ,
+		dbGetQuery( db , "SELECT v0300 FROM c00_fam" )[ , 1 ] ,
+		fpc = dbGetQuery( db , "SELECT fam_fpc FROM c00_fam" )[ , 1 ]
+	)
+
+fam.design <-
+	svrepdesign(
+		weight = ~fam_wgt ,
+		repweights = bw_fam_00$repweights ,
+		combined.weights = FALSE ,
+		scale = bw_fam_00$scale ,
+		rscales = bw_fam_00$rscales ,
+		data = 'c00_fam' ,
+		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
+	)
+
+# save the complex sample survey design
+# into a single r data file (.rda) that can now be
+# analyzed quicker than anything else.
+save( fam.design , file = 'fam 2000 design.rda' )
+
+
+# close the connection
+close( fam.design )
+
+# remove these two objects from memory
+rm( fam.design , bw_fam_00 )
+
 
 # clear up RAM
 gc()
