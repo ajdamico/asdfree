@@ -222,7 +222,7 @@ for ( curFile in files.to.download ){
 	read.SAScii.monetdb (
 		dom.file ,
 		sas_ri = tf2 ,
-		zipped = F ,						# the ascii file is stored in a zipped file
+		zipped = FALSE ,						# the ascii file is stored in a zipped file
 		tl = TRUE ,							# convert all column names to lowercase
 		tablename = dom.curTable ,			# the table will be stored in the monet database
 		connection = db
@@ -231,7 +231,7 @@ for ( curFile in files.to.download ){
 	read.SAScii.monetdb (
 		pes.file ,
 		sas_ri = tf3 ,
-		zipped = F ,						# the ascii file is stored in a zipped file
+		zipped = FALSE ,						# the ascii file is stored in a zipped file
 		tl = TRUE ,							# convert all column names to lowercase
 		tablename = pes.curTable ,			# the table will be stored in the monet database
 		connection = db
