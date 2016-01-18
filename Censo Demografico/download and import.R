@@ -361,6 +361,7 @@ bw_dom_10 <-
 	bootweights( 
 		dbGetQuery( db , "SELECT v0011 FROM c10_dom" )[ , 1 ] ,
 		dbGetQuery( db , "SELECT v0300 FROM c10_dom" )[ , 1 ] ,
+		replicates = 80 ,
 		fpc = dbGetQuery( db , "SELECT dom_fpc FROM c10_dom" )[ , 1 ]
 	)
 
@@ -399,6 +400,7 @@ bw_pes_10 <-
 	bootweights( 
 		dbGetQuery( db , "SELECT v0011 FROM c10" )[ , 1 ] ,
 		dbGetQuery( db , "SELECT v0300 FROM c10" )[ , 1 ] ,
+		replicates = 80 ,
 		fpc = dbGetQuery( db , "SELECT pes_fpc FROM c10" )[ , 1 ]
 	)
 
@@ -708,6 +710,7 @@ bw_dom_00 <-
 	bootweights( 
 		dbGetQuery( db , "SELECT areap FROM c00_dom" )[ , 1 ] ,
 		dbGetQuery( db , "SELECT v0300 FROM c00_dom" )[ , 1 ] ,
+		replicates = 80 ,
 		fpc = dbGetQuery( db , "SELECT dom_fpc FROM c00_dom" )[ , 1 ]
 	)
 
@@ -746,6 +749,7 @@ bw_pes_00 <-
 	bootweights( 
 		dbGetQuery( db , "SELECT areap FROM c00" )[ , 1 ] ,
 		dbGetQuery( db , "SELECT v0300 FROM c00" )[ , 1 ] ,
+		replicates = 80 ,
 		fpc = dbGetQuery( db , "SELECT pes_fpc FROM c00" )[ , 1 ]
 	)
 
