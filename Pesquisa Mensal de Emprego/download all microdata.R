@@ -15,6 +15,9 @@
 
 # contact me directly for free help or for paid consulting work
 
+# djalma pessoa
+# pessoad@gmail.com
+
 # anthony joseph damico
 # ajdamico@gmail.com
 
