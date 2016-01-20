@@ -164,7 +164,7 @@ svyby( ~v6033 , ~v0001 , subset( pes.d , v6033 < 900 ) , svymean , na.rm = TRUE 
 svymean( ~v0640 , pes.d , na.rm = TRUE )
 
 # marital status distribution - by state
-svyby( ~v0640 , ~v0001 , pes.design , svymean , na.rm = TRUE )
+svyby( ~v0640 , ~v0001 , pes.d , svymean , na.rm = TRUE )
 
 
 # calculate the median and other percentiles #
