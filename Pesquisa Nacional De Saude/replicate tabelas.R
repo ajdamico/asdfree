@@ -37,7 +37,14 @@
 # ..in order to set your current working directory
 
 
+library(survey) 	# load survey package (analyzes complex design surveys)
+library(ggplot2)	# load ggplot2 package (plots data according to the grammar of graphics)
+
+
+
 load( "2013 long questionnaire survey design.rda" )
+
+load( "2013 all questionnaire survey design.rda" )
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -83,134 +90,87 @@ saudufsex <- svyby( ~ saude_b_mb , ~ uf + c006 , design = pes_sel_des_pos , svym
 three_stats( saudufsex )
 
 
-
-###########################################################################################
-
-### Estimates in Tabela 3.4.1.1 of 
-# ftp://ftp.ibge.gov.br/PNS/2013/pns2013.pdf
-####################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# compute estimates of table tabela 3.4.1.1 in ftp://ftp.ibge.gov.br/PNS/2013/pns2013.pdf #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-# Compare Estimates against , 
-# % of ind. above 18yearsold that practice active travel for > 30minutes
+# % with at least 30 minutes of physical activity
   
-# Brasil    
-atfibr<-svymean(~atfi04, design=pes_sel_des_pos)
-c(round(100*coef(atfibr),1),round(100*confint(atfibr)[1,],1))
+# nationwide
+atfibr <- svymean( ~ atfi04 , design = pes_sel_des_pos )
+
+three_stats( atfibr )
 
 
-# by situation (Urban vs Rural) 
-atfisitu<-svyby(~atfi04, ~situ, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean,na.rm=T)
-cbind(atfisitu[,1],round(100*atfisitu[,2:4],1))
+# by sex
+atfibrsex <- svyby( ~ atfi04 , ~ c006 , design = pes_sel_des_pos , svymean )
+
+three_stats( atfibrsex )
 
 
-#  by Region
-atfireg<-svyby(~atfi04, ~region, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
-cbind(atfireg[,1],round(100*atfireg[,2:4],1))
+# by situation (rural and urban)
+atfisitu <- svyby( ~atfi04 , ~situ , design = pes_sel_des_pos , svymean )
 
-#  by Race
-atfirace<-svyby(~atfi04, ~c009, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
-cbind(atfirace[-6,1],round(100*atfirace[-6,2:4],1))
-
-## by UF
-
-atfiuf<-svyby(~atfi04,~uf, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
-cbind(atfiuf[,1],round(100*atfiuf[,2:4],1))
-
-## UF x SEX 
-
-atfiufsex<-svyby(~atfi04,~uf+c006, design= pes_sel_des_pos,  vartype="ci",  level = 0.95,  svymean)
-cbind(atfiufsex[,1:2],round(100*atfiufsex[,3:5],1))
+three_stats( atfisitu )
 
 
-###############################################################
-## Examples for the whole population
-#  match with Figure 8 in http://biblioteca.ibge.gov.br/visualizacao/livros/liv94074.pdf
-############################################################
+# situation x sex
+atfisitusex <- svyby( ~ atfi04 , ~ situ + c006 , design = pes_sel_des_pos , svymean )
+
+three_stats( atfisitusex )
 
 
+# by UF
+atfiuf <- svyby( ~ atfi04 , ~ uf , design = pes_sel_des_pos , svymean )
 
-# Variable vdd004:
-## Higher schooling level ( age>=5)
-# 1 No instruction
-# 2 incomplete elementary or equivalent
-# 3 complete elementary or equivalent
-# 4 incomplete middle or equivalent
-# 5 complete middle or equivalent
-# 6 incomplete university or equivalent
-# 7 Graduation
-
-svymean(~vdd004,pes.all.des.pos)
-## people with health insurance
-svymean(~i001,pes.all.des.pos,na.rm=TRUE)
-
-## by sex
-plansex<-svyby(~i001,~c006, design=pes.all.des.pos,vartype="ci",  level = 0.95,  svymean,na.rm=TRUE)
-plansex.res<-data.frame(Sex=c("Male","Female"),round(100*plansex[,c(2,4,6)],1))
-
-plansex.res
-## bar plot
-library(ggplot2)
-ggplot(plansex.res,aes(x=Sex,y=i0011,fill=Sex))+
-  geom_bar( stat="identity", width=0.9) +
-  geom_errorbar(aes(ymin=ci_l.i0011, ymax=ci_u.i0011))+
-xlab("Sex")+ylab("% Health Insurance")+  ggtitle("Proportion of people having health insurance by sex")+
-  theme_bw()  
+three_stats( atfiuf )
 
 
-# by age class
-# Estimates
-planage<-svyby(~i001,~age_cat, design=pes.all.des.pos,vartype="ci",  level = 0.95,  svymean,na.rm=TRUE)
-planage.res<-data.frame(age_cat=planage[,1],round(100*planage[,c(2,4,6)],1))
+# UF x sex 
+atfiufsex <- svyby( ~ atfi04 , ~ uf + c006 , design = pes_sel_des_pos , svymean )
 
-planage
-## bar plot
-ggplot(planage.res,aes(x=age_cat,y=i0011,fill=age_cat))+ 
-  geom_bar( stat="identity") + 
-  geom_errorbar(aes(ymin=ci_l.i0011, ymax=ci_u.i0011))+
-xlab("Age")+ylab("% Health Insurance")+  ggtitle("Proportion of people having health insurance by age")+
-  theme_bw()
+three_stats( atfiufsex )
 
 
-# by education class
-planeduc<-svyby(~i001,~educ, design=pes.all.des.pos,vartype="ci",  level = 0.95,  svymean,na.rm=TRUE)
-planeduc.res<-data.frame(educ=planeduc[,1],round(100*planeduc[,c(2,4,6)],1))
-planeduc.res
-## bar plot
-ggplot(planeduc.res,aes(x=educ,y=i0011,fill=educ))+
-  geom_bar( stat="identity") +
-  geom_errorbar(aes(ymin=ci_l.i0011, ymax=ci_u.i0011))+
-   xlab("Education")+ylab("% health insurance")+
-  ggtitle("Proportion of people having health insurance by education")+
-  theme_bw()
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# replicate grafico 8 on                                                  #
+# http://biblioteca.ibge.gov.br/visualizacao/livros/liv94074.pdf#page=30  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# people with health insurance (overall)
+overall <- data.frame( svyby( ~ as.numeric( i001 == 1 ) , ~ one , design = pes_all_des_pos , vartype = "ci" ,  level = 0.95 ,  svymean , na.rm = TRUE ) )
+overall[ 1 , 1 ] <- "overall"
+
+# by sex
+bysex <- data.frame( svyby( ~ as.numeric( i001 == 1 ) , ~ c006 , design = pes_all_des_pos , vartype = "ci" ,  level = 0.95 ,  svymean , na.rm = TRUE ) )
+
+# by age
+byage <- data.frame( svyby( ~ as.numeric( i001 == 1 ) , ~ age_cat , design = pes_all_des_pos , vartype = "ci" ,  level = 0.95 ,  svymean , na.rm = TRUE ) )
 
 # by race
-planraca<-svyby(~i001,~raca, design=pes.all.des.pos,vartype="ci",  level = 0.95,  svymean,na.rm=TRUE)
-planraca.res<-data.frame(race=planraca[,1],round(100*planraca[,c(2,4,6)],1))
-planraca.res
-## bar plot
-ggplot(planraca.res,aes(x=race,y=i0011,fill=race))+
-  geom_bar( stat="identity") +
-  geom_errorbar(aes(ymin=ci_l.i0011, ymax=ci_u.i0011))+
-  xlab("Education")+ylab("% health insurance")+
-  ggtitle("Proportion of people having health insurance by race")+
-  theme_bw()
+byrace <- data.frame( svyby( ~ as.numeric( i001 == 1 ) , ~ raca , design = pes_all_des_pos , vartype = "ci" ,  level = 0.95 ,  svymean , na.rm = TRUE ) )
 
-  
+# by education
+byeduc <- data.frame( svyby( ~ as.numeric( i001 == 1 ) , ~ educ , design = pes_all_des_pos , vartype = "ci" ,  level = 0.95 ,  svymean , na.rm = TRUE ) )
 
-#################################################################
-## household characteristic estimation
-#######################################################
-# household design 
-dom_des <- subset(pes.all.des.pos,c004=="01" )
+# re-categorize all four columns
+names( overall ) <- names( bysex ) <- names( byage ) <- names( byrace ) <- names( byeduc ) <- c( "breakout_variable" , "coefficient" , "lower_bound" , "upper_bound" )
 
-# household people density for Brasil
-svymean(~ c001,dom_des )
+# combine all results into a single table
+graphic_data <- rbind( overall , bysex , byage , byrace , byeduc )
+graphic_data$yplot <- seq( nrow( graphic_data ) )
 
-# household people density by region
+# plot these results
+ggplot(
+	graphic_data ,
+	aes( x = yplot , y = coefficient )
+	) +
+	geom_bar( stat = "identity" ) +
+	geom_errorbar( aes( ymin = lower_bound , ymax = upper_bound ) ) +
+	xlab( "grafico 8" ) +
+	ylab( "% with health insurance" )
+		
 
-svyby(~ c001,~region, dom_des,svymean)
-
-
-
-
+# happy?

@@ -37,7 +37,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "downloader" , "survey" ) )
+# install.packages( c( "SAScii" , "downloader" , "survey" , "ggplot2" ) )
 
 
 library(survey) 	# load survey package (analyzes complex design surveys)
