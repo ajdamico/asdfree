@@ -389,6 +389,9 @@ close( dom.design )
 # remove these two objects from memory
 rm( dom.design , bw_dom_10 )
 
+# clear up RAM
+gc()
+
 
 #################################################
 # create a complex sample design object
@@ -426,7 +429,6 @@ close( pes.design )
 
 # remove these two objects from memory
 rm( pes.design , bw_pes_10 )
-
 
 # clear up RAM
 gc()
@@ -737,6 +739,8 @@ close( dom.design )
 # remove these two objects from memory
 rm( dom.design , bw_dom_00 )
 
+# clear up RAM
+gc()
 
 
 #################################################
@@ -777,6 +781,8 @@ close( pes.design )
 # remove these two objects from memory
 rm( pes.design , bw_pes_00 )
 
+# clear up RAM
+gc()
 
 
 #################################################
@@ -815,7 +821,6 @@ close( fam.design )
 
 # remove these two objects from memory
 rm( fam.design , bw_fam_00 )
-
 
 # clear up RAM
 gc()
