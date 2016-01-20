@@ -67,7 +67,7 @@ three_stats( saudbrsex )
 
 
 # by situation (rural and urban)
-saudsitu <- svyby( ~saude_b_mb , ~situ , design = pes_sel_des_pos , svymean )
+saudsitu <- svyby( ~saude_b_mb , ~ situ , design = pes_sel_des_pos , svymean )
 
 three_stats( saudsitu )
 
@@ -110,7 +110,7 @@ three_stats( atfibrsex )
 
 
 # by situation (rural and urban)
-atfisitu <- svyby( ~atfi04 , ~situ , design = pes_sel_des_pos , svymean )
+atfisitu <- svyby( ~atfi04 , ~ situ , design = pes_sel_des_pos , svymean )
 
 three_stats( atfisitu )
 
