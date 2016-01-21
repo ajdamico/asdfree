@@ -217,7 +217,7 @@ write.csv( marital.status.by.urbanrural , "marital status by urbanrural.csv" )
 # ..or trimmed to only contain the values you need.
 # here's the percent married broken out by urban/rural status,
 married.by.urbanrural <-
-	data.frame( marital.status.by.urbanrural )[ 1:2 , 1 ]
+	data.frame( marital.status.by.urbanrural )[ 1:2 , 2 ]
 
 
 # print the new results to the screen
