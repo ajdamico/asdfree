@@ -165,8 +165,8 @@ svyby( ~ nmorpob1 + one , denominator = ~ one , by = ~v0001 , design = subset( p
 
 # finito.
 
-# close all connections to the sqlsurvey design object
-close( pes.design , pes.d )
+# close the connection to the survey design object
+close( pes.d )
 
 
 # disconnect from the current monet database

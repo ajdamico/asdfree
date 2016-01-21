@@ -241,7 +241,7 @@ barplot(
 ############################
 
 
-# close the connection to the sqlrepsurvey design object
+# close the connection to the survey design object
 close( pes.d )
 
 # disconnect from the current monet database
