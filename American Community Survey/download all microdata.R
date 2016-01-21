@@ -11,7 +11,7 @@
 # setwd( "C:/My Directory/ACS/" )
 # single.year.datasets.to.download <- 2005:2014
 # three.year.datasets.to.download <- 2007:2013
-# five.year.datasets.to.download <- 2009:2013
+# five.year.datasets.to.download <- 2009:2014
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/American%20Community%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -111,7 +111,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # five-year datasets are available back to 2009
 # uncomment this line to download all available five-year data sets
 # uncomment this line by removing the `#` at the front
-# five.year.datasets.to.download <- 2009:2013
+# five.year.datasets.to.download <- 2009:2014
 
 # # # # # # # # # # # # # #
 # other download examples #
