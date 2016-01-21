@@ -161,7 +161,7 @@ legend(
 svyratio( ~ nmorpob1 , ~ one , subset( pes.d , v6531 >= 0 ) , na.rm = TRUE )
 
 # by state
-svyby( ~ nmorpob1 , denominator = ~ one , by = ~v0001 , design = subset( pes.d , v6531 >= 0 ) , FUN = svyratio , na.rm = TRUE )
+svyby( ~ nmorpob1 + one , denominator = ~ one , by = ~v0001 , design = subset( pes.d , v6531 >= 0 ) , FUN = svyratio , na.rm = TRUE )
 
 # finito.
 
