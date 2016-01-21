@@ -456,7 +456,7 @@ for ( year in 2050:2005 ){
 						fpo <- tempfile()
 
 						# create a read-only file connection from the original file
-						fpx <- file( normalizePath( csvpath ) , 'r' )
+						fpx <- file( normalizePath( tf_out ) , 'r' )
 						# create a write-only file connection to the temporary file
 						fpt <- file( fpo , 'w' )
 
@@ -487,8 +487,9 @@ for ( year in 2050:2005 ){
 								) 
 						) 
 						
-						# delete the temporary file from the disk
+						# delete the temporary files from the disk
 						file.remove( fpo )
+						file.remove( tf_out )
 					}
 
 					
