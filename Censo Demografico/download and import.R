@@ -180,6 +180,15 @@ all.files <- scan( text = all.files , what = "character", quiet = T )
 # remove the two files you don't need to import
 files.to.download <- all.files[ !( all.files %in% c( 'Atualizacoes.txt' , 'Documentacao.zip' ) ) ]
 
+## state initials: "AC", "AL" ,"AM" , "AP" ,BA" ,"CE","DF","ES" ,"GO","MA" , "MG" ,"MS","MT"
+## "PA","PB", "PE","PI" ,"PR","RJ","RN","RO", "RR", "RS","SC", "SE", "SP", "TO"                
+ 
+# if you want, for example, to download just Roraima, define:  
+
+# state <- "RO"
+
+# files.to.download <- grep( state , files.to.download , value = TRUE )
+
 
 # loop through each of the files to be downloaded..
 for ( curFile in files.to.download ){
@@ -468,6 +477,14 @@ all.files <- scan( text = all.files , what = "character", quiet = T )
 # remove the two files you don't need to import
 files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' , '2_Atualizacoes.txt' , '1_Documentacao_velho.zip' ) ) ]
 
+## state initials: "AC", "AL" ,"AM" , "AP" ,BA" ,"CE","DF","ES" ,"GO","MA" , "MG" ,"MS","MT"
+## "PA","PB", "PE","PI" ,"PR","RJ","RN","RO", "RR", "RS","SC", "SE", "SP", "TO"                
+ 
+# if you want, for example, to download just Roraima, define:  
+
+# state <- "RO"
+
+# files.to.download <- grep( state , files.to.download , value = TRUE )
 
 # loop through each of the files to be downloaded..
 for ( curFile in files.to.download ){
