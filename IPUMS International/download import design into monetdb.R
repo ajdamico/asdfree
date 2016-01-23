@@ -64,7 +64,7 @@
 # # # # # # # # # # # # # # # #
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "httr" , "XML" , "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) , repos = c( "http://dev.monetdb.org/Assets/R/" , "http://cran.rstudio.com/" ) )
+# install.packages( c( "httr" , "XML" , "rvest" , "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) , repos = c( "http://dev.monetdb.org/Assets/R/" , "http://cran.rstudio.com/" ) )
 
 
 library(survey) 		# load survey package (analyzes complex design surveys)
@@ -91,6 +91,8 @@ source_url(
 	prompt = FALSE , 
 	echo = FALSE 
 )
+# thanks to the amazing respondents on stackoverflow for this algorithm
+# http://stackoverflow.com/questions/34829920/how-to-authenticate-a-shibboleth-multi-hostname-website-with-httr-in-r
 
 
 
@@ -102,12 +104,15 @@ source_url(
 
 # download the specified ipums extract to the local disk,
 # then decompress it into the current working directory
-csv_file_location <- download_ipumsi( this_extract , username , password )
+csv_list <- download_ipumsi( this_extract , username , password )
 # note: use the `download_ipumsi` file= parameter in order to
 # store the download resultant csv file elsewhere
 
-# figure out which whether columns are character or numeric
-csv_file_structure <- structure_ipumsi( this_extract , username , password )
+# store the file location
+csv_file_location <- csv_list[[1]]
+
+# store the column classes
+csv_file_structure <- csv_list[[2]]
 
 # simple check that the stored csv file matches the loaded structure
 if( !( length( csv_file_structure ) == ncol( read.csv( csv_file_location , nrow = 10 ) ) ) ) stop( "number of columns in final csv file does not match ipums structure xml file" )
