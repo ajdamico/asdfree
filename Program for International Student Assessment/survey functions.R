@@ -186,6 +186,7 @@ construct.pisa.survey.designs <-
 				scale = 4 / 80 ,
 				rscales = rep( 1 , 80 ) ,
 				mse = TRUE ,
+				type = 'JK1' ,
 				data = imputationList( datasets = as.list( paste0( table.name , "_imp" , 1:5 ) ) , dbtype = "MonetDBLite" ) ,
 				dbtype = "MonetDBLite" ,
 				dbname = dbfolder

@@ -648,6 +648,7 @@ for ( year in years.to.download ){
 					scale = sca ,
 					rscales = rsc ,
 					degf = 99 ,
+					type = 'JK1' ,
 					mse = TRUE ,
 					data = paste0( 'ldt_m_' , year ) , 			# use the person-ldt-merge data table
 					dbtype = "MonetDBLite" ,
@@ -693,6 +694,7 @@ for ( year in years.to.download ){
 				scale = sca ,
 				rscales = rsc ,
 				degf = 99 ,
+				type = 'JK1' ,
 				mse = TRUE ,
 				data = paste0( 'day_m_' , year ) , 	# use the person-day-merge data table
 				dbtype = "MonetDBLite" ,
@@ -734,6 +736,7 @@ for ( year in years.to.download ){
 				scale = sca ,
 				rscales = rsc ,
 				degf = 99 ,
+				type = 'JK1' ,
 				mse = TRUE ,
 				data = paste0( 'per_m_' , year ) , 	# use the person-merge data table
 				dbtype = "MonetDBLite" ,
@@ -774,6 +777,7 @@ for ( year in years.to.download ){
 				scale = sca ,
 				rscales = rsc ,
 				degf = 99 ,
+				type = 'JK1' ,
 				mse = TRUE ,
 				data = paste0( 'hh_m_' , year ) , 	# use the household-merge data table
 				dbtype = "MonetDBLite" ,

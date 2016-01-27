@@ -609,6 +609,7 @@ for ( year in 2050:2005 ){
 					scale = 4 / 80 ,
 					rscales = rep( 1 , 80 ) ,
 					mse = TRUE ,
+					type = 'JK1' ,
 					data = paste0( k , '_m' ) , 				# use the person-household-merge data table
 					dbtype = "MonetDBLite" ,
 					dbname = dbfolder
@@ -627,6 +628,7 @@ for ( year in 2050:2005 ){
 					scale = 4 / 80 ,
 					rscales = rep( 1 , 80 ) ,
 					mse = TRUE ,
+					type = 'JK1' ,
 					data = paste0( k , '_h' ) , 				# use the household-level data table
 					dbtype = "MonetDBLite" ,
 					dbname = dbfolder
