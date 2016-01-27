@@ -44,6 +44,11 @@ library(downloader)	# downloads and then runs the source() function on scripts f
 
 # load the census bureau's poverty thresholds
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Poverty/scrape%20census%20thresholds.R" , prompt = FALSE )
+
+# load the download_cached and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url("https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R", prompt = FALSE, echo = FALSE)
+
 # now you have an object `all_thresholds` that goes back as far as 1990
 names( all_thresholds ) <- gsub( "year" , "this_year" , names( all_thresholds ) )
 
@@ -111,7 +116,8 @@ for ( year in years.to.download ){
 	
 		# download the filetype-specific zipped file
 		# and save it as the temporary file
-		download.file( ftp , tf , mode = 'wb' )
+		download_cached( ftp , tf , mode = 'wb' )
+
 
 		# unzip all of the files in the downloaded .zip file into the current working directory
 		# then save all of their unzipped locations into a character vector called 'files'
