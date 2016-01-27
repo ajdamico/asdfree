@@ -491,6 +491,9 @@ z <-
 	)
 
 	
+# workaround for a bug in survey::svrepdesign.character
+z$mse <- TRUE
+
 
 # add a new variable 'one' that simply has the number 1 for each record #
 # and can be used to calculate unweighted and weighted population sizes #

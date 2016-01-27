@@ -88,6 +88,9 @@ y <-
 		dbname = dbfolder
 	)
 
+# workaround for a bug in survey::svrepdesign.character
+y$mse <- TRUE
+
 
 	
 #####################

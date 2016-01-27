@@ -654,6 +654,9 @@ for ( year in years.to.download ){
 					dbname = dbfolder
 				)
 
+			# workaround for a bug in survey::svrepdesign.character
+			nhts.ldt.design$mse <- TRUE
+
 				
 		
 		}
@@ -696,6 +699,9 @@ for ( year in years.to.download ){
 				dbname = dbfolder
 			)
 
+		# workaround for a bug in survey::svrepdesign.character
+		nhts.day.design$mse <- TRUE
+		
 			
 		# merge the person table with the person-level weights
 		nonmatching.fields <- nmf( db , wt.table , per.table , year )
@@ -734,6 +740,9 @@ for ( year in years.to.download ){
 				dbname = dbfolder
 			)
 
+		# workaround for a bug in survey::svrepdesign.character
+		nhts.per.design$mse <- TRUE
+		
 	
 		# merge the household table with the household-level weights
 		nonmatching.fields <- nmf( db , 'hh50wt' , hh.table , year )
@@ -770,6 +779,9 @@ for ( year in years.to.download ){
 				dbtype = "MonetDBLite" ,
 				dbname = dbfolder
 			)
+
+		# workaround for a bug in survey::svrepdesign.character
+		nhts.hh.design$mse <- TRUE
 
 
 		# done.  phew.  save all the objects to the current working directory

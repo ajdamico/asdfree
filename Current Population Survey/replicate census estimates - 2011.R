@@ -88,6 +88,9 @@ y <-
 		dbname = dbfolder
 	)
 
+# workaround for a bug in survey::svrepdesign.character
+y$mse <- TRUE
+
 
 #############################################################################################################
 # these commands replicate the results of the SAS, SUDAAN, and WesVar code presented in                     #  

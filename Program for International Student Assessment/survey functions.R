@@ -191,6 +191,9 @@ construct.pisa.survey.designs <-
 				dbname = dbfolder
 			)
 		
+		# workaround for a bug in survey::svrepdesign.character
+		this_design$mse <- TRUE
+		
 		# output file name
 		ofn <- paste0( year , " " , table.name , ".rda" )
 		

@@ -164,7 +164,12 @@ for ( this.year in rev( years ) ){
 						combined.weights = TRUE , 
 						dbtype = "MonetDBLite" ,
 						dbname = dbfolder
-					)					
+					)
+
+
+				# workaround for a bug in survey::svrepdesign.character
+				design$mse <- TRUE
+									
 
 			} else {
 			
@@ -183,6 +188,9 @@ for ( this.year in rev( years ) ){
 						dbname = dbfolder
 					)
 					
+				# workaround for a bug in survey::svrepdesign.character
+				design$mse <- TRUE
+
 			}
 				
 			rm( z ) ; gc()

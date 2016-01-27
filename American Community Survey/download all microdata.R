@@ -613,6 +613,9 @@ for ( year in 2050:2005 ){
 					dbtype = "MonetDBLite" ,
 					dbname = dbfolder
 				)
+				
+			# workaround for a bug in survey::svrepdesign.character
+			acs.m.design$mse <- TRUE
 
 			# create a sqlrepsurvey complex sample design object
 			# using the household-level table
@@ -629,6 +632,9 @@ for ( year in 2050:2005 ){
 					dbname = dbfolder
 				)
 
+			# workaround for a bug in survey::svrepdesign.character
+			acs.h.design$mse <- TRUE
+				
 			# save both complex sample survey designs
 			# into a single r data file (.rda) that can now be
 			# analyzed quicker than anything else.
