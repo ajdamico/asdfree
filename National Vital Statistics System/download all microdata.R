@@ -121,7 +121,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # but i've only slogged through the layout files back to 1999
 # uncomment this line to download all unlocked natality data sets
 # uncomment this line by removing the `#` at the front
-# natality.sets.to.download <- 2013:1999
+# natality.sets.to.download <- 2014:1999
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/natality/Nat1998doc.pdf
 
@@ -130,7 +130,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # but i've only slogged through the layout files back to 2001
 # uncomment this line to download all unlocked period-linked data sets
 # uncomment this line by removing the `#` at the front
-# periodlinked.sets.to.download <- 2011:2001
+# periodlinked.sets.to.download <- 2013:2001
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/periodlinked/LinkPE00Guide.pdf
 
@@ -139,7 +139,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # but i've only slogged through the layout files back to 1995
 # uncomment this line to download all unlocked cohort-linked data sets
 # uncomment this line by removing the `#` at the front
-# cohortlinked.sets.to.download <- 2009:1995
+# cohortlinked.sets.to.download <- 2010:1995
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/cohortlinked/LinkCO91Guide.pdf
 
@@ -148,7 +148,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # but i've only slogged through the layout files back to 2000
 # uncomment this line to download all unlocked mortality data sets
 # uncomment this line by removing the `#` at the front
-# mortality.sets.to.download <- 2012:2000
+# mortality.sets.to.download <- 2014:2000
 # if you need more, you must write sas import scripts for the file layouts stored in
 # http://www.cdc.gov/nchs/data/dvs/Mort99doc.pdf
 
@@ -157,7 +157,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # but i've only slogged through the layout files back to 2005
 # uncomment this line to download all unlocked mortality data sets
 # uncomment this line by removing the `#` at the front
-# fetaldeath.sets.to.download <- 2012:2005
+# fetaldeath.sets.to.download <- 2013:2005
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/fetaldeath/2004FetalUserGuide.pdf
 
