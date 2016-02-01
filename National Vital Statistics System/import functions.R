@@ -76,7 +76,8 @@ import.nchs <-
 				tl = TRUE ,						# convert all column names to lowercase?
 				tablename = tablenames[ i ] ,
 				overwrite = FALSE ,				# overwrite existing table?
-				connection = db
+				connection = db ,
+				try_best_effort = TRUE
 			)
 			
 			suppressWarnings( while( unlink( fti ) ) Sys.sleep( 1 ) )
