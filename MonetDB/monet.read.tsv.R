@@ -13,19 +13,11 @@ monet.read.tsv <-
 		nrow.check = 500 ,
 		structure = NULL ,
 		delimiters = "'\t'" ,
-		lower.case.names = FALSE ,
-		
-		# give this parameter a single character string
-		# containing the column name that you would like to add
-		# the name of the source file that each record came from
-		add_source_filename = NULL
+		lower.case.names = FALSE
 	) {
     
 	if (length(na.strings) > 1) stop("na.strings must be of length 1")
 
-	if( !is.null( add_source_filename ) & ( length( add_source_filename ) != 1 ) ) stop( "add_source_filename= must be a single character string containing the column name" )
-				
-	
 	# if a structure file is passed in
 	if ( !is.null( structure ) ){
 		
@@ -66,21 +58,14 @@ monet.read.tsv <-
 					"offset 2 records into", 
 					tablename, 
 					"from", 
-					paste0("'", thefile, "'"), 
+					paste("'", thefile, "'", sep = ""), 
 					"using delimiters" ,
 					delimiters ,
 					"NULL as", 
-					paste0("'", na.strings[1], "'"), 
+					paste("'", na.strings[1], "'", sep = ""), 
 					if (locked) "LOCKED"
 				)
 			)
-			
-			if( !is.null( add_source_filename ) ){
-				dbSendQuery( conn , paste( 'ALTER TABLE' , tablename , 'ADD COLUMN' , add_source_filename , 'CLOB' ) )
-				
-				dbSendQuery( conn , paste( 'UPDATE' , tablename , 'SET' , add_source_filename , '=' , paste0("'", thefile, "'") ) )
-			}
-				
         }
     } else {
         for (i in seq_along(files)) {
@@ -91,23 +76,14 @@ monet.read.tsv <-
 					"copy into", 
 					tablename, 
 					"from", 
-					paste0("'", thefile, "'"), 
+					paste("'", thefile, "'", sep = ""), 
 					"using delimiters" ,
 					delimiters ,
 					"NULL as ", 
-					paste0("'", na.strings[1], "'"), 
+					paste("'", na.strings[1], "'", sep = ""), 
 					if (locked)"LOCKED"
 				)
 			)
-			
-			
-			if( !is.null( add_source_filename ) ){
-				dbSendQuery( conn , paste( 'ALTER TABLE' , tablename , 'ADD COLUMN' , add_source_filename , 'CLOB' ) )
-				
-				dbSendQuery( conn , paste( 'UPDATE' , tablename , 'SET' , add_source_filename , '=' , paste0("'", thefile, "'") ) )
-			}
-				
-			
         }
     }
     dbGetQuery(conn, paste("select count(*) from", tablename))
