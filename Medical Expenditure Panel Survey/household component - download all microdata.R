@@ -82,7 +82,7 @@ jobs <- c( "07" , 19 , 25 , 32 , NA , NA , NA , NA , 83 , 91 , 100 , 108 , 116 ,
 prpf <- c( 24 , 47 , 47 , 47 , 47 , 57 , 66 , 76 , 88 , 95 , 103 , 111 , 119 , 127 , 136 , 145 , 153 , 161 )
 longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 , 130 , 139 , 148 , 156 , 164 , NA )
 events <- c( 10 , 16 , NA , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 , 135 , 144 , 152 , 160 )
-
+cond_event <- paste0( events , "i" )
 
 # specify the most current brr / link file locations
 lf <- "http://meps.ahrq.gov/data_files/pufs/h36brr13ssp.zip"
@@ -100,7 +100,8 @@ mm <-
 		jobs , 
 		prpf , 
 		longitudinal , 
-		events
+		events ,
+		cond_event
 	)
 
 	
@@ -187,8 +188,8 @@ rm( brr ) ; gc()
 
 
 # download the documentation and codebook as well
-download_cached( lf.cb , "linkage - brr cb.pdf" , mode="wb" , cacheOK=F , method="internal" )
-download_cached( lf.doc  , "linkage - brr doc.pdf" , mode="wb" , cacheOK=F , method="internal" )
+download_cached( lf.cb , "linkage - brr cb.pdf" , mode = "wb" , cacheOK = FALSE , method = "internal" )
+download_cached( lf.doc  , "linkage - brr doc.pdf" , mode = "wb" , cacheOK = FALSE , method = "internal" )
 
 
 
@@ -203,7 +204,7 @@ for ( i in nrow( mm ):1 ) {
 		if ( !is.na( mm[ i , j ] ) ) {
 		
 			# wait 60 seconds before each new download..
-			Sys.sleep( 60 )
+			# Sys.sleep( 60 )
 		
 			# create a character string containing the name of the .zip file
 			fn <- paste0( "h" , mm[ i , j ] , "ssp.zip" )
@@ -217,16 +218,13 @@ for ( i in nrow( mm ):1 ) {
 			# if it can't be found once, try a second time
 			if( class( err ) == "try-error" ){
 				
-				# wait 60 more seconds
-				Sys.sleep( 60 )
+				# wait 5 more seconds
+				Sys.sleep( 5 )
 				
 				# try once more
 				err <- try( getURLContent( u ) , silent = T )
 			}
 			
-			# wait 60 seconds before each new download..
-			Sys.sleep( 60 )
-					
 			# if the file doesn't exist on its own..
 			if( class( err ) == "try-error" ){
 				
@@ -259,9 +257,6 @@ for ( i in nrow( mm ):1 ) {
 			
 				# immediately delete the brr data frame from memory and clear up ram
 				rm( list = df.name ) ; gc()
-			
-				# wait 60 seconds before the second download
-				Sys.sleep( 60 )
 				
 				# download the ..f2ssp.zip file to the temporary file on your local computer
 				download_cached( sub( "ssp.zip" , "f2ssp.zip" , u ) , tf , mode = 'wb' )
@@ -320,8 +315,9 @@ for ( i in nrow( mm ):1 ) {
 				if ( class( attempt.one ) == 'try-error' ){
 					attempt.two <-
 						try({
-							# ..wait 60 seconds and try again
-							Sys.sleep( 60 )
+			
+							# ..wait 5 seconds and try again
+							Sys.sleep( 5 )
 							
 							# download the ..ssp.zip file to the temporary file on your local computer
 							download_cached( u , tf , mode = 'wb' )
@@ -373,7 +369,7 @@ for ( i in nrow( mm ):1 ) {
 			
 			# determine whether the codebooks exists
 			# (note: many early codebooks do not exist, because they are included in the documentation file)
-			err <- try( getURLContent( cbsite ) , silent = T )
+			err <- try( getURLContent( cbsite ) , silent = TRUE )
 			
 			# give the ahrq website five seconds before the actual download
 			Sys.sleep( 5 )
@@ -381,12 +377,12 @@ for ( i in nrow( mm ):1 ) {
 			attempt1 <- NULL
 			
 			# if it does, download it
-			if (! class(err) == "try-error" ) attempt1 <- try( download_cached(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" ) , silent = TRUE )
+			if (! class(err) == "try-error" ) attempt1 <- try( download_cached( cbsite , cbname , mode = "wb" , cacheOK = FALSE , method = "internal" ) , silent = TRUE )
 			
-			# if the first documentation download broke, wait 60 seconds and try again
+			# if the first documentation download broke, wait 5 seconds and try again
 			if ( class( attempt1 ) == 'try-error' ){
-				Sys.sleep( 60 )
-				download_cached(  cbsite , cbname , mode="wb" , cacheOK=F , method="internal" )
+				Sys.sleep( 5 )
+				download_cached(  cbsite , cbname , mode = "wb" , cacheOK = FALSE , method = "internal" )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
@@ -411,13 +407,13 @@ for ( i in nrow( mm ):1 ) {
 			
 			# if it does, download it
 			if (! class(err) == "try-error" ){
-				attempt1 <- try( download_cached(  docsite , docname , mode="wb" , cacheOK=F , method="internal" ) , silent = TRUE )
+				attempt1 <- try( download_cached( docsite , docname , mode = "wb" , cacheOK = FALSE , method = "internal" ) , silent = TRUE )
 			}
 			
-			# if the first documentation download broke, wait 60 seconds and try again
+			# if the first documentation download broke, wait 5 seconds and try again
 			if ( class( attempt1 ) == 'try-error' ){
-				Sys.sleep( 60 )
-				download_cached(  docsite , docname , mode="wb" , cacheOK=F , method="internal" )
+				Sys.sleep( 5 )
+				download_cached(  docsite , docname , mode = "wb" , cacheOK = FALSE , method = "internal" )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
