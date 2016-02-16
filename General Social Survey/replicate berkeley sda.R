@@ -88,10 +88,10 @@ library(survey)  # load survey package (analyzes complex design surveys)
 # DATA LOADING COMPONENT - ONLY RUN THIS ONCE #
 ###############################################
 
-# create new character variables containing the full filepath of the file on norc's website
+# create new character variables containing the full filepath of the file (stored locally)
 # that needs to be downloaded and imported into r for analysis
 GSS.2010.CS.file.location <-
-	"http://publicdata.norc.org:41000/gss/documents//OTHR/gss7210_r2b_stata.zip"
+	"https://github.com/ajdamico/asdfree/blob/master/General%20Social%20Survey/gss7210_r2b_stata.zip?raw=true"
 	
 
 # create a temporary file and a temporary directory

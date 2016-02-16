@@ -63,7 +63,7 @@ library(survey)  # load survey package (analyzes complex design surveys)
 # create new character variables containing the full filepath of the file on norc's website
 # that needs to be downloaded and imported into r for analysis
 GSS.CS.file.location <-
-	"http://publicdata.norc.org/GSS/DOCUMENTS/OTHR/GSS_spss.zip"
+	"http://gss.norc.org/documents/spss/GSS_spss.zip"
 
 
 # create a temporary file and a temporary directory
