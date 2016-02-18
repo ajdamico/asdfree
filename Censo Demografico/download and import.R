@@ -144,7 +144,7 @@ ranc <-
 				line.num <- line.num + 1
 
 				# every 10k records, print current progress to the screen
-				if ( line.num %% 10000 == 0 ) cat( " " , prettyNum( line.num , big.mark = "," ) , "census pums lines processed" , "\r" )
+				if ( line.num %% 10000 == 0 ) cat( " " , prettyNum( line.num , big.mark = "," ) , "census pums lines processed" , "\r\n" )
 			}
 
 			close( incon )
