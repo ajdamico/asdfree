@@ -313,7 +313,7 @@ read.SAScii.monetdb <-
 		
 		}
 			
-		cat( "  current progress: " , l , "of" , nrow( y ) , "columns processed.                    " , "\r" )
+		cat( "  current progress: " , l , "of" , nrow( y ) , "columns processed.                    " , "\r\n" )
 	
 
 	}
