@@ -223,30 +223,107 @@ for ( year in years.to.download ){
 	dom.fn <- files[ grepl( paste0( 'dados/dom' , year ) , tolower( files ) ) ]
 	pes.fn <- files[ grepl( paste0( 'dados/pes' , year ) , tolower( files ) ) ]
 
-	# store the PNAD household records as a MonetDBLite database
-	read.SAScii.monetdb ( 
-		dom.fn , 
-		dom.sas , 
-		zipped = F , 
-		tl = TRUE ,
-		# this default table naming setup will name the household-level tables dom2001, dom2002, dom2003 and so on
-		tablename = paste0( 'dom' , year ) ,
-		conn = db ,
-		try_best_effort = TRUE
-	)
+	first_attempt <- 
+		try({
+			# store the PNAD household records as a MonetDBLite database
+			read.SAScii.monetdb ( 
+				dom.fn , 
+				dom.sas , 
+				zipped = F , 
+				tl = TRUE ,
+				# this default table naming setup will name the household-level tables dom2001, dom2002, dom2003 and so on
+				tablename = paste0( 'dom' , year ) ,
+				conn = db
+			)
+			
+			# store the PNAD person records as a MonetDBLite database
+			read.SAScii.monetdb ( 
+				pes.fn , 
+				pes.sas , 
+				zipped = F , 
+				tl = TRUE ,
+				# this default table naming setup will name the person-level tables pes2001, pes2002, pes2003 and so on
+				tablename = paste0( 'pes' , year ) ,
+				conn = db
+			)
+		} , silent = TRUE )
 	
-	# store the PNAD person records as a MonetDBLite database
-	read.SAScii.monetdb ( 
-		pes.fn , 
-		pes.sas , 
-		zipped = F , 
-		tl = TRUE ,
-		# this default table naming setup will name the person-level tables pes2001, pes2002, pes2003 and so on
-		tablename = paste0( 'pes' , year ) ,
-		conn = db ,
-		try_best_effort = TRUE
-	)
+	# if the read.SAScii.monetdb attempts broke,
+	# remove the dots in the files
+	# and try again
+	if( class( first_attempt ) == 'try-error' ){
+	
+		dom.fn2 <- tempfile()
+		pes.fn2 <- tempfile()
+		
+		fpx <- file( normalizePath( dom.fn ) , 'r' )
+		# create a write-only file connection to the temporary file
+		fpt <- file( dom.fn2 , 'w' )
 
+		# loop through every line in the original file..
+		while ( length( line <- readLines( fpx , 1 ) ) > 0 ){
+		
+			# replace 'N.A.' with nothings..
+			line <- gsub( " ." , "  " , line , fixed = TRUE )
+			line <- gsub( ". " , "  " , line , fixed = TRUE )
+			
+			# and write the result to the temporary file connection
+			writeLines( line , fpt )
+		}
+		
+		# close the temporary file connection
+		close( fpx )
+		close( fpt )
+
+		fpx <- file( normalizePath( pes.fn ) , 'r' )
+		# create a write-only file connection to the temporary file
+		fpt <- file( pes.fn2 , 'w' )
+
+		# loop through every line in the original file..
+		while ( length( line <- readLines( fpx , 1 ) ) > 0 ){
+		
+			# replace 'N.A.' with nothings..
+			line <- gsub( "." , " " , line , fixed = TRUE )
+			
+			# and write the result to the temporary file connection
+			writeLines( line , fpt )
+		}
+		
+		# close the temporary file connection
+		close( fpx )
+		close( fpt )
+		
+	
+		# store the PNAD household records as a MonetDBLite database
+		read.SAScii.monetdb ( 
+			dom.fn2 , 
+			dom.sas , 
+			zipped = F , 
+			tl = TRUE ,
+			# this default table naming setup will name the household-level tables dom2001, dom2002, dom2003 and so on
+			tablename = paste0( 'dom' , year ) ,
+			conn = db
+		)
+		
+		# store the PNAD person records as a MonetDBLite database
+		read.SAScii.monetdb ( 
+			pes.fn2 , 
+			pes.sas , 
+			zipped = F , 
+			tl = TRUE ,
+			# this default table naming setup will name the person-level tables pes2001, pes2002, pes2003 and so on
+			tablename = paste0( 'pes' , year ) ,
+			conn = db
+		)
+
+		files <- c( files , dom.fn2 , pes.fn2 )
+		
+		stopifnot( countLines( dom.fn ) == dbGetQuery( db , paste0( "SELECT COUNT(*) FROM dom" , year ) )[ 1 , 1 ] )
+		stopifnot( countLines( pes.fn ) == dbGetQuery( db , paste0( "SELECT COUNT(*) FROM pes" , year ) )[ 1 , 1 ] )
+		
+		
+	}
+			
 	# the ASCII and SAS importation instructions stored in temporary files
 	# on the local disk are no longer necessary, so delete them.
 	attempt.one <- try( file.remove( files ) , silent = TRUE )

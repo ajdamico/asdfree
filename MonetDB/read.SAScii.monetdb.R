@@ -269,9 +269,17 @@ read.SAScii.monetdb <-
 	
 	if( class( te ) == 'try-error' ){
 	
-		if( !try_best_effort ) stop( "ran out if import ideas" ) else{
+		if( !try_best_effort ){
+			
+			dbRemoveTable( connection , tablename )
+			
+			stop( "ran out if import ideas" )
+			
+		} else{
 		
-			sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
+			sql.update <- 
+				paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
+			
 			dbSendQuery( connection , sql.update )
 		
 		}
