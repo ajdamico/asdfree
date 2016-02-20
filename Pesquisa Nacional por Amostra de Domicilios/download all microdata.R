@@ -317,6 +317,10 @@ for ( year in years.to.download ){
 
 		files <- c( files , dom.fn2 , pes.fn2 )
 		
+		stopifnot( countLines( dom.fn ) == dbGetQuery( db , paste0( "SELECT COUNT(*) FROM dom" , year ) )[ 1 , 1 ] )
+		stopifnot( countLines( pes.fn ) == dbGetQuery( db , paste0( "SELECT COUNT(*) FROM pes" , year ) )[ 1 , 1 ] )
+		
+		
 	}
 			
 	# the ASCII and SAS importation instructions stored in temporary files
