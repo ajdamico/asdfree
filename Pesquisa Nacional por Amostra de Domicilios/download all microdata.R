@@ -264,7 +264,8 @@ for ( year in years.to.download ){
 		while ( length( line <- readLines( fpx , 1 ) ) > 0 ){
 		
 			# replace 'N.A.' with nothings..
-			line <- gsub( "." , " " , line , fixed = TRUE )
+			line <- gsub( " ." , "  " , line , fixed = TRUE )
+			line <- gsub( ". " , "  " , line , fixed = TRUE )
 			
 			# and write the result to the temporary file connection
 			writeLines( line , fpt )
