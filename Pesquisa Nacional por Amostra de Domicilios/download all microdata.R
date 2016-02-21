@@ -251,7 +251,7 @@ for ( year in years.to.download ){
 		# loop through every line in the original file..
 		while ( length( line <- readLines( fpx , 1 ) ) > 0 ){
 		
-			# replace 'N.A.' with nothings..
+			# replace '.' with nothings..
 			line <- gsub( " ." , "  " , line , fixed = TRUE )
 			line <- gsub( ". " , "  " , line , fixed = TRUE )
 			
@@ -310,9 +310,11 @@ for ( year in years.to.download ){
 		# loop through every line in the original file..
 		while ( length( line <- readLines( fpx , 1 ) ) > 0 ){
 		
-			# replace 'N.A.' with nothings..
-			line <- gsub( "." , " " , line , fixed = TRUE )
-			
+			# replace '.' with nothings..
+			line <- gsub( " ." , "  " , line , fixed = TRUE )
+			line <- gsub( ". " , "  " , line , fixed = TRUE )
+			line <- gsub( "\U00A0" , " " , line )
+
 			# and write the result to the temporary file connection
 			writeLines( line , fpt )
 		}
