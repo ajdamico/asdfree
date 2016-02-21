@@ -137,7 +137,7 @@ for ( curDownload in downloads ){
 	current.year <- substr( spss.file , nchar( spss.file ) - 3 , nchar( spss.file ) )
 
 	# write the current file to the temporary file on your local disk
-	writeBin( content( current.file , "raw" ) , tf )
+	writeBin( content( current.file ) , tf )
 
 	# unzip the temporary file to the temporary directory
 	spss.files <- unzip( tf , exdir = td )
@@ -206,7 +206,7 @@ for ( curDownload in downloads ){
 		fn <- paste0( "./" , current.year , '/docs/' , basename( cur.pdf ) )
 			
 		# save the pdf to the local disk
-		writeBin( content( current.pdf , "raw" ) , fn )
+		writeBin( content( current.pdf ) , fn )
 		
 	}
 	
@@ -260,7 +260,7 @@ for ( curDownload in downloads ){
 		current.file <- GET( dfp )
 		
 		# save the downloaded file to the temporary file location
-		writeBin( content( current.file , "raw" ) , tf )
+		writeBin( content( current.file ) , tf )
 
 		# unzip the temporary file into the temporary directory,
 		# and store all local filepaths into the object `spss.files`
