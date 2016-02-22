@@ -424,9 +424,6 @@ for ( i in numbers.to.download ){
 					# loop through each variable to recode
 					for ( k in seq_along( vtr ) ){
 				
-						# print current progress, since this takes oh so long
-						cat( "blanking out missings of variable" , vtr[ k ] , "..." , k , "of" , length( vtr ) , '                 \r' )
-						
 						# overwrite sas syntax with r syntax in the patterns to match commands.
 						r.command <- gsub( "=" , "==" , ptm[ k ] )
 						r.command <- gsub( " or " , "|" , r.command )
@@ -471,9 +468,6 @@ for ( i in numbers.to.download ){
 					# loop through each variable to recode
 					for ( k in seq_along( vtr ) ){
 					
-						# print your progress, again, this takes a whiiiiiile
-						cat( "blanking out missings of variable" , vtr[ k ] , "..." , k , "of" , length( vtr ) , '                 \r' )
-						
 						# update the current data table's variable-to-replace (vtr) with missing (NULL) whenever the pattern-to-match is matched.
 						dbSendQuery( 
 							db , 
