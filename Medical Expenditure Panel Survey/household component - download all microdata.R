@@ -97,6 +97,7 @@ mm <-
 	data.frame(
 		year , 
 		consolidated , 
+		popchar ,
 		conditions , 
 		jobs , 
 		prpf , 
