@@ -157,6 +157,8 @@ for ( year in years_to_download ){
 		sas_t <- gsub( "\t" , " " , sas_t )
 		sas_t <- gsub( "char(.*)" , "\\1" , tolower( sas_t ) )
 		sas_t <- gsub( "datetime(.*)" , "$ \\1" , tolower( sas_t ) )
+		sas_t <- gsub( "\U0096" , " " , sas_t )
+		sas_t <- iconv( sas_t , "" , "ASCII" , sub = " " )
 		writeLines( sas_t , tf2 )
 		if( year %in% 1999:2000 ) options( encoding = 'latin1' )
 		
