@@ -172,12 +172,14 @@ read.SAScii.monetdb <-
 		if ( tablename %in% dbListTables( connection ) ) stop( "table with this name already in database" )
 	}
 	
-	if ( sum( grepl( 'sample' , tolower( y$varname ) ) ) > 0 ){
-		print( 'warning: variable named sample not allowed in monetdb' )
-		print( 'changing column name to sample_' )
-		y$varname <- gsub( 'sample' , 'sample_' , y$varname )
-	}
+	for ( j in y$varname[ toupper( y$varname ) %in% .SQL92Keywords ) ] ){
 	
+		print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
+		print( paste0( 'changing column name to ' , j , '_' ) )
+		y[ y$varname == j , 'varname' ] <- paste0( j , "_" )
+
+	}
+
 	fields <- y$varname
 
 	if( varchar ){

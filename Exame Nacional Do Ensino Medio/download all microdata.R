@@ -138,7 +138,7 @@ for ( year in years_to_download ){
 			
 				this_file <- ranc( this_file )
 				
-				monetdb.read.csv( db , this_file , tablename , lower.case.names = TRUE , delim = ifelse( soc , "," , ";" ) )
+				monetdb.read.csv( db , this_file , tablename , lower.case.names = TRUE , delim = ifelse( soc , "," , ";" ) , best.effort = tablename == "microdados_enem_2013" )
 				
 			}
 			
