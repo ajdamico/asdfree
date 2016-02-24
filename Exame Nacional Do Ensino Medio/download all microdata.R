@@ -79,7 +79,7 @@ years_to_download <- gsub( "(.*)([0-9][0-9][0-9][0-9])(.*)" , "\\2" , enem_files
 # start with the most recent year first
 years_to_download <- rev( sort( years_to_download ) )
 
-# for ( year in sample( years_to_download , 15 ) ){
+# for ( year in sample( years_to_download , 16 ) ){
 for ( year in years_to_download ){
 # for ( year in 2009 ){
 
