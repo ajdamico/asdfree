@@ -430,6 +430,8 @@ for ( i in numbers.to.download ){
 				# pull the data file into working memory
 				x <- dbReadTable( db , tablename )
 			
+				print( paste( "revising" , tablename ) )
+				
 				# if there are any missing values to recode
 				if ( length( mvr ) == 1 ){
 				
