@@ -69,18 +69,19 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "RCurl" , "RSQLite" , "descr" , "downloader" , "digest" , "R.utils" , "stringr" ) )
+# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" , "R.utils" , "RCurl" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
 
-library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-library(RCurl)		# load RCurl package (downloads https files)
-library(stringr)	# load stringr package (manipulates character strings easily)
-library(downloader)	# downloads and then runs the source() function on scripts from github
-library(RSQLite)	# load RSQLite package (creates database files in R)
-library(descr)		# load the descr package (converts fixed-width files to delimited files)
-library(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
-library(foreign)	# load foreign package (converts data files into R)
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(RCurl)			# load RCurl package (downloads https files)
+library(stringr)		# load stringr package (manipulates character strings easily)
+library(downloader)		# downloads and then runs the source() function on scripts from github
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+library(descr)			# load the descr package (converts fixed-width files to delimited files)
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(foreign)		# load foreign package (converts data files into R)
 
 
 # follow the authentication technique described on this stackoverflow post
@@ -91,8 +92,8 @@ library(foreign)	# load foreign package (converts data files into R)
 tf <- tempfile()
 
 
-# load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
+# load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
 # download the contents of the webpage hosting all ncvs data files
 all.ncvs.studies <- getURL( "http://www.icpsr.umich.edu/icpsrweb/NACJD/series/95/studies?archive=NACJD&q=&paging.rows=10000&sortBy=7" )
@@ -151,6 +152,8 @@ print( study.names )
 # no need to edit anything below this line #
 
 
+
+
 # if the object `studies.to.download` exists in working memory..
 if ( exists( "studies.to.download" ) ){
 
@@ -164,6 +167,19 @@ if ( exists( "studies.to.download" ) ){
 	numbers.to.download <- seq_along( study.names )
 
 }
+
+
+# 1992-2014 concatenated file does not include ascii
+# remove it (hopefully temporarily)
+numbers.to.download <- numbers.to.download[ numbers.to.download != which( study.names == "1992-2014 Concatenated File" ) ]
+
+
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # loop through all study numbers deemed download-worthy
@@ -325,9 +341,6 @@ for ( i in numbers.to.download ){
 			# let the user/viewer know whatcha doin'
 			print( paste( "currently importing" , data.file ) )
 			
-			# initiate a sqlite database for this file on your local computer
-			db <- dbConnect( SQLite() , gsub( "txt$" , "db" , data.file ) )
-
 			# in most cases, the sas importation script should start right at the beginning..
 			beginline <- 1
 			
@@ -335,20 +348,21 @@ for ( i in numbers.to.download ){
 			if ( j == "terms2?study=4429&ds=1&bundle=ascsas&path=NACJD" & study.names[ i ] == "2005 School Crime Supplement" ) beginline <- 794
 			# end of hardcoding
 			
+			tablename <- gsub( "-" , "_" , tolower( basename( data.file ) ) )
+			tablename <- gsub( "(.*)\\.(.*)" , "\\1" , tablename )
+			tablename <- gsub( "_data" , "" , tablename )
+			tablename <- paste0( 'x' , tablename )
+			
 			# read the data file into an r sqlite database
-			read.SAScii.sqlite(
+			read.SAScii.monetdb(
 				fn = data.file ,
 				sas_ri = sas.import ,
 				tl = TRUE ,	# convert all column names to lowercase?
-				tablename = "x" ,
+				tablename = tablename ,
 				beginline = beginline ,
 				skip.decimal.division = TRUE ,
 				conn = db
 			)
-
-			# clear up empty space in the database
-			dbSendQuery( db , 'VACUUM' )
-
 			
 			# figure out which variables need to be recoded to system missing #
 			
@@ -411,10 +425,10 @@ for ( i in numbers.to.download ){
 			# this loop assumes you have less than 4GB of RAM, so tables with more
 			# than 100,000 records will not automatically get read in unless you comment
 			# out this `if` block by adding `#` in front of this line and the accompanying `}`
-			if ( dbGetQuery( db , 'select count(*) from x' )[ 1 , 1 ] < 100000 ){
+			if ( dbGetQuery( db , paste0( 'select count(*) from ' , tablename ) )[ 1 , 1 ] < 100000 ){
 				
 				# pull the data file into working memory
-				x <- dbReadTable( db , 'x' )
+				x <- dbReadTable( db , tablename )
 			
 				# if there are any missing values to recode
 				if ( length( mvr ) == 1 ){
@@ -440,16 +454,16 @@ for ( i in numbers.to.download ){
 					}
 					
 					# remove the current data table from the database
-					dbRemoveTable( db , 'x' )
+					dbRemoveTable( db , tablename )
 					
 					# ..and overwrite it with the data.frame object
 					# that you've just blessedly cleaned up
-					dbWriteTable( db , 'x' , x )
+					dbWriteTable( db , tablename , x )
 
 				}
 				
 				# save the r data.frame object to the local disk as an `.rda`
-				save( x , file = gsub( "txt$" , "rda" , data.file ) )
+				save( x , file = gsub( "\\-Data\\.txt$" , "rda" , data.file ) )
 			
 				# remove the object from working memory
 				rm( x )
@@ -460,10 +474,7 @@ for ( i in numbers.to.download ){
 								
 				# if there are any variables that need system missing-ing
 				if( length( mvr ) == 1 ){
-				
-					# tell the sqlite database you're sending in a bunch of commands at once
-					dbBeginTransaction( db )
-					
+						
 					# loop through each variable to recode
 					for ( k in seq_along( vtr ) ){
 					
@@ -471,7 +482,9 @@ for ( i in numbers.to.download ){
 						dbSendQuery( 
 							db , 
 							paste(
-								"UPDATE x SET" ,
+								"UPDATE" , 
+								tablename , 
+								"SET" ,
 								vtr[ k ] ,
 								" = NULL WHERE" ,
 								ptm[ k ]
@@ -480,10 +493,6 @@ for ( i in numbers.to.download ){
 						
 					}
 					
-					# once all system missings have been overwritten with missing,
-					# save those changes in the r sqlite database
-					dbCommit( db )
-				
 				}
 				
 			}
@@ -493,10 +502,14 @@ for ( i in numbers.to.download ){
 		# clear up RAM	
 		gc()
 			
-		# disconnect from the current sqlite database
-		dbDisconnect( db )
-	
 	}
 	
 }
+
+
+# take a look at all the new data tables that have been added to your RAM-free MonetDBLite database
+dbListTables( db )
+
+# disconnect from the current database
+dbDisconnect( db )
 
