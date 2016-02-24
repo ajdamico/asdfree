@@ -150,7 +150,7 @@ for ( year in years_to_download ){
 		
 		sas_ri <- grep( "\\.sas|\\.SAS" , z , value = TRUE )
 
-		if( length( sas_ri ) > 1 ) sas_ri <- sas_ri[ !grepl( "questionario" , tolower( sas_ri ) ) ]
+		if( length( sas_ri ) > 1 ) sas_ri <- sas_ri[ !grepl( "questionario|prova" , tolower( basename( sas_ri ) ) ) ]
 		
 		if( year %in% 1999:2000 ) options( encoding = 'native.enc' )
 		sas_t <- readLines( sas_ri )
@@ -162,7 +162,7 @@ for ( year in years_to_download ){
 		
 		dfile <- grep( "\\.txt|\\.TXT" , z , value = TRUE )
 		
-		if( length( dfile ) > 1 ) dfile <- dfile[ grep( "dados" , tolower( dfile ) ) ]
+		if( length( dfile ) > 1 ) dfile <- dfile[ grep( "dados" , tolower( basename( dfile ) ) ) ]
 		
 		row_check <- TRUE
 		
