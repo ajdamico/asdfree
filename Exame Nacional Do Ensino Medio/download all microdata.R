@@ -152,12 +152,13 @@ for ( year in years_to_download ){
 
 		if( length( sas_ri ) > 1 ) sas_ri <- sas_ri[ !grepl( "questionario" , tolower( sas_ri ) ) ]
 		
+		if( year %in% 1999:2000 ) options( encoding = 'native.enc' )
 		sas_t <- readLines( sas_ri )
 		sas_t <- gsub( "\t" , " " , sas_t )
 		sas_t <- gsub( "char(.*)" , "\\1" , tolower( sas_t ) )
 		sas_t <- gsub( "datetime(.*)" , "$ \\1" , tolower( sas_t ) )
 		writeLines( sas_t , tf2 )
-		
+		if( year %in% 1999:2000 ) options( encoding = 'latin1' )
 		
 		dfile <- grep( "\\.txt|\\.TXT" , z , value = TRUE )
 		
