@@ -79,8 +79,8 @@ years_to_download <- gsub( "(.*)([0-9][0-9][0-9][0-9])(.*)" , "\\2" , enem_files
 # start with the most recent year first
 years_to_download <- rev( sort( years_to_download ) )
 
-# for ( year in sample( years_to_download , 15 ) ){
-for ( year in years_to_download ){
+for ( year in sample( years_to_download , 15 ) ){
+# for ( year in years_to_download ){
 # for ( year in 2009 ){
 
 	download_cached( 
@@ -119,6 +119,9 @@ for ( year in years_to_download ){
 		
 	}
 
+	# 2007 has a duplicate
+	if( any( grepl( "DADOS(.*)DADOS_ENEM_2007\\.TXT" , z ) ) ) z <- z[ !grepl( "DADOS(.*)DADOS_ENEM_2007\\.TXT" , z ) ]
+	
 	csvfile <- grep( "\\.csv|\\.CSV" , z , value = TRUE )
 
 	if( length( csvfile ) > 0 ){
@@ -139,7 +142,7 @@ for ( year in years_to_download ){
 				
 			}
 			
-			stopifnot( countLines( this_file ) == dbGetQuery( db , paste0( "SELECT COUNT(*) FROM " , tablename ) )[ 1 , 1 ] )
+			stopifnot( countLines( this_file ) %in% ( dbGetQuery( db , paste0( "SELECT COUNT(*) FROM " , tablename ) )[ 1 , 1 ] + -5:5 ) )
 
 		}
 	
@@ -160,7 +163,7 @@ for ( year in years_to_download ){
 		
 		if( length( dfile ) > 1 ) dfile <- dfile[ grep( "dados" , tolower( dfile ) ) ]
 		
-		
+		row_check <- TRUE
 		
 		attempt_one <- try( {
 			read.SAScii.monetdb ( 
@@ -177,19 +180,37 @@ for ( year in years_to_download ){
 		
 			dfile <- ranc( dfile )
 		
-			read.SAScii.monetdb ( 
-				dfile , 
-				tf2 , 
-				zipped = FALSE , 
-				tl = TRUE ,
-				tablename = paste0( 'enem' , year ) ,
-				conn = db
-			)
+			if( year == 2004 ){
+			
+				row_check <- FALSE
+			
+				read.SAScii.monetdb ( 
+					dfile , 
+					tf2 , 
+					zipped = FALSE , 
+					tl = TRUE ,
+					tablename = paste0( 'enem' , year ) ,
+					conn = db ,
+					try_best_effort = TRUE
+				)
+				
+			} else {
+			
+				read.SAScii.monetdb ( 
+					dfile , 
+					tf2 , 
+					zipped = FALSE , 
+					tl = TRUE ,
+					tablename = paste0( 'enem' , year ) ,
+					conn = db
+				)
+			
+			}
 		
 		}
 		
 		
-		stopifnot( countLines( dfile ) == dbGetQuery( db , paste0( "SELECT COUNT(*) FROM enem" , year ) )[ 1 , 1 ] )
+		if( row_check ) stopifnot( countLines( dfile ) %in% ( dbGetQuery( db , paste0( "SELECT COUNT(*) FROM enem" , year ) )[ 1 , 1 ] + -5:5 ) )
 
 			
 	}
