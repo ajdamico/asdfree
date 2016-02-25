@@ -90,19 +90,11 @@ years_to_download <- gsub( "(.*)([0-9][0-9][0-9][0-9])(.*)" , "\\2" , enem_files
 # start with the most recent year first
 years_to_download <- rev( sort( years_to_download ) )
 
-# BEST EFFORT does not work on 2011, it is very corrupted
-years_to_download <- years_to_download[ years_to_download != 2011 ]
-# > dbGetQuery(db,'select count(*) from enem2011')
-      # L1
-# 1 984236
-# > countLines(dfile)
-# [1] 5380856
-
 
 
 # 2008 file isn't extracting for some reason?
 years_to_download <- years_to_download[ years_to_download != 2008 ]
-
+# SKIP 2008
 
 
 for ( year in sample( years_to_download , length( years_to_download ) ) ){
