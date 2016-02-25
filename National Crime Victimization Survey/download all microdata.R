@@ -364,6 +364,9 @@ for ( i in numbers.to.download ){
 				conn = db
 			)
 			
+			
+			gc()
+			
 			# figure out which variables need to be recoded to system missing #
 			
 			# read the entire sas import script into a character vector
