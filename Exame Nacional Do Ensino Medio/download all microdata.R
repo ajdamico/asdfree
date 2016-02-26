@@ -2,9 +2,7 @@
 path.to.7z <- normalizePath( "C:/Program Files (x86)/7-zip/7z.exe" )		# # this is probably the correct line for windows
 # path.to.7z <- "7za"													# # this is probably the correct line for macintosh and *nix
 
-
-
-options( encoding = "latin1" )		# # only macintosh and *nix users need this line
+options( encoding = "latin1" )
 
 tf <- tempfile() ; tf2 <- tempfile()
 
@@ -120,7 +118,7 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 			system( dos.command )
 		}
 		
-		z <- unique( c( z , list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) ) )
+		z <- unique( list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) )
 
 		zf <- grep( "\\.zip|\\.ZIP" , list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) , value = TRUE )
 
@@ -259,9 +257,10 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 			
 	}
 	
-	
-	
+
 	unlink( z )
+	
+	rm( z )
 	
 }
 
