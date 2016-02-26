@@ -46,6 +46,8 @@ import.nchs <-
 		force.length = FALSE
 	){
 
+		gc()
+	
 		# figure out tablename from the files.to.import
 		tablenames <-
 			gsub( "./" , "" , files.to.import , fixed = TRUE )
@@ -83,6 +85,8 @@ import.nchs <-
 			suppressWarnings( while( unlink( fti ) ) Sys.sleep( 1 ) )
 			
 		}
+		
+		gc()
 		
 		TRUE
 	}
