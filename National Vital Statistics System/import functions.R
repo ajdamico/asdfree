@@ -208,6 +208,8 @@ remove.overlap <-
 		
 		sas_lines <- gsub( "@214 ucr130 3." , "@214 ucr130 $ 3." , sas_lines )
 		
+		sas_lines <- gsub( "@107  mrace6             2" , "@107  mrace6             1" , sas_lines )
+		sas_lines <- gsub( "@9    dob_yy             4" , "@1 BLANK $8  @9    dob_yy             4" , sas_lines )
 		sas_lines <- gsub( "@7    revision" , "@1    BLANK $6 @7    revision" , sas_lines )
 		sas_lines <- gsub( "@4    reparea        1." , "@4    reparea        $1" , sas_lines )
 		
