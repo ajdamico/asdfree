@@ -257,8 +257,11 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 			
 	}
 	
-
+	gc()
+	
 	unlink( z )
+	
+	unlink( list.files( tempdir() ) )
 	
 	rm( z )
 	
