@@ -172,7 +172,7 @@ read.SAScii.monetdb <-
 		if ( tablename %in% dbListTables( connection ) ) stop( "table with this name already in database" )
 	}
 	
-	for ( j in y$varname[ toupper( y$varname ) %in% .SQL92Keywords ] ){
+	for ( j in y$varname[ toupper( y$varname ) %in% MonetDB.R:::reserved_monetdb_keywords ] ){
 	
 		print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
 		print( paste0( 'changing column name to ' , j , '_' ) )
