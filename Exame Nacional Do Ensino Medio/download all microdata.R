@@ -1,5 +1,5 @@
 
-path.to.7z <- normalizePath( "C:/Program Files (x86)/7-zip/7z.exe" )		# # this is probably the correct line for windows
+path.to.7z <- normalizePath( "C:/Program Files/7-zip/7z.exe" )		# # this is probably the correct line for windows
 # path.to.7z <- "7za"													# # this is probably the correct line for macintosh and *nix
 
 options( encoding = "latin1" )
@@ -99,6 +99,10 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 # for ( year in years_to_download ){
 # for ( year in 2009 ){
 
+	this_year_tempdir <- paste0( tempdir() , '/' , year )
+	
+	dir.create( this_year_tempdir )
+
 	download_cached( 
 		paste0( 
 			"ftp://ftp.inep.gov.br/microdados/" , 
@@ -110,7 +114,7 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 
 	if( !grepl( "\\.rar" , grep( year , enem_files , value = TRUE ) ) ){
 
-		dos.command <- paste0( '"' , path.to.7z , '" e ' , tf , ' -o' , tempdir() )
+		dos.command <- paste0( '"' , path.to.7z , '" e ' , tf , ' -o' , this_year_tempdir )
 		
 		if ( .Platform$OS.type == 'windows' ){
 			shell( dos.command ) 
@@ -118,13 +122,13 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 			system( dos.command )
 		}
 		
-		z <- unique( list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) )
+		z <- unique( list.files( this_year_tempdir , recursive = TRUE , full.names = TRUE  ) )
 
-		zf <- grep( "\\.zip|\\.ZIP" , list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) , value = TRUE )
+		zf <- grep( "\\.zip|\\.ZIP" , list.files( this_year_tempdir , recursive = TRUE , full.names = TRUE  ) , value = TRUE )
 
 		if( length( zf ) > 0 ){
 
-			dos.command <- paste0( '"' , path.to.7z , '" e ' , zf , ' -o' , tempdir() )
+			dos.command <- paste0( '"' , path.to.7z , '" e ' , zf , ' -o' , this_year_tempdir )
 		
 			if ( .Platform$OS.type == 'windows' ){
 				shell( dos.command ) 
@@ -132,7 +136,7 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 				system( dos.command )
 			}
 			
-			z <- unique( c( z , list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) ) )
+			z <- unique( c( z , list.files( this_year_tempdir , recursive = TRUE , full.names = TRUE  ) ) )
 
 		}
 		
@@ -146,7 +150,7 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 		
 	if( length( rfi ) > 0 ) {
 		
-		dos.command <- paste0( '"' , path.to.7z , '" e ' , rfi , ' -o' , tempdir() )
+		dos.command <- paste0( '"' , path.to.7z , '" e ' , rfi , ' -o' , this_year_tempdir )
 		
 		if ( .Platform$OS.type == 'windows' ){
 			shell( dos.command ) 
@@ -154,7 +158,7 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 			system( dos.command )
 		}
 		
-		z <- unique( c( z , list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) ) )
+		z <- unique( c( z , list.files( this_year_tempdir , recursive = TRUE , full.names = TRUE  ) ) )
 		
 	}
 
@@ -259,9 +263,7 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 	
 	gc()
 	
-	unlink( z )
-	
-	unlink( list.files( tempdir() ) )
+	unlink( list.files( this_year_tempdir ) , recursive = TRUE )
 	
 	rm( z )
 	
