@@ -111,10 +111,33 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 	)
 
 	if( !grepl( "\\.rar" , grep( year , enem_files , value = TRUE ) ) ){
-	
-		z <- unzip( tf , exdir = tempdir() )
-		zf <- grep( "\\.zip|\\.ZIP" , z , value = TRUE )
-		if( length( zf ) > 0 ) z <- c( z , unzip( zf , exdir = tempdir() ) )
+
+		dos.command <- paste0( '"' , path.to.7z , '" e ' , tf , ' -o' , tempdir() )
+		
+		if ( .Platform$OS.type == 'windows' ){
+			shell( dos.command ) 
+		} else {
+			system( dos.command )
+		}
+		
+		z <- unique( c( z , list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) ) )
+
+		zf <- grep( "\\.zip|\\.ZIP" , list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) , value = TRUE )
+
+		if( length( zf ) > 0 ){
+
+			dos.command <- paste0( '"' , path.to.7z , '" e ' , zf , ' -o' , tempdir() )
+		
+			if ( .Platform$OS.type == 'windows' ){
+				shell( dos.command ) 
+			} else {
+				system( dos.command )
+			}
+			
+			z <- unique( c( z , list.files( tempdir() , recursive = TRUE , full.names = TRUE  ) ) )
+
+		}
+		
 		
 		rfi <- grep( "\\.rar|\\.RAR" , z , value = TRUE )
 	
