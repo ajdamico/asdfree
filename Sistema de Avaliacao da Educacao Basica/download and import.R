@@ -203,8 +203,11 @@ for ( year in years.to.download ){
 	for ( this.text in text.files ){
 
 		# remove the `.txt` to determine the name of the current table
-		table.name <- paste0( gsub( "\\.txt$" , "" , tolower( basename( this.text ) ) ) , "_" , year )
+		table.name <- gsub( "\\.txt$" , "" , tolower( basename( this.text ) ) )
 
+		# add the year
+		tnwy <- paste0( table.name , "_" , year )
+		
 		# find the appropriate sas importation instructions to be used for the current table
 		this.sas <- sas.files[ match( table.name , gsub( "i[m|n]put_sas_(.*)\\.sas$" , "\\1" , tolower( basename( sas.files ) ) ) ) ]
 		
@@ -212,7 +215,7 @@ for ( year in years.to.download ){
 		x <- read.SAScii( this.text , this.sas )
 
 		# store the `x` data.frame object in sqlite database as well
-		dbWriteTable( db , table.name , x )
+		dbWriteTable( db , tnwy , x )
 		
 		# copy the object `x` over to what it actually should be named
 		assign( table.name , x )
@@ -238,7 +241,7 @@ for ( year in years.to.download ){
 	for ( this.csv in csv.files ){
 	
 		# remove the `.csv` to determine the name of the current table
-		table.name <- paste0( gsub( "\\.csv$" , "" , tolower( basename( this.csv ) ) ) , "_" , year )
+		tnwy <- paste0( gsub( "\\.csv$" , "" , tolower( basename( this.csv ) ) ) , "_" , year )
 
 		# specify the chunk size to read in
 		chunk_size <- 250000
@@ -252,7 +255,7 @@ for ( year in years.to.download ){
 		cc <- sapply( headers , class )
 
 		# initiate the current table
-		dbWriteTable( db , table.name , headers , overwrite = TRUE , row.names = FALSE )
+		dbWriteTable( db , tnwy , headers , overwrite = TRUE , row.names = FALSE )
 		
 		# so long as there are lines to read, add them to the current table
 		tryCatch({
@@ -268,7 +271,7 @@ for ( year in years.to.download ){
 					colClasses = cc
 				)
 				
-			   dbWriteTable( db , table.name , part , append = TRUE , row.names = FALSE )
+			   dbWriteTable( db , tnwy , part , append = TRUE , row.names = FALSE )
 		   }
 		   
 		} , error = function(e) { if ( grepl( "no lines available" , conditionMessage( e ) ) ) TRUE else stop( conditionMessage( e ) ) }
