@@ -215,7 +215,7 @@ for ( i in numbers.to.download ){
 		dp <- paste0( "http://www.icpsr.umich.edu/cgi-bin/" , j )
 		
 		# download the current document
-		this.doc <- getBinaryURL( dp )
+		this.doc <- download_cached( dp , destfile = NULL , FUN = getBinaryURL )
 	
 		# initiate a header
 		h <- basicHeaderGatherer()
@@ -295,7 +295,7 @@ for ( i in numbers.to.download ){
 			)
 	
 		# download the current sas file onto the local disk
-		this.sas_ri <- getBinaryURL( dp , curl = curl )
+		this.sas_ri <- download_cached( dp , destfile = NULL , FUN = getBinaryURL , curl = curl )
 
 		# initiate a heading object
 		h <- basicHeaderGatherer()
