@@ -1,5 +1,8 @@
 
-path.to.7z <- normalizePath( "C:/Program Files/7-zip/7z.exe" )		# # this is probably the correct line for windows
+# path.to.7z <- normalizePath( "C:/Program Files (x86)/7-zip/7z.exe" )		# # this is probably the correct line for windows
+# path.to.7z <- normalizePath( "C:/Program Files/7-zip/7z.exe" )		# # this is probably the correct line for windows
+
+
 # path.to.7z <- "7za"													# # this is probably the correct line for macintosh and *nix
 
 options( encoding = "latin1" )
