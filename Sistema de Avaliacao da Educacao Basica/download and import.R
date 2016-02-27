@@ -214,6 +214,19 @@ for ( year in years.to.download ){
 		# read the data file directly into an R data frame object
 		x <- read.SAScii( this.text , this.sas )
 
+		# convert column names to lowercase
+		names( x ) <- tolower( names( x ) )
+		
+		# do not use monetdb reserved words
+		for ( j in names( x )[ toupper( names( x ) ) %in% MonetDB.R:::reserved_monetdb_keywords ] ){
+		
+			print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
+			print( paste0( 'changing column name to ' , j , '_' ) )
+			names( x )[ names( x ) == j ] <- paste0( j , "_" )
+
+		}
+		
+		
 		# store the `x` data.frame object in sqlite database as well
 		dbWriteTable( db , tnwy , x )
 		
@@ -251,6 +264,18 @@ for ( year in years.to.download ){
 
 		# read in the first chunk
 		headers <- read.csv( input , sep = ";" , dec = "," , na.strings = "." , nrows = chunk_size )
+		
+		# convert column names to lowercase
+		names( headers ) <- tolower( names( headers ) )
+		
+		# do not use monetdb reserved words
+		for ( j in names( headers )[ toupper( names( headers ) ) %in% MonetDB.R:::reserved_monetdb_keywords ] ){
+		
+			print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
+			print( paste0( 'changing column name to ' , j , '_' ) )
+			names( headers )[ names( headers ) == j ] <- paste0( j , "_" )
+
+		}
 		
 		cc <- sapply( headers , class )
 
