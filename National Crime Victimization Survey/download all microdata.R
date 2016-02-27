@@ -92,6 +92,14 @@ library(foreign)		# load foreign package (converts data files into R)
 tf <- tempfile()
 
 
+# load the download_cached and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url(
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" ,
+	prompt = FALSE ,
+	echo = FALSE
+)
+
 # load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
