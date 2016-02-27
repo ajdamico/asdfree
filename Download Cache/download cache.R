@@ -184,7 +184,7 @@ download_cached <-
 		
 				save( success , file = cachefile )
 		
-			} else if (success && savecache) file.copy( destfile , cachefile , overwrite = TRUE )
+			} else if ( !is.null( destfile ) && savecache && success ) file.copy( destfile , cachefile , overwrite = TRUE )
 			cat("\n")
 			
 			
