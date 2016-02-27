@@ -28,7 +28,7 @@ download_cached <-
   function (
 	url ,
 	
-	destfile ,
+	destfile = NULL ,
 	
 	# pass in any other arguments needed for the FUN
 	... ,
@@ -58,6 +58,7 @@ download_cached <-
 	
 	# how long should download_cached wait between attempts?
 	sleepsec = 60
+	
   ) {
   
 		# users can set the option to override usedest and usecache globally.
@@ -79,7 +80,7 @@ download_cached <-
 			)
 		)
 		
-		if ( usedest && file.exists( destfile ) && file.info( destfile )$size > 0 ) {
+		if ( !is.null( destfile ) && usedest && file.exists( destfile ) && file.info( destfile )$size > 0 ) {
 		
 			cat("Destination already exists, doing nothing (override with usedest=FALSE parameter)\n")
 			
@@ -107,7 +108,12 @@ download_cached <-
 				  )
 				)
 				
-				return( invisible( ifelse( file.copy( cachefile , destfile , overwrite = TRUE ) , 0 , 1 ) ) )
+				if( is.null( destfile ) ){
+					load( cachefile )
+					return( invisible( success ) )
+				} else {
+					return( invisible( ifelse( file.copy( cachefile , destfile , overwrite = TRUE ) , 0 , 1 ) ) )
+				}
 				
 		  }
 		  
@@ -129,13 +135,27 @@ download_cached <-
 			failed.attempt <-
 				try( {
 					
-					# did the download work?
-					success <- 
-						do.call( 
-							FUN , 
-							list( url , destfile , ... ) 
-						) == 0
-						
+					# if there is no destination file, then `success` contains the data.
+					if( is.null( destfile ) ){
+					
+						# did the download work?
+						success <- 
+							do.call( 
+								FUN , 
+								list( url ... ) 
+							) == 0
+							
+					} else {
+
+						# did the download work?
+						success <- 
+							do.call( 
+								FUN , 
+								list( url , destfile , ... ) 
+							) == 0
+
+					}
+					
 					} , 
 					silent = TRUE 
 				)
@@ -150,8 +170,15 @@ download_cached <-
 		
 		# double-check that the `success` object exists.. it might not if `attempts` was set to zero.
 		if ( exists( 'success' ) ){
-			if (success && savecache) file.copy( destfile , cachefile , overwrite = TRUE )
+		
+			if( is.null( destfile ) && savecache ){
+		
+				save( success , file = cachefile )
+		
+			} else if (success && savecache) file.copy( destfile , cachefile , overwrite = TRUE )
 			cat("\n")
+			
+			
 			return( invisible( success ) )
 		
 		# otherwise break.
