@@ -69,16 +69,25 @@ download_cached <-
 
 		if( usecache & !savecache ) warning( "usecache=TRUE and savecache=FALSE does not do anything" )
 		
-			
-		cat(
-			paste0(
-				"Downloading from URL '" ,
-				url , 
-				"' to file '" , 
-				destfile , 
-				"'... "
+		if( is.null( destfile ) ){
+			cat(
+				paste0(
+					"saving from URL '" ,
+					url , 
+					"' to this object... "
+				)
 			)
-		)
+		} else {
+			cat(
+				paste0(
+					"Downloading from URL '" ,
+					url , 
+					"' to file '" , 
+					destfile , 
+					"'... "
+				)
+			)
+		}
 		
 		if ( !is.null( destfile ) && usedest && file.exists( destfile ) && file.info( destfile )$size > 0 ) {
 		
@@ -143,7 +152,7 @@ download_cached <-
 							do.call( 
 								FUN , 
 								list( url , ... ) 
-							) == 0
+							)
 							
 					} else {
 
