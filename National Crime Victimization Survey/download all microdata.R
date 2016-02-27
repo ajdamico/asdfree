@@ -410,7 +410,10 @@ for ( i in numbers.to.download ){
 				
 				# find which variables need to be replaced by extracting whatever's directly in front of the equals sign
 				vtr <- str_trim( tolower( gsub( "(.*) THEN( ?)(.*)( ?)=(.*)" , "\\3" , recodes ) ) )
-				
+
+				# reserved words have been recoded within `read.SAScii.monetdb` and need to be recoded here as well
+				for ( j in vtr[ vtr %in% tolower( MonetDB.R:::reserved_monetdb_keywords ) ] ) vtr[ vtr == j ] <- paste0( j , "_" )
+
 				# remove everything after the `THEN` block..
 				ptm <- gsub( " THEN( ?)(.*)" , "" , recodes )
 				
