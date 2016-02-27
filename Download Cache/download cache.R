@@ -142,7 +142,7 @@ download_cached <-
 						success <- 
 							do.call( 
 								FUN , 
-								list( url ... ) 
+								list( url , ... ) 
 							) == 0
 							
 					} else {
