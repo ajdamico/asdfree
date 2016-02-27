@@ -51,7 +51,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c ( "SAScii" , "RSQLite" , "downloader" , "digest" ) )
+# install.packages( c("MonetDB.R", "MonetDBLite" , "SAScii" , "downloader" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
 
@@ -63,9 +63,10 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # # # # # # #
 
 
-library(RSQLite) 	# load RSQLite package (creates database files in R)
-library(SAScii)		# load the SAScii package (imports ascii data with a SAS script)
-library(downloader)	# downloads and then runs the source() function on scripts from github
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+library(SAScii)			# load the SAScii package (imports ascii data with a SAS script)
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
 # specify which years of saeb data are currently available for download
@@ -86,6 +87,11 @@ source_url(
 # create a directory to save all downloaded files
 dir.create( "./download" )
 
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 # create a temporary file and a temporary directory
 tf <- tempfile() ; td <- tempdir()
@@ -199,21 +205,31 @@ for ( year in years.to.download ){
 		# remove the `.txt` to determine the name of the current table
 		table.name <- gsub( "\\.txt$" , "" , tolower( basename( this.text ) ) )
 
+		# add the year
+		tnwy <- paste0( table.name , "_" , year )
+		
 		# find the appropriate sas importation instructions to be used for the current table
 		this.sas <- sas.files[ match( table.name , gsub( "i[m|n]put_sas_(.*)\\.sas$" , "\\1" , tolower( basename( sas.files ) ) ) ) ]
 		
 		# read the data file directly into an R data frame object
 		x <- read.SAScii( this.text , this.sas )
 
-		# connect to (and, if it doesn't exist, initiate) a sqlite database
-		db <- dbConnect( SQLite() , paste0( "./" , year , "/saeb.db" ) )
-	
-		# store the `x` data.frame object in sqlite database as well
-		dbWriteTable( db , table.name , x )
+		# convert column names to lowercase
+		names( x ) <- tolower( names( x ) )
 		
-		# disconnect from the sqlite database
-		dbDisconnect( db )
+		# do not use monetdb reserved words
+		for ( j in names( x )[ toupper( names( x ) ) %in% MonetDB.R:::reserved_monetdb_keywords ] ){
+		
+			print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
+			print( paste0( 'changing column name to ' , j , '_' ) )
+			names( x )[ names( x ) == j ] <- paste0( j , "_" )
 
+		}
+		
+		
+		# store the `x` data.frame object in sqlite database as well
+		dbWriteTable( db , tnwy , x )
+		
 		# copy the object `x` over to what it actually should be named
 		assign( table.name , x )
 		
@@ -237,11 +253,8 @@ for ( year in years.to.download ){
 	# loop through each available csv (also data) file..
 	for ( this.csv in csv.files ){
 	
-		# connect to (and, if it doesn't exist, initiate) a sqlite database
-		db <- dbConnect( SQLite() , paste0( "./" , year , "/saeb.db" ) )
-	
 		# remove the `.csv` to determine the name of the current table
-		table.name <- gsub( "\\.csv$" , "" , tolower( basename( this.csv ) ) )
+		tnwy <- paste0( gsub( "\\.csv$" , "" , tolower( basename( this.csv ) ) ) , "_" , year )
 
 		# specify the chunk size to read in
 		chunk_size <- 250000
@@ -252,10 +265,22 @@ for ( year in years.to.download ){
 		# read in the first chunk
 		headers <- read.csv( input , sep = ";" , dec = "," , na.strings = "." , nrows = chunk_size )
 		
+		# convert column names to lowercase
+		names( headers ) <- tolower( names( headers ) )
+		
+		# do not use monetdb reserved words
+		for ( j in names( headers )[ toupper( names( headers ) ) %in% MonetDB.R:::reserved_monetdb_keywords ] ){
+		
+			print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
+			print( paste0( 'changing column name to ' , j , '_' ) )
+			names( headers )[ names( headers ) == j ] <- paste0( j , "_" )
+
+		}
+		
 		cc <- sapply( headers , class )
 
 		# initiate the current table
-		dbWriteTable( db , table.name , headers , overwrite = TRUE , row.names = FALSE )
+		dbWriteTable( db , tnwy , headers , overwrite = TRUE , row.names = FALSE )
 		
 		# so long as there are lines to read, add them to the current table
 		tryCatch({
@@ -271,7 +296,7 @@ for ( year in years.to.download ){
 					colClasses = cc
 				)
 				
-			   dbWriteTable( db , table.name , part , append = TRUE , row.names = FALSE )
+			   dbWriteTable( db , tnwy , part , append = TRUE , row.names = FALSE )
 		   }
 		   
 		} , error = function(e) { if ( grepl( "no lines available" , conditionMessage( e ) ) ) TRUE else stop( conditionMessage( e ) ) }
@@ -279,10 +304,7 @@ for ( year in years.to.download ){
 		
 		# clear up RAM
 		rm( headers , part ) ; gc()
-		
-		# disconnect from the sqlite database
-		dbDisconnect( db )
-		
+				
 	}
 	
 }
