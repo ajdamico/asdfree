@@ -88,7 +88,7 @@ source_url(
 
 
 # name the database files in the "MonetDB" folder of the current working directory
-dbfolder <- paste0( getwd() , "/MonetDB" )
+dbfolder <- paste0( getwd() , "/monetdb-acs" )
 
 # open the connection to the monetdblite database
 db <- dbConnect( MonetDBLite() , dbfolder )
@@ -381,19 +381,14 @@ for ( year in 2050:2005 ){
 				
 				# loop through each csv file
 				for ( csvpath in fn ){
-				
-					# quickly figure out the number of lines in the data file
-					nooflines <- countLines( csvpath )
-					
+									
 					# now try to copy the current csv file into the database
 					first.attempt <-
 						try( {
 							dbSendQuery( 
 								db , 
 								paste0( 
-									"copy " , 
-									nooflines , 
-									" offset 2 records into " , 
+									"copy offset 2 records into " , 
 									tablename , 
 									" from '" , 
 									normalizePath( csvpath ) , 
@@ -425,9 +420,7 @@ for ( year in 2050:2005 ){
 								dbSendQuery( 
 									db , 
 									paste0( 
-										"copy " , 
-										nooflines , 
-										" offset 2 records into " , 
+										"copy offset 2 records into " , 
 										tablename , 
 										" from '" , 
 										normalizePath( tf_out ) , 
@@ -477,9 +470,7 @@ for ( year in 2050:2005 ){
 						dbSendQuery( 
 								db , 
 								paste0( 
-									"copy " , 
-									nooflines , 
-									" offset 2 records into " , 
+									"copy offset 2 records into " , 
 									tablename , 
 									" from '" , 
 									fpo , 						# only this time, use the temporary file as the source file

@@ -77,7 +77,7 @@ class( acs.m )
 
 
 # name the database files in the "MonetDB" folder of the current working directory
-dbfolder <- paste0( getwd() , "/MonetDB" )
+dbfolder <- paste0( getwd() , "/monetdb-acs" )
 
 # open the connection to the monetdblite database
 db <- dbConnect( MonetDBLite() , dbfolder )
