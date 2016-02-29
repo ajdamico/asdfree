@@ -16,7 +16,7 @@ library(SAScii)
 library(RCurl)
 library(R.utils)
 library(descr)
-
+library(openxlsx)
 
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
@@ -169,6 +169,12 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 	if( any( grepl( "DADOS(.*)DADOS_ENEM_2007\\.TXT" , z ) ) ) z <- z[ !grepl( "DADOS(.*)DADOS_ENEM_2007\\.TXT" , z ) ]
 	
 	csvfile <- grep( "\\.csv|\\.CSV" , z , value = TRUE )
+	
+		# save school math perfomance 
+	xlsfile <- grep( "\\.xls|\\.XLS" , z , value = TRUE )
+	school_file <- grep( "PLAN" , xlsfile , value = TRUE )
+	mat_df <- read.xlsx (school_file , sheet = 3, startRow = 2)
+	save(mat_df, file = paste0 ("MAT", year,".rda") )
 
 	if( length( csvfile ) > 0 ){
 	
