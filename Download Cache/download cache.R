@@ -96,6 +96,7 @@ download_cached <-
 			return( invisible( 0 ) )
 			
 		}
+		if (!usedest && file.exists( destfile ))  file.remove(destfile)
 		
 		cachefile <- 
 			paste0(
@@ -113,7 +114,7 @@ download_cached <-
 				  paste0(
 					"Destination cached in '" , 
 					cachefile , 
-					"', copying locally (override with usecache=FALSE parameter)\n"
+					"', creating link(override with usecache=FALSE parameter)\n"
 				  )
 				)
 				
@@ -121,7 +122,7 @@ download_cached <-
 					load( cachefile )
 					return( invisible( success ) )
 				} else {
-					return( invisible( ifelse( file.copy( cachefile , destfile , overwrite = TRUE ) , 0 , 1 ) ) )
+					return( invisible( ifelse( file.link( cachefile , destfile ) , 0 , 1 ) ) )
 				}
 				
 		  }
