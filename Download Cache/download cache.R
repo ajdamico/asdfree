@@ -114,7 +114,7 @@ download_cached <-
 				  paste0(
 					"Destination cached in '" , 
 					cachefile , 
-					"', creating link(override with usecache=FALSE parameter)\n"
+					"', creating link (override with usecache=FALSE parameter)\n"
 				  )
 				)
 				
