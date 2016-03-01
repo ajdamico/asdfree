@@ -166,7 +166,7 @@ colTypes <-
 	ifelse( 
 		grepl( "code" , fields ) & !grepl( "country|state|gender|taxonomy|postal" , fields ) , 
 		'DOUBLE PRECISION' , 
-		'VARCHAR(255)' 
+		'STRING' 
 	)
 
 # build a sql string..
