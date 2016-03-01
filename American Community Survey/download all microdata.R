@@ -388,7 +388,7 @@ for ( year in 2050:2005 ){
 							dbSendQuery( 
 								db , 
 								paste0( 
-									"copy offset 2 records into " , 
+									"copy offset 2 into " , 
 									tablename , 
 									" from '" , 
 									normalizePath( csvpath ) , 
@@ -420,7 +420,7 @@ for ( year in 2050:2005 ){
 								dbSendQuery( 
 									db , 
 									paste0( 
-										"copy offset 2 records into " , 
+										"copy offset 2 into " , 
 										tablename , 
 										" from '" , 
 										normalizePath( tf_out ) , 
@@ -470,7 +470,7 @@ for ( year in 2050:2005 ){
 						dbSendQuery( 
 								db , 
 								paste0( 
-									"copy offset 2 records into " , 
+									"copy offset 2 into " , 
 									tablename , 
 									" from '" , 
 									fpo , 						# only this time, use the temporary file as the source file
