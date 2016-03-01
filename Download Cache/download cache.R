@@ -96,7 +96,7 @@ download_cached <-
 			return( invisible( 0 ) )
 			
 		}
-		if (!usedest && file.exists( destfile ))  file.remove(destfile)
+		if (!usedest && !is.null( destfile ) && file.exists( destfile ) )  file.remove( destfile )
 		
 		cachefile <- 
 			paste0(
