@@ -248,7 +248,7 @@ if( sipp.assets.extracts ){
 
 	read.SAScii.monetdb (
 			"http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm3_aoa.zip" ,
-			chop.suid( "http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm3_aoa.sas" ) ,
+			chop.suid(fix.ct( "http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm3_aoa.sas") ) ,
 			beginline = 5 ,
 			zipped = T ,
 			tl = TRUE ,
@@ -258,7 +258,7 @@ if( sipp.assets.extracts ){
 
 	read.SAScii.monetdb (
 			"http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm6_aoa.zip" ,
-			chop.suid( "http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm6_aoa.sas" ) ,
+			chop.suid(fix.ct( "http://thedataweb.rm.census.gov/pub/sipp/2004/p04putm6_aoa.sas") ) ,
 			beginline = 4 ,
 			zipped = T ,
 			tl = TRUE ,
@@ -272,12 +272,14 @@ if( sipp.assets.extracts ){
 		
 	# pull all field names from the wave 6 assets extract
 	aoa6.fields <- dbListFields( db , 'aoa6' )
+	aoa3.fields <- dbListFields( db , 'aoa3' )
 	
 	# remove ssuid and epppnum
 	aoa6.fields <- aoa6.fields[ !( aoa6.fields %in% c( 'ssuid' , 'epppnum' ) ) ]
+	aoa3.fields <- aoa3.fields[ !( aoa3.fields %in% c( 'ssuid' , 'epppnum' ) ) ]
 	
 	# find non-intersecting fields in both of those topical modules
-	tm3.nis <- dbListFields( db , 'tm3' )[ !( dbListFields( db , 'tm3' ) %in% aoa6.fields ) ]
+	tm3.nis <- dbListFields( db , 'tm3' )[ !( dbListFields( db , 'tm3' ) %in% aoa3.fields ) ]
 	tm6.nis <- dbListFields( db , 'tm6' )[ !( dbListFields( db , 'tm6' ) %in% aoa6.fields ) ]
 
 	# create temporary tables, without the intersection columns
