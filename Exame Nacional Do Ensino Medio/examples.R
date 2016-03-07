@@ -1,3 +1,14 @@
+library(MonetDB.R)
+library(MonetDBLite)
+library (dplyr)
+
+## directory containing the monetdb data base
+setwd ("C:/My Directory/ENEM/")
+
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
+db <- dbConnect( MonetDBLite() , dbfolder )
+
 
 ## number of enrolled
 
@@ -84,3 +95,37 @@ math_mean_fam_inc <- dbGetQuery( db , "select q003 , sum(nota_mt)/count(*) as me
 # range
 
 max(math_mean_fam_inc$med_mat)-min(math_mean_fam_inc$med_mat)
+
+##############################################################################
+# using library dplyr
+
+library (dplyr)
+
+
+con <- dbConnect(MonetDB.R(), embedded = dbfolder)
+ms <- src_monetdb(embedded = dbfolder)
+mt <- tbl(ms, "microdados_enem_2014")
+
+## number of students
+dim(mt)[1]
+
+# number of students that took the math test
+
+mt %>% filter(in_presenca_mt==1) %>% summarise(n())
+
+## mean math score by UF
+
+math_mean_uf<- mt %>% filter(in_presenca_mt==1) %>% group_by(uf_residencia) %>% summarise(nstud = n(), math_mean= mean(nota_mt), min = min(nota_mt), max = max(nota_mt), range= max(nota_mt)-min(nota_mt)) %>% arrange(math_mean)
+
+
+
+# math mean by type of school
+# 1 - public
+# 2 - private
+
+mt %>% filter(in_presenca_lc==1) %>% group_by(tp_escola)  %>%summarise(nstud = n(), lc_mean= mean(nota_lc))
+
+# math mean by father education level
+
+mt %>% filter(in_presenca_lc==1) %>% group_by(q001)  %>%summarise(nstud = n(), lc_mean= mean(nota_lc))%>% arrange (q001)
+
