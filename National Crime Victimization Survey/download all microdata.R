@@ -177,9 +177,6 @@ if ( exists( "studies.to.download" ) ){
 }
 
 
-# 1992-2014 concatenated file does not include ascii
-# remove it (hopefully temporarily)
-numbers.to.download <- numbers.to.download[ numbers.to.download != which( study.names == "1992-2014 Concatenated File" ) ]
 
 # this 2009 protective behaviors supplement does not have data, only programming source code
 numbers.to.download <- numbers.to.download[ numbers.to.download != which( study.names ==  "2009 Protective Behaviors of Student Victims of Bullying A Rare Events Analysis of the School Crime Supplement to the" ) ]
