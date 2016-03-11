@@ -1,11 +1,10 @@
 
 # read.SAScii.monetdb depends on the SAScii package and the descr package
 # to install these packages, use the line:
-# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'R.utils' , 'ff' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'ff' ) )
 library(SAScii)
 library(descr)
 library(downloader)
-library(R.utils)
 library(ff)
 
 
@@ -15,8 +14,17 @@ library(ff)
 sql.copy.into <-
 	function( nullas , num.lines , tablename , tf2 , connection , delimiters ){
 		
-		# import the data into the database
-		sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
+		if( num.lines == -1 ){
+		
+			sql.update <- paste0( "copy offset 2 into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
+		
+		} else {
+		
+			# import the data into the database
+			sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
+		
+		}
+		
 		dbSendQuery( connection , sql.update )
 		
 		# return true when it's completed
@@ -220,9 +228,6 @@ read.SAScii.monetdb <-
 	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = F )
 	on.exit( { file.remove( tf2 ) } )
 	
-	# ..and that's the number of lines in the file
-	if( n_max == -1 ) num.lines <- countLines( tf2 ) else num.lines <- n_max
-	
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
 
@@ -237,27 +242,27 @@ read.SAScii.monetdb <-
 	# using the sql.copy.into() function defined above
 	
 	# capture an error (without breaking)
-	te <- try( sql.copy.into( " NULL AS ''" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+	te <- try( sql.copy.into( " NULL AS ''" , n_max , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #1 broke, trying method #2' , "\r" )
 		print( te )
-		te <- try( sql.copy.into( " NULL AS ' '" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+		te <- try( sql.copy.into( " NULL AS ' '" , n_max , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #2 broke, trying method #3' , "\r"  )
 		print( te )
-		te <- try( sql.copy.into( "" , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+		te <- try( sql.copy.into( "" , n_max , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 	
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #3 broke, trying method #4' , "\r"  )
 		print( te )
-		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , num.lines , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , n_max , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 
 	if ( class( te ) == "try-error" ){
@@ -265,7 +270,7 @@ read.SAScii.monetdb <-
 		print( te )
 		# this time without error-handling.
 		# do you want to try the BEST EFFORT flag for COPY INTO?
-		te <- try( sql.copy.into( " NULL AS '' ' '" , num.lines , tablename , tf2  , connection , delimiters ) , silent = TRUE )
+		te <- try( sql.copy.into( " NULL AS '' ' '" , n_max , tablename , tf2  , connection , delimiters ) , silent = TRUE )
 	}
 	
 	
@@ -280,7 +285,7 @@ read.SAScii.monetdb <-
 		} else{
 		
 			sql.update <- 
-				paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
+				paste0( "copy " , n_max , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
 			
 			dbSendQuery( connection , sql.update )
 		
