@@ -39,6 +39,7 @@
 
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github

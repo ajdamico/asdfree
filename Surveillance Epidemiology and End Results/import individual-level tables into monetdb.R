@@ -82,6 +82,7 @@
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
+library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)

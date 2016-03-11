@@ -35,6 +35,7 @@
 # setwd( "C:/My Directory/BSAPUF/" )
 
 
+library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 

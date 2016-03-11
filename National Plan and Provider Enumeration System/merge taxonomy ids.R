@@ -52,6 +52,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # ..in order to set your current working directory
 
 
+library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(stringr)		# load stringr package (manipulates character strings easily)

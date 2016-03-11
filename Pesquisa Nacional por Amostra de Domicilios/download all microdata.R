@@ -91,6 +91,7 @@ pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
 # program start #
 # # # # # # # # #
 
+library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)

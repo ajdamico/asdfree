@@ -61,6 +61,7 @@
 
 
 library(survey) 		# load survey package (analyzes complex design surveys)
+library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(sas7bdat)		# loads files ending in .sas7bdat directly into r as data.frame objects

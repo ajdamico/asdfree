@@ -11,6 +11,7 @@ tf <- tempfile() ; tf2 <- tempfile()
 
 library(downloader)
 library(MonetDBLite)
+library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)
 library(SAScii)
 library(RCurl)

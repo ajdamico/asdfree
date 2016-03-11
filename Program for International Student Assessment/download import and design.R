@@ -50,6 +50,7 @@ library(descr) 			# load the descr package (converts fixed-width files to delimi
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(stringr)		# load stringr package (manipulates character strings easily)
 library(survey) 		# load survey package (analyzes complex design surveys)
+library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
