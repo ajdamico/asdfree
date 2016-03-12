@@ -12,18 +12,9 @@ library(ff)
 # to use different 'NULL AS <something>' options for the actual command that imports
 # lines into monetdb: COPY <stuff> INTO <tablename> ...
 sql.copy.into <-
-	function( nullas , num.lines , tablename , tf2 , connection , delimiters ){
+	function( nullas , tablename , tf2 , connection , delimiters ){
 		
-		if( num.lines == -1 ){
-		
-			sql.update <- paste0( "copy offset 2 into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
-		
-		} else {
-		
-			# import the data into the database
-			sql.update <- paste0( "copy " , num.lines , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
-		
-		}
+		sql.update <- paste0( "copy offset 2 into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
 		
 		dbSendQuery( connection , sql.update )
 		
@@ -242,27 +233,27 @@ read.SAScii.monetdb <-
 	# using the sql.copy.into() function defined above
 	
 	# capture an error (without breaking)
-	te <- try( sql.copy.into( " NULL AS ''" , n_max , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+	te <- try( sql.copy.into( " NULL AS ''" , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #1 broke, trying method #2' , "\r" )
 		print( te )
-		te <- try( sql.copy.into( " NULL AS ' '" , n_max , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+		te <- try( sql.copy.into( " NULL AS ' '" , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #2 broke, trying method #3' , "\r"  )
 		print( te )
-		te <- try( sql.copy.into( "" , n_max , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+		te <- try( sql.copy.into( "" , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 	
 	# try another delimiter statement
 	if ( class( te ) == "try-error" ){
 		cat( 'attempt #3 broke, trying method #4' , "\r"  )
 		print( te )
-		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , n_max , tablename , tf2  , connection , delimiters )  , silent = TRUE )
+		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , tablename , tf2  , connection , delimiters )  , silent = TRUE )
 	}
 
 	if ( class( te ) == "try-error" ){
@@ -270,7 +261,7 @@ read.SAScii.monetdb <-
 		print( te )
 		# this time without error-handling.
 		# do you want to try the BEST EFFORT flag for COPY INTO?
-		te <- try( sql.copy.into( " NULL AS '' ' '" , n_max , tablename , tf2  , connection , delimiters ) , silent = TRUE )
+		te <- try( sql.copy.into( " NULL AS '' ' '" , tablename , tf2  , connection , delimiters ) , silent = TRUE )
 	}
 	
 	
@@ -285,7 +276,7 @@ read.SAScii.monetdb <-
 		} else{
 		
 			sql.update <- 
-				paste0( "copy " , n_max , " offset 2 records into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
+				paste0( "copy offset 2 into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
 			
 			dbSendQuery( connection , sql.update )
 		
