@@ -65,7 +65,7 @@ if ( .Platform$OS.type == 'windows' ) print( 'windows users: read this block' )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
+# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" , "R.utils" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 # define which years to download #
 
@@ -97,6 +97,7 @@ library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(downloader)		# downloads and then runs the source() function on scripts from github
+library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 
 # load the download_cached and related functions
