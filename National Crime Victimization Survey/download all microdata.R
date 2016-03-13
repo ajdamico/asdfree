@@ -365,6 +365,9 @@ for ( i in numbers.to.download ){
 			
 			# ..but hardcode the beginline for a few scripts
 			if ( j == "terms2?study=4429&ds=1&bundle=ascsas&path=NACJD" & study.names[ i ] == "2005 School Crime Supplement" ) beginline <- 794
+			
+			# skip one goofy line in the 2005 ppcs #
+			if( study.names[ i ] == "2005 Police-Public Contact Survey" ) tbe <- TRUE else tbe <- FALSE
 			# end of hardcoding
 			
 			tablename <- gsub( "-" , "_" , tolower( basename( data.file ) ) )
@@ -380,7 +383,8 @@ for ( i in numbers.to.download ){
 				tablename = tablename ,
 				beginline = beginline ,
 				skip.decimal.division = TRUE ,
-				conn = db
+				conn = db ,
+				try_best_effort = tbe
 			)
 			
 			
