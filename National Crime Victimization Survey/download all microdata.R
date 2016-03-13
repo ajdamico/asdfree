@@ -10,7 +10,8 @@
 # setwd( "C:/My Directory/NCVS/" )
 # your.username <- 'your@login.com'
 # your.password <- 'yourpassword'
-# rm( studies.to.download ) # or pick a few # studies.to.download <- c( "2003 Record-Type Files" , "2012 Identity Theft Supplement" , "1995 School Crime Supplement" )
+# options( encoding = "windows-1252" )				# # only macintosh and *nix users need this line
+# rm( studies.to.download ) 						# or pick a few # studies.to.download <- c( "2003 Record-Type Files" , "2012 Identity Theft Supplement" , "1995 School Crime Supplement" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Crime%20Victimization%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -66,6 +67,15 @@
 # setwd( "C:/My Directory/NCVS/" )
 # ..in order to set your current working directory
 
+
+# # # are you on a non-windows system? # # #
+if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
+# a few SAS importation scripts have a non-standard format
+# before running this whole download program,
+# you might need to run this line..
+# options( encoding="windows-1252" )
+# ..to turn on windows-style encoding.
+# # # end of non-windows system edits.
 
 
 # remove the # in order to run this install.packages line only once
