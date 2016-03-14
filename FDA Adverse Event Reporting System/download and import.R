@@ -111,7 +111,8 @@ for ( f.l in c( "faers" , "legacy" ) ){
 	ascii.names <- link.names[ names.with.ascii ]
 
 	# extract the four-digit year from the remaining filenames
-	ascii.years <- gsub( "(.*)ASCII_([0-9]*)q(.*)" , "\\2" , ascii.names )
+	ascii.years <- gsub( "(.*)ASCII ([0-9]*)q(.*)" , "\\2" , ascii.names )
+	ascii.years <- gsub( "(.*)ASCII_([0-9]*)q(.*)" , "\\2" , ascii.years )
 	ascii.years <- gsub( "(.*)ASCII ([0-9]*) Q(.*)" , "\\2" , ascii.years )
 	ascii.years <- gsub( "(.*)ASCII_([0-9]*) Q(.*)" , "\\2" , ascii.years )
 	ascii.years <- gsub( "(.*)ASCII_([0-9]*)Q(.*)" , "\\2" , ascii.years )
