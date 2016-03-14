@@ -174,8 +174,11 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 		# save school math perfomance 
 	xlsfile <- grep( "\\.xls|\\.XLS" , z , value = TRUE )
 	school_file <- grep( "PLAN" , xlsfile , value = TRUE )
-	mat_df <- read.xlsx (school_file , sheet = 3, startRow = 2)
-	save(mat_df, file = paste0 ("MAT", year,".rda") )
+	if( length( school_file ) > 0 ){
+		mat_df <- read.xlsx (school_file , sheet = 3, startRow = 2)
+		save(mat_df, file = paste0 ("MAT", year,".rda") )
+	}
+	
 
 	if( length( csvfile ) > 0 ){
 	
