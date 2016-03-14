@@ -1,0 +1,94 @@
+## example using pnad2011
+library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+library(downloader)		# downloads and then runs the source() function on scripts from github
+
+# setwd( "C:/My Directory/PNAD/" )
+pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
+db <- dbConnect( MonetDBLite() , pnad.dbfolder )
+dbListTables(db)
+
+options(survey.lonely.psu = "adjust")
+
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Pesquisa%20Nacional%20por%20Amostra%20de%20Domicilios/pnad.survey.R" , prompt = FALSE )
+
+sample.pnad <-
+  svydesign(
+    id = ~v4618 ,
+    strata = ~v4617 ,
+    data = 'pnad2011' ,
+    weights = ~pre_wgt ,
+    nest = TRUE ,
+    dbtype = "MonetDBLite" ,
+    dbname = pnad.dbfolder
+  )
+
+y <- 
+  pnad.postStratify( 
+    design = sample.pnad ,
+    strata.col = 'v4609' ,
+    oldwgt = 'pre_wgt'
+  )
+
+y.sub <- subset (y,  !is.na(v4720) & v4720!=0 & v8005>=15)
+
+y.sub <- convey_prep(y.sub)
+svymean( ~ v4720 , y.sub , na.rm = TRUE )
+library(convey)
+svygini (~ v4720,y.sub, na.rm=TRUE)
+svyiqalpha(~ v4720, y.sub, alpha= .5,na.rm=TRUE)
+svyarpt(~v4720, y.sub,na.rm=TRUE)
+svyarpr(~v4720, y.sub,na.rm=TRUE)
+
+############################################
+# working with data frame
+############################################
+
+# cria data frame
+
+pnad2011<- dbGetQuery( db , 'select one, v4618 , v4617 , pre_wgt , v4609 , v4610, v4614, v4719, v4720, v4729, v8005, v0102, v0201, v0401, v0302, uf from pnad2011')
+
+
+#Transforma os dados:
+pnad2011$v4614<- as.numeric(pnad2011$v4614)
+pnad2011$v4719<- as.numeric(pnad2011$v4719)
+pnad2011$v4720<- as.numeric(pnad2011$v4720)
+pnad2011$REG<- substring(pnad2011$v0102,1,1)
+pnad2011$REG<- factor(pnad2011$REG, labels=c("NORTE","NORDESTE","SUDESTE","SUL", "CENTRO_OESTE"))
+pnad2011$SEXO<- factor(pnad2011$v0302, labels=c("H","M"))
+nomes.estados<-c("RO","AC","AM","RR","PA","AP","TO","MA","PI","CE","RN","PB","PE","AL","SE",
+  "BA","MG","ES","RJ","SP","PR","SC","RS","MS","MT","GO","DF" )
+pnad2011$uf <- factor(pnad2011$uf, labels = nomes.estados)
+
+# save(pnad2011,file="pnad2011.rda")
+# load(file="pnad2011.rda")
+
+options( survey.lonely.psu = "adjust" )
+pnad2011_des <- svydesign(
+  id = ~v4618 ,
+  strata = ~v4617 ,
+  data = pnad2011 ,
+  weights = ~pre_wgt ,
+  nest = TRUE
+)
+
+# pos-stratify
+pop.post<- data.frame(v4609= unique(pnad2011$v4609), 
+  Freq= unique(as.numeric(pnad2011$v4609)))
+pnad2011_des_pos <- postStratify(pnad2011_des, ~v4609, pop.post)
+# pnad2011_des_pos<- convey_prep(pnad2011_des_pos)
+
+#   pnad2011_des_pos_sub <- subset(pnad2011_des_pos,v4720!=0 & is.na(v4720)==FALSE & v8005>=15)
+
+pnad2011_des_pos_sub <- subset( pnad2011_des_pos, is.na(v4720)==FALSE & v4720!=0 &  v8005>=15)
+
+pnad2011_des_pos_sub<- convey_prep(pnad2011_des_pos_sub)
+
+
+
+# variável de renda: v4720
+svymean(~v4720,pnad2011_des_pos_sub, na.rm=TRUE)
+svygini (~v4720,pnad2011_des_pos_sub, na.rm=TRUE)
+svyiqalpha(~v4720, pnad2011_des_pos_sub, alpha= .5, na.rm=TRUE )
+svyarpt(~v4720, pnad2011_des_pos_sub,na.rm=TRUE)
+svyarpr(~v4720, pnad2011_des_pos_sub,na.rm=TRUE)
