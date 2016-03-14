@@ -2,6 +2,8 @@
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
+library(survey)
+library(convey)
 
 # setwd( "C:/My Directory/PNAD/" )
 pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
@@ -34,8 +36,10 @@ y.sub <- subset (y,  !is.na(v4720) & v4720!=0 & v8005>=15)
 
 y.sub <- convey_prep(y.sub)
 svymean( ~ v4720 , y.sub , na.rm = TRUE )
-library(convey)
+
 svygini (~ v4720,y.sub, na.rm=TRUE)
+svyby(~v4720, ~region, y.sub, svygini, na.rm=TRUE )
+
 svyiqalpha(~ v4720, y.sub, alpha= .5,na.rm=TRUE)
 svyarpt(~v4720, y.sub,na.rm=TRUE)
 svyarpr(~v4720, y.sub,na.rm=TRUE)
