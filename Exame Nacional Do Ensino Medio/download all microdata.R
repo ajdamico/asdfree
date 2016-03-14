@@ -75,6 +75,15 @@ db <- dbConnect( MonetDBLite() , paste0( getwd() , "/MonetDB" ) )
 
 
 
+
+
+if (.Platform$OS.type == 'windows') {
+	wle <- '\r\n'
+} else {
+	wle <- '\n'
+}
+
+
 w <- 
 	strsplit( 
 		getURL( 
@@ -82,7 +91,7 @@ w <-
 			ftp.use.epsv = FALSE , 
 			dirlistonly = TRUE 
 		) , 
-		"\r\n" 
+		wle
 	)[[1]]
 	
 enem_files <- grep( "enem" , w , value = TRUE )
