@@ -103,11 +103,6 @@ years_to_download <- rev( sort( years_to_download ) )
 
 
 
-# 2008 file isn't extracting for some reason?
-years_to_download <- years_to_download[ years_to_download != 2008 ]
-# SKIP 2008
-
-
 for ( year in sample( years_to_download , length( years_to_download ) ) ){
 # for ( year in years_to_download ){
 # for ( year in 2009 ){
@@ -127,13 +122,9 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 
 	if( !grepl( "\\.rar" , grep( year , enem_files , value = TRUE ) ) ){
 
-		dos.command <- paste0( '"' , path.to.7z , '" e ' , tf , ' -o' , this_year_tempdir )
+		dos.command <- paste0( '"' , path.to.7z , '" e "' , tf , '" -o' , this_year_tempdir )
 		
-		if ( .Platform$OS.type == 'windows' ){
-			shell( dos.command ) 
-		} else {
-			system( dos.command )
-		}
+		system( dos.command )
 		
 		z <- unique( list.files( this_year_tempdir , recursive = TRUE , full.names = TRUE  ) )
 
@@ -141,13 +132,10 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 
 		if( length( zf ) > 0 ){
 
-			dos.command <- paste0( '"' , path.to.7z , '" e ' , zf , ' -o' , this_year_tempdir )
+			dos.command <- paste0( '"' , path.to.7z , '" e "' , zf , '" -o' , this_year_tempdir )
 		
-			if ( .Platform$OS.type == 'windows' ){
-				shell( dos.command ) 
-			} else {
-				system( dos.command )
-			}
+			system( dos.command )
+			
 			
 			z <- unique( c( z , list.files( this_year_tempdir , recursive = TRUE , full.names = TRUE  ) ) )
 
@@ -163,13 +151,10 @@ for ( year in sample( years_to_download , length( years_to_download ) ) ){
 		
 	if( length( rfi ) > 0 ) {
 		
-		dos.command <- paste0( '"' , path.to.7z , '" e ' , rfi , ' -o' , this_year_tempdir )
+		dos.command <- paste0( '"' , path.to.7z , '" e "' , rfi , '" -o' , this_year_tempdir )
 		
-		if ( .Platform$OS.type == 'windows' ){
-			shell( dos.command ) 
-		} else {
-			system( dos.command )
-		}
+		system( dos.command )
+		
 		
 		z <- unique( c( z , list.files( this_year_tempdir , recursive = TRUE , full.names = TRUE  ) ) )
 		
