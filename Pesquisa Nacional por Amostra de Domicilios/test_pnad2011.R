@@ -44,6 +44,40 @@ svyiqalpha(~ v4720, y.sub, alpha= .5,na.rm=TRUE)
 svyarpt(~v4720, y.sub,na.rm=TRUE)
 svyarpr(~v4720, y.sub,na.rm=TRUE)
 
+
+## compute percentile ratio
+
+ratio_quant <- function(formula, design, alpha1, alpha2){
+
+  q1 <-  svyiqalpha( formula , design = design, alpha1 ,na.rm =TRUE ) 
+  q2 <-  svyiqalpha( formula , design = design, alpha2, na.rm =TRUE )
+  q1_list <- list(value = coef(q1), lin = attr(q1, "lin"))
+  q2_list <- list(value = coef(q2), lin = attr(q2, "lin"))
+  list_all <- list(Q1= q1_list, Q2 = q2_list )
+  Rquant<- contrastinf(quote(Q1/Q2), list_all)
+  variance <- svyrecvar(Rquant$lin/design $prob, design$cluster, design$strata, 
+    design$fpc, postStrata = design$postStrata)
+  c(value= Rquant$value, se= sqrt(variance))
+  
+}
+
+# percentile ratios:
+
+
+prob_frame <- data.frame ( qnum = c(50, 75, 90, 95, 75, 90, 95, 90, 95, 95)/100,
+  qden= c( 25, 25, 25, 25, 50, 50, 50,  75, 75, 90)/100)
+
+percentile_ratio <- rep (NA,nrow(prob_frame) )
+
+ 
+for(i in 1:nrow(prob_frame) ) percentile_ratio[i] <- ratio_quant (~ v4720, y.sub, 
+  prob_frame$qnum[i], prob_frame$qden[i] )[1]
+
+
+prob_frame$perc_raio <- round(percentile_ratio,1)
+
+prob_frame
+
 ############################################
 # working with data frame
 ############################################
