@@ -493,7 +493,7 @@ if( 2000 %in% years.to.download ){
 	all.files <- scan( text = all.files , what = "character", quiet = T )
 
 	# remove the two files you don't need to import
-	files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' , '2_Atualizacoes.txt' , '1_Documentacao_velho.zip' , "2_Atualizacoes_20160309.txt" ) ) ]
+	files.to.download <- all.files[ !( all.files %in% c( '1_Documentacao.zip' , '2_Atualizacoes.txt' , '1_Documentacao_velho.zip' , "2_Atualizacoes_20160309.txt" , "1_Documentacao_20160309.zip" ) ) ]
 
 	## state initials: "AC", "AL" ,"AM" , "AP" ,BA" ,"CE","DF","ES" ,"GO","MA" , "MG" ,"MS","MT"
 	## "PA","PB", "PE","PI" ,"PR","RJ","RN","RO", "RR", "RS","SC", "SE", "SP", "TO"                
