@@ -35,14 +35,50 @@ y <-
 y.sub <- subset (y,  !is.na(v4720) & v4720!=0 & v8005>=15)
 
 y.sub <- convey_prep(y.sub)
-svymean( ~ v4720 , y.sub , na.rm = TRUE )
+
+## using functions of library convey
+
+# estimate poverty threshold using .6*MED (arpr- Used by Eurostat)
+
+svyarpt(~v4720, y.sub , na.rm = TRUE)
+
+# estimate the proportion below the poverty threshold arpt
+
+svyarpr(~v4720, y.sub , na.rm = TRUE)
+
+# estimate the median of incomes less than the arpt:
+
+svypoormed( ~v4720 , y.sub , na.rm = TRUE ) ## not working
+
+# estimate the relative median poverty gap
+
+svyrmpg(~v4720 , y.sub , na.rm = TRUE ) # not working
+
+# estimate the quintile share ratio
+
+svyqsr(~v4720 , y.sub , na.rm = TRUE)
+
+# estimate the Gini index
 
 svygini (~ v4720,y.sub, na.rm=TRUE)
+
+# estimate the Gini index by region: see table below Figure 5.1  http://biblioteca.ibge.gov.br/visualizacao/livros/liv66777.pdf
+
 svyby(~v4720, ~region, y.sub, svygini, na.rm=TRUE )
 
-svyiqalpha(~ v4720, y.sub, alpha= .5,na.rm=TRUE)
-svyarpt(~v4720, y.sub,na.rm=TRUE)
-svyarpr(~v4720, y.sub,na.rm=TRUE)
+
+# estimate the relative median income ratio: ratio of medians for people older than 65 and
+# younger than 65:
+
+svyrmir( ~v4720 , y.sub, age= ~v8005, agelim = 65 , na.rm=TRUE)
+
+# poverty threshold: 1/2 minimum mensal wage: 545/2
+
+svyfgt(~v4720, y.sub, g=0, type_thresh= "abs", abs_thresh=545/2 , na.rm = TRUE )
+
+svyfgt(~eqIncome, des_eusilc, g=0, type_thresh= "abs", abs_thresh=10000)
+
+
 
 
 ## compute percentile ratio
