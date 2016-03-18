@@ -208,12 +208,8 @@ for ( year in years.to.download ){
 	}
 
 	# manually set the encoding of the unziped files so they don't break things.
-	if ( .Platform$OS.type == 'windows') {
-		Encoding( files ) <- 'latin1'
-	} else {
-		Encoding( files ) <- 'UTF-8'
-	}
-
+	Encoding( files ) <- 'latin1'
+	
 	
 	# remove the UF column and the mistake with "LOCAL ÚLTIMO FURTO"
 	# described in the remove.uf() function that was loaded with source_url as pnad.survey.R
