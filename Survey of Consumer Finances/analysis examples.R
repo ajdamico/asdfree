@@ -332,7 +332,7 @@ scf.svyttest( checking ~ factor( hhsex ) , scf.design )		# yes
 
 # the relationship between (checking account amount + the gender of the head of household) and net worth
 summary( 
-	MIcombine( 
+	scf.MIcombine( 
 		with( 
 			scf.design , 
 			svyglm( networth ~ checking + hhsex ) 
@@ -343,7 +343,7 @@ summary(
 
 # the relationship between (net worth + checking account amount) and the household having any debt
 summary( 
-	MIcombine( 
+	scf.MIcombine( 
 		with( 
 			scf.design , 
 			svyglm( hdebt ~ networth + checking , family = quasibinomial() ) 
