@@ -70,8 +70,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "Hmisc" , "httr" , "stringr" , "memisc" , "haven" ) )
-# install.packages( c( "downloader","foreign"))
+# install.packages( c( "Hmisc" , "httr" , "stringr" , "memisc" , "haven" , "downloader" ) )
 
 # no need to edit anything below this line #
 
