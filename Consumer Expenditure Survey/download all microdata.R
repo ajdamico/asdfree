@@ -35,7 +35,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "sqldf" , "survey" , "SAScii" , "descr" , "mitools" , "plyr" , "downloader" , "digest" , "readxl" , "stringr" , "reshape2" , "XML" , "R.utils" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "sqldf" , "survey" , "SAScii" , "descr" , "mitools" , "plyr" , "downloader" , "digest" , "readxl" , "stringr" , "reshape2" , "XML" , "R.utils" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
 library(foreign) 	# load foreign package (converts data files into R)

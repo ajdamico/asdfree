@@ -35,7 +35,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "mitools" , "downloader" , "digest" , "survey" ) , repos=c("http://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/") )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "mitools" , "downloader" , "digest" , "survey" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/") )
 
 
 # name the database folder to be saved in the working directory

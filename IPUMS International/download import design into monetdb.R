@@ -64,7 +64,7 @@
 # # # # # # # # # # # # # # # #
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "httr" , "XML" , "rvest" , "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) , repos = c( "http://dev.monetdb.org/Assets/R/" , "http://cran.rstudio.com/" ) )
+# install.packages( c( "httr" , "XML" , "rvest" , "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) , repos = c( "https://dev.monetdb.org/Assets/R/" , "http://cran.rstudio.com/" ) )
 
 
 library(survey) 		# load survey package (analyzes complex design surveys)
