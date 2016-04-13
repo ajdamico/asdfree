@@ -145,10 +145,6 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 # open the connection to the monetdblite database
 db <- dbConnect( MonetDBLite() , dbfolder )
 
-						
-# create three temporary files and a temporary directory..
-tf <- tempfile() ; td <- tempdir() ; zf <- tempfile() ; zf2 <- tempfile()
-
 # create a download directory
 dir.create( "download" , showWarnings = FALSE )
 
@@ -157,6 +153,8 @@ dir.create( "download" , showWarnings = FALSE )
 # even on smaller, older personal computers with 4 gigabytes of RAM
 # so take a shortcut for these files and simply download them using
 # the read.xport() function from the foreign package
+dlfile <- tempfile()
+csvfile <- tempfile()
 
 # loop through each year specified by the user, so long as it's within the 1984-2001 range
 for ( year in intersect( years.to.download , 1984:2001 ) ){  
@@ -175,11 +173,11 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		) 
 		
 	# download the file from the cdc's ftp site
-	download_cached( fn , tf , mode = 'wb' )
+	download_cached( fn , dlfile , mode = 'wb' )
 	
 	# unzip it within the temporary directory on your local hard drive and
 	# store the location it's been unzipped into a new character string variable called local.fn
-	local.fn <- unzip( tf , exdir = "download" )
+	local.fn <- unzip( dlfile , exdir = "download" )
 	
 	# read the sas transport file into r
 	x <- read.xport( local.fn ) 
@@ -192,7 +190,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 	
 	# immediately export the data table to a comma separated value (.csv) file,
 	# also stored on the local hard drive
-	write.csv( x , tf , row.names = FALSE )
+	write.csv( x , csvfile , row.names = FALSE )
 
 	# count the total number of records in the table
 	# rows to check then read
@@ -210,21 +208,21 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 	first.attempt <- second.attempt <- NULL
 
 	# first try to read the csv file into the monet database with NAs for NA strings
-	first.attempt <- try( monet.read.csv( db , tf , tablename , na.strings = "NA" , nrow.check = rtctr , lower.case.names = TRUE ) , silent = TRUE )
+	first.attempt <- try( monet.read.csv( db , csvfile , tablename , na.strings = "NA" , nrow.check = rtctr , lower.case.names = TRUE ) , silent = TRUE )
 	
 	# if the monet.read.csv() function returns an error instead of working properly..
 	if( class( first.attempt ) == "try-error" ) {
 	
 		# try re-exporting the csv file (overwriting the original csv file)
 		# using "" for the NA strings
-		write.csv( x , tf , row.names = FALSE , na = "" )
+		write.csv( x , csvfile , row.names = FALSE , na = "" )
 		
 		# try to remove the data table from the monet database
 		try( dbRemoveTable( db , tablename ) , silent = TRUE )
 		
 		# and re-try reading the csv file directly into the monet database, this time with a different NA string setting
 		second.attempt <-
-			try( monet.read.csv( db , tf , tablename , na.strings = "" , nrow.check = rtctr , lower.case.names = TRUE ) , silent = TRUE )
+			try( monet.read.csv( db , csvfile , tablename , na.strings = "" , nrow.check = rtctr , lower.case.names = TRUE ) , silent = TRUE )
 	}
 
 	# if that still doesn't work, import the table manually
@@ -272,7 +270,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 				" offset 2 records into " , 
 				tablename , 
 				" from '" , 
-				tf , 
+				csvfile , 
 				"' using delimiters ',' null as ''" 
 			)
 			
@@ -283,7 +281,6 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		
 	# free up RAM
 	rm( x )
-	
 	gc()
 
 	# repeat.
@@ -295,12 +292,13 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 # so import them using the read.SAScii.monetdb() function,
 # a variant of the SAScii package's read.SAScii() function
 
+impfile <- tempfile()
+sasfile <- tempfile()
+
 # loop through each year specified by the user, so long as it's within the 2002-2014 range
 for ( year in intersect( years.to.download , 2002:2014 ) ){
 
-	# remove the temporary file (defined waaaay above) from the local disk, if it exists
-	file.remove( tf )
-	
+
 	# if the file to download is 2012 or later..
 	if ( year >= 2012 ){
 
@@ -355,13 +353,13 @@ for ( year in intersect( years.to.download , 2002:2014 ) ){
 	z <- gsub( "\f" , " " , z , fixed = TRUE )
 	
 	# re-write the sas importation script to a file on the local hard drive
-	writeLines( z , tf )
+	writeLines( z , impfile )
 
 	# download the zipped file
-	download_cached( fn , zf , mode = 'wb' )
+	download_cached( fn , dlfile , mode = 'wb' )
 	
 	#unzip the file's contents and store the file name within the temporary directory
-	local.fn <- unzip( zf , exdir = 'download' , overwrite = T )
+	local.fn <- unzip( dlfile , exdir = 'download' , overwrite = T )
 	
 	# if it's 2013 or beyond..
 	if ( year >= 2013 ){
@@ -370,7 +368,7 @@ for ( year in intersect( years.to.download , 2002:2014 ) ){
 		incon <- file( local.fn , "r")
 		
 		# ..and a write connection
-		outcon <- file( zf2 , "w" )
+		outcon <- file( sasfile , "w" )
 	
 		# read through every line
 		while( length( line <- readLines( incon , 1 , skipNul = TRUE ) ) > 0 ){
@@ -396,7 +394,7 @@ for ( year in intersect( years.to.download , 2002:2014 ) ){
 		file.remove( local.fn )
 		
 		# redirect the local filename to the new file
-		local.fn <- zf2
+		local.fn <- sasfile
 		
 		# close both connections
 		close( outcon )
@@ -408,7 +406,7 @@ for ( year in intersect( years.to.download , 2002:2014 ) ){
 	# and import the current fixed-width file into the monet database
 	read.SAScii.monetdb (
 		local.fn ,
-		tf ,
+		impfile ,
 		beginline = 70 ,
 		zipped = F ,						# the ascii file is no longer stored in a zipped file
 		tl = TRUE ,							# convert all column names to lowercase
@@ -417,12 +415,11 @@ for ( year in intersect( years.to.download , 2002:2014 ) ){
 	)
 	
 	# store the names of factor/character variables #
-	psas <- parse.SAScii( tf )
+	psas <- parse.SAScii( impfile )
 	charx <- tolower( psas[ psas$char %in% T , 'varname' ] )
 	# create a new object `cYYYY` containing the non-numeric columns
 	assign( paste0( 'c' , year ) , charx )
 	# end of factor/character variable storage #
-	
 	# repeat.
 }
 
