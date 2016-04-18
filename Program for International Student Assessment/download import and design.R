@@ -337,7 +337,7 @@ if ( 2003 %in% years.to.download ){
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_cogn_2003" , "INT_stui_2003_v2" , "INT_schi_2003" )
 	
-	sas.file.names <- paste0( "PISA" , 2003 , "_SAS_" , c( "student" , "school" , "parent" , "cognitive_item" , "scored_cognitive_item" ) )
+	sas.file.names <- paste0( "PISA" , 2003 , "_SAS_" , c( "cognitive_item" , "student" , "school" ) )
 	
 	# loop through them all
 	for ( curFile in files.to.import ){
