@@ -131,10 +131,7 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # set the prefix of all websites for downloading
-http.pre <- "http://pisa"
-# set the middle portion of the website used for downloading
-http.mid <- ".acer.edu.au/downloads/"
-
+http.pre <- "https://www.oecd.org/pisa/pisaproducts/"
 
 
 # check if 2012 is one of the years slated for download and import
@@ -147,10 +144,10 @@ if ( 2012 %in% years.to.download ){
 	for ( curFile in files.to.import ){
 
 		# construct the full path to the file..
-		fp <- paste0( http.pre , 2012 , http.mid , curFile , ".zip" )
+		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2012 , http.mid , gsub( "DEC03" , "SAS" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , gsub( "DEC03" , "SAS" , curFile ) , ".sas" )
 
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -166,7 +163,7 @@ if ( 2012 %in% years.to.download ){
 	
 		# missing recodes #
 	
-		spss.script <- paste0( http.pre , 2012 , http.mid , gsub( "DEC03" , "SPSS" , curFile ) , ".sps" )
+		spss.script <- paste0( http.pre , gsub( "DEC03" , "SPSS" , curFile ) , ".sps" )
 	
 		spss.based.missing.blankouts( db , curFile , spss.script )
 	
@@ -197,10 +194,10 @@ if ( 2009 %in% years.to.download ){
 	for ( curFile in files.to.import ){
 
 		# construct the full path to the file..
-		fp <- paste0( http.pre , 2009 , http.mid , curFile , ".zip" )
+		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2009 , http.mid , gsub( "_D(ec|EC)" , "_SAS_DEC" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , gsub( "_D(ec|EC)" , "_SAS_DEC" , curFile ) , ".sas" )
 
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -277,10 +274,10 @@ if ( 2006 %in% years.to.download ){
 	for ( curFile in files.to.import ){
 
 		# construct the full path to the file..
-		fp <- paste0( http.pre , 2006 , http.mid , curFile , ".zip" )
+		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2006 , http.mid , gsub( "_D" , "_SAS_D" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , gsub( "_D" , "_SAS_D" , curFile ) , ".sas" )
 	
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -340,10 +337,10 @@ if ( 2003 %in% years.to.download ){
 		zipped <- TRUE
 	
 		# construct the full path to the file..
-		fp <- paste0( http.pre , 2003 , http.mid , curFile , ".zip" )
+		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2003 , http.mid , gsub( "INT" , "Read" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , gsub( "INT" , "Read" , curFile ) , ".sas" )
 		sri <- gsub( "i_2003", "I_2003", sri )
 	
 		# get rid of some goofy `n` values in this ascii data
@@ -429,10 +426,10 @@ if ( 2000 %in% years.to.download ){
 	for ( curFile in files.to.import ){
 
 		# construct the full path to the file..
-		fp <- paste0( http.pre , 2000 , http.mid , curFile , ".zip" )
+		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , 2000 , http.mid , curFile , ".sas" )
+		sri <- paste0( http.pre , curFile , ".sas" )
 	
 		# well aren't you a pain in the ass as usual, mathematics?
 		if ( curFile == "intstud_math" ) {
