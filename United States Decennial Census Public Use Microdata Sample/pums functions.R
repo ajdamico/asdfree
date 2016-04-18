@@ -29,11 +29,11 @@ get.tsv <-
 		attempt1 <- attempt2 <- NA
 		
 		# specify a temporary file on the local disk
-		cur.pums <- tempfile()
-		out_pums <- tempfile()
+		dlfile <- tempfile()
+		txt_file <- tempfile()
 		
 		# try to download the text file
-		attempt1 <- try( download_cached( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
+		attempt1 <- try( download_cached( fp , dlfile , mode = 'wb' ) , silent = TRUE )
 		
 		# if the first attempt returned an error..
 		if ( class( attempt1 ) == 'try-error' ) {
@@ -42,7 +42,7 @@ get.tsv <-
 			Sys.sleep( 60 )
 			
 			# and try again
-			attempt2 <- try( download_cached( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
+			attempt2 <- try( download_cached( fp , dlfile , mode = 'wb' ) , silent = TRUE )
 			
 		}	
 		
@@ -53,7 +53,7 @@ get.tsv <-
 			Sys.sleep( 120 )
 			
 			# and try one last time.
-			download_cached( fp , cur.pums , mode = 'wb' )
+			download_cached( fp , dlfile , mode = 'wb' )
 			# since there's no `try` function encapsulating this one,
 			# it will break the whole program if it doesn't work
 		}
@@ -68,13 +68,13 @@ get.tsv <-
 		
 			tf_zip <- tempfile()
 		
-			tf_zip <- unzip( cur.pums , exdir = tempdir() )
+			tf_zip <- unzip( dlfile , exdir = tempdir() )
 			
-			out_pums <- tf_zip
+			txt_file <- tf_zip
 		
 		} else {
 		
-			out_pums <- cur.pums
+			file.copy( dlfile , txt_file )
 		
 		}
 		
@@ -83,7 +83,7 @@ get.tsv <-
 		tf.person <- tempfile()
 		
 		# initiate a read-only connection to the input file
-		incon <- file( out_pums , "r")
+		incon <- file( txt_file , "r")
 
 		# initiate two write-only file connections "w" - pointing to the household and person files
 		outcon.household <- file( tf.household , "w" )
