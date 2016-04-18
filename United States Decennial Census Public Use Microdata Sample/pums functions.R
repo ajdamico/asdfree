@@ -30,7 +30,8 @@ get.tsv <-
 		
 		# specify a temporary file on the local disk
 		cur.pums <- tempfile()
-
+		out_pums <- tempfile()
+		
 		# try to download the text file
 		attempt1 <- try( download_cached( fp , cur.pums , mode = 'wb' ) , silent = TRUE )
 		
@@ -64,13 +65,17 @@ get.tsv <-
 		# if the downloaded file was a zipped file,
 		# unzip it and replace it with its decompressed contents
 		if ( zipped ) {
-			tf <- tempfile()
-			tf <- unzip( cur.pums )
+		
+			tf_zip <- tempfile()
+		
+			tf_zip <- unzip( cur.pums , exdir = tempdir() )
 			
-			# try to get rid of the file..if it's weirdly-named, who cares.
-			try( file.remove( cur.pums ) , silent = TRUE )
-					
-			cur.pums <- tf
+			out_pums <- tf_zip
+		
+		} else {
+		
+			out_pums <- cur.pums
+		
 		}
 		
 		# create two more temporary files
@@ -78,7 +83,7 @@ get.tsv <-
 		tf.person <- tempfile()
 		
 		# initiate a read-only connection to the input file
-		incon <- file( cur.pums , "r")
+		incon <- file( out_pums , "r")
 
 		# initiate two write-only file connections "w" - pointing to the household and person files
 		outcon.household <- file( tf.household , "w" )
@@ -155,15 +160,6 @@ get.tsv <-
 		close( outcon.household )
 		close( outcon.person )
 		close( incon )
-		
-		# remove the file that was downloaded
-		
-		# file.remove sometimes needs a few seconds to cool off.
-		remove.attempt <- try( stop() , silent = TRUE )
-		while( class( remove.attempt ) == 'try-error' ){ 
-			remove.attempt <- try( file.remove( cur.pums ) , silent = TRUE )
-			Sys.sleep( 1 )
-		}
 		
 		# now we've got `tf.household` and `tf.person` on the local disk instead.
 		# these have one record per household and one record per person, respectively.
