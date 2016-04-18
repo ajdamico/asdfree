@@ -140,6 +140,8 @@ if ( 2012 %in% years.to.download ){
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_STU12_DEC03", "INT_SCQ12_DEC03" ,  "INT_PAQ12_DEC03" , "INT_COG12_DEC03" , "INT_COG12_S_DEC03" )
 	
+	sas.file.names <- paste0( "PISA" , 2012 , "_SAS_" , c( "student" , "school" , "parent" , "cognitive_item" , "scored_cognitive_item" ) )
+	
 	# loop through them all
 	for ( curFile in files.to.import ){
 
@@ -147,7 +149,7 @@ if ( 2012 %in% years.to.download ){
 		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , gsub( "DEC03" , "SAS" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , sas.file.names[ which( curFile == files.to.import ) ] , ".sas" )
 
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -190,6 +192,8 @@ if ( 2009 %in% years.to.download ){
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_STQ09_DEC11" , "INT_SCQ09_Dec11" , "INT_PAR09_DEC11" , "INT_COG09_TD_DEC11" , "INT_COG09_S_DEC11" )
 	
+	sas.file.names <- paste0( "PISA" , 2009 , "_SAS_" , c( "student" , "school" , "parent" , "cognitive_item" , "scored_cognitive_item" ) )
+	
 	# loop through them all
 	for ( curFile in files.to.import ){
 
@@ -197,7 +201,7 @@ if ( 2009 %in% years.to.download ){
 		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , gsub( "_D(ec|EC)" , "_SAS_DEC" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , sas.file.names[ which( curFile == files.to.import ) ] , ".sas" )
 
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -270,6 +274,8 @@ if ( 2006 %in% years.to.download ){
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_Stu06_Dec07" , "INT_Sch06_Dec07" , "INT_Par06_Dec07" , "INT_Cogn06_T_Dec07" , "INT_Cogn06_S_Dec07" )
 
+	sas.file.names <- paste0( "PISA" , 2006 , "_SAS_" , c( "student" , "school" , "parent" , "cognitive_item" , "scored_cognitive_item" ) )
+	
 	# loop through them all
 	for ( curFile in files.to.import ){
 
@@ -277,7 +283,7 @@ if ( 2006 %in% years.to.download ){
 		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , gsub( "_D" , "_SAS_D" , curFile ) , ".sas" )
+		sri <- paste0( http.pre , sas.file.names[ which( curFile == files.to.import ) ] , ".sas" )
 	
 		# download the file specified at the address constructed above,
 		# then immediately import it into the monetdb server
@@ -331,6 +337,8 @@ if ( 2003 %in% years.to.download ){
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "INT_cogn_2003" , "INT_stui_2003_v2" , "INT_schi_2003" )
 	
+	sas.file.names <- paste0( "PISA" , 2003 , "_SAS_" , c( "student" , "school" , "parent" , "cognitive_item" , "scored_cognitive_item" ) )
+	
 	# loop through them all
 	for ( curFile in files.to.import ){
 
@@ -340,9 +348,8 @@ if ( 2003 %in% years.to.download ){
 		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , gsub( "INT" , "Read" , curFile ) , ".sas" )
-		sri <- gsub( "i_2003", "I_2003", sri )
-	
+		sri <- paste0( http.pre , sas.file.names[ which( curFile == files.to.import ) ] , ".sas" )
+		
 		# get rid of some goofy `n` values in this ascii data
 		if ( curFile == "INT_cogn_2003" ){
 		
@@ -422,6 +429,8 @@ if ( 2000 %in% years.to.download ){
 	# figure out which table names to loop through for downloading, importing, survey designing
 	files.to.import <- c( "intcogn_v3" , "intscho" , "intstud_math" , "intstud_read" , "intstud_scie" )
 
+	sas.file.names <- paste0( "PISA" , 2000 , "_SAS_" , c( "student" , "school" , "parent" , "cognitive_item" , "scored_cognitive_item" ) )
+	
 	# loop through them all
 	for ( curFile in files.to.import ){
 
@@ -429,7 +438,7 @@ if ( 2000 %in% years.to.download ){
 		fp <- paste0( http.pre , curFile , ".zip" )
 	
 		# ..as well as the path to the sas importation script
-		sri <- paste0( http.pre , curFile , ".sas" )
+		sri <- paste0( http.pre , sas.file.names[ which( curFile == files.to.import ) ] , ".sas" )
 	
 		# well aren't you a pain in the ass as usual, mathematics?
 		if ( curFile == "intstud_math" ) {
