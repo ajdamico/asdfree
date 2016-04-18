@@ -184,6 +184,7 @@ if ( 1990 %in% c( one.percent.files.to.download , five.percent.files.to.download
 
 	# create a temporary file on the local disk
 	tf <- tempfile()
+	of <- tempfile()
 	
 	# download the pums sas script provided by the census bureau
 	download_cached( "http://www2.census.gov/census_1990/1990_PUMS_A/TOOLS/sas/PUMS.SAS" , tf )
@@ -195,13 +196,13 @@ if ( 1990 %in% c( one.percent.files.to.download , five.percent.files.to.download
 	sas.90 <- gsub( "@2 SerialNo $ 7." , "@1 rectype $ 1 @2 SerialNo $ 7." , sas.90 , fixed = TRUE )
 
 	# write the script back to memory
-	writeLines( sas.90 , tf )
+	writeLines( sas.90 , of )
 
 	# read in the household structure
-	hh.90.structure <- parse.SAScii( tf , beginline = 7 )
+	hh.90.structure <- parse.SAScii( of , beginline = 7 )
 	
 	# read in the person structure
-	person.90.structure <- parse.SAScii( tf , beginline = 125 )
+	person.90.structure <- parse.SAScii( of , beginline = 125 )
 	
 	# convert both variables to lowercase
 	hh.90.structure$variable <- tolower( hh.90.structure$varname )
