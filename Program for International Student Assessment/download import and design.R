@@ -427,9 +427,9 @@ if ( 2003 %in% years.to.download ){
 if ( 2000 %in% years.to.download ){
 
 	# figure out which table names to loop through for downloading, importing, survey designing
-	files.to.import <- c( "intcogn_v3" , "intscho" , "intstud_math" , "intstud_read" , "intstud_scie" )
+	files.to.import <- c( "intcogn_v4" , "intscho" , "intstud_math" , "intstud_read" , "intstud_scie" )
 
-	sas.file.names <- paste0( "PISA" , 2000 , "_SAS_" , c( "student" , "school" , "parent" , "cognitive_item" , "scored_cognitive_item" ) )
+	sas.file.names <- paste0( "PISA" , 2000 , "_SAS_" , c( "cognitive_item" , "school_questionnaire" , "student_mathematics" , "student_reading" , "student_science" ) )
 	
 	# loop through them all
 	for ( curFile in files.to.import ){
