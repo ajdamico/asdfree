@@ -165,7 +165,7 @@ if ( 2012 %in% years.to.download ){
 	
 		# missing recodes #
 	
-		spss.script <- paste0( http.pre , gsub( "DEC03" , "SPSS" , curFile ) , ".sps" )
+		spss.script <- paste0( http.pre , gsub( "SAS" , "SPSS" , sas.file.names[ which( curFile == files.to.import ) ] ) , ".txt" )
 	
 		spss.based.missing.blankouts( db , curFile , spss.script )
 	
