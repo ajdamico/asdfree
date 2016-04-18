@@ -11,6 +11,7 @@ add.sdt <-
 		tf <- tempfile()
 		z <- readLines( sas_ri )
 		z <- gsub( "country " , "toss_0 $ 1-1 country " , z , fixed = TRUE )
+		z <- gsub( "cnt                  1555-1557" , "cnt $ 1555-1557" , z , fixed = TRUE )
 		writeLines( z , tf )
 		tf
 	}
