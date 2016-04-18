@@ -5,7 +5,6 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/SEER/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Surveillance%20Epidemiology%20and%20End%20Results/import%20individual-level%20tables%20into%20monetdb.R" , prompt = FALSE , echo = TRUE )
@@ -31,38 +30,10 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/asdfree/blob/master/Surveillance%20Epidemiology%20and%20End%20Results/download.R  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a 'SEER_1973_2012_TEXTDATA' directory in C:/My Directory/SEER (or the cw directory) #
+# that script will create a 'SEER_1973_2013_TEXTDATA' directory in C:/My Directory/SEER (or the cw directory) #
 ###############################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-
-# # # # # # # # # # # # # # #
-# warning: monetdb required #
-# # # # # # # # # # # # # # #
-
-
-# windows machines and also machines without access
-# to large amounts of ram will often benefit from
-# the following option, available as of MonetDB.R 0.9.2 --
-# remove the `#` in the line below to turn this option on.
-# options( "monetdb.sequential" = TRUE )		# # only windows users need this line
-# -- whenever connecting to a monetdb server,
-# this option triggers sequential server processing
-# in other words: single-threading.
-# if you would prefer to turn this on or off immediately
-# (that is, without a server connect or disconnect), use
-# turn on single-threading only
-# dbSendQuery( db , "set optimizer = 'sequential_pipe';" )
-# restore default behavior -- or just restart instead
-# dbSendQuery(db,"set optimizer = 'default_pipe';")
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-###################################################################################################################################
-# prior to running this analysis script, monetdb must be installed on the local machine.  follow each step outlined on this page: #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# https://github.com/ajdamico/asdfree/blob/master/MonetDB/monetdb%20installation%20instructions.R                                   #
-###################################################################################################################################
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # set your working directory.
@@ -75,15 +46,19 @@
 # ..in order to set your current working directory
 
 
+# name the database files in the "MonetDB" folder of the current working directory
+dbfolder <- paste0( getwd() , "/MonetDB" )
+
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "descr" , "MonetDB.R" , "R.utils" ) )
+# install.packages( c("MonetDB.R", "MonetDBLite" , "SAScii" , "descr" , "R.utils" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
-library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
@@ -92,97 +67,8 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/r
 # this is a modification of the R SAScii package's read.SAScii function that imports directly into MonetDB
 
 
-# configure a monetdb database for the seer on windows #
-
-# note: only run this command once.  this creates an executable (.bat) file
-# in the appropriate directory on your local disk.
-# when adding new files or adding a new year of data, this script does not need to be re-run.
-
-# create a monetdb executable (.bat) file for the american community survey
-batfile <-
-	monetdb.server.setup(
-					
-					# set the path to the directory where the initialization batch file and all data will be stored
-					database.directory = paste0( getwd() , "/MonetDB" ) ,
-					# must be empty or not exist
-
-					# find the main path to the monetdb installation program
-					monetdb.program.path = 
-						ifelse( 
-							.Platform$OS.type == "windows" , 
-							"C:/Program Files/MonetDB/MonetDB5" , 
-							"" 
-						) ,
-					# note: for windows, monetdb usually gets stored in the program files directory
-					# for other operating systems, it's usually part of the PATH and therefore can simply be left blank.
-					
-					# choose a database name
-					dbname = "seer" ,
-					
-					# choose a database port
-					# this port should not conflict with other monetdb databases
-					# on your local computer.  two databases with the same port number
-					# cannot be accessed at the same time
-					dbport = 50008
-	)
-
-	
-# this next step is so very important.
-
-# store a line of code that will make it easy to open up the monetdb server in the future.
-# this should contain the same file path as the batfile created above,
-# you're best bet is to actually look at your local disk to find the full filepath of the executable (.bat) file.
-# if you ran this script without changes, the batfile will get stored in C:\My Directory\SEER\MonetDB\seer.bat
-
-# here's the batfile location:
-batfile
-
-# note that since you only run the `monetdb.server.setup()` function the first time this script is run,
-# you will need to note the location of the batfile for future MonetDB analyses!
-
-# in future R sessions, you can create the batfile variable with a line like..
-# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"		# # note for mac and *nix users: `seer.bat` might be `seer.sh` instead
-# obviously, without the `#` comment character
-
-# hold on to that line for future scripts.
-# you need to run this line *every time* you access
-# the surveillance epidemiology and end results program files with monetdb.
-# this is the monetdb server.
-
-# two other things you need: the database name and the database port.
-# store them now for later in this script, but hold on to them for other scripts as well
-dbname <- "seer"
-dbport <- 50008
-
-# now the local windows machine contains a new executable program at "c:\my directory\seer\monetdb\seer.bat"
-
-
-
-
-# it's recommended that after you've _created_ the monetdb server,
-# you create a block of code like the one below to _access_ the monetdb server
-
-
-#####################################################################
-# lines of code to hold on to for all other `seer` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"		# # note for mac and *nix users: `seer.bat` might be `seer.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "seer"
-dbport <- 50008
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
+# open the connection to the monetdblite database
+db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -191,7 +77,7 @@ pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet
 # first, look in the downloaded zipped file's main directory,
 # and store a character vector `all.files` containing the filepaths
 # to each of the files inside that directory
-all.files <- list.files( "./SEER_1973_2012_TEXTDATA" , full.names = TRUE , recursive = TRUE )
+all.files <- list.files( "./SEER_1973_2013_TEXTDATA" , full.names = TRUE , recursive = TRUE )
 
 # create a character vector matching the different cancer file name identifiers
 words.to.match <- c( "BREAST" , "COLRECT" , "DIGOTHR" , "FEMGEN" , "LYMYLEUK" , "MALEGEN" , "RESPIR" , "URINARY" , "OTHER" )
@@ -211,7 +97,7 @@ words.to.match <- c( "BREAST" , "COLRECT" , "DIGOTHR" , "FEMGEN" , "LYMYLEUK" , 
 edited.sas.instructions <- tempfile()
 
 # read the sas importation script into memory
-z <- readLines( "./SEER_1973_2012_TEXTDATA/incidence/read.seer.research.nov14.sas" )
+z <- readLines( grep( "\\.sas$" , list.files( recursive = TRUE ) , value = TRUE ) )
 
 # get rid of the first through fourth lines (the -1:-4 part)
 # and at the same time get rid of the word `char` (the gsub part)
@@ -234,7 +120,7 @@ writeLines( z , edited.sas.instructions )
 # remove the major folder root path
 table.names <-
 	gsub( 
-		"./SEER_1973_2012_TEXTDATA/incidence/" ,
+		"./SEER_1973_2013_TEXTDATA/incidence/" ,
 		"" , 
 		ind.file.matches
 	)
@@ -352,52 +238,3 @@ for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" 
 
 # disconnect from the current monet database
 dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `seer` monetdb analyses #
-############################################################################
-
-
-
-#####################################################################
-# lines of code to hold on to for all other `seer` monetdb analyses #
-
-# first: specify your batfile.  again, mine looks like this:
-# uncomment this line by removing the `#` at the front..
-# batfile <- "C:/My Directory/SEER/MonetDB/seer.bat"		# # note for mac and *nix users: `seer.bat` might be `seer.sh` instead
-
-# second: run the MonetDB server
-monetdb.server.start( batfile )
-
-# third: your five lines to make a monet database connection.
-# just like above, mine look like this:
-dbname <- "seer"
-dbport <- 50008
-
-monet.url <- paste0( "monetdb://localhost:" , dbport , "/" , dbname )
-db <- dbConnect( MonetDB.R() , monet.url , wait = TRUE )
-
-# fourth: store the process id
-pid <- as.integer( dbGetQuery( db , "SELECT value FROM env() WHERE name = 'monet_pid'" )[[1]] )
-
-
-# # # # run your analysis commands # # # #
-
-
-# disconnect from the current monet database
-dbDisconnect( db )
-
-# and close it using the `pid`
-monetdb.server.stop( pid )
-
-# end of lines of code to hold on to for all other `seer` monetdb analyses #
-############################################################################
-
-
-# unlike most post-importation scripts, the monetdb directory cannot be set to read-only #
-message( paste( "all done.  DO NOT set" , getwd() , "read-only or subsequent scripts will not work." ) )
-
-message( "got that? monetdb directories should not be set read-only." )
-
