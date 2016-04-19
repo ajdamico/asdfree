@@ -211,7 +211,7 @@ for ( year in years.to.download ){
 	}
 
 	# manually set the encoding of the unziped files so they don't break things.
-	Encoding( files ) <- 'latin1'
+	if( year == 2013 & .Platform$OS.type != 'windows' ) Encoding( files ) <- 'UTF-8' else Encoding( files ) <- 'latin1'
 	
 	
 	# remove the UF column and the mistake with "LOCAL ÚLTIMO FURTO"
