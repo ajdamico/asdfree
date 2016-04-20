@@ -333,7 +333,7 @@ for ( i in numbers.to.download ){
 		if ( grepl( "gz$" , tolower( data.file ) ) ){
 		
 			# gunzip it and overwrite itself in the current directory
-			data.file <- gunzip( data.file , exdir = dirname( data.file ) )
+			data.file <- gunzip( data.file )
 			
 		}
 		
