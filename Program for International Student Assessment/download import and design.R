@@ -42,7 +42,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
+# install.packages( c("MonetDB.R", "MonetDBLite" , "RCurl" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
 
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
@@ -55,6 +55,7 @@ library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(mitools) 		# load mitools package (analyzes multiply-imputed data)
+library(RCurl)			# load RCurl package (downloads https files)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
@@ -155,7 +156,7 @@ if ( 2012 %in% years.to.download ){
 		# then immediately import it into the monetdb server
 		read.SAScii.monetdb ( 
 			fp ,
-			sas_ri = remove.fakecnt.lines( find.chars( add.decimals( sri , precise = TRUE ) ) ) , 
+			sas_ri = remove.fakecnt.lines( find.chars( add.decimals( textConnection( getURL( sri ) ) , precise = TRUE ) ) ) , 
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
@@ -207,7 +208,7 @@ if ( 2009 %in% years.to.download ){
 		# then immediately import it into the monetdb server
 		read.SAScii.monetdb ( 
 			fp ,
-			sas_ri = find.chars( add.decimals( remove.tabs( sri ) ) ) , 
+			sas_ri = find.chars( add.decimals( remove.tabs( textConnection( getURL( sri ) ) ) ) ) , 
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
@@ -289,7 +290,7 @@ if ( 2006 %in% years.to.download ){
 		# then immediately import it into the monetdb server
 		read.SAScii.monetdb ( 
 			fp ,
-			sas_ri = find.chars( add.decimals( remove.tabs( sri ) ) ) , 
+			sas_ri = find.chars( add.decimals( remove.tabs( textConnection( getURL( sri ) ) ) ) ) , 
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
