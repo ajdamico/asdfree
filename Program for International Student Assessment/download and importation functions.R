@@ -8,8 +8,16 @@
 tcri <-
 	function( sas_ri ){
 		tf <- tempfile()
-		z <- textConnection( getURL( sri ) )
-		writeLines( z , tf )
+		
+		ao <- try({
+			z <- textConnection( getURL( sri ) )
+			writeLines( z , tf ) } , silent = TRUE )
+		
+		if( class( ao ) == 'try-error' ){
+			z <- getURL( sri )
+			writeLines( z , tf )
+		}
+		
 		tf
 	}
 	
