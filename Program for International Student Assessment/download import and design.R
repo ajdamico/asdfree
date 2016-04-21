@@ -6,7 +6,6 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/PISA/" )
 # years.to.download <- c( 2000 , 2003 , 2006 , 2009 , 2012 )
@@ -79,16 +78,6 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/r
 
 # uncomment this line by removing the `#` at the front..
 # setwd( "C:/My Directory/PISA/" )
-
-# # # are you on a non-windows system? # # #
-if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block' )
-# acer's ftp site has a few SAS importation
-# scripts in a non-standard format
-# if so, before running this whole download program,
-# you might need to run this line..
-# options( encoding="windows-1252" )
-# ..to turn on windows-style encoding.
-# # # end of non-windows system edits.
 
 
 # configure a monetdb database for the pisa on windows #
