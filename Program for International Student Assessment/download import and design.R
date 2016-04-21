@@ -156,7 +156,7 @@ if ( 2012 %in% years.to.download ){
 		# then immediately import it into the monetdb server
 		read.SAScii.monetdb ( 
 			fp ,
-			sas_ri = remove.fakecnt.lines( find.chars( add.decimals( tcri , precise = TRUE ) ) ) , 
+			sas_ri = remove.fakecnt.lines( find.chars( add.decimals( tcri( sri ) , precise = TRUE ) ) ) , 
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
@@ -208,7 +208,7 @@ if ( 2009 %in% years.to.download ){
 		# then immediately import it into the monetdb server
 		read.SAScii.monetdb ( 
 			fp ,
-			sas_ri = find.chars( add.decimals( remove.tabs( tcri ) ) ) , 
+			sas_ri = find.chars( add.decimals( remove.tabs( tcri( sri ) ) ) ) , 
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
@@ -290,7 +290,7 @@ if ( 2006 %in% years.to.download ){
 		# then immediately import it into the monetdb server
 		read.SAScii.monetdb ( 
 			fp ,
-			sas_ri = find.chars( add.decimals( remove.tabs( tcri ) ) ) , 
+			sas_ri = find.chars( add.decimals( remove.tabs( tcri( sri ) ) ) ) , 
 			zipped = TRUE ,
 			tl = TRUE ,
 			tablename = curFile ,
