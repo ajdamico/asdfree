@@ -4,6 +4,15 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+# mac / unix does not like standard read-ins, so use text connection read-ins
+tcri <-
+	function( sas_ri ){
+		tf <- tempfile()
+		z <- textConnection( getURL( sri ) )
+		writeLines( z , tf )
+		tf
+	}
+	
 # some of the year 2000 pisa files do not start at column position 1
 # which SAScii cannot handle, so manually add a single-digit toss
 add.sdt <-
