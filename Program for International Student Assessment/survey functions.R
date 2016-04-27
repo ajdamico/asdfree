@@ -140,18 +140,6 @@ construct.pisa.survey.designs <-
 			dbSendQuery( conn , sql )
 
 			
-			# add a new column to the monetdb data table called `row_names`
-			# that simply contains the row id
-			dbSendQuery( 
-				conn , 
-				paste( 
-					'alter table' ,
-					implicate.name ,
-					'add column row_names int auto_increment' 
-				)
-			)
-			
-			
 			# add an empty column called `one` that's an integer
 			dbSendQuery( 
 				conn , 
