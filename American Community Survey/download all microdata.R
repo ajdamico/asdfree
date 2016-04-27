@@ -242,7 +242,7 @@ for ( year in 2050:2005 ){
 				# create a character string containing the http location of the zipped csv file to be downloaded
 				if( include_puerto_rico ) {
 					
-					ACS.file.location <- paste0( ftp.path , "csv_" , j , c( "pr.zip" , "us.zip" ) )
+					ACS.file.location <- paste0( ftp.path , "csv_" , j , c( "us.zip" , "pr.zip" ) )
 					
 				} else {
 				
@@ -257,7 +257,7 @@ for ( year in 2050:2005 ){
 					# try downloading the file three times before breaking
 					
 					# store a command: "download the ACS zipped file to the temporary file location"
-					download.command <- expression( download_cached( ACS.file.location , tf , mode = "wb" ) )
+					download.command <- expression( download_cached( this_download , tf , mode = "wb" ) )
 
 					# try the download immediately.
 					# run the above command, using error-handling.
