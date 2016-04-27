@@ -564,12 +564,6 @@ for ( year in 2050:2005 ){
 			dbSendQuery( db , paste0( 'UPDATE ' , k , '_p SET one = 1' ) )
 			dbSendQuery( db , paste0( 'UPDATE ' , k , '_h SET one = 1' ) )
 			dbSendQuery( db , paste0( 'UPDATE ' , k , '_m SET one = 1' ) )
-					
-			# add a column called 'idkey' containing the row number
-			dbSendQuery( db , paste0( 'alter table ' , k , '_p add column idkey int auto_increment' ) )
-			dbSendQuery( db , paste0( 'alter table ' , k , '_h add column idkey int auto_increment' ) )
-			dbSendQuery( db , paste0( 'alter table ' , k , '_m add column idkey int auto_increment' ) )
-			
 			
 			# now the current database contains three tables more tables than it did before
 				# _h (household)
