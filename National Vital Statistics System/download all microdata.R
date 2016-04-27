@@ -839,5 +839,5 @@ for ( year in fetaldeath.sets.to.download ){
 
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

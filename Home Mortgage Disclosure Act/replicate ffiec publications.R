@@ -217,5 +217,5 @@ dbGetQuery( db , 'select ethnicity , count(*) from hmda_11 where actiontype = 1 
 
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

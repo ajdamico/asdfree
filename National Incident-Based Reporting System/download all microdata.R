@@ -521,7 +521,7 @@ for ( i in numbers.to.download ){
 
 	
 # disconnect from the current monetdb session
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 
 # once complete, this script does not need to be run again.
 # instead, use one of the national incident-based reporting system

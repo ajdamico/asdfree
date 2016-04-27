@@ -246,5 +246,5 @@ barplot(
 close( pes.d )
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

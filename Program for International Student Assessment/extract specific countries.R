@@ -84,7 +84,7 @@ for ( i in 1:5 ){
 # # # end of monetdb # # #
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 
 
 # R will exactly match SUDAAN results and Stata with the MSE option results

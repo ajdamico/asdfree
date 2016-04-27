@@ -286,5 +286,5 @@ svycontrast( bra.read , list( diff = c( 1 , -1 , 0 ) ) )
 
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

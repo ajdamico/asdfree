@@ -810,7 +810,7 @@ for ( year in years.to.download ){
 	}
 	
 	# disconnect from the current monet database
-	dbDisconnect( db )
+	dbDisconnect( db , shutdown = TRUE )
 
 }
 
@@ -838,5 +838,5 @@ tein <- dbListTables( db )[ grep( '(.)*[0-9][0-9][0-9][0-9]' , dbListTables( db 
 for ( i in tein ){ stopifnot( dbGetQuery( db , paste( 'select count(*) from' , i ) ) > 0 ) }
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

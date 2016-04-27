@@ -217,5 +217,5 @@ for ( this.year in rev( years ) ){
 # plus the original prefixed data.frame objects, all separated by year-specific folders.
 
 
-# close the connection to the sqlite database
-dbDisconnect( db )
+# close the connection to the monetdblite database
+dbDisconnect( db , shutdown = TRUE )

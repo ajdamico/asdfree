@@ -545,5 +545,4 @@ for ( i in numbers.to.download ){
 dbListTables( db )
 
 # disconnect from the current database
-dbDisconnect( db )
-
+dbDisconnect( db , shutdown = TRUE )

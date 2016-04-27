@@ -268,5 +268,5 @@ table( v[ v$provider_business_practice_location_address_state_name == 'CA' , 'ti
 
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

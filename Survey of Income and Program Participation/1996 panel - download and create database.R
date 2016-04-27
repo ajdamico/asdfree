@@ -366,7 +366,7 @@ for ( tablename in dbListTables( db ) ){
 # end of checking that every imported table has at least one record.
 
 # disconnect from the database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 
 
 # once complete, this script does not need to be run again.

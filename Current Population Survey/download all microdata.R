@@ -783,7 +783,7 @@ for ( year in cps.years.to.download ){
 	dbRemoveTable( db , "temp" )
 	
 	# disconnect from the current database
-	dbDisconnect( db )
+	dbDisconnect( db , shutdown = TRUE )
 	
 }
 

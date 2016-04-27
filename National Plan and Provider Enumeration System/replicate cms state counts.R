@@ -137,5 +137,5 @@ write.csv( z , "counts by state.csv" )
 	
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

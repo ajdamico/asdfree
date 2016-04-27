@@ -121,9 +121,9 @@ svytotal(
 # note that this is exactly equivalent to summing up the weight variable
 # from the original cps data frame
 
-db <- dbConnect( MonetDBLite() , dbfolder )			# connect to the SQLite database (.db)
-dbGetQuery( db , 'select sum( marsupwt ) from asec12' )	# run a single query, summing the person-weight
-dbDisconnect( db )									# disconnect from the database
+db <- dbConnect( MonetDBLite() , dbfolder )					# connect to the SQLite database (.db)
+dbGetQuery( db , 'select sum( marsupwt ) from asec12' )		# run a single query, summing the person-weight
+dbDisconnect( db )											# disconnect from the database but do not shut it down
 
 
 # the civilian, non-institutionalized population of the united states #

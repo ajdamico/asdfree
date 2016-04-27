@@ -468,7 +468,7 @@ for ( year in years.to.download ){
 dbListTables( db )
 
 # disconnect from the current database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 
 # remove the temporary file from the local disk
 file.remove( tf )

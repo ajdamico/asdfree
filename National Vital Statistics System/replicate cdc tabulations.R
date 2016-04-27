@@ -156,5 +156,5 @@ for ( year in 2005:2007 ){
 
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

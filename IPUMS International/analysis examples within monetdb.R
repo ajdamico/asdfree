@@ -205,5 +205,5 @@ write.csv( sex_by_employment_status , "sex by employment status.csv" )
 
 
 # disconnect from the current monet database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 

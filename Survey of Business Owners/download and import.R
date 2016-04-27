@@ -109,7 +109,7 @@ dbSendQuery( db , 'UPDATE y SET newwgt = 10 * tabwgt * SQRT( 1 - 1 / tabwgt )' )
 dbListTables( db )
 
 # disconnect from the current database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 
 # remove the temporary file from the local disk
 file.remove( tf )

@@ -289,5 +289,5 @@ for ( this_table in dbListTables( db ) ) dbSendQuery( db , paste( "ALTER TABLE" 
 
 
 # disconnect from the database
-dbDisconnect( db )
+dbDisconnect( db , shutdown = TRUE )
 
