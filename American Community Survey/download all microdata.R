@@ -404,6 +404,38 @@ for ( year in 2050:2005 ){
 				# loop through each csv file
 				for ( csvpath in fn ){
 									
+					# if the puerto rico file is out of order, read in the whole file and fix it.
+					if( grepl( "pr\\.csv$" , csvpath ) ){
+					
+						pr_header <- tolower( names( read.csv( csvpath , nrows = 1 ) ) )
+						
+						pr_header[ pr_header == 'type' ] <- 'type_'
+						
+						if( !all( pr_header %in% names( headers ) ) ) stop( "this puerto rico file does not have the same columns" )
+						
+						# otherwise, maybe they're just out of order
+						if( !all( names( headers ) == pr_header ) ){
+						
+							# read in the whole (pretty small) file
+							pr_csv <- read.csv( csvpath , stringsAsFactors = FALSE )
+							
+							# lowercase and add an underscore to the `type` column
+							names( pr_csv ) <- tolower( names( pr_csv ) )
+							names( pr_csv )[ names( pr_csv ) == 'type' ] <- 'type_'
+							
+							# sort the `data.frame` object to match the ordering in the monetdb table
+							pr_csv <- pr_csv[ names( headers ) ]
+							
+							# save the `data.frame` to the disk, now that the columns are correctly ordered
+							write.csv( pr_csv , csvpath , row.names = FALSE )
+							
+							# remove the object and clear up ram
+							rm( pr_csv ) ; gc()
+							
+						}
+						
+					}
+					
 					# now try to copy the current csv file into the database
 					first.attempt <-
 						try( {
