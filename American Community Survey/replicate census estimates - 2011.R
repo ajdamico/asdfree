@@ -66,6 +66,9 @@ load( 'acs2011_1yr.rda' )	# analyze the 2011 single-year acs
 acs.m <- open( acs.m.design , driver = MonetDB.R() )	# merged design
 acs.h <- open( acs.h.design , driver = MonetDB.R() )	# household-only design
 
+# exclude puerto rico to match the replication targets
+acs.m_no_pr <- subset( acs.m , ST != 72 )
+acs.h_no_pr <- subset( acs.h , ST != 72 )
 
 
 #############################################################################
@@ -80,12 +83,12 @@ acs.h <- open( acs.h.design , driver = MonetDB.R() )	# household-only design
 #####################################################
 
 	
-svytotal( ~I( relp %in% 0:17 ) , acs.m )						# total population
-svytotal( ~I( relp %in% 0:15 ) , acs.m )						# housing unit population
-svytotal( ~I( relp %in% 16:17 ) , acs.m )						# gq population
-svytotal( ~I( relp == 16 ) , acs.m )							# gq institutional population
-svytotal( ~I( relp == 17 ) , acs.m )							# gq noninstitutional population
-svyby( ~I( relp %in% 0:17 ) , ~ sex , acs.m , svytotal )		# total males & females
+svytotal( ~I( relp %in% 0:17 ) , acs.m_no_pr )						# total population
+svytotal( ~I( relp %in% 0:15 ) , acs.m_no_pr )						# housing unit population
+svytotal( ~I( relp %in% 16:17 ) , acs.m_no_pr )						# gq population
+svytotal( ~I( relp == 16 ) , acs.m_no_pr )							# gq institutional population
+svytotal( ~I( relp == 17 ) , acs.m_no_pr )							# gq noninstitutional population
+svyby( ~I( relp %in% 0:17 ) , ~ sex , acs.m_no_pr , svytotal )		# total males & females
 
 
 # all age categories at once #
@@ -104,7 +107,7 @@ svytotal(
 	I( agep %in% 65:74 ) +
 	I( agep %in% 75:84 ) +
 	I( agep %in% 85:100 ) , 
-	acs.m 
+	acs.m_no_pr 
 )
 
 
@@ -121,18 +124,18 @@ svytotal(
 ######################################################
 	
 
-svytotal( ~I( type_ == 1 ) , acs.h )						# total housing units
-svytotal( ~I( ten %in% 1:4 ) , acs.h )						# occupied units
-svytotal( ~I( ten %in% 1:2 ) , acs.h )						# owner-occupied units
-svytotal( ~I( ten %in% 3:4 ) , acs.h )						# renter-occupied units
-svytotal( ~I( ten == 1 ) , acs.h , na.rm = TRUE )			# owned with mortgage
-svytotal( ~I( ten == 2 ) , acs.h , na.rm = TRUE )			# owned free and clear
-svytotal( ~I( ten == 3 ) , acs.h , na.rm = TRUE )			# rented for cash
-svytotal( ~I( ten == 4 ) , acs.h , na.rm = TRUE )			# no cash rent
-svytotal( ~I( vacs %in% 1:7 ) , acs.h )						# total vacant units
-svytotal( ~I( vacs == 1 ) , acs.h , na.rm = TRUE )			# for rent
-svytotal( ~I( vacs == 3 ) , acs.h , na.rm = TRUE )			# for sale only
-svytotal( ~I( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.h )	# all other vacant
+svytotal( ~I( type_ == 1 ) , acs.h_no_pr )						# total housing units
+svytotal( ~I( ten %in% 1:4 ) , acs.h_no_pr )						# occupied units
+svytotal( ~I( ten %in% 1:2 ) , acs.h_no_pr )						# owner-occupied units
+svytotal( ~I( ten %in% 3:4 ) , acs.h_no_pr )						# renter-occupied units
+svytotal( ~I( ten == 1 ) , acs.h_no_pr , na.rm = TRUE )			# owned with mortgage
+svytotal( ~I( ten == 2 ) , acs.h_no_pr , na.rm = TRUE )			# owned free and clear
+svytotal( ~I( ten == 3 ) , acs.h_no_pr , na.rm = TRUE )			# rented for cash
+svytotal( ~I( ten == 4 ) , acs.h_no_pr , na.rm = TRUE )			# no cash rent
+svytotal( ~I( vacs %in% 1:7 ) , acs.h_no_pr )						# total vacant units
+svytotal( ~I( vacs == 1 ) , acs.h_no_pr , na.rm = TRUE )			# for rent
+svytotal( ~I( vacs == 3 ) , acs.h_no_pr , na.rm = TRUE )			# for sale only
+svytotal( ~I( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.h_no_pr )	# all other vacant
 
 
 # note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
@@ -143,7 +146,8 @@ svytotal( ~I( vacs %in% c( 2, 4 , 5 , 6 , 7 ) ) , acs.h )	# all other vacant
 ################################################
 
 
-# close the connection to the two sqlrepsurvey design objects
+# close the connection to the four svrepdesign objects
 close( acs.m )
 close( acs.h )
-
+close( acs.m_no_pr )
+close( acs.h_no_pr )

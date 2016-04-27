@@ -12,6 +12,7 @@
 # single.year.datasets.to.download <- 2005:2014
 # three.year.datasets.to.download <- 2007:2013
 # five.year.datasets.to.download <- 2009:2014
+# include_puerto_rico <- TRUE
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/American%20Community%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -129,6 +130,14 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # five.year.datasets.to.download <- 2009
 
 
+# # # # # # # # # # # # # # # # #
+# would you like to include the #
+# puerto rico community survey  #
+# in every download?
+include_puerto_rico <- TRUE
+# otherwise, set this to FALSE  #
+# # # # # # # # # # # # # # # # #
+
 	
 ###############################################
 # DATA LOADING COMPONENT - ONLY RUN THIS ONCE #
@@ -231,70 +240,81 @@ for ( year in 2050:2005 ){
 	
 			
 				# create a character string containing the http location of the zipped csv file to be downloaded
-				ACS.file.location <-
-					paste0( 
-						ftp.path ,
-						"csv_" ,
-						j ,
-						"us.zip"
-					)
-				
-				# try downloading the file three times before breaking
-				
-				# store a command: "download the ACS zipped file to the temporary file location"
-				download.command <- expression( download_cached( ACS.file.location , tf , mode = "wb" ) )
-
-				# try the download immediately.
-				# run the above command, using error-handling.
-				download.error <- tryCatch( eval( download.command ) , silent = T )
-				
-				# if the download results in an error..
-				if ( class( download.error ) == 'try-error' ) {
-				
-					# wait 3 minutes..
-					Sys.sleep( 3 * 60 )
+				if( include_puerto_rico ) {
 					
-					# ..and try the download a second time
-					download.error <- tryCatch( eval( download.command ) , silent = T )
-				}
-				
-				# if the download results in a second error..
-				if ( class( download.error ) == 'try-error' ) {
-
-					# wait 3 more minutes..
-					Sys.sleep( 3 * 60 )
+					ACS.file.location <- paste0( ftp.path , "csv_" , j , c( "us.zip" , "pr.zip" ) )
 					
-					# ..and try the download a third time.
-					# but this time, if it fails, crash the program with a download error
-					eval( download.command )
-				}
-				
-				# once the download has completed..
-				
-				# unzip the file's contents to the temporary directory
-				# extract the file, platform-specific
-				if ( .Platform$OS.type == 'windows' ){
-
-					fn <- unzip( tf , exdir = tempdir() , overwrite = TRUE )
-
 				} else {
 				
-					# build the string to send to the terminal on non-windows systems
-					dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -aoa -o"' , tempdir() , '"' )
-
-					system( dos.command )
-
-					fn <- list.files( tempdir() , full.names = TRUE )
-
+					ACS.file.location <- paste0( ftp.path , "csv_" , j , "us.zip" )
+					
 				}
 				
-				# delete all the files that do not include the text 'csv' in their filename
-				file.remove( fn[ !grepl( 'csv' , fn ) ] )
+				fn <- tfn <- NULL
 				
-				
-				# limit the files to read in to ones containing csvs
-				fn <- fn[ grepl( 'csv' , fn ) ]
+				for ( this_download in ACS.file.location ){
+					
+					# try downloading the file three times before breaking
+					
+					# store a command: "download the ACS zipped file to the temporary file location"
+					download.command <- expression( download_cached( this_download , tf , mode = "wb" ) )
 
+					# try the download immediately.
+					# run the above command, using error-handling.
+					download.error <- tryCatch( eval( download.command ) , silent = TRUE )
+					
+					# if the download results in an error..
+					if ( class( download.error ) == 'try-error' ) {
+					
+						# wait 3 minutes..
+						Sys.sleep( 3 * 60 )
+						
+						# ..and try the download a second time
+						download.error <- tryCatch( eval( download.command ) , silent = TRUE )
+					}
+					
+					# if the download results in a second error..
+					if ( class( download.error ) == 'try-error' ) {
+
+						# wait 3 more minutes..
+						Sys.sleep( 3 * 60 )
+						
+						# ..and try the download a third time.
+						# but this time, if it fails, crash the program with a download error
+						eval( download.command )
+					}
+					
+					# once the download has completed..
+					
+					# unzip the file's contents to the temporary directory
+					# extract the file, platform-specific
+					if ( .Platform$OS.type == 'windows' ){
+
+						tfn <- unzip( tf , exdir = tempdir() , overwrite = TRUE )
+
+					} else {
+					
+						# build the string to send to the terminal on non-windows systems
+						dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -aoa -o"' , tempdir() , '"' )
+
+						system( dos.command )
+
+						tfn <- list.files( tempdir() , full.names = TRUE )
+
+					}
+					
+					# delete all the files that do not include the text 'csv' in their filename
+					file.remove( tfn[ !grepl( 'csv' , tfn ) ] )
+					
+					
+					# limit the files to read in to ones containing csvs
+					tfn <- tfn[ grepl( 'csv' , tfn ) ]
+
+					# store the final csv files
+					fn <- unique( c( fn , tfn ) )
+				
+				}
+					
 				
 				# there's a few weird "01E4" strings in the 2007 single- and three-year household files
 				# that cause the monetdb importation lines to crash.
@@ -305,7 +325,7 @@ for ( year in 2050:2005 ){
 					tf07 <- tempfile()
 
 					# open a read-only file connection to the 'ss07husa.csv' table
-					incon <- file( fn[1] , 'r' )
+					incon <- file( grep( "ss07husa" , fn , value = TRUE ) , 'r' )
 					
 					# open a writable file connection to the temporary file
 					outcon <- file( tf07 , 'w' )
@@ -324,7 +344,8 @@ for ( year in 2050:2005 ){
 					
 					# replace the first element of the 'fn' vector (which should be ss07husa.csv)
 					# with the file path to the temporary file instead
-					fn[1] <- tf07
+					fn[ grep( "ss07husa" , fn ) ] <- tf07
+					
 				}
 
 
@@ -383,6 +404,38 @@ for ( year in 2050:2005 ){
 				# loop through each csv file
 				for ( csvpath in fn ){
 									
+					# if the puerto rico file is out of order, read in the whole file and fix it.
+					if( grepl( "pr\\.csv$" , csvpath ) ){
+					
+						pr_header <- tolower( names( read.csv( csvpath , nrows = 1 ) ) )
+						
+						pr_header[ pr_header == 'type' ] <- 'type_'
+						
+						if( !all( pr_header %in% names( headers ) ) ) stop( "this puerto rico file does not have the same columns" )
+						
+						# otherwise, maybe they're just out of order
+						if( !all( names( headers ) == pr_header ) ){
+						
+							# read in the whole (pretty small) file
+							pr_csv <- read.csv( csvpath , stringsAsFactors = FALSE )
+							
+							# lowercase and add an underscore to the `type` column
+							names( pr_csv ) <- tolower( names( pr_csv ) )
+							names( pr_csv )[ names( pr_csv ) == 'type' ] <- 'type_'
+							
+							# sort the `data.frame` object to match the ordering in the monetdb table
+							pr_csv <- pr_csv[  dbListFields( db , tablename ) ]
+							
+							# save the `data.frame` to the disk, now that the columns are correctly ordered
+							write.csv( pr_csv , csvpath , row.names = FALSE , na = '' )
+							
+							# remove the object and clear up ram
+							rm( pr_csv ) ; gc()
+							
+						}
+						
+					}
+					
 					# now try to copy the current csv file into the database
 					first.attempt <-
 						try( {
@@ -543,12 +596,6 @@ for ( year in 2050:2005 ){
 			dbSendQuery( db , paste0( 'UPDATE ' , k , '_p SET one = 1' ) )
 			dbSendQuery( db , paste0( 'UPDATE ' , k , '_h SET one = 1' ) )
 			dbSendQuery( db , paste0( 'UPDATE ' , k , '_m SET one = 1' ) )
-					
-			# add a column called 'idkey' containing the row number
-			dbSendQuery( db , paste0( 'alter table ' , k , '_p add column idkey int auto_increment' ) )
-			dbSendQuery( db , paste0( 'alter table ' , k , '_h add column idkey int auto_increment' ) )
-			dbSendQuery( db , paste0( 'alter table ' , k , '_m add column idkey int auto_increment' ) )
-			
 			
 			# now the current database contains three tables more tables than it did before
 				# _h (household)
