@@ -424,10 +424,10 @@ for ( year in 2050:2005 ){
 							names( pr_csv )[ names( pr_csv ) == 'type' ] <- 'type_'
 							
 							# sort the `data.frame` object to match the ordering in the monetdb table
-							pr_csv <- pr_csv[ names( headers ) ]
+							pr_csv <- pr_csv[  dbListFields( db , tablename ) ]
 							
 							# save the `data.frame` to the disk, now that the columns are correctly ordered
-							write.csv( pr_csv , csvpath , row.names = FALSE )
+							write.csv( pr_csv , csvpath , row.names = FALSE , na = '' )
 							
 							# remove the object and clear up ram
 							rm( pr_csv ) ; gc()
