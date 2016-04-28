@@ -212,7 +212,7 @@ write.csv( uninsured.rate.by.region , "uninsured rate by region.csv" )
 barplot(
 	uninsured.rate.by.region[ , 1 ] ,
 	main = "Uninsured Rate by Region of the Country" ,
-	names.arg = c( "Northeast" , "Midwest" , "South" , "West" ) ,
+	names.arg = c( "Northeast" , "Midwest" , "South" , "West" , "Puerto Rico" ) ,
 	ylim = c( 0 , .40 )
 )
 
