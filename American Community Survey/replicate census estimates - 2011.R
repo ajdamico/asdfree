@@ -67,8 +67,8 @@ acs.m <- open( acs.m.design , driver = MonetDB.R() )	# merged design
 acs.h <- open( acs.h.design , driver = MonetDB.R() )	# household-only design
 
 # exclude puerto rico to match the replication targets
-acs.m_no_pr <- subset( acs.m , ST != 72 )
-acs.h_no_pr <- subset( acs.h , ST != 72 )
+acs.m_no_pr <- subset( acs.m , st != 72 )
+acs.h_no_pr <- subset( acs.h , st != 72 )
 
 
 #############################################################################
