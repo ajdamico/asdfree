@@ -1,4 +1,22 @@
 
+mvrf <-
+	function( x , sf ){
+	
+		mvr <- grep( "^if(.*)\\.;$" , tolower( str_trim( sf ) ) , value = TRUE )
+		
+		for( this_mv in mvr ){
+			ifs <- gsub( "if(.*)then(.*)=(.*)" , "\\1" , mvr )
+			thens <- gsub( "if(.*)then(.*)=(.*)" , "\\2" , mvr )
+			ifs <- gsub( "=" , "%in%" , ifs )
+			ifs <- gsub( "or" , "|" , ifs )
+			ifs <- gsub( "and" , "&" , ifs )
+
+			x[ with( x , ifs[ 1 ] ) , thens[ 1 ] ] <- NA
+		}
+		
+		x
+	}
+	
 # you need to deal with hidden missingness like this..
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/sas/1976FemRespSetup.sas
 # * USER-DEFINED MISSING VALUES RECODE TO SAS SYSMIS;
@@ -21,10 +39,12 @@
 
 
 
-setwd( "C:/My Directory/NSFG" )
+setwd( "R:/National Survey of Family Growth" )
+# setwd( "C:/My Directory/NSFG" )
 
 setInternet2( FALSE )
 
+library(stringr)
 library(readr)
 library(SAScii)
 library(RCurl)
@@ -84,8 +104,8 @@ dat_files <- dat_files[ dat_files != "2002curr_ins.dat" ]
 
 
 
-# for ( s in sample( dat_files , length( dat_files ) ) ){
-for ( s in dat_files ){
+for ( s in sample( dat_files , length( dat_files ) ) ){
+# for ( s in dat_files ){
 
 	print( s )
 	
@@ -108,12 +128,18 @@ for ( s in dat_files ){
 				names( x ) <- tolower( names( x ) )
 				names( x )[ names( x ) == 'rectype' ] <- 'rec_type'
 				x <- subset( x , rec_type >= 5 )
+				
+				x <- mvrf( x , readLines( paste0( sas_dir , "1976PregSetup.sas" ) ) )
+				
 				save( x , file = "1976FemPreg.rda" )
 				rm( x )
 				
 				x <- read.SAScii( paste0( dat_dir , s ) , paste0( sas_dir , "1976FemRespSetup.sas" ) , beginline = 7515 )
 				names( x ) <- tolower( names( x ) )
 				x <- subset( x , marstat <= 4 )
+
+				x <- mvrf( x , readLines( paste0( sas_dir , "1976FemRespSetup.sas" ) ) )
+
 				save( x , file = "1976FemResp.rda" )
 				rm( x )
 						
@@ -127,6 +153,9 @@ for ( s in dat_files ){
 				x <- read.SAScii( paste0( dat_dir , s ) , tf , beginline = 1567 )
 				names( x ) <- tolower( names( x ) )
 				x <- subset( x , rec_type > 0 )
+				
+				x <- mvrf( x , a )
+				
 				save( x , file = "1982FemPreg.rda" )
 				rm( x )
 
@@ -147,6 +176,9 @@ for ( s in dat_files ){
 				x <- read.SAScii( paste0( dat_dir , s ) , tf )
 				names( x ) <- tolower( names( x ) )
 				x <- subset( x , rec_type == 0 )
+				
+				x <- mvrf( x , a )
+				
 				save( x , file = "1982FemResp.rda" )
 				rm( x )
 			
@@ -178,6 +210,8 @@ for ( s in dat_files ){
 		
 			
 		names( x ) <- tolower( names( x ) )
+		
+		x <- mvrf( x , readLines( sas_path ) )
 		
 		sfn <- gsub( "\\.dat" , ".rda" , tolower( s ) )
 		
