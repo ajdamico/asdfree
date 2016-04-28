@@ -5,13 +5,15 @@ mvrf <-
 		mvr <- grep( "^if(.*)\\.;$" , tolower( str_trim( sf ) ) , value = TRUE )
 		
 		for( this_mv in mvr ){
-			ifs <- gsub( "if(.*)then(.*)=(.*)" , "\\1" , mvr )
-			thens <- gsub( "if(.*)then(.*)=(.*)" , "\\2" , mvr )
+		
+			ifs <- gsub( "if(.*)then(.*)=(.*)" , "\\1" , this_mv )
+			thens <- str_trim( gsub( "if(.*)then(.*)=(.*)" , "\\2" , this_mv ) )
 			ifs <- gsub( "=" , "%in%" , ifs )
-			ifs <- gsub( "or" , "|" , ifs )
-			ifs <- gsub( "and" , "&" , ifs )
+			ifs <- gsub( " or " , "|" , ifs )
+			ifs <- gsub( " and " , "&" , ifs )
 
-			x[ with( x , ifs[ 1 ] ) , thens[ 1 ] ] <- NA
+			x[ with( x , which( eval( parse( text = ifs ) ) ) ) , thens ] <- NA
+			
 		}
 		
 		x
@@ -192,6 +194,29 @@ for ( s in sample( dat_files , length( dat_files ) ) ){
 		sas_path <- paste0( sas_dir , sas_files[ match_attempt ] )
 		
 		sasc <- parse.SAScii( sas_path )
+
+		# this file has no line endings
+		if( s == "1988PregData.dat" ){
+
+			download.file( dat_path , tf , mode = 'wb' )
+			
+			fwf88 <- NULL
+			
+			conn <- file( tf , 'r' )
+			
+			while( length( data88 <- readChar( conn, 3553 ) ) ){
+
+				fwf88 <- c( fwf88 , data88 )
+
+			}
+			close( conn )
+			
+			writeLines( fwf88 , tf )
+
+			dat_path <- tf
+			
+		}
+		
 		
 		x <- 
 			read_fwf(
@@ -200,7 +225,7 @@ for ( s in sample( dat_files , length( dat_files ) ) ){
 				col_types = paste0( ifelse( is.na( sasc$varname ) , "_" , ifelse( sasc$char , "c" , "d" ) ) , collapse = "" )
 			)
 			
-		
+			
 		# x <- 
 			# read.SAScii( 
 				# paste0( dat_dir , s ) ,
