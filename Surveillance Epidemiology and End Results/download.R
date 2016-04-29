@@ -77,6 +77,15 @@
 library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
+# load the download_cached and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
+
+
 # create a temporary file on your local disk
 tf <- tempfile()
 
@@ -111,7 +120,7 @@ seer.url <-
 
 	
 # download the zipped file to the temporary file
-download( seer.url , tf )
+download_cached( seer.url , tf , FUN = download )
 
 # unzip it into your current working directory
 unzip( tf )
