@@ -232,10 +232,7 @@ for ( year in natality.sets.to.download ){
 	natality.ps <- all.files[ grep( 'natality/ps/' , all.files ) ]
 
 	# throw out all non-digits to extract the year from the data file
-	years <- gsub( "\\D" , "" , natality.us )
-
-	# for years above 2010, substitute in 2010
-	year.plus.data <- years <- gsub( paste0( 2011:2100 , collapse = "|" ) , '2010' , years )
+	year.plus.data <- years <- gsub( "\\D" , "" , natality.us )
 
 	# the pre-2006 files have an extra "/data" in the filepath of the sas import script
 	year.plus.data[ as.numeric( year.plus.data ) %in% 1991:2005 ] <- 
@@ -684,24 +681,8 @@ for ( year in mortality.sets.to.download ){
 
 	# build the character string containing the filepath
 	# of the sas file of the mortality file
-	if( year > 2012 ){
+	sas_ri <- paste0( "http://www.nber.org/mortality/" , year.plus.data , "/mort" , years , ".sas" )
 
-		sas_ri <- "http://www.nber.org/mortality/2012/mort2012.sas"
-	
-	} else {
-	
-		sas_ri <-
-			paste0( 
-				"http://www.nber.org/mortality/" , 
-				year.plus.data ,
-				"/mort" ,
-				years ,
-				".sas"
-			)
-			
-	}
-
-		
 	# throw out all non-digits to extract the year from the mortality territory file
 	cap.at.1995 <- as.numeric( gsub( "\\D" , "" , mortality.ps ) )
 
@@ -714,23 +695,15 @@ for ( year in mortality.sets.to.download ){
 	# ..otherwise..
 	} else {
 	
-		if( year > 2012 ){
-		
-			terr_ri <- "http://www.nber.org/mortality/2012/terr12.sas"
-		
-		} else {
-		
-			# use the `terr` filepath
-			terr_ri <-
-				paste0( 
-					"http://www.nber.org/mortality/" , 
-					cap.at.1995 ,
-					"/terr" ,
-					substr( cap.at.1995 , 3 , 4 ) ,
-					".sas"
-				)
-
-		}
+		# use the `terr` filepath
+		terr_ri <-
+			paste0( 
+				"http://www.nber.org/mortality/" , 
+				cap.at.1995 ,
+				"/terr" ,
+				substr( cap.at.1995 , 3 , 4 ) ,
+				".sas"
+			)
 		
 	}
 		
