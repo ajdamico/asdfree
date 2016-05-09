@@ -51,7 +51,7 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "SAScii" , "descr" , "R.utils" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
+# install.packages( c("MonetDB.R", "MonetDBLite" , "SAScii" , "descr" , "R.utils" ) )
 
 
 library(DBI)			# load the DBI package (implements the R-database coding)

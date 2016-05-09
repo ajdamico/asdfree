@@ -51,7 +51,7 @@ if ( .Platform$OS.type == 'windows' ) print( 'windows users: read this block' )
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/") )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" )  )
 
 
 SIPP.dbname <- "SIPP04"											# choose the name of the database folder on the local disk

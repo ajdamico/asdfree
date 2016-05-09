@@ -42,7 +42,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "devtools" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/") )
+# install.packages( c( "MonetDB.R" , "MonetDBLite" , "devtools" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" )  )
 
 
 # load the `devtools` library

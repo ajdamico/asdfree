@@ -41,7 +41,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "RCurl" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
+# install.packages( c("MonetDB.R", "MonetDBLite" , "RCurl" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) )
 
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)

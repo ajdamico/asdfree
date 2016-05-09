@@ -58,7 +58,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "sas7bdat" , "R.utils" ) , repos=c("https://dev.monetdb.org/Assets/R/", "http://cran.rstudio.com/"))
+# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "sas7bdat" , "R.utils" ) )
 
 
 library(survey) 		# load survey package (analyzes complex design surveys)
