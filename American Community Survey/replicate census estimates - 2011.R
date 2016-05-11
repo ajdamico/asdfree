@@ -19,9 +19,9 @@
 
 
 #####################################################
-# this script matches the nationwide statistics at  ###############################################
-# http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #
-###################################################################################################
+# this script matches the nationwide statistics at  ###########################################
+# https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_11.lst #
+###############################################################################################
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -75,7 +75,7 @@ acs.h_no_pr <- subset( acs.h , st != 72 )
 # ..and immediately start printing each row matching the replication target #
 #############################################################################
 
-# http://www.census.gov/acs/www/Downloads/data_documentation/pums/Estimates/pums_estimates_11.lst #
+# https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_11.lst #
 
 
 #####################################################
