@@ -1,7 +1,7 @@
 
 # read.SAScii.monetdb depends on the SAScii package and the descr package
 # to install these packages, use the line:
-# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'ff' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'ff' , 'bit' ) )
 library(SAScii)
 library(descr)
 library(downloader)
