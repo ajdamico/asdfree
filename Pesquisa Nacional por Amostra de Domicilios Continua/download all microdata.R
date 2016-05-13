@@ -86,7 +86,7 @@ download_cached( input.fullname , tf , mode = 'wb' )
 z <- unzip( tf , exdir = td )
 
 # identify and store the sas file
-sasfile <- grep( "\\.sas$" , z , value = TRUE )
+sasfiles <- grep( "\\.sas$" , z , value = TRUE )
 
 # initiate the full ftp path
 year.ftp <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/"
@@ -122,6 +122,18 @@ for ( i in seq_along( zip.filenames ) ){
 	quarter <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.(zip|ZIP)" , "\\2" , zip.filenames[ i ] )
 	year <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.(zip|ZIP)" , "\\3" , zip.filenames[ i ] )
 
+	# if the year is 2012-2014 or 2015Q1-Q3, use the first sas import file..
+	if( year < 2015 | quarter < 4 ) {
+	
+		sasfile <- grep( "1Tri_2012 a 3Tri_2015" , sasfiles , value = TRUE ) 
+	
+	# otherwise, use the second
+	} else {
+		
+		sasfile <- grep( "4Tri_2015" , sasfiles , value = TRUE )
+		
+	}
+	
 	# construct the full ftp path to the current zipped file
 	current.zipfile <-
 		paste0(
