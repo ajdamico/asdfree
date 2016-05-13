@@ -33,10 +33,6 @@
 # ..in order to set your current working directory
 
 
-# windows machines might need to change their internet settings
-if ( .Platform$OS.type == 'windows' ) setInternet2( FALSE )
-
-
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "stringr" , "readr" , "RCurl" , "SAScii" ) )
 
