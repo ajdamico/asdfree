@@ -7,6 +7,9 @@
 
 options( encoding = "latin1" )
 
+# check if 7z is working
+if(system(paste(path.to.7z, "-h")) != 0) stop("Need 7z")
+
 tf <- tempfile() ; tf2 <- tempfile()
 
 library(downloader)

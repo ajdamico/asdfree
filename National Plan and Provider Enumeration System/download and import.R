@@ -37,7 +37,6 @@
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "MonetDB.R" , "MonetDBLite" , "R.utils" , "descr" , "downloader" , "digest" , "stringr" ) )
 
-
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
@@ -52,7 +51,6 @@ source_url(
 	prompt = FALSE , 
 	echo = FALSE 
 )
-
 
 
 # the MonetDB directory will be created within
@@ -73,6 +71,8 @@ source_url(
 # program start #
 # # # # # # # # #
 
+# check if 7z is working
+if(system(paste(path.to.7z, "-h")) != 0) stop("Need 7z")
 
 # the latest npi data file will be stored
 # in a temporary file on the local disk

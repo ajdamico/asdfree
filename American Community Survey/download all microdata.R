@@ -150,6 +150,9 @@ include_puerto_rico <- TRUE
 # for whichever year(s) you need #
 ##################################
 
+
+# check if 7z is working
+if(system(paste(path.to.7z, "-h")) != 0) stop("Need 7z")
 						
 #create a temporary file..
 tf <- tempfile()

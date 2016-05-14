@@ -90,7 +90,8 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # program start #
 # # # # # # # # #
 
-
+# check if 7z is working
+if(system(paste(path.to.7z, "-h")) != 0) stop("Need 7z")
 
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
 library(gdata) 				# load the gdata package (imports excel [.xls] files into R)

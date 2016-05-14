@@ -62,6 +62,8 @@
 # program start #
 # # # # # # # # #
 
+# check if 7z is working
+if(system(paste(path.to.7z, "-h")) != 0) stop("Need 7z")
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(DBI)			# load the DBI package (implements the R-database coding)
