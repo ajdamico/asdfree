@@ -119,8 +119,8 @@ for ( this.year in year.lines ){
 # loop through the `zip.filenames` character vector..
 for ( i in seq_along( zip.filenames ) ){
 
-	quarter <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.(zip|ZIP)" , "\\2" , zip.filenames[ i ] )
-	year <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])\\.(zip|ZIP)" , "\\3" , zip.filenames[ i ] )
+	quarter <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])(.*)\\.(zip|ZIP)" , "\\2" , zip.filenames[ i ] )
+	year <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])(.*)\\.(zip|ZIP)" , "\\3" , zip.filenames[ i ] )
 
 	# if the year is 2012-2014 or 2015Q1-Q3, use the first sas import file..
 	if( year < 2015 | quarter < 4 ) {
