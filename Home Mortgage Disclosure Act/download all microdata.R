@@ -63,7 +63,7 @@
 # # # # # # # # #
 
 # check if 7z is working
-if( ( .Platform$OS.type != 'windows' ) && ( system( paste( path.to.7z , "-h" ) ) != 0 ) ) stop("you need to install 7-zip")
+if( ( .Platform$OS.type != 'windows' ) && ( system( paste0('"', path.to.7z , '" -h' ) ) != 0 ) ) stop("you need to install 7-zip")
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(DBI)			# load the DBI package (implements the R-database coding)

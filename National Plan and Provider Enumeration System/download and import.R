@@ -72,7 +72,7 @@ source_url(
 # # # # # # # # #
 
 # check if 7z is working
-if( ( .Platform$OS.type != 'windows' ) && ( system( paste( path.to.7z , "-h" ) ) != 0 ) ) stop("you need to install 7-zip")
+if( ( .Platform$OS.type != 'windows' ) && ( system( paste0('"', path.to.7z , '" -h' ) ) != 0 ) ) stop("you need to install 7-zip")
 
 # the latest npi data file will be stored
 # in a temporary file on the local disk
