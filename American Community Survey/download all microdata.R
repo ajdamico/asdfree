@@ -152,7 +152,7 @@ include_puerto_rico <- TRUE
 
 
 # check if 7z is working
-if(system(paste(path.to.7z, "-h")) != 0) stop("Need 7z")
+if( ( .Platform$OS.type != 'windows' ) && ( system( paste( path.to.7z , "-h" ) ) != 0 ) ) stop("you need to install 7-zip")
 						
 #create a temporary file..
 tf <- tempfile()
