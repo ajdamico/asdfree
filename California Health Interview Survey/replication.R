@@ -21,18 +21,18 @@ chis_svy <- svrepdesign( data = x , weights = ~ rakedw0 , repweights = "rakedw[1
 
 # No usual source of care
 ## CI should equal 16.3-18.1
-x <- svymean(~usoc,chis_svy)
+x <- svymean(~factor(usoc),chis_svy)
 x
 round(100*confint(x,df=degf(chis_svy)),1)
 
 # Obesity
 ## CI should equal 24.1-26.0
-y <- svymean(~rbmi,chis_svy)
+y <- svymean(~factor(rbmi),chis_svy)
 y
 round(100*confint(y,df=degf(chis_svy)),1)
 
 # Diabetes
 ## CI should equal 7.8-8.9
-z <- svymean(~ab22,chis_svy)
+z <- svymean(~factor(ab22),chis_svy)
 z
 round(100*confint(z,df=degf(chis_svy)),1)

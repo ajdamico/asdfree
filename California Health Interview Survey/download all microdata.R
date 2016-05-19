@@ -77,6 +77,8 @@ for( this_year in c( seq( 2001 , 2011 , 2 ) , 2012:2014 ) ){
 
 	for( agegrp in c( 'adult' , 'teen' , 'child' ) ){
 
+		if( this_year == 2014 & agegrp == 'teen' ) agegrp <- 'adolescent'
+	
 		path_to_file <- paste0( "http://healthpolicy.ucla.edu/chis/data/public-use-data-file/Documents/chis" , substr( this_year , 3 , 4 ) , "_" , agegrp , "_stata.zip" )
 
 		# download the file number
