@@ -1,4 +1,4 @@
-# setwd( "C:/My Directory/CHIS")
+# setwd( "C:/My Directory/CHIS" )
 your.username <- "your_username"
 your.password <- "your_password"
 
@@ -89,7 +89,7 @@ for( this_year in c( seq( 2001 , 2011 , 2 ) , 2012:2014 ) ){
 
 		for( this_dta in grep( "\\.dta$" , unzipped_files , value = TRUE ) ){
 		
-			x <- read.dta( this_dta )
+			x <- read.dta( this_dta , convert.factors = FALSE )
 			
 			names( x ) <- tolower( names( x ) )
 			
