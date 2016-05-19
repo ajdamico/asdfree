@@ -5,6 +5,7 @@ your.password <- "your_password"
 
 
 
+# YOU MUST SIGN THE ONLINE AGREEMENT AND DOWNLOAD ONE MICRODATA SET MANUALLY BEFORE RUNNING THIS
 
 
 loginpage <- "http://healthpolicy.ucla.edu/pages/login.aspx"
@@ -65,6 +66,7 @@ html = postForm(loginpage, .params = params, curl = curl)
 
 # confirms the result's contents contains the word `Logout` because
 # if it does not contain this text, you're not logged in.  sorry.
+if ( !grepl('Logout', html) ) stop( 'YOU ARE NOT LOGGED IN' )
 
 # initiate a temporary file and a temporary directory
 tf <- tempfile() ; td <- tempdir()
