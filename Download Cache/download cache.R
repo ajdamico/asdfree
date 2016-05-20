@@ -5,6 +5,11 @@
 # options( "download_cached.usecache" = FALSE )
 # options( "download_cached.savecache" = TRUE )
 
+# you must have the `digest` package loaded
+# install.packages( "digest" )
+stopifnot(require(digest))
+
+
 
 download_cached <- 
   function (
