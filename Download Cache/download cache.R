@@ -182,11 +182,11 @@ download_cached <-
 
 			# check hashes if exists
 			if (is.na(hashes[urlhash])) {
-				message("download_cache(): hash missing for ", url, " (", urlhash, ")")
+				message("download_cached(): hash missing for ", url, " (", urlhash, ")")
 			} else {
 				filehash <- digest::digest(destfile, algo = "sha1", file = TRUE)
 				if (filehash != hashes[urlhash]) {
-					message("download_cache(): hash mismatch for ", url, " (", urlhash, ")")
+					message("download_cached(): hash mismatch for ", url, " (", urlhash, ")")
 					class(failed.attempt) <- 'try-error'
 				}
 			}
