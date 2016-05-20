@@ -39,6 +39,9 @@ download_cached <-
 	# (this is useful when a cached file did not download completely)
 	savecache = getOption( "download_cached.savecache" ) ,
 
+    # if hashwarn is TRUE, then warn about missing hash checks
+	hashwarn = getOption( "download_cached.hashwarn" ) ,
+
 	# how many attempts should be made with FUN?
 	attempts = 3 ,
 	# just in case of a server timeout or smthn equally annoying
@@ -69,7 +72,8 @@ download_cached <-
 		if( is.null( usedest ) ) usedest <- FALSE
 		if( is.null( usecache ) ) usecache <- TRUE
 		if( is.null( savecache ) ) savecache <- usecache
-
+		if( is.null( hashwarn ) ) hashwarn <- FALSE
+		
 		if( usecache & !savecache ) warning( "usecache=TRUE and savecache=FALSE does not do anything" )
 		
 		if( is.null( destfile ) ){
@@ -182,7 +186,10 @@ download_cached <-
 
 			# check hashes if exists
 			if (is.na(hashes[urlhash])) {
-				message("download_cached(): hash missing for ", url, " (", urlhash, ")")
+				
+				# if it doesn't exist and hash warnings are ON, alert the user to a missing hash
+				if( hashwarn ) message("download_cached(): hash missing for ", url, " (", urlhash, ")")
+				
 			} else {
 				filehash <- digest::digest(destfile, algo = "sha1", file = TRUE)
 				if (filehash != hashes[urlhash]) {
