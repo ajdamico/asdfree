@@ -123,6 +123,9 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/r
 # for whichever year(s) you need #
 ##################################
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
 
 # name the database files in the "MonetDB" folder of the current working directory
 dbfolder <- paste0( getwd() , "/MonetDB" )

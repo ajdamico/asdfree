@@ -74,6 +74,9 @@ years.to.download <-
 # program start #
 # # # # # # # # #
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
 
 # create the temporary file location to download all files
 tf <- tempfile()

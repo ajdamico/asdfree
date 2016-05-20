@@ -59,6 +59,10 @@ sipp.pnl.longitudinal.replicate.weights <- paste0( 'pnl' , 1:3 )	# 1-3 reads in 
 # # # # # # # # #
 
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
+
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)		# load MonetDBLite package (creates database files in R)

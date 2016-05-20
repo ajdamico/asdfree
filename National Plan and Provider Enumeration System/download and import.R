@@ -43,16 +43,6 @@ library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 
-
-# load the download_cached and related functions
-# to prevent re-downloading of files once they've been downloaded.
-source_url( 
-	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
-	prompt = FALSE , 
-	echo = FALSE 
-)
-
-
 # the MonetDB directory will be created within
 # the current working directory
 # so if you would like the NPI database stored in 
@@ -66,6 +56,17 @@ source_url(
 
 # no need to edit anything below this line #
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
+
+# load the download_cached and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url( 
+	"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
+	prompt = FALSE , 
+	echo = FALSE 
+)
 
 # # # # # # # # #
 # program start #

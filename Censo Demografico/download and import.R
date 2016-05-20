@@ -111,6 +111,9 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 # for whichever year(s) you need #
 ##################################
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
 
 
 # define a special function to   #

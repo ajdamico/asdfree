@@ -117,6 +117,10 @@ options( survey.replicates.mse = TRUE )
 
 # Stata svyset command notes can be found here: http://www.stata.com/help.cgi?svyset
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
+
 
 # begin looping through every cps year specified
 for ( year in cps.years.to.download ){

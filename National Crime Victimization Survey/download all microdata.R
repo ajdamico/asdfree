@@ -102,6 +102,9 @@ library(foreign)		# load foreign package (converts data files into R)
 # create a temporary file
 tf <- tempfile()
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
 
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.

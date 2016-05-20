@@ -85,6 +85,10 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
+
 # load the download_cached and related functions
 # to prevent re-downloading of files once they've been downloaded.
 source_url( 

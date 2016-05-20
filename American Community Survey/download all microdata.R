@@ -150,6 +150,9 @@ include_puerto_rico <- TRUE
 # for whichever year(s) you need #
 ##################################
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
 
 # check if 7z is working
 if( ( .Platform$OS.type != 'windows' ) && ( system( paste0('"', path.to.7z , '" -h' ) ) != 0 ) ) stop("you need to install 7-zip")

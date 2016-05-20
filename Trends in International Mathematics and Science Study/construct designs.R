@@ -56,6 +56,10 @@ library(mitools) 			# load mitools package (analyzes multiply-imputed data)
 # should calculate their variances by using the average of the replicates.
 options( "survey.replicates.mse" = TRUE )
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
+
 
 # figure out which years are available by creating the `years` vector with only numbers in the directory
 years <- list.files()[ as.character( as.numeric( list.files() ) ) %in% list.files() ]

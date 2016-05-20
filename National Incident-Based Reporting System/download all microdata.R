@@ -110,6 +110,9 @@ db <- dbConnect( MonetDBLite() , dbfolder )
 
 
 
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
 
 # some download caching
 downloader::source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE)

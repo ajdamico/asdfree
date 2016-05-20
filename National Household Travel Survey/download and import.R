@@ -55,7 +55,9 @@
 ############################################
 # no need to edit anything below this line #
 
-
+# this script's download files should be incorporated in download_cached's hash list
+options( "download_cached.hashwarn" = TRUE )
+# warn the user if the hash does not yet exist
 
 # initiate a function
 # that takes a monet database
