@@ -53,7 +53,7 @@ download_cached <-
 
   
 	# the huge vector of hashes wuz here
-	hashes <- NULL
+	hashes <- c( "0" = "0" )
 	
 	
   
