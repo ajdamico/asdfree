@@ -33,6 +33,7 @@ w <-
 		nest = TRUE ,
 		data = "x34061_0002" ,									# table name within the monet database (defined in the character string above)
 		dbtype = "MonetDBLite" ,
+		dbname = dbfolder
 	)
 
 x <- subset( w , exclude_outUS = 0 & dummy = 0 & year = 2011 )
