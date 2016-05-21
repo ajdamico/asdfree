@@ -201,7 +201,13 @@ download_cached <-
 		
 		# double-check that the `success` object exists.. it might not if `attempts` was set to zero.
 		if ( exists( 'success' ) ){
-			 if ( !is.null( destfile ) && savecache && success ) file.copy( destfile , cachefile , overwrite = TRUE )
+		
+			if( is.null( destfile ) && savecache ){
+
+					save( success , file = cachefile )
+
+			} else if ( !is.null( destfile ) && savecache && success ) file.copy( destfile , cachefile , overwrite = TRUE )
+
 			cat("\n")
 			
 			
