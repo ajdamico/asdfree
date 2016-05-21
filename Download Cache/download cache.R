@@ -191,7 +191,14 @@ download_cached <-
 				if( hashwarn ) message("download_cached(): hash missing for ", url, " (", urlhash, ")")
 				
 			} else {
-				filehash <- digest::digest(destfile, algo = "sha1", file = TRUE)
+			
+				# if FUN = getBinaryURL, use the `success` object
+				if( is.null( destfile ) ){
+					filehash <- digest::digest(success, algo = "sha1", file = FALSE)
+				} else {
+					filehash <- digest::digest(destfile, algo = "sha1", file = TRUE)
+				}
+				
 				if (filehash != hashes[urlhash]) {
 					message("download_cached(): hash mismatch for ", url, " (", urlhash, ")")
 					class(failed.attempt) <- 'try-error'
