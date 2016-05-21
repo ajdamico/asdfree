@@ -200,8 +200,13 @@ download_cached <-
 				}
 				
 				if (filehash != hashes[urlhash]) {
+					
 					message("download_cached(): hash mismatch for ", url, " (", urlhash, ")")
+					
 					class(failed.attempt) <- 'try-error'
+					
+					rm( success )
+					
 				}
 			}
 		}
