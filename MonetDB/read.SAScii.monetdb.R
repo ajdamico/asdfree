@@ -102,7 +102,16 @@ read.SAScii.monetdb <-
 	if( !is.null( sas_ri ) ){
 	
 		tf_sri <- tempfile()
-		download_cached( sas_ri , tf_sri , mode = 'wb' )
+		
+		# if the sas read-in file needs to be downloaded..
+		if( any( grepl( 'url' , attr( file( sas_ri ) , "class" ) ) ) ){
+		
+			# download it.
+			download_cached( sas_ri , tf_sri , mode = 'wb' )
+		
+		# otherwise, just copy it over.
+		} else tf_sri <- sas_ri
+		
 		x <- parse.SAScii( tf_sri , beginline , lrecl )
 	
 	} else {
