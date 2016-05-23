@@ -101,7 +101,9 @@ read.SAScii.monetdb <-
 
 	if( !is.null( sas_ri ) ){
 	
-		x <- parse.SAScii( sas_ri , beginline , lrecl )
+		tf_sri <- tempfile()
+		download_cached( sas_ri , tf_sri , mode = 'wb' )
+		x <- parse.SAScii( tf_sri , beginline , lrecl )
 	
 	} else {
 	
