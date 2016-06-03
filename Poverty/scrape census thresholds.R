@@ -1,5 +1,8 @@
-# install.packages( c( "readxl" , "stringr" , "reshape2" , "XML" ) )
+# install.packages( c( "xml2" , "rvest" , "readxl" , "stringr" , "reshape2" , "XML" ) )
 
+
+library(xml2)
+library(rvest)
 library(readxl)
 library(stringr)
 library(reshape2)
@@ -69,18 +72,14 @@ for ( year in 1990:2009 ){
 # remove all commas and convert the columns to numeric
 all_thresholds$threshold <- as.numeric( gsub( "," , "" , all_thresholds$threshold ) )
 
+cpov <- "https://www.census.gov/data/tables/time-series/demo/income-poverty/historical-poverty-thresholds.html" 
+
+pg <- read_html(cpov)
+
+all_links <- html_attr(html_nodes(pg, "a"), "href")
+
 # find all excel files on the census poverty webpage
-excel_locations <-
-	grep( 
-		"threshld/thresh(.*)\\.xls" , 
-		xpathSApply( 
-			htmlParse( 
-				"http://www.census.gov/hhes/www/poverty/data/threshld/index.html" 
-			) , 
-			"//a//@href" 
-		) , 
-		value = TRUE 
-	)
+excel_locations <- grep( "thresholds/thresh(.*)\\.xls" , all_links , value = TRUE )
 
 # figure out which years are available among the excel file strings
 ya <- ( 2010:2099 )[ substr( 2010:2099 , 3 , 4 ) %in% gsub( "(.*)thresh(.*)\\.xl(.*)" , "\\2" , excel_locations ) ]
@@ -89,7 +88,7 @@ ya <- ( 2010:2099 )[ substr( 2010:2099 , 3 , 4 ) %in% gsub( "(.*)thresh(.*)\\.xl
 for ( year in ya ){
 
 	# figure out the location of the excel file on the drive
-	this_excel <- paste0( "http://www.census.gov" , grep( substr( year , 3 , 4 ) , excel_locations , value = TRUE ) )
+	this_excel <- paste0( "https:" , grep( substr( year , 3 , 4 ) , excel_locations , value = TRUE ) )
 	
 	# name the excel file something appropriate
 	fn <- paste0( tempdir() , "/" , basename( this_excel ) )
