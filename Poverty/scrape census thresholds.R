@@ -74,7 +74,8 @@ all_thresholds$threshold <- as.numeric( gsub( "," , "" , all_thresholds$threshol
 
 cpov <- "https://www.census.gov/data/tables/time-series/demo/income-poverty/historical-poverty-thresholds.html" 
 
-pg <- read_html(cpov)
+pgdl <- try( pg <- read_html(cpov) , silent = TRUE )
+if( class( pgdl ) == 'try-error' ) pg <- read_html(cpov, method='wininet')
 
 all_links <- html_attr(html_nodes(pg, "a"), "href")
 
