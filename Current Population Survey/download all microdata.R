@@ -495,7 +495,7 @@ for ( year in cps.years.to.download ){
 		
 		if( year %in% c( 2014 , 2014.58 ) ){
 			
-			ace <- "http://www.census.gov/hhes/www/hlthins/data/incpovhlth/2013/asec14_now_anycov.dat"
+			ace <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec14_now_anycov.dat"
 
 			download_cached( ace , tf , mode = "wb" )	
 
