@@ -586,7 +586,7 @@ int_cogn06_t_dec07.missings <-
 		
 		for ( i in seq( nrow( n.outs ) ) ){
 
-			if( dbDataType( db , n.outs[ i , 3 ] ) == 'varchar' ) {
+			if( dbDataType( db , n.outs[ i , 3 ] ) %in% c( 'clob' , 'string' , 'varchar' ) ) {
 
 				dbSendQuery(
 					db ,

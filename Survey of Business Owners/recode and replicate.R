@@ -163,7 +163,7 @@ for ( i in 1:4 ){
 }
 
 # add a new character column called `tab` to the `x` data table
-dbSendQuery( db , 'ALTER TABLE x ADD COLUMN tab VARCHAR(255)' )
+dbSendQuery( db , 'ALTER TABLE x ADD COLUMN tab STRING' )
 
 # any business owned by less than half minorities is an `N`
 dbSendQuery( db , "UPDATE x SET tab = 'N' WHERE pct_minority < 50" )

@@ -370,7 +370,6 @@ for ( year in cps.years.to.download ){
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = hh_beginline , 
 				zipped = FALSE ,
-				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'household' ,
 				conn = db
@@ -382,7 +381,6 @@ for ( year in cps.years.to.download ){
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = fa_beginline , 
 				zipped = FALSE ,
-				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'family' ,
 				conn = db
@@ -394,7 +392,6 @@ for ( year in cps.years.to.download ){
 				CPS.ASEC.mar.SAS.read.in.instructions , 
 				beginline = pe_beginline , 
 				zipped = FALSE ,
-				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'person' ,
 				conn = db
@@ -405,7 +402,6 @@ for ( year in cps.years.to.download ){
 				tf.household , 
 				sas_stru = sas_ris[[1]] ,
 				zipped = FALSE ,
-				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'household' ,
 				conn = db
@@ -416,7 +412,6 @@ for ( year in cps.years.to.download ){
 				tf.family , 
 				sas_stru = sas_ris[[2]] ,
 				zipped = FALSE ,
-				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'family' ,
 				conn = db
@@ -427,7 +422,6 @@ for ( year in cps.years.to.download ){
 				tf.person , 
 				sas_stru = sas_ris[[3]] ,
 				zipped = FALSE ,
-				varchar = FALSE ,
 				tl = TRUE ,
 				tablename = 'person' ,
 				conn = db
@@ -454,7 +448,6 @@ for ( year in cps.years.to.download ){
 			tf.xwalk , 
 			xwalk.sas.tf , 
 			zipped = FALSE ,
-			varchar = FALSE ,
 			tl = TRUE ,
 			tablename = 'xwalk' ,
 			conn = db
@@ -659,8 +652,7 @@ for ( year in cps.years.to.download ){
 			zipped = zip_file , 
 			tl = TRUE ,
 			tablename = 'rw' ,
-			conn = db ,
-			varchar = FALSE
+			conn = db
 		)
 
 

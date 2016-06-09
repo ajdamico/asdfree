@@ -255,7 +255,6 @@ if ( sipp.household.extract ){
 		tl = TRUE ,
 		tablename = "hh" ,
 		conn = db ,
-		varchar = FALSE ,
 		try_best_effort = TRUE
 	)
 	

@@ -169,7 +169,7 @@ for ( i in seq( length( table.names ) ) ){
 		paste(
 			"alter table" ,
 			table.names[ i ] ,
-			"add column tablename varchar(255)"
+			"add column tablename STRING"
 		)
 	
 	# execute the sql 'alter table' command

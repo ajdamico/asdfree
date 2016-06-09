@@ -89,7 +89,7 @@ sql.process <-
 			)
 		
 		# blank only columns that are not varchar
-		cols.to.blank <- all.columns[ !( all.columns$type %in% c( 'clob' , 'varchar' ) ) , 'name' ]
+		cols.to.blank <- all.columns[ !( all.columns$type %in% c( 'clob' , 'varchar' , 'string' ) ) , 'name' ]
 		
 		
 		# loop through every field in the data set
