@@ -1,27 +1,12 @@
 
 # read.SAScii.monetdb depends on the SAScii package and the descr package
 # to install these packages, use the line:
-# install.packages( c( 'SAScii' , 'descr' , 'downloader' , 'digest' , 'ff' , 'bit' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'downloader' ) )
 library(SAScii)
 library(descr)
 library(downloader)
-library(ff)
+library(DBI)
 
-
-# create importation function
-# to use different 'NULL AS <something>' options for the actual command that imports
-# lines into monetdb: COPY <stuff> INTO <tablename> ...
-sql.copy.into <-
-	function( nullas , tablename , tf2 , connection , delimiters ){
-		
-		sql.update <- paste0( "copy offset 2 into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters  , nullas ) 
-		
-		dbSendQuery( connection , sql.update )
-		
-		# return true when it's completed
-		TRUE
-	}
-	
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # differences from the SAScii package's read.SAScii() --
@@ -50,15 +35,11 @@ read.SAScii.monetdb <-
 										# this option is useful for keeping protected data off of random temporary folders on your computer--
 										# specifying this option creates the temporary file inside the folder specified
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
-		sleep.between.col.updates = 0 ,
-		varchar = TRUE ,				# import character strings as type VARCHAR(255)?  use FALSE to import them as clob
 		n_max = -1 ,
 		try_best_effort = FALSE ,
 		sas_stru = NULL
 		
 	) {
-
-	
 		if( is.null( sas_ri ) & is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified" )
 		if( !is.null( sas_ri ) & !is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified, but not both" )
 
@@ -92,7 +73,7 @@ read.SAScii.monetdb <-
 	if ( !exists( "download_cached" ) ){
 		# load the download_cached and related functions
 		# to prevent re-downloading of files once they've been downloaded.
-		source_url( 
+		downloader::source_url( 
 			"https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , 
 			prompt = FALSE , 
 			echo = FALSE 
@@ -159,15 +140,8 @@ read.SAScii.monetdb <-
 
 	# improve speed of `n_max` by limiting the file
 	if( n_max != -1 ) {
-	
-		infile <- read.table.ffdf( file = fn , nrows = n_max , header = FALSE , sep = "\n" , colClasses = "factor" , row.names = NULL , quote = '' , na.strings = NULL , comment.char = "" )
-	
-		file.remove( fn )
-		
-		write.table.ffdf( infile , file = fn , col.names = FALSE , row.names = FALSE , quote = FALSE , sep = "" , na = "" )
-		
-		rm( infile )
-	
+		lines <- readLines(fn, n=n_max)
+		writeLines(lines, fn)
 	}
 	
 	
@@ -192,12 +166,7 @@ read.SAScii.monetdb <-
 
 	fields <- y$varname
 
-	if( varchar ){
-		colTypes <- ifelse( !y[ , 'char' ] , 'DOUBLE PRECISION' , 'VARCHAR(255)' )
-	} else {
-		colTypes <- ifelse( !y[ , 'char' ] , 'DOUBLE PRECISION' , 'clob' )
-	}
-	
+	colTypes <- ifelse( !y[ , 'char' ] , 'DOUBLE PRECISION' , 'STRING' )
 
 	colDecl <- paste( fields , colTypes )
 
@@ -216,20 +185,7 @@ read.SAScii.monetdb <-
 	
 	# starts and ends
 	w <- abs ( x$width )
-	s <- 1
-	e <- w[ 1 ]
-	for ( i in 2:length( w ) ) {
-		s[ i ] <- s[ i - 1 ] + w[ i - 1 ]
-		e[ i ] <- e[ i - 1 ] + w[ i ]
-	}
-	
-	# create another file connection to the temporary file to store the fwf2csv output..
-	
-	# convert the fwf to a csv
-	# verbose = TRUE prints a message, which has to be captured.
-	fwf2csv( fn , tf2 , names = x$varname , begin = s , end = e , verbose = F )
-	on.exit( { file.remove( tf2 ) } )
-	
+		
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
 
@@ -238,61 +194,18 @@ read.SAScii.monetdb <-
 	
 	##############################
 	# begin importation attempts #
-
-	# notice the differences in the NULL AS <stuff> for the five different attempts.
-	# monetdb importation is finnicky, so attempt a bunch of different COPY INTO tries
-	# using the sql.copy.into() function defined above
 	
 	# capture an error (without breaking)
-	te <- try( sql.copy.into( " NULL AS ''" , tablename , tf2  , connection , delimiters )  , silent = TRUE )
-
-	# try another delimiter statement
-	if ( class( te ) == "try-error" ){
-		cat( 'attempt #1 broke, trying method #2' , "\r" )
-		print( te )
-		te <- try( sql.copy.into( " NULL AS ' '" , tablename , tf2  , connection , delimiters )  , silent = TRUE )
-	}
-
-	# try another delimiter statement
-	if ( class( te ) == "try-error" ){
-		cat( 'attempt #2 broke, trying method #3' , "\r"  )
-		print( te )
-		te <- try( sql.copy.into( "" , tablename , tf2  , connection , delimiters )  , silent = TRUE )
-	}
+	te <- try(dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' FWF (", paste0(w, collapse=", "), ")")), silent=TRUE)
 	
-	# try another delimiter statement
-	if ( class( te ) == "try-error" ){
-		cat( 'attempt #3 broke, trying method #4' , "\r"  )
-		print( te )
-		te <- try( sql.copy.into( paste0( " NULL AS '" , '""' , "'" ) , tablename , tf2  , connection , delimiters )  , silent = TRUE )
-	}
-
-	if ( class( te ) == "try-error" ){
-		cat( 'attempt #4 broke, trying method #5' , "\r" )
-		print( te )
-		# this time without error-handling.
-		# do you want to try the BEST EFFORT flag for COPY INTO?
-		te <- try( sql.copy.into( " NULL AS '' ' '" , tablename , tf2  , connection , delimiters ) , silent = TRUE )
-	}
-	
-	
+	# TODO: DO WE STILL NEED THIS?!
 	if( class( te ) == 'try-error' ){
-	
 		if( !try_best_effort ){
-			
 			dbRemoveTable( connection , tablename )
-			
-			stop( "ran out if import ideas" )
-			
-		} else{
-		
-			sql.update <- 
-				paste0( "copy offset 2 into " , tablename , " from '" , tf2 , "' using delimiters " , delimiters , " BEST EFFORT" ) 
-			
-			dbSendQuery( connection , sql.update )
-		
+			stop( "my evil plans failed" )
+		} else {
+			dbSendQuery( connection , paste0( "COPY INTO " , tablename , " FROM '" , tf2 , "' USING DELIMITERS " , delimiters , " BEST EFFORT" ) )
 		}
-		
 	}
 	
 	# end importation attempts #
@@ -323,9 +236,6 @@ read.SAScii.monetdb <-
 				
 			if ( !skip.decimal.division ){
 				dbSendQuery( connection , sql )
-			
-				# give the MonetDB mserver.exe a certain number of seconds to process each column
-				Sys.sleep( sleep.between.col.updates )
 			}
 		
 		}
