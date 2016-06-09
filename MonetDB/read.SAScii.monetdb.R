@@ -34,6 +34,7 @@ read.SAScii.monetdb <-
 										# this option is useful for keeping protected data off of random temporary folders on your computer--
 										# specifying this option creates the temporary file inside the folder specified
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
+		try_best_effort = FALSE ,
 		sas_stru = NULL
 		
 	) {
@@ -186,8 +187,7 @@ read.SAScii.monetdb <-
 	#############################
 	# begin importation attempt #
 	
-	dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' FWF (", paste0(w, collapse=", "), ")"))
-	
+	dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' FWF (", paste0(w, collapse=", "), ")" , if( try_best_effort ) " BEST EFFORT" ))
 	
 	# end importation attempt #
 	###########################	
