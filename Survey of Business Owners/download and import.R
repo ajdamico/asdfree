@@ -51,7 +51,6 @@ SBO.dbname <- "sbo"
 
 
 library(DBI)				# load the DBI package (implements the R-database coding)
-library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(mitools) 			# load mitools package (analyzes multiply-imputed data)
 library(survey) 			# load survey package (analyzes complex design surveys)
 library(downloader)			# downloads and then runs the source() function on scripts from github
@@ -89,7 +88,7 @@ z <- unzip( tf , exdir = td )
 dbfolder <- paste0( getwd() , "/" , SBO.dbname )
 
 # connect to the MonetDBLite database (.db)
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 # read the comma separated value (csv) file you just downloaded
 # directly into the monetdb database you just created.

@@ -40,7 +40,6 @@
 
 library(survey) 		# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # the censo demografico download and importation script
@@ -62,7 +61,7 @@ library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 # uncomment this line by removing the `#` at the front..
@@ -78,7 +77,7 @@ pes.d <- open( pes.design , driver = MonetDB.R() )	# recoded
 # then make a copy so you don't lose the pristine original.    #
 
 # the command above
-# db <- dbConnect( MonetDBLite() , dbfolder )
+# db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 # has already connected the current instance of r to the monet database
 
 

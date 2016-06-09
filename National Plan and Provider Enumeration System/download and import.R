@@ -39,7 +39,6 @@
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 
 # the MonetDB directory will be created within
@@ -132,7 +131,7 @@ csv.file <- z[ grepl( 'csv' , z ) & !grepl( 'FileHeader' , z ) ]
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 # from now on, the 'db' object will be used for r to connect with the monetdb server
 
 

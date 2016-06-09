@@ -25,7 +25,6 @@
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -65,7 +64,7 @@ year <- 2008
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 # end of monetdb database configuration #
 

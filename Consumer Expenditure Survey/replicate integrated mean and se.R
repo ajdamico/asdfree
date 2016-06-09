@@ -63,7 +63,6 @@ library(stringr) 		# load stringr package (manipulates character strings easily)
 library(reshape2)		# load reshape2 package (transposes data frames quickly)
 library(sqldf)			# load the sqldf package (enables sql queries on data frames)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # # # # # # # # # # # # # # # # # # # #
@@ -479,7 +478,7 @@ expend <- expend[ order( expend$newid ) , ]
 # therefore, the following database (db) commands use sql to avoid memory issues
 
 # create a new connection to the temporary database file (defined above)
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 # store the family data frame in that database
 dbWriteTable( db , 'fmly' , fmly , row.names = FALSE )

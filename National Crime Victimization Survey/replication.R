@@ -1,12 +1,11 @@
 library(survey)
 library(DBI)
-library(MonetDBLite)
 
 # http://www.bjs.gov/content/pub/pdf/Variance_Guide_Appendix_C_SAS.pdf
 
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 dbSendQuery( db , "ALTER TABLE x34061_0004 ADD COLUMN series DOUBLE" )
 dbSendQuery( db , "ALTER TABLE x34061_0004 ADD COLUMN serieswgt DOUBLE" )

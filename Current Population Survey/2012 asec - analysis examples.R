@@ -54,7 +54,6 @@
 
 library(survey)				# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 
 
 # if this option is set to TRUE
@@ -120,7 +119,7 @@ svytotal(
 # note that this is exactly equivalent to summing up the weight variable
 # from the original cps data frame
 
-db <- dbConnect( MonetDBLite() , dbfolder )					# connect to the SQLite database (.db)
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )					# connect to the SQLite database (.db)
 dbGetQuery( db , 'select sum( marsupwt ) from asec12' )		# run a single query, summing the person-weight
 dbDisconnect( db )											# disconnect from the database but do not shut it down
 

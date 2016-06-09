@@ -64,7 +64,6 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(SAScii)			# load the SAScii package (imports ascii data with a SAS script)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 
@@ -94,7 +93,7 @@ dir.create( "./download" )
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 # create a temporary file and a temporary directory
 tf <- tempfile() ; td <- tempdir()

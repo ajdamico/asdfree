@@ -38,7 +38,6 @@
 
 library(survey) 		# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 
@@ -51,7 +50,7 @@ library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 # # # # # sql-based analysis starts here # # # # #

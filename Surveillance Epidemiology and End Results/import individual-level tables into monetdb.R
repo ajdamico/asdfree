@@ -55,7 +55,6 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(downloader)		# downloads and then runs the source() function on scripts from github
@@ -67,7 +66,7 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/r
 
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

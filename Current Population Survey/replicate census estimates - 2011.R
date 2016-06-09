@@ -54,7 +54,6 @@
 
 library(survey)		# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # if this option is set to TRUE

@@ -37,7 +37,6 @@
 # install.packages( "sqldf" )
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(sqldf)		# load the sqldf package (enables sql queries on data frames)
 
 
@@ -53,7 +52,7 @@ library(sqldf)		# load the sqldf package (enables sql queries on data frames)
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 # # # # # # # # # # # # #

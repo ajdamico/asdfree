@@ -13,7 +13,6 @@ if( system( paste0('"', path.to.7z , '" -h' ) ) != 0 ) stop("you need to install
 tf <- tempfile() ; tf2 <- tempfile()
 
 library(downloader)
-library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(SAScii)
 library(RCurl)
@@ -78,7 +77,7 @@ ranc <-
 
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , paste0( getwd() , "/MonetDB" ) )
+db <- dbConnect( MonetDBLite::MonetDBLite() , paste0( getwd() , "/MonetDB" ) )
 
 
 

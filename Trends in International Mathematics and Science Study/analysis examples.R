@@ -39,7 +39,6 @@ library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(survey) 		# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # load the multiply-imputed design combination alteration function (scf.MIcombine)

@@ -169,7 +169,6 @@ nmf <-
 library(stringr) 			# load stringr package (manipulates character strings easily)
 library(survey) 			# load survey package (analyzes complex design surveys)
 library(DBI)				# load the DBI package (implements the R-database coding)
-library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 library(sas7bdat)			# loads files ending in .sas7bdat directly into r as data.frame objects
 library(foreign) 			# load foreign package (converts data files into R)
@@ -206,7 +205,7 @@ for ( year in years.to.download ){
 
 
 	# immediately connect to the monetdblite folder
-	db <- dbConnect( MonetDBLite() , dbfolder )
+	db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 	# 1983 is just sas transport files, so import them independently.
@@ -831,7 +830,7 @@ unlink( td , recursive = TRUE )
 # double-check that all tables have at least one record #
 
 # reconnect to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 # all tables created by this script end in numbers
 tein <- dbListTables( db )[ grep( '(.)*[0-9][0-9][0-9][0-9]' , dbListTables( db ) ) ]

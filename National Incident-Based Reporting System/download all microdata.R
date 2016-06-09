@@ -92,7 +92,6 @@ library(RCurl)		# load RCurl package (downloads https files)
 library(stringr)	# load stringr package (manipulates character strings easily)
 library(downloader)	# downloads and then runs the source() function on scripts from github
 library(DBI)		# load the DBI package (implements the R-database coding)
-library(MonetDBLite)# load MonetDBLite package (creates database files in R)
 library(descr)		# load the descr package (converts fixed-width files to delimited files)
 library(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)
 library(foreign)	# load foreign package (converts data files into R)
@@ -104,7 +103,7 @@ library(foreign)	# load foreign package (converts data files into R)
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 

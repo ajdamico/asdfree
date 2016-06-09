@@ -1,12 +1,11 @@
 # example using pnad2011
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(survey)
 library(convey)
 
 # setwd( "C:/My Directory/PNAD/" )
 pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
-db <- dbConnect( MonetDBLite() , pnad.dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , pnad.dbfolder )
 dbListTables(db)
 
 options(survey.lonely.psu = "adjust")

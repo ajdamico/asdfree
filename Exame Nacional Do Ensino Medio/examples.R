@@ -1,5 +1,4 @@
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)
 library (dplyr)
 
 ## directory containing the monetdb data base
@@ -7,7 +6,7 @@ setwd ("C:/My Directory/ENEM/")
 
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 ## number of enrolled

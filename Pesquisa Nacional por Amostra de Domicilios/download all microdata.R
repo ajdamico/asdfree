@@ -77,7 +77,6 @@ pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
 # # # # # # # # #
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(downloader)		# downloads and then runs the source() function on scripts from github
@@ -109,7 +108,7 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Pesquisa%
 tf <- tempfile() ; td <- tempdir()
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , pnad.dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , pnad.dbfolder )
 
 
 # download and import the tables containing missing codes
@@ -413,7 +412,7 @@ for ( year in years.to.download ){
 			# also add a new column "one" that simply contains the number 1 for every record in the data set
 			# also add a new column "uf" that contains the state code, since these were thrown out of the SAS script
 			# also add a new column "region" that contains the larger region, since these are shown in the tables
-			# NOTE: the substr() function luckily works in MonetDBLite() databases, but may not work if you change SQL database engines to something else.
+			# NOTE: the substr() function luckily works in MonetDBLite::MonetDBLite() databases, but may not work if you change SQL database engines to something else.
 			" as select a.* , " ,
 			paste( b_fields , collapse = "," ) ,
 			" , 1 as one , substr( a.v0102 , 1 , 2 ) as uf , substr( a.v0102 , 1 , 1 ) as region from pes" , 

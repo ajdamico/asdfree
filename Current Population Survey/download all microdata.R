@@ -79,7 +79,6 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(survey)				# load survey package (analyzes complex design surveys)
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 				# load the descr package (converts fixed-width files to delimited files)
@@ -146,7 +145,7 @@ for ( year in cps.years.to.download ){
 	if ( year == 2014 ){
 		
 		# open the connection to the monetdblite database
-		db <- dbConnect( MonetDBLite() , dbfolder )
+		db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 		tf1 <- tempfile() ; tf2 <- tempfile() ; tf3 <- tempfile()
 	
@@ -356,7 +355,7 @@ for ( year in cps.years.to.download ){
 
 
 		# open the connection to the monetdblite database
-		db <- dbConnect( MonetDBLite() , dbfolder )
+		db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 		# the 2011 SAS file produced by the National Bureau of Economic Research (NBER)

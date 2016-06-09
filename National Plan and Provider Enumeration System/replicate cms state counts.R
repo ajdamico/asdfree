@@ -64,7 +64,6 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 
 # after running the r script above, users should have handy a few lines
@@ -76,7 +75,7 @@ library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 dbfolder <- paste0( getwd() , "/MonetDB" )
 
 # open the connection to the monetdblite database
-db <- dbConnect( MonetDBLite() , dbfolder )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 # from now on, the 'db' object will be used for r to connect with the monetdb server
 
 
