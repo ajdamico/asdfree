@@ -340,7 +340,7 @@ for ( i in numbers.to.download ){
 		
 		# let the user/viewer know whatcha doin'
 		print( paste( "currently importing" , data.file ) )
-		
+		dbBegin(db)
 		# determine the tablename within the big database
 		tablename <- gsub( "(.*)/ICPSR_(.*)/(DS|ds)(.*)" , "x\\2_\\4" , dirname( data.file ) )
 		# it should be x[study number]_[dataset number]
@@ -466,25 +466,17 @@ for ( i in numbers.to.download ){
 								
 				# if there are any variables that need system missing-ing
 				if( length( mvr ) == 1 ){
-					
-					# loop through each variable to recode
-					for ( k in seq_along( vtr ) ){
-					
-						# update the current data table's variable-to-replace (vtr) with missing (NULL) whenever the pattern-to-match is matched.
-						dbSendQuery( 
-							db , 
-							paste(
-								"UPDATE" ,
-								tablename ,
-								"SET" ,
-								vtr[ k ] ,
-								" = NULL WHERE" ,
-								ptm[ k ]
-							)
+					dbSendQuery( 
+						db , 
+						paste(
+							"UPDATE" ,
+							tablename ,
+							"SET" ,
+							vtr ,
+							" = NULL WHERE" ,
+							ptm, ";", collapse=" "
 						)
-						
-					}
-					
+					)
 				}
 				
 			}
@@ -507,7 +499,7 @@ for ( i in numbers.to.download ){
 			}
 			
 		}
-		
+		dbCommit(db)
 		# clear up RAM	
 		gc()
 		

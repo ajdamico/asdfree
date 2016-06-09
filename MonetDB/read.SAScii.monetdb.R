@@ -204,7 +204,7 @@ read.SAScii.monetdb <-
 			dbRemoveTable( connection , tablename )
 			stop( "my evil plans failed" )
 		} else {
-			dbSendQuery( connection , paste0( "COPY INTO " , tablename , " FROM '" , tf2 , "' USING DELIMITERS " , delimiters , " BEST EFFORT" ) )
+			dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' BEST EFFORT FWF (", paste0(w, collapse=", "), ")"))
 		}
 	}
 	
