@@ -13,7 +13,6 @@ library(DBI)
 # 	um well a whole lot faster
 # 	no RAM issues
 # 	decimal division must be TRUE/FALSE (as opposed to NULL - the user must decide)
-# 	can read in only part of the table with `n_max=`
 #	requires MonetDBLite and a few other packages
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -35,8 +34,6 @@ read.SAScii.monetdb <-
 										# this option is useful for keeping protected data off of random temporary folders on your computer--
 										# specifying this option creates the temporary file inside the folder specified
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
-		n_max = -1 ,
-		try_best_effort = FALSE ,
 		sas_stru = NULL
 		
 	) {
@@ -138,12 +135,6 @@ read.SAScii.monetdb <-
 		on.exit( file.remove( tf ) )
 	}
 
-	# improve speed of `n_max` by limiting the file
-	if( n_max != -1 ) {
-		lines <- readLines(fn, n=n_max)
-		writeLines(lines, fn)
-	}
-	
 	
 	# if the overwrite flag is TRUE, then check if the table is in the database..
 	if ( overwrite ){
@@ -192,24 +183,14 @@ read.SAScii.monetdb <-
 	# create the table in the database
 	dbSendQuery( connection , sql.create )
 	
-	##############################
-	# begin importation attempts #
+	#############################
+	# begin importation attempt #
 	
-	# capture an error (without breaking)
-	te <- try(dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' FWF (", paste0(w, collapse=", "), ")")), silent=TRUE)
+	dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' FWF (", paste0(w, collapse=", "), ")"))
 	
-	# TODO: DO WE STILL NEED THIS?!
-	if( class( te ) == 'try-error' ){
-		if( !try_best_effort ){
-			dbRemoveTable( connection , tablename )
-			stop( "my evil plans failed" )
-		} else {
-			dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' BEST EFFORT FWF (", paste0(w, collapse=", "), ")"))
-		}
-	}
 	
-	# end importation attempts #
-	############################	
+	# end importation attempt #
+	###########################	
 	
 	
 	# loop through all columns to:
