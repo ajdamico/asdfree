@@ -1,4 +1,4 @@
-# this is a slight modification of the monet.read.csv function found in the MonetDB.R package
+# this is a slight modification of the monet.read.csv function found in the MonetDBLite package
 # this is particularly useful alongside the descr package's fwf2csv function,
 # which converts ascii files to tab-separated files.  this new monet.read.tsv will read in those straightaway!
 

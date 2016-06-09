@@ -44,7 +44,7 @@
 # setwd( "C:/My Directory/HMDA/" )
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) )
+# install.packages( c( "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) )
 
 # choose which hmda data sets to download
 # uncomment this line to download all available data sets
@@ -67,7 +67,6 @@ if( ( .Platform$OS.type != 'windows' ) && ( system( paste0('"', path.to.7z , '" 
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)

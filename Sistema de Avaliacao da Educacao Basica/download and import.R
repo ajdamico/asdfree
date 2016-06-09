@@ -51,7 +51,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "SAScii" , "downloader" ) )
+# install.packages( c( "MonetDBLite" , "SAScii" , "downloader" ) )
 
 
 
@@ -64,7 +64,6 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(SAScii)			# load the SAScii package (imports ascii data with a SAS script)
 library(downloader)		# downloads and then runs the source() function on scripts from github
@@ -222,7 +221,7 @@ for ( year in years.to.download ){
 		names( x ) <- tolower( names( x ) )
 		
 		# do not use monetdb reserved words
-		for ( j in names( x )[ toupper( names( x ) ) %in% MonetDB.R:::reserved_monetdb_keywords ] ){
+		for ( j in names( x )[ toupper( names( x ) ) %in% MonetDBLite:::reserved_monetdb_keywords ] ){
 		
 			print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
 			print( paste0( 'changing column name to ' , j , '_' ) )
@@ -273,7 +272,7 @@ for ( year in years.to.download ){
 		names( headers ) <- tolower( names( headers ) )
 		
 		# do not use monetdb reserved words
-		for ( j in names( headers )[ toupper( names( headers ) ) %in% MonetDB.R:::reserved_monetdb_keywords ] ){
+		for ( j in names( headers )[ toupper( names( headers ) ) %in% MonetDBLite:::reserved_monetdb_keywords ] ){
 		
 			print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
 			print( paste0( 'changing column name to ' , j , '_' ) )

@@ -64,12 +64,11 @@
 # # # # # # # # # # # # # # # #
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "httr" , "XML" , "rvest" , "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) )
+# install.packages( c( "httr" , "XML" , "rvest" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) )
 
 
 library(survey) 		# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
@@ -143,7 +142,7 @@ colTypes <- ifelse( csv_file_structure == 'character' , 'CLOB' , 'DOUBLE PRECISI
 cn <- toupper( names( read.csv( csv_file_location , nrow = 1 ) ) )
 
 # for any column names that conflict with a monetdb reserved word, add an underscore
-cn[ cn %in% MonetDB.R:::reserved_monetdb_keywords ] <- paste0( cn[ cn %in% MonetDB.R:::reserved_monetdb_keywords ] , "_" )
+cn[ cn %in% MonetDBLite:::reserved_monetdb_keywords ] <- paste0( cn[ cn %in% MonetDBLite:::reserved_monetdb_keywords ] , "_" )
 
 # force all column names to be lowercase, since MonetDB.R is now case-sensitive
 cn <- tolower( cn )

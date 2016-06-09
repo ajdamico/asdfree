@@ -1,5 +1,4 @@
-## example using pnad2011
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
+# example using pnad2011
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(survey)

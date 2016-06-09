@@ -31,7 +31,7 @@
 # setwd( "C:/My Directory/BSAPUF/" )
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) )
+# install.packages( c( "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) )
 
 
 # no need to edit anything below this line #

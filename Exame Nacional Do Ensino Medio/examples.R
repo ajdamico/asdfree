@@ -1,5 +1,4 @@
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)
 library(MonetDBLite)
 library (dplyr)
 

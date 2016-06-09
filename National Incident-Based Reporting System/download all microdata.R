@@ -83,7 +83,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "RCurl" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" , "R.utils" ) )
+# install.packages( c( "MonetDBLite" , "RCurl" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" , "R.utils" ) )
 
 
 
@@ -91,8 +91,7 @@ library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script
 library(RCurl)		# load RCurl package (downloads https files)
 library(stringr)	# load stringr package (manipulates character strings easily)
 library(downloader)	# downloads and then runs the source() function on scripts from github
-library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)	# load the MonetDB.R package (connects r to a monet database)
+library(DBI)		# load the DBI package (implements the R-database coding)
 library(MonetDBLite)# load MonetDBLite package (creates database files in R)
 library(descr)		# load the descr package (converts fixed-width files to delimited files)
 library(R.utils)	# load the R.utils package (counts the number of lines in a file quickly)

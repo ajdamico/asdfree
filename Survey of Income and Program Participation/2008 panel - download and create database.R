@@ -36,7 +36,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" )  )
+# install.packages( c( "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" )  )
 
 
 SIPP.dbname <- "SIPP08"																	# choose the name of the database folder on the local disk
@@ -60,8 +60,7 @@ sipp.pnl.longitudinal.replicate.weights <- paste0( 'pn' , 1:5 )							# reads in
 options( "download_cached.hashwarn" = TRUE )
 # warn the user if the hash does not yet exist
 
-library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(DBI)				# load the DBI package (implements the R-database coding)
 library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
 library(downloader)			# downloads and then runs the source() function on scripts from github

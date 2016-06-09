@@ -41,7 +41,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "RCurl" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) )
+# install.packages( c( "MonetDBLite" , "RCurl" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) )
 
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
@@ -50,7 +50,6 @@ library(downloader)		# downloads and then runs the source() function on scripts 
 library(stringr)		# load stringr package (manipulates character strings easily)
 library(survey) 		# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(mitools) 		# load mitools package (analyzes multiply-imputed data)

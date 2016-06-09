@@ -29,7 +29,7 @@ sql.copy.into <-
 # 	no RAM issues
 # 	decimal division must be TRUE/FALSE (as opposed to NULL - the user must decide)
 # 	can read in only part of the table with `n_max=`
-#	requires MonetDB.R and a few other packages
+#	requires MonetDBLite and a few other packages
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 read.SAScii.monetdb <-
@@ -182,7 +182,7 @@ read.SAScii.monetdb <-
 		if ( tablename %in% dbListTables( connection ) ) stop( "table with this name already in database" )
 	}
 	
-	for ( j in y$varname[ toupper( y$varname ) %in% MonetDB.R:::reserved_monetdb_keywords ] ){
+	for ( j in y$varname[ toupper( y$varname ) %in% MonetDBLite:::reserved_monetdb_keywords ] ){
 	
 		print( paste0( 'warning: variable named ' , j , ' not allowed in monetdb' ) )
 		print( paste0( 'changing column name to ' , j , '_' ) )

@@ -1,6 +1,5 @@
 library(survey)
 library(DBI)
-library(MonetDB.R)
 library(MonetDBLite)
 
 # http://www.bjs.gov/content/pub/pdf/Variance_Guide_Appendix_C_SAS.pdf

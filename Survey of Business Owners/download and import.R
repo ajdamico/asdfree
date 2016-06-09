@@ -35,7 +35,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "mitools" , "downloader" , "digest" , "survey" )  )
+# install.packages( c( "MonetDBLite" , "mitools" , "downloader" , "digest" , "survey" )  )
 
 
 # name the database folder to be saved in the working directory
@@ -50,8 +50,7 @@ SBO.dbname <- "sbo"
 # # # # # # # # #
 
 
-library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(DBI)				# load the DBI package (implements the R-database coding)
 library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(mitools) 			# load mitools package (analyzes multiply-imputed data)
 library(survey) 			# load survey package (analyzes complex design surveys)

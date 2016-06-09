@@ -70,7 +70,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "xlsx" , "stringr" , "R.utils" ) )
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "xlsx" , "stringr" , "R.utils" ) )
 
 
 # # # # # # # # # # # # # #
@@ -100,7 +100,6 @@ library(stringr)		# load stringr package (manipulates character strings easily)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(survey) 		# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(xlsx)			# imports excel .xlsx files cleanly

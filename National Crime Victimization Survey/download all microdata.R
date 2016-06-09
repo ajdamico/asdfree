@@ -79,7 +79,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" , "R.utils" , "RCurl" ) )
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" , "R.utils" , "RCurl" ) )
 
 
 
@@ -88,7 +88,6 @@ library(RCurl)			# load RCurl package (downloads https files)
 library(stringr)		# load stringr package (manipulates character strings easily)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(descr)			# load the descr package (converts fixed-width files to delimited files)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
@@ -438,7 +437,7 @@ for ( i in numbers.to.download ){
 				pre_vtr <- vtr <- str_trim( tolower( gsub( "(.*) THEN( ?)(.*)( ?)=(.*)" , "\\3" , recodes ) ) )
 
 				# reserved words have been recoded within `read.SAScii.monetdb` and need to be recoded here as well
-				for ( j in vtr[ vtr %in% tolower( MonetDB.R:::reserved_monetdb_keywords ) ] ) vtr[ vtr == j ] <- paste0( j , "_" )
+				for ( j in vtr[ vtr %in% tolower( MonetDBLite:::reserved_monetdb_keywords ) ] ) vtr[ vtr == j ] <- paste0( j , "_" )
 
 				# remove everything after the `THEN` block..
 				ptm <- gsub( " THEN( ?)(.*)" , "" , recodes )
@@ -447,7 +446,7 @@ for ( i in numbers.to.download ){
 				ptm <- tolower( str_trim( ptm ) )
 				
 				# reserved words have been recoded within `read.SAScii.monetdb` and need to be recoded here as well
-				for ( j in intersect( pre_vtr , tolower( MonetDB.R:::reserved_monetdb_keywords ) ) ) ptm <- gsub( j , paste0( j , "_" ) , ptm )
+				for ( j in intersect( pre_vtr , tolower( MonetDBLite:::reserved_monetdb_keywords ) ) ) ptm <- gsub( j , paste0( j , "_" ) , ptm )
 				
 				# hardcode weird sas import file
 				if( study.names[ i ] == "1995 School Crime Supplement" & ptm[ 1 ] == "/* v9=9" ) ptm[ 1 ] <- "v9=9"

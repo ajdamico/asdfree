@@ -42,7 +42,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "devtools" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" )  )
+# install.packages( c( "MonetDBLite" , "devtools" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" )  )
 
 
 # load the `devtools` library
@@ -79,7 +79,6 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(survey)				# load survey package (analyzes complex design surveys)
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)

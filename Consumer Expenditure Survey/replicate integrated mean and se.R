@@ -63,7 +63,6 @@ library(stringr) 		# load stringr package (manipulates character strings easily)
 library(reshape2)		# load reshape2 package (transposes data frames quickly)
 library(sqldf)			# load the sqldf package (enables sql queries on data frames)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 
 

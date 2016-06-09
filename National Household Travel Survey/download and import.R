@@ -35,7 +35,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "sas7bdat" , "R.utils" , "ff" , "readr" ) )
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "sas7bdat" , "R.utils" , "ff" , "readr" ) )
 
 
 # define which years to download #
@@ -168,8 +168,7 @@ nmf <-
 
 library(stringr) 			# load stringr package (manipulates character strings easily)
 library(survey) 			# load survey package (analyzes complex design surveys)
-library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)			# load the MonetDB.R package (connects r to a monet database)
+library(DBI)				# load the DBI package (implements the R-database coding)
 library(MonetDBLite)		# load MonetDBLite package (creates database files in R)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 library(sas7bdat)			# loads files ending in .sas7bdat directly into r as data.frame objects

@@ -50,7 +50,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c("MonetDB.R", "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" , "R.utils" ) )
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "stringr" , "R.utils" ) )
 
 # define which years to download #
 
@@ -77,7 +77,6 @@ pnad.dbfolder <- paste0( getwd() , "/MonetDB" )
 # # # # # # # # #
 
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)

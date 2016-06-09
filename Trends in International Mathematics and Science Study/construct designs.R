@@ -25,7 +25,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDB.R" , "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "mitools" , "R.utils" ) )
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "mitools" , "R.utils" ) )
 
 
 # set your TIMSS data directory
@@ -47,9 +47,8 @@
 
 library(survey) 		# load survey package (analyzes complex design surveys)
 library(DBI)			# load the DBI package (implements the R-database coding)
-library(MonetDB.R)		# load the MonetDB.R package (connects r to a monet database)
 library(MonetDBLite)	# load MonetDBLite package (creates database files in R)
-library(mitools) 			# load mitools package (analyzes multiply-imputed data)
+library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 
 
 # specify that replicate-weighted complex sample survey design objects
