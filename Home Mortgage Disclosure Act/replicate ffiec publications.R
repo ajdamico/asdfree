@@ -36,6 +36,7 @@
 # setwd( "C:/My Directory/HMDA/" )
 
 
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 
 

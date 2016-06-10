@@ -63,6 +63,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # end of non-windows system edits.
 
 
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 
 

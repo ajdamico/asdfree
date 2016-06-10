@@ -13,6 +13,7 @@ if( system( paste0('"', path.to.7z , '" -h' ) ) != 0 ) stop("you need to install
 tf <- tempfile() ; tf2 <- tempfile()
 
 library(downloader)
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(SAScii)
 library(RCurl)

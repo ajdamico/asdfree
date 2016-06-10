@@ -78,6 +78,7 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 # # # # # # # # #
 
 
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(survey)				# load survey package (analyzes complex design surveys)
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)

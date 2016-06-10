@@ -66,6 +66,7 @@
 if( ( .Platform$OS.type != 'windows' ) && ( system( paste0('"', path.to.7z , '" -h' ) ) != 0 ) ) stop("you need to install 7-zip")
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)

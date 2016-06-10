@@ -35,6 +35,7 @@
 # setwd( "C:/My Directory/BSAPUF/" )
 
 
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 
 

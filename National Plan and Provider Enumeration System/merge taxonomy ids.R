@@ -52,6 +52,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # ..in order to set your current working directory
 
 
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(stringr)		# load stringr package (manipulates character strings easily)
 library(downloader)		# downloads and then runs the source() function on scripts from github

@@ -57,6 +57,7 @@
 # install.packages( c( "MonetDBLite" , "SAScii" , "descr" , "downloader" , "digest" , "R.utils" ) )
 
 
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
 library(downloader)		# downloads and then runs the source() function on scripts from github

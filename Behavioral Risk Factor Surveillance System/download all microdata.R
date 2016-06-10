@@ -44,6 +44,7 @@
 
 
 library(survey)			# load survey package (analyzes complex design surveys)
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(foreign) 		# load foreign package (converts data files into R)
 library(downloader)		# downloads and then runs the source() function on scripts from github

@@ -99,6 +99,7 @@ library(R.utils)		# load the R.utils package (counts the number of lines in a fi
 library(stringr)		# load stringr package (manipulates character strings easily)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
 library(survey) 		# load survey package (analyzes complex design surveys)
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 library(xlsx)			# imports excel .xlsx files cleanly

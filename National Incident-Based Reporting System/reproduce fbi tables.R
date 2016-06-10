@@ -62,6 +62,7 @@
 # install.packages( "sqldf" )
 
 
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(sqldf)			# load the sqldf package (enables sql queries on data frames)
 

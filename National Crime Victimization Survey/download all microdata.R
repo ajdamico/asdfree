@@ -87,6 +87,7 @@ library(SAScii) 		# load the SAScii package (imports ascii data with a SAS scrip
 library(RCurl)			# load RCurl package (downloads https files)
 library(stringr)		# load stringr package (manipulates character strings easily)
 library(downloader)		# downloads and then runs the source() function on scripts from github
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(descr)			# load the descr package (converts fixed-width files to delimited files)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)

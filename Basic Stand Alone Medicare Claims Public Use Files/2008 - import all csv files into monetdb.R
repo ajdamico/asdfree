@@ -24,6 +24,7 @@
 
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 
 

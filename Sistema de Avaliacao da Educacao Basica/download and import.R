@@ -63,6 +63,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 # # # # # # # # #
 
 
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(SAScii)			# load the SAScii package (imports ascii data with a SAS script)
 library(downloader)		# downloads and then runs the source() function on scripts from github

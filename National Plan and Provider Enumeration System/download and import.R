@@ -38,6 +38,7 @@
 # install.packages( c( "MonetDBLite" , "R.utils" , "descr" , "downloader" , "digest" , "stringr" ) )
 
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
+library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(downloader)		# downloads and then runs the source() function on scripts from github
 
