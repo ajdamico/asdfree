@@ -456,7 +456,7 @@ if ( 2000 %in% years.to.download ){
 			write.csv( ism , tf , row.names = FALSE )
 			
 			# read that csv file directly into monetdb
-			dbWriteTable( db , tf , curFile , nrow.check = 20000 , na.strings = "NA" , lower.case.names = TRUE )
+			dbWriteTable( db , curFile , tf , nrow.check = 20000 , na.strings = "NA" , lower.case.names = TRUE )
 
 			# remove the `ism` object from working memory
 			rm( ism )

@@ -194,7 +194,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 	first.attempt <- second.attempt <- NULL
 
 	# first try to read the csv file into the monet database with NAs for NA strings
-	first.attempt <- try( dbWriteTable( db , csvfile , tablename , na.strings = "NA" , nrow.check = rtctr , lower.case.names = TRUE ) , silent = TRUE )
+	first.attempt <- try( dbWriteTable( db , tablename , csvfile , na.strings = "NA" , nrow.check = rtctr , lower.case.names = TRUE ) , silent = TRUE )
 	
 	# if the dbWriteTable() function returns an error instead of working properly..
 	if( class( first.attempt ) == "try-error" ) {
@@ -208,7 +208,7 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		
 		# and re-try reading the csv file directly into the monet database, this time with a different NA string setting
 		second.attempt <-
-			try( dbWriteTable( db , csvfile , tablename , na.strings = "" , nrow.check = rtctr , lower.case.names = TRUE ) , silent = TRUE )
+			try( dbWriteTable( db , tablename , csvfile , na.strings = "" , nrow.check = rtctr , lower.case.names = TRUE ) , silent = TRUE )
 	}
 
 	# if that still doesn't work, import the table manually

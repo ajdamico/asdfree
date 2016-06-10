@@ -121,12 +121,12 @@ dbWriteTable(
 	# use the monet database connection initiated above
 	db , 
 
-	# store the external csv file contained in the 'inpatient' character string
-	inpatient , 
-
 	# save the csv file in the monetdb to a data table named 'inpatient08'
 	paste0( 'inpatient' , substr( year , 3 , 4 ) ) ,
 	
+	# store the external csv file contained in the 'inpatient' character string
+	inpatient , 
+
 	# force all column names to be lowercase
 	lower.case.names = TRUE
 )
@@ -135,8 +135,8 @@ dbWriteTable(
 # store the 2008 durable medical equipment table in the database as the 'dme08' table
 dbWriteTable( 
 	db , 
-	dme , 
 	paste0( 'dme' , substr( year , 3 , 4 ) ) ,
+	dme , 
 	
 	# force all column names to be lowercase
 	lower.case.names = TRUE
@@ -145,8 +145,8 @@ dbWriteTable(
 # store the five 2008 prescription drug events tables in the database as a single 'pde08' table
 dbWriteTable( 
 	db , 
-	pde , 
 	paste0( 'pde' , substr( year , 3 , 4 ) ) ,
+	pde , 
 	
 	# force all column names to be lowercase
 	lower.case.names = TRUE
@@ -155,8 +155,8 @@ dbWriteTable(
 # store the 2008 hospice table in the database as the 'hospice08' table
 dbWriteTable( 
 	db , 
-	hospice , 
 	paste0( 'hospice' , substr( year , 3 , 4 ) ) ,
+	hospice , 
 	
 	# force all column names to be lowercase
 	lower.case.names = TRUE
@@ -165,8 +165,8 @@ dbWriteTable(
 # store the seven 2008 carrier line items tables in the database as a single 'carrier08' table
 dbWriteTable( 
 	db , 
-	carrier , 
 	paste0( 'carrier' , substr( year , 3 , 4 ) ) ,
+	carrier , 
 	
 	# force all column names to be lowercase
 	lower.case.names = TRUE
@@ -176,8 +176,8 @@ dbWriteTable(
 # store the 2008 home health agency table in the database as the 'hha08' table
 dbWriteTable( 
 	db , 
-	hha , 
 	paste0( 'hha' , substr( year , 3 , 4 ) ) ,
+	hha , 
 	
 	# force all column names to be lowercase
 	lower.case.names = TRUE
@@ -187,8 +187,8 @@ dbWriteTable(
 # store the three 2008 outpatient claims tables in the database as a single 'outpatient08' table
 dbWriteTable( 
 	db , 
-	outpatient , 
 	paste0( 'outpatient' , substr( year , 3 , 4 ) ) ,
+	outpatient , 
 	
 	# force all column names to be lowercase
 	lower.case.names = TRUE
@@ -198,8 +198,8 @@ dbWriteTable(
 # store the 2008 snf table in the database as the 'snf08' table
 dbWriteTable( 
 	db , 
-	snf , 
 	paste0( 'snf' , substr( year , 3 , 4 ) ) ,
+	snf , 
 	
 	# force all column names to be lowercase
 	lower.case.names = TRUE
@@ -223,8 +223,8 @@ rm( ipbs_df ) ; gc()
 # store the 2008 prescription drug profile table in the database as the 'rxp08' table
 dbWriteTable( 
 	db , 
-	rxp , 
 	paste0( 'rxp' , substr( year , 3 , 4 ) ) ,
+	rxp , 
 	nrow.check = 10000 ,
 	
 	# force all column names to be lowercase
