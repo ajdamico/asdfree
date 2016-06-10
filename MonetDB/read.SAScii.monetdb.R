@@ -181,62 +181,66 @@ read.SAScii.monetdb <-
 	# in speed tests, adding the exact number of lines in the file was much faster
 	# than setting a very high number and letting it finish..
 
-	# create the table in the database
-	dbSendQuery( connection , sql.create )
-	
-	#############################
-	# begin importation attempt #
-	
-	dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' FWF (", paste0(w, collapse=", "), ")" , if( try_best_effort ) " BEST EFFORT" ))
-	
-	# end importation attempt #
-	###########################	
-	
-	
-	# loop through all columns to:
-		# convert to numeric where necessary
-		# divide by the divisor whenever necessary
-	for ( l in seq( nrow(y) ) ){
-	
-		if ( 
-			( y[ l , "divisor" ] != 1 ) & 
-			!( y[ l , "char" ] )
-		) {
-			
-			sql <- 
-				paste( 
-					"UPDATE" , 
-					tablename , 
-					"SET" , 
-					y[ l , 'varname' ] , 
-					"=" ,
-					y[ l , 'varname' ] , 
-					"*" ,
-					y[ l , "divisor" ]
-				)
-				
-			if ( !skip.decimal.division ){
-				dbSendQuery( connection , sql )
-			}
+	full_table_editing_attempt <-
+		try({
 		
-		}
+			# create the table in the database
+			dbSendQuery( connection , sql.create )
 
-	}
-	
-	# eliminate gap variables.. loop through every gap
-	if ( num.gaps > 0 ){
-		for ( i in seq( num.gaps ) ) {
-		
-			# create a SQL query to drop these columns
-			sql.drop <- paste0( "ALTER TABLE " , tablename , " DROP toss_" , i )
+			#############################
+			# begin importation attempt #
+
+			dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' FWF (", paste0(w, collapse=", "), ")" , if( try_best_effort ) " BEST EFFORT" ))
+
+			# end importation attempt #
+			###########################	
+
+
+			# loop through all columns to:
+			# convert to numeric where necessary
+			# divide by the divisor whenever necessary
+			for ( l in seq( nrow(y) ) ){
+
+				if ( ( y[ l , "divisor" ] != 1 ) & !( y[ l , "char" ] )	) {
+
+					sql <- paste( "UPDATE" , tablename , "SET" , y[ l , 'varname' ] , "=" , y[ l , 'varname' ] , "*" , y[ l , "divisor" ] )
+
+					if ( !skip.decimal.division ) dbSendQuery( connection , sql )
+
+
+				}
+
+			}
+
+			# eliminate gap variables.. loop through every gap
+			if ( num.gaps > 0 ){
+				
+				for ( i in seq( num.gaps ) ) {
+
+					# create a SQL query to drop these columns
+					sql.drop <- paste0( "ALTER TABLE " , tablename , " DROP toss_" , i )
+
+					# and drop them!
+					dbSendQuery( connection , sql.drop )
+				}
+				
+			}
 			
-			# and drop them!
-			dbSendQuery( connection , sql.drop )
-		}
-	}
+		} , silent = TRUE )
 	
+
 	# reset scientific notation length
 	options( scipen = user.defined.scipen )
-
+	
+	# if anything about the table creation/import/editing went wrong, then remove the table and return the error
+	if( class( full_table_editing_attempt ) == 'try-error' ){
+	
+		try( dbRemoveTable( connection , tablename ) , silent = TRUE )
+		
+		return( full_table_editing_attempt )
+		
+	} 
+	
 	TRUE
+	
 }
