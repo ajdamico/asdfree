@@ -36,7 +36,8 @@ read.SAScii.monetdb <-
 										# specifying this option creates the temporary file inside the folder specified
 		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
 		try_best_effort = FALSE ,
-		sas_stru = NULL
+		sas_stru = NULL ,
+		allow_zero_records = FALSE		# by default, expect more than zero records to be imported.
 		
 	) {
 		if( is.null( sas_ri ) & is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified" )
@@ -242,6 +243,10 @@ read.SAScii.monetdb <-
 		
 	} 
 	
-	TRUE
+	num_recs <- dbGetQuery( connection , paste( "SELECT COUNT(*) FROM" , tablename ) )[ 1 , 1 ]
+	
+	if( num_recs == 0 && !allow_zero_records ) stop( "imported table has zero records.  if this is expected, set allow_zero_records = TRUE" )
+	
+	num_recs
 	
 }
