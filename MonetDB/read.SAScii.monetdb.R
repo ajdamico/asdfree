@@ -239,7 +239,7 @@ read.SAScii.monetdb <-
 	
 		try( dbRemoveTable( connection , tablename ) , silent = TRUE )
 		
-		return( full_table_editing_attempt )
+		stop( full_table_editing_attempt )
 		
 	} 
 	
