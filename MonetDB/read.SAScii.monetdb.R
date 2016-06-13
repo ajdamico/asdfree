@@ -192,7 +192,19 @@ read.SAScii.monetdb <-
 			#############################
 			# begin importation attempt #
 
-			dbSendQuery(connection, paste0("COPY INTO ", tablename, " FROM '", normalizePath(fn), "' NULL AS '' FWF (", paste0(w, collapse=", "), ")" , if( try_best_effort ) " BEST EFFORT" ))
+			dbSendQuery(
+				connection , 
+				paste0(
+					"COPY INTO " , 
+					tablename , 
+					" FROM '" , 
+					normalizePath( fn ) , 
+					"' NULL AS '' FWF (" , 
+					paste0( w , collapse = ", " ) , 
+					")" , 
+					if( try_best_effort ) " BEST EFFORT" 
+				)
+			)
 
 			# end importation attempt #
 			###########################	
