@@ -199,10 +199,11 @@ read.SAScii.monetdb <-
 					tablename , 
 					" FROM '" , 
 					normalizePath( fn ) , 
-					"' NULL AS '' FWF (" , 
+					"' NULL AS '' " ,
+					if( try_best_effort ) " BEST EFFORT " ,
+					" FWF (" , 
 					paste0( w , collapse = ", " ) , 
-					")" , 
-					if( try_best_effort ) " BEST EFFORT" 
+					")" 
 				)
 			)
 
