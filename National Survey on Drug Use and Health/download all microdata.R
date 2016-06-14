@@ -157,7 +157,7 @@ for ( i in rev( seq( nrow( studies.by.year ) ) ) ){
 	cat( "  current progress: preparing the nsduh" , year , "file                    " , "\r" )
 
 	# list out the filepath on the server of the file-to-download
-	dp <- paste0( "http://www.icpsr.umich.edu/cgi-bin/bob/zipcart2?study=" , id5 , "&ds=1&path=ICPSR" )
+	dp <- paste0( "http://www.icpsr.umich.edu/cgi-bin/bob/zipcart2?study=" , id , "&ds=1&path=ICPSR" )
 		
 	# post your username and password to the umich server
 	login.page <- 
@@ -177,7 +177,7 @@ for ( i in rev( seq( nrow( studies.by.year ) ) ) ){
 			"http://www.icpsr.umich.edu/cgi-bin/terms" , 
 			agree = 'yes' ,
 			path = "ICPSR" , 
-			study = id5 , 
+			study = id , 
 			ds = 1 , 
 			bundle = "all" , 
 			dups = "yes" ,
