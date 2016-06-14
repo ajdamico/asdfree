@@ -68,7 +68,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "SAScii" , "RCurl" , "stringr" ) )
+# install.packages( c( "SAScii" , "RCurl" , "stringr" , "downloader" ) )
 
 # no need to edit anything below this line #
 
