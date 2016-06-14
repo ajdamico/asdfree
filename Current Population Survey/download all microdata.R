@@ -36,20 +36,21 @@
 
 
 # warning: to import the 2014 income-consistent file,
-# you will need the `devtools` library to install the github sas7bdat.parso library
+# you will need the `devtools` library to install the latest haven library from github
 # if you have trouble installing devtools within R, perhaps you need the r tools software
 # http://cran.r-project.org/bin/windows/Rtools/
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDBLite" , "devtools" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "haven" , "devtools" )  )
-
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "devtools" )  )
 
 # load the `devtools` library
 library(devtools)
 
 # remove the # in order to run this install.packages line only once
-# install_github( "biostatmatt/sas7bdat.parso" )
+# install_github( "hadley/haven" )
+
+
 
 
 # define which years to download #
@@ -79,13 +80,12 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 library(MonetDBLite)
-library(DBI)			# load the DBI package (implements the R-database coding)
+library(DBI)				# load the DBI package (implements the R-database coding)
 library(survey)				# load survey package (analyzes complex design surveys)
 library(SAScii) 			# load the SAScii package (imports ascii data with a SAS script)
 library(descr) 				# load the descr package (converts fixed-width files to delimited files)
 library(downloader)			# downloads and then runs the source() function on scripts from github
 library(haven) 				# load the haven package (imports dta files faaaaaast)
-library(sas7bdat.parso) 	# load the sas7bdat.parso (imports binary/compressed sas7bdat files)
 
 
 # load the download_cached and related functions
@@ -154,21 +154,21 @@ for ( year in cps.years.to.download ){
 		download_cached( "http://www.census.gov/housing/extract_files/data%20extracts/cpsasec14/family.sas7bdat" , tf2 , mode = 'wb' )
 		download_cached( "http://www.census.gov/housing/extract_files/data%20extracts/cpsasec14/person.sas7bdat" , tf3 , mode = 'wb' )
 
-		hhld <- read.sas7bdat.parso( tf1 )
+		hhld <- data.frame( read_sas( tf1 ) )
 		names( hhld ) <- tolower( names( hhld ) )
 		for ( i in names( hhld ) ) hhld[ , i ] <- as.numeric( hhld[ , i ] )
 		hhld$hsup_wgt <- hhld$hsup_wgt / 100
 		dbWriteTable( db , 'hhld' , hhld )
 		rm( hhld ) ; gc() ; file.remove( tf1 )
 		
-		family <- read.sas7bdat.parso( tf2 )
+		family <- data.frame( read_sas( tf2 ) )
 		names( family ) <- tolower( names( family ) )
 		for ( i in names( family ) ) family[ , i ] <- as.numeric( family[ , i ] )
 		family$fsup_wgt <- family$fsup_wgt / 100
 		dbWriteTable( db , 'family' , family )
 		rm( family ) ; gc() ; file.remove( tf2 )
 		
-		person <- read.sas7bdat.parso( tf3 )
+		person <- data.frame( read_sas( tf3 ) )
 		names( person ) <- tolower( names( person ) )
 		for ( i in names( person ) ) person[ , i ] <- as.numeric( person[ , i ] )
 		for ( i in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) person[ , i ] <- person[ , i ] / 100
