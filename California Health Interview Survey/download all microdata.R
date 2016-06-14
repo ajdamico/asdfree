@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CHIS/" )
-# your_username <- 'your@login.com'
+# your_username <- 'yourusername'
 # your_password <- 'yourpassword'
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/California%20Health%20Interview%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
@@ -41,7 +41,7 @@ loginpage <- "http://healthpolicy.ucla.edu/pages/login.aspx"
 # this script will not run until a valid username and password are included in the two lines below.
 # and make sure you uncomment those two lines by removing the `#`s as well
 
-# your_username <- 'your@login.com'
+# your_username <- 'yourusername'
 # your_password <- 'yourpassword'
 
 # this download automation script will not work without the above lines filled in.
