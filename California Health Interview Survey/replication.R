@@ -8,7 +8,7 @@
 
 library(survey)
 
-load( "./2011/adult.rda" )
+load( "./2014/adult.rda" )
 
 options( survey.replicates.mse = TRUE )
 
