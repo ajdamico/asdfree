@@ -324,34 +324,34 @@ for ( year in 2050:2005 ){
 				# there's a few weird "01E4" strings in the 2007 single- and three-year household files
 				# that cause the monetdb importation lines to crash.
 				# this block manually recodes "01E4" to 10,000 in the source csv files.
-				if ( year == 2007 & j == 'h' ){
+				# if ( year == 2007 & j == 'h' ){
 				
-					# create a temporary file
-					tf07 <- tempfile()
+				# 	# create a temporary file
+				# 	tf07 <- tempfile()
 
-					# open a read-only file connection to the 'ss07husa.csv' table
-					incon <- file( grep( "ss07husa" , fn , value = TRUE ) , 'r' )
+				# 	# open a read-only file connection to the 'ss07husa.csv' table
+				# 	incon <- file( grep( "ss07husa" , fn , value = TRUE ) , 'r' )
 					
-					# open a writable file connection to the temporary file
-					outcon <- file( tf07 , 'w' )
+				# 	# open a writable file connection to the temporary file
+				# 	outcon <- file( tf07 , 'w' )
 
-					# read through every line in the ss07husa.csv table
-					while( length( x <- readLines( incon , 1 ) ) > 0 ) {
-						# replace that 01E4 (which represents 1 x 10^4) with the numeric value 10,000
-						x <- gsub( "01E4" , "10000" , x )
-						# write them all to the temporary file
-						writeLines( x , outcon )
-					}
+				# 	# read through every line in the ss07husa.csv table
+				# 	while( length( x <- readLines( incon , 1 ) ) > 0 ) {
+				# 		# replace that 01E4 (which represents 1 x 10^4) with the numeric value 10,000
+				# 		x <- gsub( "01E4" , "10000" , x , fixed = TRUE )
+				# 		# write them all to the temporary file
+				# 		writeLines( x , outcon )
+				# 	}
 
-					# close both file connections
-					close( incon )
-					close( outcon )
+				# 	# close both file connections
+				# 	close( incon )
+				# 	close( outcon )
 					
-					# replace the first element of the 'fn' vector (which should be ss07husa.csv)
-					# with the file path to the temporary file instead
-					fn[ grep( "ss07husa" , fn ) ] <- tf07
+				# 	# replace the first element of the 'fn' vector (which should be ss07husa.csv)
+				# 	# with the file path to the temporary file instead
+				# 	fn[ grep( "ss07husa" , fn ) ] <- tf07
 					
-				}
+				# }
 
 
 				# create the table name
