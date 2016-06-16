@@ -642,7 +642,8 @@ for ( year in cohortlinked.sets.to.download ){
 	import.nchs( 
 		cohortlinked.ps.unl , 
 		sas.scripts = unl_ri ,
-		db
+		db ,
+		azr = ( year == 2005 )
 	)
 	
 	# delete all files in the "/cohortlinked/us" directory (the fifty states plus DC)
