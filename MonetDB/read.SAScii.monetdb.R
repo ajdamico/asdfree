@@ -258,7 +258,10 @@ read.SAScii.monetdb <-
 	
 	num_recs <- dbGetQuery( connection , paste( "SELECT COUNT(*) FROM" , tablename ) )[ 1 , 1 ]
 	
-	if( num_recs == 0 && !allow_zero_records ) stop( "imported table has zero records.  if this is expected, set allow_zero_records = TRUE" )
+	if( num_recs == 0 && !allow_zero_records ) {
+		dbRemoveTable( connection , tablename )
+		stop( "imported table has zero records.  if this is expected, set allow_zero_records = TRUE" )
+	}
 	
 	num_recs
 	
