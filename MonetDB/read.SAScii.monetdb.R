@@ -34,7 +34,6 @@ read.SAScii.monetdb <-
 		tf.path = NULL ,				# do temporary files need to be stored in a specific folder?
 										# this option is useful for keeping protected data off of random temporary folders on your computer--
 										# specifying this option creates the temporary file inside the folder specified
-		delimiters = "'\t'" ,			# delimiters for the monetdb COPY INTO command
 		try_best_effort = FALSE ,
 		sas_stru = NULL ,
 		allow_zero_records = FALSE		# by default, expect more than zero records to be imported.
