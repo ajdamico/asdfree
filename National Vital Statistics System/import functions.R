@@ -43,7 +43,8 @@ import.nchs <-
 		files.to.import ,
 		sas.scripts ,
 		db ,
-		force.length = FALSE
+		force.length = FALSE ,
+		azr = FALSE
 	){
 
 		gc()
@@ -79,7 +80,7 @@ import.nchs <-
 				tablename = tablenames[ i ] ,
 				overwrite = FALSE ,				# overwrite existing table?
 				connection = db ,
-				try_best_effort = FALSE
+				allow_zero_records = azr
 			)
 			
 			suppressWarnings( while( unlink( fti ) ) Sys.sleep( 1 ) )
