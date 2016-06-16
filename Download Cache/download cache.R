@@ -124,7 +124,7 @@ download_cached <-
 				  paste0(
 					"Destination cached in '" , 
 					cachefile , 
-					"', creating link (override with usecache=FALSE parameter)\n"
+					"', copying (override with usecache=FALSE parameter)\n"
 				  )
 				)
 				
@@ -132,7 +132,7 @@ download_cached <-
 					load( cachefile )
 					return( invisible( success ) )
 				} else {
-					return( invisible( ifelse( file.link( cachefile , destfile ) , 0 , 1 ) ) )
+					return( invisible( ifelse( file.copy( cachefile , destfile ) , 0 , 1 ) ) )
 				}
 				
 		  }
