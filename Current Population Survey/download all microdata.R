@@ -487,7 +487,7 @@ for ( year in cps.years.to.download ){
 		
 		if( year %in% c( 2014 , 2014.58 ) ){
 			
-			ace <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec14_now_anycov.dat"
+			ace <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/asec14_now_anycov.dat"
 
 			download_cached( ace , tf , mode = "wb" )	
 
@@ -497,7 +497,7 @@ for ( year in cps.years.to.download ){
 
 		if( year %in% c( 2014 , 2014.38 ) ){
 			
-			ace <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec14_now_anycov_redes.dat"
+			ace <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/asec14_now_anycov_redes.dat"
 
 			download_cached( ace , tf , mode = "wb" )	
 
@@ -507,7 +507,7 @@ for ( year in cps.years.to.download ){
 		
 		if ( year %in% c( 2014 , 2014.38 , 2014.58 ) ){
 		
-			ote <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec14_outtyp_full.dat"
+			ote <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/asec14_outtyp_full.dat"
 			
 			download_cached( ote , tf , mode = 'wb' )
 			
@@ -522,13 +522,13 @@ for ( year in cps.years.to.download ){
 		
 		if ( year %in% 2015 ){
 		
-			ote <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec15_outtyp.dat"
+			ote <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/asec15_outtyp.dat"
 		
 			download_cached( ote , tf , mode = 'wb' )
 			
 			ot <- read.fwf( tf , c( 5 , 2 , 2 , 1 ) )
 			
-			ace <- "http://www.census.gov/housing/extract_files/data%20extracts/health%20data%20files/asec15_currcov_extract.dat"
+			ace <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/asec15_currcov_extract.dat"
 		
 			download_cached( ace , tf , mode = 'wb' )
 			
