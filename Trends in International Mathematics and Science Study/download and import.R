@@ -164,7 +164,7 @@ for ( this.year in rev( years ) ){
 				x <- read_spss( this.file )
 				
 				# coerce the file into a data.frame object
-				x <- as.data.frame.matrix( x )
+				x <- as.data.frame( x , optional = TRUE )
 				
 				if ( !is.null( y ) & this.year == 2003 & any( !( names( x ) %in% names( y ) ) ) ) for ( i in names( x )[ !( names( x ) %in% names( y ) ) ] ) y[ , i ] <- NA
 				if ( !is.null( y ) & this.year == 2003 & any( !( names( y ) %in% names( x ) ) ) ) for ( i in names( y )[ !( names( y ) %in% names( x ) ) ] ) x[ , i ] <- NA
@@ -177,7 +177,7 @@ for ( this.year in rev( years ) ){
 					load( 'temp.rda' )
 					unlink( 'temp.rda' )
 				}
-										
+				
 				# stack it
 				y <- rbind( y , x ) ; rm( x ) ; gc()
 				
@@ -244,7 +244,7 @@ for ( this.year in rev( years ) ){
 					x <- read.SAScii( this.file , this.sas )
 					
 					# coerce the file into a data.frame object
-					x <- as.data.frame.matrix( x )
+					x <- as.data.frame( x , optional = TRUE )
 					
 					# stack it
 					y <- rbind( y , x ) ; rm( x ) ; gc()
