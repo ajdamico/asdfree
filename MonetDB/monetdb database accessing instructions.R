@@ -1,6 +1,6 @@
 
 
-stop( "these instructions are obsolete.  instead, use https://www.monetdb.org/blog/monetdblite-r" )
+stop( "these instructions are obsolete.  instead, use https://github.com/hannesmuehleisen/MonetDBLite/blob/master/README.md" )
 
 
 # # # # # # # # # # # # # # # # # # # # # # # #
