@@ -513,6 +513,10 @@ for ( year in cps.years.to.download ){
 			
 			ot <- read.fwf( tf , c( 5 , 2 , 2 , 1 ) )
 			
+			download_cached( "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/ppint14esi_offer_ext.sas7bdat" , tf , mode = 'wb' )
+			
+			offer <- data.frame( read_sas( tf ) )
+			
 		}
 		
 		
@@ -529,6 +533,10 @@ for ( year in cps.years.to.download ){
 			download_cached( ace , tf , mode = 'wb' )
 			
 			ac <- read.fwf( tf , c( 5 , 2 , 1 ) ) 
+
+			download_cached( "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/ppint15esi_offer_ext.sas7bdat" , tf , mode = 'wb' )
+			
+			offer <- data.frame( read_sas( tf ) )
 		
 		}
 		
@@ -536,28 +544,32 @@ for ( year in cps.years.to.download ){
 		
 		names( ac ) <- c( 'ph_seq' , 'ppposold' , 'census_anycov' )
 		
+		names( offer ) <- tolower( names( offer ) )
+		
 		ac[ ac$census_anycov == 2 , 'census_anycov' ] <- 0
 		
 		ot_ac <- merge( ot , ac )
 		
-		dbWriteTable( db , 'ot_ac' , ot_ac )
+		ot_ac_of <- merge( ot_ac , offer , by.x = c( 'ph_seq' , 'ppposold' ) , by.y = c( 'h_seq' , 'ppposold' ) )
 		
-		rm( ot , ac , ot_ac ) ; gc()
+		dbWriteTable( db , 'ot_ac_of' , ot_ac_of )
+		
+		rm( ot , ac , ot_ac , ot_ac_of ) ; gc()
 		
 		
-		mmf <- dbListFields( db , 'ot_ac' )[ !( dbListFields( db , 'ot_ac' ) %in% dbListFields( db , 'hfp_pac' ) ) ]
+		mmf <- dbListFields( db , 'ot_ac_of' )[ !( dbListFields( db , 'ot_ac_of' ) %in% dbListFields( db , 'hfp_pac' ) ) ]
 		dbSendQuery( 
 			db , 
 			paste( 
 				"create table hfp as select a.* , " , 
 				paste( "b." , mmf , sep = "" , collapse = "," ) , 
-				" from hfp_pac as a inner join ot_ac as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" 
+				" from hfp_pac as a inner join ot_ac_of as b on a.h_seq = b.ph_seq AND a.ppposold = b.ppposold" 
 			)
 		)
 		
 		stopifnot( dbGetQuery( db , 'select count(*) from hfp' )[ 1 , 1 ] == dbGetQuery( db , 'select count(*) from hfp_pac' )[ 1 , 1 ] )
 		
-		dbRemoveTable( db , 'ot_ac' )
+		dbRemoveTable( db , 'ot_ac_of' )
 		
 		dbRemoveTable( db , 'hfp_pac' )
 		
