@@ -291,7 +291,7 @@ download.nchs <-
 				dos.command <- paste0( '"' , path.to.winrar , '" x ' , tf , ' ' , winrar.dir )
 				shell( dos.command ) 
 			} else {
-				sys.command <- paste( "unzip" , tf , "-d" , winrar.dir )
+				sys.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -o"' , winrar.dir , '"' )
 				system( sys.command )
 			}
 

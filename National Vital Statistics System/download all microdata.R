@@ -6,6 +6,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # options( encoding = "windows-1252" )											# # only macintosh and *nix users need this line
+# path.to.7z <- "7za"															# # only macintosh and *nix users need this line
 # path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )		# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NVSS/" )
@@ -34,12 +35,23 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #####################################################################################################################################################
-# prior to running this script you must have the program winrar installed on your computer. it's a free. go to http://www.win-rar.com/download.html #
+# prior to running this script windows users need (free) winrar software installed on their computer. go to http://www.win-rar.com/download.html    #
 # this code has only been tested in a microsoft windows environment, tell us what modifications are needed for other operating systems! cool thanx  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )		# # only windows users need this line
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # the line above sets the location of the winrar program on your local computer. uncomment it by removing the `#`                                   #
+#####################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#####################################################################################################################################################
+# macintosh and *nix users need 7za installed:  http://superuser.com/questions/548349/how-can-i-install-7zip-so-i-can-run-it-from-terminal-on-os-x  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# path.to.7z <- "7za"														# # this is probably the correct line for macintosh and *nix
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# the line above sets the location of the 7-zip program on your local computer. uncomment it by removing the `#` and change the directory if ya did #
 #####################################################################################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
