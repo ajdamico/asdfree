@@ -26,7 +26,7 @@
 
 # contact me directly for free help or for paid consulting work
 
-# anthony joseph damico
+# anthony joseph damico the first
 # ajdamico@gmail.com
 
 

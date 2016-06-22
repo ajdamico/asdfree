@@ -19,7 +19,7 @@
 # emily rowe
 # eprowe@gmail.com
 
-# anthony joseph damico
+# anthony joseph damico the first
 # ajdamico@gmail.com
 
 
