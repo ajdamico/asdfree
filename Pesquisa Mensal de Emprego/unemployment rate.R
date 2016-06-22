@@ -16,7 +16,7 @@
 # djalma pessoa
 # pessoad@gmail.com
 
-# anthony joseph damico the first
+# anthony joseph damico
 # ajdamico@gmail.com
 
 

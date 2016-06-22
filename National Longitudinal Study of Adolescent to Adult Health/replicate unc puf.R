@@ -14,7 +14,7 @@
 
 # contact me directly for free help or for paid consulting work
 
-# anthony joseph damico the first
+# anthony joseph damico
 # ajdamico@gmail.com
 
 # note that the university of north carolina's carolina population center only publishes standard error examples
