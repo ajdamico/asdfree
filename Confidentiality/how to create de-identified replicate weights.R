@@ -2,7 +2,7 @@
 # how to create de-identified replicate weights
 # in less than ten steps
 
-# anthony joseph damico
+# anthony joseph damico the first
 # ajdamico@gmail.com
 
 
