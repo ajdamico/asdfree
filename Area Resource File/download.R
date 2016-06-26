@@ -35,7 +35,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( 'SAScii' , 'descr' , 'RSQLite' , 'downloader' , 'digest' ) )
+# install.packages( c( 'SAScii' , 'descr' , 'MonetDBLite' , 'downloader' , 'digest' ) )
 
 
 
@@ -48,25 +48,26 @@
 
 
 # load necessary libraries
-library(RSQLite) 	# load RSQLite package (creates database files in R)
-library(SAScii) 	# load the SAScii package (imports ascii data with a SAS script)
-library(descr) 		# load the descr package (converts fixed-width files to delimited files)
-library(foreign) 	# load foreign package (converts data files into R)
-library(downloader)	# downloads and then runs the source() function on scripts from github
+library(DBI)			# load the DBI package (sets up main SQL configuration and connectivity functions)
+library(MonetDBLite) 	# load MonetDBLite package (creates database files in R)
+library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
+library(descr) 			# load the descr package (converts fixed-width files to delimited files)
+library(foreign) 		# load foreign package (converts data files into R)
+library(downloader)		# downloads and then runs the source() function on scripts from github
 
 
 # load the read.SAScii.sqlite function (a variant of read.SAScii that creates a database directly)
-source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/SQLite/read.SAScii.sqlite.R" , prompt = FALSE )
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
 
+# store the downloaded file locally forever
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE )
 
-# create a temporary database file and another temporary file
-temp.db <- tempfile()
+# create a temporary file
 tf <- tempfile()
-
 
 # download the most current ARF file
 # and save it as the temporary file
-download.file( "http://datawarehouse.hrsa.gov/DataDownload/ARF/AHRF_2014-2015.zip" , tf , mode = 'wb' )
+download_cached( "http://datawarehouse.hrsa.gov/DataDownload/ARF/AHRF_2014-2015.zip" , tf , mode = 'wb' )
 
 
 # unzip all of the files in the downloaded .zip file into the current working directory
@@ -79,22 +80,42 @@ files <- unzip( tf , exdir = getwd() )
 # identify ascii file on your local disk
 fn <- files[ grep( '\\.asc' , files ) ]
 
+# make an overwritten file
+fn_ue <- gsub( "\\.asc" , "_ascii.asc" , fn )
+
+# store the pre-run encoding configuration
+pre_encoding <- getOption( "encoding" )
+
+# switch the environment to ascii (very strict) encoding
+options( encoding = "ASCII" )
+
+# load in the whole file (in ASCII)
+arf_load <- readLines( fn )
+
+# overwrite the file with the stricter encoding
+writeLines( arf_load , fn_ue )
+
+# remove this object from memory & clear up RAM
+rm( arf_load ) ; gc()
+
+# restore the previous encoding settings
+options( encoding = pre_encoding )
 
 # identify sas (read-in) import instructions
 sas_ri <- files[ grep( '\\.sas' , files ) ]
 
-
-# create and connect to a temporary SQLite database
-db <- dbConnect( SQLite() , temp.db )
+# create and connect to a temporary MonetDBLite database
+db <- dbConnect( MonetDBLite::MonetDBLite() )
 
 
 # parse through the ARF without touching RAM #
-read.SAScii.sqlite( 
-  fn = fn ,
-  sas_ri = sas_ri ,
-  tl = TRUE ,			# convert all column names to lowercase?
-  tablename = 'arf' ,
-  conn = db
+read.SAScii.monetdb( 
+	fn = fn_ue ,
+	sas_ri = sas_ri ,
+	tl = TRUE ,			# convert all column names to lowercase?
+	tablename = 'arf' ,
+	conn = db ,
+	na_strings = "."	# unlike most other datasets, na strings are dots
 )
 
 
@@ -102,11 +123,8 @@ read.SAScii.sqlite(
 arf <- dbReadTable( db , 'arf' )
 
 
-# disconnect from the temporary SQLite database
-dbDisconnect( db )
-
-# and delete it
-file.remove( temp.db )
+# disconnect from the temporary MonetDBLite database
+dbDisconnect( db , shutdown = TRUE )
 
 
 # save the arf data table as an R data file (.rda)

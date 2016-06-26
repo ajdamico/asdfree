@@ -36,12 +36,13 @@ read.SAScii.monetdb <-
 										# specifying this option creates the temporary file inside the folder specified
 		try_best_effort = FALSE ,
 		sas_stru = NULL ,
-		allow_zero_records = FALSE		# by default, expect more than zero records to be imported.
-		
+		allow_zero_records = FALSE ,	# by default, expect more than zero records to be imported.
+		na_strings = ""					# by default, na strings are empty
 	) {
 		if( is.null( sas_ri ) & is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified" )
 		if( !is.null( sas_ri ) & !is.null( sas_stru ) ) stop( "either sas_ri= or sas_stru= must be specified, but not both" )
 
+		if( length( na_strings ) != 1 ) stop( "na_strings must have length of one" )
 	
 	# before anything else, create the temporary files needed for this function to run
 	# if the user doesn't specify that the temporary files get stored in a temporary directory
@@ -198,7 +199,9 @@ read.SAScii.monetdb <-
 					tablename , 
 					" FROM '" , 
 					normalizePath( fn ) , 
-					"' NULL AS '' " ,
+					"' NULL AS " ,
+					paste0( "'" , na_strings , "'" ) ,
+					" " ,
 					if( try_best_effort ) " BEST EFFORT " ,
 					" FWF (" , 
 					paste0( w , collapse = ", " ) , 

@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # area resource file
-# 2013-2014
+# 2014-2015
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -26,13 +26,13 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # https://github.com/ajdamico/asdfree/blob/master/Area%20Resource%20File/download.R #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# that script will create a file "arf2013.rda" with 'arf' in C:/My Directory/ARF  #
+# that script will create a file "arf2014.rda" with 'arf' in C:/My Directory/ARF  #
 ###################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # set your working directory.
-# the ARF 2013-2014 data files should have been stored here
+# the ARF 2014-2015 data files should have been stored here
 # after running the program described above
 # use forward slashes instead of back slashes
 
@@ -41,8 +41,8 @@
 # ..in order to set your current working directory
 
 
-# load the 2013-2014 ARF data file
-load( "arf2013.rda" )
+# load the 2014-2015 ARF data file
+load( "arf2014.rda" )
 
 
 # now the 'arf' data frame is available in memory..
@@ -50,7 +50,7 @@ load( "arf2013.rda" )
 ncol( arf )
 
 
-# the "AHRF 2013-2014 Technical Documentation.xls" file in the current working directory contains field labels
+# the "AHRF 2014-2015 Technical Documentation.xls" file in the current working directory contains field labels
 # so create a smaller data table with only a few columns of interest
 # first, create a character vector containing only the columns you'll need:
 variables.to.keep <-
@@ -103,11 +103,11 @@ length( unique( arf.sub$ssa ) )
 
 # because many counties with fips codes do not have ssa county codes
 # here's a few records where the ssa county code equals zero (missing)
-head( arf.sub[ arf.sub$ssa == 0 , ] )
+head( arf.sub[ arf.sub$ssa == '' , ] )
 
 
 # you could print all of them to the screen
-arf.sub[ arf.sub$ssa == 0 , ]
+arf.sub[ arf.sub$ssa == '' , ]
 # ..and find they're mostly the us territories.
 # because territories have fips but not ssa county codes
 
@@ -174,7 +174,7 @@ nrow( fakedata )
 
 # to merge the arf onto fakedata using the county ssa code,
 # try limiting the arf to only records with a non-zero ssa code
-arf.with.ssa <- subset( arf.sub , ssa != 0 )
+arf.with.ssa <- subset( arf.sub , ssa != '' )
 # count the number of records in fakedata
 nrow( fakedata )
 # perform the merge
