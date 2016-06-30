@@ -8,7 +8,7 @@
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NHIS/" )
-# nhis.years.to.download <- 2014:1963
+# nhis.years.to.download <- 2015:1963
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Health%20Interview%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -60,7 +60,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# nhis.years.to.download <- 2013:1963
+# nhis.years.to.download <- 2015:1963
 
 # uncomment this line to only download the 2012 files
 # nhis.years.to.download <- 2012
@@ -356,55 +356,17 @@ for ( year in nhis.years.to.download ){
 			# substr( fn , 1 , dp - 1 ) identifies the string up to the final '.sas' to allow the 2004 files' folder structure to work
 			sas_ri <- paste0( "ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Program_Code/NHIS/" , year , "/" , substr( fn , 1 , dp - 1 ) , ".sas" )
 
-			# save the nhis dataframe / read.SAScii download & import command into an expression
-			ndrs <- expression( nhis.df <- read.SAScii( efl , sas_ri , zipped = T ) )
+			# download the zipped file to a temporary file
+			download_cached( efl , tf , mode = 'wb' )
 			
+			# unzip the downloaded file
+			ztf <- unzip( tf , exdir = tempdir() )
 			
-			# start of error-handling
+			# if the zipped file includes a csv file, pick only the `.dat` file instead
+			if( length( ztf ) > 1 ) ztf <- ztf[ grep( "\\.dat$" , tolower( ztf ) ) ]
 			
-			# blank out the try.error object
-			try.error <- NULL
-			
-			# attempt #1:
-			# read the nhis file directly into an R data frame.. actually run the expression constructed above
-			try.error <- try( eval( ndrs ) , silent = T )
-			
-			# if the attempt to download the file resulted in an error..
-			if ( class( try.error ) == "try-error" ){
-				
-				# attempt #2
-				
-				# wait for three minutes
-				Sys.sleep( 3 * 60 )
-				
-				# and try again!
-				
-				# read the nhis file directly into an R data frame.. actually run the expression constructed above
-				try.error <- try( eval( ndrs ) , silent = T )
-				
-			}
-			
-			# if the attempt to download the file resulted in a second error..
-			if ( class( try.error ) == "try-error" ){
-				
-				# attempt #3
-				
-				# wait for three more minutes
-				Sys.sleep( 3 * 60 )
-				
-				# and try a third-and-final time
-				
-				# read the nhis file directly into an R data frame.. actually run the expression constructed above
-				eval( ndrs )
-				# note that this third attempt no longer contains error-handling
-				# (so if the command throws an error, the program will just crash)
-				
-				# if the download / read-in was still unsuccessful after the third attempt,
-				# the program will crash
-			}
-			
-			# end of error-handling
-			
+			# now load the fixed-width file directly into a data.frame object
+			nhis.df <- read.SAScii( ztf , sas_ri )
 			
 			# convert all column names to lowercase
 			names( nhis.df ) <- tolower( names( nhis.df ) )
