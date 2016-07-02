@@ -5,11 +5,11 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# your.name <- "first last"
-# your.email <- "email@address.com"
-# your.organization <- "organization name"
-# your.project <- "project name"
-# your.purpose <- "description of project"
+# your.name <- "first and last"
+# your.email <- "your@email.com"
+# your.organization <- "your organization name"
+# your.project <- "your project name"
+# your.purpose <- "your description of project"
 # do.you.agree <- FALSE
 # library(downloader)
 # setwd( "C:/My Directory/WVS/" )
@@ -45,11 +45,11 @@
 # note that you'll have to change `do.you.agree` to TRUE as well as
 # filling in the other information within the "quotes like this"
 
-# your.name <- "first last"
-# your.email <- "email@address.com"
-# your.organization <- "organization name"
-# your.project <- "project name"
-# your.purpose <- "description of project"
+# your.name <- "first and last"
+# your.email <- "your@email.com"
+# your.organization <- "your organization name"
+# your.project <- "your project name"
+# your.purpose <- "your description of project"
 # do.you.agree <- FALSE
 
 # this download automation script will not work without the above lines filled in.
@@ -139,12 +139,13 @@ for ( this.wave in waves.to.download ){
 	values$SAID <- ifelse( this.wave == -1 , -1 , "" )
 	values$DOID <- ""
 	values$CndWAVE <- this.wave
+	values$COUNTRY <- ":1"
 
 	# determine the integrated (all-country) files available for download
 	agg <- GET( "http://www.worldvaluessurvey.org/AJDocumentationSmpl.jsp" , query = values )
 
 	# extract the available links from the page above
-	all.links <- unlist( xpathSApply( content( agg ) , "//*/a" , xmlAttrs ) )
+	all.links <- unlist( xpathSApply( htmlParse( content( agg , as = 'text' ) ) , "//*/a" , xmlAttrs ) )
 	
 	# determine which of those links are on a line with the text 'Download'
 	dlid <- all.links[ grep( "Download" , all.links ) ]
@@ -161,8 +162,9 @@ for ( this.wave in waves.to.download ){
 		# add the current file id as the "download id" parameter for
 		# the `values` object that gets sent to the website
 		values$DOID <- this.id
-		values$SAID <- ""
-
+		values$SAID <- "0"
+		values$COUNTRY <- NULL
+		
 		# pass those new query requests to the server
 		POST( "http://www.worldvaluessurvey.org/AJDownloadLicense.jsp" , body = values )
 
