@@ -1,4 +1,4 @@
-# install.packages( c( "xml2" , "rvest" , "readxl" , "stringr" , "reshape2" , "XML" ) )
+# install.packages( c( "xml2" , "rvest" , "readxl" , "stringr" , "reshape2" , "XML" , "downloader" ) )
 
 
 library(xml2)
@@ -7,70 +7,15 @@ library(readxl)
 library(stringr)
 library(reshape2)
 library(XML)
+library(downloader)
+
+
+# load the download_cached and related functions
+# to prevent re-downloading of files once they've been downloaded.
+source_url("https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R", prompt = FALSE, echo = FALSE)
 
 # initiate an empty data.frame object
 all_thresholds <- NULL
-
-# loop through each year with an html page showing the thresholds
-for ( year in 1990:2009 ){
-
-	# figure out the exact url
-	this_html <- 
-		paste0( 
-			"http://www.census.gov/hhes/www/poverty/data/threshld/thresh" , 
-			substr( year , 3 , 4 ) , 
-			".html" 
-		)
-	
-	# scrape the table from the web
-	this_thresh <- readHTMLTable( this_html )[[ 1 ]]
-	
-	# remove goofy characters
-	this_thresh[ , 1 ] <- iconv( this_thresh[ , 1 ] , to = "ASCII" , sub = "_" )
-	
-	# remove rows where the first column contains missing or just the weird A
-	this_thresh <- this_thresh[ !( this_thresh[ , 1 ] %in% c( "_" , NA ) ) , ]
-	
-	# remove the second column, universally
-	this_thresh$V2 <- NULL
-	
-	# remove the final row, universally
-	this_thresh <- this_thresh[ -nrow( this_thresh ) , ]
-	
-	# name the 2nd-10th row 0-8 (number of kids)
-	names( this_thresh )[ -1 ] <- 0:8 
-
-	# remove the first and second rows, universally
-	this_thresh <- this_thresh[ -1:-2 , ]
-	
-	# remove rows where the second column is the weird A
-	this_thresh <- this_thresh[ iconv( this_thresh[ , 2 ] , to = 'ASCII' , sub = "_" ) != '_' , ]
-	
-	# remove weird A space text from the first column
-	this_thresh$V1 <- gsub( "_" , "" , as.character( this_thresh$V1 ) , fixed = TRUE )
-	
-	# remove dots in the first column
-	this_thresh$V1 <- str_trim( gsub( "." , "" , as.character( this_thresh$V1 ) , fixed = TRUE ) )
-	
-	# switch persons with people
-	this_thresh$V1 <- gsub( "persons" , "people" , this_thresh$V1 )
-	
-	# reshape the table from wide to long
-	this_thresh <- melt( this_thresh , "V1" )
-	
-	# appropriately name everything
-	names( this_thresh ) <- c( "family_type" , "num_kids" , "threshold" )
-	
-	# tack on a year
-	this_thresh$year <- year
-
-	# stack it with the others
-	all_thresholds <- rbind( all_thresholds , this_thresh )
-	
-}
-
-# remove all commas and convert the columns to numeric
-all_thresholds$threshold <- as.numeric( gsub( "," , "" , all_thresholds$threshold ) )
 
 cpov <- "https://www.census.gov/data/tables/time-series/demo/income-poverty/historical-poverty-thresholds.html" 
 
@@ -80,13 +25,13 @@ if( class( pgdl ) == 'try-error' ) pg <- read_html(cpov, method='wininet')
 all_links <- html_attr(html_nodes(pg, "a"), "href")
 
 # find all excel files on the census poverty webpage
-excel_locations <- grep( "thresholds/thresh(.*)\\.xls" , all_links , value = TRUE )
+excel_locations <- grep( "thresholds/thresh(.*)\\.(.*)" , all_links , value = TRUE )
 
 # figure out which years are available among the excel file strings
-ya <- ( 2010:2099 )[ substr( 2010:2099 , 3 , 4 ) %in% gsub( "(.*)thresh(.*)\\.xl(.*)" , "\\2" , excel_locations ) ]
+ya <- ( 1990:2058 )[ substr( 1990:2058 , 3 , 4 ) %in% gsub( "(.*)thresh(.*)\\.(.*)" , "\\2" , excel_locations ) ]
 
 # loop through all years available
-for ( year in ya ){
+for ( year in rev(ya) ){
 
 	# figure out the location of the excel file on the drive
 	this_excel <- paste0( "https:" , grep( substr( year , 3 , 4 ) , excel_locations , value = TRUE ) )
@@ -95,23 +40,37 @@ for ( year in ya ){
 	fn <- paste0( tempdir() , "/" , basename( this_excel ) )
 	
 	# download the file to your local disk
-	download.file( this_excel , fn , mode = 'wb' )
+	download_cached( this_excel , fn , mode = 'wb' )
 	
-	# import the current excel file
-	this_thresh <- read_excel( fn )
+	# import the current table
+	if( grepl( "\\.csv$" , fn ) ){
+
+		skipsix <- try( this_thresh <- read.csv( fn , skip = 6 , stringsAsFactors = FALSE ) , silent = TRUE )
+		
+		if( class( skipsix ) == 'try-error' ) skipfive <- try( this_thresh <- read.csv( fn , skip = 7 , stringsAsFactors = FALSE ) , silent = TRUE ) else skipfive <- NULL
+		
+		if( class( skipfive ) == 'try-error' ) this_thresh <- read.csv( fn , skip = 5 , stringsAsFactors = FALSE )
+		
+	} else {
+		this_thresh <- read_excel( fn )
+	}
 	
 	# if the text `Weighted` exists in the second column, toss the second column
-	if( any( grepl( "Weighted" , this_thresh[ , 2 ] ) ) ) this_thresh <- this_thresh[ , -2 ]
+	if( any( grepl( "Weighted" , c( names( this_thresh )[2] , this_thresh[ , 2 ] ) ) ) ) this_thresh <- this_thresh[ , -2 ]
 	
 	# keep all rows where the second column is not missing
-	this_thresh <- this_thresh[ !is.na( this_thresh[ , 2 ] ) , ]
+	this_thresh <- this_thresh[ !is.na( this_thresh[ , 2 ] ) & !( str_trim( this_thresh[ , 2 ] ) == "" ) , ]
 	
 	# remove crap at the beginning and end
 	this_thresh[ , 1 ] <- str_trim( iconv( as.character( this_thresh[ , 1 ] ) , to = "ASCII" , sub = " " ) )
 	this_thresh[ , 1 ] <- str_trim( gsub( "\\." , "" , as.character( this_thresh[ , 1 ] ) ) )
+	this_thresh <- this_thresh[ !is.na( this_thresh[ , 1 ] ) & !( this_thresh[ , 1 ] %in% "" ) ,  ]
+	
+	this_thresh[ -1 ] <- sapply( this_thresh[ -1 ] , function( z ) as.numeric( gsub( ",|\\$" , "" , z ) ) )
+	
 	
 	# keep only rows where a `family_type` matches something we've already found
-	this_thresh <- this_thresh[ this_thresh[ , 1 ] %in% all_thresholds$family_type , ]
+	# this_thresh <- this_thresh[ this_thresh[ , 1 ] %in% all_thresholds$family_type , ]
 
 	# name the 2nd-10th columns based on number of kids
 	names( this_thresh ) <- c( "family_type" , 0:8 )
@@ -125,32 +84,29 @@ for ( year in ya ){
 	# tack on the year
 	this_thresh$year <- year
 	
+	this_thresh <- subset( this_thresh , !is.na( family_type ) & !is.na( threshold ) )
+		
+	# typo on census bureau page
+	this_thresh <-
+		subset(
+			this_thresh ,
+			!( 
+				threshold == 26753 & 
+				year == 2000 & 
+				num_kids == 8 & 
+				family_type == "Eight persons" 
+			)
+		)
+
+	stopifnot( nrow( this_thresh ) == 48 )
+	
 	# stack it with the others
 	all_thresholds <- rbind( all_thresholds , this_thresh )
 	
 }
 
-all_thresholds$year <- as.numeric( all_thresholds$year )
-all_thresholds$threshold <- as.numeric( all_thresholds$threshold )
+all_thresholds$family_type <- gsub( "persons" , "people" , all_thresholds$family_type )
 all_thresholds$num_kids <- as.numeric( as.character( all_thresholds$num_kids ) )
 
-# toss the records missing thresholds
-all_thresholds <- 
-	subset( 
-		all_thresholds , 
-		!is.na( threshold )
-	)
-
-# typo on census bureau page
-all_thresholds <-
-	subset(
-		all_thresholds ,
-		!( 
-			threshold == 26753 & 
-			year == 2000 & 
-			num_kids == 8 & 
-			family_type == "Eight people" 
-		)
-	)
 
 # done scraping official census poverty thresholds back to 1990
