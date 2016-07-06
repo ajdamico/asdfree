@@ -1,12 +1,9 @@
-# install.packages( c( "xml2" , "rvest" , "readxl" , "stringr" , "reshape2" , "XML" , "downloader" ) )
+# install.packages( c( "rvest" , "readxl" , "stringr" , "reshape2" , "downloader" ) )
 
-
-library(xml2)
 library(rvest)
 library(readxl)
 library(stringr)
 library(reshape2)
-library(XML)
 library(downloader)
 
 
@@ -20,7 +17,7 @@ all_thresholds <- NULL
 cpov <- "https://www.census.gov/data/tables/time-series/demo/income-poverty/historical-poverty-thresholds.html" 
 
 pgdl <- try( pg <- read_html(cpov) , silent = TRUE )
-if( class( pgdl ) == 'try-error' ) pg <- read_html(cpov, method='wininet')
+if( 'try-error' %in% class( pgdl ) ) pg <- read_html(cpov, method='wininet')
 
 all_links <- html_attr(html_nodes(pg, "a"), "href")
 
