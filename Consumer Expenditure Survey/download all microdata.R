@@ -54,17 +54,22 @@ names( all_thresholds ) <- gsub( "year" , "this_year" , names( all_thresholds ) 
 
 # figure out which years are available to download
 years.to.download <-
-	unique( 
-		gsub( 
-			"(.*)/pumd_([0-9][0-9][0-9][0-9]).htm(.*)" , 
-			"\\2" , 
-			grep( 
-				"/pumd_([0-9][0-9][0-9][0-9]).htm" , 
-				readLines( "http://www.bls.gov/cex/pumdhome.htm" ) , 
-				value = TRUE 
+	as.numeric(
+		unique( 
+			gsub( 
+				"(.*)/pumd/data/stata/intrvw([0-9][0-9]).zip(.*)" , 
+				"\\2" , 
+				grep(
+					"(.*)/pumd/data/stata/intrvw([0-9][0-9]).zip(.*)" ,
+					readLines( "http://www.bls.gov/cex/pumd_data.htm#stata" ) ,
+					value = TRUE
+				)
 			) 
-		) 
+		)
 	)
+
+# add centuries
+years.to.download <- ifelse( years.to.download >= 96 , 1900 + years.to.download , 2000 + years.to.download )
 	
 
 ############################################
@@ -93,13 +98,12 @@ for ( year in years.to.download ){
 	# determine the exact path to the current year of microdata on the bureau of labor statistics ftp site
 	# for each of the four main consumer expenditure public use microdata files
 	intrvw.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/intrvw" , substr( year , 3 , 4 ) , ".zip" )
-	expn.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/expn" , substr( year , 3 , 4 ) , ".zip" )
 	diary.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/diary" , substr( year , 3 , 4 ) , ".zip" )
 	docs.ftp <- paste0( "http://www.bls.gov/cex/pumd/documentation/documentation" , substr( year , 3 , 4 ) , ".zip" )
 	
 	
-	# in 2014, the public use microdata stopped being shipped with a separate `expn` file.
-	if( year < 2014 ) ttd <- c( "intrvw" , "expn" , "diary" , "docs" ) else ttd <- c( "intrvw" , "diary" , "docs" )
+	# all three file types to download
+	ttd <- c( "intrvw" , "diary" , "docs" )
 	
 	
 	# loop through the interview, expenditure, diary, and documentation files and..
