@@ -209,8 +209,8 @@ for ( year in years.to.download ){
 
 	# since `files` contains multiple file paths,
 	# determine the filepath on the local disk to the household (dom) and person (pes) files
-	dom.fn <- files[ grepl( paste0( 'dados/dom' , year ) , tolower( files ) ) ]
-	pes.fn <- files[ grepl( paste0( 'dados/pes' , year ) , tolower( files ) ) ]
+	dom.fn <- files[ grepl( paste0( '/dom' , year ) , tolower( files ) ) ]
+	pes.fn <- files[ grepl( paste0( '/pes' , year ) , tolower( files ) ) ]
 
 	first_attempt_dom <- 
 		try({
