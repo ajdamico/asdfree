@@ -31,10 +31,10 @@ y <-
     strata.col = 'v4609' ,
     oldwgt = 'pre_wgt'
   )
+  
+y <- convey_prep(y)
 
 y.sub <- subset (y,  !is.na(v4720) & v4720!=0 & v8005>=15)
-
-y.sub <- convey_prep(y.sub)
 
 ## using functions of library convey
 
