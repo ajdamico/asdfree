@@ -369,7 +369,7 @@ for ( i in nrow( mm ):1 ) {
 			# if the first documentation download broke, wait 5 seconds and try again
 			if ( class( attempt1 ) == 'try-error' ){
 				Sys.sleep( 5 )
-				download_cached(  cbsite , cbname , mode = "wb" , cacheOK = FALSE , method = "internal" )
+				try( download_cached(  cbsite , cbname , mode = "wb" , cacheOK = FALSE , method = "internal" ) , silent = TRUE )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
@@ -400,7 +400,7 @@ for ( i in nrow( mm ):1 ) {
 			# if the first documentation download broke, wait 5 seconds and try again
 			if ( class( attempt1 ) == 'try-error' ){
 				Sys.sleep( 5 )
-				download_cached(  docsite , docname , mode = "wb" , cacheOK = FALSE , method = "internal" )
+				try( download_cached(  docsite , docname , mode = "wb" , cacheOK = FALSE , method = "internal" ) , silent = TRUE )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
