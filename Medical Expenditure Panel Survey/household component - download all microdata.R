@@ -200,7 +200,7 @@ for ( i in nrow( mm ):1 ) {
 			u <- paste0( "https://meps.ahrq.gov/mepsweb/data_files/pufs/h" , mm[ i , j ] , "ssp.zip" )
 			
 			# figure out if the file exists
-			err <- try( getURLContent( u ) , silent = T )
+			err <- try( getURLContent( u , ssl.verifypeer = FALSE ) , silent = T )
 
 			# if it can't be found once, try a second time
 			if( class( err ) == "try-error" ){
@@ -209,7 +209,7 @@ for ( i in nrow( mm ):1 ) {
 				Sys.sleep( 5 )
 				
 				# try once more
-				err <- try( getURLContent( u ) , silent = T )
+				err <- try( getURLContent( u , ssl.verifypeer = FALSE ) , silent = T )
 			}
 			
 			# if the file doesn't exist on its own..
@@ -356,7 +356,7 @@ for ( i in nrow( mm ):1 ) {
 			
 			# determine whether the codebooks exists
 			# (note: many early codebooks do not exist, because they are included in the documentation file)
-			err <- try( getURLContent( cbsite ) , silent = TRUE )
+			err <- try( getURLContent( cbsite , ssl.verifypeer = FALSE ) , silent = TRUE )
 			
 			# give the ahrq website five seconds before the actual download
 			Sys.sleep( 5 )
@@ -385,7 +385,7 @@ for ( i in nrow( mm ):1 ) {
 			docsite <- paste0( "https://meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h" , mm[ i , j ] , "/h" , mm[ i , j ] , "doc.pdf" )
 			
 			# determine whether the documentation exists
-			err <- try( getURLContent( docsite ) , silent = T )
+			err <- try( getURLContent( docsite , ssl.verifypeer = FALSE ) , silent = T )
 			
 			# give the ahrq website five seconds before the actual download
 			Sys.sleep( 5 )
