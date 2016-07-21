@@ -175,8 +175,8 @@ rm( brr ) ; gc()
 
 
 # download the documentation and codebook as well
-download_cached( lf.cb , "linkage - brr cb.pdf" , mode = "wb" , cacheOK = FALSE , method = "internal" )
-download_cached( lf.doc  , "linkage - brr doc.pdf" , mode = "wb" , cacheOK = FALSE , method = "internal" )
+download_cached( lf.cb , "linkage - brr cb.pdf" , mode = "wb" )
+download_cached( lf.doc  , "linkage - brr doc.pdf" , mode = "wb" )
 
 
 
@@ -364,12 +364,12 @@ for ( i in nrow( mm ):1 ) {
 			attempt1 <- NULL
 			
 			# if it does, download it
-			if (! class(err) == "try-error" ) attempt1 <- try( download_cached( cbsite , cbname , mode = "wb" , cacheOK = FALSE , method = "internal" ) , silent = TRUE )
+			if (! class(err) == "try-error" ) attempt1 <- try( download_cached( cbsite , cbname , mode = "wb" ) , silent = TRUE )
 			
 			# if the first documentation download broke, wait 5 seconds and try again
 			if ( class( attempt1 ) == 'try-error' ){
 				Sys.sleep( 5 )
-				try( download_cached(  cbsite , cbname , mode = "wb" , cacheOK = FALSE , method = "internal" ) , silent = TRUE )
+				try( download_cached(  cbsite , cbname , mode = "wb" ) , silent = TRUE )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
@@ -394,13 +394,13 @@ for ( i in nrow( mm ):1 ) {
 			
 			# if it does, download it
 			if (! class(err) == "try-error" ){
-				attempt1 <- try( download_cached( docsite , docname , mode = "wb" , cacheOK = FALSE , method = "internal" ) , silent = TRUE )
+				attempt1 <- try( download_cached( docsite , docname , mode = "wb" ) , silent = TRUE )
 			}
 			
 			# if the first documentation download broke, wait 5 seconds and try again
 			if ( class( attempt1 ) == 'try-error' ){
 				Sys.sleep( 5 )
-				try( download_cached(  docsite , docname , mode = "wb" , cacheOK = FALSE , method = "internal" ) , silent = TRUE )
+				try( download_cached(  docsite , docname , mode = "wb" ) , silent = TRUE )
 			}
 			
 			# reset the error object (this object stores whether or not the download attempt failed)
