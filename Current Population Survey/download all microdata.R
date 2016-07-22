@@ -148,19 +148,19 @@ for ( year in cps.years.to.download ){
 		dbWriteTable( db , 'hhld' , hhld )
 		rm( hhld ) ; gc() ; file.remove( tf1 )
 		
-		family <- data.frame( read_sas( tf2 ) )
-		names( family ) <- tolower( names( family ) )
-		for ( i in names( family ) ) family[ , i ] <- as.numeric( family[ , i ] )
-		family$fsup_wgt <- family$fsup_wgt / 100
-		dbWriteTable( db , 'family' , family )
-		rm( family ) ; gc() ; file.remove( tf2 )
+		fmly <- data.frame( read_sas( tf2 ) )
+		names( fmly ) <- tolower( names( fmly ) )
+		for ( i in names( fmly ) ) fmly[ , i ] <- as.numeric( fmly[ , i ] )
+		fmly$fsup_wgt <- fmly$fsup_wgt / 100
+		dbWriteTable( db , 'family' , fmly )
+		rm( fmly ) ; gc() ; file.remove( tf2 )
 		
-		person <- data.frame( read_sas( tf3 ) )
-		names( person ) <- tolower( names( person ) )
-		for ( i in names( person ) ) person[ , i ] <- as.numeric( person[ , i ] )
-		for ( i in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) person[ , i ] <- person[ , i ] / 100
-		dbWriteTable( db , 'person' , person )
-		rm( person ) ; gc() ; file.remove( tf3 )
+		prsn <- data.frame( read_sas( tf3 ) )
+		names( prsn ) <- tolower( names( prsn ) )
+		for ( i in names( prsn ) ) prsn[ , i ] <- as.numeric( prsn[ , i ] )
+		for ( i in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) prsn[ , i ] <- prsn[ , i ] / 100
+		dbWriteTable( db , 'person' , prsn )
+		rm( prsn ) ; gc() ; file.remove( tf3 )
 
 		mmf <- dbListFields( db , 'person' )[ !( dbListFields( db , 'person' ) %in% dbListFields( db , 'family' ) ) ]
 		dbSendQuery( db , paste( "create table f_p as select a.* ," , paste( "b." , mmf , sep = "" , collapse = "," ) , "from family as a inner join person as b on a.fh_seq = b.ph_seq AND a.ffpos = b.phf_seq" ) )
