@@ -35,8 +35,21 @@
 # ..in order to set your current working directory
 
 
+# warning: to import the 2014 income-consistent file,
+# you will need the `devtools` library to install the latest haven library from github
+# if you have trouble installing devtools within R, perhaps you need the r tools software
+# http://cran.r-project.org/bin/windows/Rtools/
+
+
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "haven" )  )
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "devtools" )  )
+
+# load the `devtools` library
+library(devtools)
+
+# remove the # in order to run this install.packages line only once
+# install_github( "hadley/haven" )
+
 
 
 
