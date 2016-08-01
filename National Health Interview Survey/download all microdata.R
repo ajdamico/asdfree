@@ -422,167 +422,170 @@ for ( year in nhis.years.to.download ){
 			# determine the exact ftp location (efl) of the file on the nhis ftp site
 			efl <- paste0( year.nhis.ftp , i )
 	
-			# ..and simply download the file into the local directory
-			download_cached( efl , destfile = paste0( output.directory , i ) , mode = 'wb' )
+			# ..and simply download the file into the local directory.
+			try( download_cached( efl , destfile = paste0( output.directory , i ) , mode = 'wb' ) , silent = TRUE )
+			# ..but if it fails, who cares.
 			
 		}
 		
 		# search for the SAS importation script (.sas)
 		# this will determine which data file to read in
-		sas.file <- tolower( ftp.files[ grepl( '.sas' , ftp.files ) ] )
+		all_sas_files <- tolower( ftp.files[ grepl( '.sas' , ftp.files ) ] )
 
 		# if both incmimp.sas and incimps.sas are available,
-		# use incmimp (because it matches more current years)
-		if ( identical( sort( sas.file ) , c( 'incimps.sas' , 'incmimp.sas' ) ) ) sas.file <- 'incmimp.sas'
-		
-		# figure out the SAScii.start position
-		# in NHIS imputed income files, each INPUT block is directly preceded by the text "INPUT ALL VARIABLES"
-		# so just find it and add one line
-		SAScii.start <- grep( "INPUT ALL VARIABLES" , readLines( paste0( year.nhis.ftp , sas.file ) ) ) + 1
-		
-		# the data file to download should have the exact same prefix
-		# but either .exe or .zip as a suffix
-		possible.exe <- gsub( '.sas' , '.exe' , sas.file )
-		possible.zip <- gsub( '.sas' , '.zip' , sas.file )
-		
-		# if the '.exe' file exists in the directory,
-		if ( possible.exe %in% ftp.files ){
-		
-			# use that as the file to download
-			efl <- paste0( year.nhis.ftp , possible.exe )
+		# as they are for some years, then download them all
+		for ( sas.file in all_sas_files ){
 			
-		} else {
-		
-			# otherwise, assume the .zip file exists in the directory
-			efl <- paste0( year.nhis.ftp , possible.zip )
+			# figure out the SAScii.start position
+			# in NHIS imputed income files, each INPUT block is directly preceded by the text "INPUT ALL VARIABLES"
+			# so just find it and add one line
+			SAScii.start <- grep( "INPUT ALL VARIABLES" , readLines( paste0( year.nhis.ftp , sas.file ) ) ) + 1
 			
-		}
-		
-		# download the compressed file from the nhis ftp site
-		# and save it to a temporary file on your local disk
-		# ..but just save this download_cached into an error-handling expression
-		dfeh <- expression( download_cached( efl , tf , mode = "wb" ) )
-	
-		
-		# start of error-handling
-	
-		# blank out the try.error object
-		try.error <- NULL
-		
-		# attempt #1:
-		# download the file.. actually run the expression constructed above
-		try.error <- try( eval( dfeh ) , silent = T )
-		
-		# if the attempt to download the file resulted in an error..
-		if ( class( try.error ) == "try-error" ){
+			# the data file to download should have the exact same prefix
+			# but either .exe or .zip as a suffix
+			possible.exe <- gsub( '.sas' , '.exe' , sas.file )
+			possible.zip <- gsub( '.sas' , '.zip' , sas.file )
 			
-			# attempt #2
+			# if the '.exe' file exists in the directory,
+			if ( possible.exe %in% ftp.files ){
 			
-			# wait for three minutes
-			Sys.sleep( 3 * 60 )
+				# use that as the file to download
+				efl <- paste0( year.nhis.ftp , possible.exe )
+				
+			} else {
 			
-			# and try again!
+				# otherwise, assume the .zip file exists in the directory
+				efl <- paste0( year.nhis.ftp , possible.zip )
+				
+			}
 			
+			# download the compressed file from the nhis ftp site
+			# and save it to a temporary file on your local disk
+			# ..but just save this download_cached into an error-handling expression
+			dfeh <- expression( download_cached( efl , tf , mode = "wb" ) )
+		
+			
+			# start of error-handling
+		
+			# blank out the try.error object
+			try.error <- NULL
+			
+			# attempt #1:
 			# download the file.. actually run the expression constructed above
 			try.error <- try( eval( dfeh ) , silent = T )
 			
-		}
-		
-		# if the attempt to download the file resulted in a second error..
-		if ( class( try.error ) == "try-error" ){
+			# if the attempt to download the file resulted in an error..
+			if ( class( try.error ) == "try-error" ){
+				
+				# attempt #2
+				
+				# wait for three minutes
+				Sys.sleep( 3 * 60 )
+				
+				# and try again!
+				
+				# download the file.. actually run the expression constructed above
+				try.error <- try( eval( dfeh ) , silent = T )
+				
+			}
 			
-			# attempt #3
+			# if the attempt to download the file resulted in a second error..
+			if ( class( try.error ) == "try-error" ){
+				
+				# attempt #3
+				
+				# wait for three more minutes
+				Sys.sleep( 3 * 60 )
+				
+				# and try a third-and-final time
+				
+				# download the file.. actually run the expression constructed above
+				eval( dfeh )
+				# note that this third attempt no longer contains error-handling
+				# (so if the command throws an error, the program will just crash)
+				
+				# if the download was still unsuccessful after the third attempt,
+				# the program will crash
+			}
+			# end of error-handling
 			
-			# wait for three more minutes
-			Sys.sleep( 3 * 60 )
-			
-			# and try a third-and-final time
-			
-			# download the file.. actually run the expression constructed above
-			eval( dfeh )
-			# note that this third attempt no longer contains error-handling
-			# (so if the command throws an error, the program will just crash)
-			
-			# if the download was still unsuccessful after the third attempt,
-			# the program will crash
-		}
-		# end of error-handling
-		
-		# unzip the file into a temporary directory.
-		# the unzipped file should contain *five* ascii files
-		income.file.names <- sort( unzip( tf , exdir = td ) )
-			
-		# loop through all five imputed income files
-		for ( i in 1:length( income.file.names ) ){
+			# unzip the file into a temporary directory.
+			# the unzipped file should contain *five* ascii files
+			income.file.names <- sort( unzip( tf , exdir = td ) )
+				
+			# loop through all five imputed income files
+			for ( i in 1:length( income.file.names ) ){
 
-			# print current progress to the screen
-			print( paste( "currently working on imputed income file" , i , "of 5" ) )
-		
-			# read the ascii dat file directly into R with read.SAScii()
-			ii <- 
-				read.SAScii( 
-					income.file.names[ i ] , 				# location of the ascii file in a temp directory on the local disk
-					paste0( year.nhis.ftp , sas.file ) ,	# location of the sas import instructions on the nhis ftp site
-					beginline = SAScii.start				# code line in the sas import instructions where the INPUT block begins (determined above)
+				# print current progress to the screen
+				print( paste( "currently working on imputed income file" , i , "of 5" ) )
+			
+				# read the ascii dat file directly into R with read.SAScii()
+				ii <- 
+					read.SAScii( 
+						income.file.names[ i ] , 				# location of the ascii file in a temp directory on the local disk
+						paste0( year.nhis.ftp , sas.file ) ,	# location of the sas import instructions on the nhis ftp site
+						beginline = SAScii.start				# code line in the sas import instructions where the INPUT block begins (determined above)
+					)
+
+				# the read.SAScii function produces column names in whatever case specified by the sas importation script
+				# convert them all to lowercase
+				names( ii ) <- tolower( names( ii ) )
+
+				# dump rectype variable from the imputed income data frame
+				# it is already on the personsx file, so it will screw up the merge
+				ii$rectype <- NULL
+				
+				# store the imputed income data table into a new data frame (named ii1 through ii5)
+				assign( 
+					paste0( "ii" , i ) , 
+					ii
 				)
-
-			# the read.SAScii function produces column names in whatever case specified by the sas importation script
-			# convert them all to lowercase
-			names( ii ) <- tolower( names( ii ) )
-
-			# dump rectype variable from the imputed income data frame
-			# it is already on the personsx file, so it will screw up the merge
-			ii$rectype <- NULL
+				
+				# delete ii (since it's also saved as ii#)
+				ii <- NULL
+				
+				# garbage collection - free up RAM from recently-deleted data tables
+				gc()
+				
+			}
 			
-			# store the imputed income data table into a new data frame (named ii1 through ii5)
-			assign( 
-				paste0( "ii" , i ) , 
-				ii
-			)
+			# save all five imputed income data frames to a single .rda file #
 			
-			# delete ii (since it's also saved as ii#)
-			ii <- NULL
+			# determine the output file name (ofn)
+			ofn <- paste0( output.directory , gsub( '.sas' , '.rda' , sas.file ) )
+			
+			# then save ii1 - ii5 to that .rda file on the local disk
+			if ( rda ) save( list = paste0( "ii" , 1:5 ) , file = ofn )
+			
+			# if the csv option is flagged, then save ii1 - ii5 to five .csv files on the local disk
+			if ( csv ){
+				for ( i in 1:5 ) {
+					write.csv( 
+						get( paste0( "ii" , i ) ) , 
+						paste0( output.directory , gsub( '.sas' , paste0( i , '.csv' ) , sas.file ) ) 
+					)
+				}
+			}
+			
+			# if the dta option is flagged, then save ii1 - ii5 to five stata files on the local disk
+			if ( dta ){
+				for ( i in 1:5 ) {
+					write.dta( 
+						get( paste0( "ii" , i ) ) , 
+						paste0( output.directory , gsub( '.sas' , paste0( i , '.dta' ) , sas.file ) ) 
+					)
+				}
+			}
+			
+			
+			
+			# remove all five imputed income data tables from RAM
+			rm( list = paste0( "ii" , 1:5 ) )
 			
 			# garbage collection - free up RAM from recently-deleted data tables
 			gc()
 			
 		}
-		
-		# save all five imputed income data frames to a single .rda file #
-		
-		# determine the output file name (ofn)
-		ofn <- paste0( output.directory , gsub( '.sas' , '.rda' , sas.file ) )
-		
-		# then save ii1 - ii5 to that .rda file on the local disk
-		if ( rda ) save( list = paste0( "ii" , 1:5 ) , file = ofn )
-		
-		# if the csv option is flagged, then save ii1 - ii5 to five .csv files on the local disk
-		if ( csv ){
-			for ( i in 1:5 ) {
-				write.csv( 
-					get( paste0( "ii" , i ) ) , 
-					paste0( output.directory , gsub( '.sas' , paste0( i , '.csv' ) , sas.file ) ) 
-				)
-			}
-		}
-		
-		# if the dta option is flagged, then save ii1 - ii5 to five stata files on the local disk
-		if ( dta ){
-			for ( i in 1:5 ) {
-				write.dta( 
-					get( paste0( "ii" , i ) ) , 
-					paste0( output.directory , gsub( '.sas' , paste0( i , '.dta' ) , sas.file ) ) 
-				)
-			}
-		}
-		
-		
-		
-		# remove all five imputed income data tables from RAM
-		rm( list = paste0( "ii" , 1:5 ) )
-		
-		# garbage collection - free up RAM from recently-deleted data tables
-		gc()
 		
 	}
 }
