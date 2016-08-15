@@ -207,11 +207,11 @@ for ( year in years.to.download ){
 	dom.sas <- remove.uf( files[ grepl( paste0( 'input[^?]dom' , year , '.txt' ) , tolower( files ) ) ] )
 	pes.sas <- remove.uf( files[ grepl( paste0( 'input[^?]pes' , year , '.txt' ) , tolower( files ) ) ] )
 
-	# in 2007, the age variable had been read in as a factor variable
+	# in 2003 and 2007, the age variable had been read in as a factor variable
 	# which breaks certain commands by treating the variable incorrectly as a factor
-	if( year == 2007 ){
+	if( year %in% c( 2003 , 2007 ) ){
 		pes_lines <- readLines( pes.sas )
-		pes_lines <- gsub( "@00027  V8005    $3." , "@00027  V8005    3." , pes_lines , fixed = TRUE )
+		pes_lines <- gsub( "@00027( *)V8005( *)\\$3\\." , "@00027 V8005 3\\." , pes_lines )
 		writeLines( pes_lines , pes.sas )
 	}
 	
