@@ -344,6 +344,14 @@ for ( year in years.to.download ){
 	# weird brazilian file encoding operates differently on mac+*nix versus windows, so try both ways.
 	if( class( attempt.one ) == 'try-error' ) { Encoding( files ) <- '' ; file.remove( files ) }
 	
+	# add 4617 and 4618 to 2001 file
+	if( year == 2001 ){
+	
+		dbSendQuery( db , paste0( 'alter table dom2001 add column pre_wgt real' ) )
+		dbSendQuery( db , "UPDATE dom2001 SET v4617 = strat" )
+		dbSendQuery( db , "UPDATE dom2001 SET v4618 = psu" )
+		
+	}
 	
 	# missing level blank-outs #
 	# this section loops through the non-response values & variables for all years
@@ -447,8 +455,12 @@ for ( year in years.to.download ){
 	# now create the pre-stratified weight to be used in all of the survey designs
 	# if it's not in there, copy it over
 	dbSendQuery( db , paste0( 'alter table pnad' , year , ' add column pre_wgt real' ) )
-	dbSendQuery( db , paste0( 'update pnad' , year , ' set pre_wgt = v4619 * v4610' ) )
-	
+
+	if( year == 2001 ){
+		dbSendQuery( db , paste0( 'update pnad' , year , ' set pre_wgt = v4610 * v4729' ) )
+	} else {
+		dbSendQuery( db , paste0( 'update pnad' , year , ' set pre_wgt = v4619 * v4610' ) )	
+	}
 	
 	# confirm that the number of records in the pnad merged file
 	# matches the number of records in the person file
