@@ -347,7 +347,6 @@ for ( year in years.to.download ){
 	# add 4617 and 4618 to 2001 file
 	if( year == 2001 ){
 	
-		dbSendQuery( db , paste0( 'alter table dom2001 add column pre_wgt real' ) )
 		dbSendQuery( db , "UPDATE dom2001 SET v4617 = strat" )
 		dbSendQuery( db , "UPDATE dom2001 SET v4618 = psu" )
 		
@@ -456,8 +455,8 @@ for ( year in years.to.download ){
 	# if it's not in there, copy it over
 	dbSendQuery( db , paste0( 'alter table pnad' , year , ' add column pre_wgt real' ) )
 
-	if( year == 2001 ){
-		dbSendQuery( db , paste0( 'update pnad' , year , ' set pre_wgt = v4610 * v4729' ) )
+	if( year < 2004 ){
+		dbSendQuery( db , paste0( 'update pnad' , year , ' set pre_wgt = v4610' ) )
 	} else {
 		dbSendQuery( db , paste0( 'update pnad' , year , ' set pre_wgt = v4619 * v4610' ) )	
 	}
