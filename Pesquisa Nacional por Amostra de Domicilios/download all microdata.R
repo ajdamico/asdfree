@@ -347,6 +347,9 @@ for ( year in years.to.download ){
 	# add 4617 and 4618 to 2001 file
 	if( year == 2001 ){
 	
+		dbSendQuery( db , "ALTER TABLE dom2001 ADD COLUMN v4617 real" )
+		dbSendQuery( db , "ALTER TABLE dom2001 ADD COLUMN v4618 real" )
+	
 		dbSendQuery( db , "UPDATE dom2001 SET v4617 = strat" )
 		dbSendQuery( db , "UPDATE dom2001 SET v4618 = psu" )
 		
