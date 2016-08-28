@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # behavioral risk factor surveillance system
-# 1984-2014 single-year files
+# 1984-2015 single-year files
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -8,7 +8,7 @@
 # options( encoding = "windows-1252" )		# # only macintosh and *nix users need this line
 # library(downloader)
 # setwd( "C:/My Directory/BRFSS/" )
-# years.to.download <- 1984:2014
+# years.to.download <- 1984:2015
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Behavioral%20Risk%20Factor%20Surveillance%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -95,7 +95,7 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/r
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- 1984:2014
+# years.to.download <- 1984:2015
 
 # pretty orwellian, huh?	
 
@@ -275,15 +275,15 @@ for ( year in intersect( years.to.download , 1984:2001 ) ){
 		
 
 		
-# the 2002 - 2014 brfss single-year files are too large to be read directly into RAM
+# the 2002 - 2015 brfss single-year files are too large to be read directly into RAM
 # so import them using the read.SAScii.monetdb() function,
 # a variant of the SAScii package's read.SAScii() function
 
 impfile <- tempfile()
 sasfile <- tempfile()
 
-# loop through each year specified by the user, so long as it's within the 2002-2014 range
-for ( year in intersect( years.to.download , 2002:2014 ) ){
+# loop through each year specified by the user, so long as it's within the 2002-2015 range
+for ( year in intersect( years.to.download , 2002:2015 ) ){
 
 
 	# if the file to download is 2012 or later..
@@ -326,6 +326,14 @@ for ( year in intersect( years.to.download , 2002:2014 ) ){
 	if ( year == 2013 ) z[ 361:362 ] <- c( "_FRTLT1z       2259" , "_VEGLT1z       2260" )
 	if ( year == 2014 ) z[ 86 ] <- "COLGHOUS $ 64"
 
+	if( year == 2015 ){
+	
+		z <- gsub( "\\\f" , "" , z )
+		z <- gsub( "_FRTLT1       2056" , "_FRTLT1_       2056" , z )
+		z <- gsub( "_VEGLT1       2057" , "_VEGLT1_       2057" , z )
+		
+	}
+	
 	# replace all underscores in variable names with x's
 	z <- gsub( "_" , "x" , z , fixed = TRUE )
 	
@@ -413,10 +421,10 @@ for ( year in intersect( years.to.download , 2002:2014 ) ){
 # create a data frame containing all weight, psu, and stratification variables for each year
 survey.vars <-
 	data.frame(
-		year = 1984:2014 ,
-		weight = c( rep( 'x_finalwt' , 18 ) , rep( 'xfinalwt' , 9 ) , rep( 'xllcpwt' , 4 ) ) ,
-		psu = c( rep( 'x_psu' , 18 ) , rep( 'xpsu' , 13 ) ) ,
-		strata = c( rep( 'x_ststr' , 18 ) , rep( 'xststr' , 13 ) )
+		year = 1984:2015 ,
+		weight = c( rep( 'x_finalwt' , 18 ) , rep( 'xfinalwt' , 9 ) , rep( 'xllcpwt' , 5 ) ) ,
+		psu = c( rep( 'x_psu' , 18 ) , rep( 'xpsu' , 14 ) ) ,
+		strata = c( rep( 'x_ststr' , 18 ) , rep( 'xststr' , 14 ) )
 	)
 
 # convert all columns in the survey.vars table to character strings,
