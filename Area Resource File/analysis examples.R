@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # area resource file
-# 2014-2015
+# 2015-2016
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
@@ -32,7 +32,7 @@
 
 
 # set your working directory.
-# the ARF 2014-2015 data files should have been stored here
+# the ARF 2015-2016 data files should have been stored here
 # after running the program described above
 # use forward slashes instead of back slashes
 
@@ -41,8 +41,8 @@
 # ..in order to set your current working directory
 
 
-# load the 2014-2015 ARF data file
-load( "arf2014.rda" )
+# load the 2015-2016 ARF data file
+load( "arf2015.rda" )
 
 
 # now the 'arf' data frame is available in memory..
@@ -50,7 +50,7 @@ load( "arf2014.rda" )
 ncol( arf )
 
 
-# the "AHRF 2014-2015 Technical Documentation.xls" file in the current working directory contains field labels
+# the "AHRF 2015-2016 Technical Documentation.xls" file in the current working directory contains field labels
 # so create a smaller data table with only a few columns of interest
 # first, create a character vector containing only the columns you'll need:
 variables.to.keep <-
@@ -83,10 +83,10 @@ head( arf.sub )
 # run some simple summary statistics
 
 # in 2010, the census recorded a total us population of..
-sum( arf.sub$pop2010 )
+sum( arf.sub$pop2010 , na.rm = TRUE )
 
 # in 2010, the american medical association masterfile recorded this many active doctors..
-sum( arf.sub$md2010 )
+sum( arf.sub$md2010 , na.rm = TRUE )
 
 
 # when merging the arf to another data set,
@@ -222,7 +222,7 @@ arf.sub$colorBuckets <- as.numeric( cut( arf.sub$dpp , cut.points , include.lowe
 # align data with map definitions by matching FIPS codes
 # works much better than trying to match the state, county names
 # which also include multiple polygons for some counties
-colorsmatched <- arf.sub$colorBuckets[ match( county.fips$fips , arf.sub$fips ) ]
+colorsmatched <- arf.sub$colorBuckets[ match( county.fips$fips , as.numeric( arf.sub$fips ) ) ]
 
 # create the legend's text
 # print the number of doctors per ten thousand people to the screen
