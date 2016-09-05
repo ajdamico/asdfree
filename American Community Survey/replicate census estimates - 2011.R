@@ -62,8 +62,8 @@ load( 'acs2011_1yr.rda' )	# analyze the 2011 single-year acs
 
 
 # connect the complex sample designs to the monet database #
-acs.m <- open( acs.m.design , driver = MonetDB.R() )	# merged design
-acs.h <- open( acs.h.design , driver = MonetDB.R() )	# household-only design
+acs.m <- open( acs.m.design , driver = MonetDBLite) )	# merged design
+acs.h <- open( acs.h.design , driver = MonetDBLite() )	# household-only design
 
 # exclude puerto rico to match the replication targets
 acs.m_no_pr <- subset( acs.m , st != 72 )
