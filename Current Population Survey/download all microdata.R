@@ -207,10 +207,10 @@ for ( year in cps.years.to.download ){
 							ifelse( 
 								year == 2014.38 ,
 								"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun_v2.zip" ,
-								# ifelse( year == 2015 ,
-									# paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "early_pubuse.zip" ) ,
+								ifelse( year == 2016 ,
+									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "early_pubuse_v2.zip" ) ,
 									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
-								# )
+								)
 							)
 						)
 					)
@@ -234,6 +234,7 @@ for ( year in cps.years.to.download ){
 
 		} else {
 			
+			if( year == 2016 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2016early_pubuse.dd.txt" )
 			if( year == 2015 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015early_pubuse.dd.txt" )
 			if( year == 2014.38 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014R_pubuse.dd.txt" )
 			if( year == 2014.58 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
@@ -535,6 +536,26 @@ for ( year in cps.years.to.download ){
 			ac <- read.fwf( tf , c( 5 , 2 , 1 ) ) 
 
 			download_cached( "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/ppint15esi_offer_ext.sas7bdat" , tf , mode = 'wb' )
+			
+			offer <- data.frame( read_sas( tf ) )
+		
+		}
+		
+		if ( year %in% 2016 ){
+		
+			ote <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/cps-redesign/asec16_outtyp.dat"
+		
+			download_cached( ote , tf , mode = 'wb' )
+			
+			ot <- read.fwf( tf , c( 5 , 2 , 2 , 1 ) )
+			
+			ace <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/cps-redesign/asec16_currcov_extract.dat"
+		
+			download_cached( ace , tf , mode = 'wb' )
+			
+			ac <- read.fwf( tf , c( 5 , 2 , 1 ) ) 
+
+			download_cached( "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/cps-redesign/ppint16esi_offer_ext.sas7bdat" , tf , mode = 'wb' )
 			
 			offer <- data.frame( read_sas( tf ) )
 		
