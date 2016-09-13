@@ -1,14 +1,14 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # current population survey 
 # annual social and economic supplement
-# 1998 - 2015
+# 1998 - 2016
 
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/CPS/" )
-# cps.years.to.download <- c( 2015 , 2014 , 2014.58 , 2014.38 , 2013:1998 )
+# cps.years.to.download <- c( 2016:2014 , 2014.58 , 2014.38 , 2013:1998 )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Current%20Population%20Survey/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -478,7 +478,7 @@ for ( year in cps.years.to.download ){
 		
 		dbRemoveTable( db , 'hfpz' )
 		
-		stopifnot( year %in% c( 2015 , 2014.58 , 2014.38 , 2014 ) )
+		stopifnot( year %in% c( 2016 , 2015 , 2014.58 , 2014.38 , 2014 ) )
 		
 		tf <- tempfile()
 		
@@ -543,21 +543,24 @@ for ( year in cps.years.to.download ){
 		
 		if ( year %in% 2016 ){
 		
-			ote <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/cps-redesign/asec16_outtyp.dat"
+			ote <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/asec16_outtyp_extract.dat"
 		
 			download_cached( ote , tf , mode = 'wb' )
 			
 			ot <- read.fwf( tf , c( 5 , 2 , 2 , 1 ) )
 			
-			ace <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/cps-redesign/asec16_currcov_extract.dat"
+			ace <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/asec16_currcov_extract.dat"
 		
 			download_cached( ace , tf , mode = 'wb' )
 			
 			ac <- read.fwf( tf , c( 5 , 2 , 1 ) ) 
 
-			download_cached( "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/cps-redesign/ppint16esi_offer_ext.sas7bdat" , tf , mode = 'wb' )
+			# fix this later when census posts it
+			load( "R:/Current Population Survey/offer16.rda" )
 			
-			offer <- data.frame( read_sas( tf ) )
+			# download_cached( "" , tf , mode = 'wb' )
+			
+			# offer <- data.frame( read_sas( tf ) )
 		
 		}
 		
@@ -736,13 +739,13 @@ for ( year in cps.years.to.download ){
 	
 	overlapping.spm.fields <- c( "gestfips" , "fpovcut" , "ftotval" , "marsupwt" )
 	
-	if( year %in% c( 2010:2015 , 2014.38 , 2014.58 ) ){
+	if( year %in% c( 2010:2016 , 2014.38 , 2014.58 ) ){
 
 		sp.url <- 
 			paste0( 
 			"http://www.census.gov/housing/povmeas/spmresearch/spmresearch" , 
 			floor( year - 1 ) , 
-			if ( year == 2014.38 ) "_redes" else if ( year == 2015 ) "" else "new" ,
+			if ( year == 2014.38 ) "_redes" else if ( year >= 2015 ) "" else "new" ,
 			".sas7bdat" 
 		)
 		
