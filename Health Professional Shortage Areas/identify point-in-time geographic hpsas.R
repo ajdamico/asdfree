@@ -163,7 +163,7 @@ table( x$type.description )
 
 # remove hpsa records that are *points* (like health centers, clinics, correctional facilities, etc)
 # and keep only geographic areas
-x <- x[ x$type.description %in% c( 'Single County' , 'Geographical Area' , 'Population Group' ) , ]
+x <- x[ x$type.description %in% c( 'Hpsa Geographic' , 'Hpsa Geographic High Needs' , 'Hpsa Population' ) , ]
 
 # re-print the current count of records by state
 table( x$type.description )
@@ -180,7 +180,7 @@ throw.out.pop.group.hpsas.please <- FALSE
 if ( throw.out.pop.group.hpsas.please ){
 
 	# only keep single county and geographical area hpsa types
-	x <- x[ x$type.description %in% c( 'Single County' , 'Geographical Area' ) , ]
+	x <- x[ x$type.description %in% c( 'Hpsa Geographic' , 'Hpsa Geographic High Needs' ) , ]
 
 # ..otherwise, it's a bit more work.  and also imperfect.
 } else {
@@ -242,7 +242,7 @@ if ( throw.out.pop.group.hpsas.please ){
 
 		
 	# identify the records in `x` that are population groups
-	pg.recs <- ( x$type.description == 'Population Group' )
+	pg.recs <- ( x$type.description == 'Hpsa Population' )
 
 	# create new TRUE/FALSE variables for each 
 	x[ pg.recs , 'spanish' ] <- pop.group.id( spanish.text.matches , x[ pg.recs , 'name' ] )
@@ -265,7 +265,7 @@ if ( throw.out.pop.group.hpsas.please ){
 		subset( 
 			x , 
 			!spanish & !poverty & !li & !medicaid & !indigent & !amerind & !migrant & !inmate & !homeless & !mental & 
-			type.description == 'Population Group' 
+			type.description == 'Hpsa Population' 
 		)
 	
 	# ..here's the first six

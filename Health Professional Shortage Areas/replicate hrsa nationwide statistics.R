@@ -127,9 +127,8 @@ y <-
 		unique.designations ,
 		type.description %in% 
 			c(
-				"Single County" ,
-				"Geographical Area" ,
-				"Population Group" ,
+				'Hpsa Geographic' , 'Hpsa Geographic High Needs' ,
+				"Hpsa Population" ,
 				"Correctional Facility" ,
 				"Other Facility"
 			)
