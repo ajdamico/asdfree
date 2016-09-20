@@ -543,13 +543,13 @@ for ( year in cps.years.to.download ){
 		
 		if ( year %in% 2016 ){
 		
-			ote <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/asec16_outtyp_extract.dat"
+			ote <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/cps-redesign/asec16_outtyp_full.dat"
 		
 			download_cached( ote , tf , mode = 'wb' )
 			
 			ot <- read.fwf( tf , c( 5 , 2 , 2 , 1 ) )
 			
-			ace <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/asec16_currcov_extract.dat"
+			ace <- "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2016/cps-redesign/asec16_currcov_extract.dat"
 		
 			download_cached( ace , tf , mode = 'wb' )
 			
