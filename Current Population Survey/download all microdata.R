@@ -555,12 +555,9 @@ for ( year in cps.years.to.download ){
 			
 			ac <- read.fwf( tf , c( 5 , 2 , 1 ) ) 
 
-			# fix this later when census posts it
-			load( "R:/Current Population Survey/offer16.rda" )
+			download_cached( "http://www2.census.gov/programs-surveys/demo/datasets/health-insurance/2014/cps-redesign/pubuse_esioffer_2016.sas7bdat" , tf , mode = 'wb' )
 			
-			# download_cached( "" , tf , mode = 'wb' )
-			
-			# offer <- data.frame( read_sas( tf ) )
+			offer <- data.frame( read_sas( tf ) )
 		
 		}
 		
