@@ -70,7 +70,7 @@ longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 
 events <- c( 10 , 16 , NA , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 , 135 , 144 , 152 , 160 , 168 )
 
 # condition-event link file currently only available until 2013
-cond_event <- paste0( ifelse( events < 168 , events , NA ) , "i" )
+cond_event <- ifelse( events < 168 , paste0( events , "i" ) , NA )
 
 
 # specify the most current brr / link file locations
