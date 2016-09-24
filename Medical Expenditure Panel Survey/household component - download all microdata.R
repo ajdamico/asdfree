@@ -1,6 +1,6 @@
 # analyze survey data for free (http://asdfree.com) with the r language
 # medical expenditure panel survey
-# 1996 through 2013
+# 1996 through 2014
 # full-year consolidated, medical conditions, jobs, person round plan, longitudinal weight, and event files
 
 # # # # # # # # # # # # # # # # #
@@ -61,13 +61,13 @@ year <- 1996:2014
 # 2000, 2001, 2002, and 2003 jobs files need a workaround.
 # 2001 and 2002 medical conditions files need a workaround.
 # 2000, 2001, and 2002 events files need a workaround.
-consolidated <- c( 12 , 20 , 28 , 38 , 50 , 60 , 70 , 79 , 89 , 97 , 105 , 113 , 121 , 129 , 138 , 147 , 155 , 163 , NA )
+consolidated <- c( 12 , 20 , 28 , 38 , 50 , 60 , 70 , 79 , 89 , 97 , 105 , 113 , 121 , 129 , 138 , 147 , 155 , 163 , 171 )
 popchar <- c( NA , NA , NA , NA , NA , NA , NA , NA , NA , NA , NA , NA , 115 , 123 , 132 , 141 , 149 , 157 , 165 )
-conditions <- c( "06r" , 18 , 27 , 37 , 52 , NA , NA , 78 , 87 , 96 , 104 , 112 , 120 , 128 , 137 , 146 , 154 , 162 , NA )
+conditions <- c( "06r" , 18 , 27 , 37 , 52 , NA , NA , 78 , 87 , 96 , 104 , 112 , 120 , 128 , 137 , 146 , 154 , 162 , 170 )
 jobs <- c( "07" , 19 , 25 , 32 , NA , NA , NA , NA , 83 , 91 , 100 , 108 , 116 , 124 , 133 , 142 , 150 , 158 , 166 )
-prpf <- c( 24 , 47 , 47 , 47 , 47 , 57 , 66 , 76 , 88 , 95 , 103 , 111 , 119 , 127 , 136 , 145 , 153 , 161 , NA )
+prpf <- c( 24 , 47 , 47 , 47 , 47 , 57 , 66 , 76 , 88 , 95 , 103 , 111 , 119 , 127 , 136 , 145 , 153 , 161 , 169 )
 longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 , 130 , 139 , 148 , 156 , 164 , NA , NA )
-events <- c( 10 , 16 , NA , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 , 135 , 144 , 152 , 160 , NA )
+events <- c( 10 , 16 , NA , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 , 135 , 144 , 152 , 160 , 168 )
 cond_event <- paste0( events , "i" )
 
 # specify the most current brr / link file locations
