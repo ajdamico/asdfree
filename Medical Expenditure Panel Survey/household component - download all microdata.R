@@ -68,7 +68,10 @@ jobs <- c( "07" , 19 , 25 , 32 , NA , NA , NA , NA , 83 , 91 , 100 , 108 , 116 ,
 prpf <- c( 24 , 47 , 47 , 47 , 47 , 57 , 66 , 76 , 88 , 95 , 103 , 111 , 119 , 127 , 136 , 145 , 153 , 161 , 169 )
 longitudinal <- c( 23 , 35 , 48 , 58 , 65 , 71 , 80 , 86 , 98 , 106 , 114 , 122 , 130 , 139 , 148 , 156 , 164 , NA , NA )
 events <- c( 10 , 16 , NA , 33 , NA , NA , NA , 77 , 85 , 94 , 102 , 110 , 118 , 126 , 135 , 144 , 152 , 160 , 168 )
-cond_event <- paste0( events , "i" )
+
+# condition-event link file currently only available until 2013
+cond_event <- paste0( ifelse( events < 168 , events , NA ) , "i" )
+
 
 # specify the most current brr / link file locations
 lf <- "https://meps.ahrq.gov/mepsweb/data_files/pufs/h36brr13ssp.zip"
