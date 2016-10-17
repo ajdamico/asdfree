@@ -194,7 +194,7 @@ for ( year in cps.years.to.download ){
 								year == 2014.38 ,
 								"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun_v2.zip" ,
 								ifelse( year == 2016 ,
-									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "early_pubuse_v2.zip" ) ,
+									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse_v2.zip" ) ,
 									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
 								)
 							)
@@ -220,7 +220,7 @@ for ( year in cps.years.to.download ){
 
 		} else {
 			
-			if( year == 2016 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2016early_pubuse.dd.txt" )
+			if( year == 2016 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2016_pubuse.dd.txt" )
 			if( year == 2015 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2015early_pubuse.dd.txt" )
 			if( year == 2014.38 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014R_pubuse.dd.txt" )
 			if( year == 2014.58 ) sas_ris <- dd_parser( "http://thedataweb.rm.census.gov/pub/cps/march/asec2014early_pubuse.dd.txt" )
