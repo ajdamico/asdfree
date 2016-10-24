@@ -127,13 +127,17 @@ for ( i in seq_along( zip.filenames ) ){
 	
 		sasfile <- grep( "1Tri_2012 a 3Tri_2015" , sasfiles , value = TRUE ) 
 	
-	# otherwise, use the second
+	# if 2015Q4 or 2016Q1, use the second
+	} else if( (year == 2015 | quarter == 4) | (year == 2016 | quarter == 1) ) {
+		
+		sasfile <- grep( "4Tri_2015 a 1Tri_2016" , sasfiles , value = TRUE )
+		
+	# if 2016Q2, use the third
 	} else {
-		
-		sasfile <- grep( "4Tri_2015" , sasfiles , value = TRUE )
-		
-	}
 	
+		sasfile <- grep( "2Tri_2016", sasfiles , value = TRUE)
+	
+	}	
 	# construct the full ftp path to the current zipped file
 	current.zipfile <-
 		paste0(
