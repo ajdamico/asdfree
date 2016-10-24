@@ -123,7 +123,7 @@ for ( i in seq_along( zip.filenames ) ){
 	year <- gsub( "(.*)PNADC_([0-9][0-9])([0-9][0-9][0-9][0-9])(.*)\\.(zip|ZIP)" , "\\3" , zip.filenames[ i ] )
 
 	# if the year is 2012-2014 or 2015Q1-Q3, use the first sas import file..
-	if( year < 2015 | quarter < 4 ) {
+	if( year < 2015 | ( year < 2016 & quarter < 4 ) ) {
 	
 		sasfile <- grep( "1Tri_2012 a 3Tri_2015" , sasfiles , value = TRUE ) 
 	
