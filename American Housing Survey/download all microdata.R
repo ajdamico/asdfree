@@ -78,17 +78,50 @@ tf <- tempfile() ; td <- tempdir()
 # open the connection to the sqlite database
 db <- dbConnect( SQLite() , ahs.dbname )
 
+
+# figure out available ahs years
+
 # hard-code the location of the census bureau's all ahs data page
 download.file( "http://www.census.gov/programs-surveys/ahs/data.All.html" , tf , mode = 'wb' )
 
 # split up the page into separate lines
 http.contents <- readLines( tf )
 
-# isolate all puf lines
-puf.lines <- grep( "href(.*)Public Use" , http.contents , value = TRUE )
+# look for four-digit years in html filenames
+available_years <- 
+	gsub( 
+		"(.*)>(.*)<(.*)" , 
+		"\\2" , 
+		grep( "http://www.census.gov/programs-surveys/ahs/data.([0-9][0-9][0-9][0-9]).html" , http.contents , value = TRUE )
+	)
 
-# extract only the link
-puf.pages <- gsub('(.*)href=\"(.*)\" title(.*)' , '\\2' , puf.lines )
+
+# record each of the public use file pages
+puf.pages <- NULL
+
+for( year in available_years ){
+
+	download.file( paste0( "http://www.census.gov/programs-surveys/ahs/data." , year , ".html" ) , tf , mode = 'wb' )
+
+	# isolate all puf lines
+	puf.lines <- gsub('(.*)href=\"(.*)\" title(.*)' , '\\2' , grep( "href(.*)Public Use" , readLines( tf ) , value = TRUE ) )
+
+	# starting in 2013, public use file pages are broken into two
+	if( year >= 2013 ){
+		
+		download.file( paste0( "http://www.census.gov/" , puf.lines ) , tf , mode = 'wb' )
+		
+		these_lines <- gsub('(.*)href=\"(.*)\" title(.*)' , '\\2' , grep( "href(.*)Public Use" , readLines( tf ) , value = TRUE ) )
+		
+		these_lines <- these_lines[ !grepl( "mailto" , these_lines ) ] 
+		
+	} else these_lines <- puf.lines
+	
+	# extract only the link
+	puf.pages <- unique( c( puf.pages , these_lines ) )
+	
+}
+
 
 # start with an empty vector..
 precise.files <- NULL
@@ -100,11 +133,7 @@ for ( this.page in puf.pages ){
 	
 	zipped.file.lines <- this.contents[ grep( "\\.zip" , tolower( this.contents ) ) ]
 
-	precise.files <-
-		c( 
-			precise.files ,
-			gsub( "(.*)downloadLink: '(.*)' }, collect(.*)" , "\\2" , zipped.file.lines )
-		)
+	precise.files <- unique( c( precise.files , gsub( '\"(.*)' , "" , gsub( '(.*)href=\"' , "" , zipped.file.lines ) ) ) )
 	
 }
 
