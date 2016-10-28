@@ -6,8 +6,7 @@
 # # # # # # # # # # # # # # # # #
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
-# your.username <- "username"
-# your.password <- "password"
+# your.username <- "email@address.com"
 # library(downloader)
 # setwd( "C:/My Directory/ANES/" )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/American%20National%20Election%20Studies/download%20and%20import.R" , prompt = FALSE , echo = TRUE )
@@ -45,8 +44,7 @@
 # this script will not run until a valid username and password are included in the two lines below.
 # oh and don't forget to uncomment these two lines by removing the `#`
 
-# your.username <- "username"
-# your.password <- "password"
+# your.username <- "email@address.com"
 
 # this massive ftp download automation script will not work without the above lines filled in.
 # if the your.username and your.password lines above are not filled in with the details you provided at registration, 
@@ -88,11 +86,7 @@ library(memisc)		# load memisc package (loads spss portable table import functio
 library(haven)		# load stata files after version 12
 
 # construct a list containing the pre-specified login information
-values <- 
-    list(
-        "email" = your.username , 
-        "pass" = your.password
-    )
+values <- list( "email" = your.username )
 
 # contact the anes website to log in
 POST( "http://www.electionstudies.org/studypages/download/login-process.php" , body = values )
@@ -101,7 +95,7 @@ POST( "http://www.electionstudies.org/studypages/download/login-process.php" , b
 z <- GET( "http://www.electionstudies.org/studypages/download/datacenter_all_datasets.php" )
 
 # create a temporary file and a temporary directory
-tf <- tempfile() ; td <- tempdir()
+tf <- tempfile()
 
 # write the information from the `all_datasets` page to a local file
 writeBin( z$content , tf )
@@ -110,210 +104,75 @@ writeBin( z$content , tf )
 # with one character string per line
 y <- readLines( tf )
 
-# retain only the lines containing text in bold
-y <- y[ grep('<b>' , y ) ]
+# retain only the dta.zip files
+y <- grep( 'dta\\.zip' , y , value = TRUE )
 
 # remove everything in those strings before the bold tag `<b>`
-y <- unlist( lapply( strsplit( y , '<b>' ) , '[[' , 2 ) )
-
-# extract each of the study names
-study.names <- unlist( lapply( strsplit( y , '<' ) , '[[' , 1 ) )
-
-# remove colons and slashes
-study.names <- gsub( '/|: ' , ' ' , study.names )
-
-# perform some regular expression magic thanks to help from stackoverflow
-# http://stackoverflow.com/questions/17775013/how-to-extract-a-string-that-both-matches-some-pattern-and-rests-between-two-oth
-
-# extract the filenames of all .dta files available
-dta.files <-
-	gsub(
-		"(.*a href=\\\")(.*dta\\.zip)(.*)$" , 
-		"\\2" , 
-		y
-	)
-
-# a few of these studies did not include `.dta` files, so blank out the file names
-dta.files[ !grepl( 'dta.zip' , dta.files , fixed = TRUE ) ] <- ""
-
-# make this character vector into a list
-files.to.download <- as.list( dta.files )
-
-# add some names to every element in the list
-names( files.to.download ) <- str_trim( study.names )
-
-# hardcode a couple of the studies that are non-standard on the anes website #
-
-# identify studies with no data files
-no.data.studies <-
-	c(
-		'ANES 2010 Time Series Study' ,
-		'ANES 2006' ,
-		"Auxiliary File ANES 2004 Time Series and Panel Contextual File" ,
-		# these two are just full of broken links
-		"User-Contributed Data (for use with the ANES 1996 Time Series Study)" ,
-		"User-Contributed Data (for use with the ANES 1992 Time Series Study)" ,
-		# this last one isn't a no data study, but it needs a database to load into a computer with 4GB
-		# ..and it's not particularly useful
-		"Auxiliary File Supplemental (off-wave non-ANES) Data File"
-	)
-
-# throw them out entirely!
-files.to.download <-
-	files.to.download[ !( names( files.to.download ) %in% no.data.studies ) ]
-# no need to download data that's not there, huh?
-	
-# .sav files only
-files.to.download[[ "ANES 2010-2012 Evaluations of Government and Society Study" ]] <-
-	c(
-		"../data/2010_2012EGSS/anes_specialstudies_2012egss4_sav.zip" ,
-		"../data/2010_2012EGSS/anes_specialstudies_2011egss3_sav.zip" ,
-		"../data/2010_2012EGSS/anes2010_2012egss2_sav.zip" ,
-		"../data/2010_2012EGSS/anes2010_2012egss1por.zip"
-	)
-
-files.to.download[[ "ANES Time Series Cumulative Data File" ]] <-
-		"../data/anes_timeseries_cdf/anes_timeseries_cdf_sav.zip"
-
-files.to.download[[ "ANES 2012 Time Series Study" ]] <-
-	"../data/anes_timeseries_2012/anes_timeseries_2012_sav.zip"
-	
-	
-# .por files only
-files.to.download[[ "ANES 2008-2009 Panel Study" ]] <-
-	"../data/2008_2009panel/anes2008_2009panelpor.zip"
-
-# and this one was just duplicated then removed, so put it back in anew
-files.to.download[[ "Auxiliary File ANES 2004 Time Series and Panel Contextual File" ]] <-
-	"../data/2004prepost/anes2004TSandPanel_contextdta.zip"
-
-
-# `ANES 2016 Pilot Study` has not been uploaded as of March 2016
-if( files.to.download[2] %in% "" ) files.to.download[2] <- NULL
-	
-# end of hardcodes #
-
-
-# confirm that there are no empty strings in the files to be downloaded
-if( any( sapply( files.to.download , function( z ) "" %in% z ) ) ) stop( "empty string lurkin around" )
-
+all_studies <- gsub( '(.*)data/(.*)dta\\.zip\"(.*)' , "\\2dta.zip" , y )
 
 # loop through each available study to download
-for ( curStudy in seq( length( files.to.download ) ) ){
+for ( this_study in all_studies ){
 
-	# prepare a directory that's appropriately named
-	dfn <- names( files.to.download )[[ curStudy ]]
-	
-	# remove the text 'anes' from the folder name
-	dfn <- gsub( "ANES " , "" , dfn )
+	# decide where to save the zipped file
+	study_folder <- gsub( "/(.*)" , "" , this_study )
 	
 	# create the directory on the local disk
-	dir.create( dfn )
+	dir.create( study_folder , showWarnings = FALSE )
 
-	# loop through each file that needs to be downloaded..
-	for ( i in files.to.download[[ curStudy ]] ){
+	# determine the full http:// filepath of the file to download
+	fn <- paste0( "http://www.electionstudies.org/studypages/data/" , this_study )
 	
-		# determine the full http:// filepath of the file to download
-		fn <- 
-			gsub( 
-				".." , 
-				"http://www.electionstudies.org/studypages" , 
-				i , 
-				fixed = TRUE 
-			)
-		
-		# print currrent progress to the screen
-		cat( 'currently working on' , fn , '\r' )
-		
-		# download the damn file
-		z <- GET( fn )
+	# print currrent progress to the screen
+	cat( 'currently working on' , fn , '\r' )
 	
-		# save the result to a temporary file on the local disk
-		writeBin( z$content , tf )
+	# download the damn file
+	z <- GET( fn )
 
-		# unzip that temporary file to an equally-temporary directory
-		z <- unzip( tf , exdir = td )
-	
-		# first look for a dta file
-		if ( any( grepl( 'dta' , z ) ) ){
-			
-			# find which one it is from among everything zipped up together..
-			fp <- z[ grep( 'dta' , z ) ]
-		
-			# ..import that puppy
-			x <- read_dta( fp[ 1 ] )
-			
-			# just check that it's the same file if there's more than
-			# one file included in the zipped file.
-			if( length( fp ) == 2 ) stopifnot( nrow( read_dta( fp[ 2 ] ) ) == nrow( x ) )
-		
-			# also confirm that there's a max of two files in the zipped file.
-			stopifnot( length( fp ) %in% 1:2 )
-		
-		} else {
-		
-			# look for a .por file
-			if ( any( grepl( 'por' , z ) ) ){
-			
-				# find which one it is from among everything zipped up together
-				fp <- z[ grep( 'por' , z ) ]
-			
-				# import that puppy
-				x <- 
-					data.frame( 
-						as.data.set(
-							spss.portable.file( fp )
-						) 
-					)
-			
-			# otherwise find the .sav file
-			} else {
-		
-				# find which one it is from among everything zipped up together
-				fp <- z[ grep( 'sav' , z ) ]
-			
-				# import that puppy
-				x <- spss.get( fp , use.value.labels = FALSE )
-				
-			}
-		}
-	
-		# store the basename of the file,
-		# replacing the extension with `.rda`
-		bn <- gsub( 'sav|por|dta' , 'rda' , basename( fp[ 1 ] ) )
-			
-		# convert all column names in the data.frame to lowercase
-		names( x ) <- tolower( names( x ) )
+	# save the result to a temporary file on the local disk
+	writeBin( z$content , tf )
 
-		# construct the save filename
-		sfn <-
-			paste( 
-				names( files.to.download )[[ curStudy ]] ,
-				bn ,
-				sep = "/"
-			)
+	# unzip that temporary file to an equally-temporary directory
+	z <- unzip( tf , exdir = study_folder )
 
-		# remove the text 'anes' from the filename
-		sfn <- gsub( "ANES " , "" , sfn )
-		
-		# save the data.frame to an `.rda` file on the local disk
-		save( x , file = sfn )
-		
-		# remove both objects from memory
-		rm( x , z )
-		
-		# clear up RAM
-		gc()
+	# find which one it is from among everything zipped up together..
+	fp <- z[ grep( 'dta' , z ) ]
 	
-	}
+	# ..import that puppy
+	x <- read_dta( fp[ 1 ] )
 	
+	# just check that it's the same file if there's more than
+	# one file included in the zipped file.
+	if( length( fp ) == 2 ) stopifnot( nrow( read_dta( fp[ 2 ] ) ) == nrow( x ) )
+
+	# also confirm that there's a max of two files in the zipped file.
+	stopifnot( length( fp ) %in% 1:2 )
+		
+	# store the basename of the file,
+	# replacing the extension with `.rda`
+	bn <- gsub( 'dta' , 'rda' , basename( fp[ 1 ] ) )
+		
+	# convert all column names in the data.frame to lowercase
+	names( x ) <- tolower( names( x ) )
+
+	# construct the save filename
+	sfn <- paste( study_folder , bn , sep = "/"	)
+
+	# remove the text 'anes' from the filename
+	sfn <- gsub( "ANES " , "" , sfn )
+	
+	# save the data.frame to an `.rda` file on the local disk
+	save( x , file = sfn )
+	
+	# remove both objects from memory
+	rm( x , z )
+	
+	# clear up RAM
+	gc()
+		
 }
 
-# delete the temporary file..
+# delete the temporary file
 file.remove( tf )
-
-# ..and temporary directory on the local disk
-unlink( td , recursive = TRUE )
 
 # print a reminder: set the directory you just saved everything to as read-only!
 message( paste0( "all done. you should set the folder " , getwd() , " read-only so you don't accidentally alter these tables." ) )

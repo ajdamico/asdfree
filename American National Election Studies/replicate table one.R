@@ -72,7 +72,7 @@ library(survey)  # load survey package (analyzes complex design surveys)
 # from your local hard drive, since the download script has already run
 
 # load the 2006 pilot file
-load( "./2006 Pilot Study/anes2006pilot.rda" )
+load( "./2006pilot/anes2006pilot.rda" )
 # immediately rename the pilot data.frame to `p06`
 p06 <- x
 

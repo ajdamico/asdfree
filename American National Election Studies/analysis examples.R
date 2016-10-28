@@ -64,7 +64,7 @@ library(survey)  # load survey package (analyzes complex design surveys)
 # this setting matches the MISSUNIT option in SUDAAN
 
 # load the 2012 time series file
-load( "./2012 Time Series Study/anes_timeseries_2012.rda" )
+load( "./anes_timeseries_2012/anes_timeseries_2012.rda" )
 
 # display the number of rows in the merged data set
 nrow( x )
