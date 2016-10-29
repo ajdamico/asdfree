@@ -281,11 +281,12 @@ for ( i in numbers.to.download ){
 		# post your username and password to the umich server
 		login.page <- 
 			postForm(
-				"http://www.icpsr.umich.edu/ticketlogin" , 
+				"https://www.icpsr.umich.edu/rpxlogin" , 
 				email = your.username ,
 				password = your.password ,
 				path = "NACJD" ,
 				request_uri = dp ,
+				app_seq = "" ,
 				style = "POST" ,
 				curl = curl 
 			)
