@@ -44,11 +44,14 @@ library(stringr)	# load stringr package (manipulates character strings easily)
 library(downloader)	# downloads and then runs the source() function on scripts from github
 
 
+# open the jsp box
+GET( "https://www.nlsinfo.org/investigator/pages/search.jsp" )
+
 # log on to the nlsinfo investigator and pull all available studies
-studies <- GET( "https://www.nlsinfo.org/investigator/servlet1?get=STUDIES" )
+studies <- GET( "https://www.nlsinfo.org/investigator/servlet1?get=STUDIES&t=1" )
 
 # extract the study names option
-study.names <- xpathSApply( content( studies ) , "//option" , xmlAttrs )
+study.names <- xpathSApply( xmlParse( content( studies ) ) , "//option" , xmlAttrs )
 
 # remove the negative one, which is the default but not its own study
 study.names <- study.names[ study.names != '-1' ]
@@ -112,10 +115,10 @@ for ( this.study in study.names ){
 		)
 	
 	# extract the option tags from the substudies page
-	substudy.numbers <- xpathSApply( content( substudies ) , "//option" , xmlAttrs )
+	substudy.numbers <- xpathSApply( xmlParse( content( substudies ) ) , "//option" , xmlAttrs )
 	
 	# also extract the values contained within those tags
-	substudy.names <- xpathSApply( content( substudies ) , "//option" , xmlValue )
+	substudy.names <- xpathSApply( xmlParse( content( substudies ) ) , "//option" , xmlValue )
 	
 	# convert that list into a vector
 	substudy.numbers <- unlist( substudy.numbers )
@@ -257,7 +260,7 @@ for ( this.study in study.names ){
 						v <- ""
 						
 						# so long as the `v` string does not contain this response text..
-						while( !( grepl( "{\"status_response\":{\"message\":\"\",\"name\"" , as.character( v ) , fixed = TRUE ) ) ){
+						while( !( grepl( "{\"status_response\":{\"name\":\"default\"" , as.character( v ) , fixed = TRUE ) ) ){
 							
 							# ping the server to determine the current progress of the creation of the current extract
 							v <- GET( paste0( "https://www.nlsinfo.org/investigator/servlet1?job=" , job.id , "&event=progress&cmd=extract&_=" , as.numeric( Sys.time() ) * 1000 ) )
