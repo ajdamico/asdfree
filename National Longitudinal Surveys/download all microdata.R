@@ -260,7 +260,7 @@ for ( this.study in study.names ){
 						v <- ""
 						
 						# so long as the `v` string does not contain this response text..
-						while( !( grepl( "{\"status_response\":{\"name\":\"default\"" , as.character( v ) , fixed = TRUE ) ) ){
+						while( !( grepl( "\"message\":\"\"}}" , as.character( v ) , fixed = TRUE ) ) ){
 							
 							# ping the server to determine the current progress of the creation of the current extract
 							v <- GET( paste0( "https://www.nlsinfo.org/investigator/servlet1?job=" , job.id , "&event=progress&cmd=extract&_=" , as.numeric( Sys.time() ) * 1000 ) )
@@ -276,7 +276,7 @@ for ( this.study in study.names ){
 							# first successful usage of `&&` operator.  pat on the back.
 						
 							# extract the current contents of the `v` object to determine the current progress
-							msg <- strsplit( strsplit( as.character(v) , 'message\":\"' )[[1]][2] , '\",\"name' )[[1]][1]
+							msg <- strsplit( strsplit( as.character(v) , 'message\":\"' )[[1]][2] , '\"}}' )[[1]][1]
 							
 							# print that progress to the screen
 							cat( "    " , msg , "\r" )
