@@ -140,7 +140,7 @@ for ( this.year in years ){
 			x <- read_spss( this.file )
 			
 			# coerce the file into a data.frame object
-			x <- as.data.frame.matrix( x )
+			x <- as.data.frame( x )
 			
 			# stack it
 			y <- rbind( y , x )
