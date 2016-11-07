@@ -187,14 +187,14 @@ for ( year in cps.years.to.download ){
 					ifelse(
 						year %in% 2002:1998 ,
 						paste0( "http://thedataweb.rm.census.gov/pub/cps/march/mar" , substr( year , 3 , 4 ) , "supp.zip" ) ,
-						ifelse(
-							year == 2014.58 ,
-							"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_tax_fix_5x8.zip" ,
+						ifelse( 
+							year == 2014.38 ,
+							"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun_v2.zip" ,
 							ifelse( 
-								year == 2014.38 ,
-								"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse_3x8_rerun_v2.zip" ,
+								year == 2014.58 ,
+								"http://thedataweb.rm.census.gov/pub/cps/march/asec2014_pubuse.zip" ,
 								ifelse( year == 2016 ,
-									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse_v2.zip" ) ,
+									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "early_pubuse_v2.zip" ) ,
 									paste0( "http://thedataweb.rm.census.gov/pub/cps/march/asec" , year , "_pubuse.zip" )
 								)
 							)
