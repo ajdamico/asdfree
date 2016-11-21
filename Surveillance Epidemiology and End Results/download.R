@@ -95,7 +95,7 @@ tf <- tempfile()
 
 
 # find the seerstat page containing the link to the latest zipped file
-ssp <- readLines( "http://seer.cancer.gov/data/options.html" )
+ssp <- readLines( "https://seer.cancer.gov/data/options.html" )
 
 
 # find the latest filepath
