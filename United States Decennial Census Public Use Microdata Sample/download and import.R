@@ -70,18 +70,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "xlsx" , "stringr" , "R.utils" ) )
-
-
-# # # # # # # # # # # # # #
-# warning: perl required! #
-# # # # # # # # # # # # # #
-
-# if you do not have perl installed, this two-minute video
-# walks through how to get it (for free): http://www.screenr.com/QiN8
-
-# remove the # in order to run this install.packages line only once
-# install.packages('gdata')
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "readxl" , "stringr" , "R.utils" ) )
 
 
 
@@ -94,7 +83,6 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
-library(gdata) 			# load the gdata package (imports excel [.xls] files into R)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(stringr)		# load stringr package (manipulates character strings easily)
 library(descr) 			# load the descr package (converts fixed-width files to delimited files)
@@ -102,7 +90,7 @@ library(survey) 		# load survey package (analyzes complex design surveys)
 library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(downloader)		# downloads and then runs the source() function on scripts from github
-library(xlsx)			# imports excel .xlsx files cleanly
+library(readxl)			# imports excel .xlsx files cleanly
 
 # load the `get.tsv` and `pums.import.and.merge` functions from my github account.
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/pums%20functions.R" , prompt = FALSE )
@@ -240,7 +228,7 @@ if ( 1990 %in% c( one.percent.files.to.download , five.percent.files.to.download
 if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download ) ){
 
 	# create a temporary file on the local disk
-	pums.layout <- tempfile()
+	pums.layout <- paste0( tempfile() , 'xls' )
 
 	# download the layout excel file
 	download_cached( "http://www2.census.gov/census_2000/datasets/PUMS/FivePercent/5%25_PUMS_record_layout.xls" ,	pums.layout , mode = 'wb' )
@@ -250,7 +238,7 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 		function( fn , sheet ){
 
 			# read the sheet (specified as a function input) to an object `stru
-			stru <- read.xls( fn , sheet = sheet , skip = 1 )
+			stru <- data.frame( read_excel( fn , sheet = sheet , skip = 1 ) )
 			
 			# make all column names of the `stru` data.frame lowercase
 			names( stru ) <- tolower( names( stru ) )
@@ -304,7 +292,7 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 if ( 2010 %in% ten.percent.files.to.download ){
 
 	# create a temporary file on the local disk
-	pums.layout <- tempfile()
+	pums.layout <- paste0( tempfile() , ".xlsx" )
 
 	# download the layout excel file
 	download_cached( "http://www2.census.gov/census_2010/12-Stateside_PUMS/2010%20PUMS%20Record%20Layout.xlsx" ,	pums.layout , mode = 'wb' )
@@ -314,7 +302,7 @@ if ( 2010 %in% ten.percent.files.to.download ){
 		function( fn , sheet ){
 
 			# read the sheet (specified as a function input) to an object `stru
-			stru <- read.xlsx( fn , sheetIndex = sheet , startRow = 2 )
+			stru <- data.frame( read_excel( fn , sheet = sheet , skip = 1 ) )
 			
 			# make all column names of the `stru` data.frame lowercase
 			names( stru ) <- tolower( names( stru ) )
