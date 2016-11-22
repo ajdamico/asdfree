@@ -228,7 +228,7 @@ if ( 1990 %in% c( one.percent.files.to.download , five.percent.files.to.download
 if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download ) ){
 
 	# create a temporary file on the local disk
-	pums.layout <- paste0( tempfile() , 'xls' )
+	pums.layout <- paste0( tempfile() , '.xls' )
 
 	# download the layout excel file
 	download_cached( "http://www2.census.gov/census_2000/datasets/PUMS/FivePercent/5%25_PUMS_record_layout.xls" ,	pums.layout , mode = 'wb' )
