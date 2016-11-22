@@ -70,7 +70,7 @@ if ( .Platform$OS.type != 'windows' ) print( 'non-windows users: read this block
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "readxl" , "stringr" , "R.utils" ) )
+# install.packages( c( "MonetDBLite" , "survey" , "SAScii" , "descr" , "downloader" , "digest" , "gdata" , "stringr" , "R.utils" ) )
 
 
 
@@ -90,7 +90,8 @@ library(survey) 		# load survey package (analyzes complex design surveys)
 library(MonetDBLite)
 library(DBI)			# load the DBI package (implements the R-database coding)
 library(downloader)		# downloads and then runs the source() function on scripts from github
-library(readxl)			# imports excel .xlsx files cleanly
+library(gdata) 			# load the gdata package (imports excel [.xls] files into R)
+
 
 # load the `get.tsv` and `pums.import.and.merge` functions from my github account.
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/United%20States%20Decennial%20Census%20Public%20Use%20Microdata%20Sample/pums%20functions.R" , prompt = FALSE )
@@ -238,7 +239,7 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 		function( fn , sheet ){
 
 			# read the sheet (specified as a function input) to an object `stru
-			stru <- data.frame( read_excel( fn , sheet = sheet , skip = 1 ) )
+			stru <- data.frame( read.xls( fn , sheet = sheet , skip = 1 ) )
 			
 			# make all column names of the `stru` data.frame lowercase
 			names( stru ) <- tolower( names( stru ) )
@@ -246,6 +247,9 @@ if ( 2000 %in% c( one.percent.files.to.download , five.percent.files.to.download
 			# remove leading and trailing whitespace, and convert everything to lowercase
 			# in the `variable` column of the `stru` table
 			stru$variable <- str_trim( tolower( stru$variable ) )
+			
+			# coerce these two columns to numeric
+			stru[ c( 'beg' , 'end' ) ] <- sapply( stru[ c( 'beg' , 'end' ) ] , as.numeric )
 			
 			# keep only four columns, and only unique records from the `stru` table
 			stru <- unique( stru[ , c( 'beg' , 'end' , 'a.n' , 'variable' ) ] )
@@ -302,7 +306,7 @@ if ( 2010 %in% ten.percent.files.to.download ){
 		function( fn , sheet ){
 
 			# read the sheet (specified as a function input) to an object `stru
-			stru <- data.frame( read_excel( fn , sheet = sheet , skip = 1 ) )
+			stru <- data.frame( read.xls( fn , sheet = sheet , skip = 1 ) )
 			
 			# make all column names of the `stru` data.frame lowercase
 			names( stru ) <- tolower( names( stru ) )
