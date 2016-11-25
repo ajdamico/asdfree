@@ -97,6 +97,7 @@ while( class( attempt ) != 'try-error' ){
 		paste0(
 			"ftp://ftp.cdc.gov/pub/data/yrbs/" ,
 			year , 
+			if( year == 2015 ) "smy" ,
 			"/YRBS_" ,
 			year , 
 			"_SAS_Input_Program.sas"
@@ -132,6 +133,7 @@ for ( year in years.to.download ){
 		paste0( 
 			"ftp://ftp.cdc.gov/pub/data/yrbs/" , 
 			year , 
+			if( year == 2015 ) "smy" ,
 			"/YRBS" ,
 			year , 
 			".dat"
@@ -143,6 +145,7 @@ for ( year in years.to.download ){
 		paste0(
 			"ftp://ftp.cdc.gov/pub/data/yrbs/" ,
 			year , 
+			if( year == 2015 ) "smy" ,
 			"/YRBS_" ,
 			year , 
 			"_SAS_Input_Program.sas"
