@@ -15,7 +15,7 @@
 # # # # # # # # # # # # # # #
 
 # this r script will replicate the massive table in the folder "Programs 2011\SAS\2011 Integrated Mean and SE.lst" inside the bls documentation
-# http://www.bls.gov/cex/pumd/documentation/documentation11.zip
+# http://www.bls.gov/cex/programs/sas11.zip
 
 
 # contact me directly for free help or for paid consulting work
@@ -161,7 +161,7 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 # find the filepath to the IntStubYYYY.txt file
-sf <- paste0( "./" , year , "/docs/Programs " , year , "/IntStub" , year , ".txt" )
+sf <- paste0( "http://www.bls.gov/cex/" , year , "/csxintstub.txt" )
 
 # create a temporary file on the local disk..
 tf <- tempfile()
