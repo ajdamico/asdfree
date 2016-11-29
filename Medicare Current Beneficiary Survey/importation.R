@@ -253,6 +253,7 @@ for ( year in consolidated.files.to.create ){
 			( year == 2007 & i == 'ric5' ) |
 			( year == 2007 & i == 'ric1' ) |
 			( year == 2010 & i == 'ric2' ) |
+			( year == 2013 & i == 'ricPME' ) |
 			
 			# ricn files do not have SAS importation scripts across the board.
 			# just import these files with `read.sas7bdat`
