@@ -10,11 +10,11 @@
 # path.to.winrar <- normalizePath( "C:/Program Files/winrar/winrar.exe" )		# # only windows users need this line
 # library(downloader)
 # setwd( "C:/My Directory/NVSS/" )
-# natality.sets.to.download <- 2014:1999
+# natality.sets.to.download <- 2015:1999
 # periodlinked.sets.to.download <- 2013:2001
 # cohortlinked.sets.to.download <- 2010:1995
 # mortality.sets.to.download <- 2014:2000
-# fetaldeath.sets.to.download <- 2013:2005
+# fetaldeath.sets.to.download <- 2014:2005
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/National%20Vital%20Statistics%20System/download%20all%20microdata.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -133,7 +133,7 @@ db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 # but i've only slogged through the layout files back to 1999
 # uncomment this line to download all unlocked natality data sets
 # uncomment this line by removing the `#` at the front
-# natality.sets.to.download <- 2014:1999
+# natality.sets.to.download <- 2015:1999
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/natality/Nat1998doc.pdf
 
@@ -169,7 +169,7 @@ db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 # but i've only slogged through the layout files back to 2005
 # uncomment this line to download all unlocked mortality data sets
 # uncomment this line by removing the `#` at the front
-# fetaldeath.sets.to.download <- 2013:2005
+# fetaldeath.sets.to.download <- 2014:2005
 # if you need more, you must write sas import scripts for the file layouts stored in
 # ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/DVS/fetaldeath/2004FetalUserGuide.pdf
 
@@ -238,6 +238,9 @@ for ( year in natality.sets.to.download ){
 
 	# create a character vector containing all files in the current working directory
 	all.files <- paste0( "./" , list.files( '.' , recursive = T ) )
+
+	# remove pdfs from possible identifier files
+	all.files <- all.files[ !grepl( "\\.pdf$" , tolower( all.files ) ) ]
 	
 	# extract the filepaths of the nationwide natality files
 	natality.us <- all.files[ grep( 'natality/us/' , all.files ) ]
@@ -549,6 +552,9 @@ for ( year in cohortlinked.sets.to.download ){
 	# create a character vector containing all files in the current working directory
 	all.files <- paste0( "./" , list.files( '.' , recursive = T ) )
 
+	# remove pdfs from possible identifier files
+	all.files <- all.files[ !grepl( "\\.pdf$" , tolower( all.files ) ) ]
+	
 	# extract the filepaths of the nationwide cohort-linked unlinked files
 	cohortlinked.us.unl <- all.files[ grep( 'cohortlinked/us/unl' , all.files ) ]
 
@@ -680,6 +686,9 @@ for ( year in mortality.sets.to.download ){
 	# create a character vector containing all files in the current working directory
 	all.files <- paste0( "./" , list.files( '.' , recursive = T ) )
 
+	# remove pdfs from possible identifier files
+	all.files <- all.files[ !grepl( "\\.pdf$" , tolower( all.files ) ) ]
+	
 	# extract the filepaths of the nationwide mortality files
 	mortality.us <- all.files[ grep( 'mortality/us/' , all.files ) ]
 
