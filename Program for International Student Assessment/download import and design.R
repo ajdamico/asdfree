@@ -8,7 +8,7 @@
 # # # # # # # # # # # # # # # # #
 # library(downloader)
 # setwd( "C:/My Directory/PISA/" )
-# years.to.download <- c( 2000 , 2003 , 2006 , 2009 , 2012 )
+# years.to.download <- c( 2000 , 2003 , 2006 , 2009 , 2012 , 2015 )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" , prompt = FALSE , echo = TRUE )
 # # # # # # # # # # # # # # #
 # # end of auto-run block # #
@@ -41,7 +41,7 @@
 
 
 # remove the # in order to run this install.packages line only once
-# install.packages( c( "MonetDBLite" , "RCurl" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) )
+# install.packages( c( "MonetDBLite" , "haven" , "RCurl" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) )
 
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
@@ -54,6 +54,7 @@ library(DBI)			# load the DBI package (implements the R-database coding)
 library(R.utils)		# load the R.utils package (counts the number of lines in a file quickly)
 library(mitools) 		# load mitools package (analyzes multiply-imputed data)
 library(RCurl)			# load RCurl package (downloads https files)
+library(haven) 			# load the haven package (imports sas7bdat files faaaaaast)
 
 
 # load a compilation of functions that will be useful when executing actual analysis commands with this multiply-imputed, monetdb-backed behemoth
@@ -67,6 +68,9 @@ source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%2
 
 # load the read.SAScii.monetdb function (a variant of read.SAScii that creates a database directly)
 source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/MonetDB/read.SAScii.monetdb.R" , prompt = FALSE )
+
+# load the download_cached function to store downloads when possible
+source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Download%20Cache/download%20cache.R" , prompt = FALSE , echo = FALSE )
 
 
 # set your PISA data directory
@@ -89,12 +93,12 @@ db <- dbConnect( MonetDBLite::MonetDBLite() , dbfolder )
 
 
 
-# choose which pisa data sets to download: 2000, 2003, 2006, 2009, or 2012
+# choose which pisa data sets to download: 2000, 2003, 2006, 2009, 2012, 2015
 # if you have a big hard drive, hey why not download them all?
 
 # uncomment this line to download all available data sets
 # uncomment this line by removing the `#` at the front
-# years.to.download <- c( 2000 , 2003 , 2006 , 2009 , 2012 )
+# years.to.download <- c( 2000 , 2003 , 2006 , 2009 , 2012 , 2015 )
 
 # # # # # # # # # # # # # #
 # other download examples #
@@ -125,6 +129,59 @@ options( "download_cached.hashwarn" = TRUE )
 
 # set the prefix of all websites for downloading
 http.pre <- "https://www.oecd.org/pisa/pisaproducts/"
+
+
+# add a temporary file and folder
+tf <- tempfile() ; td <- tempdir()
+
+
+# check if 2012 is one of the years slated for download and import
+if ( 2015 %in% years.to.download ){
+
+	# figure out which table names to loop through for downloading, importing, survey designing
+	files.to.import <- c( "CMB_STU_QQQ" , "CMB_SCH_QQQ" , "CMB_TCH_QQQ" , "CMB_STU_COG" , "CMB_STU%20_QTM" , "CM2_STU_QQQ_COG_QTM_SCH_TCH" )
+	
+	# loop through them all
+	for ( curFile in files.to.import ){
+
+		# construct the full path to the file..
+		fp <- paste0( "http://vs-web-fs-1.oecd.org/pisa/PUF_SAS_COMBINED_" , curFile , ".zip" )
+	
+		# download the file to the local disk
+		download_cached( fp , tf , mode = 'wb' )
+		
+		# unzip the downloaded file a local directory
+		z <- unzip( tf , exdir = td )
+		
+		# loop through all sas7bdat files and load them into monetdb
+		for( this_sas in grep( "\\.sas7bdat$" , z , value = TRUE ) ){
+		
+			this_df <- data.frame( read_sas( this_sas ) )
+			
+			names( this_df ) <- tolower( names( this_df ) )
+			
+			dbWriteTable( db , gsub( "(.*)\\.sas7bdat$" , "\\1" , basename( tolower( this_sas ) ) ) , this_df )
+			
+			rm( this_df ) ; gc()
+			
+		}
+		
+		file.remove( tf )
+			
+	}
+	
+	
+	# use the table (already imported into monetdb) to spawn ten different tables (one for each plausible [imputed] value)
+	# then construct a multiply-imputed, monetdb-backed, replicated-weighted complex-sample survey-design object-object.
+	construct.pisa.survey.designs(
+		db , 
+		year = 2015 ,
+		table.name = 'cy6_ms_cmb_stu_qqq' ,
+		pv.vars = c( 'math' , 'read' , 'scie' , 'scep' , 'sced' , 'scid' , 'skco' , 'skpe' , 'ssph' , 'ssli' , 'sses' ) ,
+		implicates = 10
+	)
+
+}
 
 
 # check if 2012 is one of the years slated for download and import

@@ -170,7 +170,7 @@ construct.pisa.survey.designs <-
 		this_design <-
 			svrepdesign( 	
 				weights = ~w_fstuwt , 
-				repweights = "w_fstr[1-9]" , 
+				repweights = if( year >= 2015 ) "w_fsturwt[1-9]" else "w_fstr[1-9]" , 
 				scale = 4 / 80 ,
 				rscales = rep( 1 , 80 ) ,
 				mse = TRUE ,
