@@ -86,9 +86,6 @@ library(XML)		# load XML (parses through html code to extract links)
 # authentication page
 terms <- "https://dhsprogram.com/data/dataset_admin/login_main.cfm"
 
-# projects page
-projects.page <- "https://dhsprogram.com/data/dataset_admin/"
-
 # countries page
 countries.page <- "https://dhsprogram.com/data/dataset_admin/download-datasets.cfm"
 
@@ -100,7 +97,9 @@ tf <- tempfile() ; td <- tempdir()
 values <- 
 	list( 
 		UserName = your.username , 
-		UserPass = your.password 
+		UserPass = your.password ,
+		Submitted = 1 ,
+		UserType = 2
 	)
 
 # log in.
@@ -108,7 +107,7 @@ GET( terms , query = values )
 POST( terms , body = values )
 
 # extract the available countries from the projects page
-z <- GET( projects.page )
+z <- GET( countries.page )
 
 # write the information from the `projects` page to a local file
 writeBin( z$content , tf )
@@ -140,18 +139,18 @@ z <-
 		body = list( proj_id = project.number ) 
 	)
 
+# write the information from the `countries` page to a local file
+writeBin( z$content , tf )
+
+# load the text 
+y <- readLines( tf )
+
+# figure out the country lines
+country_lines <- unique( grep( 'notranslate' , y , value = TRUE ) )
 
 # figure out which countries are available for download
-country.names <- xpathSApply( content( z ) , "//option" , xmlValue )
-country.numbers <- xpathSApply( content( z ) , "//option" , xmlGetAttr , "value" )
-
-# remove everything *after* select a region
-country.numbers <- country.numbers[ -which( country.names == "Select Region" ):-length(country.numbers) ]
-country.names <- country.names[ -which( country.names == "Select Region" ):-length(country.names) ]
-
-# remove "select a country"
-country.numbers <- country.numbers[ -1 ]
-country.names <- country.names[ -1 ]
+country.names <- gsub( "(.*)>(.*)<(.*)" , "\\2" , country_lines )
+country.numbers <- gsub( '(.*)value = \"(.*)\"(.*)' , "\\2" , country_lines )
 
 
 # loop through each available country #
@@ -184,148 +183,93 @@ for ( j in seq( length( country.numbers ) ) ){
 		)
 		
 	# pull all links
-	link.names <- xpathSApply( content( z ) , "//a" , xmlValue )
-	link.urls <- xpathSApply( content( z ) , "//a" , xmlGetAttr , "href" )
+	link.urls <- xpathSApply( xmlParse( content( z ) ) , "//a" , xmlGetAttr , "href" )
 
 	# extract all links containing the current country's name
-	valid.surveys <- grep( this.name , link.names )
-
-	# de-parse link titles and specific urls
-	link.names <- unlist( link.names [ valid.surveys ] )
+	valid.surveys <- grep( "?flag=1" , link.urls )
 	link.urls <- unlist( link.urls [ valid.surveys ] )
-
+	
 	# loop through each available data set within the country #
 	for ( this.link in link.urls ){
 
 		# access each dataset's link
 		z <- GET( paste0( "https://dhsprogram.com" , this.link ) )
 
+		writeBin( z$content , tf )
+		
 		# read the table from each country page, remove the country name, and remove extraneous characters
-		this.title <- gsub( ": |," , "" , gsub( this.name , "" , readHTMLTable( content(z) )[[1]][1,1] ) )
+		this.title <- gsub( ": |," , "" , gsub( this.name , "" , gsub( '(.*)surveyTitle\">(.*)<(.*)' , "\\2" , grep( 'surveyTitle\">' , readLines( tf ) , value = TRUE ) ) ) )
 
 		# create a dataset-specific folder within the country folder within the current working directory
 		dir.create( paste0( "./" , this.name , "/" , this.title ) )
 
 		# store all dataset-specific links
-		all.links <- xpathSApply( content( z ) , "//div//a" , xmlGetAttr , "href" )
+		all.links <- xpathSApply( xmlParse( content( z ) ) , "//div//a" , xmlGetAttr , "href" )
 
 		# keep only /data/dataset/ links
-		data.link <- unique( all.links[ grepl( "/data/dataset/" , all.links ) ] )
+		data.link <- unique( all.links[ grepl( "customcf/legacy/data/download_dataset" , all.links ) ] )
 
-		# there's only one of these urls.
-		stopifnot( length( data.link ) == 1 )
-
-		# follow the dataset-link again
-		z <- GET( paste0( "https://dhsprogram.com" , data.link ) )
-
-		# now pull all the file names, sizes, and titles
-		ytab <- readHTMLTable( content( z ) )
-
-		# if it's more than just the main survey, stack 'em
-		if ( length( ytab ) == 1 ) y <- ytab[[1]] else {
-			y <- ytab[[1]]
-			for ( k in seq( 2 , length( ytab ) ) ){
-				
-				hsep <- data.frame( "File Name" = "Supplemental" , "File Size" = NA , "File Format" = NA )
-				names( hsep ) <- c( "File Name" , "File Size" , "File Format" )
-			
-				names( ytab[[k]] ) <- gsub( "File Name( *)" , "File Name" , names( ytab[[k]] ) )
-			
-				y <- 
-					rbind( 
-						y , 
-						hsep ,
-						ytab[[k]]
-					)
-			}
-		}
+		# directory path
+		this_dir <- paste0( "./" , this.name , "/" , this.title )
 		
-		# also find the country codes and links
-		all.links <- unique( tolower( xpathSApply( content( z ) , "//div//a" , xmlGetAttr , "href" ) ) )
+		for( file.url in unlist( data.link ) ){
+			
+			# maintain the zipped filename
+			zfn <- paste0( this_dir , "/" , gsub( "(.*)Filename=(.*)\\.(ZIP|zip)(.*)" , "\\2.zip" , file.url ) )
+			
+			# download the actual microdata file directly to disk
+			# don't read it into memory.  save it as `tf` immediately (RAM-free)
+			attempt <- try( { current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( zfn , overwrite = TRUE ) , progress() ) } , silent = TRUE )
+			
+			# if first download didn't work, try again.
+			if( class( attempt ) == 'try-error' ){
+				Sys.sleep( 60 )
+				current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( zfn , overwrite = TRUE ) , progress() )
+			}
 
-		# loop through each of the available survey data sets..
-		for ( i in seq( nrow( y ) ) ){
 			
-			# clear up RAM
-			gc()
+			# make sure the file-specific folder exists
+			dir.create( gsub( "\\.zip" , "" , zfn ) , showWarnings = FALSE )
 			
-			# if it's a table header..
-			if ( is.na( y[ i , 'File Size' ] ) ){
-			
-				# find the filename
-				fname <- y[ i , 'File Name' ]
-			
-				# check whether the previous folder was also missing
-				if( i != 1 ) if( is.na( y[ i - 1 , 'File Size' ] ) ){
-					fname <- paste( y[ i - 1 , 'File Name' ] , y[ i , 'File Name' ] )
-				}
-			
-				# assign a new save-folder
-				cur.folder <- paste0( "./" , this.name , "/" , this.title , '/' , fname )
-				
-				# and create it.
-				dir.create( cur.folder )
-				
-			# ..otherwise it's a microdata file!
-			} else {
-			
-				# figure out the url to download
-				file.url <- all.links[ grep( y[ i , 'File Name' ] , all.links ) ]
-				
-				# download the actual microdata file directly to disk
-				# don't read it into memory.  save it as `tf` immediately (RAM-free)
-				attempt <- try( { current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( tf , overwrite = TRUE ) , progress() ) } , silent = TRUE )
-				
-				# if first download didn't work, try again.
-				if( class( attempt ) == 'try-error' ){
-					Sys.sleep( 60 )
-					current.file <- GET( paste0( "https://dhsprogram.com" , file.url ) , write_disk( tf , overwrite = TRUE ) , progress() )
-				}
+			# unzip the contents of the zipped file
+			z <- unzip( zfn , exdir = gsub( "\\.zip" , "" , zfn ) )
 
-				# final folder to save it
-				fs <- paste( cur.folder , tolower( gsub( " System file| data" , "" , y[ i , 'File Format' ] ) ) , sep = '/' )
+			# figure out the correct location for the rda
+			rda_name <- tolower( paste0( gsub( "\\.zip" , ".rda" , zfn ) ) )
 			
-				# make sure the file-specific folder exists
-				dir.create( fs , showWarnings = FALSE )
+			# and now, if there's a stata file, import it!
+			if ( any( st <- grepl( "\\.dta$" , tolower( z ) ) ) ){
 				
-				# unzip the contents of the zipped file
-				z <- unzip( tf , exdir = fs )
+				# remove any prior `x` tables ; clear up RAM
+				rm( x ) ; gc()
+				
+				# load the current stata file into working memory
+				x <- read.dta( z[ which( st ) ] , convert.factors = FALSE )
+			
+				# save the file on the local disk, within the appropriate country-survey filepath
+				save( x , file = rda_name )
+				
+			}
 
-				# and now, if there's a stata file, import it!
-				if ( any( st <- grepl( "\\.dta$" , tolower( z ) ) ) ){
+			# if a file has not been saved as an rda yet,
+			# look for an spss file as well.  this way, stata always takes priority.
+			if ( !file.exists( rda_name ) ){
+			
+				# if there's any spss file, import it!
+				if ( any( st <- grepl( "\\.sav$" , tolower( z ) ) ) ){
 					
 					# remove any prior `x` tables ; clear up RAM
 					rm( x ) ; gc()
-					
+				
 					# load the current stata file into working memory
-					x <- read.dta( z[ which( st ) ] , convert.factors = FALSE )
+					x <- read.spss( z[ which( st ) ] , to.data.frame = TRUE , use.value.labels = FALSE )
 				
 					# save the file on the local disk, within the appropriate country-survey filepath
-					save( x , file = paste0( cur.folder , ".rda" ) )
+					save( x , file = rda_name )
 					
 				}
-
-				# if a file has not been saved as an rda yet,
-				# look for an spss file as well.  this way, stata always takes priority.
-				if ( !file.exists( paste0( cur.folder , ".rda" ) ) ){
-				
-					# if there's any spss file, import it!
-					if ( any( st <- grepl( "\\.sav$" , tolower( z ) ) ) ){
-						
-						# remove any prior `x` tables ; clear up RAM
-						rm( x ) ; gc()
-					
-						# load the current stata file into working memory
-						x <- read.spss( z[ which( st ) ] , to.data.frame = TRUE , use.value.labels = FALSE )
-					
-						# save the file on the local disk, within the appropriate country-survey filepath
-						save( x , file = paste0( cur.folder , ".rda" ) )
-						
-					}
-				}
-				
 			}
-
+			
 		}
 	}
 }
