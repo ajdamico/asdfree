@@ -127,6 +127,7 @@ for ( s in dat_files ){
 	
 	# however, here are three hardcodes of sas import script to dat file relationships
 	if( s == "1973NSFGData.dat" ) match_attempt <- which( sas_files == "1973FemRespSetup.sas" )
+	if( s %in% c( "2011_2015_FemaleWeight.dat" , "2011_2015_MaleWeight.dat" ) ) match_attempt <- which( sas_files == "2011_2015_4YearWeightSetup.sas" )
 	if( length( match_attempt ) == 0 ) match_attempt <- which( gsub( "\\.dat" , "" , s ) == gsub( "Data" , "" , tsf ) )
 	if( length( match_attempt ) == 0 ) match_attempt <- which( gsub( "\\.dat" , "" , s ) == gsub( "FemPreg" , "Preg" , tsf ) )
 	
@@ -279,6 +280,9 @@ for ( s in dat_files ){
 		# figure out the column positions
 		sasc <- parse.SAScii( sas_path )
 
+		# fix widths on 2011_2015 weights file
+		if( sas_path == "ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/sas/2011_2015_4YearWeightSetup.sas" ) sasc$width <- 12
+					
 		# this particular file has no line endings
 		if( s == "1988PregData.dat" ){
 
