@@ -92,10 +92,10 @@ pisa.svyttest <-
 
 
 construct.pisa.survey.designs <-
-	function( conn , year , table.name , pv.vars ){
+	function( conn , year , table.name , pv.vars , implicates = 5 ){
 
 		# identify all variables that are multiply-imputed
-		pv.colnames <- paste0( "pv" , outer( 1:5 , pv.vars , paste0 ) )
+		pv.colnames <- paste0( "pv" , outer( seq( implicates ) , pv.vars , paste0 ) )
 
 		# identify all variables that are *not* multiply-imputed
 		table.fields <- dbListFields( conn , table.name )
@@ -106,7 +106,7 @@ construct.pisa.survey.designs <-
 		nr.pv.vars <- gsub( "read" , "readZ" , pv.vars )
 
 		# loop through each of the five variables..
-		for ( i in 1:5 ){
+		for ( i in seq( implicates ) ){
 
 			print( paste( 'currently working on implicate' , i , 'from table' , table.name ) )
 
@@ -175,7 +175,7 @@ construct.pisa.survey.designs <-
 				rscales = rep( 1 , 80 ) ,
 				mse = TRUE ,
 				type = 'JK1' ,
-				data = imputationList( datasets = as.list( paste0( table.name , "_imp" , 1:5 ) ) , dbtype = "MonetDBLite" ) ,
+				data = imputationList( datasets = as.list( paste0( table.name , "_imp" , seq( implicates ) ) ) , dbtype = "MonetDBLite" ) ,
 				dbtype = "MonetDBLite" ,
 				dbname = dbfolder
 			)
