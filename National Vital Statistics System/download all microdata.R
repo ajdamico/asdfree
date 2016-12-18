@@ -213,7 +213,7 @@ options( "download_cached.hashwarn" = TRUE )
 # warn the user if the hash does not yet exist
 
 # create a character string containing the cdc's vital statistics website
-url.with.data <- "http://www.cdc.gov/nchs/data_access/vitalstatsonline.htm"
+url.with.data <- "https://www.cdc.gov/nchs/data_access/vitalstatsonline.htm"
 
 # pull that html code directly into R
 z <- readLines( url.with.data )
