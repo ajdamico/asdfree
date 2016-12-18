@@ -290,15 +290,15 @@ for ( year in intersect( years.to.download , 2002:2015 ) ){
 	if ( year >= 2012 ){
 
 		# the zipped filename and sas importation script are here:
-		fn <- paste0( "http://www.cdc.gov/brfss/annual_data/" , year , "/files/LLCP" , year , "ASC.ZIP" )
-		sas_ri <- paste0( "http://www.cdc.gov/brfss/annual_data/" , year , "/files/sasout" , substr( year , 3 , 4 ) , "_llcp.sas" )
+		fn <- paste0( "https://www.cdc.gov/brfss/annual_data/" , year , "/files/LLCP" , year , "ASC.ZIP" )
+		sas_ri <- paste0( "https://www.cdc.gov/brfss/annual_data/" , year , "/files/sasout" , substr( year , 3 , 4 ) , "_llcp.sas" )
 
 	# otherwise, if the file to download is 2011..
 	} else if ( year == 2011 ){
 	
 		# the zipped filename and sas importation script are here:
 		fn <- "ftp://ftp.cdc.gov/pub/data/brfss/LLCP2011ASC.ZIP"
-		sas_ri <- "http://www.cdc.gov/brfss/annual_data/2011/sasout11_llcp.sas"
+		sas_ri <- "https://www.cdc.gov/brfss/annual_data/2011/sasout11_llcp.sas"
 		
 	# otherwise..
 	} else {
@@ -308,7 +308,7 @@ for ( year in intersect( years.to.download , 2002:2015 ) ){
 				
 		sas_ri <- 
 			paste0( 
-				"http://www.cdc.gov/brfss/annual_data/" , 
+				"https://www.cdc.gov/brfss/annual_data/" , 
 				year , 
 				"/files/sasout" , substr( year , 3 , 4 ) , 
 				ifelse( year > 2006 , ".SAS" , ".sas" )
