@@ -7,6 +7,7 @@
 # # block of code to run this # #
 # # # # # # # # # # # # # # # # #
 # library(downloader)
+# path.to.7z <- "7za"							# # only macintosh and *nix users need this line
 # setwd( "C:/My Directory/PISA/" )
 # years.to.download <- c( 2000 , 2003 , 2006 , 2009 , 2012 , 2015 )
 # source_url( "https://raw.githubusercontent.com/ajdamico/asdfree/master/Program%20for%20International%20Student%20Assessment/download%20import%20and%20design.R" , prompt = FALSE , echo = TRUE )
@@ -29,6 +30,8 @@
 #####################################################################################
 
 
+
+
 # # # # # # # # # # # # # # # #
 # warning: this takes a while #
 # # # # # # # # # # # # # # # #
@@ -42,6 +45,17 @@
 
 # remove the # in order to run this install.packages line only once
 # install.packages( c( "MonetDBLite" , "haven" , "RCurl" , "survey" , "SAScii" , "descr" , "ff" , "downloader" , "digest" , "R.utils" , "stringr" , "mitools" ) )
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+#####################################################################################################################################################
+# macintosh and *nix users need 7za installed:  http://superuser.com/questions/548349/how-can-i-install-7zip-so-i-can-run-it-from-terminal-on-os-x  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# path.to.7z <- "7za"														# # this is probably the correct line for macintosh and *nix
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# the line above sets the location of the 7-zip program on your local computer. uncomment it by removing the `#` and change the directory if ya did #
+#####################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 library(SAScii) 		# load the SAScii package (imports ascii data with a SAS script)
@@ -150,9 +164,22 @@ if ( 2015 %in% years.to.download ){
 		# download the file to the local disk
 		download_cached( fp , tf , mode = 'wb' )
 		
-		# unzip the downloaded file a local directory
-		z <- unzip( tf , exdir = td )
-		
+		# extract the file, platform-specific
+		if ( .Platform$OS.type == 'windows' ){
+
+			z <- unzip( tf , exdir = td )
+
+		} else {
+
+			# build the string to send to the terminal on non-windows systems
+			dos.command <- paste0( '"' , path.to.7z , '" x ' , tf , ' -o"' , td , '"' )
+
+			system( dos.command )
+
+			z <- list.files( td , full.names = TRUE )
+
+		}
+
 		# loop through all sas7bdat files and load them into monetdb
 		for( this_sas in grep( "\\.sas7bdat$" , z , value = TRUE ) ){
 		
@@ -180,6 +207,9 @@ if ( 2015 %in% years.to.download ){
 		pv.vars = c( 'math' , 'read' , 'scie' , 'scep' , 'sced' , 'scid' , 'skco' , 'skpe' , 'ssph' , 'ssli' , 'sses' ) ,
 		implicates = 10
 	)
+	
+	# clear up the temporary directory
+	file.remove( z )
 
 }
 
