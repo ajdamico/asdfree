@@ -61,7 +61,7 @@ years.to.download <-
 				"\\2" , 
 				grep(
 					"(.*)/pumd/data/stata/intrvw([0-9][0-9]).zip(.*)" ,
-					readLines( "http://www.bls.gov/cex/pumd_data.htm#stata" ) ,
+					readLines( "https://www.bls.gov/cex/pumd_data.htm#stata" ) ,
 					value = TRUE
 				)
 			) 
@@ -96,12 +96,12 @@ for ( year in years.to.download ){
 	try( dir.create( output.directory ) , silent = T )
 
 	# download all documentation
-	download_cached( paste0( "http://www.bls.gov/cex/" , year , "/csxintvw.pdf" ) , paste0( output.directory , "csxintvw.pdf" ) , mode = 'wb' )
-	download_cached( paste0( "http://www.bls.gov/cex/" , year , "/csxdiary.pdf" ) , paste0( output.directory , "csxdiary.pdf" ) , mode = 'wb' )
+	download_cached( paste0( "https://www.bls.gov/cex/" , year , "/csxintvw.pdf" ) , paste0( output.directory , "csxintvw.pdf" ) , mode = 'wb' )
+	download_cached( paste0( "https://www.bls.gov/cex/" , year , "/csxdiary.pdf" ) , paste0( output.directory , "csxdiary.pdf" ) , mode = 'wb' )
 
 	if( year > 2006 ){
-		download_cached( paste0( "http://www.bls.gov/cex/" , year , "/csxintvwdata.pdf" ) , paste0( output.directory , "csxintvwdata.pdf" ) , mode = 'wb' )
-		download_cached( paste0( "http://www.bls.gov/cex/" , year , "/csxdiarydata.pdf" ) , paste0( output.directory , "csxdiarydata.pdf" ) , mode = 'wb' )
+		download_cached( paste0( "https://www.bls.gov/cex/" , year , "/csxintvwdata.pdf" ) , paste0( output.directory , "csxintvwdata.pdf" ) , mode = 'wb' )
+		download_cached( paste0( "https://www.bls.gov/cex/" , year , "/csxdiarydata.pdf" ) , paste0( output.directory , "csxdiarydata.pdf" ) , mode = 'wb' )
 	}
 	
 	# end of documentation download
@@ -109,8 +109,8 @@ for ( year in years.to.download ){
 	
 	# determine the exact path to the current year of microdata on the bureau of labor statistics ftp site
 	# for each of the four main consumer expenditure public use microdata files
-	intrvw.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/intrvw" , substr( year , 3 , 4 ) , ".zip" )
-	diary.ftp <- paste0( "http://www.bls.gov/cex/pumd/data/stata/diary" , substr( year , 3 , 4 ) , ".zip" )
+	intrvw.ftp <- paste0( "https://www.bls.gov/cex/pumd/data/stata/intrvw" , substr( year , 3 , 4 ) , ".zip" )
+	diary.ftp <- paste0( "https://www.bls.gov/cex/pumd/data/stata/diary" , substr( year , 3 , 4 ) , ".zip" )
 	
 	
 	# all three file types to download
