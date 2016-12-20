@@ -181,7 +181,7 @@ for ( year in years.to.download ){
 		
 			if ( year == 2013 & this.file == "Dicionarios_e_input.zip" ) this.file <- "Dicionarios_e_input_20150814.zip"
 		
-			if( year == 2014 ) this.file <- gsub( "\\.zip" , "_20160706.zip" , this.file )
+			if( year == 2014 ) this.file <- gsub( "\\.zip" , "_20161116.zip" , this.file )
 			
 		
 			try({
@@ -202,7 +202,7 @@ for ( year in years.to.download ){
 	if( year %in% 2013:2014 & .Platform$OS.type != 'windows' ) Encoding( files ) <- 'UTF-8' else Encoding( files ) <- 'latin1'
 	
 	
-	# remove the UF column and the mistake with "LOCAL ÚLTIMO FURTO"
+	# remove the UF column and the mistake with "LOCAL ÃšLTIMO FURTO"
 	# described in the remove.uf() function that was loaded with source_url as pnad.survey.R
 	dom.sas <- remove.uf( files[ grepl( paste0( 'input[^?]dom' , year , '.txt' ) , tolower( files ) ) ] )
 	pes.sas <- remove.uf( files[ grepl( paste0( 'input[^?]pes' , year , '.txt' ) , tolower( files ) ) ] )
