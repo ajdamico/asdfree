@@ -161,7 +161,7 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 
 
 # find the filepath to the IntStubYYYY.txt file
-sf <- paste0( "http://www.bls.gov/cex/" , year , "/csxintstub.txt" )
+sf <- paste0( "https://www.bls.gov/cex/" , year , "/csxintstub.txt" )
 
 # create a temporary file on the local disk..
 tf <- tempfile()
