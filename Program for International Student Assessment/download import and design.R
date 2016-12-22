@@ -192,9 +192,9 @@ if ( 2015 %in% years.to.download ){
 			rm( this_df ) ; gc()
 			
 		}
-		
-		file.remove( tf )
-			
+
+		file.remove( tf , z )
+
 	}
 	
 	
