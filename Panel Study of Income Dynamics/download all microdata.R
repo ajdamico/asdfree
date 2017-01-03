@@ -153,7 +153,7 @@ params <-
 # initiate a function that requires..
 save.psid <-
 	# ..a file number, a save name, the parameters list, and the curl options
-	function( file , name , params , curl ){
+	function( file , name_category , params , curl ){
 
 		# logs into the umich form
 		html = postForm('http://simba.isr.umich.edu/U/Login.aspx', .params = params, curl = curl)
@@ -182,37 +182,46 @@ save.psid <-
 		z <- unzip( tf , exdir = td )
 	
 		# figure out which file contains the data (so no readmes or technical docs)
-		fn <- z[ grepl( ".txt" , tolower( z ) , fixed = TRUE ) & ! grepl( "_vdm|readme|doc|errata" , tolower( z ) ) ]
+		fns <- z[ grepl( ".txt" , tolower( z ) , fixed = TRUE ) & ! grepl( "_vdm|readme|doc|errata" , tolower( z ) ) ]
 		
-		# figure out which file contains the sas importation script
-		sas_ri <- z[ grepl( '.sas' , z , fixed = TRUE ) ]
-
-		# read the text file directly into an R data frame with `read.SAScii`
-		x <- read.SAScii( fn , sas_ri )
-
-		# convert all column names to lowercase
-		names( x ) <- tolower( names( x ) )
-		
-		# add a `one` column
-		x$one <- 1
+		# loop through all of the files and convert them to R data frames
+		for (fn in fns) {
+  		
+			# the sas importation script should have the same filename as the data, except with a .sas extension
+			sas_ri <- gsub(".txt", ".sas", fn)
+			if(file.exists(sas_ri)) {
+      
+				# read the text file directly into an R data frame with `read.SAScii`
+				x <- read.SAScii( fn , sas_ri)
+  
+				# convert all column names to lowercase
+				names( x ) <- tolower( names( x ) )
+  
+				# add a `one` column
+				x$one <- 1
+  
+				# name the dataset combining the data category with the individual file name
+				name<-paste0(name_category, "_", gsub(".txt","",tolower(basename(fn)))) 
+  
+				# copy the data.frame `x` over to whatever the `name` parameter was supposed to be
+				assign( name , x )
+  
+				# save the renamed data.frame to an R data file (.rda)
+				save( list = name , file = paste0( name , '.rda' ) )
+  
+				# delete the data.frame `x`
+				rm( x )
+  
+				# delete the data.frame (name)
+				rm( list = name )
+  
+				# clear up RAM
+				gc()
+			}
+		}
 		
 		# remove the files you'd downloaded from the local disk
 		file.remove( tf , z )
-	
-		# copy the data.frame `x` over to whatever the `name` parameter was supposed to be
-		assign( name , x )
-		
-		# save the renamed data.frame to an R data file (.rda)
-		save( list = name , file = paste0( name , '.rda' ) )
-		
-		# delete the data.frame `x`
-		rm( x )
-
-		# delete the data.frame (name)
-		rm( list = name )
-		
-		# clear up RAM
-		gc()
 		
 		# confirm that the function worked by returning TRUE
 		TRUE
@@ -238,10 +247,12 @@ for ( i in seq( nrow( family ) ) ){
 	save.psid( family[ i , 'file' ] , paste0( "fam" , family[ i , 'year' ] ) , params , curl )
 }
 
-# automatically down the marriage, childbirth, parentid, and cross-year individual files
-# the exact same way, with the exact samee pre-defined function
+# automatically down the marriage, childbirth, parentid, cross-year individual, and 
+# child development supplement files the exact same way, with the exact samee pre-defined function
 save.psid( 1121 , 'marriage' , params , curl )
 save.psid( 1109 , 'childbirth' , params , curl )
 save.psid( 1123 , 'parentid' , params , curl )
 save.psid( 1053 , 'ind' , params , curl )
+save.psid( 1174 , 'cds02' , params , curl )
+save.psid( 1170 , 'cds07' , params , curl )
 
