@@ -147,7 +147,7 @@ if ( !grepl('Logout', html) ) stop( 'YOU ARE NOT LOGGED IN' )
 tf <- tempfile() ; td <- tempdir()
 
 # loop through every year of available chis microdata
-for( this_year in c( seq( 2001 , 2011 , 2 ) , 2012:2014 ) ){
+for( this_year in c( seq( 2001 , 2011 , 2 ) , 2012:2015 ) ){
 
 	# create an empty year-specific folder within the working directory
 	dir.create( as.character( this_year ) )
