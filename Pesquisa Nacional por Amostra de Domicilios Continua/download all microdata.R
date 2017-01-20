@@ -128,7 +128,7 @@ for ( i in seq_along( zip.filenames ) ){
 		sasfile <- grep( "1Tri_2012 a 3Tri_2015" , sasfiles , value = TRUE ) 
 	
 	# if 2015Q4 or 2016Q1, use the second
-	} else if( (year == 2015 | quarter == '04') | (year == 2016 | quarter == '01') ) {
+	} else if( (year == 2015 & quarter == '04') | (year == 2016 & quarter == '01') ) {
 		
 		sasfile <- grep( "4Tri_2015 a 1Tri_2016" , sasfiles , value = TRUE )
 		
