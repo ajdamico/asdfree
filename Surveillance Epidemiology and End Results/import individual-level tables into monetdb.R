@@ -119,7 +119,7 @@ writeLines( z , edited.sas.instructions )
 # remove the major folder root path
 table.names <-
 	gsub( 
-		"./SEER_1973_2013_TEXTDATA/incidence/" ,
+		"./SEER_1973_2014_TEXTDATA/incidence/" ,
 		"" , 
 		ind.file.matches
 	)
