@@ -77,7 +77,7 @@ source_url(
 tf <- tempfile() ; td <- tempdir()
 
 # designate the position of the input file
-input.fullname <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/Dicionario_e_input_20161122.zip"
+input.fullname <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/Dicionario_e_input_20170518.zip"
 
 # download the input file immediately
 download_cached( input.fullname , tf , mode = 'wb' )
