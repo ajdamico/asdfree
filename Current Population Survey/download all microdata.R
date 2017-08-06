@@ -728,7 +728,7 @@ for ( year in cps.years.to.download ){
 			paste0( 
 			"http://www.census.gov/housing/povmeas/spmresearch/spmresearch" , 
 			floor( year - 1 ) , 
-			if ( year == 2014.38 ) "_redes" else if ( year >= 2015 ) "" else "new" ,
+			if ( year == 2014.38 ) "_redes" else if ( year >= 2016 ) "" else "new" ,
 			".sas7bdat" 
 		)
 		
