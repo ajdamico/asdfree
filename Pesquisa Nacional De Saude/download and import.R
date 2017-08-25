@@ -58,7 +58,7 @@ source_url(
 tf <- tempfile()
 
 # download the latest pns microdata
-download_cached( "ftp://ftp.ibge.gov.br/PNS/2013/microdados/pns_2013_microdados_2016_12_02.zip" , tf , mode = 'wb' )
+download_cached( "ftp://ftp.ibge.gov.br/PNS/2013/microdados/pns_2013_microdados_2017_03_23.zip" , tf , mode = 'wb' )
 
 # extract all files to the local disk
 z <- unzip( tf , exdir = tempdir() )
