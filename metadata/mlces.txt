@@ -1,0 +1,45 @@
+chapter_title: Medical Large Claims Experience Study
+
+~~~{dataset_introduction}
+The Medical Large Claims Experience Study (MLCES) might be the best private health insurance claims data available to the public.  This data should be used to calibrate other data sets, and probably nothing more.
+~~~
+
+table_structure: * One table with one row per individual with nonzero total paid charges.
+
+generalizable_population: * A convenience sample of group (employer-sponsored) health insurance claims from seven private health insurers in the United States.
+
+publication_period: * 1997 thru 1999 with no expected updates in the future.
+
+administrative_organization: * Provided by the [Society of Actuaries (SOA)](http://www.soa.org/).
+
+
+~~~{analysis_examples_loading_block}
+chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "mcles1997.rds" ) )
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		claimant_relationship_to_policyholder =
+			ifelse( relation == "E" , "covered employee" ,
+			ifelse( relation == "S" , "spouse of covered employee" ,
+			ifelse( relation == "D" , "dependent of covered employee" , NA ) ) ) ,
+			
+		ppo_plan = as.numeric( ppo == 'Y' )
+	)
+	
+~~~
+
+group_by_variable: claimant_relationship_to_policyholder
+linear_variable: totpdchg
+categorical_variable: patsex
+subset_definition: ( ( claimyr - patbrtyr ) < 18 )
+subset_definition_description: persons under 18
+binary_variable: ppo_plan
+needs_dplyr_block: yes
+
+
+
+needs_build_status_line: yes

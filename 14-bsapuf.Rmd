@@ -1,0 +1,219 @@
+# Basic Stand Alone Public Use File (BSAPUF) {-}
+
+The CMS Basic Stand Alone Public Use File (BSAPUF) contains a five percent sample of Medicare beneficiary spending and utilization in the enrolled population.
+
+* Multiple non-linkable tables, each with one row per beneficiary event.
+
+* The population of elderly and disabled individuals covered by [fee-for-service](https://en.wikipedia.org/wiki/Fee-for-service) Medicare in the United States.
+
+* No listed update frequency.
+
+* Maintained by the United States [Centers for Medicare & Medicaid Services (CMS)](http://www.cms.gov/)
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available BSAPUF microdata by simply specifying `"bsapuf"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "bsapuf" , output_dir = file.path( path.expand( "~" ) , "BSAPUF" ) )
+```
+
+## Analysis Examples with SQL and `MonetDBLite` {-}
+
+Connect to a database:
+
+```{r eval = FALSE }
+library(DBI)
+dbdir <- file.path( path.expand( "~" ) , "BSAPUF" , "MonetDB" )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbdir )
+```
+
+```{r eval = FALSE }
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+dbSendQuery( 
+	db , 
+	"ALTER TABLE bsa_partd_events_2008 ADD COLUMN brand_name_drug INTEGER" 
+)
+
+dbSendQuery( db , 
+	"UPDATE bsa_partd_events_2008 
+	SET brand_name_drug = 
+		CASE 
+			WHEN pde_drug_type_cd = 1 THEN 1 
+			WHEN pde_drug_type_cd = 2 THEN 0 
+			ELSE NULL 
+		END" 
+)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the SQL table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT COUNT(*) FROM bsa_partd_events_2008" )
+
+dbGetQuery( db ,
+	"SELECT
+		bene_sex_ident_cd ,
+		COUNT(*) 
+	FROM bsa_partd_events_2008
+	GROUP BY bene_sex_ident_cd"
+)
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT AVG( pde_drug_cost ) FROM bsa_partd_events_2008" )
+
+dbGetQuery( db , 
+	"SELECT 
+		bene_sex_ident_cd , 
+		AVG( pde_drug_cost ) AS mean_pde_drug_cost
+	FROM bsa_partd_events_2008 
+	GROUP BY bene_sex_ident_cd" 
+)
+```
+
+Initiate a function that allows division by zero:
+```{r eval = FALSE , results = "hide" }
+dbSendQuery( db , 
+	"CREATE FUNCTION 
+		div_noerror(l DOUBLE, r DOUBLE) 
+	RETURNS DOUBLE 
+	EXTERNAL NAME calc.div_noerror" 
+)
+```
+
+Calculate the distribution of a categorical variable:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		bene_age_cat_cd , 
+		div_noerror( 
+			COUNT(*) , 
+			( SELECT COUNT(*) FROM bsa_partd_events_2008 ) 
+		) AS share_bene_age_cat_cd
+	FROM bsa_partd_events_2008 
+	GROUP BY bene_age_cat_cd" 
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT SUM( pde_drug_cost ) FROM bsa_partd_events_2008" )
+
+dbGetQuery( db , 
+	"SELECT 
+		bene_sex_ident_cd , 
+		SUM( pde_drug_cost ) AS sum_pde_drug_cost 
+	FROM bsa_partd_events_2008 
+	GROUP BY bene_sex_ident_cd" 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT QUANTILE( pde_drug_cost , 0.5 ) FROM bsa_partd_events_2008" )
+
+dbGetQuery( db , 
+	"SELECT 
+		bene_sex_ident_cd , 
+		QUANTILE( pde_drug_cost , 0.5 ) AS median_pde_drug_cost
+	FROM bsa_partd_events_2008 
+	GROUP BY bene_sex_ident_cd" 
+)
+```
+
+### Subsetting {-}
+
+Limit your SQL analysis to events where patient paid 100% of drug's cost with `WHERE`:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db ,
+	"SELECT
+		AVG( pde_drug_cost )
+	FROM bsa_partd_events_2008
+	WHERE pde_drug_pat_pay_cd = 3"
+)
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance and standard deviation, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		VAR_SAMP( pde_drug_cost ) , 
+		STDDEV_SAMP( pde_drug_cost ) 
+	FROM bsa_partd_events_2008" 
+)
+
+dbGetQuery( db , 
+	"SELECT 
+		bene_sex_ident_cd , 
+		VAR_SAMP( pde_drug_cost ) AS var_pde_drug_cost ,
+		STDDEV_SAMP( pde_drug_cost ) AS stddev_pde_drug_cost
+	FROM bsa_partd_events_2008 
+	GROUP BY bene_sex_ident_cd" 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Calculate the correlation between two variables, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		CORR( CAST( brand_name_drug AS DOUBLE ) , CAST( pde_drug_cost AS DOUBLE ) )
+	FROM bsa_partd_events_2008" 
+)
+
+dbGetQuery( db , 
+	"SELECT 
+		bene_sex_ident_cd , 
+		CORR( CAST( brand_name_drug AS DOUBLE ) , CAST( pde_drug_cost AS DOUBLE ) )
+	FROM bsa_partd_events_2008 
+	GROUP BY bene_sex_ident_cd" 
+)
+```
+
+## Analysis Examples with `dplyr` {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for BSAPUF users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+dplyr_db <- MonetDBLite::src_monetdblite( dbdir )
+bsapuf_tbl <- tbl( dplyr_db , 'bsa_partd_events_2008' )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+bsapuf_tbl %>%
+	summarize( mean = mean( pde_drug_cost ) )
+
+bsapuf_tbl %>%
+	group_by( bene_sex_ident_cd ) %>%
+	summarize( mean = mean( pde_drug_cost ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT COUNT(*) FROM bsa_partd_events_2008" )
+```
+
+## Database Shutdown {-}
+
+```{r eval = FALSE , results = "hide" }
+dbDisconnect( db , shutdown = TRUE )
+```

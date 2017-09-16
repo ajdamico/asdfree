@@ -1,0 +1,176 @@
+# Public Libraries Survey (PLS) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/pls.svg?branch=master)](https://travis-ci.org/asdfree/pls) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pls?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pls)
+
+An annual census of public libraries in the United States.
+
+* One table with one row per state, a second table with one row per library system, and a third table with one row per library building or bookmobile.
+
+* Released annually since 1992.
+
+* Conducted by the [Institute of Museum and Library Services (IMLS)](https://www.imls.gov/) and collected by the [US Census Bureau](http://www.census.gov/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available PLS microdata by simply specifying `"pls"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "pls" , output_dir = file.path( path.expand( "~" ) , "PLS" ) )
+```
+
+## Analysis Examples with base R {-}
+
+Load a data frame:
+
+```{r eval = FALSE }
+pls_df <- readRDS( file.path( path.expand( "~" ) , "PLS" , "2014/pls_fy_ae_puplda.rds" ) )
+```
+
+```{r eval = FALSE }
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+pls_df <- 
+	transform( 
+		pls_df , 
+		
+		c_relatn = 
+			factor( c_relatn , levels = c( "HQ" , "ME" , "NO" ) ,
+				c( "HQ-Headquarters of a federation or cooperative" ,
+				"ME-Member of a federation or cooperative" ,
+				"NO-Not a member of a federation or cooperative" )
+			) ,
+			
+		more_than_one_librarian = as.numeric( libraria > 1 )
+				
+	)	
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( pls_df )
+
+table( pls_df[ , "stabr" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( pls_df[ , "popu_lsa" ] )
+
+tapply(
+	pls_df[ , "popu_lsa" ] ,
+	pls_df[ , "stabr" ] ,
+	mean 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( pls_df[ , "c_relatn" ] ) )
+
+prop.table(
+	table( pls_df[ , c( "c_relatn" , "stabr" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( pls_df[ , "popu_lsa" ] )
+
+tapply(
+	pls_df[ , "popu_lsa" ] ,
+	pls_df[ , "stabr" ] ,
+	sum 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( pls_df[ , "popu_lsa" ] , 0.5 )
+
+tapply(
+	pls_df[ , "popu_lsa" ] ,
+	pls_df[ , "stabr" ] ,
+	quantile ,
+	0.5 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to more than one million annual visits:
+```{r eval = FALSE , results = "hide" }
+sub_pls_df <- subset( pls_df , visits > 1000000 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_pls_df[ , "popu_lsa" ] )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( pls_df[ , "popu_lsa" ] )
+
+tapply(
+	pls_df[ , "popu_lsa" ] ,
+	pls_df[ , "stabr" ] ,
+	var 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( popu_lsa ~ more_than_one_librarian , pls_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( pls_df[ , c( "more_than_one_librarian" , "c_relatn" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		popu_lsa ~ more_than_one_librarian + c_relatn , 
+		data = pls_df
+	)
+
+summary( glm_result )
+```
+
+## Analysis Examples with `dplyr` {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for PLS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+pls_tbl <- tbl_df( pls_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+pls_tbl %>%
+	summarize( mean = mean( popu_lsa ) )
+
+pls_tbl %>%
+	group_by( stabr ) %>%
+	summarize( mean = mean( popu_lsa ) )
+```
+
+

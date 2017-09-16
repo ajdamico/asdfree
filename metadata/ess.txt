@@ -1,0 +1,133 @@
+chapter_title: European Social Survey
+authorship_line: *Contributed by Dr. Daniel Oberski <<daniel.oberski@gmail.com>>*
+
+
+lodown_password_parameters: , \\\\n\\\\tyour_email = "email@address.com"
+get_catalog_password_parameters: , \\\\n\\\\t\\\\tyour_email = "email@address.com"
+
+
+~~~{dataset_introduction}
+The European Social Survey measures political opinion and behavior across the continent.
+~~~
+
+table_structure: * One table per country with one row per sampled respondent.
+
+generalizable_population: * A complex sample survey designed to generalize to residents aged 15 and older in participating nations.
+
+publication_period: * Released biennially since 2002.
+
+administrative_organization: * Headquartered at [City, University of London](http://www.city.ac.uk/) and governed by [a scientific team across Europe](http://www.europeansocialsurvey.org/about/structure_and_governance.html).
+
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2014 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2014 )
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_be_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014/ESS7BE.rds" ) )
+
+chapter_tag_sddf_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014/ESS7SDDFe01_1.rds" ) )
+
+chapter_tag_df <-
+	merge( 
+		chapter_tag_be_df , 
+		chapter_tag_sddf_df , 
+		by = c( 'cntry' , 'idno' ) 
+	)
+
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_be_df ) )
+
+chapter_tag_design <- 
+	svydesign(
+		ids = ~psu ,
+		strata = ~stratify ,
+		probs = ~prob ,
+		data = chapter_tag_df
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		non_european_immigrants =
+			factor( impcntr ,
+				labels = c( 'Allow many to come and live here' , 
+				'Allow some' , 'Allow a few' , 'Allow none' )
+			) ,
+		
+		sex = factor( icgndra , labels = c( 'male' , 'female' ) ) ,
+			
+		more_than_one_hour_tv_daily = as.numeric( tvtot >= 3 )
+	)
+~~~
+
+group_by_variable: non_european_immigrants
+
+categorical_variable: sex
+categorical_narm: , na.rm = TRUE
+
+linear_variable: ppltrst
+linear_variable_description: Please tell me on a score of 0 to 10, where 0 means you can't be too careful and 10 means that most people can be trusted.
+
+ratio_estimation_numerator: ppltrst
+ratio_estimation_denominator: pplfair
+
+
+subset_definition: vote == 1
+subset_definition_description: voters
+
+binary_variable: more_than_one_hour_tv_daily
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
+needs_build_status_line: yes
+
+
+dependencies: library(memisc)
+
+
+
+~~~{machine_specific_replacements_block}
+machine_specific_replacements <- 
+	list( 
+		
+		# replace the folder path on macnix
+		c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
+		
+		# change other things in the script to be run
+		c( "hello" , "howdy" ) ,
+		
+		c( '"email@address.com"' , 'my_email_address' )
+		
+	)
+~~~
+
+~~~{environment_variables_block}
+my_email_address <- Sys.getenv( "my_email_address" )
+~~~

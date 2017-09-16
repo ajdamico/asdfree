@@ -1,0 +1,285 @@
+# Pesquisa Nacional por Amostra de Domicilios (PNAD) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/pnad.svg?branch=master)](https://travis-ci.org/asdfree/pnad) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pnad?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pnad)
+
+*Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+Brazil's previous principal household survey, the Pesquisa Nacional por Amostra de Domicilios (PNAD) measures general education, labor, income, and housing characteristics of the population.
+
+* One table with one row per sampled household and a second table with one row per individual within each sampled household.
+
+* A complex sample survey designed to generalize to the civilian non-institutional population of Brazil, although the rural north was not included prior to 2004.
+
+* Released annually since 2001 except for years ending in zero, when the decennial census takes its place.
+
+* Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available PNAD microdata by simply specifying `"pnad"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "pnad" , output_dir = file.path( path.expand( "~" ) , "PNAD" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the PNAD catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available PNAD microdata files
+pnad_cat <-
+	get_catalog( "pnad" ,
+		output_dir = file.path( path.expand( "~" ) , "PNAD" ) )
+
+# 2011 only
+pnad_cat <- subset( pnad_cat , year == 2011 )
+# download the microdata to your local computer
+lodown( "pnad" , pnad_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+pnad_df <- readRDS( pnad_cat[ 1 , 'output_filename' ] )
+
+pop_types <- 
+	data.frame( 
+		v4609 = unique( pnad_df$v4609 ) , 
+		Freq = unique( pnad_df$v4609 )
+	)
+
+prestratified_design <-
+	svydesign(
+		id = ~ v4618 ,
+		strata = ~ v4617 ,
+		data = pnad_df ,
+		weights = ~ pre_wgt ,
+		nest = TRUE
+	)
+	
+rm( pnad_df ) ; gc()
+
+pnad_design <- 
+	postStratify( 
+		design = prestratified_design ,
+		strata = ~ v4609 ,
+		population = pop_types
+	)
+	
+rm( prestratified_design ) ; gc()
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+pnad_design <- 
+	update( 
+		pnad_design , 
+		age_categories = factor( 1 + findInterval( v8005 , seq( 5 , 60 , 5 ) ) ) ,
+		male = as.numeric( v0302 == 2 ) ,
+		teenagers = as.numeric( v8005 > 12 & v8005 < 20 ) ,
+		started_working_before_thirteen = as.numeric( v9892 < 13 )
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( pnad_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ region , pnad_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , pnad_design )
+
+svyby( ~ one , ~ region , pnad_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ v4720 , pnad_design , na.rm = TRUE )
+
+svyby( ~ v4720 , ~ region , pnad_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ age_categories , pnad_design )
+
+svyby( ~ age_categories , ~ region , pnad_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ v4720 , pnad_design , na.rm = TRUE )
+
+svyby( ~ v4720 , ~ region , pnad_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ age_categories , pnad_design )
+
+svyby( ~ age_categories , ~ region , pnad_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ v4720 , pnad_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ v4720 , 
+	~ region , 
+	pnad_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE ,
+	na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ started_working_before_thirteen , 
+	denominator = ~ teenagers , 
+	pnad_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to married persons:
+```{r eval = FALSE , results = "hide" }
+sub_pnad_design <- subset( pnad_design , v4011 == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ v4720 , sub_pnad_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ v4720 , pnad_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ v4720 , 
+		~ region , 
+		pnad_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( pnad_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ v4720 , pnad_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ v4720 , pnad_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ v4720 , pnad_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ male , pnad_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( v4720 ~ male , pnad_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ male + age_categories , 
+	pnad_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		v4720 ~ male + age_categories , 
+		pnad_design 
+	)
+
+summary( glm_result )
+```
+
+## Poverty and Inequality Estimation with `convey` {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for PNAD users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+pnad_design <- convey_prep( pnad_design )
+
+sub_pnad_design <- 
+	subset( 
+		pnad_design , 
+		!is.na( v4720 ) & v4720 != 0 & v8005 >= 15
+	)
+
+svygini( ~ v4720 , sub_pnad_design , na.rm = TRUE )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+svytotal( ~one , pnad_design )
+svytotal( ~factor( v0302 ) , pnad_design )
+cv( svytotal( ~factor( v0302 ) , pnad_design ) )
+```
+
+

@@ -1,0 +1,131 @@
+chapter_title: General Social Survey
+
+~~~{dataset_introduction}
+The General Social Survey (GSS) has captured political beliefs and social attitudes since 1972.  In contrast to non-trendable tracking polls that capture newspaper headlines, the GSS has sustained a set of questions over four decades.
+~~~
+
+table_structure: * One table with one row per sampled respondent.
+
+generalizable_population: * A complex sample survey designed to generalize to the non-institutional population of adults (18+) in the United States.
+
+publication_period: * Updated biennially since 1972.
+
+administrative_organization: * Funded by the [National Science Foundation](http://www.nsf.gov/) and administered by the [National Opinion Research Center](http://www.norc.org/).
+
+needs_catalog_block: no
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+		"gss 1972 2016 cross sectional cumulative data release 1 march 29 2017.rds" ) )
+
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		# the calculation for compwt comes from
+		# http://sda.berkeley.edu/D3/GSS10/Doc/gs100195.htm#COMPWT
+		compwt =  oversamp  *  formwt * wtssall , 
+		
+		# the calculation for samplerc comes from
+		# http://sda.berkeley.edu/D3/GSS10/Doc/gs100195.htm#SAMPLERC
+		samplerc = 
+			# if sample is a three or a four, samplerc should be a three
+			ifelse( sample %in% 3:4 , 3 , 
+			# if sample is a six or a seven, samplerc should be a six
+			ifelse( sample %in% 6:7 , 6 , 
+			# otherwise, samplerc should just be set to sample
+				sample ) )
+
+	)
+
+# keep only the variables you need
+keep_vars <- 
+	c( "sampcode" , "samplerc" , "compwt" , "polviews" , 
+		"born" , "adults" , "hompop" , "race" , "region" ,
+		"age" , "sex" , "one" )
+		
+chapter_tag_df <- chapter_tag_df[ keep_vars ] ; gc()
+# this step conserves RAM
+
+chapter_tag_design <- 
+	svydesign( 
+		~sampcode , 
+		strata = ~samplerc , 
+		data = subset( chapter_tag_df , !is.na( sampcode ) ) , 
+		weights = ~compwt , 
+		nest = TRUE 
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+
+		polviews = 
+			factor( polviews ,
+				labels = c( "Extremely liberal" , "Liberal" ,
+				"Slightly liberal" , "Moderate, middle of the road" ,
+				"Slightly conservative" , "Conservative" ,
+				"Extremely conservative" )
+			) ,
+		
+		born_in_usa = ifelse( born %in% 1:2 , as.numeric( born == 1 ) , NA ) ,
+		
+		adults_in_hh = ifelse( adults > 8 , NA , adults ) ,
+		
+		persons_in_hh = ifelse( hompop > 11 , NA , hompop ) ,
+		
+		race = factor( race , labels = c( "white" , "black" , "other" ) ) ,
+		
+		region = 
+			factor( region , 
+				labels = c( "New England" , "Middle Atlantic" ,
+					"East North Central" , "West North Central" ,
+					"South Atlantic" , "East South Central" ,
+					"West South Central" , "Mountain" , "Pacific" )
+			)
+
+	)
+~~~
+
+group_by_variable: region
+group_by_variable_description: Census Region
+
+categorical_variable: race
+categorical_narm: , na.rm = TRUE
+
+linear_variable: age
+linear_variable_description: age
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: adults_in_hh
+ratio_estimation_denominator: persons_in_hh
+ratio_narm: , na.rm = TRUE
+
+subset_definition: sex == 2
+subset_definition_description: females
+
+binary_variable: born_in_usa
+binary_variable_description: born in the United States
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+needs_build_status_line: yes

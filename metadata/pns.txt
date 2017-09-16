@@ -1,0 +1,80 @@
+chapter_title: Pesquisa Nacional de Saude
+authorship_line: *Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+~~~{dataset_introduction}
+The Pesquisa Nacional de Saude (PNS) is Brazil's healthcare survey.
+~~~
+
+table_structure: * One table with one row per long-questionnaire respondent and a second table with one row for all respondents.
+
+generalizable_population: * A complex sample survey designed to generalize to Brazil's civilian population.
+
+publication_period: * First released 2013.
+
+administrative_organization: * Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+
+
+needs_catalog_block: yes
+
+~~~{analysis_examples_survey_design}
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+chapter_tag_design <- 
+	readRDS( 
+		file.path( 
+			path.expand( "~" ) , "CHAPTER_TAG" , 
+			"2013 long questionnaire survey design.rds" ) 
+		)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+
+		one = 1 ,
+		
+		health_insurance = as.numeric( i001 == 1 )
+	)
+~~~
+
+group_by_variable: uf
+group_by_variable_description: state
+
+categorical_variable: c006
+
+linear_variable: w00101
+linear_variable_description: weight in kg
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: w00203
+ratio_estimation_denominator: w00101
+ratio_narm: , na.rm = TRUE
+
+subset_definition: atfi04 == 1
+subset_definition_description: at least 30 minutes of physical activity
+
+binary_variable: health_insurance
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+needs_build_status_line: yes

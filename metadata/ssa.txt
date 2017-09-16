@@ -1,0 +1,57 @@
+chapter_title: Social Security Administration Public Use Microdata
+
+~~~{dataset_introduction}
+Research extracts provided by the Social Security Administration.
+~~~
+
+table_structure: * Tables contain either one record per person or one record per person per year.
+
+generalizable_population: * The entire population of either social security number holders (most of the country) or social security recipients (just beneficiaries).  One-percent samples should be multiplied by 100 to get accurate nationwide count statistics, five-percent samples by 20.
+
+publication_period: * No expected release timeline.
+
+administrative_organization: * Released by the United States [Social Security Administration (SSA)](http://www.ssa.gov/).
+
+catalog_subset_description: # december 2001 supplemental security income 5% sample
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , grepl( "ssr_data\\.zip$" , full_url ) )
+
+~~~{analysis_examples_loading_block}
+chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "ssr_data/SSIPUF.rds" ) )
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		mental_disorder = as.numeric( diag %in% 1:2 ) ,
+		
+		program_eligibility =
+			factor( 
+				prel , 
+				
+				levels = 0:5 , 
+				
+				labels =
+					c( "Unspecified" ,
+					"Aged individual" ,
+					"Aged spouse" ,
+					"Disabled or blind individual" ,
+					"Disabled or blind spouse" ,
+					"Disabled or blind child" )
+			)
+			
+	)
+	
+~~~
+
+group_by_variable: stat
+linear_variable: fpmt
+categorical_variable: program_eligibility
+subset_definition: sex == "F"
+subset_definition_description: females
+binary_variable: mental_disorder
+needs_dplyr_block: yes
+
+
+needs_build_status_line: yes

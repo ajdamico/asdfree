@@ -1,0 +1,265 @@
+# National Beneficiary Survey (NBS) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/nbs.svg?branch=master)](https://travis-ci.org/asdfree/nbs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nbs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nbs)
+
+The National Beneficiary Survey (NBS) is the principal microdata for disability researchers in the United States interested in Social Security program performance.
+
+* One table with one row per sampled youth respondent.
+
+* A complex sample survey designed to generalize to Americans covered by either Social Security Disability Insurance (SSDI) or Supplemental Security Income (SSI). Note that the public use files do not include individuals sampled for ticket-to-work (TTW) programs.
+
+* Released at irregular intervals, with 2004, 2005, 2006, and 2010 available and 2015, 2017, and 2019 forthcoming.
+
+* Administered by the [Social Security Administration](http://www.ssa.gov/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available NBS microdata by simply specifying `"nbs"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "nbs" , output_dir = file.path( path.expand( "~" ) , "NBS" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the NBS catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available NBS microdata files
+nbs_cat <-
+	get_catalog( "nbs" ,
+		output_dir = file.path( path.expand( "~" ) , "NBS" ) )
+
+# 2010 only
+nbs_cat <- subset( nbs_cat , this_round == 4 )
+# download the microdata to your local computer
+lodown( "nbs" , nbs_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+library(survey)
+
+nbs_df <- readRDS( file.path( path.expand( "~" ) , "NBS" , "round 04.rds" ) )
+
+nbs_design <- 
+	svydesign( 
+		~ a_psu_pub , 
+		strata = ~ a_strata , 
+		data = nbs_df , 
+		weights = ~ wtr4_ben 
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+nbs_design <- 
+	update( 
+		nbs_design , 
+		
+		male = as.numeric( orgsampinfo_sex == 1 ) ,
+		
+		age_categories = 
+			factor( 
+				c_intage_pub ,
+				labels = 
+					c( "18-25" , "26-40" , "41-55" , "56 and older" )
+			)
+		
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( nbs_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ age_categories , nbs_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , nbs_design )
+
+svyby( ~ one , ~ age_categories , nbs_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ n_totssbenlastmnth_pub , nbs_design )
+
+svyby( ~ n_totssbenlastmnth_pub , ~ age_categories , nbs_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ c_hhsize_pub , nbs_design )
+
+svyby( ~ c_hhsize_pub , ~ age_categories , nbs_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ n_totssbenlastmnth_pub , nbs_design )
+
+svyby( ~ n_totssbenlastmnth_pub , ~ age_categories , nbs_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ c_hhsize_pub , nbs_design )
+
+svyby( ~ c_hhsize_pub , ~ age_categories , nbs_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ n_totssbenlastmnth_pub , nbs_design , 0.5 )
+
+svyby( 
+	~ n_totssbenlastmnth_pub , 
+	~ age_categories , 
+	nbs_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ n_ssilastmnth_pub , 
+	denominator = ~ n_totssbenlastmnth_pub , 
+	nbs_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to currently covered by Medicare:
+```{r eval = FALSE , results = "hide" }
+sub_nbs_design <- subset( nbs_design , c_curmedicare == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ n_totssbenlastmnth_pub , sub_nbs_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ n_totssbenlastmnth_pub , nbs_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ n_totssbenlastmnth_pub , 
+		~ age_categories , 
+		nbs_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( nbs_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ n_totssbenlastmnth_pub , nbs_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ n_totssbenlastmnth_pub , nbs_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ n_totssbenlastmnth_pub , nbs_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ male , nbs_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( n_totssbenlastmnth_pub ~ male , nbs_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ male + c_hhsize_pub , 
+	nbs_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		n_totssbenlastmnth_pub ~ male + c_hhsize_pub , 
+		nbs_design 
+	)
+
+summary( glm_result )
+```
+
+## Analysis Examples with `srvyr` {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NBS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nbs_srvyr_design <- as_survey( nbs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nbs_srvyr_design %>%
+	summarize( mean = survey_mean( n_totssbenlastmnth_pub ) )
+
+nbs_srvyr_design %>%
+	group_by( age_categories ) %>%
+	summarize( mean = survey_mean( n_totssbenlastmnth_pub ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+

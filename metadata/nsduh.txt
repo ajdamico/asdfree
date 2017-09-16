@@ -1,0 +1,136 @@
+chapter_title: National Study on Drug Use and Health
+
+~~~{dataset_introduction}
+The National Study on Drug Use and Health measures the prevalence and correlates of drug use in the United States.
+~~~
+
+
+lodown_password_parameters: , \\\\n\\\\tyour_email = "email@address.com" , \\\\n\\\\tyour_password = "password"
+get_catalog_password_parameters: , \\\\n\\\\t\\\\tyour_email = "email@address.com" , \\\\n\\\\t\\\\tyour_password = "password"
+
+
+table_structure: * One table with one row per sampled respondent.
+
+generalizable_population: * A complex sample survey designed to generalize to the civilian, noninstitutionalized population of the United States aged 12 and older.
+
+publication_period: * Released periodically since 1979 and annually since 1990.
+
+administrative_organization: * Administered by the [Substance Abuse and Mental Health Services Administration](http://www.samhsa.gov/).
+
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2014 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , temporalCoverage == 2014 )
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014 main.rds" ) )
+
+chapter_tag_design <- 
+	svydesign( 
+		id = ~ verep , 
+		strata = ~ vestr , 
+		data = chapter_tag_df , 
+		weights = ~ analwt_c , 
+		nest = TRUE 
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		health = 
+			factor( 
+				health , 
+				levels = 1:5 , 
+				labels = c( "excellent" , "very good" , "good" ,
+					"fair" , "poor" )
+			) ,
+			
+		age_tried_first_cigarette = ifelse( cigtry > 99 , NA , cigtry ) ,
+		
+		age_tried_cocaine = ifelse( cocage > 99 , NA , cocage ) ,
+
+		ever_used_marijuana = as.numeric( mjever == 1 ) ,
+		
+		county_type =
+			factor(
+				coutyp2 ,
+				levels = 1:3 ,
+				labels = c( "large metro" , "small metro" , "nonmetro" )
+			)
+			
+	)
+~~~
+
+group_by_variable: county_type
+
+categorical_variable: health
+categorical_narm: , na.rm = TRUE
+
+linear_variable: age_tried_first_cigarette
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: age_tried_first_cigarette
+ratio_estimation_denominator: age_tried_cocaine
+ratio_narm: , na.rm = TRUE
+
+subset_definition: preg == 1
+subset_definition_description: individuals who are pregnant
+
+binary_variable: ever_used_marijuana
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
+
+needs_build_status_line: yes
+
+~~~{machine_specific_replacements_block}
+machine_specific_replacements <- 
+	list( 
+		
+		# replace the folder path on macnix
+		c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
+		
+		# change other things in the script to be run
+		c( "hello" , "howdy" ) ,
+		
+		c( '"email@address.com"' , 'my_email_address' ) ,
+		
+		c( '"password"' , 'my_password' )
+		
+	)
+~~~
+
+
+
+~~~{environment_variables_block}
+my_email_address <- Sys.getenv( "my_email_address" )
+my_password <- Sys.getenv( "my_password" )
+~~~
+
+

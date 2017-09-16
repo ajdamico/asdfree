@@ -1,0 +1,261 @@
+# Pesquisa Nacional de Saude (PNS) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/pns.svg?branch=master)](https://travis-ci.org/asdfree/pns) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pns?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pns)
+
+*Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+The Pesquisa Nacional de Saude (PNS) is Brazil's healthcare survey.
+
+* One table with one row per long-questionnaire respondent and a second table with one row for all respondents.
+
+* A complex sample survey designed to generalize to Brazil's civilian population.
+
+* First released 2013.
+
+* Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available PNS microdata by simply specifying `"pns"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "pns" , output_dir = file.path( path.expand( "~" ) , "PNS" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the PNS catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available PNS microdata files
+pns_cat <-
+	get_catalog( "pns" ,
+		output_dir = file.path( path.expand( "~" ) , "PNS" ) )
+
+# download the microdata to your local computer
+lodown( "pns" , pns_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+pns_design <- 
+	readRDS( 
+		file.path( 
+			path.expand( "~" ) , "PNS" , 
+			"2013 long questionnaire survey design.rds" ) 
+		)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+pns_design <- 
+	update( 
+		pns_design , 
+
+		one = 1 ,
+		
+		health_insurance = as.numeric( i001 == 1 )
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( pns_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ uf , pns_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , pns_design )
+
+svyby( ~ one , ~ uf , pns_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ w00101 , pns_design , na.rm = TRUE )
+
+svyby( ~ w00101 , ~ uf , pns_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ c006 , pns_design )
+
+svyby( ~ c006 , ~ uf , pns_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ w00101 , pns_design , na.rm = TRUE )
+
+svyby( ~ w00101 , ~ uf , pns_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ c006 , pns_design )
+
+svyby( ~ c006 , ~ uf , pns_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ w00101 , pns_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ w00101 , 
+	~ uf , 
+	pns_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE ,
+	na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ w00203 , 
+	denominator = ~ w00101 , 
+	pns_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to at least 30 minutes of physical activity:
+```{r eval = FALSE , results = "hide" }
+sub_pns_design <- subset( pns_design , atfi04 == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ w00101 , sub_pns_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ w00101 , pns_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ w00101 , 
+		~ uf , 
+		pns_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( pns_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ w00101 , pns_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ w00101 , pns_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ w00101 , pns_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ health_insurance , pns_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( w00101 ~ health_insurance , pns_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ health_insurance + c006 , 
+	pns_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		w00101 ~ health_insurance + c006 , 
+		pns_design 
+	)
+
+summary( glm_result )
+```
+
+## Analysis Examples with `srvyr` {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for PNS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+pns_srvyr_design <- as_survey( pns_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+pns_srvyr_design %>%
+	summarize( mean = survey_mean( w00101 , na.rm = TRUE ) )
+
+pns_srvyr_design %>%
+	group_by( uf ) %>%
+	summarize( mean = survey_mean( w00101 , na.rm = TRUE ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+

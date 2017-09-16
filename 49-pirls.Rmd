@@ -1,0 +1,260 @@
+# Progress in International Reading Literacy Study (PIRLS) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/pirls.svg?branch=master)](https://travis-ci.org/asdfree/pirls) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pirls?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pirls)
+
+The Progress in International Reading Literacy Study (PIRLS) tracks the reading competency of fourth graders across about fifty nations.
+
+* A series of tables with one record per school (ACG), per student (ASG), per teacher (ATG), as well as files containing student achievement (ASA), home background (ASH), student-teacher linkage (AST), and within-country scoring reliability (ASR).
+
+* A complex sample survey designed to generalize to the fourth-grade student population of participating countries.
+
+* Released quinquennially since 2001.
+
+* Funded by the [International Association for the Evaluation of Educational Achievement](https://www.iea.nl/) and compiled by the [Lynch School of Education at Boston College](http://www.bc.edu/bc-web/schools/lsoe.html).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available PIRLS microdata by simply specifying `"pirls"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "pirls" , output_dir = file.path( path.expand( "~" ) , "PIRLS" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the PIRLS catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available PIRLS microdata files
+pirls_cat <-
+	get_catalog( "pirls" ,
+		output_dir = file.path( path.expand( "~" ) , "PIRLS" ) )
+
+# 2011 only
+pirls_cat <- subset( pirls_cat , year == 2011 )
+# download the microdata to your local computer
+lodown( "pirls" , pirls_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a multiply-imputed, complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+library(survey)
+library(mitools)
+
+# load the ASG (student background) + ASH (home background) merged design
+pirls_design <- readRDS( file.path( path.expand( "~" ) , "PIRLS" , "2011/asg_design.rds" ) )
+
+# optional step to limit memory usage
+variables_to_keep <-
+	c( 'idcntry' , 'itsex' , 'itbirthy' , 'asrrea' , 'asrlit' )
+	
+pirls_design$designs <-
+	lapply( 
+		pirls_design$designs ,
+		function( w ) {
+			w$variables <- w$variables[ variables_to_keep ]
+			w
+		}
+	)
+
+gc()
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+pirls_design <- 
+	update( 
+		pirls_design , 
+		
+		one = 1 ,
+		
+		idcntry = factor( idcntry ) ,
+		
+		sex = factor( itsex , labels = c( "male" , "female" ) ) ,
+		
+		born_2001_or_later = as.numeric( itbirthy >= 2001 )
+
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design , svyby( ~ one , ~ one , unwtd.count ) ) )
+
+lodown:::pirls_MIcombine( with( pirls_design , svyby( ~ one , ~ idcntry , unwtd.count ) ) )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design , svytotal( ~ one ) ) )
+
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svyby( ~ one , ~ idcntry , svytotal )
+) )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design , svymean( ~ asrrea ) ) )
+
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svyby( ~ asrrea , ~ idcntry , svymean )
+) )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design , svymean( ~ sex , na.rm = TRUE ) ) )
+
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svyby( ~ sex , ~ idcntry , svymean , na.rm = TRUE )
+) )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design , svytotal( ~ asrrea ) ) )
+
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svyby( ~ asrrea , ~ idcntry , svytotal )
+) )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design , svytotal( ~ sex , na.rm = TRUE ) ) )
+
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svyby( ~ sex , ~ idcntry , svytotal , na.rm = TRUE )
+) )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design , svyquantile( ~ asrrea , 0.5 , se = TRUE ) ) )
+
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svyby( 
+		~ asrrea , ~ idcntry , svyquantile , 0.5 ,
+		se = TRUE , keep.var = TRUE , ci = TRUE 
+) ) )
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svyratio( numerator = ~ asrlit , denominator = ~ asrrea )
+) )
+```
+
+### Subsetting {-}
+
+Restrict the survey design to Australia, Austria, Azerbaijan, Belgium (French):
+```{r eval = FALSE , results = "hide" }
+sub_pirls_design <- subset( pirls_design , idcntry %in% c( 36 , 40 , 31 , 957 ) )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( sub_pirls_design , svymean( ~ asrrea ) ) )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <-
+	lodown:::pirls_MIcombine( with( pirls_design ,
+		svymean( ~ asrrea )
+	) )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	lodown:::pirls_MIcombine( with( pirls_design ,
+		svyby( ~ asrrea , ~ idcntry , svymean )
+	) )
+
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( pirls_design$designs[[1]] )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+lodown:::pirls_MIcombine( with( pirls_design , svyvar( ~ asrrea ) ) )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svymean( ~ asrrea , deff = TRUE )
+) )
+
+# SRS with replacement
+lodown:::pirls_MIcombine( with( pirls_design ,
+	svymean( ~ asrrea , deff = "replace" )
+) )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvyciprop( ~ born_2001_or_later , pirls_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvyttest( asrrea ~ born_2001_or_later , pirls_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvychisq( ~ born_2001_or_later + sex , pirls_design )
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	lodown:::pirls_MIcombine( with( pirls_design ,
+		svyglm( asrrea ~ born_2001_or_later + sex )
+	) )
+	
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+

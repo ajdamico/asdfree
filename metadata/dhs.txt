@@ -1,0 +1,171 @@
+chapter_title: Demographic and Health Surveys
+
+~~~{dataset_introduction}
+The Demographic and Health Surveys collect data on population, health, HIV, and nutrition in over 90 countries.
+~~~
+
+
+lodown_password_parameters: , \\\\n\\\\tyour_email = "email@address.com" , \\\\n\\\\tyour_password = "password" , \\\\n\\\\tyour_project = "project"
+get_catalog_password_parameters: , \\\\n\\\\t\\\\tyour_email = "email@address.com" , \\\\n\\\\t\\\\tyour_password = "password" , \\\\n\\\\t\\\\tyour_project = "project"
+
+
+table_structure: * Many tables, often with one row per male, per female, or per responding household.
+
+generalizable_population: * A complex sample survey designed to generalize to the residents of various countries.
+
+publication_period: * Many releases for different countries annually, since 1984.
+
+administrative_organization: * Administered by the [ICF International](http://www.icfi.com/) and funded by the [US Agency for International Development](http://www.usaid.gov/).
+
+
+
+needs_catalog_block: yes
+catalog_subset_description: # Malawi only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , country == 'Malawi' )
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_df <- 
+	readRDS( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+		"Malawi/Standard DHS 2004/MWIR4EDT.rds" ) 
+	)
+
+# convert the weight column to a numeric type
+chapter_tag_df$weight <- as.numeric( chapter_tag_df$v005 )
+
+# paste the `sdist` and `v025` columns together
+# into a single strata variable
+chapter_tag_df$strata <- do.call( paste , chapter_tag_df[ , c( 'sdist' , 'v025' ) ] )
+# as shown at
+# http://userforum.dhsprogram.com/index.php?t=rview&goto=2154#msg_2154
+
+chapter_tag_design <- 
+	svydesign( 
+		~ v021 , 
+		strata = ~strata , 
+		data = chapter_tag_df , 
+		weights = ~weight
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		total_children_ever_born = v201 ,
+		
+		surviving_children = v201 - v206 - v207 ,
+		
+		urban_rural = factor( v025 , labels = c( 'urban' , 'rural' ) ) ,
+		
+		ethnicity =
+			factor( v131 , levels = c( 1:8 , 96 ) , labels =
+				c( "Chewa" , "Tumbuka" , "Lomwe" , "Tonga" , 
+				"Yao" , "Sena" , "Nkonde" , "Ngoni" , "Other" ) ) ,
+				
+		no_formal_education = as.numeric( v149 == 0 )
+		
+	)
+~~~
+
+group_by_variable: urban_rural
+
+categorical_variable: ethnicity
+categorical_narm: , na.rm = TRUE
+
+linear_variable: surviving_children
+
+ratio_estimation_numerator: surviving_children
+ratio_estimation_denominator: total_children_ever_born
+
+subset_definition: v447a %in% 40:49
+subset_definition_description: 40-49 year old females only
+
+binary_variable: no_formal_education
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
+
+needs_build_status_line: yes
+
+~~~{machine_specific_replacements_block}
+machine_specific_replacements <- 
+	list( 
+		
+		# replace the folder path on macnix
+		c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
+		
+		# change other things in the script to be run
+		c( "hello" , "howdy" ) ,
+		
+		c( '"email@address.com"' , 'my_email_address' ) ,
+		
+		c( '"password"' , 'my_password' ) ,
+		
+		c( '"project"' , 'my_project' )
+		
+	)
+~~~
+
+
+
+~~~{environment_variables_block}
+my_email_address <- Sys.getenv( "my_email_address" )
+my_password <- Sys.getenv( "my_password" )
+my_project <- Sys.getenv( "my_project" )
+~~~
+
+
+
+
+
+
+
+
+
+~~~{sample_setup_block}
+library(lodown)
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
+		your_email = my_email_address , 
+		your_password = my_password ,
+		your_project = my_project )
+
+# some indian files are too large to test on 
+chapter_tag_cat <- subset( chapter_tag_cat , !grepl( "IAIR52" , full_url ) )
+		
+# sample 10% of the records
+which_records <- sample( seq( nrow( chapter_tag_cat ) ) , round( nrow( chapter_tag_cat ) * 0.10 ) )
+
+# always sample the 2004 malawi sample
+chapter_tag_cat <- unique( rbind( chapter_tag_cat[ which_records , ] , subset( chapter_tag_cat , year == 2004 & country == 'Malawi' & grepl( "MWIR4EDT" , full_url ) ) ) )
+
+lodown( "chapter_tag" , chapter_tag_cat , 
+		your_email = my_email_address , 
+		your_password = my_password ,
+		your_project = my_project )
+
+~~~

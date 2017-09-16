@@ -1,0 +1,249 @@
+# Trends in International Mathematics and Science Study (TIMSS) {-}
+
+The Trends in International Mathematics and Science Study (TIMSS) tracks the math and science competency of fourth graders across about fifty nations.
+
+* A series of tables with one record per school (ACG), per student (ASG), per teacher (ATG), as well as files containing student achievement (ASA), home background (ASH), student-teacher linkage (AST), and within-country scoring reliability (ASR).
+
+* A complex sample survey designed to generalize to the fourth-grade student population of participating countries.
+
+* Released quadrennially since 1995.
+
+* Funded by the [International Association for the Evaluation of Educational Achievement](https://www.iea.nl/) and compiled by the [Lynch School of Education at Boston College](http://www.bc.edu/bc-web/schools/lsoe.html).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available TIMSS microdata by simply specifying `"timss"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "timss" , output_dir = file.path( path.expand( "~" ) , "TIMSS" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the TIMSS catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available TIMSS microdata files
+timss_cat <-
+	get_catalog( "timss" ,
+		output_dir = file.path( path.expand( "~" ) , "TIMSS" ) )
+
+# 2015 only
+timss_cat <- subset( timss_cat , year == 2015 )
+# download the microdata to your local computer
+lodown( "timss" , timss_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a multiply-imputed, complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+library(survey)
+library(mitools)
+library(MonetDBLite)
+
+# load the ASG (student background) + ASH (home background) merged design
+timss_design <- readRDS( file.path( path.expand( "~" ) , "TIMSS" , "2015/asg_design.rds" ) )
+
+design_weights <- readRDS( file.path( path.expand( "~" ) , "TIMSS" , "2015/asg_weights.rds" ) )
+
+five_tablenames <- paste0( "asg_2015_" , 1:5 )
+
+timss_design <- lodown:::svyMDBdesign( timss_design )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+timss_design <- 
+	update( 
+		timss_design , 
+		
+		one = 1 ,
+		
+		idcntry = factor( idcntry ) ,
+		
+		sex = factor( itsex , labels = c( "male" , "female" ) ) ,
+		
+		born_2005_or_later = as.numeric( itbirthy >= 2005 )
+
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design , svyby( ~ one , ~ one , unwtd.count ) ) )
+
+lodown:::timss_MIcombine( with( timss_design , svyby( ~ one , ~ sex , unwtd.count ) ) )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design , svytotal( ~ one ) ) )
+
+lodown:::timss_MIcombine( with( timss_design ,
+	svyby( ~ one , ~ sex , svytotal )
+) )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design , svymean( ~ asmmat ) ) )
+
+lodown:::timss_MIcombine( with( timss_design ,
+	svyby( ~ asmmat , ~ sex , svymean )
+) )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design , svymean( ~ idcntry ) ) )
+
+lodown:::timss_MIcombine( with( timss_design ,
+	svyby( ~ idcntry , ~ sex , svymean )
+) )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design , svytotal( ~ asmmat ) ) )
+
+lodown:::timss_MIcombine( with( timss_design ,
+	svyby( ~ asmmat , ~ sex , svytotal )
+) )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design , svytotal( ~ idcntry ) ) )
+
+lodown:::timss_MIcombine( with( timss_design ,
+	svyby( ~ idcntry , ~ sex , svytotal )
+) )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design , svyquantile( ~ asmmat , 0.5 , se = TRUE ) ) )
+
+lodown:::timss_MIcombine( with( timss_design ,
+	svyby( 
+		~ asmmat , ~ sex , svyquantile , 0.5 ,
+		se = TRUE , keep.var = TRUE , ci = TRUE 
+) ) )
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design ,
+	svyratio( numerator = ~ asssci , denominator = ~ asmmat )
+) )
+```
+
+### Subsetting {-}
+
+Restrict the survey design to Australia, Austria, Azerbaijan, Belgium (French):
+```{r eval = FALSE , results = "hide" }
+sub_timss_design <- subset( timss_design , idcntry %in% c( 36 , 40 , 31 , 957 ) )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( sub_timss_design , svymean( ~ asmmat ) ) )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <-
+	lodown:::timss_MIcombine( with( timss_design ,
+		svymean( ~ asmmat )
+	) )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	lodown:::timss_MIcombine( with( timss_design ,
+		svyby( ~ asmmat , ~ sex , svymean )
+	) )
+
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( timss_design$designs[[1]] )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+lodown:::timss_MIcombine( with( timss_design , svyvar( ~ asmmat ) ) )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+lodown:::timss_MIcombine( with( timss_design ,
+	svymean( ~ asmmat , deff = TRUE )
+) )
+
+# SRS with replacement
+lodown:::timss_MIcombine( with( timss_design ,
+	svymean( ~ asmmat , deff = "replace" )
+) )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvyciprop( ~ born_2001_or_later , timss_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvyttest( asmmat ~ born_2001_or_later , timss_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvychisq( ~ born_2001_or_later + idcntry , timss_design )
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	lodown:::timss_MIcombine( with( timss_design ,
+		svyglm( asmmat ~ born_2001_or_later + idcntry )
+	) )
+	
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+

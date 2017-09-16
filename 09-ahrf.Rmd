@@ -1,0 +1,188 @@
+# Area Health Resource File (AHRF) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/ahrf.svg?branch=master)](https://travis-ci.org/asdfree/ahrf) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ahrf?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ahrf)
+
+Though not a survey data set itself, useful to merge onto other microdata.
+
+* One table with one row per county and a second table with one row per state.
+
+* Replaced annually with the latest available county- and state-level statistics.
+
+* Compiled by the United States [Health Services and Resources Administration (HRSA)](http://www.hrsa.gov/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available AHRF microdata by simply specifying `"ahrf"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "ahrf" , output_dir = file.path( path.expand( "~" ) , "AHRF" ) )
+```
+
+## Analysis Examples with base R {-}
+
+Load a data frame:
+
+```{r eval = FALSE }
+ahrf_df <- readRDS( file.path( path.expand( "~" ) , "AHRF" , "county/AHRF_2016-2017.rds" ) )
+```
+
+```{r eval = FALSE }
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+ahrf_df <- 
+	transform( 
+		ahrf_df , 
+		
+		cbsa_indicator_code = 
+			factor( 
+				1 + as.numeric( f1406715 ) , 
+				labels = c( "not metro" , "metro" , "micro" ) 
+			) ,
+			
+		mhi_2014 = f1322614 ,
+		
+		whole_county_hpsa_2016 = as.numeric( f0978716 == 1 ) ,
+		
+		census_region = 
+			factor( 
+				as.numeric( f04439 ) , 
+				labels = c( "northeast" , "midwest" , "south" , "west" ) 
+			)
+
+	)
+	
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( ahrf_df )
+
+table( ahrf_df[ , "cbsa_indicator_code" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( ahrf_df[ , "mhi_2014" ] , na.rm = TRUE )
+
+tapply(
+	ahrf_df[ , "mhi_2014" ] ,
+	ahrf_df[ , "cbsa_indicator_code" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( ahrf_df[ , "census_region" ] ) )
+
+prop.table(
+	table( ahrf_df[ , c( "census_region" , "cbsa_indicator_code" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( ahrf_df[ , "mhi_2014" ] , na.rm = TRUE )
+
+tapply(
+	ahrf_df[ , "mhi_2014" ] ,
+	ahrf_df[ , "cbsa_indicator_code" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( ahrf_df[ , "mhi_2014" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	ahrf_df[ , "mhi_2014" ] ,
+	ahrf_df[ , "cbsa_indicator_code" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to California:
+```{r eval = FALSE , results = "hide" }
+sub_ahrf_df <- subset( ahrf_df , f12424 == "CA" )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_ahrf_df[ , "mhi_2014" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( ahrf_df[ , "mhi_2014" ] , na.rm = TRUE )
+
+tapply(
+	ahrf_df[ , "mhi_2014" ] ,
+	ahrf_df[ , "cbsa_indicator_code" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( mhi_2014 ~ whole_county_hpsa_2016 , ahrf_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( ahrf_df[ , c( "whole_county_hpsa_2016" , "census_region" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		mhi_2014 ~ whole_county_hpsa_2016 + census_region , 
+		data = ahrf_df
+	)
+
+summary( glm_result )
+```
+
+## Analysis Examples with `dplyr` {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for AHRF users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+ahrf_tbl <- tbl_df( ahrf_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+ahrf_tbl %>%
+	summarize( mean = mean( mhi_2014 , na.rm = TRUE ) )
+
+ahrf_tbl %>%
+	group_by( cbsa_indicator_code ) %>%
+	summarize( mean = mean( mhi_2014 , na.rm = TRUE ) )
+```
+
+

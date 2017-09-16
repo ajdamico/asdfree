@@ -1,0 +1,291 @@
+# American National Election Study (ANES) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/anes.svg?branch=master)](https://travis-ci.org/asdfree/anes) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/anes?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/anes)
+
+The American National Election Study (ANES) collects information on political belief and behavior from eligible voters in the United States.
+
+* Most tables contain one row per sampled eligible voter.
+
+* A complex sample survey designed to generalize to eligible voters in the United States.
+
+* Time series studies released biennially.
+
+* Administered by [Stanford University](https://iriss.stanford.edu/) and the [University of Michigan](https://www.isr.umich.edu/cps/index.html) and funded by the [National Science Foundation](https://www.nsf.gov).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available ANES microdata by simply specifying `"anes"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "anes" , output_dir = file.path( path.expand( "~" ) , "ANES" ) , 
+	your_email = "email@address.com" )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the ANES catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available ANES microdata files
+anes_cat <-
+	get_catalog( "anes" ,
+		output_dir = file.path( path.expand( "~" ) , "ANES" ) , 
+		your_email = "email@address.com" )
+
+# 2016 only
+anes_cat <- subset( anes_cat , directory == "2016 Time Series Study" )
+# download the microdata to your local computer
+lodown( "anes" , anes_cat , 
+	your_email = "email@address.com" )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+library(survey)
+
+anes_df <- 
+	readRDS( 
+		file.path( path.expand( "~" ) , "ANES" , 
+			"2016 Time Series Study/anes_timeseries_2016_.rds" )
+	)
+
+anes_design <-
+	svydesign( 
+		~v160202 , 
+		strata = ~v160201 , 
+		data = anes_df , 
+		weights = ~v160102 , 
+		nest = TRUE 
+	)
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+anes_design <- 
+	update( 
+		anes_design , 
+		
+		one = 1 ,
+		
+		pope_francis_score = ifelse( v162094 %in% 0:100 , v162094 , NA ) ,
+
+		christian_fundamentalist_score = ifelse( v162095 %in% 0:100 , v162095 , NA ) ,
+		
+		primary_voter = ifelse( v161021 %in% 1:2 , as.numeric( v161021 == 1 ) , NA ) ,
+
+		think_gov_spend =
+			factor( v161514 , levels = 1:4 , labels =
+				c( 'foreign aid' , 'medicare' , 'national defense' , 'social security' )
+			) ,
+		
+		undoc_kids =
+			factor( v161195x , levels = 1:6 , labels =
+				c( 'should sent back - favor a great deal' ,
+					'should sent back - favor a moderate amount' ,
+					'should sent back - favor a little' ,
+					'should allow to stay - favor a little' ,
+					'should allow to stay - favor a moderate amount' ,
+					'should allow to stay - favor a great deal' )
+			)
+
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( anes_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ undoc_kids , anes_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , anes_design )
+
+svyby( ~ one , ~ undoc_kids , anes_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ pope_francis_score , anes_design , na.rm = TRUE )
+
+svyby( ~ pope_francis_score , ~ undoc_kids , anes_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ think_gov_spend , anes_design , na.rm = TRUE )
+
+svyby( ~ think_gov_spend , ~ undoc_kids , anes_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ pope_francis_score , anes_design , na.rm = TRUE )
+
+svyby( ~ pope_francis_score , ~ undoc_kids , anes_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ think_gov_spend , anes_design , na.rm = TRUE )
+
+svyby( ~ think_gov_spend , ~ undoc_kids , anes_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ pope_francis_score , anes_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ pope_francis_score , 
+	~ undoc_kids , 
+	anes_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE ,
+	na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ christian_fundamentalist_score , 
+	denominator = ~ pope_francis_score , 
+	anes_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to party id: independent:
+```{r eval = FALSE , results = "hide" }
+sub_anes_design <- subset( anes_design , v161158x == 4 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ pope_francis_score , sub_anes_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ pope_francis_score , anes_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ pope_francis_score , 
+		~ undoc_kids , 
+		anes_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( anes_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ pope_francis_score , anes_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ pope_francis_score , anes_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ pope_francis_score , anes_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ primary_voter , anes_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( pope_francis_score ~ primary_voter , anes_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ primary_voter + think_gov_spend , 
+	anes_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		pope_francis_score ~ primary_voter + think_gov_spend , 
+		anes_design 
+	)
+
+summary( glm_result )
+```
+
+## Analysis Examples with `srvyr` {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ANES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+anes_srvyr_design <- as_survey( anes_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+anes_srvyr_design %>%
+	summarize( mean = survey_mean( pope_francis_score , na.rm = TRUE ) )
+
+anes_srvyr_design %>%
+	group_by( undoc_kids ) %>%
+	summarize( mean = survey_mean( pope_francis_score , na.rm = TRUE ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+

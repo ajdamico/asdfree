@@ -1,0 +1,50 @@
+chapter_title: Public Libraries Survey
+
+~~~{dataset_introduction}
+An annual census of public libraries in the United States.
+~~~
+
+table_structure: * One table with one row per state, a second table with one row per library system, and a third table with one row per library building or bookmobile.
+
+publication_period: * Released annually since 1992.
+
+administrative_organization: * Conducted by the [Institute of Museum and Library Services (IMLS)](https://www.imls.gov/) and collected by the [US Census Bureau](http://www.census.gov/).
+
+catalog_subset_description: # 2014 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2014 )
+
+
+~~~{analysis_examples_loading_block}
+chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014/pls_fy_ae_puplda.rds" ) )
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		c_relatn = 
+			factor( c_relatn , levels = c( "HQ" , "ME" , "NO" ) ,
+				c( "HQ-Headquarters of a federation or cooperative" ,
+				"ME-Member of a federation or cooperative" ,
+				"NO-Not a member of a federation or cooperative" )
+			) ,
+			
+		more_than_one_librarian = as.numeric( libraria > 1 )
+				
+	)	
+~~~
+
+group_by_variable: stabr
+linear_variable: popu_lsa
+categorical_variable: c_relatn
+subset_definition: visits > 1000000
+subset_definition_description: more than one million annual visits
+binary_variable: more_than_one_librarian
+needs_dplyr_block: yes
+
+
+
+
+
+needs_build_status_line: yes

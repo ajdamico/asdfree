@@ -1,0 +1,279 @@
+# Pesquisa Nacional por Amostra de Domicilios (NHTS) {-}
+
+*Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+Brazil's previous principal household survey, the Pesquisa Nacional por Amostra de Domicilios (PNAD) measures general education, labor, income, and housing characteristics of the population.
+
+* One table with one row per sampled household and a second table with one row per individual within each sampled household.
+
+* A complex sample survey designed to generalize to the civilian non-institutional population of Brazil, although the rural north was not included prior to 2004.
+
+* Released annually since 2001 except for years ending in zero, when the decennial census takes its place.
+
+* Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available NHTS microdata by simply specifying `"nhts"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "nhts" , output_dir = file.path( path.expand( "~" ) , "NHTS" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the NHTS catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available NHTS microdata files
+nhts_cat <-
+	get_catalog( "nhts" ,
+		output_dir = file.path( path.expand( "~" ) , "NHTS" ) )
+
+# 2011 only
+nhts_cat <- subset( nhts_cat , year == 2011 )
+# download the microdata to your local computer
+lodown( "nhts" , nhts_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a database-backed complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+library(DBI)
+library(MonetDBLite)
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+prestratified_design <-
+	svydesign(
+		id = ~v4618 ,
+		strata = ~v4617 ,
+		data = nhts_cat[ 1 , "db_tablename" ] ,
+		weights = ~pre_wgt ,
+		nest = TRUE ,
+		dbtype = "MonetDBLite" ,
+		dbname = nhts_cat[ 1 , "dbfolder" ]
+	)
+	
+nhts_design <- 
+	lodown:::pnad_postStratify( 
+		design = prestratified_design ,
+		strata.col = 'v4609' ,
+		oldwgt = 'pre_wgt'
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+nhts_design <- 
+	update( 
+		nhts_design , 
+		age_categories = factor( 1 + findInterval( v8005 , seq( 5 , 60 , 5 ) ) ) ,
+		male = as.numeric( v0302 == 2 ) ,
+		teenagers = as.numeric( v8005 > 12 & v8005 < 20 ) ,
+		started_working_before_thirteen = as.numeric( v9892 < 13 )
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( nhts_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ region , nhts_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , nhts_design )
+
+svyby( ~ one , ~ region , nhts_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ v4720 , nhts_design , na.rm = TRUE )
+
+svyby( ~ v4720 , ~ region , nhts_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ age_categories , nhts_design )
+
+svyby( ~ age_categories , ~ region , nhts_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ v4720 , nhts_design , na.rm = TRUE )
+
+svyby( ~ v4720 , ~ region , nhts_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ age_categories , nhts_design )
+
+svyby( ~ age_categories , ~ region , nhts_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ v4720 , nhts_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ v4720 , 
+	~ region , 
+	nhts_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE ,
+	na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ started_working_before_thirteen , 
+	denominator = ~ teenagers , 
+	nhts_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to married persons:
+```{r eval = FALSE , results = "hide" }
+sub_nhts_design <- subset( nhts_design , v4011 == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ v4720 , sub_nhts_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ v4720 , nhts_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ v4720 , 
+		~ region , 
+		nhts_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( nhts_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ v4720 , nhts_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ v4720 , nhts_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ v4720 , nhts_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ male , nhts_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( v4720 ~ male , nhts_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ male + age_categories , 
+	nhts_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		v4720 ~ male + age_categories , 
+		nhts_design 
+	)
+
+summary( glm_result )
+```
+
+## Poverty and Inequality Estimation with `convey` {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for NHTS users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+nhts_design <- convey_prep( nhts_design )
+
+sub_nhts_design <- 
+	subset( 
+		nhts_design , 
+		!is.na( v4720 ) & v4720 != 0 & v8005 >= 15
+	)
+
+svygini( ~ v4720 , sub_nhts_design , na.rm = TRUE )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+svytotal( ~one , nhts_design )
+svytotal( ~factor( v0302 ) , nhts_design )
+cv( svytotal( ~factor( v0302 ) , nhts_design ) )
+```
+
+## Database Shutdown {-}
+
+```{r eval = FALSE , results = "hide" }
+close( nhts_design , shutdown = TRUE )
+```

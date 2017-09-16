@@ -1,0 +1,185 @@
+chapter_title: Pesquisa Nacional por Amostra de Domicilios - Continua
+authorship_line: *Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+~~~{dataset_introduction}
+Brazil's principal household survey, the Pesquisa Nacional por Amostra de Domicilios Continua (PNADC) measures general education, labor, income, and housing characteristics of the population.
+~~~
+
+table_structure: * One table with one row per sampled household and a second table with one row per individual within each sampled household.
+
+generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional population of Brazil.
+
+publication_period: * Released quarterly since 2012.
+
+administrative_organization: * Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2015 3rd quarter only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2015 & quarter == '03' )
+
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "pnadc 2015 03.rds" ) )
+
+# add a column of all ones
+chapter_tag_df$one <- 1
+
+# construct a data.frame object with all state names.
+uf <-
+  structure(list(V1 = c(11L, 12L, 13L, 14L, 15L, 16L, 17L, 21L, 
+    22L, 23L, 24L, 25L, 26L, 27L, 28L, 29L, 31L, 32L, 33L, 35L, 41L, 
+    42L, 43L, 50L, 51L, 52L, 53L), V2 = structure(c(22L, 1L, 4L, 
+      23L, 14L, 3L, 27L, 10L, 18L, 6L, 20L, 15L, 17L, 2L, 26L, 5L, 
+      13L, 8L, 19L, 25L, 16L, 24L, 21L, 12L, 11L, 9L, 7L), .Label = c("Acre", 
+        "Alagoas", "Amapa", "Amazonas", "Bahia", "Ceara", "Distrito Federal", 
+        "Espirito Santo", "Goias", "Maranhao", "Mato Grosso", "Mato Grosso do Sul", 
+        "Minas Gerais", "Para", "Paraiba", "Parana", "Pernambuco", "Piaui", 
+        "Rio de Janeiro", "Rio Grande do Norte", "Rio Grande do Sul", 
+        "Rondonia", "Roraima", "Santa Catarina", "Sao Paulo", "Sergipe", 
+        "Tocantins"), class = "factor")), .Names = c("uf", "uf_name"), 
+		class = "data.frame", row.names = c(NA, -27L))
+
+# merge this data.frame onto the main `x` data.frame
+# using `uf` as the merge field, keeping all non-matches.
+chapter_tag_df <- merge( chapter_tag_df , uf , all.x = TRUE )
+
+# confirm complete matches
+stopifnot( all( !is.na( chapter_tag_df$uf_name ) ) )
+
+# preliminary survey design
+pre_stratified <-
+	svydesign(
+		ids = ~ upa , 
+		strata = ~ estrato , 
+		weights = ~ v1027 , 
+		data = chapter_tag_df ,
+		nest = TRUE
+	)
+# warning: do not use `pre_stratified` in your analyses!
+# you must use the `chapter_tag_design` object created below.
+
+# post-stratification targets
+df_pos <- 
+	data.frame( posest = unique( chapter_tag_df$posest ) , Freq = unique( chapter_tag_df$v1029 ) )
+
+# final survey design object
+chapter_tag_design <- postStratify( pre_stratified , ~ posest , df_pos )
+
+# remove the `chapter_tag_df` data.frame object
+# and the `pre_stratified` design before stratification
+rm( chapter_tag_df , pre_stratified )
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		age_categories = factor( 1 + findInterval( v2009 , seq( 5 , 60 , 5 ) ) ) ,
+		male = as.numeric( v2007 == 1 ) ,
+		pia = as.numeric( v2009 >= 14 ) ,
+		region = substr( uf , 1 , 1 )
+	)
+	
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		ocup_c = ifelse( pia == 1 , as.numeric( vd4002 %in% 1 ) , NA ) ,
+		desocup30 = ifelse( pia == 1 , as.numeric( vd4002 %in% 2 ) , NA ) ,
+		# calculate usual income from main job
+		# (rendimento habitual do trabalho principal)
+		vd4016n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4016 , NA ) ,
+		# calculate effective income from main job
+		# (rendimento efetivo do trabalho principal) 
+		vd4017n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4017 , NA ) ,
+		# calculate usual income from all jobs
+		# (variavel rendimento habitual de todos os trabalhos)
+		vd4019n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4019 , NA ) ,
+		# calculate effective income from all jobs
+		# (rendimento efetivo do todos os trabalhos) 
+		vd4020n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4020 , NA ) ,
+		# determine individuals who are either working or not working
+		# (that is, the potential labor force)
+		pea_c = as.numeric( ocup_c == 1 | desocup30 == 1 )
+	)
+~~~
+
+
+group_by_variable: uf_name
+linear_variable: vd4020n
+linear_narm: , na.rm = TRUE
+categorical_variable: age_categories
+ratio_estimation_numerator: ocup_c
+ratio_estimation_denominator: pea_c
+ratio_narm: , na.rm = TRUE
+subset_definition: desocup30 == 1
+subset_definition_description: unemployed persons in the labor force
+binary_variable: male
+
+~~~{convey_block}
+## Poverty and Inequality Estimation with `convey` {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+chapter_tag_design <- convey_prep( chapter_tag_design )
+
+sub_chapter_tag_design <- 
+	subset( chapter_tag_design , pia == 1 )
+
+svygini( ~ vd4020n , sub_chapter_tag_design , na.rm = TRUE )
+```
+~~~
+
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+nationwide_pop <- 
+	svytotal( ~ pia , chapter_tag_design , na.rm = TRUE )
+nationwide_forca <- 
+	svytotal( ~ factor( vd4001 ) , chapter_tag_design , na.rm = TRUE )
+nationwide_ocupacao <- 
+	svytotal( ~ factor( vd4002 ) , chapter_tag_design , na.rm = TRUE )
+regional_pop <- 
+	svyby( ~ pia , ~ region , chapter_tag_design , svytotal , na.rm = TRUE )
+regional_forca <- 
+	svyby( ~ factor( vd4001 ) , ~ region , chapter_tag_design , svytotal , na.rm = TRUE )
+regional_ocupacao <- 
+	svyby( ~ factor( vd4002 ) , ~ region , chapter_tag_design , svytotal , na.rm = TRUE )
+```
+
+~~~
+
+
+
+
+needs_build_status_line: yes
+
+
+
+
+~~~{sample_setup_block}
+library(lodown)
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
+
+# sample 75% of the records
+which_records <- sample( seq( nrow( chapter_tag_cat ) ) , round( nrow( chapter_tag_cat ) * 0.75 ) )
+
+# always sample year == 2015
+chapter_tag_cat <- unique( rbind( chapter_tag_cat[ which_records , ] , subset( chapter_tag_cat , year == 2015 ) ) )
+
+lodown( "chapter_tag" , chapter_tag_cat )
+~~~

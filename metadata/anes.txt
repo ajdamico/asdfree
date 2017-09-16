@@ -1,0 +1,129 @@
+chapter_title: American National Election Study
+
+~~~{dataset_introduction}
+The American National Election Study (ANES) collects information on political belief and behavior from eligible voters in the United States.
+~~~
+
+lodown_password_parameters: , \\\\n\\\\tyour_email = "email@address.com"
+get_catalog_password_parameters: , \\\\n\\\\t\\\\tyour_email = "email@address.com"
+
+table_structure: * Most tables contain one row per sampled eligible voter.
+
+generalizable_population: * A complex sample survey designed to generalize to eligible voters in the United States.
+
+publication_period: * Time series studies released biennially.
+
+administrative_organization: * Administered by [Stanford University](https://iriss.stanford.edu/) and the [University of Michigan](https://www.isr.umich.edu/cps/index.html) and funded by the [National Science Foundation](https://www.nsf.gov).
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2016 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , directory == "2016 Time Series Study" )
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_df <- 
+	readRDS( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+			"2016 Time Series Study/anes_timeseries_2016_.rds" )
+	)
+
+chapter_tag_design <-
+	svydesign( 
+		~v160202 , 
+		strata = ~v160201 , 
+		data = chapter_tag_df , 
+		weights = ~v160102 , 
+		nest = TRUE 
+	)
+
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		pope_francis_score = ifelse( v162094 %in% 0:100 , v162094 , NA ) ,
+
+		christian_fundamentalist_score = ifelse( v162095 %in% 0:100 , v162095 , NA ) ,
+		
+		primary_voter = ifelse( v161021 %in% 1:2 , as.numeric( v161021 == 1 ) , NA ) ,
+
+		think_gov_spend =
+			factor( v161514 , levels = 1:4 , labels =
+				c( 'foreign aid' , 'medicare' , 'national defense' , 'social security' )
+			) ,
+		
+		undoc_kids =
+			factor( v161195x , levels = 1:6 , labels =
+				c( 'should sent back - favor a great deal' ,
+					'should sent back - favor a moderate amount' ,
+					'should sent back - favor a little' ,
+					'should allow to stay - favor a little' ,
+					'should allow to stay - favor a moderate amount' ,
+					'should allow to stay - favor a great deal' )
+			)
+
+	)
+~~~
+
+group_by_variable: undoc_kids
+
+categorical_variable: think_gov_spend
+categorical_narm: , na.rm = TRUE
+
+linear_variable: pope_francis_score
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: christian_fundamentalist_score
+ratio_estimation_denominator: pope_francis_score
+ratio_narm: , na.rm = TRUE
+
+subset_definition: v161158x == 4
+subset_definition_description: party id: independent
+
+binary_variable: primary_voter
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+dependencies: library(purrr)
+
+
+
+needs_build_status_line: yes
+
+~~~{machine_specific_replacements_block}
+machine_specific_replacements <- 
+	list( 
+		
+		# replace the folder path on macnix
+		c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
+		
+		# change other things in the script to be run
+		c( "hello" , "howdy" ) ,
+		
+		c( '"email@address.com"' , 'my_email_address' )
+		
+	)
+~~~
+
+~~~{environment_variables_block}
+my_email_address <- Sys.getenv( "my_email_address" )
+~~~

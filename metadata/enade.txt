@@ -1,0 +1,58 @@
+chapter_title: Exame Nacional de Desempenho de Estudantes
+
+~~~{dataset_introduction}
+The Exame Nacional de Desempenho de Estudantes (ENADE) evaluates the performance of undergraduate students in relation to the program content, skills and competences acquired in their training. The exam is mandatory and the student's regularity in the exam must be included in his or her school record.
+~~~
+
+table_structure: * One table with one row per individual undergraduate student in Brazil.
+
+publication_period: * Released annually since 2004.
+
+generalizable_population: * An enumeration of undergraduate students in Brazil.
+
+administrative_organization: * Compiled by the Brazilian [Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)](http://www.inep.gov.br/).
+
+
+~~~{analysis_examples_loading_block}
+chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015 main.rds" ) )
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		# qual foi o tempo gasto por voce para concluir a prova?
+		less_than_two_hours = as.numeric( qp_i9 %in% c( 'A' , 'B' ) ) ,
+		
+
+		state_name = 
+			factor( 
+				co_uf_curso , 
+				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
+				"Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+				"Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+				"Bahia" , "Minas Gerais" , "Espirito Santo" , 
+				"Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+				"Santa Catarina" , "Rio Grande do Sul" , 
+				"Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+				"Distrito Federal" )
+			)
+
+	)
+	
+~~~
+
+group_by_variable: tp_sexo
+linear_variable: nt_obj_fg
+linear_narm: , na.rm = TRUE
+categorical_variable: state_name
+subset_definition: qp_i1 %in% c( "A" , "B" )
+subset_definition_description: Students reporting that the general training section of the test was easy or very easy
+binary_variable: less_than_two_hours
+needs_dplyr_block: yes
+
+
+needs_build_status_line: yes

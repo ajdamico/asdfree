@@ -1,0 +1,72 @@
+chapter_title: Program for International Student Assessment
+
+~~~{dataset_introduction}
+The authoritative source for evaluating educational achievement across nations, the Program(me) for International Student Assessment ranks the math, science, and reading skills of high school students across the developed world.
+~~~
+
+table_structure: * A large table with one row per student, a smaller table with one row per school, then multiple (optional) tables such as one row per parent or per teacher.
+
+generalizable_population: * A complex sample survey designed to generalize to 15-year-old schoolchildren in more than sixty countries.
+
+publication_period: * Released triennially since 2000.
+
+administrative_organization: * Administered by the [OECD](www.oecd.org/).
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2015 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2015 )
+
+
+~~~{analysis_examples_survey_design}
+library(DBI)
+library(MonetDBLite)
+library(survey)
+library(mitools)
+
+chapter_tag_design <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015 cmb_stu_qqq design.rds" ) )
+
+chapter_tag_design <- lodown:::svyMDBdesign( chapter_tag_design )
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		gender = factor( st004d01t , labels = c( "male" , "female" ) ) ,
+		
+		how_many_computers_at_home = 
+			factor( 
+				st012q06na , 
+				labels = c( "none" , "one" , "two" , "three or more" ) 
+			)
+ 
+	)
+~~~
+
+
+group_by_variable: gender
+linear_variable: scie
+categorical_variable: how_many_computers_at_home
+ratio_estimation_numerator: math
+ratio_estimation_denominator: reading
+subset_definition: cnt == "ALB"
+subset_definition_description: Albania
+binary_variable: oecd
+
+
+
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+
+```
+~~~
+

@@ -1,0 +1,279 @@
+# Brazilian Censo Demografico (CENSO) {-}
+
+*Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+Brazil's decennial census.
+
+* One table with one row per household and a second table with one row per individual within each household. The 2000 Censo also includes a table with one record per family inside each household.
+
+* An enumeration of the civilian non-institutional population of Brazil.
+
+* Released decennially by IBGE since 2000, however earlier extracts are available from IPUMS International.
+
+* Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available CENSO microdata by simply specifying `"censo"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "censo" , output_dir = file.path( path.expand( "~" ) , "CENSO" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the CENSO catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available CENSO microdata files
+censo_cat <-
+	get_catalog( "censo" ,
+		output_dir = file.path( path.expand( "~" ) , "CENSO" ) )
+
+# 2010 only
+censo_cat <- subset( censo_cat , year == 2010 )
+# download the microdata to your local computer
+lodown( "censo" , censo_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a database-backed complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+library(DBI)
+library(MonetDBLite)
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+censo_design <- readRDS( file.path( path.expand( "~" ) , "CENSO" , "pes 2010 design.rds" ) )
+
+censo_design <- open( censo_design , driver = MonetDBLite() )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+censo_design <-
+	update(
+		
+		censo_design ,
+		
+		nmorpob1 = ifelse( v6531 >= 0 , as.numeric( v6531 < 70 ) , NA ) ,
+		nmorpob2 = ifelse( v6531 >= 0 , as.numeric( v6531 < 80 ) , NA ) , 
+		nmorpob3 = ifelse( v6531 >= 0 , as.numeric( v6531 < 90 ) , NA ) , 
+		nmorpob4 = ifelse( v6531 >= 0 , as.numeric( v6531 < 100 ) , NA ) , 
+		nmorpob5 = ifelse( v6531 >= 0 , as.numeric( v6531 < 140 ) , NA ) , 
+		nmorpob6 = ifelse( v6531 >= 0 , as.numeric( v6531 < 272.50 ) , NA ) ,
+		
+		sexo = factor( v0601 , labels = c( "masculino" , "feminino" ) ) ,
+		
+		state_name = 
+			factor( 
+				v0001 , 
+				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
+				"Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+				"Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+				"Bahia" , "Minas Gerais" , "Espirito Santo" , 
+				"Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+				"Santa Catarina" , "Rio Grande do Sul" , 
+				"Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+				"Distrito Federal" )
+			)
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( censo_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ state_name , censo_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , censo_design )
+
+svyby( ~ one , ~ state_name , censo_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ v6033 , censo_design )
+
+svyby( ~ v6033 , ~ state_name , censo_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ sexo , censo_design )
+
+svyby( ~ sexo , ~ state_name , censo_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ v6033 , censo_design )
+
+svyby( ~ v6033 , ~ state_name , censo_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ sexo , censo_design )
+
+svyby( ~ sexo , ~ state_name , censo_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ v6033 , censo_design , 0.5 )
+
+svyby( 
+	~ v6033 , 
+	~ state_name , 
+	censo_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ nmorpob1 , 
+	denominator = ~ nmorpob1 + one , 
+	censo_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to married persons:
+```{r eval = FALSE , results = "hide" }
+sub_censo_design <- subset( censo_design , v0640 == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ v6033 , sub_censo_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ v6033 , censo_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ v6033 , 
+		~ state_name , 
+		censo_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( censo_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ v6033 , censo_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ v6033 , censo_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ v6033 , censo_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ nmorpob6 , censo_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( v6033 ~ nmorpob6 , censo_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ nmorpob6 + sexo , 
+	censo_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		v6033 ~ nmorpob6 + sexo , 
+		censo_design 
+	)
+
+summary( glm_result )
+```
+
+## Poverty and Inequality Estimation with `convey` {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for CENSO users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+censo_design <- convey_prep( censo_design )
+
+sub_censo_design <- 
+	subset( censo_design , v6531 >= 0 )
+
+svygini( ~ v6531 , sub_censo_design , na.rm = TRUE )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+## Database Shutdown {-}
+
+```{r eval = FALSE , results = "hide" }
+close( censo_design , shutdown = TRUE )
+```

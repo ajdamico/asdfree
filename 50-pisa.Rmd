@@ -1,0 +1,249 @@
+# Program for International Student Assessment (PISA) {-}
+
+The authoritative source for evaluating educational achievement across nations, the Program(me) for International Student Assessment ranks the math, science, and reading skills of high school students across the developed world.
+
+* A large table with one row per student, a smaller table with one row per school, then multiple (optional) tables such as one row per parent or per teacher.
+
+* A complex sample survey designed to generalize to 15-year-old schoolchildren in more than sixty countries.
+
+* Released triennially since 2000.
+
+* Administered by the [OECD](www.oecd.org/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available PISA microdata by simply specifying `"pisa"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "pisa" , output_dir = file.path( path.expand( "~" ) , "PISA" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the PISA catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available PISA microdata files
+pisa_cat <-
+	get_catalog( "pisa" ,
+		output_dir = file.path( path.expand( "~" ) , "PISA" ) )
+
+# 2015 only
+pisa_cat <- subset( pisa_cat , year == 2015 )
+# download the microdata to your local computer
+lodown( "pisa" , pisa_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a multiply-imputed, database-backed complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+library(DBI)
+library(MonetDBLite)
+library(survey)
+library(mitools)
+
+pisa_design <- readRDS( file.path( path.expand( "~" ) , "PISA" , "2015 cmb_stu_qqq design.rds" ) )
+
+pisa_design <- lodown:::svyMDBdesign( pisa_design )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+pisa_design <- 
+	update( 
+		pisa_design , 
+		
+		gender = factor( st004d01t , labels = c( "male" , "female" ) ) ,
+		
+		how_many_computers_at_home = 
+			factor( 
+				st012q06na , 
+				labels = c( "none" , "one" , "two" , "three or more" ) 
+			)
+ 
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design , svyby( ~ one , ~ one , unwtd.count ) ) )
+
+MIcombine( with( pisa_design , svyby( ~ one , ~ gender , unwtd.count ) ) )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design , svytotal( ~ one ) ) )
+
+MIcombine( with( pisa_design ,
+	svyby( ~ one , ~ gender , svytotal )
+) )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design , svymean( ~ scie ) ) )
+
+MIcombine( with( pisa_design ,
+	svyby( ~ scie , ~ gender , svymean )
+) )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design , svymean( ~ how_many_computers_at_home ) ) )
+
+MIcombine( with( pisa_design ,
+	svyby( ~ how_many_computers_at_home , ~ gender , svymean )
+) )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design , svytotal( ~ scie ) ) )
+
+MIcombine( with( pisa_design ,
+	svyby( ~ scie , ~ gender , svytotal )
+) )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design , svytotal( ~ how_many_computers_at_home ) ) )
+
+MIcombine( with( pisa_design ,
+	svyby( ~ how_many_computers_at_home , ~ gender , svytotal )
+) )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design , svyquantile( ~ scie , 0.5 , se = TRUE ) ) )
+
+MIcombine( with( pisa_design ,
+	svyby( 
+		~ scie , ~ gender , svyquantile , 0.5 ,
+		se = TRUE , keep.var = TRUE , ci = TRUE 
+) ) )
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design ,
+	svyratio( numerator = ~ math , denominator = ~ reading )
+) )
+```
+
+### Subsetting {-}
+
+Restrict the survey design to Albania:
+```{r eval = FALSE , results = "hide" }
+sub_pisa_design <- subset( pisa_design , cnt == "ALB" )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( sub_pisa_design , svymean( ~ scie ) ) )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <-
+	MIcombine( with( pisa_design ,
+		svymean( ~ scie )
+	) )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	MIcombine( with( pisa_design ,
+		svyby( ~ scie , ~ gender , svymean )
+	) )
+
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( pisa_design$designs[[1]] )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( pisa_design , svyvar( ~ scie ) ) )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+MIcombine( with( pisa_design ,
+	svymean( ~ scie , deff = TRUE )
+) )
+
+# SRS with replacement
+MIcombine( with( pisa_design ,
+	svymean( ~ scie , deff = "replace" )
+) )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvyciprop( ~ oecd , pisa_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvyttest( scie ~ oecd , pisa_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+lodown:::MIsvychisq( ~ oecd + how_many_computers_at_home , pisa_design )
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	MIcombine( with( pisa_design ,
+		svyglm( scie ~ oecd + how_many_computers_at_home )
+	) )
+	
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+## Database Shutdown {-}
+
+```{r eval = FALSE , results = "hide" }
+close( pisa_design , shutdown = TRUE )
+```

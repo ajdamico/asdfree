@@ -1,0 +1,117 @@
+chapter_title: American Housing Survey
+
+~~~{dataset_introduction}
+The American Housing Survey tracks housing structures across the United States.
+~~~
+
+table_structure: * A collection of tables, most with one row per housing unit.
+
+generalizable_population: * A complex sample survey designed to generalize to both occupied and vacant housing units across the United States and also for about twenty-five metropolitan areas.
+
+publication_period: * Released more or less biennially since 1973.
+
+administrative_organization: * Sponsored by [the Department of Housing and Urban Development (HUD)](https://www.hud.gov/) and conducted by the [U.S. Census Bureau](https://www.census.gov/).
+
+needs_catalog_block: yes
+catalog_subset_description: # 2015 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2015 )
+
+~~~{analysis_examples_survey_design}
+options( survey.replicates.mse = TRUE )
+
+library(survey)
+
+chapter_tag_df <- 
+	readRDS( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+			"2015/national_v1.3/household.rds" 
+		) 
+	)
+
+chapter_tag_design <- 
+	svrepdesign(
+		weights = ~weight,
+		repweights = "repwgt[1-9]" ,
+		type = "Fay" ,
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		data = chapter_tag_df
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+
+		occupant = 
+			ifelse( tenure == 1 , "owner" , 
+			ifelse( tenure %in% 2:3 , "renter" , 
+				"not occupied" ) ) ,
+				
+		lotsize =
+			factor( lotsize , levels = 1:7 ,
+				labels = c( "Less then 1/8 acre" , 
+				"1/8 up to 1/4 acre" , "1/4 up to 1/2 acre" ,
+				"1/2 up to 1 acre" , "1 up to 5 acres" , 
+				"5 up to 10 acres" , "10 acres or more" ) ) ,
+				
+				
+		below_poverty = as.numeric( perpovlvl < 100 )
+				
+	)
+~~~
+
+group_by_variable: occupant
+
+categorical_variable: lotsize
+categorical_narm: , na.rm = TRUE
+
+linear_variable: totrooms
+
+ratio_estimation_numerator: totrooms
+ratio_estimation_denominator: rent
+ratio_narm: , na.rm = TRUE
+
+subset_definition: garage == 1
+subset_definition_description: homes with a garage or carport
+
+binary_variable: below_poverty
+binary_narm: , na.rm = TRUE
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+needs_build_status_line: yes
+
+
+
+
+~~~{sample_setup_block}
+library(lodown)
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
+
+# sample 50% of the records
+which_records <- sample( seq( nrow( chapter_tag_cat ) ) , round( nrow( chapter_tag_cat ) * 0.5 ) )
+
+# always sample year == 2015
+chapter_tag_cat <- unique( rbind( chapter_tag_cat[ which_records , ] , subset( chapter_tag_cat , year == 2015 ) ) )
+
+lodown( "chapter_tag" , chapter_tag_cat )
+~~~

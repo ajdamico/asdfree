@@ -1,0 +1,356 @@
+# Panel Study of Income Dynamics (PSID) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/psid.svg?branch=master)](https://travis-ci.org/asdfree/psid) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/psid?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/psid)
+
+The Panel Study of Income Dynamics is the longest running longitudinal household survey in the world.
+
+* One cross-year individual with one record per respondent in participating household, many family data tables with one record per family per timepoint.
+
+* A complex sample survey designed to generalize to residents of the United States.
+
+* Released either annually or biennially since 1968.
+
+* Administered by the [University of Michigan's Institute for Social Research](https://www.isr.umich.edu/home/) and funded by [consortium](https://psidonline.isr.umich.edu/Guide/Sponsorship.aspx).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available PSID microdata by simply specifying `"psid"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "psid" , output_dir = file.path( path.expand( "~" ) , "PSID" ) , 
+	your_email = "email@address.com" , 
+	your_password = "password" )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the PSID catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available PSID microdata files
+psid_cat <-
+	get_catalog( "psid" ,
+		output_dir = file.path( path.expand( "~" ) , "PSID" ) , 
+		your_email = "email@address.com" , 
+		your_password = "password" )
+
+# download the microdata to your local computer
+lodown( "psid" , psid_cat , 
+	your_email = "email@address.com" , 
+	your_password = "password" )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+# identify the cross-year individual filename
+cross_year_individual_rds <- 
+	grep( 
+		"cross-year individual" ,
+		list.files( 
+			file.path( path.expand( "~" ) , "PSID" ) , 
+			recursive = TRUE , 
+			full.names = TRUE 
+		) ,
+		value = TRUE
+	)
+
+individual_df <- readRDS( cross_year_individual_rds )
+
+ind_variables_to_keep <-
+	c( 
+		'one' ,			# column with all ones
+		'er30001' , 	# 1968 interview number
+		'er30002' , 	# 1968 person number
+		'er31997' ,		# primary sampling unit variable
+		'er31996' ,		# stratification variable
+		'er33802' ,		# sequence number, 2005
+		'er34302' , 	# sequence number, 2015
+		'er32000' ,		# sex
+		'er34305' ,		# age in 2015
+		'er33813' ,		# employment status in 2005
+		'er34317' ,		# employment status in 2015
+		'er33848' ,		# 2005 longitudinal weight
+		'er34413'		# 2015 longitudinal weight
+	)
+
+	
+
+individual_df <- individual_df[ ind_variables_to_keep ] ; gc()
+
+family_2005_df <- 
+	readRDS( file.path( path.expand( "~" ) , "PSID" , "family files/2005.rds" ) )
+
+fam_2005_variables_to_keep <- 
+	c( 
+		'er25002' ,	# 2005 interview number
+		'er28037' 	# 2005 total family income
+		
+	)
+
+family_2005_df <- family_2005_df[ fam_2005_variables_to_keep ] ; gc()
+
+family_2015_df <- 
+	readRDS( file.path( path.expand( "~" ) , "PSID" , "family files/2015.rds" ) )
+
+fam_2015_variables_to_keep <-
+	c( 
+		'er60002' ,	# 2015 interview number
+		'er65349' 	# 2015 total family income
+	)
+
+family_2015_df <- family_2015_df[ fam_2015_variables_to_keep ] ; gc()
+
+ind_fam_2005 <- 
+	merge( 
+		individual_df , 
+		family_2005_df , 
+		by.x = 'er33802' , 
+		by.y = 'er25002' 
+	)
+
+ind_fam_2015 <- 
+	merge( 
+		individual_df , 
+		family_2015_df , 
+		by.x = 'er34302' , 
+		by.y = 'er60002' 
+	)
+
+psid_df <- merge( ind_fam_2005 , ind_fam_2015 , all = TRUE )
+
+psid_design <- 
+	svydesign( 
+		~ er31997 , 
+		strata = ~ er31996 , 
+		data = psid_df , 
+		weights = ~ er33848 , 
+		nest = TRUE 
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+psid_design <- 
+	update( 
+		psid_design , 
+		
+		employment_2005 =
+			factor( er33813 , levels = 1:8 ,
+				labels = c( 'working now' , 'only temporarily laid off' ,
+				'looking for work, unemployed' , 'retired' , 'permanently disabled' ,
+				'housewife; keeping house' , 'student' , 'other' )
+			) ,
+			
+		employed_in_2015 = 
+			factor( er34317 , levels = 1:8 ,
+				labels = c( 'working now' , 'only temporarily laid off' ,
+				'looking for work, unemployed' , 'retired' , 'permanently disabled' ,
+				'housewife; keeping house' , 'student' , 'other' )
+			) ,
+			
+		female = as.numeric( er32000 == 2 )
+
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( psid_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ employment_2005 , psid_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , psid_design )
+
+svyby( ~ one , ~ employment_2005 , psid_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ er28037 , psid_design , na.rm = TRUE )
+
+svyby( ~ er28037 , ~ employment_2005 , psid_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ employed_in_2015 , psid_design , na.rm = TRUE )
+
+svyby( ~ employed_in_2015 , ~ employment_2005 , psid_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ er28037 , psid_design , na.rm = TRUE )
+
+svyby( ~ er28037 , ~ employment_2005 , psid_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ employed_in_2015 , psid_design , na.rm = TRUE )
+
+svyby( ~ employed_in_2015 , ~ employment_2005 , psid_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ er28037 , psid_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ er28037 , 
+	~ employment_2005 , 
+	psid_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE ,
+	na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ er28037 , 
+	denominator = ~ er65349 , 
+	psid_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to senior in 2015:
+```{r eval = FALSE , results = "hide" }
+sub_psid_design <- subset( psid_design , er34305 >= 65 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ er28037 , sub_psid_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ er28037 , psid_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ er28037 , 
+		~ employment_2005 , 
+		psid_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( psid_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ er28037 , psid_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ er28037 , psid_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ er28037 , psid_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ female , psid_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( er28037 ~ female , psid_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ female + employed_in_2015 , 
+	psid_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		er28037 ~ female + employed_in_2015 , 
+		psid_design 
+	)
+
+summary( glm_result )
+```
+
+## Analysis Examples with `srvyr` {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for PSID users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+psid_srvyr_design <- as_survey( psid_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+psid_srvyr_design %>%
+	summarize( mean = survey_mean( er28037 , na.rm = TRUE ) )
+
+psid_srvyr_design %>%
+	group_by( employment_2005 ) %>%
+	summarize( mean = survey_mean( er28037 , na.rm = TRUE ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+

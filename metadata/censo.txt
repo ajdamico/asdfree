@@ -1,0 +1,105 @@
+chapter_title: Brazilian Censo Demografico
+authorship_line: *Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+~~~{dataset_introduction}
+Brazil's decennial census.
+~~~
+
+table_structure: * One table with one row per household and a second table with one row per individual within each household.  The 2000 Censo also includes a table with one record per family inside each household.
+
+generalizable_population: * An enumeration of the civilian non-institutional population of Brazil.
+
+publication_period: * Released decennially by IBGE since 2000, however earlier extracts are available from IPUMS International.
+
+administrative_organization: * Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2010 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2010 )
+
+
+~~~{analysis_examples_survey_design}
+library(DBI)
+library(MonetDBLite)
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+chapter_tag_design <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "pes 2010 design.rds" ) )
+
+chapter_tag_design <- open( chapter_tag_design , driver = MonetDBLite() )
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <-
+	update(
+		
+		chapter_tag_design ,
+		
+		nmorpob1 = ifelse( v6531 >= 0 , as.numeric( v6531 < 70 ) , NA ) ,
+		nmorpob2 = ifelse( v6531 >= 0 , as.numeric( v6531 < 80 ) , NA ) , 
+		nmorpob3 = ifelse( v6531 >= 0 , as.numeric( v6531 < 90 ) , NA ) , 
+		nmorpob4 = ifelse( v6531 >= 0 , as.numeric( v6531 < 100 ) , NA ) , 
+		nmorpob5 = ifelse( v6531 >= 0 , as.numeric( v6531 < 140 ) , NA ) , 
+		nmorpob6 = ifelse( v6531 >= 0 , as.numeric( v6531 < 272.50 ) , NA ) ,
+		
+		sexo = factor( v0601 , labels = c( "masculino" , "feminino" ) ) ,
+		
+		state_name = 
+			factor( 
+				v0001 , 
+				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
+				"Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+				"Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+				"Bahia" , "Minas Gerais" , "Espirito Santo" , 
+				"Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+				"Santa Catarina" , "Rio Grande do Sul" , 
+				"Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+				"Distrito Federal" )
+			)
+	)
+~~~
+
+
+group_by_variable: state_name
+linear_variable: v6033
+categorical_variable: sexo
+ratio_estimation_numerator: nmorpob1
+ratio_estimation_denominator: nmorpob1 + one
+ratio_narm: , na.rm = TRUE
+subset_definition: v0640 == 1
+subset_definition_description: married persons
+binary_variable: nmorpob6
+binary_narm: , na.rm = TRUE
+
+~~~{convey_block}
+## Poverty and Inequality Estimation with `convey` {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+chapter_tag_design <- convey_prep( chapter_tag_design )
+
+sub_chapter_tag_design <- 
+	subset( chapter_tag_design , v6531 >= 0 )
+
+svygini( ~ v6531 , sub_chapter_tag_design , na.rm = TRUE )
+```
+~~~
+
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~

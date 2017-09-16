@@ -1,0 +1,222 @@
+# Brazilian Vital Statistics System (DATASUS) {-}
+
+*Contributed by Guilherme Jacob <<guilhermejacob91@gmail.com>>*
+
+The Brazilian Health System (also known as SUS) provides information about births, deaths and prenatal care through DataSUS. Preset tabulation can be done online using [TabNet](http://tabnet.datasus.gov.br), the online interface of the DataSUS.
+
+* The system is composed of 14 tables, three tables containing birth information, ten tables containing information about mortality information and one containg prenatal care information.
+
+* A census of births, deaths and pregnancies ocurred and registered by the Brazilian health system.
+
+* Released annually since 1979.
+
+* Administered by the [Brazilian Ministry of Health](http://www.saude.gov.br/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available DATASUS microdata by simply specifying `"datasus"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "datasus" , output_dir = file.path( path.expand( "~" ) , "DATASUS" ) )
+```
+
+## Analysis Examples with SQL and `MonetDBLite` {-}
+
+Connect to a database:
+
+```{r eval = FALSE }
+library(DBI)
+dbdir <- file.path( path.expand( "~" ) , "DATASUS" , "MonetDB" )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbdir )
+```
+
+```{r eval = FALSE }
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+dbSendQuery( db , "ALTER TABLE nasc_cid10 ADD COLUMN birthyear INTEGER" )
+
+dbSendQuery( db , 
+	"UPDATE nasc_cid10 
+	SET birthyear = 
+		RIGHT( DTNASC , 4 )" 
+)
+
+dbSendQuery( db , "ALTER TABLE nasc_cid10 ADD COLUMN race INTEGER" )
+
+dbSendQuery( db , 
+	"UPDATE nasc_cid10 
+	SET race = 
+		CASE WHEN ( racacor = 1 ) THEN 1 ELSE 0 END" 
+)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the SQL table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT COUNT(*) FROM nasc_cid10" )
+
+dbGetQuery( db ,
+	"SELECT
+		semagestac ,
+		COUNT(*) 
+	FROM nasc_cid10
+	GROUP BY semagestac"
+)
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT AVG( peso ) FROM nasc_cid10" )
+
+dbGetQuery( db , 
+	"SELECT 
+		semagestac , 
+		AVG( peso ) AS mean_peso
+	FROM nasc_cid10 
+	GROUP BY semagestac" 
+)
+```
+
+Initiate a function that allows division by zero:
+```{r eval = FALSE , results = "hide" }
+dbSendQuery( db , 
+	"CREATE FUNCTION 
+		div_noerror(l DOUBLE, r DOUBLE) 
+	RETURNS DOUBLE 
+	EXTERNAL NAME calc.div_noerror" 
+)
+```
+
+Calculate the distribution of a categorical variable:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		sexo , 
+		div_noerror( 
+			COUNT(*) , 
+			( SELECT COUNT(*) FROM nasc_cid10 ) 
+		) AS share_sexo
+	FROM nasc_cid10 
+	GROUP BY sexo" 
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT SUM( peso ) FROM nasc_cid10" )
+
+dbGetQuery( db , 
+	"SELECT 
+		semagestac , 
+		SUM( peso ) AS sum_peso 
+	FROM nasc_cid10 
+	GROUP BY semagestac" 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT QUANTILE( peso , 0.5 ) FROM nasc_cid10" )
+
+dbGetQuery( db , 
+	"SELECT 
+		semagestac , 
+		QUANTILE( peso , 0.5 ) AS median_peso
+	FROM nasc_cid10 
+	GROUP BY semagestac" 
+)
+```
+
+### Subsetting {-}
+
+Limit your SQL analysis to births occurred in 2015 with `WHERE`:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db ,
+	"SELECT
+		AVG( peso )
+	FROM nasc_cid10
+	WHERE birthyear = 2015"
+)
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance and standard deviation, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		VAR_SAMP( peso ) , 
+		STDDEV_SAMP( peso ) 
+	FROM nasc_cid10" 
+)
+
+dbGetQuery( db , 
+	"SELECT 
+		semagestac , 
+		VAR_SAMP( peso ) AS var_peso ,
+		STDDEV_SAMP( peso ) AS stddev_peso
+	FROM nasc_cid10 
+	GROUP BY semagestac" 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Calculate the correlation between two variables, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		CORR( CAST( race AS DOUBLE ) , CAST( peso AS DOUBLE ) )
+	FROM nasc_cid10" 
+)
+
+dbGetQuery( db , 
+	"SELECT 
+		semagestac , 
+		CORR( CAST( race AS DOUBLE ) , CAST( peso AS DOUBLE ) )
+	FROM nasc_cid10 
+	GROUP BY semagestac" 
+)
+```
+
+## Analysis Examples with `dplyr` {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for DATASUS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+dplyr_db <- MonetDBLite::src_monetdblite( dbdir )
+datasus_tbl <- tbl( dplyr_db , 'nasc_cid10' )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+datasus_tbl %>%
+	summarize( mean = mean( peso ) )
+
+datasus_tbl %>%
+	group_by( semagestac ) %>%
+	summarize( mean = mean( peso ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT COUNT(*) FROM nasc_cid10 GROUP BY birthyear ORDER BY birthyear" )
+```
+
+## Database Shutdown {-}
+
+```{r eval = FALSE , results = "hide" }
+dbDisconnect( db , shutdown = TRUE )
+```

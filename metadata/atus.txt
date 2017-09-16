@@ -1,0 +1,174 @@
+chapter_title: American Time Use Survey
+
+~~~{dataset_introduction}
+The American Time Use Survey (ATUS) collects information about how we spend our time.  Sampled individuals write down everything they do for a single twenty-four hour period, in ten minute intervals.  Many economists use ATUS to study uncompensated work (chores and childcare), but you can use it to learn that even in the dead of night, one-twentieth of us are awake.
+~~~
+
+table_structure: * Many tables with different structures [described in the user guide](https://www.bls.gov/tus/atususersguide.pdf#page=33).
+
+generalizable_population: * A complex sample survey designed to generalize to the number of person-hours in the civilian non-institutional population of the United States aged older than fourteen.
+
+publication_period: * Released annually since 2003.
+
+administrative_organization: * Administered by the [Bureau of Labor Statistics](https://www.bls.gov/).
+
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2015 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , directory == 2015 )
+
+~~~{analysis_examples_survey_design}
+options( survey.replicates.mse = TRUE )
+library(survey)
+
+atusact <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015/atusact.rds" ) )
+atusact <- atusact[ c( 'tucaseid' , 'tutier1code' , 'tutier2code' , 'tuactdur24' ) ]
+
+atusresp <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015/atusresp.rds" ) )
+atusresp <- atusresp[ c( 'tucaseid' , 'tufinlwgt' , 'tulineno' ) ]
+
+atusrost <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015/atusrost.rds" ) )
+atusrost <- atusrost[ , c( 'tucaseid' , 'tulineno' , 'teage' , 'tesex' ) ]
+
+atuswgts <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015/atuswgts.rds" ) )
+atuswgts <- atuswgts[ , c( 1 , grep( 'finlwgt' , names( atuswgts ) ) ) ]
+
+
+
+# looking at the 2012 lexicon, travel-related activities
+# have a tier 1 code of 18 --
+# http://www.bls.gov/tus/lexiconnoex2012.pdf#page=22
+
+# for all records where the tier 1 code is 18 (travel)
+# replace that tier 1 of 18 with whatever's stored in tier 2
+atusact[ atusact$tutier1code == 18 , 'tutier1code' ] <- atusact[ atusact$tutier1code == 18 , 'tutier2code' ]
+# this will distribute all travel-related activities
+# to the appropriate tier 1 category, which matches
+# the structure of the 2012 bls table available at
+# http://www.bls.gov/tus/tables/a1_2012.pdf
+
+
+# sum up activity duration at the respondent-level
+# *and* also the tier 1 code level
+# (using tucaseid as the unique identifier)
+# from the activities file
+x <- aggregate( tuactdur24 ~ tucaseid + tutier1code , data = atusact , sum )
+
+# now table `x` contains
+# one record per person per major activity category
+
+# reshape this data from "long" to "wide" format,
+# creating a one-record-per-person table
+y <- reshape( x , idvar = 'tucaseid' , timevar = 'tutier1code' , direction = 'wide' )
+
+y[ is.na( y ) ] <- 0
+# convert all missings to zeroes,
+# since those individuals simply did not
+# engage in those activities during their interview day
+# (meaning they should have zero minutes of time)
+
+
+# except for the first column (the unique identifier,
+# replace each column by the quotient of itself and sixty
+y[ , -1 ] <- y[ , -1 ] / 60
+# now you've got an activity file `y`
+# with one record per respondent
+
+
+# merge together the data.frame objects with all needed columns
+# in order to create a replicate-weighted survey design object
+
+# merge the respondent file with the newly-created activity file
+# (which, remember, is also one-record-per-respondent)
+resp_y <- merge( atusresp , y )
+
+# confirm that the result of the merge has the same number of records
+# as the original bls atus respondent file. (this is a worthwhile check)
+stopifnot( nrow( resp_y ) == nrow( atusresp ) )
+
+# merge that result with the roster file
+# note that the roster file has multiple records per `tucaseid`
+# but only the `tulineno` columns equal to 1 will match
+# records in the original respondent file, this merge works.
+resp_y_rost <- merge( resp_y , atusrost )
+
+# confirm that the result of the merge has the same number of records
+stopifnot( nrow( resp_y_rost ) == nrow( atusresp ) )
+
+# merge that result with the replicate weights file
+z <- merge( resp_y_rost , atuswgts )
+
+# confirm that the result of the merge has the same number of records
+stopifnot( nrow( z ) == nrow( atusresp ) )
+
+# remove dots from column names
+names( z ) <- gsub( "\\\\." , "_" , names( z ) )
+
+# add a column of ones
+z$one <- 1
+
+chapter_tag_design <- 
+	svrepdesign(
+		weights = ~tufinlwgt ,
+		repweights = "finlwgt[1-9]" , 
+		type = "Fay" , 
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		data = z
+	)
+
+~~~
+
+~~~{variable_recoding_block}
+
+chapter_tag_design <-
+	update(
+		chapter_tag_design ,
+		any_care = as.numeric( tuactdur24_3 > 0 ) ,
+		age_category = 
+			factor( 
+				1 + findInterval( teage , c( 18 , 35 , 65 ) ) , 
+				labels = c( "under 18" , "18 - 34" , "35 - 64" , "65 or older" ) 
+			)
+	)
+# caring for and helping household members row
+# which we know is top level 03 from
+# http://www.bls.gov/tus/lexiconnoex2012.pdf
+
+~~~
+
+group_by_variable: age_category
+group_by_variable_description: age categories
+
+categorical_variable: tesex
+categorical_variable_description: sex (1=male, 2=female)
+
+linear_variable: tuactdur24_1
+linear_variable_description: average hours per day spent in personal care activities
+
+ratio_estimation_numerator: tuactdur24_5
+ratio_estimation_denominator: tuactdur24_12
+
+subset_definition: tuactdur24_15 > 0
+subset_definition_description: any time volunteering
+
+binary_variable: any_care
+binary_variable_description: percent performing any care of household members during the day
+
+needs_srvyr_block: yes
+
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+
+```
+~~~
+
+
+
+needs_build_status_line: yes

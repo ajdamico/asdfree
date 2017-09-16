@@ -1,0 +1,280 @@
+# American Housing Survey (AHS) {-}
+
+[![Build Status](https://travis-ci.org/asdfree/ahs.svg?branch=master)](https://travis-ci.org/asdfree/ahs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ahs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ahs)
+
+The American Housing Survey tracks housing structures across the United States.
+
+* A collection of tables, most with one row per housing unit.
+
+* A complex sample survey designed to generalize to both occupied and vacant housing units across the United States and also for about twenty-five metropolitan areas.
+
+* Released more or less biennially since 1973.
+
+* Sponsored by [the Department of Housing and Urban Development (HUD)](https://www.hud.gov/) and conducted by the [U.S. Census Bureau](https://www.census.gov/).
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available AHS microdata by simply specifying `"ahs"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "ahs" , output_dir = file.path( path.expand( "~" ) , "AHS" ) )
+```
+
+`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the AHS catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+
+```{r eval = FALSE , results = "hide" }
+library(lodown)
+# examine all available AHS microdata files
+ahs_cat <-
+	get_catalog( "ahs" ,
+		output_dir = file.path( path.expand( "~" ) , "AHS" ) )
+
+# 2015 only
+ahs_cat <- subset( ahs_cat , year == 2015 )
+# download the microdata to your local computer
+lodown( "ahs" , ahs_cat )
+```
+
+## Analysis Examples with the `survey` library {-}
+
+Construct a complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+options( survey.replicates.mse = TRUE )
+
+library(survey)
+
+ahs_df <- 
+	readRDS( 
+		file.path( path.expand( "~" ) , "AHS" , 
+			"2015/national_v1.3/household.rds" 
+		) 
+	)
+
+ahs_design <- 
+	svrepdesign(
+		weights = ~weight,
+		repweights = "repwgt[1-9]" ,
+		type = "Fay" ,
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		data = ahs_df
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+ahs_design <- 
+	update( 
+		ahs_design , 
+
+		occupant = 
+			ifelse( tenure == 1 , "owner" , 
+			ifelse( tenure %in% 2:3 , "renter" , 
+				"not occupied" ) ) ,
+				
+		lotsize =
+			factor( lotsize , levels = 1:7 ,
+				labels = c( "Less then 1/8 acre" , 
+				"1/8 up to 1/4 acre" , "1/4 up to 1/2 acre" ,
+				"1/2 up to 1 acre" , "1 up to 5 acres" , 
+				"5 up to 10 acres" , "10 acres or more" ) ) ,
+				
+				
+		below_poverty = as.numeric( perpovlvl < 100 )
+				
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( ahs_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ occupant , ahs_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , ahs_design )
+
+svyby( ~ one , ~ occupant , ahs_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ totrooms , ahs_design )
+
+svyby( ~ totrooms , ~ occupant , ahs_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ lotsize , ahs_design , na.rm = TRUE )
+
+svyby( ~ lotsize , ~ occupant , ahs_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ totrooms , ahs_design )
+
+svyby( ~ totrooms , ~ occupant , ahs_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ lotsize , ahs_design , na.rm = TRUE )
+
+svyby( ~ lotsize , ~ occupant , ahs_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ totrooms , ahs_design , 0.5 )
+
+svyby( 
+	~ totrooms , 
+	~ occupant , 
+	ahs_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ totrooms , 
+	denominator = ~ rent , 
+	ahs_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to homes with a garage or carport:
+```{r eval = FALSE , results = "hide" }
+sub_ahs_design <- subset( ahs_design , garage == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ totrooms , sub_ahs_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ totrooms , ahs_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ totrooms , 
+		~ occupant , 
+		ahs_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( ahs_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ totrooms , ahs_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ totrooms , ahs_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ totrooms , ahs_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ below_poverty , ahs_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( totrooms ~ below_poverty , ahs_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ below_poverty + lotsize , 
+	ahs_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		totrooms ~ below_poverty + lotsize , 
+		ahs_design 
+	)
+
+summary( glm_result )
+```
+
+## Analysis Examples with `srvyr` {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for AHS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+ahs_srvyr_design <- as_survey( ahs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+ahs_srvyr_design %>%
+	summarize( mean = survey_mean( totrooms ) )
+
+ahs_srvyr_design %>%
+	group_by( occupant ) %>%
+	summarize( mean = survey_mean( totrooms ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+

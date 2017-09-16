@@ -1,0 +1,65 @@
+chapter_title: Programme for the International Assessment of Adult Competencies
+
+~~~{dataset_introduction}
+The Programme for the International Assessment of Adult Competencies (PIAAC) offers cross-national comparisons for the serious study of advanced-nation labor markets.
+~~~
+
+table_structure: * One row per sampled adult.
+
+generalizable_population: * A multiply-imputed, complex sample survey designed to generalize to the population aged 16 to 65 across thirty three OECD nations.
+
+publication_period: * No expected release timeline.
+
+administrative_organization: * Administered by the [Organisation for Economic Co-operation and Development](http://www.oecd.org/).
+
+needs_catalog_block: yes
+
+~~~{analysis_examples_survey_design}
+library(survey)
+library(mitools)
+
+chapter_tag_design <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "prgusap1 design.rds" ) )
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <-
+	update(
+		chapter_tag_design ,
+		
+		one = 1 ,
+		
+		sex = factor( gender_r , labels = c( "male" , "female" ) ) ,
+
+		age_categories = factor( ageg10lfs , levels = 1:5 , labels = c( "24 or less" , "25-34" , "35-44" , "45-54" , "55 plus" ) ) ,
+		
+		working_at_paid_job_last_week = as.numeric( c_q01a == 1 )
+		
+	)
+~~~
+
+group_by_variable: age_categories
+linear_variable: pvnum
+linear_narm: , na.rm = TRUE
+categorical_variable: sex
+ratio_estimation_numerator: pvnum
+ratio_estimation_denominator: pvlit
+ratio_narm: , na.rm = TRUE
+subset_definition: i_q08 %in% 4:5
+subset_definition_description: self-reported fair or poor health
+binary_variable: working_at_paid_job_last_week
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+
+```
+~~~
+
+
+
+
+needs_build_status_line: yes

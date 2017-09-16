@@ -1,0 +1,129 @@
+chapter_title: National Health and Nutrition Examination Survey
+
+~~~{dataset_introduction}
+The National Health and Nutrition Examination Survey (NHANES) is this fascinating survey where doctors and dentists accompany survey interviewers in a little mobile medical center that drives around the country.  While the survey methodologists interview people, the medical professionals administer laboratory tests and conduct a thorough physical examination.  The blood work and medical exam allow researchers to answer tough questions like, "how many people have diabetes but don't know they have diabetes?"
+~~~
+
+table_structure: * Many tables containing information gathered from the various examinations, generally with one row per individual respondent.
+
+generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutionalized population of the United States.
+
+publication_period: * Released biennially since 1999-2000.
+
+administrative_organization: * Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
+
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2013-2014 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , years == "2013-2014" )
+
+~~~{analysis_examples_survey_design}
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+chapter_tag_demo_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2013-2014/demo_h.rds" ) )
+
+chapter_tag_tchol_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2013-2014/tchol_h.rds" ) )
+
+chapter_tag_df <- merge( chapter_tag_demo_df , chapter_tag_tchol_df , all = TRUE )
+
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_demo_df ) )
+
+# keep only individuals who took the "mobile examination center" component
+chapter_tag_df <- subset( chapter_tag_df , ridstatr %in% 2 )
+
+chapter_tag_design <- 
+	svydesign(
+		id = ~sdmvpsu , 
+		strata = ~sdmvstra ,
+		nest = TRUE ,
+		weights = ~wtmec2yr ,
+		data = chapter_tag_df
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		pregnant_at_interview = 
+			ifelse( ridexprg %in% 1:2 , as.numeric( ridexprg == 1 ) , NA ) ,
+		
+		race_ethnicity = 
+			factor( 
+				c( 3 , 3 , 1 , 2 , 4 )[ ridreth1 ] ,
+				levels = 1:4 , 
+				labels = 
+					c( 'non-hispanic white' , 'non-hispanic black' , 
+						'hispanic' , 'other' )
+			) ,
+		
+		age_category =
+			factor(
+				findInterval( ridageyr , c( 20 , 40 , 60 ) ) ,
+				labels = c( "0-19" , "20-39" , "40-59" , "60+" )
+			)
+	)
+~~~
+
+group_by_variable: race_ethnicity
+group_by_variable_description: race/ethnicity
+
+categorical_variable: riagendr
+categorical_variable_description: sex (1=male, 2=female)
+
+linear_variable: lbxtc
+linear_variable_description: average body mass index percentile within the respondent's age and sex cohort
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: lbxtc
+ratio_estimation_denominator: ridageyr
+ratio_narm: , na.rm = TRUE
+
+subset_definition: age_category == "60+"
+subset_definition_description: respondents aged 60 or older
+
+binary_variable: pregnant_at_interview
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+needs_build_status_line: yes
+
+
+
+~~~{sample_setup_block}
+library(lodown)
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
+
+# sample 25% of the records
+which_records <- sample( seq( nrow( chapter_tag_cat ) ) , round( nrow( chapter_tag_cat ) * 0.25 ) )
+
+# always sample years == "2013-2014"
+chapter_tag_cat <- unique( rbind( chapter_tag_cat[ which_records , ] , subset( chapter_tag_cat , years == "2013-2014" ) ) )
+
+lodown( "chapter_tag" , chapter_tag_cat )
+~~~

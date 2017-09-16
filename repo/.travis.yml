@@ -1,0 +1,35 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: r
+cache: packages
+sudo: required
+apt_packages:
+- unixodbc-dev
+- libarchive-dev
+
+script: 
+  - |
+    R CMD build .
+    travis_wait 120 R CMD check chapter_tag*tar.gz
+    
+after_failure:
+- find *Rcheck -name '*.fail' -print -exec cat '{}' \;
+# show memory usage again
+- sudo free -m -t
+# show actions of the OOM killer
+- sudo dmesg
+
+r_github_packages:
+ - jimhester/archive
+ - ajdamico/lodown
+
+ 
+before_install:
+# shutdown servies on Travis, which may have a memory impact
+# show memory usage before and after shutdown of services
+- sudo service --status-all
+- sudo free -m -t
+- sudo /etc/init.d/mysql stop
+- sudo /etc/init.d/postgresql stop
+- sudo free -m -t
+

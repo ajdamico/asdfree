@@ -1,0 +1,102 @@
+chapter_title: Medical Expenditure Panel Survey
+
+~~~{dataset_introduction}
+The Medical Expenditure Panel Survey's Household Component (MEPS-HC) captures person-level medical expenditures by payor and type of service with more detail than any other publicly-available data set.
+~~~
+
+table_structure: * The annual consolidated file contains one row per individual within each sampled household.  Other available mergeable tables contain one record per medical event, one record per job, one record per insurance held.
+
+generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutionalized population of the United States.
+
+publication_period: * Released annually since 1996.
+
+administrative_organization: * Administered by the [Agency for Healthcare Research and Quality](http://www.ahrq.gov/).
+
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2014 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2014 )
+
+~~~{analysis_examples_survey_design}
+options( survey.replicates.mse = TRUE )
+
+library(survey)
+
+chapter_tag_cons_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+		"2014/full year consolidated.rds" ) )
+
+chapter_tag_brr <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+		"meps 1996-2014 replicates for variance estimation.rds" ) )
+
+chapter_tag_brr <- 
+	chapter_tag_brr[ , 
+		c( "dupersid" , "panel" , 
+			names( chapter_tag_brr )[ !( names( chapter_tag_brr ) %in% names( chapter_tag_cons_df ) ) ] 
+		)
+	]
+
+chapter_tag_df <- merge( chapter_tag_cons_df , chapter_tag_brr )
+
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_cons_df ) )
+
+chapter_tag_design <-
+	svrepdesign(
+		data = chapter_tag_df ,
+		weights = ~ perwt14f ,
+		type = "BRR" ,
+		combined.weights = FALSE ,
+		repweights = "brr[1-9]+"
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		insured_december_31st = ifelse( ins14x %in% 1:2 , as.numeric( ins14x == 1 ) , NA )
+		
+	)
+~~~
+
+group_by_variable: region14
+group_by_variable_description: Census Region
+
+categorical_variable: sex
+categorical_variable_description: sex (1=male, 2=female)
+
+linear_variable: totexp14
+linear_variable_description: total medical expenditure during the year
+
+ratio_estimation_numerator: totmcd14
+ratio_estimation_denominator: totexp14
+
+subset_definition: agelast >= 65
+subset_definition_description: seniors
+
+binary_variable: insured_december_31st
+binary_variable_description: insured December 31st, 2014
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+needs_build_status_line: yes
+

@@ -1,0 +1,220 @@
+# National Plan and Provider Enumeration System (SEER) {-}
+
+The National Plan and Provider Enumeration System (NPPES) contains information about every medical provider, insurance plan, and clearinghouse actively operating in the United States healthcare industry.
+
+* A single large table with one row per enumerated health care provider.
+
+* A census of individuals and organizations who bill for medical services in the United States.
+
+* Updated monthly with new providers.
+
+* Maintained by the United States [Centers for Medicare & Medicaid Services (CMS)](http://www.cms.gov/)
+
+## Simplified Download and Importation {-}
+
+The R `lodown` package easily downloads and imports all available SEER microdata by simply specifying `"seer"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+
+```{r eval = FALSE }
+library(lodown)
+lodown( "seer" , output_dir = file.path( path.expand( "~" ) , "SEER" ) )
+```
+
+## Analysis Examples with SQL and `MonetDBLite` {-}
+
+Connect to a database:
+
+```{r eval = FALSE }
+library(DBI)
+dbdir <- file.path( path.expand( "~" ) , "SEER" , "MonetDB" )
+db <- dbConnect( MonetDBLite::MonetDBLite() , dbdir )
+```
+
+```{r eval = FALSE }
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+dbSendQuery( db , "ALTER TABLE npi ADD COLUMN individual INTEGER" )
+
+dbSendQuery( db , 
+	"UPDATE npi 
+	SET individual = 
+		CASE WHEN entity_type_code = 1 THEN 1 ELSE 0 END" 
+)
+
+dbSendQuery( db , "ALTER TABLE npi ADD COLUMN provider_enumeration_year INTEGER" )
+
+dbSendQuery( db , 
+	"UPDATE npi 
+	SET provider_enumeration_year = 
+		CAST( SUBSTRING( provider_enumeration_date , 7 , 10 ) AS INTEGER )" 
+)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the SQL table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT COUNT(*) FROM npi" )
+
+dbGetQuery( db ,
+	"SELECT
+		provider_gender_code ,
+		COUNT(*) 
+	FROM npi
+	GROUP BY provider_gender_code"
+)
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT AVG( provider_enumeration_year ) FROM npi" )
+
+dbGetQuery( db , 
+	"SELECT 
+		provider_gender_code , 
+		AVG( provider_enumeration_year ) AS mean_provider_enumeration_year
+	FROM npi 
+	GROUP BY provider_gender_code" 
+)
+```
+
+Initiate a function that allows division by zero:
+```{r eval = FALSE , results = "hide" }
+dbSendQuery( db , 
+	"CREATE FUNCTION 
+		div_noerror(l DOUBLE, r DOUBLE) 
+	RETURNS DOUBLE 
+	EXTERNAL NAME calc.div_noerror" 
+)
+```
+
+Calculate the distribution of a categorical variable:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		is_sole_proprietor , 
+		div_noerror( 
+			COUNT(*) , 
+			( SELECT COUNT(*) FROM npi ) 
+		) AS share_is_sole_proprietor
+	FROM npi 
+	GROUP BY is_sole_proprietor" 
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT SUM( provider_enumeration_year ) FROM npi" )
+
+dbGetQuery( db , 
+	"SELECT 
+		provider_gender_code , 
+		SUM( provider_enumeration_year ) AS sum_provider_enumeration_year 
+	FROM npi 
+	GROUP BY provider_gender_code" 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT QUANTILE( provider_enumeration_year , 0.5 ) FROM npi" )
+
+dbGetQuery( db , 
+	"SELECT 
+		provider_gender_code , 
+		QUANTILE( provider_enumeration_year , 0.5 ) AS median_provider_enumeration_year
+	FROM npi 
+	GROUP BY provider_gender_code" 
+)
+```
+
+### Subsetting {-}
+
+Limit your SQL analysis to California with `WHERE`:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db ,
+	"SELECT
+		AVG( provider_enumeration_year )
+	FROM npi
+	WHERE provider_business_practice_location_address_state_name = 'CA'"
+)
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance and standard deviation, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		VAR_SAMP( provider_enumeration_year ) , 
+		STDDEV_SAMP( provider_enumeration_year ) 
+	FROM npi" 
+)
+
+dbGetQuery( db , 
+	"SELECT 
+		provider_gender_code , 
+		VAR_SAMP( provider_enumeration_year ) AS var_provider_enumeration_year ,
+		STDDEV_SAMP( provider_enumeration_year ) AS stddev_provider_enumeration_year
+	FROM npi 
+	GROUP BY provider_gender_code" 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Calculate the correlation between two variables, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , 
+	"SELECT 
+		CORR( CAST( individual AS DOUBLE ) , CAST( provider_enumeration_year AS DOUBLE ) )
+	FROM npi" 
+)
+
+dbGetQuery( db , 
+	"SELECT 
+		provider_gender_code , 
+		CORR( CAST( individual AS DOUBLE ) , CAST( provider_enumeration_year AS DOUBLE ) )
+	FROM npi 
+	GROUP BY provider_gender_code" 
+)
+```
+
+## Analysis Examples with `dplyr` {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for SEER users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+dplyr_db <- MonetDBLite::src_monetdblite( dbdir )
+seer_tbl <- tbl( dplyr_db , 'npi' )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+seer_tbl %>%
+	summarize( mean = mean( provider_enumeration_year ) )
+
+seer_tbl %>%
+	group_by( provider_gender_code ) %>%
+	summarize( mean = mean( provider_enumeration_year ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT COUNT(*) FROM npi" )
+```
+
+## Database Shutdown {-}
+
+```{r eval = FALSE , results = "hide" }
+dbDisconnect( db , shutdown = TRUE )
+```

@@ -1,0 +1,167 @@
+chapter_title: Health and Retirement Study
+
+~~~{dataset_introduction}
+The Health and Retirement Study interviews Americans aged 50+ for their entire life.  Allows for findings like, "Among Americans who were 50-74 years old in 1998, X% lived in nursing homes by 2010."
+~~~
+
+
+lodown_password_parameters: , \\\\n\\\\tyour_username = "username" , \\\\n\\\\tyour_password = "password"
+get_catalog_password_parameters: , \\\\n\\\\t\\\\tyour_username = "username" , \\\\n\\\\t\\\\tyour_password = "password"
+
+
+
+table_structure: * Many tables, most with one row per sampled respondent and linkable over time.  Use the RAND HRS data file for a cleaner, cross-wave data set.
+
+generalizable_population: * A complex sample survey designed to generalize to Americans aged 50+ at each interview, but longitudinal analysts can observe outcomes.
+
+publication_period: * Released biennially since 1992.
+
+administrative_organization: * Administered by the [University of Michigan's Institute for Social Research](http://isr.umich.edu/) with data management by the [RAND Corporation](http://www.rand.org/).  Funded by the [National Institute on Aging](https://www.nia.nih.gov/) and the [Social Security Administration](https://www.ssa.gov/).
+
+
+
+needs_catalog_block: yes
+catalog_subset_description: # RAND consolidated file only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , grepl( 'rand([a-z]+)stata\\\\.zip' , file_name ) )
+
+
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_df <- 
+	readRDS( list.files( chapter_tag_cat$output_folder , full.names = TRUE ) )
+	
+# RAM cleanup
+keep_vars <- 
+	c( "raehsamp" , "raestrat" , "r3wtresp" , 
+		"r3work" , "r12work" , "h12ahous" ,
+		"r3mstat" , "r12mstat" , "h4ahous" )
+
+chapter_tag_df <- chapter_tag_df[ keep_vars ]
+	
+# community residents aged 50+ in 1996
+chapter_tag_design <- 
+	svydesign(
+		id = ~ raehsamp ,
+		strata = ~ raestrat ,
+		weights = ~ r3wtresp , 
+		nest = TRUE ,
+		data = subset( chapter_tag_df , r3wtresp > 0 )
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+
+		one = 1 ,
+		
+		working_in_1996 = r3work ,
+
+		working_in_2014 = r12work ,
+
+		marital_status_in_1996 =
+			factor( r3mstat , levels = 1:8 , labels =
+				c( "Married" , "Married, spouse absent" ,
+				"Partnered" , "Separated" , "Divorced" ,
+				"Separated/divorced" , "Widowed" ,
+				"Never married" ) ) ,
+				
+		marital_status_in_2014 =
+			factor( r12mstat , levels = 1:8 , labels =
+				c( "Married" , "Married, spouse absent" ,
+				"Partnered" , "Separated" , "Divorced" ,
+				"Separated/divorced" , "Widowed" ,
+				"Never married" ) )
+	)
+~~~
+
+group_by_variable: marital_status_in_1996
+
+categorical_variable: marital_status_in_2014
+categorical_narm: , na.rm = TRUE
+
+linear_variable: h12ahous
+linear_variable_description: value of primary residence in 2014
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: h4ahous
+ratio_estimation_denominator: h12ahous
+ratio_narm: , na.rm = TRUE
+
+subset_definition: working_in_1996 == 1
+
+binary_variable: working_in_2014
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
+
+needs_build_status_line: yes
+
+~~~{machine_specific_replacements_block}
+machine_specific_replacements <- 
+	list( 
+		
+		# replace the folder path on macnix
+		c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
+		
+		# change other things in the script to be run
+		c( "hello" , "howdy" ) ,
+		
+		c( '"username"' , 'my_username' ) ,
+		
+		c( '"password"' , 'my_password' )
+		
+	)
+~~~
+
+
+
+~~~{environment_variables_block}
+my_username <- Sys.getenv( "my_username" )
+my_password <- Sys.getenv( "my_password" )
+~~~
+
+
+
+
+
+
+~~~{sample_setup_block}
+library(lodown)
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
+		your_username = "username" , 
+		your_password = "password" )
+
+# sample 75% of the records
+which_records <- sample( seq( nrow( chapter_tag_cat ) ) , round( nrow( chapter_tag_cat ) * 0.75 ) )
+
+# always sample the rand a-z stata file
+chapter_tag_cat <- unique( rbind( chapter_tag_cat[ which_records , ] , subset( chapter_tag_cat , grepl( 'rand([a-z]+)stata\\.zip' , file_name ) ) ) )
+
+lodown( "chapter_tag" , chapter_tag_cat , 
+		your_username = "username" , 
+		your_password = "password" )
+
+~~~

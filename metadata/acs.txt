@@ -1,0 +1,137 @@
+chapter_title: American Community Survey
+
+~~~{dataset_introduction}
+The US Census Bureau's annual replacement for the long-form decennial census.
+~~~
+
+table_structure: * One table with one row per household and a second table with one row per individual within each household.
+
+generalizable_population: * The civilian population of the United States.
+
+publication_period: * Released annually since 2005.
+
+administrative_organization: * Administered and financed by the [US Census Bureau](http://www.census.gov/).
+
+
+needs_catalog_block: yes
+catalog_subset_description: # 2011 single-year only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 & time_period == '1-Year' )
+
+
+~~~{analysis_examples_survey_design}
+library(DBI)
+library(MonetDBLite)
+library(survey)
+
+chapter_tag_design <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "acs2011_1yr.rds" ) )
+
+chapter_tag_design_with_puerto_rico <- open( chapter_tag_design , driver = MonetDBLite() )
+
+# remove puerto rico
+chapter_tag_design <- subset( chapter_tag_design_with_puerto_rico , st != 72 )
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <-
+	update(
+		
+		chapter_tag_design ,
+		
+		state_name =
+			factor(
+				st ,
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L) ,
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming")
+			) ,
+		
+		married = as.numeric( mar %in% 1 ) ,
+		
+		sex = factor( sex , labels = c( 'male' , 'female' ) )
+	)
+~~~
+
+
+group_by_variable: state_name
+linear_variable: povpip
+linear_narm: , na.rm = TRUE
+categorical_variable: sex
+ratio_estimation_numerator: ssip
+ratio_estimation_denominator: pincp
+ratio_narm: , na.rm = TRUE
+subset_definition: st == 6
+subset_definition_description: California
+binary_variable: married
+
+~~~{convey_block}
+## Poverty and Inequality Estimation with `convey` {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+chapter_tag_design <- convey_prep( chapter_tag_design )
+
+svygini( ~ hincp , chapter_tag_design , na.rm = TRUE )
+```
+~~~
+
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+svytotal( ~I( relp %in% 0:17 ) , chapter_tag_design )						# total population
+svytotal( ~I( relp %in% 0:15 ) , chapter_tag_design )						# housing unit population
+svytotal( ~I( relp %in% 16:17 ) , chapter_tag_design )						# gq population
+svytotal( ~I( relp == 16 ) , chapter_tag_design )							# gq institutional population
+svytotal( ~I( relp == 17 ) , chapter_tag_design )							# gq noninstitutional population
+svyby( ~I( relp %in% 0:17 ) , ~ sex , chapter_tag_design , svytotal )		# total males & females
+
+
+# all age categories at once #
+
+svytotal( 
+	~I( agep %in% 0:4 ) +
+	I( agep %in% 5:9 )   +
+	I( agep %in% 10:14 ) +
+	I( agep %in% 15:19 ) +
+	I( agep %in% 20:24 ) +
+	I( agep %in% 25:34 ) +
+	I( agep %in% 35:44 ) +
+	I( agep %in% 45:54 ) +
+	I( agep %in% 55:59 ) +
+	I( agep %in% 60:64 ) +
+	I( agep %in% 65:74 ) +
+	I( agep %in% 75:84 ) +
+	I( agep %in% 85:100 ) , 
+	chapter_tag_design
+)
+
+
+# note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
+
+```
+
+~~~

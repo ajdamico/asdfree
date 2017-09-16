@@ -1,0 +1,52 @@
+chapter_title: Area Health Resource File
+
+~~~{dataset_introduction}
+Though not a survey data set itself, useful to merge onto other microdata.
+~~~
+
+table_structure: * One table with one row per county and a second table with one row per state.
+
+publication_period: * Replaced annually with the latest available county- and state-level statistics.
+
+administrative_organization: * Compiled by the United States [Health Services and Resources Administration (HRSA)](http://www.hrsa.gov/).
+
+
+~~~{analysis_examples_loading_block}
+chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "county/AHRF_2016-2017.rds" ) )
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		cbsa_indicator_code = 
+			factor( 
+				1 + as.numeric( f1406715 ) , 
+				labels = c( "not metro" , "metro" , "micro" ) 
+			) ,
+			
+		mhi_2014 = f1322614 ,
+		
+		whole_county_hpsa_2016 = as.numeric( f0978716 == 1 ) ,
+		
+		census_region = 
+			factor( 
+				as.numeric( f04439 ) , 
+				labels = c( "northeast" , "midwest" , "south" , "west" ) 
+			)
+
+	)
+	
+~~~
+
+group_by_variable: cbsa_indicator_code
+linear_variable: mhi_2014
+linear_narm: , na.rm = TRUE
+categorical_variable: census_region
+subset_definition: f12424 == "CA"
+subset_definition_description: California
+binary_variable: whole_county_hpsa_2016
+needs_dplyr_block: yes
+
+needs_build_status_line: yes

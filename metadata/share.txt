@@ -1,0 +1,178 @@
+chapter_title: Survey of Health, Ageing and Retirement in Europe
+
+~~~{dataset_introduction}
+The Survey of Health, Ageing and Retirement in Europe interviews senior citizens across the continent for their entire life.  Allows for findings like, "Among Belgians who were 50-74 years old in 2004, X% lived in nursing homes by 2010."
+~~~
+
+
+lodown_password_parameters: , \\\\n\\\\tyour_username = "username" , \\\\n\\\\tyour_password = "password"
+get_catalog_password_parameters: , \\\\n\\\\t\\\\tyour_username = "username" , \\\\n\\\\t\\\\tyour_password = "password"
+
+
+table_structure: * Many tables, most with one row per sampled respondent for the period.
+
+generalizable_population: * A complex sample longitudinal survey designed to generalize to the civilian, non-institutionalized population of participating European countries aged 50 or older.
+
+publication_period: * Released every two or three years since 2004.
+
+administrative_organization: * Coordinated at the [Max Planck Institute](http://www.share-project.org/organisation/coordination.html) and [funded by consortium](http://www.share-project.org/organisation/funding.html).
+
+
+
+needs_catalog_block: yes
+catalog_subset_description: # wave 1, wave 6, and longitudinal weights only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , grepl( "ave 1|ave 6|ongitudinal" , output_folder ) )
+
+
+
+
+~~~{analysis_examples_survey_design}
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+available_files <-
+	list.files( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
+		recursive = TRUE , 
+		full.names = TRUE 
+	)
+
+# wave six demographics file
+chapter_tag_dn6_df <-
+	readRDS( grep( "6\\\\.0\\\\.0(.*)sharew6(.*)dn\\\\.rds" , available_files , value = TRUE ) )
+
+chapter_tag_dn6_df <-
+	chapter_tag_dn6_df[ c( "mergeid" , "country" , "dn042_" , "dn004_" ) ]
+	
+# wave six physical health file
+chapter_tag_ph1_df <-
+	readRDS( grep( "sharew1(.*)ph\\\\.rds" , available_files , value = TRUE ) )
+
+chapter_tag_ph1_df$weight_in_2004 <-
+		ifelse( chapter_tag_ph1_df$ph012_ < 0 , NA , chapter_tag_ph1_df$ph012_ )
+		
+chapter_tag_ph1_df <-
+	chapter_tag_ph1_df[ c( "mergeid" , "weight_in_2004" , "ph005_" ) ]
+	
+# wave six physical health file
+chapter_tag_ph6_df <-
+	readRDS( grep( "6\\\\.0\\\\.0(.*)sharew6(.*)ph\\\\.rds" , available_files , value = TRUE ) )
+
+chapter_tag_ph6_df$weight_in_2015 <-
+		ifelse( chapter_tag_ph6_df$ph012_ < 0 , NA , chapter_tag_ph6_df$ph012_ )
+		
+chapter_tag_ph6_df <-
+	chapter_tag_ph6_df[ c( "mergeid" , "weight_in_2015" , "ph003_" ) ]
+	
+
+# longitudinal weights file
+chapter_tag_longwt_df <-
+	readRDS( grep( "longitudinal_weights_w1\\\\-(.*)\\\\.rds" , available_files , value = TRUE ) )
+
+# france only longitudinal weights
+france_df <- subset( chapter_tag_longwt_df , country == 17 & ( cliw_a > 0 ) )
+
+nrow_check <- nrow( france_df )
+
+# merge on each of the tables
+france_df <- merge( france_df , chapter_tag_dn6_df )
+france_df <- merge( france_df , chapter_tag_ph1_df )
+france_df <- merge( france_df , chapter_tag_ph6_df )
+
+# confirm no change in records
+stopifnot( nrow( france_df ) == nrow_check )
+
+chapter_tag_design <- 
+	svydesign( 
+		~ psu + ssu , 
+		strata = ~ stratum1 + stratum2 , 
+		data = france_df , 
+		weights = ~ cliw_a , 
+		nest = TRUE 
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		sexe = factor( dn042_ , levels = 1:2 , labels = c( 'masculin' , 'feminin' ) ) ,
+		
+		health_in_general_2015 =
+			factor( ph003_ , levels = 1:5 , labels =
+				c( "excellente" , "tres bonne" , "bonne" , "acceptable" , "mediocre" )
+			) ,
+			
+		fortemente_limite_2004 = ifelse( ph005_ %in% 1:3 , as.numeric( ph005_ == 1 ) , NA )
+
+	)
+~~~
+
+group_by_variable: sexe
+
+categorical_variable: health_in_general_2015
+categorical_narm: , na.rm = TRUE
+
+linear_variable: weight_in_2015
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: weight_in_2015
+ratio_estimation_denominator: weight_in_2004
+ratio_narm: , na.rm = TRUE
+
+subset_definition: dn004_ == 1
+subset_definition_description: persons born in france
+
+binary_variable: fortemente_limite_2004
+binary_variable_description: health problems strongly prevented normal activities
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
+
+needs_build_status_line: yes
+
+~~~{machine_specific_replacements_block}
+machine_specific_replacements <- 
+	list( 
+		
+		# replace the folder path on macnix
+		c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
+		
+		# change other things in the script to be run
+		c( "hello" , "howdy" ) ,
+		
+		c( '"username"' , 'my_username' ) ,
+		
+		c( '"password"' , 'my_password' )
+		
+	)
+~~~
+
+
+
+~~~{environment_variables_block}
+my_username <- Sys.getenv( "my_username" )
+my_password <- Sys.getenv( "my_password" )
+~~~
+
+
