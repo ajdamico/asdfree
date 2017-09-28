@@ -428,7 +428,6 @@ for( this_ci_file in ci_rmd_files ){
 	git_push_script <-
 		c( git_push_script ,
 			paste( "cd" , chapter_tag ) ,
-			paste0( "git clone https://github.com/asdfree/" , chapter_tag ) ,
 			"git add -u" ,
 			"git add ." ,
 			paste( "git commit -m" , commit_memo ) ,
