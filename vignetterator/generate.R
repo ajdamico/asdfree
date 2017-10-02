@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 # Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'sample ces'"
+commit_memo <- "'travis badge rename'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -17,7 +17,10 @@ source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\measure
 source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\tests_of_association_blocks.R" )
 
 
-needs_build_status_line <- "[![Build Status](https://travis-ci.org/asdfree/chapter_tag.svg?branch=master)](https://travis-ci.org/asdfree/chapter_tag) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chapter_tag?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chapter_tag)"
+needs_travis_build_status_line <- "[![Build Status](https://travis-ci.org/asdfree/chapter_tag.svg?branch=master)](https://travis-ci.org/asdfree/chapter_tag) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chapter_tag?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chapter_tag)"
+
+needs_sisyphus_build_status_line <- "[![Build Status](https://sisyphus.project.cwi.nl/?badge=chapter_tag&host=stones14win)](http://sisyphus.project.cwi.nl/) [![Build status](https://sisyphus.project.cwi.nl/?badge=chapter_tag&host=stones06fedora)](http://sisyphus.project.cwi.nl/)"
+
 
 needs_catalog_block <- '`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function.  After requesting the CHAPTER_TAG catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).\n\n```{r eval = FALSE , results = "hide" }\nlibrary(lodown)\n# examine all available CHAPTER_TAG microdata files\nchapter_tag_cat <-\n\tget_catalog( "chapter_tag" ,\n\t\toutput_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) get_catalog_password_parameters )\n\ncatalog_subset_description\ncatalog_subset\n# download the microdata to your local computer\nlodown( "chapter_tag" , chapter_tag_cat lodown_password_parameters )\n```'
 
@@ -55,7 +58,7 @@ pull_line <-
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "lodown_password_parameters" , "get_catalog_password_parameters" , "authorship_line" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "catalog_subset_description" , "catalog_subset" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
 sub_chunks <- c( "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "convey_block" , "replacement_block" )
-needs_this_block <- c( "needs_catalog_block" , "needs_srvyr_block" , "needs_dplyr_block" , "needs_build_status_line" )
+needs_this_block <- c( "needs_catalog_block" , "needs_srvyr_block" , "needs_dplyr_block" , "needs_sisyphus_build_status_line" , "needs_travis_build_status_line" )
 
 
 library(bookdown)
@@ -105,8 +108,12 @@ for ( i in seq_along( chapter_tag ) ){
 	}
 	
 	# store the build status badges
-	if( any( grepl( "^needs_build_status_line: yes" , tolower( full_text[[i]] ) ) ) ) {
-		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , needs_build_status_line ) , '\n' ) )
+	if( any( grepl( "^needs_travis_build_status_line: yes" , tolower( full_text[[i]] ) ) ) ) {
+		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , travis_build_status_line ) , '\n' ) )
+	}
+	
+	if( any( grepl( "^needs_sisyphus_build_status_line: yes" , tolower( full_text[[i]] ) ) ) ) {
+		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , sisyphus_build_status_line ) , '\n' ) )
 	}
 		
 	
