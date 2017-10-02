@@ -1,6 +1,10 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 # Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
+<<<<<<< HEAD
 commit_memo <- "'travis badge rename'"
+=======
+commit_memo <- "'gss rename'"
+>>>>>>> origin/master
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
