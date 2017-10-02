@@ -1,10 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 # Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-<<<<<<< HEAD
-commit_memo <- "'travis badge rename'"
-=======
-commit_memo <- "'gss rename'"
->>>>>>> origin/master
+commit_memo <- "'seer password'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -113,11 +109,11 @@ for ( i in seq_along( chapter_tag ) ){
 	
 	# store the build status badges
 	if( any( grepl( "^needs_travis_build_status_line: yes" , tolower( full_text[[i]] ) ) ) ) {
-		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , travis_build_status_line ) , '\n' ) )
+		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , needs_travis_build_status_line ) , '\n' ) )
 	}
 	
 	if( any( grepl( "^needs_sisyphus_build_status_line: yes" , tolower( full_text[[i]] ) ) ) ) {
-		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , sisyphus_build_status_line ) , '\n' ) )
+		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , needs_sisyphus_build_status_line ) , '\n' ) )
 	}
 		
 	
