@@ -43,6 +43,8 @@ faers: [![Build Status](https://travis-ci.org/asdfree/faers.svg?branch=master)](
 
 gss: [![Build Status](https://travis-ci.org/asdfree/gss.svg?branch=master)](https://travis-ci.org/asdfree/gss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/gss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/gss)
 
+hmda: [![Build Status](https://sisyphus.project.cwi.nl/?badge=hmda&host=stones14win)](http://sisyphus.project.cwi.nl/) [![Build status](https://sisyphus.project.cwi.nl/?badge=hmda&host=stones06fedora)](http://sisyphus.project.cwi.nl/)
+
 hrs: [![Build Status](https://travis-ci.org/asdfree/hrs.svg?branch=master)](https://travis-ci.org/asdfree/hrs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/hrs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/hrs)
 
 lavaanex: [![Build Status](https://travis-ci.org/asdfree/lavaanex.svg?branch=master)](https://travis-ci.org/asdfree/lavaanex) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/lavaanex?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/lavaanex)

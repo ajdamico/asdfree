@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 # Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'seer password'"
+commit_memo <- "'hmda badge password'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
