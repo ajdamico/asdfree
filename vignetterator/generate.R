@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 # Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'hrs, pnadc decrease, meps brr file always, atus year=='"
+commit_memo <- "'recreate from scratch every time'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -11,7 +11,7 @@ commit_memo <- "'hrs, pnadc decrease, meps brr file always, atus year=='"
 # multiply-imputed, database-backed survey (pisa)
 
 
-
+github_password <- readLines( "C:\\Users\\anthonyd\\Documents\\github password.txt" )
 source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\descriptive_statistics_blocks.R" )
 source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\measures_of_uncertainty_blocks.R" )
 source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\tests_of_association_blocks.R" )
@@ -280,17 +280,14 @@ rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Gith
 ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "travis|appveyor" , readLines( w ) ) & grepl( "Build Status" , readLines( w ) ) ) )
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
-git_push_script <- 
-	c( "git add -u" ,
-		"git add ." ,
-		paste( "git commit -m" , commit_memo ) ,
-		"git push origin master" ,
-		"cd .." ,
-		"cd datasets" )
-		
+
+stopifnot( file.remove( list.files( 'C:/Users/AnthonyD/Documents/Github/datasets/' , recursive = TRUE , full.names = TRUE , include.dirs = TRUE ) ) )
+
 for( this_ci_file in ci_rmd_files ){
 
 	chapter_tag <- gsub( "(.*)-(.*)\\.Rmd" , "\\2" , basename( this_ci_file ) )
+
+	system( paste0( "powershell git clone https://github.com/asdfree/" , chapter_tag , "/ 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "'" ) )
 	
 	this_metadata_file <- gsub( paste0( "/([0-9]+)-" , chapter_tag , ".Rmd$" ) , paste0( "/metadata/" , chapter_tag , ".txt" ) , this_ci_file )
 
@@ -431,19 +428,13 @@ for( this_ci_file in ci_rmd_files ){
 	
 	
 	
-	
-	git_push_script <-
-		c( git_push_script ,
-			paste( "cd" , chapter_tag ) ,
-			"git add -u" ,
-			"git add ." ,
-			paste( "git commit -m" , commit_memo ) ,
-			"git push origin master" ,
-			"cd .." )
+	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' add -u" ) )
+	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' add ." ) )
+	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' commit -m " , commit_memo ) )
+	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' remote add origin https://ajdamico:" , github_password , "@github.com/asdfree/" , chapter_tag , ".git" ) )
+	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' push origin master" ) )
 
 }
-
-writeLines( git_push_script , paste0( datasets_path , "/asdfree shell git script.txt" ) )
 
 
 writeLines( readme_md_text , file.path( path.expand( "~" ) , "Github/asdfree/README.md" ) )
