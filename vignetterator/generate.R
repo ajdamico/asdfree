@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 # Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'recreate from scratch every time'"
+commit_memo <- "'delete as much as you can'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -281,7 +281,7 @@ ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "travis|appveyor" 
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
 
-stopifnot( file.remove( list.files( 'C:/Users/AnthonyD/Documents/Github/datasets/' , recursive = TRUE , full.names = TRUE , include.dirs = TRUE ) ) )
+unlink( list.files( 'C:/Users/AnthonyD/Documents/Github/datasets' , recursive = TRUE , full.names = TRUE , include.dirs = TRUE , all.files = TRUE ) )
 
 for( this_ci_file in ci_rmd_files ){
 
@@ -438,3 +438,9 @@ for( this_ci_file in ci_rmd_files ){
 
 
 writeLines( readme_md_text , file.path( path.expand( "~" ) , "Github/asdfree/README.md" ) )
+
+system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add -u" ) )
+system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add ." ) )
+system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' commit -m " , commit_memo ) )
+system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' remote add origin https://ajdamico:" , github_password , "@github.com/ajdamico/asdfree.git" ) )
+system( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' push origin master" )
