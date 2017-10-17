@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 # Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'lots of time decreases'"
+commit_memo <- "'remove unnecessary directory creation and add nvss to readme'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -277,7 +277,7 @@ repo_files <- list.files( normalizePath( file.path( path.expand( "~" ) , "Github
 
 rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
 
-ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Build Status" , readLines( w ) ) ) )
+ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "travis|appveyor" , readLines( w ) ) & grepl( "Build Status" , readLines( w ) ) ) )
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
 git_push_script <- 

@@ -77,6 +77,8 @@ nsduh: [![Build Status](https://travis-ci.org/asdfree/nsduh.svg?branch=master)](
 
 nsfg: [![Build Status](https://travis-ci.org/asdfree/nsfg.svg?branch=master)](https://travis-ci.org/asdfree/nsfg) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nsfg?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nsfg)
 
+nvss: [![Build Status](https://sisyphus.project.cwi.nl/?badge=nvss&host=stones14win)](http://sisyphus.project.cwi.nl/) [![Build status](https://sisyphus.project.cwi.nl/?badge=nvss&host=stones06fedora)](http://sisyphus.project.cwi.nl/)
+
 nychvs: [![Build Status](https://travis-ci.org/asdfree/nychvs.svg?branch=master)](https://travis-ci.org/asdfree/nychvs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nychvs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nychvs)
 
 pew: [![Build Status](https://travis-ci.org/asdfree/pew.svg?branch=master)](https://travis-ci.org/asdfree/pew) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pew?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pew)
