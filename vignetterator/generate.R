@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 # Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'delete as much as you can'"
+commit_memo <- "'git pull or git clone'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -281,13 +281,15 @@ ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "travis|appveyor" 
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
 
-unlink( list.files( 'C:/Users/AnthonyD/Documents/Github/datasets' , recursive = TRUE , full.names = TRUE , include.dirs = TRUE , all.files = TRUE ) )
-
 for( this_ci_file in ci_rmd_files ){
 
 	chapter_tag <- gsub( "(.*)-(.*)\\.Rmd" , "\\2" , basename( this_ci_file ) )
 
-	system( paste0( "powershell git clone https://github.com/asdfree/" , chapter_tag , "/ 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "'" ) )
+	if( dir.exists( paste0( "C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag ) ) ){
+		system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' pull" ) )
+	} else {
+		system( paste0( "powershell git clone https://github.com/asdfree/" , chapter_tag , "/ 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "'" ) )
+	}
 	
 	this_metadata_file <- gsub( paste0( "/([0-9]+)-" , chapter_tag , ".Rmd$" ) , paste0( "/metadata/" , chapter_tag , ".txt" ) , this_ci_file )
 
