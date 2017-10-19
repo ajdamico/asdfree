@@ -1,5 +1,5 @@
 # Sys.getenv("RSTUDIO_PANDOC")
-# Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
+Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
 commit_memo <- "'brfss 75%'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
