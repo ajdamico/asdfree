@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'brfss 75%'"
+commit_memo <- "'switch badges'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -19,7 +19,7 @@ source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\tests_o
 
 needs_travis_build_status_line <- "[![Build Status](https://travis-ci.org/asdfree/chapter_tag.svg?branch=master)](https://travis-ci.org/asdfree/chapter_tag) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chapter_tag?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chapter_tag)"
 
-needs_sisyphus_build_status_line <- "[![Build Status](https://sisyphus.project.cwi.nl/?badge=chapter_tag&host=stones14win)](http://sisyphus.project.cwi.nl/) [![Build status](https://sisyphus.project.cwi.nl/?badge=chapter_tag&host=stones06fedora)](http://sisyphus.project.cwi.nl/)"
+needs_sisyphus_build_status_line <- "[![Build status](https://sisyphus.project.cwi.nl/?badge=chapter_tag&host=stones06fedora)](http://sisyphus.project.cwi.nl/) [![Build Status](https://sisyphus.project.cwi.nl/?badge=chapter_tag&host=stones14win)](http://sisyphus.project.cwi.nl/)"
 
 
 needs_catalog_block <- '`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function.  After requesting the CHAPTER_TAG catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).\n\n```{r eval = FALSE , results = "hide" }\nlibrary(lodown)\n# examine all available CHAPTER_TAG microdata files\nchapter_tag_cat <-\n\tget_catalog( "chapter_tag" ,\n\t\toutput_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) get_catalog_password_parameters )\n\ncatalog_subset_description\ncatalog_subset\n# download the microdata to your local computer\nlodown( "chapter_tag" , chapter_tag_cat lodown_password_parameters )\n```'
