@@ -71,7 +71,7 @@ stopifnot( nrow( meps_df ) == nrow( meps_cons_df ) )
 meps_design <-
 	svrepdesign(
 		data = meps_df ,
-		weights = ~ perwt14f ,
+		weights = ~ perwt15f ,
 		type = "BRR" ,
 		combined.weights = FALSE ,
 		repweights = "brr[1-9]+"
@@ -88,7 +88,7 @@ meps_design <-
 		
 		one = 1 ,
 		
-		insured_december_31st = ifelse( ins14x %in% 1:2 , as.numeric( ins14x == 1 ) , NA )
+		insured_december_31st = ifelse( ins15x %in% 1:2 , as.numeric( ins15x == 1 ) , NA )
 		
 	)
 ```
@@ -99,7 +99,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 sum( weights( meps_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ region14 , meps_design , unwtd.count )
+svyby( ~ one , ~ region15 , meps_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
@@ -107,46 +107,46 @@ Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , meps_design )
 
-svyby( ~ one , ~ region14 , meps_design , svytotal )
+svyby( ~ one , ~ region15 , meps_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ totexp14 , meps_design )
+svymean( ~ totexp15 , meps_design )
 
-svyby( ~ totexp14 , ~ region14 , meps_design , svymean )
+svyby( ~ totexp15 , ~ region15 , meps_design , svymean )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svymean( ~ sex , meps_design )
 
-svyby( ~ sex , ~ region14 , meps_design , svymean )
+svyby( ~ sex , ~ region15 , meps_design , svymean )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ totexp14 , meps_design )
+svytotal( ~ totexp15 , meps_design )
 
-svyby( ~ totexp14 , ~ region14 , meps_design , svytotal )
+svyby( ~ totexp15 , ~ region15 , meps_design , svytotal )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ sex , meps_design )
 
-svyby( ~ sex , ~ region14 , meps_design , svytotal )
+svyby( ~ sex , ~ region15 , meps_design , svytotal )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ totexp14 , meps_design , 0.5 )
+svyquantile( ~ totexp15 , meps_design , 0.5 )
 
 svyby( 
-	~ totexp14 , 
-	~ region14 , 
+	~ totexp15 , 
+	~ region15 , 
 	meps_design , 
 	svyquantile , 
 	0.5 ,
@@ -158,8 +158,8 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ totmcd14 , 
-	denominator = ~ totexp14 , 
+	numerator = ~ totmcd15 , 
+	denominator = ~ totexp15 , 
 	meps_design 
 )
 ```
@@ -172,14 +172,14 @@ sub_meps_design <- subset( meps_design , agelast >= 65 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ totexp14 , sub_meps_design )
+svymean( ~ totexp15 , sub_meps_design )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ totexp14 , meps_design )
+this_result <- svymean( ~ totexp15 , meps_design )
 
 coef( this_result )
 SE( this_result )
@@ -188,8 +188,8 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ totexp14 , 
-		~ region14 , 
+		~ totexp15 , 
+		~ region15 , 
 		meps_design , 
 		svymean 
 	)
@@ -207,16 +207,16 @@ degf( meps_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ totexp14 , meps_design )
+svyvar( ~ totexp15 , meps_design )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ totexp14 , meps_design , deff = TRUE )
+svymean( ~ totexp15 , meps_design , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ totexp14 , meps_design , deff = "replace" )
+svymean( ~ totexp15 , meps_design , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -229,7 +229,7 @@ svyciprop( ~ insured_december_31st , meps_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( totexp14 ~ insured_december_31st , meps_design )
+svyttest( totexp15 ~ insured_december_31st , meps_design )
 ```
 
 Perform a chi-squared test of association for survey data:
@@ -244,7 +244,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		totexp14 ~ insured_december_31st + sex , 
+		totexp15 ~ insured_december_31st + sex , 
 		meps_design 
 	)
 
@@ -262,11 +262,11 @@ meps_srvyr_design <- as_survey( meps_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 meps_srvyr_design %>%
-	summarize( mean = survey_mean( totexp14 ) )
+	summarize( mean = survey_mean( totexp15 ) )
 
 meps_srvyr_design %>%
-	group_by( region14 ) %>%
-	summarize( mean = survey_mean( totexp14 ) )
+	group_by( region15 ) %>%
+	summarize( mean = survey_mean( totexp15 ) )
 ```
 
 ---
