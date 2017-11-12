@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'meps brr 2015'"
+commit_memo <- "'cpsasec build matrix'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -294,7 +294,7 @@ for( this_ci_file in ci_rmd_files ){
 	this_metadata_file <- gsub( paste0( "/([0-9]+)-" , chapter_tag , ".Rmd$" ) , paste0( "/metadata/" , chapter_tag , ".txt" ) , this_ci_file )
 
 	needed_libraries <- paste( gsub( "^(dependencies: )?library\\(|\\)" , "" , unique( grep( "^(dependencies: )?library\\(" , c( if( file.exists( this_metadata_file ) ) readLines( this_metadata_file ) , readLines( this_ci_file ) ) , value = TRUE ) ) ) , collapse = ", " )
-
+	
 	this_repo_path <- normalizePath( file.path( datasets_path , chapter_tag ) , winslash = '/' , mustWork = FALSE )
 	
 	copied_files <- gsub( normalizePath( file.path( path.expand( "~" ) , "Github/asdfree/repo/" ) , winslash = '/' ) , this_repo_path , repo_files )
@@ -337,6 +337,7 @@ for( this_ci_file in ci_rmd_files ){
 					} else {
 
 						sample_setup_block <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , sample_setup_block )
+						sample_setup_block <- gsub( "sample_setup_breaks" , pull_line( this_metadata_file , "sample_setup_breaks" ) , sample_setup_block )
 						for ( this_replacement in machine_specific_replacements ) sample_setup_block <- gsub( this_replacement[ 1 ] , this_replacement[ 2 ] , sample_setup_block , fixed = TRUE )
 						these_lines <- c( these_lines , sample_setup_block )
 						
@@ -347,6 +348,46 @@ for( this_ci_file in ci_rmd_files ){
 				if( grepl( 'test\\.R$' , this_file ) ) these_lines <- c( these_lines , readLines( lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements , setup_test = "test" , local_comp = TRUE ) ) )
 
 			}
+			
+			
+			
+			
+			sample_setup_breaks <- pull_line( this_metadata_file , "sample_setup_breaks" )
+
+			if( sample_setup_breaks != '' ){
+				
+				if( basename( this_file ) == 'appveyor.yml' ){
+				
+					these_lines <-
+						gsub( 
+							"# this_build_matrix" ,
+							paste0( 
+								"    matrix:\n" ,
+								paste0( "    - this_sample_break: " , seq( as.integer( sample_setup_breaks ) ) , collapse = "\n" ) ,
+								collapse = "\n"
+							) , 
+							these_lines 
+						)
+						
+				}
+				
+				if( basename( this_file ) == '.travis.yml' ){
+					
+					these_lines <-
+						gsub( 
+							"# this_build_matrix" ,
+							paste0( 
+								"env:\n" ,
+								paste0( " - this_sample_break=" , seq( as.integer( sample_setup_breaks ) ) , collapse = "\n" ) ,
+								collapse = "\n"
+							) , 
+							these_lines 
+						)
+							
+				}
+			
+			}
+		
 
 			these_lines <- gsub( "chapter_tag" , chapter_tag , these_lines )
 			these_lines <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , these_lines )
@@ -421,7 +462,7 @@ for( this_ci_file in ci_rmd_files ){
 			these_lines <- gsub( "chapter_tag" , chapter_tag , these_lines )
 			these_lines <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , these_lines )
 			these_lines <- gsub( "needed_libraries" , needed_libraries , these_lines )
-
+				
 			writeLines( these_lines , this_copied_file )
 		
 		}
