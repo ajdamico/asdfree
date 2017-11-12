@@ -143,8 +143,11 @@ my_project <- Sys.getenv( "my_project" )
 
 
 
+sample_setup_breaks: 10
 
 ~~~{sample_setup_block}
+this_sample_break <- Sys.getenv( "this_sample_break" )
+
 library(lodown)
 
 chapter_tag_cat <-
@@ -156,12 +159,10 @@ chapter_tag_cat <-
 
 # some indian files are too large to test on 
 chapter_tag_cat <- subset( chapter_tag_cat , !grepl( "IAIR52" , full_url ) )
-		
-# sample 10% of the records
-which_records <- sample( seq( nrow( chapter_tag_cat ) ) , round( nrow( chapter_tag_cat ) * 0.10 ) )
+	
+record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
 
-# always sample the 2004 malawi sample
-chapter_tag_cat <- unique( rbind( chapter_tag_cat[ which_records , ] , subset( chapter_tag_cat , year == 2004 & country == 'Malawi' & grepl( "MWIR4EDT" , full_url ) ) ) )
+chapter_tag_cat <- unique( rbind( chapter_tag_cat[ record_categories == this_sample_break , ] , chapter_tag_cat[ chapter_tag_cat$year == 2004 & chapter_tag_cat$country == 'Malawi' & grepl( "MWIR4EDT" , chapter_tag_cat$full_url ) , ] ) )
 
 lodown( "chapter_tag" , chapter_tag_cat , 
 		your_email = my_email_address , 

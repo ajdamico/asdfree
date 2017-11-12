@@ -102,20 +102,20 @@ needs_travis_build_status_line: yes
 
 
 
-
+sample_setup_breaks: 5
 
 ~~~{sample_setup_block}
+this_sample_break <- Sys.getenv( "this_sample_break" )
+
 library(lodown)
 
 chapter_tag_cat <-
 	get_catalog( "chapter_tag" ,
 		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
 
-# sample 25% of the records
-which_records <- sample( seq( nrow( chapter_tag_cat ) ) , round( nrow( chapter_tag_cat ) * 0.25 ) )
+record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
 
-# always sample the united states wave == 6 file
-chapter_tag_cat <- unique( rbind( chapter_tag_cat[ which_records , ] , subset( chapter_tag_cat , grepl( "United(.*)States" , full_url ) & wave == 6 ) ) )
+chapter_tag_cat <- unique( rbind( chapter_tag_cat[ record_categories == this_sample_break , ] , chapter_tag_cat[ grepl( "United(.*)States" , chapter_tag_cat$full_url ) & chapter_tag_cat$wave == 6 , ] ) )
 
 lodown( "chapter_tag" , chapter_tag_cat )
 ~~~

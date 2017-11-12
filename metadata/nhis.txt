@@ -187,18 +187,20 @@ needs_travis_build_status_line: yes
 
 
 
+sample_setup_breaks: 4
+
 ~~~{sample_setup_block}
+this_sample_break <- Sys.getenv( "this_sample_break" )
+
 library(lodown)
 
 chapter_tag_cat <-
 	get_catalog( "chapter_tag" ,
 		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
 
-# sample 40% of the records
-which_records <- sample( seq( nrow( chapter_tag_cat ) ) , round( nrow( chapter_tag_cat ) * 0.40 ) )
+record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
 
-# always sample year == 2016
-chapter_tag_cat <- unique( rbind( chapter_tag_cat[ which_records , ] , subset( chapter_tag_cat , year == 2016 ) ) )
+chapter_tag_cat <- unique( rbind( chapter_tag_cat[ record_categories == this_sample_break , ] , chapter_tag_cat[ chapter_tag_cat$year == 2016 , ] ) )
 
 lodown( "chapter_tag" , chapter_tag_cat )
 ~~~
