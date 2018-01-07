@@ -147,3 +147,23 @@ needs_travis_build_status_line: yes
 sample_setup_breaks: 3
 
 broken_sample_test_condition: any( grepl( 'rand([a-z]+)stata\\.zip' , chapter_tag_cat$file_name ) )
+
+~~~{sample_setup_block}
+this_sample_break <- Sys.getenv( "this_sample_break" )
+
+library(lodown)
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
+		your_username = my_username , 
+		your_password = my_password )
+
+record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
+
+chapter_tag_cat <- chapter_tag_cat[ record_categories == this_sample_break , ]
+
+lodown( "chapter_tag" , chapter_tag_cat , 
+	your_username = my_username , 
+	your_password = my_password )
+~~~
