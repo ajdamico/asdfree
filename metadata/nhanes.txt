@@ -110,9 +110,9 @@ needs_srvyr_block: yes
 
 needs_travis_build_status_line: yes
 
-
-
 sample_setup_breaks: 8
+
+broken_sample_test_condition: any( chapter_tag_cat$years == "2015-2016" )
 
 ~~~{sample_setup_block}
 this_sample_break <- Sys.getenv( "this_sample_break" )
@@ -125,7 +125,7 @@ chapter_tag_cat <-
 
 record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
 
-chapter_tag_cat <- unique( rbind( chapter_tag_cat[ record_categories == this_sample_break , ] , chapter_tag_cat[ chapter_tag_cat$years == "2015-2016" , ] ) )
+chapter_tag_cat <- chapter_tag_cat[ record_categories == this_sample_break , ]
 
 # skip the two physical activity files because ci fails for some undetermined reason
 chapter_tag_cat <- subset( chapter_tag_cat , !grepl( "paxraw" , output_filename ) )

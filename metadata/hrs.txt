@@ -114,8 +114,6 @@ needs_srvyr_block: yes
 
 
 
-needs_travis_build_status_line: yes
-
 ~~~{machine_specific_replacements_block}
 machine_specific_replacements <- 
 	list( 
@@ -144,25 +142,8 @@ my_password <- Sys.getenv( "my_password" )
 
 
 
+needs_travis_build_status_line: yes
+
 sample_setup_breaks: 3
 
-~~~{sample_setup_block}
-this_sample_break <- Sys.getenv( "this_sample_break" )
-
-library(lodown)
-
-chapter_tag_cat <-
-	get_catalog( "chapter_tag" ,
-		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
-		your_username = "username" , 
-		your_password = "password" )
-
-record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
-
-chapter_tag_cat <- unique( rbind( chapter_tag_cat[ record_categories == this_sample_break , ] , chapter_tag_cat[ grepl( 'rand([a-z]+)stata\\.zip' , chapter_tag_cat$file_name ) , ] ) )
-
-lodown( "chapter_tag" , chapter_tag_cat , 
-		your_username = "username" , 
-		your_password = "password" )
-
-~~~
+broken_sample_test_condition: any( grepl( 'rand([a-z]+)stata\\.zip' , chapter_tag_cat$file_name ) )

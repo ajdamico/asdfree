@@ -100,22 +100,6 @@ needs_srvyr_block: yes
 
 needs_travis_build_status_line: yes
 
-
-
 sample_setup_breaks: 5
 
-~~~{sample_setup_block}
-this_sample_break <- Sys.getenv( "this_sample_break" )
-
-library(lodown)
-
-chapter_tag_cat <-
-	get_catalog( "chapter_tag" ,
-		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
-
-record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
-
-chapter_tag_cat <- unique( rbind( chapter_tag_cat[ record_categories == this_sample_break , ] , chapter_tag_cat[ grepl( "United(.*)States" , chapter_tag_cat$full_url ) & chapter_tag_cat$wave == 6 , ] ) )
-
-lodown( "chapter_tag" , chapter_tag_cat )
-~~~
+broken_sample_test_condition: any( grepl( "United(.*)States" , chapter_tag_cat$full_url ) & chapter_tag_cat$wave == 6 )

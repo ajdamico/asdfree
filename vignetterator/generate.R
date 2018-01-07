@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'pme sample breaks'"
+commit_memo <- "'big new generation'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -309,16 +309,18 @@ for( this_ci_file in ci_rmd_files ){
 	
 	lapply( this_repo_dirs , dir.create , showWarnings = FALSE )
 	
+	file.copy( repo_files , copied_files , overwrite = TRUE )
+		
 	# do this for dataset pages
 	if( file.exists( this_metadata_file ) ){
-		
-		file.copy( repo_files , copied_files , overwrite = TRUE )
 		
 		for( this_file in copied_files ){
 		
 			these_lines <- readLines( this_file )
 
-			if( grepl( 'setup\\.R$|test\\.R$' , this_file ) ){
+			sample_setup_breaks <- pull_line( this_metadata_file , "sample_setup_breaks" )
+			
+			if( grepl( 'setup\\.R$' , this_file ) ){
 
 				environment_variables <- pull_chunk( this_metadata_file , "environment_variables_block" )
 
@@ -331,35 +333,39 @@ for( this_ci_file in ci_rmd_files ){
 				if( identical( msrb , '' ) ) msrb <- c("machine_specific_replacements <- ", "\tlist( ", "\t\t", "\t\t# replace the folder path on macnix", paste0( "\t\tc( 'path.expand( \\\"~\\\" ) , \\\"" , toupper( chapter_tag ) , "\\\"' , 'getwd()' ) ," ), "\t\t", "\t\t# change other things in the script to be run", "\t\tc( \"hello\" , \"howdy\" )", "\t)")
 
 				eval( parse( text = msrb ) )
-				
-				if( grepl( 'setup\\.R$' , this_file ) ) {
-				
-					sample_setup_block <- pull_chunk( this_metadata_file , "sample_setup_block" )
 			
-					if( identical( sample_setup_block , '' ) ){
-				
-						these_lines <- c( these_lines , readLines( lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements , setup_test = "setup" , local_comp = TRUE ) ) )
-					
-					} else {
+				sample_setup_block <- pull_chunk( this_metadata_file , "sample_setup_block" )
 
-						sample_setup_block <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , sample_setup_block )
-						sample_setup_block <- gsub( "sample_setup_breaks" , pull_line( this_metadata_file , "sample_setup_breaks" ) , sample_setup_block )
-						for ( this_replacement in machine_specific_replacements ) sample_setup_block <- gsub( this_replacement[ 1 ] , this_replacement[ 2 ] , sample_setup_block , fixed = TRUE )
-						these_lines <- c( these_lines , sample_setup_block )
-						
-					}
-					
+				broken_sample_test_condition <- pull_line( this_metadata_file , "broken_sample_test_condition" )
+
+				if( !identical( sample_setup_block , '' ) ){
+			
+					sample_setup_block <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , sample_setup_block )
+					for ( this_replacement in machine_specific_replacements ) sample_setup_block <- gsub( this_replacement[ 1 ] , this_replacement[ 2 ] , sample_setup_block , fixed = TRUE )
+					these_lines <- c( these_lines , sample_setup_block )
+				
 				}
 				
-				if( grepl( 'test\\.R$' , this_file ) ) these_lines <- c( these_lines , readLines( lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements , setup_test = "test" , local_comp = TRUE ) ) )
-
+				these_lines <- 
+					c( 
+						these_lines , 
+						readLines(
+							lodown::syntaxtractor( 
+								chapter_tag , 
+								replacements = machine_specific_replacements , 
+								setup_rmd = identical( sample_setup_block , '' ) ,
+								sample_setup_breaks = if( !identical( sample_setup_breaks , '' ) ) sample_setup_breaks ,
+								broken_sample_test_condition = if( !identical( broken_sample_test_condition , '' ) ) broken_sample_test_condition
+							)
+						)
+						
+					)
+				
+				
+				
 			}
 			
 			
-			
-			
-			sample_setup_breaks <- pull_line( this_metadata_file , "sample_setup_breaks" )
-
 			if( sample_setup_breaks != '' ){
 				
 				if( basename( this_file ) == 'appveyor.yml' ){
@@ -395,6 +401,7 @@ for( this_ci_file in ci_rmd_files ){
 			}
 		
 
+			these_lines <- gsub( "sample_setup_breaks" , sample_setup_breaks , these_lines )
 			these_lines <- gsub( "chapter_tag" , chapter_tag , these_lines )
 			these_lines <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , these_lines )
 			these_lines <- gsub( "needed_libraries" , needed_libraries , these_lines )
@@ -445,24 +452,16 @@ for( this_ci_file in ci_rmd_files ){
 				)
 		}
 		
-				
-	
-		# setup.R only, no test.
-		file.copy( 
-			repo_files[ !grepl( "test\\.R$" , repo_files ) ] , 
-			copied_files[ !grepl( "test\\.R$" , copied_files ) ] , 
-			overwrite = TRUE 
-		)
-		
+
 		setup_fn <- grep( "setup\\.R$" , copied_files , value = TRUE )
 		
 		file.copy(
-			lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements , local_comp = TRUE ) ,
+			lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements ) ,
 			setup_fn ,
 			overwrite = TRUE
 		)
-	
-		for( this_copied_file in copied_files[ !grepl( "test\\.R$" , copied_files ) ] ){
+
+		for( this_copied_file in copied_files ){
 			
 			these_lines <- readLines( this_copied_file )
 			
@@ -477,7 +476,7 @@ for( this_ci_file in ci_rmd_files ){
 			writeLines( these_lines , this_copied_file )
 		
 		}
-	
+		
 	}
 	
 	
