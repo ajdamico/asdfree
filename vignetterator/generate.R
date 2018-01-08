@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'output_dir'"
+commit_memo <- "'setup sample breaks revisions'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -456,7 +456,7 @@ for( this_ci_file in ci_rmd_files ){
 		setup_fn <- grep( "setup\\.R$" , copied_files , value = TRUE )
 		
 		file.copy(
-			lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements ) ,
+			lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements , test_rmd = FALSE ) ,
 			setup_fn ,
 			overwrite = TRUE
 		)
