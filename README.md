@@ -15,6 +15,10 @@ brfss: [![Build Status](https://travis-ci.org/asdfree/brfss.svg?branch=master)](
 
 bsapuf: [![Build Status](https://travis-ci.org/asdfree/bsapuf.svg?branch=master)](https://travis-ci.org/asdfree/bsapuf) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/bsapuf?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/bsapuf)
 
+censo: [![Build Status](https://travis-ci.org/asdfree/censo.svg?branch=master)](https://travis-ci.org/asdfree/censo) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/censo?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/censo)
+
+censo_escolar: [![Build Status](https://travis-ci.org/asdfree/censo_escolar.svg?branch=master)](https://travis-ci.org/asdfree/censo_escolar) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/censo_escolar?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/censo_escolar)
+
 ces: [![Build Status](https://travis-ci.org/asdfree/ces.svg?branch=master)](https://travis-ci.org/asdfree/ces) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ces?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ces)
 
 chis: [![Build Status](https://travis-ci.org/asdfree/chis.svg?branch=master)](https://travis-ci.org/asdfree/chis) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chis?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chis)
@@ -29,11 +33,15 @@ dhs: [![Build Status](https://travis-ci.org/asdfree/dhs.svg?branch=master)](http
 
 enade: [![Build Status](https://travis-ci.org/asdfree/enade.svg?branch=master)](https://travis-ci.org/asdfree/enade) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/enade?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/enade)
 
+enem: [![Build Status](https://travis-ci.org/asdfree/enem.svg?branch=master)](https://travis-ci.org/asdfree/enem) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/enem?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/enem)
+
 ess: [![Build Status](https://travis-ci.org/asdfree/ess.svg?branch=master)](https://travis-ci.org/asdfree/ess) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ess?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ess)
 
 faers: [![Build Status](https://travis-ci.org/asdfree/faers.svg?branch=master)](https://travis-ci.org/asdfree/faers) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/faers?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/faers)
 
 gss: [![Build Status](https://travis-ci.org/asdfree/gss.svg?branch=master)](https://travis-ci.org/asdfree/gss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/gss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/gss)
+
+hmda: [![Build Status](https://travis-ci.org/asdfree/hmda.svg?branch=master)](https://travis-ci.org/asdfree/hmda) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/hmda?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/hmda)
 
 hrs: [![Build Status](https://travis-ci.org/asdfree/hrs.svg?branch=master)](https://travis-ci.org/asdfree/hrs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/hrs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/hrs)
 
@@ -45,13 +53,19 @@ mlces: [![Build Status](https://travis-ci.org/asdfree/mlces.svg?branch=master)](
 
 nbs: [![Build Status](https://travis-ci.org/asdfree/nbs.svg?branch=master)](https://travis-ci.org/asdfree/nbs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nbs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nbs)
 
+ncvs: [![Build Status](https://travis-ci.org/asdfree/ncvs.svg?branch=master)](https://travis-ci.org/asdfree/ncvs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ncvs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ncvs)
+
 nhanes: [![Build Status](https://travis-ci.org/asdfree/nhanes.svg?branch=master)](https://travis-ci.org/asdfree/nhanes) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nhanes?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nhanes)
 
 nhis: [![Build Status](https://travis-ci.org/asdfree/nhis.svg?branch=master)](https://travis-ci.org/asdfree/nhis) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nhis?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nhis)
 
+nhts: [![Build Status](https://travis-ci.org/asdfree/nhts.svg?branch=master)](https://travis-ci.org/asdfree/nhts) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nhts?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nhts)
+
 nis: [![Build Status](https://travis-ci.org/asdfree/nis.svg?branch=master)](https://travis-ci.org/asdfree/nis) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nis?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nis)
 
 nls: [![Build Status](https://travis-ci.org/asdfree/nls.svg?branch=master)](https://travis-ci.org/asdfree/nls) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nls?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nls)
+
+nppes: [![Build Status](https://travis-ci.org/asdfree/nppes.svg?branch=master)](https://travis-ci.org/asdfree/nppes) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nppes?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nppes)
 
 nps: [![Build Status](https://travis-ci.org/asdfree/nps.svg?branch=master)](https://travis-ci.org/asdfree/nps) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nps?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nps)
 
@@ -61,6 +75,8 @@ nsduh: [![Build Status](https://travis-ci.org/asdfree/nsduh.svg?branch=master)](
 
 nsfg: [![Build Status](https://travis-ci.org/asdfree/nsfg.svg?branch=master)](https://travis-ci.org/asdfree/nsfg) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nsfg?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nsfg)
 
+nvss: [![Build Status](https://travis-ci.org/asdfree/nvss.svg?branch=master)](https://travis-ci.org/asdfree/nvss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nvss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nvss)
+
 nychvs: [![Build Status](https://travis-ci.org/asdfree/nychvs.svg?branch=master)](https://travis-ci.org/asdfree/nychvs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nychvs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nychvs)
 
 pew: [![Build Status](https://travis-ci.org/asdfree/pew.svg?branch=master)](https://travis-ci.org/asdfree/pew) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pew?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pew)
@@ -68,6 +84,8 @@ pew: [![Build Status](https://travis-ci.org/asdfree/pew.svg?branch=master)](http
 piaac: [![Build Status](https://travis-ci.org/asdfree/piaac.svg?branch=master)](https://travis-ci.org/asdfree/piaac) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/piaac?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/piaac)
 
 pirls: [![Build Status](https://travis-ci.org/asdfree/pirls.svg?branch=master)](https://travis-ci.org/asdfree/pirls) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pirls?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pirls)
+
+pisa: [![Build Status](https://travis-ci.org/asdfree/pisa.svg?branch=master)](https://travis-ci.org/asdfree/pisa) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pisa?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pisa)
 
 pls: [![Build Status](https://travis-ci.org/asdfree/pls.svg?branch=master)](https://travis-ci.org/asdfree/pls) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pls?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pls)
 
@@ -83,15 +101,25 @@ pof: [![Build Status](https://travis-ci.org/asdfree/pof.svg?branch=master)](http
 
 psid: [![Build Status](https://travis-ci.org/asdfree/psid.svg?branch=master)](https://travis-ci.org/asdfree/psid) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/psid?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/psid)
 
+saeb: [![Build Status](https://travis-ci.org/asdfree/saeb.svg?branch=master)](https://travis-ci.org/asdfree/saeb) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/saeb?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/saeb)
+
 sbo: [![Build Status](https://travis-ci.org/asdfree/sbo.svg?branch=master)](https://travis-ci.org/asdfree/sbo) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/sbo?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/sbo)
 
 scf: [![Build Status](https://travis-ci.org/asdfree/scf.svg?branch=master)](https://travis-ci.org/asdfree/scf) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/scf?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/scf)
 
+seer: [![Build Status](https://travis-ci.org/asdfree/seer.svg?branch=master)](https://travis-ci.org/asdfree/seer) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/seer?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/seer)
+
 share: [![Build Status](https://travis-ci.org/asdfree/share.svg?branch=master)](https://travis-ci.org/asdfree/share) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/share?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/share)
+
+sipp: [![Build Status](https://travis-ci.org/asdfree/sipp.svg?branch=master)](https://travis-ci.org/asdfree/sipp) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/sipp?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/sipp)
 
 ssa: [![Build Status](https://travis-ci.org/asdfree/ssa.svg?branch=master)](https://travis-ci.org/asdfree/ssa) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ssa?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ssa)
 
+timss: [![Build Status](https://travis-ci.org/asdfree/timss.svg?branch=master)](https://travis-ci.org/asdfree/timss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/timss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/timss)
+
 trendy: [![Build Status](https://travis-ci.org/asdfree/trendy.svg?branch=master)](https://travis-ci.org/asdfree/trendy) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/trendy?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/trendy)
+
+uspums: [![Build Status](https://travis-ci.org/asdfree/uspums.svg?branch=master)](https://travis-ci.org/asdfree/uspums) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/uspums?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/uspums)
 
 wvs: [![Build Status](https://travis-ci.org/asdfree/wvs.svg?branch=master)](https://travis-ci.org/asdfree/wvs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/wvs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/wvs)
 
