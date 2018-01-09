@@ -1,4 +1,6 @@
 # You can find the book at http://asdfree.com/
+acs: [![Build Status](https://travis-ci.org/asdfree/acs.svg?branch=master)](https://travis-ci.org/asdfree/acs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/acs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/acs)
+
 addhealth: [![Build Status](https://travis-ci.org/asdfree/addhealth.svg?branch=master)](https://travis-ci.org/asdfree/addhealth) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/addhealth?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/addhealth)
 
 ahrf: [![Build Status](https://travis-ci.org/asdfree/ahrf.svg?branch=master)](https://travis-ci.org/asdfree/ahrf) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ahrf?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ahrf)
@@ -10,6 +12,8 @@ anes: [![Build Status](https://travis-ci.org/asdfree/anes.svg?branch=master)](ht
 atus: [![Build Status](https://travis-ci.org/asdfree/atus.svg?branch=master)](https://travis-ci.org/asdfree/atus) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/atus?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/atus)
 
 brfss: [![Build Status](https://travis-ci.org/asdfree/brfss.svg?branch=master)](https://travis-ci.org/asdfree/brfss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/brfss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/brfss)
+
+bsapuf: [![Build Status](https://travis-ci.org/asdfree/bsapuf.svg?branch=master)](https://travis-ci.org/asdfree/bsapuf) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/bsapuf?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/bsapuf)
 
 ces: [![Build Status](https://travis-ci.org/asdfree/ces.svg?branch=master)](https://travis-ci.org/asdfree/ces) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ces?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ces)
 
