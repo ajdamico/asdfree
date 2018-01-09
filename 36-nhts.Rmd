@@ -46,7 +46,7 @@ Construct a database-backed complex sample survey design:
 
 ```{r eval = FALSE }
 library(DBI)
-library(MonetDBLite)
+library(SQLite)
 library(survey)
 
 options( survey.lonely.psu = "adjust" )
@@ -58,8 +58,8 @@ prestratified_design <-
 		data = nhts_cat[ 1 , "db_tablename" ] ,
 		weights = ~pre_wgt ,
 		nest = TRUE ,
-		dbtype = "MonetDBLite" ,
-		dbname = nhts_cat[ 1 , "dbfolder" ]
+		dbtype = "SQLite" ,
+		dbname = nhts_cat[ 1 , "dbfile" ]
 	)
 	
 nhts_design <- 
@@ -272,8 +272,3 @@ svytotal( ~factor( v0302 ) , nhts_design )
 cv( svytotal( ~factor( v0302 ) , nhts_design ) )
 ```
 
-## Database Shutdown {-}
-
-```{r eval = FALSE , results = "hide" }
-close( nhts_design , shutdown = TRUE )
-```

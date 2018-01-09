@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'travis_wait 50 '"
+commit_memo <- "'monetdblite removals'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -190,14 +190,6 @@ for ( i in seq_along( chapter_tag ) ){
 	rmd_lines <- gsub( "^tests_of_association_block$" , tests_of_association_block , rmd_lines )
 
 	
-	db_closure_block <-
-		if( is_survey & is_db ) {
-			survey_db_closure
-		} else if( is_db ) db_closure else ""
-
-	rmd_lines <- gsub( "^db_closure_block$" , db_closure_block , rmd_lines )
-
-
 	
 	subsetting_block <-
 		if( is_survey ){

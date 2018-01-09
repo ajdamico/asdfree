@@ -46,7 +46,7 @@ Construct a database-backed complex sample survey design:
 
 ```{r eval = FALSE }
 library(DBI)
-library(MonetDBLite)
+library(RSQLite)
 library(survey)
 
 options( survey.lonely.psu = "adjust" )
@@ -58,8 +58,8 @@ prestratified_design <-
 		data = sipp_cat[ 1 , "db_tablename" ] ,
 		weights = ~pre_wgt ,
 		nest = TRUE ,
-		dbtype = "MonetDBLite" ,
-		dbname = sipp_cat[ 1 , "dbfolder" ]
+		dbtype = "SQLite" ,
+		dbname = sipp_cat[ 1 , "dbfile" ]
 	)
 	
 sipp_design <- 
@@ -272,8 +272,3 @@ svytotal( ~factor( v0302 ) , sipp_design )
 cv( svytotal( ~factor( v0302 ) , sipp_design ) )
 ```
 
-## Database Shutdown {-}
-
-```{r eval = FALSE , results = "hide" }
-close( sipp_design , shutdown = TRUE )
-```

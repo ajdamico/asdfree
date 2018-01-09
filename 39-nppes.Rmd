@@ -19,14 +19,14 @@ library(lodown)
 lodown( "nppes" , output_dir = file.path( path.expand( "~" ) , "NPPES" ) )
 ```
 
-## Analysis Examples with SQL and `MonetDBLite` {-}
+## Analysis Examples with SQL and `RSQLite` {-}
 
 Connect to a database:
 
 ```{r eval = FALSE }
 library(DBI)
-dbdir <- file.path( path.expand( "~" ) , "NPPES" , "MonetDB" )
-db <- dbConnect( MonetDBLite::MonetDBLite() , dbdir )
+dbdir <- file.path( path.expand( "~" ) , "NPPES" , "SQLite.db" )
+db <- dbConnect( RSQLite::SQLite() , dbdir )
 ```
 
 ```{r eval = FALSE }
@@ -192,7 +192,7 @@ The R `dplyr` library offers an alternative grammar of data manipulation to base
 
 ```{r eval = FALSE , results = "hide" }
 library(dplyr)
-dplyr_db <- MonetDBLite::src_monetdblite( dbdir )
+dplyr_db <- dplyr::src_sqlite( dbdir )
 nppes_tbl <- tbl( dplyr_db , 'npi' )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
@@ -213,8 +213,3 @@ nppes_tbl %>%
 dbGetQuery( db , "SELECT COUNT(*) FROM npi" )
 ```
 
-## Database Shutdown {-}
-
-```{r eval = FALSE , results = "hide" }
-dbDisconnect( db , shutdown = TRUE )
-```

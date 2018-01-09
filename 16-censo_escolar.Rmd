@@ -21,14 +21,14 @@ library(lodown)
 lodown( "censo_escolar" , output_dir = file.path( path.expand( "~" ) , "CENSO_ESCOLAR" ) )
 ```
 
-## Analysis Examples with SQL and `MonetDBLite` {-}
+## Analysis Examples with SQL and `RSQLite` {-}
 
 Connect to a database:
 
 ```{r eval = FALSE }
 library(DBI)
-dbdir <- file.path( path.expand( "~" ) , "CENSO_ESCOLAR" , "MonetDB" )
-db <- dbConnect( MonetDBLite::MonetDBLite() , dbdir )
+dbdir <- file.path( path.expand( "~" ) , "CENSO_ESCOLAR" , "SQLite.db" )
+db <- dbConnect( RSQLite::SQLite() , dbdir )
 ```
 
 ```{r eval = FALSE }
@@ -194,7 +194,7 @@ The R `dplyr` library offers an alternative grammar of data manipulation to base
 
 ```{r eval = FALSE , results = "hide" }
 library(dplyr)
-dplyr_db <- MonetDBLite::src_monetdblite( dbdir )
+dplyr_db <- dplyr::src_sqlite( dbdir )
 censo_escolar_tbl <- tbl( dplyr_db , 'matricula_2015' )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
@@ -230,8 +230,3 @@ dbGetQuery( db ,"SELECT COUNT(*) AS n_mat_tot
  WHERE TP_TIPO_TURMA NOT IN (4,5) AND CO_UF = 11 " )
 ```
 
-## Database Shutdown {-}
-
-```{r eval = FALSE , results = "hide" }
-dbDisconnect( db , shutdown = TRUE )
-```
