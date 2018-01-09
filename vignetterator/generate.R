@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'sort order'"
+commit_memo <- "'travis_wait 50 '"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -99,7 +99,7 @@ for ( i in seq_along( chapter_tag ) ){
 	is_mi <- any( grepl( "library(mitools)" , full_text[[i]] , fixed = TRUE ) )
 	is_db <- any( grepl( "library(DBI)" , full_text[[i]] , fixed = TRUE ) ) 
 
-	rmd_lines <- gsub( "kind_of_analysis_examples" , if( is_survey ) "the `survey` library" else if( is_db ) "SQL and `MonetDBLite`" else "base R" , rmd_lines )
+	rmd_lines <- gsub( "kind_of_analysis_examples" , if( is_survey ) "the `survey` library" else if( is_db ) "SQL and `RSQLite`" else "base R" , rmd_lines )
 	
 	for( this_block in needs_this_block ){
 		rmd_lines <- gsub( this_block , if( any( grepl( paste0( "^" , this_block , ": yes" ) , tolower( full_text[[i]] ) ) ) ) get( this_block ) else "" , rmd_lines )
@@ -111,7 +111,7 @@ for ( i in seq_along( chapter_tag ) ){
 	}
 	
 	
-	if( !is_survey ) rmd_lines <- gsub( "tbl_initiation_line" , if( is_db ) "dplyr_db <- MonetDBLite::src_monetdblite( dbdir )\nchapter_tag_tbl <- tbl( dplyr_db , 'sql_tablename' )" else "chapter_tag_tbl <- tbl_df( chapter_tag_df )" , rmd_lines )
+	if( !is_survey ) rmd_lines <- gsub( "tbl_initiation_line" , if( is_db ) "dplyr_db <- dplyr::src_sqlite( dbdir )\nchapter_tag_tbl <- tbl( dplyr_db , 'sql_tablename' )" else "chapter_tag_tbl <- tbl_df( chapter_tag_df )" , rmd_lines )
 	
 	
 	# standalone dataset, survey design, multiply-imputed survey design, database-backed survey design, or multiply-imputed database-backed survey design
