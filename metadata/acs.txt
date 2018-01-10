@@ -23,12 +23,50 @@ library(DBI)
 library(RSQLite)
 library(survey)
 
-chapter_tag_design <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "acs2011_1yr.rds" ) )
 
-chapter_tag_design_with_puerto_rico <- open( chapter_tag_design , driver = SQLite() )
+# create a nationwide survey design
+# chapter_tag_design_with_puerto_rico <-
+	# svrepdesign(
+		# weight = ~pwgtp ,
+		# repweights = 'pwgtp[0-9]+' ,
+		# scale = 4 / 80 ,
+		# rscales = rep( 1 , 80 ) ,
+		# mse = TRUE ,
+		# type = 'JK1' ,
+		# data = catalog[ i , 'db_tablename' ]  ,
+		# dbtype = "SQLite" ,
+		# dbname = catalog[ i , 'dbfile' ]
+	# )
+	
+# # workaround for a bug in survey::svrepdesign.character
+# chapter_tag_design$mse <- TRUE
 
-# remove puerto rico
-chapter_tag_design <- subset( chapter_tag_design_with_puerto_rico , st != 72 )
+# # remove puerto rico from the national design
+# chapter_tag_design <- subset( chapter_tag_design_with_puerto_rico , st != 72 )
+
+
+
+# to conserve RAM, create a smaller table within the database
+db <- dbConnect( RSQLite:SQLite() , catalog[ i , 'dbfile' ] )
+dbSendQuery( db , "CREATE TABLE alabama_1yr_2011 AS ( SELECT * FROM acs2011_1yr WHERE st = 1 )" )
+
+# notice the edited `data =` parameter
+# this design is alabama only
+chapter_tag_design <-
+	svrepdesign(
+		weight = ~pwgtp ,
+		repweights = 'pwgtp[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = 'acs2011_1yr'  ,
+		dbtype = "SQLite" ,
+		dbname = catalog[ i , 'dbfile' ]
+	)
+	
+# workaround for a bug in survey::svrepdesign.character
+chapter_tag_design$mse <- TRUE
 ~~~
 
 
@@ -139,3 +177,27 @@ svytotal(
 
 
 needs_travis_build_status_line: yes
+
+sample_setup_breaks: 12
+
+broken_sample_test_condition: any( chapter_tag_cat$year == 2011 )
+
+~~~{sample_setup_block}
+this_sample_break <- Sys.getenv( "this_sample_break" )
+
+library(lodown)
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
+
+# skip the three-year and five-year files
+chapter_tag_cat <- subset( chapter_tag_cat , time_period == '1-Year' )
+
+record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
+
+chapter_tag_cat <- chapter_tag_cat[ record_categories == this_sample_break , ]
+
+lodown( "chapter_tag" , chapter_tag_cat )
+
+~~~

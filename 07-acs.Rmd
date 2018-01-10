@@ -49,12 +49,47 @@ library(DBI)
 library(RSQLite)
 library(survey)
 
-acs_design <- readRDS( file.path( path.expand( "~" ) , "ACS" , "acs2011_1yr.rds" ) )
+# create a nationwide survey design
+# acs_design_with_puerto_rico <-
+	# svrepdesign(
+		# weight = ~pwgtp ,
+		# repweights = 'pwgtp[0-9]+' ,
+		# scale = 4 / 80 ,
+		# rscales = rep( 1 , 80 ) ,
+		# mse = TRUE ,
+		# type = 'JK1' ,
+		# data = catalog[ i , 'db_tablename' ] ,
+		# dbtype = "SQLite" ,
+		# dbname = catalog[ i , 'dbfile' ]
+	# )
+	
+# # workaround for a bug in survey::svrepdesign.character
+# acs_design$mse <- TRUE
 
-acs_design_with_puerto_rico <- open( acs_design , driver = SQLite() )
+# # remove puerto rico from the national design
+# acs_design <- subset( acs_design_with_puerto_rico , st != 72 )
 
-# remove puerto rico
-acs_design <- subset( acs_design_with_puerto_rico , st != 72 )
+# to conserve RAM, create a smaller table within the database
+db <- dbConnect( RSQLite:SQLite() , catalog[ i , 'dbfile' ] )
+dbSendQuery( db , "CREATE TABLE alabama_1yr_2011 AS ( SELECT * FROM acs2011_1yr WHERE st = 1 )" )
+
+# notice the edited `data =` parameter
+# this design is alabama only
+acs_design <-
+	svrepdesign(
+		weight = ~pwgtp ,
+		repweights = 'pwgtp[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = 'acs2011_1yr' ,
+		dbtype = "SQLite" ,
+		dbname = catalog[ i , 'dbfile' ]
+	)
+	
+# workaround for a bug in survey::svrepdesign.character
+acs_design$mse <- TRUE
 ```
 
 ### Variable Recoding {-}

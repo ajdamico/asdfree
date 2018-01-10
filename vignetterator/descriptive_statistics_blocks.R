@@ -109,25 +109,13 @@ dbGetQuery( db ,
 )
 ```
 
-Initiate a function that allows division by zero:
-```{r eval = FALSE , results = "hide" }
-dbSendQuery( db , 
-	"CREATE FUNCTION 
-		div_noerror(l DOUBLE, r DOUBLE) 
-	RETURNS DOUBLE 
-	EXTERNAL NAME calc.div_noerror" 
-)
-```
-
 Calculate the distribution of a categorical variable:
 ```{r eval = FALSE , results = "hide" }
 dbGetQuery( db , 
 	"SELECT 
 		categorical_variable , 
-		div_noerror( 
-			COUNT(*) , 
-			( SELECT COUNT(*) FROM sql_tablename ) 
-		) AS share_categorical_variable
+		COUNT(*) / ( SELECT COUNT(*) FROM sql_tablename ) 
+			AS share_categorical_variable
 	FROM sql_tablename 
 	GROUP BY categorical_variable" 
 )

@@ -988,12 +988,47 @@ acs_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( acs_cat , 
 <span class="kw">library</span>(RSQLite)
 <span class="kw">library</span>(survey)
 
-acs_design &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ACS&quot;</span> , <span class="st">&quot;acs2011_1yr.rds&quot;</span> ) )
+<span class="co"># create a nationwide survey design</span>
+<span class="co"># acs_design_with_puerto_rico &lt;-</span>
+    <span class="co"># svrepdesign(</span>
+        <span class="co"># weight = ~pwgtp ,</span>
+        <span class="co"># repweights = &#39;pwgtp[0-9]+&#39; ,</span>
+        <span class="co"># scale = 4 / 80 ,</span>
+        <span class="co"># rscales = rep( 1 , 80 ) ,</span>
+        <span class="co"># mse = TRUE ,</span>
+        <span class="co"># type = &#39;JK1&#39; ,</span>
+        <span class="co"># data = catalog[ i , &#39;db_tablename&#39; ] ,</span>
+        <span class="co"># dbtype = &quot;SQLite&quot; ,</span>
+        <span class="co"># dbname = catalog[ i , &#39;dbfile&#39; ]</span>
+    <span class="co"># )</span>
+    
+<span class="co"># # workaround for a bug in survey::svrepdesign.character</span>
+<span class="co"># acs_design$mse &lt;- TRUE</span>
 
-acs_design_with_puerto_rico &lt;-<span class="st"> </span><span class="kw">open</span>( acs_design , <span class="dt">driver =</span> <span class="kw">SQLite</span>() )
+<span class="co"># # remove puerto rico from the national design</span>
+<span class="co"># acs_design &lt;- subset( acs_design_with_puerto_rico , st != 72 )</span>
 
-<span class="co"># remove puerto rico</span>
-acs_design &lt;-<span class="st"> </span><span class="kw">subset</span>( acs_design_with_puerto_rico , st !=<span class="st"> </span><span class="dv">72</span> )</code></pre></div>
+<span class="co"># to conserve RAM, create a smaller table within the database</span>
+db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite:<span class="kw">SQLite</span>() , catalog[ i , <span class="st">&#39;dbfile&#39;</span> ] )
+<span class="kw">dbSendQuery</span>( db , <span class="st">&quot;CREATE TABLE alabama_1yr_2011 AS ( SELECT * FROM acs2011_1yr WHERE st = 1 )&quot;</span> )
+
+<span class="co"># notice the edited `data =` parameter</span>
+<span class="co"># this design is alabama only</span>
+acs_design &lt;-
+<span class="st">    </span><span class="kw">svrepdesign</span>(
+        <span class="dt">weight =</span> ~pwgtp ,
+        <span class="dt">repweights =</span> <span class="st">&#39;pwgtp[0-9]+&#39;</span> ,
+        <span class="dt">scale =</span> <span class="dv">4</span> /<span class="st"> </span><span class="dv">80</span> ,
+        <span class="dt">rscales =</span> <span class="kw">rep</span>( <span class="dv">1</span> , <span class="dv">80</span> ) ,
+        <span class="dt">mse =</span> <span class="ot">TRUE</span> ,
+        <span class="dt">type =</span> <span class="st">&#39;JK1&#39;</span> ,
+        <span class="dt">data =</span> <span class="st">&#39;acs2011_1yr&#39;</span> ,
+        <span class="dt">dbtype =</span> <span class="st">&quot;SQLite&quot;</span> ,
+        <span class="dt">dbname =</span> catalog[ i , <span class="st">&#39;dbfile&#39;</span> ]
+    )
+    
+<span class="co"># workaround for a bug in survey::svrepdesign.character</span>
+acs_design$mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code></pre></div>
 <div id="variable-recoding" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
 <p>Add new columns to the data set:</p>
