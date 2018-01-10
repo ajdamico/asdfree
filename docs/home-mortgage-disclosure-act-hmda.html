@@ -1013,21 +1013,12 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite::<sp
 <span class="st">    FROM hmda_2015 </span>
 <span class="st">    GROUP BY loanpurpose&quot;</span> 
 )</code></pre></div>
-<p>Initiate a function that allows division by zero:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbSendQuery</span>( db , 
-    <span class="st">&quot;CREATE FUNCTION </span>
-<span class="st">        div_noerror(l DOUBLE, r DOUBLE) </span>
-<span class="st">    RETURNS DOUBLE </span>
-<span class="st">    EXTERNAL NAME calc.div_noerror&quot;</span> 
-)</code></pre></div>
 <p>Calculate the distribution of a categorical variable:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
 <span class="st">        actiontype , </span>
-<span class="st">        div_noerror( </span>
-<span class="st">            COUNT(*) , </span>
-<span class="st">            ( SELECT COUNT(*) FROM hmda_2015 ) </span>
-<span class="st">        ) AS share_actiontype</span>
+<span class="st">        COUNT(*) / ( SELECT COUNT(*) FROM hmda_2015 ) </span>
+<span class="st">            AS share_actiontype</span>
 <span class="st">    FROM hmda_2015 </span>
 <span class="st">    GROUP BY actiontype&quot;</span> 
 )</code></pre></div>

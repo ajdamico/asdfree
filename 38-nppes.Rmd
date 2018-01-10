@@ -86,25 +86,13 @@ dbGetQuery( db ,
 )
 ```
 
-Initiate a function that allows division by zero:
-```{r eval = FALSE , results = "hide" }
-dbSendQuery( db , 
-	"CREATE FUNCTION 
-		div_noerror(l DOUBLE, r DOUBLE) 
-	RETURNS DOUBLE 
-	EXTERNAL NAME calc.div_noerror" 
-)
-```
-
 Calculate the distribution of a categorical variable:
 ```{r eval = FALSE , results = "hide" }
 dbGetQuery( db , 
 	"SELECT 
 		is_sole_proprietor , 
-		div_noerror( 
-			COUNT(*) , 
-			( SELECT COUNT(*) FROM npi ) 
-		) AS share_is_sole_proprietor
+		COUNT(*) / ( SELECT COUNT(*) FROM npi ) 
+			AS share_is_sole_proprietor
 	FROM npi 
 	GROUP BY is_sole_proprietor" 
 )
