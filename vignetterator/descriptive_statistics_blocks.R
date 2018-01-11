@@ -134,14 +134,24 @@ dbGetQuery( db ,
 )
 ```
 
-Calculate the median (50th percentile) of a linear variable, overall and by groups:
+Calculate the 25th, median, and 75th percentiles of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT QUANTILE( linear_variable , 0.5 ) FROM sql_tablename" )
+RSQLite::initExtension( db )
+
+dbGetQuery( db , 
+	"SELECT 
+		LOWER_QUARTILE( linear_variable ) , 
+		MEDIAN( linear_variable ) , 
+		UPPER_QUARTILE( linear_variable ) 
+	FROM sql_tablename" 
+)
 
 dbGetQuery( db , 
 	"SELECT 
 		group_by_variable , 
-		QUANTILE( linear_variable , 0.5 ) AS median_linear_variable
+		LOWER_QUARTILE( linear_variable ) AS lower_quartile_linear_variable , 
+		MEDIAN( linear_variable ) AS median_linear_variable , 
+		UPPER_QUARTILE( linear_variable ) AS upper_quartile_linear_variable
 	FROM sql_tablename 
 	GROUP BY group_by_variable" 
 )

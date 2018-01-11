@@ -1038,13 +1038,23 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite::<sp
 <span class="st">    FROM bsa_partd_events_2008 </span>
 <span class="st">    GROUP BY bene_sex_ident_cd&quot;</span> 
 )</code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , <span class="st">&quot;SELECT QUANTILE( pde_drug_cost , 0.5 ) FROM bsa_partd_events_2008&quot;</span> )
+<p>Calculate the 25th, median, and 75th percentiles of a linear variable, overall and by groups:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSQLite::<span class="kw">initExtension</span>( db )
+
+<span class="kw">dbGetQuery</span>( db , 
+    <span class="st">&quot;SELECT </span>
+<span class="st">        LOWER_QUARTILE( pde_drug_cost ) , </span>
+<span class="st">        MEDIAN( pde_drug_cost ) , </span>
+<span class="st">        UPPER_QUARTILE( pde_drug_cost ) </span>
+<span class="st">    FROM bsa_partd_events_2008&quot;</span> 
+)
 
 <span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
 <span class="st">        bene_sex_ident_cd , </span>
-<span class="st">        QUANTILE( pde_drug_cost , 0.5 ) AS median_pde_drug_cost</span>
+<span class="st">        LOWER_QUARTILE( pde_drug_cost ) AS lower_quartile_pde_drug_cost , </span>
+<span class="st">        MEDIAN( pde_drug_cost ) AS median_pde_drug_cost , </span>
+<span class="st">        UPPER_QUARTILE( pde_drug_cost ) AS upper_quartile_pde_drug_cost</span>
 <span class="st">    FROM bsa_partd_events_2008 </span>
 <span class="st">    GROUP BY bene_sex_ident_cd&quot;</span> 
 )</code></pre></div>
@@ -1062,18 +1072,20 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite::<sp
 <div id="measures-of-uncertainty-7" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Calculate the variance and standard deviation, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSQLite::<span class="kw">initExtension</span>( db )
+
+<span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
-<span class="st">        VAR_SAMP( pde_drug_cost ) , </span>
-<span class="st">        STDDEV_SAMP( pde_drug_cost ) </span>
+<span class="st">        VARIANCE( pde_drug_cost ) , </span>
+<span class="st">        STDEV( pde_drug_cost ) </span>
 <span class="st">    FROM bsa_partd_events_2008&quot;</span> 
 )
 
 <span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
 <span class="st">        bene_sex_ident_cd , </span>
-<span class="st">        VAR_SAMP( pde_drug_cost ) AS var_pde_drug_cost ,</span>
-<span class="st">        STDDEV_SAMP( pde_drug_cost ) AS stddev_pde_drug_cost</span>
+<span class="st">        VARIANCE( pde_drug_cost ) AS var_pde_drug_cost ,</span>
+<span class="st">        STDEV( pde_drug_cost ) AS stddev_pde_drug_cost</span>
 <span class="st">    FROM bsa_partd_events_2008 </span>
 <span class="st">    GROUP BY bene_sex_ident_cd&quot;</span> 
 )</code></pre></div>

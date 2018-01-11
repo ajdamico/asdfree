@@ -113,14 +113,24 @@ dbGetQuery( db ,
 )
 ```
 
-Calculate the median (50th percentile) of a linear variable, overall and by groups:
+Calculate the 25th, median, and 75th percentiles of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT QUANTILE( nu_idade , 0.5 ) FROM matricula_2015" )
+RSQLite::initExtension( db )
+
+dbGetQuery( db , 
+	"SELECT 
+		LOWER_QUARTILE( nu_idade ) , 
+		MEDIAN( nu_idade ) , 
+		UPPER_QUARTILE( nu_idade ) 
+	FROM matricula_2015" 
+)
 
 dbGetQuery( db , 
 	"SELECT 
 		tp_localizacao , 
-		QUANTILE( nu_idade , 0.5 ) AS median_nu_idade
+		LOWER_QUARTILE( nu_idade ) AS lower_quartile_nu_idade , 
+		MEDIAN( nu_idade ) AS median_nu_idade , 
+		UPPER_QUARTILE( nu_idade ) AS upper_quartile_nu_idade
 	FROM matricula_2015 
 	GROUP BY tp_localizacao" 
 )
@@ -142,18 +152,20 @@ dbGetQuery( db ,
 
 Calculate the variance and standard deviation, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
+RSQLite::initExtension( db )
+
 dbGetQuery( db , 
 	"SELECT 
-		VAR_SAMP( nu_idade ) , 
-		STDDEV_SAMP( nu_idade ) 
+		VARIANCE( nu_idade ) , 
+		STDEV( nu_idade ) 
 	FROM matricula_2015" 
 )
 
 dbGetQuery( db , 
 	"SELECT 
 		tp_localizacao , 
-		VAR_SAMP( nu_idade ) AS var_nu_idade ,
-		STDDEV_SAMP( nu_idade ) AS stddev_nu_idade
+		VARIANCE( nu_idade ) AS var_nu_idade ,
+		STDEV( nu_idade ) AS stddev_nu_idade
 	FROM matricula_2015 
 	GROUP BY tp_localizacao" 
 )

@@ -97,18 +97,20 @@ svyciprop( ~ binary_variable , chapter_tag_design ,
 db_measures_of_uncertainty_block <-
 'Calculate the variance and standard deviation, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
+RSQLite::initExtension( db )
+
 dbGetQuery( db , 
 	"SELECT 
-		VAR_SAMP( linear_variable ) , 
-		STDDEV_SAMP( linear_variable ) 
+		VARIANCE( linear_variable ) , 
+		STDEV( linear_variable ) 
 	FROM sql_tablename" 
 )
 
 dbGetQuery( db , 
 	"SELECT 
 		group_by_variable , 
-		VAR_SAMP( linear_variable ) AS var_linear_variable ,
-		STDDEV_SAMP( linear_variable ) AS stddev_linear_variable
+		VARIANCE( linear_variable ) AS var_linear_variable ,
+		STDEV( linear_variable ) AS stddev_linear_variable
 	FROM sql_tablename 
 	GROUP BY group_by_variable" 
 )

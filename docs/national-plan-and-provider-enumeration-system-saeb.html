@@ -1039,13 +1039,23 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite::<sp
 <span class="st">    FROM npi </span>
 <span class="st">    GROUP BY provider_gender_code&quot;</span> 
 )</code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , <span class="st">&quot;SELECT QUANTILE( provider_enumeration_year , 0.5 ) FROM npi&quot;</span> )
+<p>Calculate the 25th, median, and 75th percentiles of a linear variable, overall and by groups:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSQLite::<span class="kw">initExtension</span>( db )
+
+<span class="kw">dbGetQuery</span>( db , 
+    <span class="st">&quot;SELECT </span>
+<span class="st">        LOWER_QUARTILE( provider_enumeration_year ) , </span>
+<span class="st">        MEDIAN( provider_enumeration_year ) , </span>
+<span class="st">        UPPER_QUARTILE( provider_enumeration_year ) </span>
+<span class="st">    FROM npi&quot;</span> 
+)
 
 <span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
 <span class="st">        provider_gender_code , </span>
-<span class="st">        QUANTILE( provider_enumeration_year , 0.5 ) AS median_provider_enumeration_year</span>
+<span class="st">        LOWER_QUARTILE( provider_enumeration_year ) AS lower_quartile_provider_enumeration_year , </span>
+<span class="st">        MEDIAN( provider_enumeration_year ) AS median_provider_enumeration_year , </span>
+<span class="st">        UPPER_QUARTILE( provider_enumeration_year ) AS upper_quartile_provider_enumeration_year</span>
 <span class="st">    FROM npi </span>
 <span class="st">    GROUP BY provider_gender_code&quot;</span> 
 )</code></pre></div>
@@ -1063,18 +1073,20 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite::<sp
 <div id="measures-of-uncertainty-49" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Calculate the variance and standard deviation, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSQLite::<span class="kw">initExtension</span>( db )
+
+<span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
-<span class="st">        VAR_SAMP( provider_enumeration_year ) , </span>
-<span class="st">        STDDEV_SAMP( provider_enumeration_year ) </span>
+<span class="st">        VARIANCE( provider_enumeration_year ) , </span>
+<span class="st">        STDEV( provider_enumeration_year ) </span>
 <span class="st">    FROM npi&quot;</span> 
 )
 
 <span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
 <span class="st">        provider_gender_code , </span>
-<span class="st">        VAR_SAMP( provider_enumeration_year ) AS var_provider_enumeration_year ,</span>
-<span class="st">        STDDEV_SAMP( provider_enumeration_year ) AS stddev_provider_enumeration_year</span>
+<span class="st">        VARIANCE( provider_enumeration_year ) AS var_provider_enumeration_year ,</span>
+<span class="st">        STDEV( provider_enumeration_year ) AS stddev_provider_enumeration_year</span>
 <span class="st">    FROM npi </span>
 <span class="st">    GROUP BY provider_gender_code&quot;</span> 
 )</code></pre></div>

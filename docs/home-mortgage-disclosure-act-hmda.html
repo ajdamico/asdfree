@@ -1032,13 +1032,23 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite::<sp
 <span class="st">    FROM hmda_2015 </span>
 <span class="st">    GROUP BY loanpurpose&quot;</span> 
 )</code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , <span class="st">&quot;SELECT QUANTILE( loanamount , 0.5 ) FROM hmda_2015&quot;</span> )
+<p>Calculate the 25th, median, and 75th percentiles of a linear variable, overall and by groups:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSQLite::<span class="kw">initExtension</span>( db )
+
+<span class="kw">dbGetQuery</span>( db , 
+    <span class="st">&quot;SELECT </span>
+<span class="st">        LOWER_QUARTILE( loanamount ) , </span>
+<span class="st">        MEDIAN( loanamount ) , </span>
+<span class="st">        UPPER_QUARTILE( loanamount ) </span>
+<span class="st">    FROM hmda_2015&quot;</span> 
+)
 
 <span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
 <span class="st">        loanpurpose , </span>
-<span class="st">        QUANTILE( loanamount , 0.5 ) AS median_loanamount</span>
+<span class="st">        LOWER_QUARTILE( loanamount ) AS lower_quartile_loanamount , </span>
+<span class="st">        MEDIAN( loanamount ) AS median_loanamount , </span>
+<span class="st">        UPPER_QUARTILE( loanamount ) AS upper_quartile_loanamount</span>
 <span class="st">    FROM hmda_2015 </span>
 <span class="st">    GROUP BY loanpurpose&quot;</span> 
 )</code></pre></div>
@@ -1056,18 +1066,20 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite::<sp
 <div id="measures-of-uncertainty-20" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Calculate the variance and standard deviation, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSQLite::<span class="kw">initExtension</span>( db )
+
+<span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
-<span class="st">        VAR_SAMP( loanamount ) , </span>
-<span class="st">        STDDEV_SAMP( loanamount ) </span>
+<span class="st">        VARIANCE( loanamount ) , </span>
+<span class="st">        STDEV( loanamount ) </span>
 <span class="st">    FROM hmda_2015&quot;</span> 
 )
 
 <span class="kw">dbGetQuery</span>( db , 
     <span class="st">&quot;SELECT </span>
 <span class="st">        loanpurpose , </span>
-<span class="st">        VAR_SAMP( loanamount ) AS var_loanamount ,</span>
-<span class="st">        STDDEV_SAMP( loanamount ) AS stddev_loanamount</span>
+<span class="st">        VARIANCE( loanamount ) AS var_loanamount ,</span>
+<span class="st">        STDEV( loanamount ) AS stddev_loanamount</span>
 <span class="st">    FROM hmda_2015 </span>
 <span class="st">    GROUP BY loanpurpose&quot;</span> 
 )</code></pre></div>
