@@ -48,24 +48,6 @@ glm_result <-
 summary( glm_result )
 ```'
 
-db_tests_of_association_block <-
-'Calculate the correlation between two variables, overall and by groups:
-```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , 
-	"SELECT 
-		CORR( CAST( binary_variable AS DOUBLE ) , CAST( linear_variable AS DOUBLE ) )
-	FROM sql_tablename" 
-)
-
-dbGetQuery( db , 
-	"SELECT 
-		group_by_variable , 
-		CORR( CAST( binary_variable AS DOUBLE ) , CAST( linear_variable AS DOUBLE ) )
-	FROM sql_tablename 
-	GROUP BY group_by_variable" 
-)
-```'
-
 
 base_tests_of_association_block <-
 'Perform a t-test:
