@@ -1,6 +1,6 @@
-# Censo Escolar (CENSO_ESCOLAR) {-}
+# Censo Escolar (CENSOESCOLAR) {-}
 
-[![Build Status](https://travis-ci.org/asdfree/censo_escolar.svg?branch=master)](https://travis-ci.org/asdfree/censo_escolar) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/censo_escolar?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/censo_escolar)
+[![Build Status](https://travis-ci.org/asdfree/censoescolar.svg?branch=master)](https://travis-ci.org/asdfree/censoescolar) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/censoescolar?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/censoescolar)
 
 *Contributed by Guilherme Jacob <<guilhermejacob91@gmail.com>>*
 
@@ -16,11 +16,11 @@ The Brazilian School Census (Censo Escolar) is a massive source of information a
 
 ## Simplified Download and Importation {-}
 
-The R `lodown` package easily downloads and imports all available CENSO_ESCOLAR microdata by simply specifying `"censo_escolar"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
+The R `lodown` package easily downloads and imports all available CENSOESCOLAR microdata by simply specifying `"censoescolar"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
 
 ```{r eval = FALSE }
 library(lodown)
-lodown( "censo_escolar" , output_dir = file.path( path.expand( "~" ) , "CENSO_ESCOLAR" ) )
+lodown( "censoescolar" , output_dir = file.path( path.expand( "~" ) , "CENSOESCOLAR" ) )
 ```
 
 ## Analysis Examples with SQL and `RSQLite` \ {-}
@@ -29,7 +29,7 @@ Connect to a database:
 
 ```{r eval = FALSE }
 library(DBI)
-dbdir <- file.path( path.expand( "~" ) , "CENSO_ESCOLAR" , "SQLite.db" )
+dbdir <- file.path( path.expand( "~" ) , "CENSOESCOLAR" , "SQLite.db" )
 db <- dbConnect( RSQLite::SQLite() , dbdir )
 ```
 
@@ -175,19 +175,19 @@ dbGetQuery( db ,
 
 ## Analysis Examples with `dplyr` \ {-}
 
-The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for CENSO_ESCOLAR users, this code replicates previously-presented examples:
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for CENSOESCOLAR users, this code replicates previously-presented examples:
 
 ```{r eval = FALSE , results = "hide" }
 library(dplyr)
 dplyr_db <- dplyr::src_sqlite( dbdir )
-censo_escolar_tbl <- tbl( dplyr_db , 'matricula_2015' )
+censoescolar_tbl <- tbl( dplyr_db , 'matricula_2015' )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-censo_escolar_tbl %>%
+censoescolar_tbl %>%
 	summarize( mean = mean( nu_idade ) )
 
-censo_escolar_tbl %>%
+censoescolar_tbl %>%
 	group_by( tp_localizacao ) %>%
 	summarize( mean = mean( nu_idade ) )
 ```
