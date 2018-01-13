@@ -173,7 +173,7 @@ dbGetQuery( db ,
 
 Perform a t-test:
 ```{r eval = FALSE , results = "hide" }
-nppes_three_columns_df <- 
+nppes_slim_df <- 
 	dbGetQuery( db , 
 		"SELECT 
 			provider_enumeration_year , 
@@ -182,12 +182,13 @@ nppes_three_columns_df <-
 		FROM npi" 
 	)
 
-t.test( provider_enumeration_year ~ individual , nppes_three_columns_df )
+t.test( provider_enumeration_year ~ individual , nppes_slim_df )
 ```
 
 Perform a chi-squared test of association:
 ```{r eval = FALSE , results = "hide" }
-this_table <- table( nppes_three_columns_df[ , c( "individual" , "is_sole_proprietor" ) ] )
+this_table <-
+	table( nppes_slim_df[ , c( "individual" , "is_sole_proprietor" ) ] )
 
 chisq.test( this_table )
 ```
@@ -197,7 +198,7 @@ Perform a generalized linear model:
 glm_result <- 
 	glm( 
 		provider_enumeration_year ~ individual + is_sole_proprietor , 
-		data = nppes_three_columns_df
+		data = nppes_slim_df
 	)
 
 summary( glm_result )

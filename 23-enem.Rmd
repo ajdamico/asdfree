@@ -196,7 +196,7 @@ dbGetQuery( db ,
 
 Perform a t-test:
 ```{r eval = FALSE , results = "hide" }
-enem_three_columns_df <- 
+enem_slim_df <- 
 	dbGetQuery( db , 
 		"SELECT 
 			nota_mt , 
@@ -205,12 +205,13 @@ enem_three_columns_df <-
 		FROM microdados_enem_2015" 
 	)
 
-t.test( nota_mt ~ female , enem_three_columns_df )
+t.test( nota_mt ~ female , enem_slim_df )
 ```
 
 Perform a chi-squared test of association:
 ```{r eval = FALSE , results = "hide" }
-this_table <- table( enem_three_columns_df[ , c( "female" , "uf_residencia" ) ] )
+this_table <-
+	table( enem_slim_df[ , c( "female" , "uf_residencia" ) ] )
 
 chisq.test( this_table )
 ```
@@ -220,7 +221,7 @@ Perform a generalized linear model:
 glm_result <- 
 	glm( 
 		nota_mt ~ female + uf_residencia , 
-		data = enem_three_columns_df
+		data = enem_slim_df
 	)
 
 summary( glm_result )

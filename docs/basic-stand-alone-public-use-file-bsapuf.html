@@ -1093,7 +1093,7 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite<span
 <div id="regression-models-and-tests-of-association-7" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bsapuf_three_columns_df &lt;-<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bsapuf_slim_df &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">dbGetQuery</span>( db , 
         <span class="st">&quot;SELECT </span>
 <span class="st">            pde_drug_cost , </span>
@@ -1102,16 +1102,17 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite<span
 <span class="st">        FROM bsa_partd_events_2008&quot;</span> 
     )
 
-<span class="kw">t.test</span>( pde_drug_cost <span class="op">~</span><span class="st"> </span>brand_name_drug , bsapuf_three_columns_df )</code></pre></div>
+<span class="kw">t.test</span>( pde_drug_cost <span class="op">~</span><span class="st"> </span>brand_name_drug , bsapuf_slim_df )</code></pre></div>
 <p>Perform a chi-squared test of association:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-<span class="st"> </span><span class="kw">table</span>( bsapuf_three_columns_df[ , <span class="kw">c</span>( <span class="st">&quot;brand_name_drug&quot;</span> , <span class="st">&quot;bene_age_cat_cd&quot;</span> ) ] )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-
+<span class="st">    </span><span class="kw">table</span>( bsapuf_slim_df[ , <span class="kw">c</span>( <span class="st">&quot;brand_name_drug&quot;</span> , <span class="st">&quot;bene_age_cat_cd&quot;</span> ) ] )
 
 <span class="kw">chisq.test</span>( this_table )</code></pre></div>
 <p>Perform a generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">glm</span>( 
         pde_drug_cost <span class="op">~</span><span class="st"> </span>brand_name_drug <span class="op">+</span><span class="st"> </span>bene_age_cat_cd , 
-        <span class="dt">data =</span> bsapuf_three_columns_df
+        <span class="dt">data =</span> bsapuf_slim_df
     )
 
 <span class="kw">summary</span>( glm_result )</code></pre></div>

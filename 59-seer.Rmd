@@ -175,7 +175,7 @@ dbGetQuery( db ,
 
 Perform a t-test:
 ```{r eval = FALSE , results = "hide" }
-seer_three_columns_df <- 
+seer_slim_df <- 
 	dbGetQuery( db , 
 		"SELECT 
 			provider_enumeration_year , 
@@ -184,12 +184,13 @@ seer_three_columns_df <-
 		FROM npi" 
 	)
 
-t.test( provider_enumeration_year ~ individual , seer_three_columns_df )
+t.test( provider_enumeration_year ~ individual , seer_slim_df )
 ```
 
 Perform a chi-squared test of association:
 ```{r eval = FALSE , results = "hide" }
-this_table <- table( seer_three_columns_df[ , c( "individual" , "is_sole_proprietor" ) ] )
+this_table <-
+	table( seer_slim_df[ , c( "individual" , "is_sole_proprietor" ) ] )
 
 chisq.test( this_table )
 ```
@@ -199,7 +200,7 @@ Perform a generalized linear model:
 glm_result <- 
 	glm( 
 		provider_enumeration_year ~ individual + is_sole_proprietor , 
-		data = seer_three_columns_df
+		data = seer_slim_df
 	)
 
 summary( glm_result )

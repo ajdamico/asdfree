@@ -1113,7 +1113,7 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite<span
 <div id="regression-models-and-tests-of-association-16" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">enem_three_columns_df &lt;-<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">enem_slim_df &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">dbGetQuery</span>( db , 
         <span class="st">&quot;SELECT </span>
 <span class="st">            nota_mt , </span>
@@ -1122,16 +1122,17 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite<span
 <span class="st">        FROM microdados_enem_2015&quot;</span> 
     )
 
-<span class="kw">t.test</span>( nota_mt <span class="op">~</span><span class="st"> </span>female , enem_three_columns_df )</code></pre></div>
+<span class="kw">t.test</span>( nota_mt <span class="op">~</span><span class="st"> </span>female , enem_slim_df )</code></pre></div>
 <p>Perform a chi-squared test of association:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-<span class="st"> </span><span class="kw">table</span>( enem_three_columns_df[ , <span class="kw">c</span>( <span class="st">&quot;female&quot;</span> , <span class="st">&quot;uf_residencia&quot;</span> ) ] )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-
+<span class="st">    </span><span class="kw">table</span>( enem_slim_df[ , <span class="kw">c</span>( <span class="st">&quot;female&quot;</span> , <span class="st">&quot;uf_residencia&quot;</span> ) ] )
 
 <span class="kw">chisq.test</span>( this_table )</code></pre></div>
 <p>Perform a generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">glm</span>( 
         nota_mt <span class="op">~</span><span class="st"> </span>female <span class="op">+</span><span class="st"> </span>uf_residencia , 
-        <span class="dt">data =</span> enem_three_columns_df
+        <span class="dt">data =</span> enem_slim_df
     )
 
 <span class="kw">summary</span>( glm_result )</code></pre></div>

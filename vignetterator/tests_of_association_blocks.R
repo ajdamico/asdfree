@@ -76,7 +76,7 @@ summary( glm_result )
 db_tests_of_association_block <-
 'Perform a t-test:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_three_columns_df <- 
+chapter_tag_slim_df <- 
 	dbGetQuery( db , 
 		"SELECT 
 			linear_variable , 
@@ -85,12 +85,13 @@ chapter_tag_three_columns_df <-
 		FROM sql_tablename" 
 	)
 
-t.test( linear_variable ~ binary_variable , chapter_tag_three_columns_df )
+t.test( linear_variable ~ binary_variable , chapter_tag_slim_df )
 ```
 
 Perform a chi-squared test of association:
 ```{r eval = FALSE , results = "hide" }
-this_table <- table( chapter_tag_three_columns_df[ , c( "binary_variable" , "categorical_variable" ) ] )
+this_table <-
+	table( chapter_tag_slim_df[ , c( "binary_variable" , "categorical_variable" ) ] )
 
 chisq.test( this_table )
 ```
@@ -100,7 +101,7 @@ Perform a generalized linear model:
 glm_result <- 
 	glm( 
 		linear_variable ~ binary_variable + categorical_variable , 
-		data = chapter_tag_three_columns_df
+		data = chapter_tag_slim_df
 	)
 
 summary( glm_result )

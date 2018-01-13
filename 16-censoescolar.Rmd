@@ -175,7 +175,7 @@ dbGetQuery( db ,
 
 Perform a t-test:
 ```{r eval = FALSE , results = "hide" }
-censoescolar_three_columns_df <- 
+censoescolar_slim_df <- 
 	dbGetQuery( db , 
 		"SELECT 
 			nu_idade , 
@@ -184,12 +184,13 @@ censoescolar_three_columns_df <-
 		FROM matricula_2015" 
 	)
 
-t.test( nu_idade ~ id_public , censoescolar_three_columns_df )
+t.test( nu_idade ~ id_public , censoescolar_slim_df )
 ```
 
 Perform a chi-squared test of association:
 ```{r eval = FALSE , results = "hide" }
-this_table <- table( censoescolar_three_columns_df[ , c( "id_public" , "tp_categoria_escola_privada" ) ] )
+this_table <-
+	table( censoescolar_slim_df[ , c( "id_public" , "tp_categoria_escola_privada" ) ] )
 
 chisq.test( this_table )
 ```
@@ -199,7 +200,7 @@ Perform a generalized linear model:
 glm_result <- 
 	glm( 
 		nu_idade ~ id_public + tp_categoria_escola_privada , 
-		data = censoescolar_three_columns_df
+		data = censoescolar_slim_df
 	)
 
 summary( glm_result )
