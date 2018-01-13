@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'remove underscores'"
+commit_memo <- "'dbplyr'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -106,7 +106,7 @@ for ( i in seq_along( chapter_tag ) ){
 	}
 	
 	
-	if( !is_survey ) rmd_lines <- gsub( "tbl_initiation_line" , if( is_db ) "dplyr_db <- dplyr::src_sqlite( dbdir )\nchapter_tag_tbl <- tbl( dplyr_db , 'sql_tablename' )" else "chapter_tag_tbl <- tbl_df( chapter_tag_df )" , rmd_lines )
+	if( !is_survey ) rmd_lines <- gsub( "tbl_initiation_line" , if( is_db ) "library(dbplyr)\ndplyr_db <- dplyr::src_sqlite( dbdir )\nchapter_tag_tbl <- tbl( dplyr_db , 'sql_tablename' )" else "chapter_tag_tbl <- tbl_df( chapter_tag_df )" , rmd_lines )
 	
 	
 	# standalone dataset, survey design, multiply-imputed survey design, database-backed survey design, or multiply-imputed database-backed survey design
