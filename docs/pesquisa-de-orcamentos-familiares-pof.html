@@ -978,7 +978,7 @@ pof_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;POF&quot;</span> ) )
 
 <span class="co"># 2008-2009 only</span>
-pof_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( pof_cat , period ==<span class="st"> &quot;2008_2009&quot;</span> )
+pof_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( pof_cat , period <span class="op">==</span><span class="st"> &quot;2008_2009&quot;</span> )
 <span class="co"># download the microdata to your local computer</span>
 <span class="kw">lodown</span>( <span class="st">&quot;pof&quot;</span> , pof_cat )</code></pre></div>
 </div>
@@ -1010,27 +1010,27 @@ t_morador_s &lt;-
     
 pof_df &lt;-<span class="st"> </span><span class="kw">merge</span>( t_morador_s , poststr )
 
-<span class="kw">stopifnot</span>( <span class="kw">nrow</span>( pof_df ) ==<span class="st"> </span><span class="kw">nrow</span>( t_morador_s ) )
+<span class="kw">stopifnot</span>( <span class="kw">nrow</span>( pof_df ) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>( t_morador_s ) )
 
 pre_stratified_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svydesign</span>(
-        <span class="dt">id =</span> ~control , 
-        <span class="dt">strata =</span> ~estrato_unico ,
-        <span class="dt">weights =</span> ~fator_expansao1 ,
+        <span class="dt">id =</span> <span class="op">~</span>control , 
+        <span class="dt">strata =</span> <span class="op">~</span>estrato_unico ,
+        <span class="dt">weights =</span> <span class="op">~</span>fator_expansao1 ,
         <span class="dt">data =</span> pof_df ,
         <span class="dt">nest =</span> <span class="ot">TRUE</span>
     )
 
 population_totals &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">data.frame</span>(
-        <span class="dt">pos_estrato =</span> <span class="kw">unique</span>( pof_df$pos_estrato ) , 
-        <span class="dt">Freq =</span> <span class="kw">unique</span>( pof_df$tot_pop ) 
+        <span class="dt">pos_estrato =</span> <span class="kw">unique</span>( pof_df<span class="op">$</span>pos_estrato ) , 
+        <span class="dt">Freq =</span> <span class="kw">unique</span>( pof_df<span class="op">$</span>tot_pop ) 
     )
 
 pof_design &lt;-
 <span class="st">    </span><span class="kw">postStratify</span>(
         pre_stratified_design , 
-        ~<span class="st"> </span>pos_estrato , 
+        <span class="op">~</span><span class="st"> </span>pos_estrato , 
         population_totals
     )</code></pre></div>
 <div id="variable-recoding-47" class="section level3 unnumbered">
@@ -1043,20 +1043,20 @@ pof_design &lt;-
         <span class="dt">one =</span> <span class="dv">1</span> ,
         
         <span class="co"># centimeters instead of meters</span>
-        <span class="dt">altura_imputado =</span> altura_imputado /<span class="st"> </span><span class="dv">100</span> ,
+        <span class="dt">altura_imputado =</span> altura_imputado <span class="op">/</span><span class="st"> </span><span class="dv">100</span> ,
         
         <span class="dt">age_categories =</span>
             <span class="kw">factor</span>( 
-                <span class="dv">1</span> +<span class="st"> </span><span class="kw">findInterval</span>( idade_anos , 
+                <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">findInterval</span>( idade_anos , 
                     <span class="kw">c</span>( <span class="dv">20</span> , <span class="dv">25</span> , <span class="dv">30</span> , <span class="dv">35</span> , <span class="dv">45</span> , <span class="dv">55</span> , <span class="dv">65</span> , <span class="dv">75</span> ) ) ,
-                <span class="dt">levels =</span> <span class="dv">1</span>:<span class="dv">9</span> , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;under 20&quot;</span> , <span class="st">&quot;20-24&quot;</span> , <span class="st">&quot;25-29&quot;</span> ,
+                <span class="dt">levels =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">9</span> , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;under 20&quot;</span> , <span class="st">&quot;20-24&quot;</span> , <span class="st">&quot;25-29&quot;</span> ,
                 <span class="st">&quot;30-34&quot;</span> , <span class="st">&quot;35-44&quot;</span> , <span class="st">&quot;45-54&quot;</span> , <span class="st">&quot;55-64&quot;</span> , <span class="st">&quot;65-74&quot;</span> , <span class="st">&quot;75+&quot;</span> )
             ) ,
         
         <span class="co"># create a body mass index (bmi) variable, excluding babies (who have altura_imputado==0)           </span>
-        <span class="dt">body_mass_index =</span> <span class="kw">ifelse</span>( altura_imputado ==<span class="st"> </span><span class="dv">0</span> , <span class="dv">0</span> , peso_imputado /<span class="st"> </span>( altura_imputado ^<span class="st"> </span><span class="dv">2</span> ) ) ,
+        <span class="dt">body_mass_index =</span> <span class="kw">ifelse</span>( altura_imputado <span class="op">==</span><span class="st"> </span><span class="dv">0</span> , <span class="dv">0</span> , peso_imputado <span class="op">/</span><span class="st"> </span>( altura_imputado <span class="op">^</span><span class="st"> </span><span class="dv">2</span> ) ) ,
         
-        <span class="dt">sexo =</span> <span class="kw">ifelse</span>( cod_sexo ==<span class="st"> &#39;01&#39;</span> , <span class="st">&quot;masculino&quot;</span> , <span class="kw">ifelse</span>( cod_sexo ==<span class="st"> &#39;02&#39;</span> , <span class="st">&quot;feminino&quot;</span> , <span class="ot">NA</span> ) )
+        <span class="dt">sexo =</span> <span class="kw">ifelse</span>( cod_sexo <span class="op">==</span><span class="st"> &#39;01&#39;</span> , <span class="st">&quot;masculino&quot;</span> , <span class="kw">ifelse</span>( cod_sexo <span class="op">==</span><span class="st"> &#39;02&#39;</span> , <span class="st">&quot;feminino&quot;</span> , <span class="ot">NA</span> ) )
         
         
     )
@@ -1066,53 +1066,53 @@ pof_design &lt;-
         pof_design ,
         
         <span class="co"># individuals with a low bmi - underweight</span>
-        <span class="dt">underweight =</span> <span class="kw">ifelse</span>( body_mass_index &lt;<span class="st"> </span><span class="fl">18.5</span> , <span class="dv">1</span> , <span class="dv">0</span> ) ,
+        <span class="dt">underweight =</span> <span class="kw">ifelse</span>( body_mass_index <span class="op">&lt;</span><span class="st"> </span><span class="fl">18.5</span> , <span class="dv">1</span> , <span class="dv">0</span> ) ,
         
         <span class="co"># individuals with a high bmi - overweight</span>
-        <span class="dt">overweight =</span> <span class="kw">ifelse</span>( body_mass_index &gt;=<span class="st"> </span><span class="dv">25</span> , <span class="dv">1</span> , <span class="dv">0</span> ) ,
+        <span class="dt">overweight =</span> <span class="kw">ifelse</span>( body_mass_index <span class="op">&gt;=</span><span class="st"> </span><span class="dv">25</span> , <span class="dv">1</span> , <span class="dv">0</span> ) ,
         
         <span class="co"># individuals with a very high bmi - obese</span>
-        <span class="dt">obese =</span> <span class="kw">ifelse</span>( body_mass_index &gt;=<span class="st"> </span><span class="dv">30</span> , <span class="dv">1</span> , <span class="dv">0</span> )
+        <span class="dt">obese =</span> <span class="kw">ifelse</span>( body_mass_index <span class="op">&gt;=</span><span class="st"> </span><span class="dv">30</span> , <span class="dv">1</span> , <span class="dv">0</span> )
     )</code></pre></div>
 </div>
 <div id="unweighted-counts-47" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( pof_design , <span class="st">&quot;sampling&quot;</span> ) !=<span class="st"> </span><span class="dv">0</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( pof_design , <span class="st">&quot;sampling&quot;</span> ) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>sexo , pof_design , unwtd.count )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>sexo , pof_design , unwtd.count )</code></pre></div>
 </div>
 <div id="weighted-counts-36" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>one , pof_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , pof_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>sexo , pof_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>sexo , pof_design , svytotal )</code></pre></div>
 </div>
 <div id="descriptive-statistics-47" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>body_mass_index , ~<span class="st"> </span>sexo , pof_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , <span class="op">~</span><span class="st"> </span>sexo , pof_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>age_categories , pof_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>age_categories , pof_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>age_categories , ~<span class="st"> </span>sexo , pof_design , svymean )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>age_categories , <span class="op">~</span><span class="st"> </span>sexo , pof_design , svymean )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>body_mass_index , ~<span class="st"> </span>sexo , pof_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , <span class="op">~</span><span class="st"> </span>sexo , pof_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>age_categories , pof_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>age_categories , pof_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>age_categories , ~<span class="st"> </span>sexo , pof_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>age_categories , <span class="op">~</span><span class="st"> </span>sexo , pof_design , svytotal )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( ~<span class="st"> </span>body_mass_index , pof_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , pof_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">svyby</span>( 
-    ~<span class="st"> </span>body_mass_index , 
-    ~<span class="st"> </span>sexo , 
+    <span class="op">~</span><span class="st"> </span>body_mass_index , 
+    <span class="op">~</span><span class="st"> </span>sexo , 
     pof_design , 
     svyquantile , 
     <span class="fl">0.5</span> ,
@@ -1122,8 +1122,8 @@ pof_design &lt;-
 )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyratio</span>( 
-    <span class="dt">numerator =</span> ~<span class="st"> </span>peso_imputado , 
-    <span class="dt">denominator =</span> ~<span class="st"> </span>altura_imputado , 
+    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>peso_imputado , 
+    <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>altura_imputado , 
     pof_design ,
     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>
 )</code></pre></div>
@@ -1131,14 +1131,14 @@ pof_design &lt;-
 <div id="subsetting-47" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to :</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_pof_design &lt;-<span class="st"> </span><span class="kw">subset</span>( pof_design , underweight ==<span class="st"> </span><span class="dv">1</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_pof_design &lt;-<span class="st"> </span><span class="kw">subset</span>( pof_design , underweight <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>body_mass_index , sub_pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , sub_pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-47" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( ~<span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">coef</span>( this_result )
 <span class="kw">SE</span>( this_result )
@@ -1147,8 +1147,8 @@ pof_design &lt;-
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">svyby</span>( 
-        ~<span class="st"> </span>body_mass_index , 
-        ~<span class="st"> </span>sexo , 
+        <span class="op">~</span><span class="st"> </span>body_mass_index , 
+        <span class="op">~</span><span class="st"> </span>sexo , 
         pof_design , 
         svymean ,
         <span class="dt">na.rm =</span> <span class="ot">TRUE</span> 
@@ -1161,30 +1161,30 @@ grouped_result &lt;-
 <p>Calculate the degrees of freedom of any survey design object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( pof_design )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( ~<span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># SRS with replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>body_mass_index , pof_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( ~<span class="st"> </span>obese , pof_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( <span class="op">~</span><span class="st"> </span>obese , pof_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-47" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( body_mass_index ~<span class="st"> </span>obese , pof_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( body_mass_index <span class="op">~</span><span class="st"> </span>obese , pof_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
-    ~<span class="st"> </span>obese +<span class="st"> </span>age_categories , 
+    <span class="op">~</span><span class="st"> </span>obese <span class="op">+</span><span class="st"> </span>age_categories , 
     pof_design 
 )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        body_mass_index ~<span class="st"> </span>obese +<span class="st"> </span>age_categories , 
+        body_mass_index <span class="op">~</span><span class="st"> </span>obese <span class="op">+</span><span class="st"> </span>age_categories , 
         pof_design 
     )
 
@@ -1197,11 +1197,11 @@ grouped_result &lt;-
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(srvyr)
 pof_srvyr_design &lt;-<span class="st"> </span><span class="kw">as_survey</span>( pof_design )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pof_srvyr_design %&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pof_srvyr_design <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( body_mass_index , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )
 
-pof_srvyr_design %&gt;%
-<span class="st">    </span><span class="kw">group_by</span>( sexo ) %&gt;%
+pof_srvyr_design <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>( sexo ) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( body_mass_index , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )</code></pre></div>
 <hr />
 </div>

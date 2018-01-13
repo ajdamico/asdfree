@@ -982,11 +982,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
         mlces_df , 
         
         <span class="dt">claimant_relationship_to_policyholder =</span>
-            <span class="kw">ifelse</span>( relation ==<span class="st"> &quot;E&quot;</span> , <span class="st">&quot;covered employee&quot;</span> ,
-            <span class="kw">ifelse</span>( relation ==<span class="st"> &quot;S&quot;</span> , <span class="st">&quot;spouse of covered employee&quot;</span> ,
-            <span class="kw">ifelse</span>( relation ==<span class="st"> &quot;D&quot;</span> , <span class="st">&quot;dependent of covered employee&quot;</span> , <span class="ot">NA</span> ) ) ) ,
+            <span class="kw">ifelse</span>( relation <span class="op">==</span><span class="st"> &quot;E&quot;</span> , <span class="st">&quot;covered employee&quot;</span> ,
+            <span class="kw">ifelse</span>( relation <span class="op">==</span><span class="st"> &quot;S&quot;</span> , <span class="st">&quot;spouse of covered employee&quot;</span> ,
+            <span class="kw">ifelse</span>( relation <span class="op">==</span><span class="st"> &quot;D&quot;</span> , <span class="st">&quot;dependent of covered employee&quot;</span> , <span class="ot">NA</span> ) ) ) ,
             
-        <span class="dt">ppo_plan =</span> <span class="kw">as.numeric</span>( ppo ==<span class="st"> &#39;Y&#39;</span> )
+        <span class="dt">ppo_plan =</span> <span class="kw">as.numeric</span>( ppo <span class="op">==</span><span class="st"> &#39;Y&#39;</span> )
     )</code></pre></div>
 </div>
 <div id="unweighted-counts-23" class="section level3 unnumbered">
@@ -1034,7 +1034,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="subsetting-23" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Limit your <code>data.frame</code> to persons under 18:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_mlces_df &lt;-<span class="st"> </span><span class="kw">subset</span>( mlces_df , ( ( claimyr -<span class="st"> </span>patbrtyr ) &lt;<span class="st"> </span><span class="dv">18</span> ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_mlces_df &lt;-<span class="st"> </span><span class="kw">subset</span>( mlces_df , ( ( claimyr <span class="op">-</span><span class="st"> </span>patbrtyr ) <span class="op">&lt;</span><span class="st"> </span><span class="dv">18</span> ) )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>( sub_mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] )</code></pre></div>
 </div>
@@ -1052,7 +1052,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="regression-models-and-tests-of-association-23" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>( totpdchg ~<span class="st"> </span>ppo_plan , mlces_df )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>( totpdchg <span class="op">~</span><span class="st"> </span>ppo_plan , mlces_df )</code></pre></div>
 <p>Perform a chi-squared test of association:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-<span class="st"> </span><span class="kw">table</span>( mlces_df[ , <span class="kw">c</span>( <span class="st">&quot;ppo_plan&quot;</span> , <span class="st">&quot;patsex&quot;</span> ) ] )
 
@@ -1060,7 +1060,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Perform a generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">glm</span>( 
-        totpdchg ~<span class="st"> </span>ppo_plan +<span class="st"> </span>patsex , 
+        totpdchg <span class="op">~</span><span class="st"> </span>ppo_plan <span class="op">+</span><span class="st"> </span>patsex , 
         <span class="dt">data =</span> mlces_df
     )
 
@@ -1073,11 +1073,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 mlces_tbl &lt;-<span class="st"> </span><span class="kw">tbl_df</span>( mlces_df )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mlces_tbl %&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mlces_tbl <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">mean</span>( totpdchg ) )
 
-mlces_tbl %&gt;%
-<span class="st">    </span><span class="kw">group_by</span>( claimant_relationship_to_policyholder ) %&gt;%
+mlces_tbl <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>( claimant_relationship_to_policyholder ) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">mean</span>( totpdchg ) )</code></pre></div>
 
 </div>

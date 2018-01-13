@@ -977,7 +977,7 @@ nbs_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;NBS&quot;</span> ) )
 
 <span class="co"># 2010 only</span>
-nbs_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( nbs_cat , this_round ==<span class="st"> </span><span class="dv">4</span> )
+nbs_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( nbs_cat , this_round <span class="op">==</span><span class="st"> </span><span class="dv">4</span> )
 <span class="co"># download the microdata to your local computer</span>
 <span class="kw">lodown</span>( <span class="st">&quot;nbs&quot;</span> , nbs_cat )</code></pre></div>
 </div>
@@ -990,10 +990,10 @@ nbs_df &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <span clas
 
 nbs_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svydesign</span>( 
-        ~<span class="st"> </span>a_psu_pub , 
-        <span class="dt">strata =</span> ~<span class="st"> </span>a_strata , 
+        <span class="op">~</span><span class="st"> </span>a_psu_pub , 
+        <span class="dt">strata =</span> <span class="op">~</span><span class="st"> </span>a_strata , 
         <span class="dt">data =</span> nbs_df , 
-        <span class="dt">weights =</span> ~<span class="st"> </span>wtr4_ben 
+        <span class="dt">weights =</span> <span class="op">~</span><span class="st"> </span>wtr4_ben 
     )</code></pre></div>
 <div id="variable-recoding-24" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
@@ -1002,7 +1002,7 @@ nbs_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">update</span>( 
         nbs_design , 
         
-        <span class="dt">male =</span> <span class="kw">as.numeric</span>( orgsampinfo_sex ==<span class="st"> </span><span class="dv">1</span> ) ,
+        <span class="dt">male =</span> <span class="kw">as.numeric</span>( orgsampinfo_sex <span class="op">==</span><span class="st"> </span><span class="dv">1</span> ) ,
         
         <span class="dt">age_categories =</span> 
             <span class="kw">factor</span>( 
@@ -1016,41 +1016,41 @@ nbs_design &lt;-<span class="st"> </span>
 <div id="unweighted-counts-24" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( nbs_design , <span class="st">&quot;sampling&quot;</span> ) !=<span class="st"> </span><span class="dv">0</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( nbs_design , <span class="st">&quot;sampling&quot;</span> ) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>age_categories , nbs_design , unwtd.count )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>age_categories , nbs_design , unwtd.count )</code></pre></div>
 </div>
 <div id="weighted-counts-16" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>one , nbs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , nbs_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>age_categories , nbs_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>age_categories , nbs_design , svytotal )</code></pre></div>
 </div>
 <div id="descriptive-statistics-24" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , nbs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , nbs_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , ~<span class="st"> </span>age_categories , nbs_design , svymean )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , <span class="op">~</span><span class="st"> </span>age_categories , nbs_design , svymean )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>c_hhsize_pub , nbs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>c_hhsize_pub , nbs_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>c_hhsize_pub , ~<span class="st"> </span>age_categories , nbs_design , svymean )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>c_hhsize_pub , <span class="op">~</span><span class="st"> </span>age_categories , nbs_design , svymean )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , nbs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , nbs_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , ~<span class="st"> </span>age_categories , nbs_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , <span class="op">~</span><span class="st"> </span>age_categories , nbs_design , svytotal )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>c_hhsize_pub , nbs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>c_hhsize_pub , nbs_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>c_hhsize_pub , ~<span class="st"> </span>age_categories , nbs_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>c_hhsize_pub , <span class="op">~</span><span class="st"> </span>age_categories , nbs_design , svytotal )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , nbs_design , <span class="fl">0.5</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , nbs_design , <span class="fl">0.5</span> )
 
 <span class="kw">svyby</span>( 
-    ~<span class="st"> </span>n_totssbenlastmnth_pub , 
-    ~<span class="st"> </span>age_categories , 
+    <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , 
+    <span class="op">~</span><span class="st"> </span>age_categories , 
     nbs_design , 
     svyquantile , 
     <span class="fl">0.5</span> ,
@@ -1059,22 +1059,22 @@ nbs_design &lt;-<span class="st"> </span>
 )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyratio</span>( 
-    <span class="dt">numerator =</span> ~<span class="st"> </span>n_ssilastmnth_pub , 
-    <span class="dt">denominator =</span> ~<span class="st"> </span>n_totssbenlastmnth_pub , 
+    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>n_ssilastmnth_pub , 
+    <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , 
     nbs_design 
 )</code></pre></div>
 </div>
 <div id="subsetting-24" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to currently covered by Medicare:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_nbs_design &lt;-<span class="st"> </span><span class="kw">subset</span>( nbs_design , c_curmedicare ==<span class="st"> </span><span class="dv">1</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_nbs_design &lt;-<span class="st"> </span><span class="kw">subset</span>( nbs_design , c_curmedicare <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , sub_nbs_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , sub_nbs_design )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-24" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , nbs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , nbs_design )
 
 <span class="kw">coef</span>( this_result )
 <span class="kw">SE</span>( this_result )
@@ -1083,8 +1083,8 @@ nbs_design &lt;-<span class="st"> </span>
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">svyby</span>( 
-        ~<span class="st"> </span>n_totssbenlastmnth_pub , 
-        ~<span class="st"> </span>age_categories , 
+        <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , 
+        <span class="op">~</span><span class="st"> </span>age_categories , 
         nbs_design , 
         svymean 
     )
@@ -1096,30 +1096,30 @@ grouped_result &lt;-
 <p>Calculate the degrees of freedom of any survey design object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( nbs_design )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , nbs_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , nbs_design )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , nbs_design , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , nbs_design , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># SRS with replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>n_totssbenlastmnth_pub , nbs_design , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>n_totssbenlastmnth_pub , nbs_design , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( ~<span class="st"> </span>male , nbs_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( <span class="op">~</span><span class="st"> </span>male , nbs_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-24" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( n_totssbenlastmnth_pub ~<span class="st"> </span>male , nbs_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( n_totssbenlastmnth_pub <span class="op">~</span><span class="st"> </span>male , nbs_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
-    ~<span class="st"> </span>male +<span class="st"> </span>c_hhsize_pub , 
+    <span class="op">~</span><span class="st"> </span>male <span class="op">+</span><span class="st"> </span>c_hhsize_pub , 
     nbs_design 
 )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        n_totssbenlastmnth_pub ~<span class="st"> </span>male +<span class="st"> </span>c_hhsize_pub , 
+        n_totssbenlastmnth_pub <span class="op">~</span><span class="st"> </span>male <span class="op">+</span><span class="st"> </span>c_hhsize_pub , 
         nbs_design 
     )
 
@@ -1132,11 +1132,11 @@ grouped_result &lt;-
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(srvyr)
 nbs_srvyr_design &lt;-<span class="st"> </span><span class="kw">as_survey</span>( nbs_design )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nbs_srvyr_design %&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nbs_srvyr_design <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( n_totssbenlastmnth_pub ) )
 
-nbs_srvyr_design %&gt;%
-<span class="st">    </span><span class="kw">group_by</span>( age_categories ) %&gt;%
+nbs_srvyr_design <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>( age_categories ) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( n_totssbenlastmnth_pub ) )</code></pre></div>
 <hr />
 </div>

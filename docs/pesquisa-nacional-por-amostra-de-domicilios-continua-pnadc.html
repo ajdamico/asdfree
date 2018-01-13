@@ -978,7 +978,7 @@ pnadc_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;PNADC&quot;</span> ) )
 
 <span class="co"># 2015 3rd quarter only</span>
-pnadc_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( pnadc_cat , year ==<span class="st"> </span><span class="dv">2015</span> &amp;<span class="st"> </span>quarter ==<span class="st"> &#39;03&#39;</span> )
+pnadc_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( pnadc_cat , year <span class="op">==</span><span class="st"> </span><span class="dv">2015</span> <span class="op">&amp;</span><span class="st"> </span>quarter <span class="op">==</span><span class="st"> &#39;03&#39;</span> )
 <span class="co"># download the microdata to your local computer</span>
 <span class="kw">lodown</span>( <span class="st">&quot;pnadc&quot;</span> , pnadc_cat )</code></pre></div>
 </div>
@@ -992,7 +992,7 @@ pnadc_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( pnadc_ca
 pnadc_df &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;PNADC&quot;</span> , <span class="st">&quot;pnadc 2015 03.rds&quot;</span> ) )
 
 <span class="co"># add a column of all ones</span>
-pnadc_df$one &lt;-<span class="st"> </span><span class="dv">1</span>
+pnadc_df<span class="op">$</span>one &lt;-<span class="st"> </span><span class="dv">1</span>
 
 <span class="co"># construct a data.frame object with all state names.</span>
 uf &lt;-
@@ -1007,21 +1007,21 @@ uf &lt;-
  <span class="st">&quot;Rio de Janeiro&quot;</span>, <span class="st">&quot;Rio Grande do Norte&quot;</span>, <span class="st">&quot;Rio Grande do Sul&quot;</span>, 
  <span class="st">&quot;Rondonia&quot;</span>, <span class="st">&quot;Roraima&quot;</span>, <span class="st">&quot;Santa Catarina&quot;</span>, <span class="st">&quot;Sao Paulo&quot;</span>, <span class="st">&quot;Sergipe&quot;</span>, 
  <span class="st">&quot;Tocantins&quot;</span>), <span class="dt">class =</span> <span class="st">&quot;factor&quot;</span>)), <span class="dt">.Names =</span> <span class="kw">c</span>(<span class="st">&quot;uf&quot;</span>, <span class="st">&quot;uf_name&quot;</span>), 
-        <span class="dt">class =</span> <span class="st">&quot;data.frame&quot;</span>, <span class="dt">row.names =</span> <span class="kw">c</span>(<span class="ot">NA</span>, -27L))
+        <span class="dt">class =</span> <span class="st">&quot;data.frame&quot;</span>, <span class="dt">row.names =</span> <span class="kw">c</span>(<span class="ot">NA</span>, <span class="op">-</span>27L))
 
 <span class="co"># merge this data.frame onto the main `x` data.frame</span>
 <span class="co"># using `uf` as the merge field, keeping all non-matches.</span>
 pnadc_df &lt;-<span class="st"> </span><span class="kw">merge</span>( pnadc_df , uf , <span class="dt">all.x =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># confirm complete matches</span>
-<span class="kw">stopifnot</span>( <span class="kw">all</span>( !<span class="kw">is.na</span>( pnadc_df$uf_name ) ) )
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( <span class="op">!</span><span class="kw">is.na</span>( pnadc_df<span class="op">$</span>uf_name ) ) )
 
 <span class="co"># preliminary survey design</span>
 pre_stratified &lt;-
 <span class="st">    </span><span class="kw">svydesign</span>(
-        <span class="dt">ids =</span> ~<span class="st"> </span>upa , 
-        <span class="dt">strata =</span> ~<span class="st"> </span>estrato , 
-        <span class="dt">weights =</span> ~<span class="st"> </span>v1027 , 
+        <span class="dt">ids =</span> <span class="op">~</span><span class="st"> </span>upa , 
+        <span class="dt">strata =</span> <span class="op">~</span><span class="st"> </span>estrato , 
+        <span class="dt">weights =</span> <span class="op">~</span><span class="st"> </span>v1027 , 
         <span class="dt">data =</span> pnadc_df ,
         <span class="dt">nest =</span> <span class="ot">TRUE</span>
     )
@@ -1030,10 +1030,10 @@ pre_stratified &lt;-
 
 <span class="co"># post-stratification targets</span>
 df_pos &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">data.frame</span>( <span class="dt">posest =</span> <span class="kw">unique</span>( pnadc_df$posest ) , <span class="dt">Freq =</span> <span class="kw">unique</span>( pnadc_df$v1029 ) )
+<span class="st">    </span><span class="kw">data.frame</span>( <span class="dt">posest =</span> <span class="kw">unique</span>( pnadc_df<span class="op">$</span>posest ) , <span class="dt">Freq =</span> <span class="kw">unique</span>( pnadc_df<span class="op">$</span>v1029 ) )
 
 <span class="co"># final survey design object</span>
-pnadc_design &lt;-<span class="st"> </span><span class="kw">postStratify</span>( pre_stratified , ~<span class="st"> </span>posest , df_pos )
+pnadc_design &lt;-<span class="st"> </span><span class="kw">postStratify</span>( pre_stratified , <span class="op">~</span><span class="st"> </span>posest , df_pos )
 
 <span class="co"># remove the `pnadc_df` data.frame object</span>
 <span class="co"># and the `pre_stratified` design before stratification</span>
@@ -1044,72 +1044,72 @@ pnadc_design &lt;-<span class="st"> </span><span class="kw">postStratify</span>(
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pnadc_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">update</span>( 
         pnadc_design , 
-        <span class="dt">age_categories =</span> <span class="kw">factor</span>( <span class="dv">1</span> +<span class="st"> </span><span class="kw">findInterval</span>( v2009 , <span class="kw">seq</span>( <span class="dv">5</span> , <span class="dv">60</span> , <span class="dv">5</span> ) ) ) ,
-        <span class="dt">male =</span> <span class="kw">as.numeric</span>( v2007 ==<span class="st"> </span><span class="dv">1</span> ) ,
-        <span class="dt">pia =</span> <span class="kw">as.numeric</span>( v2009 &gt;=<span class="st"> </span><span class="dv">14</span> ) ,
+        <span class="dt">age_categories =</span> <span class="kw">factor</span>( <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">findInterval</span>( v2009 , <span class="kw">seq</span>( <span class="dv">5</span> , <span class="dv">60</span> , <span class="dv">5</span> ) ) ) ,
+        <span class="dt">male =</span> <span class="kw">as.numeric</span>( v2007 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> ) ,
+        <span class="dt">pia =</span> <span class="kw">as.numeric</span>( v2009 <span class="op">&gt;=</span><span class="st"> </span><span class="dv">14</span> ) ,
         <span class="dt">region =</span> <span class="kw">substr</span>( uf , <span class="dv">1</span> , <span class="dv">1</span> )
     )
     
 pnadc_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">update</span>( 
         pnadc_design , 
-        <span class="dt">ocup_c =</span> <span class="kw">ifelse</span>( pia ==<span class="st"> </span><span class="dv">1</span> , <span class="kw">as.numeric</span>( vd4002 %in%<span class="st"> </span><span class="dv">1</span> ) , <span class="ot">NA</span> ) ,
-        <span class="dt">desocup30 =</span> <span class="kw">ifelse</span>( pia ==<span class="st"> </span><span class="dv">1</span> , <span class="kw">as.numeric</span>( vd4002 %in%<span class="st"> </span><span class="dv">2</span> ) , <span class="ot">NA</span> ) ,
+        <span class="dt">ocup_c =</span> <span class="kw">ifelse</span>( pia <span class="op">==</span><span class="st"> </span><span class="dv">1</span> , <span class="kw">as.numeric</span>( vd4002 <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> ) , <span class="ot">NA</span> ) ,
+        <span class="dt">desocup30 =</span> <span class="kw">ifelse</span>( pia <span class="op">==</span><span class="st"> </span><span class="dv">1</span> , <span class="kw">as.numeric</span>( vd4002 <span class="op">%in%</span><span class="st"> </span><span class="dv">2</span> ) , <span class="ot">NA</span> ) ,
         <span class="co"># calculate usual income from main job</span>
         <span class="co"># (rendimento habitual do trabalho principal)</span>
-        <span class="dt">vd4016n =</span> <span class="kw">ifelse</span>( pia %in%<span class="st"> </span><span class="dv">1</span> &amp;<span class="st"> </span>vd4015 %in%<span class="st"> </span><span class="dv">1</span> , vd4016 , <span class="ot">NA</span> ) ,
+        <span class="dt">vd4016n =</span> <span class="kw">ifelse</span>( pia <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>vd4015 <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> , vd4016 , <span class="ot">NA</span> ) ,
         <span class="co"># calculate effective income from main job</span>
         <span class="co"># (rendimento efetivo do trabalho principal) </span>
-        <span class="dt">vd4017n =</span> <span class="kw">ifelse</span>( pia %in%<span class="st"> </span><span class="dv">1</span> &amp;<span class="st"> </span>vd4015 %in%<span class="st"> </span><span class="dv">1</span> , vd4017 , <span class="ot">NA</span> ) ,
+        <span class="dt">vd4017n =</span> <span class="kw">ifelse</span>( pia <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>vd4015 <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> , vd4017 , <span class="ot">NA</span> ) ,
         <span class="co"># calculate usual income from all jobs</span>
         <span class="co"># (variavel rendimento habitual de todos os trabalhos)</span>
-        <span class="dt">vd4019n =</span> <span class="kw">ifelse</span>( pia %in%<span class="st"> </span><span class="dv">1</span> &amp;<span class="st"> </span>vd4015 %in%<span class="st"> </span><span class="dv">1</span> , vd4019 , <span class="ot">NA</span> ) ,
+        <span class="dt">vd4019n =</span> <span class="kw">ifelse</span>( pia <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>vd4015 <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> , vd4019 , <span class="ot">NA</span> ) ,
         <span class="co"># calculate effective income from all jobs</span>
         <span class="co"># (rendimento efetivo do todos os trabalhos) </span>
-        <span class="dt">vd4020n =</span> <span class="kw">ifelse</span>( pia %in%<span class="st"> </span><span class="dv">1</span> &amp;<span class="st"> </span>vd4015 %in%<span class="st"> </span><span class="dv">1</span> , vd4020 , <span class="ot">NA</span> ) ,
+        <span class="dt">vd4020n =</span> <span class="kw">ifelse</span>( pia <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>vd4015 <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> , vd4020 , <span class="ot">NA</span> ) ,
         <span class="co"># determine individuals who are either working or not working</span>
         <span class="co"># (that is, the potential labor force)</span>
-        <span class="dt">pea_c =</span> <span class="kw">as.numeric</span>( ocup_c ==<span class="st"> </span><span class="dv">1</span> |<span class="st"> </span>desocup30 ==<span class="st"> </span><span class="dv">1</span> )
+        <span class="dt">pea_c =</span> <span class="kw">as.numeric</span>( ocup_c <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">|</span><span class="st"> </span>desocup30 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )
     )</code></pre></div>
 </div>
 <div id="unweighted-counts-45" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( pnadc_design , <span class="st">&quot;sampling&quot;</span> ) !=<span class="st"> </span><span class="dv">0</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( pnadc_design , <span class="st">&quot;sampling&quot;</span> ) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>uf_name , pnadc_design , unwtd.count )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>uf_name , pnadc_design , unwtd.count )</code></pre></div>
 </div>
 <div id="weighted-counts-34" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>one , pnadc_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , pnadc_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>uf_name , pnadc_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>uf_name , pnadc_design , svytotal )</code></pre></div>
 </div>
 <div id="descriptive-statistics-45" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>vd4020n , ~<span class="st"> </span>uf_name , pnadc_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>vd4020n , <span class="op">~</span><span class="st"> </span>uf_name , pnadc_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>age_categories , pnadc_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>age_categories , pnadc_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>age_categories , ~<span class="st"> </span>uf_name , pnadc_design , svymean )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>age_categories , <span class="op">~</span><span class="st"> </span>uf_name , pnadc_design , svymean )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>vd4020n , ~<span class="st"> </span>uf_name , pnadc_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>vd4020n , <span class="op">~</span><span class="st"> </span>uf_name , pnadc_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>age_categories , pnadc_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>age_categories , pnadc_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>age_categories , ~<span class="st"> </span>uf_name , pnadc_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>age_categories , <span class="op">~</span><span class="st"> </span>uf_name , pnadc_design , svytotal )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( ~<span class="st"> </span>vd4020n , pnadc_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>vd4020n , pnadc_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">svyby</span>( 
-    ~<span class="st"> </span>vd4020n , 
-    ~<span class="st"> </span>uf_name , 
+    <span class="op">~</span><span class="st"> </span>vd4020n , 
+    <span class="op">~</span><span class="st"> </span>uf_name , 
     pnadc_design , 
     svyquantile , 
     <span class="fl">0.5</span> ,
@@ -1119,8 +1119,8 @@ pnadc_design &lt;-<span class="st"> </span>
 )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyratio</span>( 
-    <span class="dt">numerator =</span> ~<span class="st"> </span>ocup_c , 
-    <span class="dt">denominator =</span> ~<span class="st"> </span>pea_c , 
+    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>ocup_c , 
+    <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>pea_c , 
     pnadc_design ,
     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>
 )</code></pre></div>
@@ -1128,14 +1128,14 @@ pnadc_design &lt;-<span class="st"> </span>
 <div id="subsetting-45" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to unemployed persons in the labor force:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_pnadc_design &lt;-<span class="st"> </span><span class="kw">subset</span>( pnadc_design , desocup30 ==<span class="st"> </span><span class="dv">1</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_pnadc_design &lt;-<span class="st"> </span><span class="kw">subset</span>( pnadc_design , desocup30 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>vd4020n , sub_pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>vd4020n , sub_pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-45" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( ~<span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">coef</span>( this_result )
 <span class="kw">SE</span>( this_result )
@@ -1144,8 +1144,8 @@ pnadc_design &lt;-<span class="st"> </span>
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">svyby</span>( 
-        ~<span class="st"> </span>vd4020n , 
-        ~<span class="st"> </span>uf_name , 
+        <span class="op">~</span><span class="st"> </span>vd4020n , 
+        <span class="op">~</span><span class="st"> </span>uf_name , 
         pnadc_design , 
         svymean ,
         <span class="dt">na.rm =</span> <span class="ot">TRUE</span> 
@@ -1158,30 +1158,30 @@ grouped_result &lt;-
 <p>Calculate the degrees of freedom of any survey design object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( pnadc_design )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( ~<span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># SRS with replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>vd4020n , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( ~<span class="st"> </span>male , pnadc_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( <span class="op">~</span><span class="st"> </span>male , pnadc_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-45" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( vd4020n ~<span class="st"> </span>male , pnadc_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( vd4020n <span class="op">~</span><span class="st"> </span>male , pnadc_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
-    ~<span class="st"> </span>male +<span class="st"> </span>age_categories , 
+    <span class="op">~</span><span class="st"> </span>male <span class="op">+</span><span class="st"> </span>age_categories , 
     pnadc_design 
 )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        vd4020n ~<span class="st"> </span>male +<span class="st"> </span>age_categories , 
+        vd4020n <span class="op">~</span><span class="st"> </span>male <span class="op">+</span><span class="st"> </span>age_categories , 
         pnadc_design 
     )
 
@@ -1195,25 +1195,25 @@ grouped_result &lt;-
 pnadc_design &lt;-<span class="st"> </span><span class="kw">convey_prep</span>( pnadc_design )
 
 sub_pnadc_design &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">subset</span>( pnadc_design , pia ==<span class="st"> </span><span class="dv">1</span> )
+<span class="st">    </span><span class="kw">subset</span>( pnadc_design , pia <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )
 
-<span class="kw">svygini</span>( ~<span class="st"> </span>vd4020n , sub_pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svygini</span>( <span class="op">~</span><span class="st"> </span>vd4020n , sub_pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <hr />
 </div>
 <div id="replication-example-40" class="section level2 unnumbered">
 <h2>Replication Example</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nationwide_pop &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">svytotal</span>( ~<span class="st"> </span>pia , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<span class="st">    </span><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>pia , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 nationwide_forca &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">svytotal</span>( ~<span class="st"> </span><span class="kw">factor</span>( vd4001 ) , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<span class="st">    </span><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span><span class="kw">factor</span>( vd4001 ) , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 nationwide_ocupacao &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">svytotal</span>( ~<span class="st"> </span><span class="kw">factor</span>( vd4002 ) , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<span class="st">    </span><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span><span class="kw">factor</span>( vd4002 ) , pnadc_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 regional_pop &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">svyby</span>( ~<span class="st"> </span>pia , ~<span class="st"> </span>region , pnadc_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<span class="st">    </span><span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>pia , <span class="op">~</span><span class="st"> </span>region , pnadc_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 regional_forca &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">svyby</span>( ~<span class="st"> </span><span class="kw">factor</span>( vd4001 ) , ~<span class="st"> </span>region , pnadc_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<span class="st">    </span><span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span><span class="kw">factor</span>( vd4001 ) , <span class="op">~</span><span class="st"> </span>region , pnadc_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 regional_ocupacao &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">svyby</span>( ~<span class="st"> </span><span class="kw">factor</span>( vd4002 ) , ~<span class="st"> </span>region , pnadc_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="st">    </span><span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span><span class="kw">factor</span>( vd4002 ) , <span class="op">~</span><span class="st"> </span>region , pnadc_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 
 </div>
 </div>

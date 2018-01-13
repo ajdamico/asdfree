@@ -985,15 +985,15 @@ gss_df &lt;-<span class="st"> </span>
         
         <span class="co"># the calculation for compwt comes from</span>
         <span class="co"># http://sda.berkeley.edu/D3/GSS10/Doc/gs100195.htm#COMPWT</span>
-        <span class="dt">compwt =</span> oversamp *<span class="st"> </span>formwt *<span class="st"> </span>wtssall , 
+        <span class="dt">compwt =</span> oversamp <span class="op">*</span><span class="st"> </span>formwt <span class="op">*</span><span class="st"> </span>wtssall , 
         
         <span class="co"># the calculation for samplerc comes from</span>
         <span class="co"># http://sda.berkeley.edu/D3/GSS10/Doc/gs100195.htm#SAMPLERC</span>
         <span class="dt">samplerc =</span> 
             <span class="co"># if sample is a three or a four, samplerc should be a three</span>
-            <span class="kw">ifelse</span>( sample %in%<span class="st"> </span><span class="dv">3</span>:<span class="dv">4</span> , <span class="dv">3</span> , 
+            <span class="kw">ifelse</span>( sample <span class="op">%in%</span><span class="st"> </span><span class="dv">3</span><span class="op">:</span><span class="dv">4</span> , <span class="dv">3</span> , 
             <span class="co"># if sample is a six or a seven, samplerc should be a six</span>
-            <span class="kw">ifelse</span>( sample %in%<span class="st"> </span><span class="dv">6</span>:<span class="dv">7</span> , <span class="dv">6</span> , 
+            <span class="kw">ifelse</span>( sample <span class="op">%in%</span><span class="st"> </span><span class="dv">6</span><span class="op">:</span><span class="dv">7</span> , <span class="dv">6</span> , 
             <span class="co"># otherwise, samplerc should just be set to sample</span>
                 sample ) )
 
@@ -1010,10 +1010,10 @@ gss_df &lt;-<span class="st"> </span>gss_df[ keep_vars ] ; <span class="kw">gc</
 
 gss_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svydesign</span>( 
-        ~sampcode , 
-        <span class="dt">strata =</span> ~samplerc , 
-        <span class="dt">data =</span> <span class="kw">subset</span>( gss_df , !<span class="kw">is.na</span>( sampcode ) ) , 
-        <span class="dt">weights =</span> ~compwt , 
+        <span class="op">~</span>sampcode , 
+        <span class="dt">strata =</span> <span class="op">~</span>samplerc , 
+        <span class="dt">data =</span> <span class="kw">subset</span>( gss_df , <span class="op">!</span><span class="kw">is.na</span>( sampcode ) ) , 
+        <span class="dt">weights =</span> <span class="op">~</span>compwt , 
         <span class="dt">nest =</span> <span class="ot">TRUE</span> 
     )</code></pre></div>
 <div id="variable-recoding-19" class="section level3 unnumbered">
@@ -1031,11 +1031,11 @@ gss_design &lt;-<span class="st"> </span>
                 <span class="st">&quot;Extremely conservative&quot;</span> )
             ) ,
         
-        <span class="dt">born_in_usa =</span> <span class="kw">ifelse</span>( born %in%<span class="st"> </span><span class="dv">1</span>:<span class="dv">2</span> , <span class="kw">as.numeric</span>( born ==<span class="st"> </span><span class="dv">1</span> ) , <span class="ot">NA</span> ) ,
+        <span class="dt">born_in_usa =</span> <span class="kw">ifelse</span>( born <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span> , <span class="kw">as.numeric</span>( born <span class="op">==</span><span class="st"> </span><span class="dv">1</span> ) , <span class="ot">NA</span> ) ,
         
-        <span class="dt">adults_in_hh =</span> <span class="kw">ifelse</span>( adults &gt;<span class="st"> </span><span class="dv">8</span> , <span class="ot">NA</span> , adults ) ,
+        <span class="dt">adults_in_hh =</span> <span class="kw">ifelse</span>( adults <span class="op">&gt;</span><span class="st"> </span><span class="dv">8</span> , <span class="ot">NA</span> , adults ) ,
         
-        <span class="dt">persons_in_hh =</span> <span class="kw">ifelse</span>( hompop &gt;<span class="st"> </span><span class="dv">11</span> , <span class="ot">NA</span> , hompop ) ,
+        <span class="dt">persons_in_hh =</span> <span class="kw">ifelse</span>( hompop <span class="op">&gt;</span><span class="st"> </span><span class="dv">11</span> , <span class="ot">NA</span> , hompop ) ,
         
         <span class="dt">race =</span> <span class="kw">factor</span>( race , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;white&quot;</span> , <span class="st">&quot;black&quot;</span> , <span class="st">&quot;other&quot;</span> ) ) ,
         
@@ -1052,41 +1052,41 @@ gss_design &lt;-<span class="st"> </span>
 <div id="unweighted-counts-19" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( gss_design , <span class="st">&quot;sampling&quot;</span> ) !=<span class="st"> </span><span class="dv">0</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( gss_design , <span class="st">&quot;sampling&quot;</span> ) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>region , gss_design , unwtd.count )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>region , gss_design , unwtd.count )</code></pre></div>
 </div>
 <div id="weighted-counts-13" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>one , gss_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , gss_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>region , gss_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>region , gss_design , svytotal )</code></pre></div>
 </div>
 <div id="descriptive-statistics-19" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>age , ~<span class="st"> </span>region , gss_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>age , <span class="op">~</span><span class="st"> </span>region , gss_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>race , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>race , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>race , ~<span class="st"> </span>region , gss_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>race , <span class="op">~</span><span class="st"> </span>region , gss_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>age , ~<span class="st"> </span>region , gss_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>age , <span class="op">~</span><span class="st"> </span>region , gss_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>race , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>race , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>race , ~<span class="st"> </span>region , gss_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>race , <span class="op">~</span><span class="st"> </span>region , gss_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( ~<span class="st"> </span>age , gss_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>age , gss_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">svyby</span>( 
-    ~<span class="st"> </span>age , 
-    ~<span class="st"> </span>region , 
+    <span class="op">~</span><span class="st"> </span>age , 
+    <span class="op">~</span><span class="st"> </span>region , 
     gss_design , 
     svyquantile , 
     <span class="fl">0.5</span> ,
@@ -1096,8 +1096,8 @@ gss_design &lt;-<span class="st"> </span>
 )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyratio</span>( 
-    <span class="dt">numerator =</span> ~<span class="st"> </span>adults_in_hh , 
-    <span class="dt">denominator =</span> ~<span class="st"> </span>persons_in_hh , 
+    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>adults_in_hh , 
+    <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>persons_in_hh , 
     gss_design ,
     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>
 )</code></pre></div>
@@ -1105,14 +1105,14 @@ gss_design &lt;-<span class="st"> </span>
 <div id="subsetting-19" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to females:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_gss_design &lt;-<span class="st"> </span><span class="kw">subset</span>( gss_design , sex ==<span class="st"> </span><span class="dv">2</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_gss_design &lt;-<span class="st"> </span><span class="kw">subset</span>( gss_design , sex <span class="op">==</span><span class="st"> </span><span class="dv">2</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>age , sub_gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>age , sub_gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-19" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( ~<span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">coef</span>( this_result )
 <span class="kw">SE</span>( this_result )
@@ -1121,8 +1121,8 @@ gss_design &lt;-<span class="st"> </span>
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">svyby</span>( 
-        ~<span class="st"> </span>age , 
-        ~<span class="st"> </span>region , 
+        <span class="op">~</span><span class="st"> </span>age , 
+        <span class="op">~</span><span class="st"> </span>region , 
         gss_design , 
         svymean ,
         <span class="dt">na.rm =</span> <span class="ot">TRUE</span> 
@@ -1135,30 +1135,30 @@ grouped_result &lt;-
 <p>Calculate the degrees of freedom of any survey design object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( gss_design )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( ~<span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># SRS with replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>age , gss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( ~<span class="st"> </span>born_in_usa , gss_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( <span class="op">~</span><span class="st"> </span>born_in_usa , gss_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-19" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( age ~<span class="st"> </span>born_in_usa , gss_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( age <span class="op">~</span><span class="st"> </span>born_in_usa , gss_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
-    ~<span class="st"> </span>born_in_usa +<span class="st"> </span>race , 
+    <span class="op">~</span><span class="st"> </span>born_in_usa <span class="op">+</span><span class="st"> </span>race , 
     gss_design 
 )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        age ~<span class="st"> </span>born_in_usa +<span class="st"> </span>race , 
+        age <span class="op">~</span><span class="st"> </span>born_in_usa <span class="op">+</span><span class="st"> </span>race , 
         gss_design 
     )
 
@@ -1171,11 +1171,11 @@ grouped_result &lt;-
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(srvyr)
 gss_srvyr_design &lt;-<span class="st"> </span><span class="kw">as_survey</span>( gss_design )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gss_srvyr_design %&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gss_srvyr_design <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( age , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )
 
-gss_srvyr_design %&gt;%
-<span class="st">    </span><span class="kw">group_by</span>( region ) %&gt;%
+gss_srvyr_design <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>( region ) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( age , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )</code></pre></div>
 <hr />
 </div>

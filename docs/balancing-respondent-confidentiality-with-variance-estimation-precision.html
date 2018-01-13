@@ -1018,18 +1018,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co"># this design does not have a `strata=` parameter</span>
 api.tsl.without.strata &lt;-
 <span class="st">    </span><span class="kw">svydesign</span>(
-        <span class="dt">id =</span> ~dnum , 
+        <span class="dt">id =</span> <span class="op">~</span>dnum , 
         <span class="dt">data =</span> apistrat , 
-        <span class="dt">weights =</span> ~pw
+        <span class="dt">weights =</span> <span class="op">~</span>pw
     )
 
 <span class="co"># this design does have a `strata=` parameter</span>
 api.tsl.with.strata &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svydesign</span>(
-        <span class="dt">id =</span> ~dnum , 
-        <span class="dt">strata =</span> ~stype , 
+        <span class="dt">id =</span> <span class="op">~</span>dnum , 
+        <span class="dt">strata =</span> <span class="op">~</span>stype , 
         <span class="dt">data =</span> apistrat , 
-        <span class="dt">weights =</span> ~pw ,
+        <span class="dt">weights =</span> <span class="op">~</span>pw ,
         <span class="dt">nest =</span> <span class="ot">TRUE</span>
     )
 
@@ -1102,14 +1102,14 @@ api.jkn &lt;-<span class="st"> </span>
 
 <span class="co"># calculate the mean 1999 and 2000 academic performance index scores</span>
 <span class="co"># using the original stratified taylor-series design..</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>api99 +<span class="st"> </span>api00 , api.tsl.with.strata )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>api99 <span class="op">+</span><span class="st"> </span>api00 , api.tsl.with.strata )
 <span class="co"># ..and the newly-created jackknife replication-based design</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>api99 +<span class="st"> </span>api00 , api.jkn )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>api99 <span class="op">+</span><span class="st"> </span>api00 , api.jkn )
 <span class="co"># the standard errors for these estimates are nearly identical #</span>
 
 <span class="co"># run the same commands as above, broken down by award program eligibility</span>
-<span class="kw">svyby</span>( ~<span class="st"> </span>api99 +<span class="st"> </span>api00 , ~<span class="st"> </span>awards , api.tsl.with.strata , svymean )
-<span class="kw">svyby</span>( ~<span class="st"> </span>api99 +<span class="st"> </span>api00 , ~<span class="st"> </span>awards , api.jkn , svymean )
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>api99 <span class="op">+</span><span class="st"> </span>api00 , <span class="op">~</span><span class="st"> </span>awards , api.tsl.with.strata , svymean )
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>api99 <span class="op">+</span><span class="st"> </span>api00 , <span class="op">~</span><span class="st"> </span>awards , api.jkn , svymean )
 
 <span class="co"># in each case, the replication-based design</span>
 <span class="co"># (that we created off of the linearized design)</span>
@@ -1138,19 +1138,19 @@ api.jkn
 <span class="kw">names</span>( api.jkn )
     
 <span class="co"># look at the first six replicate weight records within your survey design</span>
-<span class="kw">head</span>( api.jkn$repweights )
+<span class="kw">head</span>( api.jkn<span class="op">$</span>repweights )
 <span class="co"># note that these weights are not *combined* by default</span>
 <span class="co"># in other words, they still need to be multiplied by the original weight</span>
 
 <span class="co"># you can confirm this by looking at the flag that indicates:</span>
 <span class="co"># &quot;have replicate weights been combined?&quot;</span>
-api.jkn$combined.weights
+api.jkn<span class="op">$</span>combined.weights
 <span class="co"># no.  they have not been combined</span>
 
 
 <span class="co"># therefore, these replication weights are `uncombined`</span>
 <span class="co"># and will need to be analyzed by the user as such</span>
-your.replicate.weights &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="kw">unclass</span>( api.jkn$repweights ) )
+your.replicate.weights &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="kw">unclass</span>( api.jkn<span class="op">$</span>repweights ) )
 
 
 
@@ -1179,7 +1179,7 @@ transposed.rw &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
 
 <span class="co"># going back to the original microdata set,</span>
 <span class="co"># eleven records are in this cluster x stratum</span>
-<span class="kw">which</span>( apistrat$dnum ==<span class="st"> </span><span class="dv">401</span> &amp;<span class="st"> </span>apistrat$stype ==<span class="st"> &#39;E&#39;</span> )
+<span class="kw">which</span>( apistrat<span class="op">$</span>dnum <span class="op">==</span><span class="st"> </span><span class="dv">401</span> <span class="op">&amp;</span><span class="st"> </span>apistrat<span class="op">$</span>stype <span class="op">==</span><span class="st"> &#39;E&#39;</span> )
 
 <span class="co"># without massaging your replicate weights at all,</span>
 <span class="co"># a malicious user could easily view the correlations</span>
@@ -1190,7 +1190,7 @@ transposed.rw &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
 <span class="co"># for example, here are all replicate-weight records that</span>
 <span class="co"># perfectly (after rounding) correlate with </span>
 <span class="co"># the first record.</span>
-<span class="kw">which</span>( <span class="kw">round</span>( <span class="kw">cor</span>( transposed.rw )[ <span class="dv">1</span> , ] ) ==<span class="st"> </span><span class="dv">1</span> )
+<span class="kw">which</span>( <span class="kw">round</span>( <span class="kw">cor</span>( transposed.rw )[ <span class="dv">1</span> , ] ) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )
 
 <span class="co"># same numbers!</span>
 
@@ -1215,26 +1215,26 @@ transposed.rw &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
 
 
 <span class="co"># figure out how much noise to add.</span>
-noisy.transposed.rw &lt;-<span class="st"> </span><span class="kw">addNoise</span>( transposed.rw , <span class="dt">noise =</span> <span class="dv">1</span> )$xm
+noisy.transposed.rw &lt;-<span class="st"> </span><span class="kw">addNoise</span>( transposed.rw , <span class="dt">noise =</span> <span class="dv">1</span> )<span class="op">$</span>xm
 
 
 <span class="co"># remember, on the original replicate weight objects,</span>
 <span class="co"># the correlations between the first record and</span>
 <span class="co"># other records within the same clusters and strata</span>
 <span class="co"># were perfect.</span>
-<span class="kw">which</span>( <span class="kw">sapply</span>( <span class="kw">cor</span>( transposed.rw )[ <span class="dv">1</span> , ] , function( z ) <span class="kw">isTRUE</span>( <span class="kw">all.equal</span>( z , <span class="dv">1</span> ) ) ) )
+<span class="kw">which</span>( <span class="kw">sapply</span>( <span class="kw">cor</span>( transposed.rw )[ <span class="dv">1</span> , ] , <span class="cf">function</span>( z ) <span class="kw">isTRUE</span>( <span class="kw">all.equal</span>( z , <span class="dv">1</span> ) ) ) )
 
 <span class="co"># run the same test on noisified weights</span>
-<span class="kw">which</span>( <span class="kw">sapply</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] , function( z ) <span class="kw">isTRUE</span>( <span class="kw">all.equal</span>( z , <span class="dv">1</span> ) ) ) )
+<span class="kw">which</span>( <span class="kw">sapply</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] , <span class="cf">function</span>( z ) <span class="kw">isTRUE</span>( <span class="kw">all.equal</span>( z , <span class="dv">1</span> ) ) ) )
 <span class="co"># and suddenly none of the other records are perfectly correlated</span>
 
 
 <span class="co"># but even moderately correlations might allow evildoers</span>
 <span class="co"># to identify clusters and strata</span>
 <span class="co"># these records have a 0.1 or higher correlation coefficient</span>
-<span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] &gt;<span class="st"> </span><span class="fl">0.1</span> )
+<span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.1</span> )
 <span class="co"># these records have a 0.2 or higher correlation coefficient</span>
-<span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] &gt;<span class="st"> </span><span class="fl">0.2</span> )
+<span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.2</span> )
 <span class="co"># whoops.  we did not add enough noise.</span>
 <span class="co"># records in the same cluster x strata still have</span>
 <span class="co"># too high of a correlation coefficient,</span>
@@ -1263,30 +1263,30 @@ hmncyt &lt;-<span class="st"> </span><span class="dv">3</span>
 
 
 <span class="co"># crank up the random noise percentage to three</span>
-noisy.transposed.rw &lt;-<span class="st"> </span><span class="kw">addNoise</span>( transposed.rw , <span class="dt">noise =</span> hmncyt )$xm
+noisy.transposed.rw &lt;-<span class="st"> </span><span class="kw">addNoise</span>( transposed.rw , <span class="dt">noise =</span> hmncyt )<span class="op">$</span>xm
 <span class="co"># and suddenly..</span>
 
 <span class="co"># records 29, 73 and 158 have a correlation coefficient</span>
 <span class="co"># that&#39;s greater than zero point two.</span>
-<span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] &gt;<span class="st"> </span><span class="fl">0.2</span> )
+<span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.2</span> )
 
 <span class="co"># and of those, only record #29 is in the same cluster x strata</span>
 <span class="kw">intersect</span>(
-    <span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] &gt;<span class="st"> </span><span class="fl">0.2</span> ) ,
-    <span class="kw">which</span>( <span class="kw">round</span>( <span class="kw">cor</span>( transposed.rw )[ <span class="dv">1</span> , ] ) ==<span class="st"> </span><span class="dv">1</span> )
+    <span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.2</span> ) ,
+    <span class="kw">which</span>( <span class="kw">round</span>( <span class="kw">cor</span>( transposed.rw )[ <span class="dv">1</span> , ] ) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )
 )
 <span class="co"># that&#39;s awesome, because you have two false-positives here.</span>
 <span class="co"># the &quot;73&quot; and &quot;158&quot; will throw off a malicious user.</span>
 
 
 <span class="co"># these records have a 0.1 or higher correlation coefficient</span>
-<span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] &gt;<span class="st"> </span><span class="fl">0.1</span> )
+<span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.1</span> )
 <span class="co"># and that looks very good.</span>
 <span class="co"># because less than half of those records</span>
 <span class="co"># are actually in the same cluster x strata</span>
 <span class="kw">intersect</span>(
-    <span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] &gt;<span class="st"> </span><span class="fl">0.1</span> ) ,
-    <span class="kw">which</span>( <span class="kw">round</span>( <span class="kw">cor</span>( transposed.rw )[ <span class="dv">1</span> , ] ) ==<span class="st"> </span><span class="dv">1</span> )
+    <span class="kw">which</span>( <span class="kw">cor</span>( noisy.transposed.rw )[ <span class="dv">1</span> , ] <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.1</span> ) ,
+    <span class="kw">which</span>( <span class="kw">round</span>( <span class="kw">cor</span>( transposed.rw )[ <span class="dv">1</span> , ] ) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )
 )
 <span class="co"># and there are lots of other records with high correlations (false positives)</span>
 <span class="co"># that in fact are not in the same strata.  great.  perf.  magnifique!</span>
@@ -1343,7 +1343,7 @@ noisy.rw &lt;-<span class="st"> </span><span class="kw">t</span>( noisy.transpos
 <span class="co"># and store that entire table into `x`</span>
 x &lt;-<span class="st"> </span>apistrat
 <span class="co"># remove the columns that were deemed too confidential to release</span>
-x$dnum &lt;-<span class="st"> </span>x$stype &lt;-<span class="st"> </span><span class="ot">NULL</span>
+x<span class="op">$</span>dnum &lt;-<span class="st"> </span>x<span class="op">$</span>stype &lt;-<span class="st"> </span><span class="ot">NULL</span>
 <span class="co"># in other words, delete the cluster and strata variables</span>
 <span class="co"># from this data.frame object so you have a &quot;safe-for-the-public&quot; data set</span>
 
@@ -1406,7 +1406,7 @@ z &lt;-
         <span class="dt">data =</span> y ,
         <span class="dt">type =</span> <span class="st">&quot;JKn&quot;</span> ,
         <span class="dt">repweights =</span> <span class="st">&quot;X[1-9]+&quot;</span> ,
-        <span class="dt">weights =</span> ~pw ,
+        <span class="dt">weights =</span> <span class="op">~</span>pw ,
         <span class="dt">scale =</span> <span class="dv">1</span> ,
         <span class="dt">combined.weights =</span> <span class="ot">FALSE</span> ,
         <span class="dt">mse =</span> <span class="ot">TRUE</span>
@@ -1423,11 +1423,11 @@ z &lt;-
 <span class="co"># this `z` object can now be analyzed</span>
 <span class="co"># and the statistics but not the standard errors</span>
 <span class="co"># will match the `api.jkn` shown above.</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>api99 +<span class="st"> </span>api00 , z )
-<span class="kw">svymean</span>( ~<span class="st"> </span>api99 +<span class="st"> </span>api00 , api.jkn )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>api99 <span class="op">+</span><span class="st"> </span>api00 , z )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>api99 <span class="op">+</span><span class="st"> </span>api00 , api.jkn )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>api99 +<span class="st"> </span>api00 , ~<span class="st"> </span>awards , z , svymean )
-<span class="kw">svyby</span>( ~<span class="st"> </span>api99 +<span class="st"> </span>api00 , ~<span class="st"> </span>awards , api.jkn , svymean )
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>api99 <span class="op">+</span><span class="st"> </span>api00 , <span class="op">~</span><span class="st"> </span>awards , z , svymean )
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>api99 <span class="op">+</span><span class="st"> </span>api00 , <span class="op">~</span><span class="st"> </span>awards , api.jkn , svymean )
 <span class="co"># see how the standard errors have a-little-more-than-doubled?</span>
 <span class="co"># that&#39;s because we had to BRING THE NOISE to the replicate weights</span>
 

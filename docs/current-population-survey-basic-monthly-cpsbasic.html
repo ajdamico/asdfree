@@ -977,7 +977,7 @@ cpsbasic_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;CPSBASIC&quot;</span> ) )
 
 <span class="co"># march 2017 only</span>
-cpsbasic_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( cpsbasic_cat , year ==<span class="st"> </span><span class="dv">2017</span> &amp;<span class="st"> </span>month ==<span class="st"> </span><span class="dv">3</span> )
+cpsbasic_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( cpsbasic_cat , year <span class="op">==</span><span class="st"> </span><span class="dv">2017</span> <span class="op">&amp;</span><span class="st"> </span>month <span class="op">==</span><span class="st"> </span><span class="dv">3</span> )
 <span class="co"># download the microdata to your local computer</span>
 <span class="kw">lodown</span>( <span class="st">&quot;cpsbasic&quot;</span> , cpsbasic_cat )</code></pre></div>
 </div>
@@ -994,9 +994,9 @@ cpsbasic_df &lt;-<span class="st"> </span>
 <span class="st">but incorrect standard errors.&quot;</span> )
 cpsbasic_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svydesign</span>( 
-        ~<span class="st"> </span><span class="dv">1</span> , 
+        <span class="op">~</span><span class="st"> </span><span class="dv">1</span> , 
         <span class="dt">data =</span> cpsbasic_df , 
-        <span class="dt">weights =</span> ~<span class="st"> </span>pwsswgt
+        <span class="dt">weights =</span> <span class="op">~</span><span class="st"> </span>pwsswgt
     )</code></pre></div>
 <div id="variable-recoding-13" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
@@ -1007,15 +1007,15 @@ cpsbasic_design &lt;-<span class="st"> </span>
         
         <span class="dt">one =</span> <span class="dv">1</span> ,
         
-        <span class="dt">pesex =</span> <span class="kw">factor</span>( pesex , <span class="dt">levels =</span> <span class="dv">1</span>:<span class="dv">2</span> , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,
+        <span class="dt">pesex =</span> <span class="kw">factor</span>( pesex , <span class="dt">levels =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span> , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,
         
-        <span class="dt">weekly_earnings =</span> <span class="kw">ifelse</span>( prernwa ==<span class="st"> </span>-.<span class="dv">01</span> , <span class="ot">NA</span> , prernwa ) ,
+        <span class="dt">weekly_earnings =</span> <span class="kw">ifelse</span>( prernwa <span class="op">==</span><span class="st"> </span><span class="op">-</span>.<span class="dv">01</span> , <span class="ot">NA</span> , prernwa ) ,
         
         <span class="co"># exclude anyone whose hours vary</span>
-        <span class="dt">weekly_hours =</span> <span class="kw">ifelse</span>( pehrusl1 &lt;<span class="st"> </span><span class="dv">0</span> , <span class="ot">NA</span> , pehrusl1 ) ,
+        <span class="dt">weekly_hours =</span> <span class="kw">ifelse</span>( pehrusl1 <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span> , <span class="ot">NA</span> , pehrusl1 ) ,
         
         <span class="dt">class_of_worker =</span>
-            <span class="kw">factor</span>( peio1cow , <span class="dt">levels =</span> <span class="dv">1</span>:<span class="dv">8</span> ,
+            <span class="kw">factor</span>( peio1cow , <span class="dt">levels =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">8</span> ,
                 <span class="dt">labels =</span> 
                     <span class="kw">c</span>( <span class="st">&quot;government - federal&quot;</span> , <span class="st">&quot;government - state&quot;</span> ,
                     <span class="st">&quot;government - local&quot;</span> , <span class="st">&quot;private, for profit&quot;</span> ,
@@ -1023,47 +1023,47 @@ cpsbasic_design &lt;-<span class="st"> </span>
                     <span class="st">&quot;self-employed, unincorporated&quot;</span> , <span class="st">&quot;without pay&quot;</span> )
             ) ,
             
-        <span class="dt">part_time =</span> <span class="kw">ifelse</span>( pemlr ==<span class="st"> </span><span class="dv">1</span> , <span class="kw">as.numeric</span>( pehruslt &lt;<span class="st"> </span><span class="dv">35</span> ) , <span class="ot">NA</span> )
+        <span class="dt">part_time =</span> <span class="kw">ifelse</span>( pemlr <span class="op">==</span><span class="st"> </span><span class="dv">1</span> , <span class="kw">as.numeric</span>( pehruslt <span class="op">&lt;</span><span class="st"> </span><span class="dv">35</span> ) , <span class="ot">NA</span> )
     )</code></pre></div>
 </div>
 <div id="unweighted-counts-13" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( cpsbasic_design , <span class="st">&quot;sampling&quot;</span> ) !=<span class="st"> </span><span class="dv">0</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( cpsbasic_design , <span class="st">&quot;sampling&quot;</span> ) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>pesex , cpsbasic_design , unwtd.count )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>pesex , cpsbasic_design , unwtd.count )</code></pre></div>
 </div>
 <div id="weighted-counts-10" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>one , cpsbasic_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , cpsbasic_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>pesex , cpsbasic_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>pesex , cpsbasic_design , svytotal )</code></pre></div>
 </div>
 <div id="descriptive-statistics-13" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>weekly_earnings , ~<span class="st"> </span>pesex , cpsbasic_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , <span class="op">~</span><span class="st"> </span>pesex , cpsbasic_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>class_of_worker , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>class_of_worker , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>class_of_worker , ~<span class="st"> </span>pesex , cpsbasic_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>class_of_worker , <span class="op">~</span><span class="st"> </span>pesex , cpsbasic_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>weekly_earnings , ~<span class="st"> </span>pesex , cpsbasic_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , <span class="op">~</span><span class="st"> </span>pesex , cpsbasic_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>class_of_worker , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>class_of_worker , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>class_of_worker , ~<span class="st"> </span>pesex , cpsbasic_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>class_of_worker , <span class="op">~</span><span class="st"> </span>pesex , cpsbasic_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( ~<span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">svyby</span>( 
-    ~<span class="st"> </span>weekly_earnings , 
-    ~<span class="st"> </span>pesex , 
+    <span class="op">~</span><span class="st"> </span>weekly_earnings , 
+    <span class="op">~</span><span class="st"> </span>pesex , 
     cpsbasic_design , 
     svyquantile , 
     <span class="fl">0.5</span> ,
@@ -1073,8 +1073,8 @@ cpsbasic_design &lt;-<span class="st"> </span>
 )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyratio</span>( 
-    <span class="dt">numerator =</span> ~<span class="st"> </span>weekly_earnings , 
-    <span class="dt">denominator =</span> ~<span class="st"> </span>weekly_hours , 
+    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>weekly_earnings , 
+    <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>weekly_hours , 
     cpsbasic_design ,
     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>
 )</code></pre></div>
@@ -1082,14 +1082,14 @@ cpsbasic_design &lt;-<span class="st"> </span>
 <div id="subsetting-13" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to california residents:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_cpsbasic_design &lt;-<span class="st"> </span><span class="kw">subset</span>( cpsbasic_design , gestfips ==<span class="st"> </span><span class="dv">6</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_cpsbasic_design &lt;-<span class="st"> </span><span class="kw">subset</span>( cpsbasic_design , gestfips <span class="op">==</span><span class="st"> </span><span class="dv">6</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>weekly_earnings , sub_cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , sub_cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-13" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( ~<span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">coef</span>( this_result )
 <span class="kw">SE</span>( this_result )
@@ -1098,8 +1098,8 @@ cpsbasic_design &lt;-<span class="st"> </span>
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">svyby</span>( 
-        ~<span class="st"> </span>weekly_earnings , 
-        ~<span class="st"> </span>pesex , 
+        <span class="op">~</span><span class="st"> </span>weekly_earnings , 
+        <span class="op">~</span><span class="st"> </span>pesex , 
         cpsbasic_design , 
         svymean ,
         <span class="dt">na.rm =</span> <span class="ot">TRUE</span> 
@@ -1112,30 +1112,30 @@ grouped_result &lt;-
 <p>Calculate the degrees of freedom of any survey design object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( cpsbasic_design )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( ~<span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># SRS with replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>weekly_earnings , cpsbasic_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( ~<span class="st"> </span>part_time , cpsbasic_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( <span class="op">~</span><span class="st"> </span>part_time , cpsbasic_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-13" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( weekly_earnings ~<span class="st"> </span>part_time , cpsbasic_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( weekly_earnings <span class="op">~</span><span class="st"> </span>part_time , cpsbasic_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
-    ~<span class="st"> </span>part_time +<span class="st"> </span>class_of_worker , 
+    <span class="op">~</span><span class="st"> </span>part_time <span class="op">+</span><span class="st"> </span>class_of_worker , 
     cpsbasic_design 
 )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        weekly_earnings ~<span class="st"> </span>part_time +<span class="st"> </span>class_of_worker , 
+        weekly_earnings <span class="op">~</span><span class="st"> </span>part_time <span class="op">+</span><span class="st"> </span>class_of_worker , 
         cpsbasic_design 
     )
 
@@ -1148,11 +1148,11 @@ grouped_result &lt;-
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(srvyr)
 cpsbasic_srvyr_design &lt;-<span class="st"> </span><span class="kw">as_survey</span>( cpsbasic_design )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cpsbasic_srvyr_design %&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cpsbasic_srvyr_design <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( weekly_earnings , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )
 
-cpsbasic_srvyr_design %&gt;%
-<span class="st">    </span><span class="kw">group_by</span>( pesex ) %&gt;%
+cpsbasic_srvyr_design <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>( pesex ) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( weekly_earnings , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )</code></pre></div>
 <hr />
 </div>

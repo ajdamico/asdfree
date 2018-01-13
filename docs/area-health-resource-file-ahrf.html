@@ -982,13 +982,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
         
         <span class="dt">cbsa_indicator_code =</span> 
             <span class="kw">factor</span>( 
-                <span class="dv">1</span> +<span class="st"> </span><span class="kw">as.numeric</span>( f1406715 ) , 
+                <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">as.numeric</span>( f1406715 ) , 
                 <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;not metro&quot;</span> , <span class="st">&quot;metro&quot;</span> , <span class="st">&quot;micro&quot;</span> ) 
             ) ,
             
         <span class="dt">mhi_2014 =</span> f1322614 ,
         
-        <span class="dt">whole_county_hpsa_2016 =</span> <span class="kw">as.numeric</span>( f0978716 ==<span class="st"> </span><span class="dv">1</span> ) ,
+        <span class="dt">whole_county_hpsa_2016 =</span> <span class="kw">as.numeric</span>( f0978716 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> ) ,
         
         <span class="dt">census_region =</span> 
             <span class="kw">factor</span>( 
@@ -1046,7 +1046,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="subsetting-2" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Limit your <code>data.frame</code> to California:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_ahrf_df &lt;-<span class="st"> </span><span class="kw">subset</span>( ahrf_df , f12424 ==<span class="st"> &quot;CA&quot;</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_ahrf_df &lt;-<span class="st"> </span><span class="kw">subset</span>( ahrf_df , f12424 <span class="op">==</span><span class="st"> &quot;CA&quot;</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>( sub_ahrf_df[ , <span class="st">&quot;mhi_2014&quot;</span> ] , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
@@ -1065,7 +1065,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="regression-models-and-tests-of-association-2" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>( mhi_2014 ~<span class="st"> </span>whole_county_hpsa_2016 , ahrf_df )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>( mhi_<span class="dv">2014</span> <span class="op">~</span><span class="st"> </span>whole_county_hpsa_<span class="dv">2016</span> , ahrf_df )</code></pre></div>
 <p>Perform a chi-squared test of association:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-<span class="st"> </span><span class="kw">table</span>( ahrf_df[ , <span class="kw">c</span>( <span class="st">&quot;whole_county_hpsa_2016&quot;</span> , <span class="st">&quot;census_region&quot;</span> ) ] )
 
@@ -1073,7 +1073,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Perform a generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">glm</span>( 
-        mhi_2014 ~<span class="st"> </span>whole_county_hpsa_2016 +<span class="st"> </span>census_region , 
+        mhi_<span class="dv">2014</span> <span class="op">~</span><span class="st"> </span>whole_county_hpsa_<span class="dv">2016</span> <span class="op">+</span><span class="st"> </span>census_region , 
         <span class="dt">data =</span> ahrf_df
     )
 
@@ -1086,12 +1086,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 ahrf_tbl &lt;-<span class="st"> </span><span class="kw">tbl_df</span>( ahrf_df )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ahrf_tbl %&gt;%
-<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">mean</span>( mhi_2014 , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ahrf_tbl <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">mean</span>( mhi_<span class="dv">2014</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )
 
-ahrf_tbl %&gt;%
-<span class="st">    </span><span class="kw">group_by</span>( cbsa_indicator_code ) %&gt;%
-<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">mean</span>( mhi_2014 , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )</code></pre></div>
+ahrf_tbl <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>( cbsa_indicator_code ) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">mean</span>( mhi_<span class="dv">2014</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) )</code></pre></div>
 
 </div>
 </div>

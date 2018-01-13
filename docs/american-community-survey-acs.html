@@ -977,7 +977,7 @@ acs_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ACS&quot;</span> ) )
 
 <span class="co"># 2011 single-year only</span>
-acs_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( acs_cat , year ==<span class="st"> </span><span class="dv">2011</span> &amp;<span class="st"> </span>time_period ==<span class="st"> &#39;1-Year&#39;</span> )
+acs_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( acs_cat , year <span class="op">==</span><span class="st"> </span><span class="dv">2011</span> <span class="op">&amp;</span><span class="st"> </span>time_period <span class="op">==</span><span class="st"> &#39;1-Year&#39;</span> )
 <span class="co"># download the microdata to your local computer</span>
 <span class="kw">lodown</span>( <span class="st">&quot;acs&quot;</span> , acs_cat )</code></pre></div>
 </div>
@@ -1009,26 +1009,26 @@ acs_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( acs_cat , 
 <span class="co"># acs_design &lt;- subset( acs_design_with_puerto_rico , st != 72 )</span>
 
 <span class="co"># to conserve RAM, create a smaller table within the database</span>
-db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite::<span class="kw">SQLite</span>() , acs_cat[ i , <span class="st">&#39;dbfile&#39;</span> ] )
+db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite<span class="op">::</span><span class="kw">SQLite</span>() , acs_cat[ i , <span class="st">&#39;dbfile&#39;</span> ] )
 <span class="kw">dbSendQuery</span>( db , <span class="st">&quot;CREATE TABLE alabama_1yr_2011 AS ( SELECT * FROM acs2011_1yr WHERE st = 1 )&quot;</span> )
 
 <span class="co"># notice the edited `data =` parameter</span>
 <span class="co"># this design is alabama only</span>
 acs_design &lt;-
 <span class="st">    </span><span class="kw">svrepdesign</span>(
-        <span class="dt">weight =</span> ~pwgtp ,
+        <span class="dt">weight =</span> <span class="op">~</span>pwgtp ,
         <span class="dt">repweights =</span> <span class="st">&#39;pwgtp[0-9]+&#39;</span> ,
-        <span class="dt">scale =</span> <span class="dv">4</span> /<span class="st"> </span><span class="dv">80</span> ,
+        <span class="dt">scale =</span> <span class="dv">4</span> <span class="op">/</span><span class="st"> </span><span class="dv">80</span> ,
         <span class="dt">rscales =</span> <span class="kw">rep</span>( <span class="dv">1</span> , <span class="dv">80</span> ) ,
         <span class="dt">mse =</span> <span class="ot">TRUE</span> ,
         <span class="dt">type =</span> <span class="st">&#39;JK1&#39;</span> ,
         <span class="dt">data =</span> <span class="st">&#39;alabama_1yr_2011&#39;</span> ,
         <span class="dt">dbtype =</span> <span class="st">&quot;SQLite&quot;</span> ,
-        <span class="dt">dbname =</span> acs_cat$dbfile
+        <span class="dt">dbname =</span> acs_cat<span class="op">$</span>dbfile
     )
     
 <span class="co"># workaround for a bug in survey::svrepdesign.character</span>
-acs_design$mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code></pre></div>
+acs_design<span class="op">$</span>mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code></pre></div>
 <div id="variable-recoding" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
 <p>Add new columns to the data set:</p>
@@ -1062,7 +1062,7 @@ acs_design$mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code>
                     <span class="st">&quot;Washington&quot;</span>, <span class="st">&quot;West Virginia&quot;</span>, <span class="st">&quot;Wisconsin&quot;</span>, <span class="st">&quot;Wyoming&quot;</span>)
             ) ,
         
-        <span class="dt">married =</span> <span class="kw">as.numeric</span>( mar %in%<span class="st"> </span><span class="dv">1</span> ) ,
+        <span class="dt">married =</span> <span class="kw">as.numeric</span>( mar <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span> ) ,
         
         <span class="dt">sex =</span> <span class="kw">factor</span>( sex , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) )
     )</code></pre></div>
@@ -1070,41 +1070,41 @@ acs_design$mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code>
 <div id="unweighted-counts" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( acs_design , <span class="st">&quot;sampling&quot;</span> ) !=<span class="st"> </span><span class="dv">0</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( acs_design , <span class="st">&quot;sampling&quot;</span> ) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>state_name , acs_design , unwtd.count )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>state_name , acs_design , unwtd.count )</code></pre></div>
 </div>
 <div id="weighted-counts" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>one , acs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , acs_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>state_name , acs_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>state_name , acs_design , svytotal )</code></pre></div>
 </div>
 <div id="descriptive-statistics" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>povpip , ~<span class="st"> </span>state_name , acs_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>povpip , <span class="op">~</span><span class="st"> </span>state_name , acs_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>sex , acs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>sex , acs_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>sex , ~<span class="st"> </span>state_name , acs_design , svymean )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>sex , <span class="op">~</span><span class="st"> </span>state_name , acs_design , svymean )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>povpip , ~<span class="st"> </span>state_name , acs_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>povpip , <span class="op">~</span><span class="st"> </span>state_name , acs_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>sex , acs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>sex , acs_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>sex , ~<span class="st"> </span>state_name , acs_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>sex , <span class="op">~</span><span class="st"> </span>state_name , acs_design , svytotal )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( ~<span class="st"> </span>povpip , acs_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>povpip , acs_design , <span class="fl">0.5</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">svyby</span>( 
-    ~<span class="st"> </span>povpip , 
-    ~<span class="st"> </span>state_name , 
+    <span class="op">~</span><span class="st"> </span>povpip , 
+    <span class="op">~</span><span class="st"> </span>state_name , 
     acs_design , 
     svyquantile , 
     <span class="fl">0.5</span> ,
@@ -1114,8 +1114,8 @@ acs_design$mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code>
 )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyratio</span>( 
-    <span class="dt">numerator =</span> ~<span class="st"> </span>ssip , 
-    <span class="dt">denominator =</span> ~<span class="st"> </span>pincp , 
+    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>ssip , 
+    <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>pincp , 
     acs_design ,
     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>
 )</code></pre></div>
@@ -1123,14 +1123,14 @@ acs_design$mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code>
 <div id="subsetting" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to California:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_acs_design &lt;-<span class="st"> </span><span class="kw">subset</span>( acs_design , st ==<span class="st"> </span><span class="dv">6</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_acs_design &lt;-<span class="st"> </span><span class="kw">subset</span>( acs_design , st <span class="op">==</span><span class="st"> </span><span class="dv">6</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>povpip , sub_acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>povpip , sub_acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( ~<span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
 <span class="kw">coef</span>( this_result )
 <span class="kw">SE</span>( this_result )
@@ -1139,8 +1139,8 @@ acs_design$mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code>
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">svyby</span>( 
-        ~<span class="st"> </span>povpip , 
-        ~<span class="st"> </span>state_name , 
+        <span class="op">~</span><span class="st"> </span>povpip , 
+        <span class="op">~</span><span class="st"> </span>state_name , 
         acs_design , 
         svymean ,
         <span class="dt">na.rm =</span> <span class="ot">TRUE</span> 
@@ -1153,30 +1153,30 @@ grouped_result &lt;-
 <p>Calculate the degrees of freedom of any survey design object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( acs_design )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( ~<span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># SRS with replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>povpip , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( ~<span class="st"> </span>married , acs_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( <span class="op">~</span><span class="st"> </span>married , acs_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( povpip ~<span class="st"> </span>married , acs_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( povpip <span class="op">~</span><span class="st"> </span>married , acs_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
-    ~<span class="st"> </span>married +<span class="st"> </span>sex , 
+    <span class="op">~</span><span class="st"> </span>married <span class="op">+</span><span class="st"> </span>sex , 
     acs_design 
 )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        povpip ~<span class="st"> </span>married +<span class="st"> </span>sex , 
+        povpip <span class="op">~</span><span class="st"> </span>married <span class="op">+</span><span class="st"> </span>sex , 
         acs_design 
     )
 
@@ -1189,34 +1189,34 @@ grouped_result &lt;-
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(convey)
 acs_design &lt;-<span class="st"> </span><span class="kw">convey_prep</span>( acs_design )
 
-<span class="kw">svygini</span>( ~<span class="st"> </span>hincp , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svygini</span>( <span class="op">~</span><span class="st"> </span>hincp , acs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <hr />
 </div>
 <div id="replication-example" class="section level2 unnumbered">
 <h2>Replication Example</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="kw">I</span>( relp %in%<span class="st"> </span><span class="dv">0</span>:<span class="dv">17</span> ) , acs_design )                       <span class="co"># total population</span>
-<span class="kw">svytotal</span>( ~<span class="kw">I</span>( relp %in%<span class="st"> </span><span class="dv">0</span>:<span class="dv">15</span> ) , acs_design )                       <span class="co"># housing unit population</span>
-<span class="kw">svytotal</span>( ~<span class="kw">I</span>( relp %in%<span class="st"> </span><span class="dv">16</span>:<span class="dv">17</span> ) , acs_design )                      <span class="co"># gq population</span>
-<span class="kw">svytotal</span>( ~<span class="kw">I</span>( relp ==<span class="st"> </span><span class="dv">16</span> ) , acs_design )                           <span class="co"># gq institutional population</span>
-<span class="kw">svytotal</span>( ~<span class="kw">I</span>( relp ==<span class="st"> </span><span class="dv">17</span> ) , acs_design )                           <span class="co"># gq noninstitutional population</span>
-<span class="kw">svyby</span>( ~<span class="kw">I</span>( relp %in%<span class="st"> </span><span class="dv">0</span>:<span class="dv">17</span> ) , ~<span class="st"> </span>sex , acs_design , svytotal )       <span class="co"># total males &amp; females</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">17</span> ) , acs_design )                       <span class="co"># total population</span>
+<span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">15</span> ) , acs_design )                       <span class="co"># housing unit population</span>
+<span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">%in%</span><span class="st"> </span><span class="dv">16</span><span class="op">:</span><span class="dv">17</span> ) , acs_design )                      <span class="co"># gq population</span>
+<span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">==</span><span class="st"> </span><span class="dv">16</span> ) , acs_design )                           <span class="co"># gq institutional population</span>
+<span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">==</span><span class="st"> </span><span class="dv">17</span> ) , acs_design )                           <span class="co"># gq noninstitutional population</span>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">17</span> ) , <span class="op">~</span><span class="st"> </span>sex , acs_design , svytotal )       <span class="co"># total males &amp; females</span>
 
 <span class="co"># all age categories at once #</span>
 
 <span class="kw">svytotal</span>( 
-    ~<span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">0</span>:<span class="dv">4</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">5</span>:<span class="dv">9</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">10</span>:<span class="dv">14</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">15</span>:<span class="dv">19</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">20</span>:<span class="dv">24</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">25</span>:<span class="dv">34</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">35</span>:<span class="dv">44</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">45</span>:<span class="dv">54</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">55</span>:<span class="dv">59</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">60</span>:<span class="dv">64</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">65</span>:<span class="dv">74</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">75</span>:<span class="dv">84</span> ) +
-<span class="st">    </span><span class="kw">I</span>( agep %in%<span class="st"> </span><span class="dv">85</span>:<span class="dv">100</span> ) , 
+    <span class="op">~</span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">4</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">5</span><span class="op">:</span><span class="dv">9</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">10</span><span class="op">:</span><span class="dv">14</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">15</span><span class="op">:</span><span class="dv">19</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">20</span><span class="op">:</span><span class="dv">24</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">25</span><span class="op">:</span><span class="dv">34</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">35</span><span class="op">:</span><span class="dv">44</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">45</span><span class="op">:</span><span class="dv">54</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">55</span><span class="op">:</span><span class="dv">59</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">60</span><span class="op">:</span><span class="dv">64</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">65</span><span class="op">:</span><span class="dv">74</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">75</span><span class="op">:</span><span class="dv">84</span> ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">85</span><span class="op">:</span><span class="dv">100</span> ) , 
     acs_design
 )
 

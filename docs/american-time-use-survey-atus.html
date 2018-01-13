@@ -977,7 +977,7 @@ atus_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ATUS&quot;</span> ) )
 
 <span class="co"># 2015 only</span>
-atus_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( atus_cat , directory ==<span class="st"> </span><span class="dv">2015</span> )
+atus_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( atus_cat , directory <span class="op">==</span><span class="st"> </span><span class="dv">2015</span> )
 <span class="co"># download the microdata to your local computer</span>
 <span class="kw">lodown</span>( <span class="st">&quot;atus&quot;</span> , atus_cat )</code></pre></div>
 </div>
@@ -1005,7 +1005,7 @@ atuswgts &lt;-<span class="st"> </span>atuswgts[ , <span class="kw">c</span>( <s
 
 <span class="co"># for all records where the tier 1 code is 18 (travel)</span>
 <span class="co"># replace that tier 1 of 18 with whatever&#39;s stored in tier 2</span>
-atusact[ atusact$tutier1code ==<span class="st"> </span><span class="dv">18</span> , <span class="st">&#39;tutier1code&#39;</span> ] &lt;-<span class="st"> </span>atusact[ atusact$tutier1code ==<span class="st"> </span><span class="dv">18</span> , <span class="st">&#39;tutier2code&#39;</span> ]
+atusact[ atusact<span class="op">$</span>tutier1code <span class="op">==</span><span class="st"> </span><span class="dv">18</span> , <span class="st">&#39;tutier1code&#39;</span> ] &lt;-<span class="st"> </span>atusact[ atusact<span class="op">$</span>tutier1code <span class="op">==</span><span class="st"> </span><span class="dv">18</span> , <span class="st">&#39;tutier2code&#39;</span> ]
 <span class="co"># this will distribute all travel-related activities</span>
 <span class="co"># to the appropriate tier 1 category, which matches</span>
 <span class="co"># the structure of the 2012 bls table available at</span>
@@ -1015,7 +1015,7 @@ atusact[ atusact$tutier1code ==<span class="st"> </span><span class="dv">18</spa
 <span class="co"># *and* also the tier 1 code level</span>
 <span class="co"># (using tucaseid as the unique identifier)</span>
 <span class="co"># from the activities file</span>
-x &lt;-<span class="st"> </span><span class="kw">aggregate</span>( tuactdur24 ~<span class="st"> </span>tucaseid +<span class="st"> </span>tutier1code , <span class="dt">data =</span> atusact , sum )
+x &lt;-<span class="st"> </span><span class="kw">aggregate</span>( tuactdur24 <span class="op">~</span><span class="st"> </span>tucaseid <span class="op">+</span><span class="st"> </span>tutier1code , <span class="dt">data =</span> atusact , sum )
 
 <span class="co"># now table `x` contains</span>
 <span class="co"># one record per person per major activity category</span>
@@ -1032,7 +1032,7 @@ y[ <span class="kw">is.na</span>( y ) ] &lt;-<span class="st"> </span><span clas
 
 <span class="co"># except for the first column (the unique identifier,</span>
 <span class="co"># replace each column by the quotient of itself and sixty</span>
-y[ , -<span class="dv">1</span> ] &lt;-<span class="st"> </span>y[ , -<span class="dv">1</span> ] /<span class="st"> </span><span class="dv">60</span>
+y[ , <span class="op">-</span><span class="dv">1</span> ] &lt;-<span class="st"> </span>y[ , <span class="op">-</span><span class="dv">1</span> ] <span class="op">/</span><span class="st"> </span><span class="dv">60</span>
 <span class="co"># now you&#39;ve got an activity file `y`</span>
 <span class="co"># with one record per respondent</span>
 
@@ -1045,7 +1045,7 @@ resp_y &lt;-<span class="st"> </span><span class="kw">merge</span>( atusresp , y
 
 <span class="co"># confirm that the result of the merge has the same number of records</span>
 <span class="co"># as the original bls atus respondent file. (this is a worthwhile check)</span>
-<span class="kw">stopifnot</span>( <span class="kw">nrow</span>( resp_y ) ==<span class="st"> </span><span class="kw">nrow</span>( atusresp ) )
+<span class="kw">stopifnot</span>( <span class="kw">nrow</span>( resp_y ) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>( atusresp ) )
 
 <span class="co"># merge that result with the roster file</span>
 <span class="co"># note that the roster file has multiple records per `tucaseid`</span>
@@ -1054,26 +1054,26 @@ resp_y &lt;-<span class="st"> </span><span class="kw">merge</span>( atusresp , y
 resp_y_rost &lt;-<span class="st"> </span><span class="kw">merge</span>( resp_y , atusrost )
 
 <span class="co"># confirm that the result of the merge has the same number of records</span>
-<span class="kw">stopifnot</span>( <span class="kw">nrow</span>( resp_y_rost ) ==<span class="st"> </span><span class="kw">nrow</span>( atusresp ) )
+<span class="kw">stopifnot</span>( <span class="kw">nrow</span>( resp_y_rost ) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>( atusresp ) )
 
 <span class="co"># merge that result with the replicate weights file</span>
 z &lt;-<span class="st"> </span><span class="kw">merge</span>( resp_y_rost , atuswgts )
 
 <span class="co"># confirm that the result of the merge has the same number of records</span>
-<span class="kw">stopifnot</span>( <span class="kw">nrow</span>( z ) ==<span class="st"> </span><span class="kw">nrow</span>( atusresp ) )
+<span class="kw">stopifnot</span>( <span class="kw">nrow</span>( z ) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>( atusresp ) )
 
 <span class="co"># remove dots from column names</span>
 <span class="kw">names</span>( z ) &lt;-<span class="st"> </span><span class="kw">gsub</span>( <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span> , <span class="st">&quot;_&quot;</span> , <span class="kw">names</span>( z ) )
 
 <span class="co"># add a column of ones</span>
-z$one &lt;-<span class="st"> </span><span class="dv">1</span>
+z<span class="op">$</span>one &lt;-<span class="st"> </span><span class="dv">1</span>
 
 atus_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svrepdesign</span>(
-        <span class="dt">weights =</span> ~tufinlwgt ,
+        <span class="dt">weights =</span> <span class="op">~</span>tufinlwgt ,
         <span class="dt">repweights =</span> <span class="st">&quot;finlwgt[1-9]&quot;</span> , 
         <span class="dt">type =</span> <span class="st">&quot;Fay&quot;</span> , 
-        <span class="dt">rho =</span> ( <span class="dv">1</span> -<span class="st"> </span><span class="dv">1</span> /<span class="st"> </span><span class="kw">sqrt</span>( <span class="dv">4</span> ) ) ,
+        <span class="dt">rho =</span> ( <span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>( <span class="dv">4</span> ) ) ,
         <span class="dt">data =</span> z
     )</code></pre></div>
 <div id="variable-recoding-5" class="section level3 unnumbered">
@@ -1082,10 +1082,10 @@ atus_design &lt;-<span class="st"> </span>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">atus_design &lt;-
 <span class="st">    </span><span class="kw">update</span>(
         atus_design ,
-        <span class="dt">any_care =</span> <span class="kw">as.numeric</span>( tuactdur24_3 &gt;<span class="st"> </span><span class="dv">0</span> ) ,
+        <span class="dt">any_care =</span> <span class="kw">as.numeric</span>( tuactdur24_<span class="dv">3</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> ) ,
         <span class="dt">age_category =</span> 
             <span class="kw">factor</span>( 
-                <span class="dv">1</span> +<span class="st"> </span><span class="kw">findInterval</span>( teage , <span class="kw">c</span>( <span class="dv">18</span> , <span class="dv">35</span> , <span class="dv">65</span> ) ) , 
+                <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">findInterval</span>( teage , <span class="kw">c</span>( <span class="dv">18</span> , <span class="dv">35</span> , <span class="dv">65</span> ) ) , 
                 <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;under 18&quot;</span> , <span class="st">&quot;18 - 34&quot;</span> , <span class="st">&quot;35 - 64&quot;</span> , <span class="st">&quot;65 or older&quot;</span> ) 
             )
     )
@@ -1096,41 +1096,41 @@ atus_design &lt;-<span class="st"> </span>
 <div id="unweighted-counts-5" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( atus_design , <span class="st">&quot;sampling&quot;</span> ) !=<span class="st"> </span><span class="dv">0</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( atus_design , <span class="st">&quot;sampling&quot;</span> ) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>age_category , atus_design , unwtd.count )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>age_category , atus_design , unwtd.count )</code></pre></div>
 </div>
 <div id="weighted-counts-4" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>one , atus_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , atus_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>age_category , atus_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>age_category , atus_design , svytotal )</code></pre></div>
 </div>
 <div id="descriptive-statistics-5" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>tuactdur24_1 , atus_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , atus_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>tuactdur24_1 , ~<span class="st"> </span>age_category , atus_design , svymean )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , <span class="op">~</span><span class="st"> </span>age_category , atus_design , svymean )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>tesex , atus_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>tesex , atus_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>tesex , ~<span class="st"> </span>age_category , atus_design , svymean )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>tesex , <span class="op">~</span><span class="st"> </span>age_category , atus_design , svymean )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>tuactdur24_1 , atus_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , atus_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>tuactdur24_1 , ~<span class="st"> </span>age_category , atus_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , <span class="op">~</span><span class="st"> </span>age_category , atus_design , svytotal )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( ~<span class="st"> </span>tesex , atus_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>tesex , atus_design )
 
-<span class="kw">svyby</span>( ~<span class="st"> </span>tesex , ~<span class="st"> </span>age_category , atus_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>tesex , <span class="op">~</span><span class="st"> </span>age_category , atus_design , svytotal )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( ~<span class="st"> </span>tuactdur24_1 , atus_design , <span class="fl">0.5</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , atus_design , <span class="fl">0.5</span> )
 
 <span class="kw">svyby</span>( 
-    ~<span class="st"> </span>tuactdur24_1 , 
-    ~<span class="st"> </span>age_category , 
+    <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , 
+    <span class="op">~</span><span class="st"> </span>age_category , 
     atus_design , 
     svyquantile , 
     <span class="fl">0.5</span> ,
@@ -1139,22 +1139,22 @@ atus_design &lt;-<span class="st"> </span>
 )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyratio</span>( 
-    <span class="dt">numerator =</span> ~<span class="st"> </span>tuactdur24_5 , 
-    <span class="dt">denominator =</span> ~<span class="st"> </span>tuactdur24_12 , 
+    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">5</span> , 
+    <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">12</span> , 
     atus_design 
 )</code></pre></div>
 </div>
 <div id="subsetting-5" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to any time volunteering:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_atus_design &lt;-<span class="st"> </span><span class="kw">subset</span>( atus_design , tuactdur24_15 &gt;<span class="st"> </span><span class="dv">0</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_atus_design &lt;-<span class="st"> </span><span class="kw">subset</span>( atus_design , tuactdur24_<span class="dv">15</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( ~<span class="st"> </span>tuactdur24_1 , sub_atus_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , sub_atus_design )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-5" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( ~<span class="st"> </span>tuactdur24_1 , atus_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , atus_design )
 
 <span class="kw">coef</span>( this_result )
 <span class="kw">SE</span>( this_result )
@@ -1163,8 +1163,8 @@ atus_design &lt;-<span class="st"> </span>
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">svyby</span>( 
-        ~<span class="st"> </span>tuactdur24_1 , 
-        ~<span class="st"> </span>age_category , 
+        <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , 
+        <span class="op">~</span><span class="st"> </span>age_category , 
         atus_design , 
         svymean 
     )
@@ -1176,30 +1176,30 @@ grouped_result &lt;-
 <p>Calculate the degrees of freedom of any survey design object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( atus_design )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( ~<span class="st"> </span>tuactdur24_1 , atus_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , atus_design )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>tuactdur24_1 , atus_design , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , atus_design , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># SRS with replacement</span>
-<span class="kw">svymean</span>( ~<span class="st"> </span>tuactdur24_1 , atus_design , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>tuactdur24_<span class="dv">1</span> , atus_design , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( ~<span class="st"> </span>any_care , atus_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( <span class="op">~</span><span class="st"> </span>any_care , atus_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-5" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( tuactdur24_1 ~<span class="st"> </span>any_care , atus_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( tuactdur24_<span class="dv">1</span> <span class="op">~</span><span class="st"> </span>any_care , atus_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
-    ~<span class="st"> </span>any_care +<span class="st"> </span>tesex , 
+    <span class="op">~</span><span class="st"> </span>any_care <span class="op">+</span><span class="st"> </span>tesex , 
     atus_design 
 )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        tuactdur24_1 ~<span class="st"> </span>any_care +<span class="st"> </span>tesex , 
+        tuactdur24_<span class="dv">1</span> <span class="op">~</span><span class="st"> </span>any_care <span class="op">+</span><span class="st"> </span>tesex , 
         atus_design 
     )
 
@@ -1212,12 +1212,12 @@ grouped_result &lt;-
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(srvyr)
 atus_srvyr_design &lt;-<span class="st"> </span><span class="kw">as_survey</span>( atus_design )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">atus_srvyr_design %&gt;%
-<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( tuactdur24_1 ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">atus_srvyr_design <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( tuactdur24_<span class="dv">1</span> ) )
 
-atus_srvyr_design %&gt;%
-<span class="st">    </span><span class="kw">group_by</span>( age_category ) %&gt;%
-<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( tuactdur24_1 ) )</code></pre></div>
+atus_srvyr_design <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>( age_category ) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( tuactdur24_<span class="dv">1</span> ) )</code></pre></div>
 <hr />
 </div>
 <div id="replication-example-4" class="section level2 unnumbered">

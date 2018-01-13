@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'savecache=FALSE and filesize_fun default'"
+commit_memo <- "'savecache=FALSE inside syntaxtractor'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -335,15 +335,15 @@ for( this_ci_file in ci_rmd_files ){
 				
 				these_lines <- 
 					c( 
+
 						these_lines , 
-						readLines(
-							lodown::syntaxtractor( 
-								chapter_tag , 
-								replacements = machine_specific_replacements , 
-								setup_rmd = identical( sample_setup_block , '' ) ,
-								sample_setup_breaks = if( !identical( sample_setup_breaks , '' ) ) sample_setup_breaks ,
-								broken_sample_test_condition = if( !identical( broken_sample_test_condition , '' ) ) broken_sample_test_condition
-							)
+						
+						lodown::syntaxtractor( 
+							chapter_tag , 
+							replacements = machine_specific_replacements , 
+							setup_rmd = identical( sample_setup_block , '' ) ,
+							sample_setup_breaks = if( !identical( sample_setup_breaks , '' ) ) sample_setup_breaks ,
+							broken_sample_test_condition = if( !identical( broken_sample_test_condition , '' ) ) broken_sample_test_condition
 						)
 						
 					)
@@ -442,11 +442,13 @@ for( this_ci_file in ci_rmd_files ){
 
 		setup_fn <- grep( "setup\\.R$" , copied_files , value = TRUE )
 		
-		file.copy(
-			lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements , test_rmd = FALSE ) ,
-			setup_fn ,
-			overwrite = TRUE
-		)
+		these_lines <- 
+			c(
+				readLines( setup_fn ) ,
+				lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements , test_rmd = FALSE )
+			)
+			
+		writeLines( these_lines , setup_fn )
 
 		for( this_copied_file in copied_files ){
 			

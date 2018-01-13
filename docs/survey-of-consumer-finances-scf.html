@@ -977,7 +977,7 @@ scf_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;SCF&quot;</span> ) )
 
 <span class="co"># 2016 only</span>
-scf_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( scf_cat , year ==<span class="st"> </span><span class="dv">2016</span> )
+scf_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( scf_cat , year <span class="op">==</span><span class="st"> </span><span class="dv">2016</span> )
 <span class="co"># download the microdata to your local computer</span>
 <span class="kw">lodown</span>( <span class="st">&quot;scf&quot;</span> , scf_cat )</code></pre></div>
 </div>
@@ -993,11 +993,11 @@ scf_rw &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <span clas
 
 scf_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svrepdesign</span>( 
-        <span class="dt">weights =</span> ~wgt , 
-        <span class="dt">repweights =</span> scf_rw[ , -<span class="dv">1</span> ] , 
+        <span class="dt">weights =</span> <span class="op">~</span>wgt , 
+        <span class="dt">repweights =</span> scf_rw[ , <span class="op">-</span><span class="dv">1</span> ] , 
         <span class="dt">data =</span> <span class="kw">imputationList</span>( scf_imp ) , 
         <span class="dt">scale =</span> <span class="dv">1</span> ,
-        <span class="dt">rscales =</span> <span class="kw">rep</span>( <span class="dv">1</span> /<span class="st"> </span><span class="dv">998</span> , <span class="dv">999</span> ) ,
+        <span class="dt">rscales =</span> <span class="kw">rep</span>( <span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="dv">998</span> , <span class="dv">999</span> ) ,
         <span class="dt">mse =</span> <span class="ot">TRUE</span> ,
         <span class="dt">type =</span> <span class="st">&quot;other&quot;</span> ,
         <span class="dt">combined.weights =</span> <span class="ot">TRUE</span>
@@ -1011,7 +1011,7 @@ scf_design &lt;-<span class="st"> </span>
         
         <span class="dt">hhsex =</span> <span class="kw">factor</span>( hhsex , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) ) ,
         
-        <span class="dt">married =</span> <span class="kw">as.numeric</span>( married ==<span class="st"> </span><span class="dv">1</span> ) ,
+        <span class="dt">married =</span> <span class="kw">as.numeric</span>( married <span class="op">==</span><span class="st"> </span><span class="dv">1</span> ) ,
         
         <span class="dt">edcl =</span> 
             <span class="kw">factor</span>( 
@@ -1030,71 +1030,71 @@ scf_design &lt;-<span class="st"> </span>
 <div id="unweighted-counts-51" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>one , unwtd.count ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>one , unwtd.count ) ) )
 
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>hhsex , unwtd.count ) ) )</code></pre></div>
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>hhsex , unwtd.count ) ) )</code></pre></div>
 </div>
 <div id="weighted-counts-39" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svytotal</span>( ~<span class="st"> </span>one ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one ) ) )
 
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>hhsex , svytotal )
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>hhsex , svytotal )
 ) )</code></pre></div>
 </div>
 <div id="descriptive-statistics-51" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svymean</span>( ~<span class="st"> </span>networth ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>networth ) ) )
 
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>networth , ~<span class="st"> </span>hhsex , svymean )
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>networth , <span class="op">~</span><span class="st"> </span>hhsex , svymean )
 ) )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svymean</span>( ~<span class="st"> </span>edcl ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>edcl ) ) )
 
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>edcl , ~<span class="st"> </span>hhsex , svymean )
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>edcl , <span class="op">~</span><span class="st"> </span>hhsex , svymean )
 ) )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svytotal</span>( ~<span class="st"> </span>networth ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>networth ) ) )
 
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>networth , ~<span class="st"> </span>hhsex , svytotal )
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>networth , <span class="op">~</span><span class="st"> </span>hhsex , svytotal )
 ) )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svytotal</span>( ~<span class="st"> </span>edcl ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>edcl ) ) )
 
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>edcl , ~<span class="st"> </span>hhsex , svytotal )
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>edcl , <span class="op">~</span><span class="st"> </span>hhsex , svytotal )
 ) )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svyquantile</span>( ~<span class="st"> </span>networth , <span class="fl">0.5</span> , <span class="dt">se =</span> <span class="ot">TRUE</span> ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>networth , <span class="fl">0.5</span> , <span class="dt">se =</span> <span class="ot">TRUE</span> ) ) )
 
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
     <span class="kw">svyby</span>( 
-        ~<span class="st"> </span>networth , ~<span class="st"> </span>hhsex , svyquantile , <span class="fl">0.5</span> ,
+        <span class="op">~</span><span class="st"> </span>networth , <span class="op">~</span><span class="st"> </span>hhsex , svyquantile , <span class="fl">0.5</span> ,
         <span class="dt">se =</span> <span class="ot">TRUE</span> , <span class="dt">keep.var =</span> <span class="ot">TRUE</span> , <span class="dt">ci =</span> <span class="ot">TRUE</span> 
 ) ) )</code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-    <span class="kw">svyratio</span>( <span class="dt">numerator =</span> ~<span class="st"> </span>income , <span class="dt">denominator =</span> ~<span class="st"> </span>networth )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+    <span class="kw">svyratio</span>( <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>income , <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>networth )
 ) )</code></pre></div>
 </div>
 <div id="subsetting-51" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to labor force participants:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_scf_design &lt;-<span class="st"> </span><span class="kw">subset</span>( scf_design , lf ==<span class="st"> </span><span class="dv">1</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_scf_design &lt;-<span class="st"> </span><span class="kw">subset</span>( scf_design , lf <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( sub_scf_design , <span class="kw">svymean</span>( ~<span class="st"> </span>networth ) ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( sub_scf_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>networth ) ) )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-51" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-
-<span class="st">    </span>lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-        <span class="kw">svymean</span>( ~<span class="st"> </span>networth )
+<span class="st">    </span>lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+        <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>networth )
     ) )
 
 <span class="kw">coef</span>( this_result )
@@ -1103,8 +1103,8 @@ lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( sc
 <span class="kw">cv</span>( this_result )
 
 grouped_result &lt;-
-<span class="st">    </span>lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-        <span class="kw">svyby</span>( ~<span class="st"> </span>networth , ~<span class="st"> </span>hhsex , svymean )
+<span class="st">    </span>lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+        <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>networth , <span class="op">~</span><span class="st"> </span>hhsex , svymean )
     ) )
 
 <span class="kw">coef</span>( grouped_result )
@@ -1112,33 +1112,33 @@ grouped_result &lt;-
 <span class="kw">confint</span>( grouped_result )
 <span class="kw">cv</span>( grouped_result )</code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( scf_design$designs[[<span class="dv">1</span>]] )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( scf_design<span class="op">$</span>designs[[<span class="dv">1</span>]] )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svyvar</span>( ~<span class="st"> </span>networth ) ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>networth ) ) )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-    <span class="kw">svymean</span>( ~<span class="st"> </span>networth , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+    <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>networth , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 ) )
 
 <span class="co"># SRS with replacement</span>
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-    <span class="kw">svymean</span>( ~<span class="st"> </span>networth , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+    <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>networth , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )
 ) )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">MIsvyciprop</span>( ~<span class="st"> </span>married , scf_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">MIsvyciprop</span>( <span class="op">~</span><span class="st"> </span>married , scf_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-51" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">MIsvyttest</span>( networth ~<span class="st"> </span>married , scf_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">MIsvyttest</span>( networth <span class="op">~</span><span class="st"> </span>married , scf_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">MIsvychisq</span>( ~<span class="st"> </span>married +<span class="st"> </span>edcl , scf_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">MIsvychisq</span>( <span class="op">~</span><span class="st"> </span>married <span class="op">+</span><span class="st"> </span>edcl , scf_design )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
-<span class="st">    </span>lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
-        <span class="kw">svyglm</span>( networth ~<span class="st"> </span>married +<span class="st"> </span>edcl )
+<span class="st">    </span>lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design ,
+        <span class="kw">svyglm</span>( networth <span class="op">~</span><span class="st"> </span>married <span class="op">+</span><span class="st"> </span>edcl )
     ) )
     
 <span class="kw">summary</span>( glm_result )</code></pre></div>
@@ -1148,9 +1148,9 @@ lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( sc
 <h2>Poverty and Inequality Estimation with <code>convey</code>  </h2>
 <p>The R <code>convey</code> library estimates measures of income concentration, poverty, inequality, and wellbeing. <a href="https://guilhermejacob.github.io/context/">This textbook</a> details the available features. As a starting point for SCF users, this code calculates the gini coefficient on complex sample survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(convey)
-scf_design$designs &lt;-<span class="st"> </span><span class="kw">lapply</span>( scf_design$designs , convey_prep )
+scf_design<span class="op">$</span>designs &lt;-<span class="st"> </span><span class="kw">lapply</span>( scf_design<span class="op">$</span>designs , convey_prep )
 
-lodown:::<span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svygini</span>( ~<span class="st"> </span>networth ) ) )</code></pre></div>
+lodown<span class="op">:::</span><span class="kw">scf_MIcombine</span>( <span class="kw">with</span>( scf_design , <span class="kw">svygini</span>( <span class="op">~</span><span class="st"> </span>networth ) ) )</code></pre></div>
 <hr />
 </div>
 <div id="replication-example-46" class="section level2 unnumbered">

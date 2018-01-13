@@ -977,7 +977,7 @@ pisa_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;PISA&quot;</span> ) )
 
 <span class="co"># 2015 only</span>
-pisa_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( pisa_cat , year ==<span class="st"> </span><span class="dv">2015</span> )
+pisa_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( pisa_cat , year <span class="op">==</span><span class="st"> </span><span class="dv">2015</span> )
 <span class="co"># download the microdata to your local computer</span>
 <span class="kw">lodown</span>( <span class="st">&quot;pisa&quot;</span> , pisa_cat )</code></pre></div>
 </div>
@@ -991,7 +991,7 @@ pisa_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( pisa_cat 
 
 pisa_design &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;PISA&quot;</span> , <span class="st">&quot;2015 cmb_stu_qqq design.rds&quot;</span> ) )
 
-pisa_design &lt;-<span class="st"> </span>lodown:::<span class="kw">svyMDBdesign</span>( pisa_design )</code></pre></div>
+pisa_design &lt;-<span class="st"> </span>lodown<span class="op">:::</span><span class="kw">svyMDBdesign</span>( pisa_design )</code></pre></div>
 <div id="variable-recoding-41" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
 <p>Add new columns to the data set:</p>
@@ -1012,71 +1012,71 @@ pisa_design &lt;-<span class="st"> </span>lodown:::<span class="kw">svyMDBdesign
 <div id="unweighted-counts-41" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>one , unwtd.count ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>one , unwtd.count ) ) )
 
-<span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>gender , unwtd.count ) ) )</code></pre></div>
+<span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>gender , unwtd.count ) ) )</code></pre></div>
 </div>
 <div id="weighted-counts-31" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svytotal</span>( ~<span class="st"> </span>one ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one ) ) )
 
 <span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>one , ~<span class="st"> </span>gender , svytotal )
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>gender , svytotal )
 ) )</code></pre></div>
 </div>
 <div id="descriptive-statistics-41" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svymean</span>( ~<span class="st"> </span>scie ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>scie ) ) )
 
 <span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>scie , ~<span class="st"> </span>gender , svymean )
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>scie , <span class="op">~</span><span class="st"> </span>gender , svymean )
 ) )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svymean</span>( ~<span class="st"> </span>how_many_computers_at_home ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>how_many_computers_at_home ) ) )
 
 <span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>how_many_computers_at_home , ~<span class="st"> </span>gender , svymean )
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>how_many_computers_at_home , <span class="op">~</span><span class="st"> </span>gender , svymean )
 ) )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svytotal</span>( ~<span class="st"> </span>scie ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>scie ) ) )
 
 <span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>scie , ~<span class="st"> </span>gender , svytotal )
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>scie , <span class="op">~</span><span class="st"> </span>gender , svytotal )
 ) )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svytotal</span>( ~<span class="st"> </span>how_many_computers_at_home ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>how_many_computers_at_home ) ) )
 
 <span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-    <span class="kw">svyby</span>( ~<span class="st"> </span>how_many_computers_at_home , ~<span class="st"> </span>gender , svytotal )
+    <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>how_many_computers_at_home , <span class="op">~</span><span class="st"> </span>gender , svytotal )
 ) )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svyquantile</span>( ~<span class="st"> </span>scie , <span class="fl">0.5</span> , <span class="dt">se =</span> <span class="ot">TRUE</span> ) ) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>scie , <span class="fl">0.5</span> , <span class="dt">se =</span> <span class="ot">TRUE</span> ) ) )
 
 <span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
     <span class="kw">svyby</span>( 
-        ~<span class="st"> </span>scie , ~<span class="st"> </span>gender , svyquantile , <span class="fl">0.5</span> ,
+        <span class="op">~</span><span class="st"> </span>scie , <span class="op">~</span><span class="st"> </span>gender , svyquantile , <span class="fl">0.5</span> ,
         <span class="dt">se =</span> <span class="ot">TRUE</span> , <span class="dt">keep.var =</span> <span class="ot">TRUE</span> , <span class="dt">ci =</span> <span class="ot">TRUE</span> 
 ) ) )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-    <span class="kw">svyratio</span>( <span class="dt">numerator =</span> ~<span class="st"> </span>math , <span class="dt">denominator =</span> ~<span class="st"> </span>reading )
+    <span class="kw">svyratio</span>( <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>math , <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>reading )
 ) )</code></pre></div>
 </div>
 <div id="subsetting-41" class="section level3 unnumbered">
 <h3>Subsetting</h3>
 <p>Restrict the survey design to Albania:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_pisa_design &lt;-<span class="st"> </span><span class="kw">subset</span>( pisa_design , cnt ==<span class="st"> &quot;ALB&quot;</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_pisa_design &lt;-<span class="st"> </span><span class="kw">subset</span>( pisa_design , cnt <span class="op">==</span><span class="st"> &quot;ALB&quot;</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( sub_pisa_design , <span class="kw">svymean</span>( ~<span class="st"> </span>scie ) ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( sub_pisa_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>scie ) ) )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-41" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-
 <span class="st">    </span><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-        <span class="kw">svymean</span>( ~<span class="st"> </span>scie )
+        <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>scie )
     ) )
 
 <span class="kw">coef</span>( this_result )
@@ -1086,7 +1086,7 @@ pisa_design &lt;-<span class="st"> </span>lodown:::<span class="kw">svyMDBdesign
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-        <span class="kw">svyby</span>( ~<span class="st"> </span>scie , ~<span class="st"> </span>gender , svymean )
+        <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>scie , <span class="op">~</span><span class="st"> </span>gender , svymean )
     ) )
 
 <span class="kw">coef</span>( grouped_result )
@@ -1094,33 +1094,33 @@ grouped_result &lt;-
 <span class="kw">confint</span>( grouped_result )
 <span class="kw">cv</span>( grouped_result )</code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( pisa_design$designs[[<span class="dv">1</span>]] )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( pisa_design<span class="op">$</span>designs[[<span class="dv">1</span>]] )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svyvar</span>( ~<span class="st"> </span>scie ) ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design , <span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>scie ) ) )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
 <span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-    <span class="kw">svymean</span>( ~<span class="st"> </span>scie , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+    <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>scie , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 ) )
 
 <span class="co"># SRS with replacement</span>
 <span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-    <span class="kw">svymean</span>( ~<span class="st"> </span>scie , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )
+    <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>scie , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )
 ) )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">MIsvyciprop</span>( ~<span class="st"> </span>oecd , pisa_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">MIsvyciprop</span>( <span class="op">~</span><span class="st"> </span>oecd , pisa_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-41" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">MIsvyttest</span>( scie ~<span class="st"> </span>oecd , pisa_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">MIsvyttest</span>( scie <span class="op">~</span><span class="st"> </span>oecd , pisa_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown:::<span class="kw">MIsvychisq</span>( ~<span class="st"> </span>oecd +<span class="st"> </span>how_many_computers_at_home , pisa_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lodown<span class="op">:::</span><span class="kw">MIsvychisq</span>( <span class="op">~</span><span class="st"> </span>oecd <span class="op">+</span><span class="st"> </span>how_many_computers_at_home , pisa_design )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">MIcombine</span>( <span class="kw">with</span>( pisa_design ,
-        <span class="kw">svyglm</span>( scie ~<span class="st"> </span>oecd +<span class="st"> </span>how_many_computers_at_home )
+        <span class="kw">svyglm</span>( scie <span class="op">~</span><span class="st"> </span>oecd <span class="op">+</span><span class="st"> </span>how_many_computers_at_home )
     ) )
     
 <span class="kw">summary</span>( glm_result )</code></pre></div>
