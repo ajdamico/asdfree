@@ -173,6 +173,38 @@ dbGetQuery( db ,
 
 ### Regression Models and Tests of Association {-}
 
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+censoescolar_three_columns_df <- 
+	dbGetQuery( db , 
+		"SELECT 
+			nu_idade , 
+			id_public ,
+			tp_categoria_escola_privada
+		FROM matricula_2015" 
+	)
+
+t.test( nu_idade ~ id_public , censoescolar_three_columns_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( censoescolar_three_columns_df[ , c( "id_public" , "tp_categoria_escola_privada" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		nu_idade ~ id_public + tp_categoria_escola_privada , 
+		data = censoescolar_three_columns_df
+	)
+
+summary( glm_result )
+```
+
 ## Analysis Examples with `dplyr` \ {-}
 
 The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for CENSOESCOLAR users, this code replicates previously-presented examples:

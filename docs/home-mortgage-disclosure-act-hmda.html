@@ -1086,6 +1086,29 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite<span
 </div>
 <div id="regression-models-and-tests-of-association-20" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
+<p>Perform a t-test:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hmda_three_columns_df &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">dbGetQuery</span>( db , 
+        <span class="st">&quot;SELECT </span>
+<span class="st">            loanamount , </span>
+<span class="st">            multifamily_home ,</span>
+<span class="st">            actiontype</span>
+<span class="st">        FROM hmda_2015&quot;</span> 
+    )
+
+<span class="kw">t.test</span>( loanamount <span class="op">~</span><span class="st"> </span>multifamily_home , hmda_three_columns_df )</code></pre></div>
+<p>Perform a chi-squared test of association:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-<span class="st"> </span><span class="kw">table</span>( hmda_three_columns_df[ , <span class="kw">c</span>( <span class="st">&quot;multifamily_home&quot;</span> , <span class="st">&quot;actiontype&quot;</span> ) ] )
+
+<span class="kw">chisq.test</span>( this_table )</code></pre></div>
+<p>Perform a generalized linear model:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">glm</span>( 
+        loanamount <span class="op">~</span><span class="st"> </span>multifamily_home <span class="op">+</span><span class="st"> </span>actiontype , 
+        <span class="dt">data =</span> hmda_three_columns_df
+    )
+
+<span class="kw">summary</span>( glm_result )</code></pre></div>
 </div>
 </div>
 <div id="analysis-examples-with-dplyr-6" class="section level2 unnumbered">

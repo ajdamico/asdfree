@@ -1093,6 +1093,29 @@ db &lt;-<span class="st"> </span><span class="kw">dbConnect</span>( RSQLite<span
 </div>
 <div id="regression-models-and-tests-of-association-49" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
+<p>Perform a t-test:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">saeb_three_columns_df &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">dbGetQuery</span>( db , 
+        <span class="st">&quot;SELECT </span>
+<span class="st">            provider_enumeration_year , </span>
+<span class="st">            individual ,</span>
+<span class="st">            is_sole_proprietor</span>
+<span class="st">        FROM npi&quot;</span> 
+    )
+
+<span class="kw">t.test</span>( provider_enumeration_year <span class="op">~</span><span class="st"> </span>individual , saeb_three_columns_df )</code></pre></div>
+<p>Perform a chi-squared test of association:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-<span class="st"> </span><span class="kw">table</span>( saeb_three_columns_df[ , <span class="kw">c</span>( <span class="st">&quot;individual&quot;</span> , <span class="st">&quot;is_sole_proprietor&quot;</span> ) ] )
+
+<span class="kw">chisq.test</span>( this_table )</code></pre></div>
+<p>Perform a generalized linear model:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">glm</span>( 
+        provider_enumeration_year <span class="op">~</span><span class="st"> </span>individual <span class="op">+</span><span class="st"> </span>is_sole_proprietor , 
+        <span class="dt">data =</span> saeb_three_columns_df
+    )
+
+<span class="kw">summary</span>( glm_result )</code></pre></div>
 </div>
 </div>
 <div id="analysis-examples-with-dplyr-11" class="section level2 unnumbered">

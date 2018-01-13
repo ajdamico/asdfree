@@ -171,6 +171,38 @@ dbGetQuery( db ,
 
 ### Regression Models and Tests of Association {-}
 
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+nvss_three_columns_df <- 
+	dbGetQuery( db , 
+		"SELECT 
+			provider_enumeration_year , 
+			individual ,
+			is_sole_proprietor
+		FROM npi" 
+	)
+
+t.test( provider_enumeration_year ~ individual , nvss_three_columns_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( nvss_three_columns_df[ , c( "individual" , "is_sole_proprietor" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		provider_enumeration_year ~ individual + is_sole_proprietor , 
+		data = nvss_three_columns_df
+	)
+
+summary( glm_result )
+```
+
 ## Analysis Examples with `dplyr` \ {-}
 
 The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for NVSS users, this code replicates previously-presented examples:

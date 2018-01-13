@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'dbplyr'"
+commit_memo <- "'db_tests_of_association_block'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -180,7 +180,7 @@ for ( i in seq_along( chapter_tag ) ){
 	tests_of_association_block <-
 		if( is_survey ) {
 			if( is_mi ) mi_tests_of_association_block else survey_tests_of_association_block
-		} else if( is_db ) "" else base_tests_of_association_block
+		} else if( is_db ) db_tests_of_association_block else base_tests_of_association_block
 
 	rmd_lines <- gsub( "^tests_of_association_block$" , tests_of_association_block , rmd_lines )
 
