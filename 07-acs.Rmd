@@ -138,7 +138,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 sum( weights( acs_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ state_name , acs_design , unwtd.count )
+svyby( ~ one , ~ sex , acs_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
@@ -146,7 +146,7 @@ Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , acs_design )
 
-svyby( ~ one , ~ state_name , acs_design , svytotal )
+svyby( ~ one , ~ sex , acs_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
@@ -155,28 +155,28 @@ Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svymean( ~ povpip , acs_design , na.rm = TRUE )
 
-svyby( ~ povpip , ~ state_name , acs_design , svymean , na.rm = TRUE )
+svyby( ~ povpip , ~ sex , acs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ sex , acs_design )
+svymean( ~ state_name , acs_design )
 
-svyby( ~ sex , ~ state_name , acs_design , svymean )
+svyby( ~ state_name , ~ sex , acs_design , svymean )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ povpip , acs_design , na.rm = TRUE )
 
-svyby( ~ povpip , ~ state_name , acs_design , svytotal , na.rm = TRUE )
+svyby( ~ povpip , ~ sex , acs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ sex , acs_design )
+svytotal( ~ state_name , acs_design )
 
-svyby( ~ sex , ~ state_name , acs_design , svytotal )
+svyby( ~ state_name , ~ sex , acs_design , svytotal )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
@@ -185,7 +185,7 @@ svyquantile( ~ povpip , acs_design , 0.5 , na.rm = TRUE )
 
 svyby( 
 	~ povpip , 
-	~ state_name , 
+	~ sex , 
 	acs_design , 
 	svyquantile , 
 	0.5 ,
@@ -230,7 +230,7 @@ cv( this_result )
 grouped_result <-
 	svyby( 
 		~ povpip , 
-		~ state_name , 
+		~ sex , 
 		acs_design , 
 		svymean ,
 		na.rm = TRUE 
@@ -277,7 +277,7 @@ svyttest( povpip ~ married , acs_design )
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
 svychisq( 
-	~ married + sex , 
+	~ married + state_name , 
 	acs_design 
 )
 ```
@@ -286,7 +286,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		povpip ~ married + sex , 
+		povpip ~ married + state_name , 
 		acs_design 
 	)
 
