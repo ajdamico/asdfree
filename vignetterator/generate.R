@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'7za to nppes'"
+commit_memo <- "'hmda breaks and acs fix'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -306,7 +306,10 @@ for( this_ci_file in ci_rmd_files ){
 			these_lines <- readLines( this_file )
 
 			sample_setup_breaks <- pull_line( this_metadata_file , "sample_setup_breaks" )
+			needs_7za_install <- pull_line( this_metadata_file , "needs_7za_install" )
 			
+			if( basename( this_file ) == '.travis.yml' ) if( needs_7za_install == 'yes' ) these_lines <- gsub( "# needs_7za_install" , "- p7zip-full" , these_lines ) else these_lines <- these_lines[ these_lines != "# needs_7za_install" ]
+
 			if( grepl( 'setup\\.R$' , this_file ) ){
 
 				environment_variables <- pull_chunk( this_metadata_file , "environment_variables_block" )
