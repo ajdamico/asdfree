@@ -126,6 +126,22 @@ acs_design <-
 					"Washington", "West Virginia", "Wisconsin", "Wyoming")
 			) ,
 		
+		cit =
+			factor( 
+				cit , 
+				levels = 1:5 , 
+				labels = 
+					c( 
+						'born in the u.s.' ,
+						'born in the territories' ,
+						'born abroad to american parents' ,
+						'naturalized citizen' ,
+						'non-citizen'
+					)
+			) ,
+		
+		poverty_level = as.numeric( povpip ) ,
+		
 		married = as.numeric( mar %in% 1 ) ,
 		
 		sex = factor( sex , labels = c( 'male' , 'female' ) )
@@ -138,7 +154,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 sum( weights( acs_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ sex , acs_design , unwtd.count )
+svyby( ~ one , ~ cit , acs_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
@@ -146,46 +162,46 @@ Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , acs_design )
 
-svyby( ~ one , ~ sex , acs_design , svytotal )
+svyby( ~ one , ~ cit , acs_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ povpip , acs_design , na.rm = TRUE )
+svymean( ~ poverty_level , acs_design , na.rm = TRUE )
 
-svyby( ~ povpip , ~ sex , acs_design , svymean , na.rm = TRUE )
+svyby( ~ poverty_level , ~ cit , acs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ state_name , acs_design )
+svymean( ~ sex , acs_design )
 
-svyby( ~ state_name , ~ sex , acs_design , svymean )
+svyby( ~ sex , ~ cit , acs_design , svymean )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ povpip , acs_design , na.rm = TRUE )
+svytotal( ~ poverty_level , acs_design , na.rm = TRUE )
 
-svyby( ~ povpip , ~ sex , acs_design , svytotal , na.rm = TRUE )
+svyby( ~ poverty_level , ~ cit , acs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ state_name , acs_design )
+svytotal( ~ sex , acs_design )
 
-svyby( ~ state_name , ~ sex , acs_design , svytotal )
+svyby( ~ sex , ~ cit , acs_design , svytotal )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ povpip , acs_design , 0.5 , na.rm = TRUE )
+svyquantile( ~ poverty_level , acs_design , 0.5 , na.rm = TRUE )
 
 svyby( 
-	~ povpip , 
-	~ sex , 
+	~ poverty_level , 
+	~ cit , 
 	acs_design , 
 	svyquantile , 
 	0.5 ,
@@ -207,20 +223,20 @@ svyratio(
 
 ### Subsetting {-}
 
-Restrict the survey design to California:
+Restrict the survey design to senior citizens:
 ```{r eval = FALSE , results = "hide" }
-sub_acs_design <- subset( acs_design , st == 6 )
+sub_acs_design <- subset( acs_design , agep >= 65 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ povpip , sub_acs_design , na.rm = TRUE )
+svymean( ~ poverty_level , sub_acs_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ povpip , acs_design , na.rm = TRUE )
+this_result <- svymean( ~ poverty_level , acs_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -229,8 +245,8 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ povpip , 
-		~ sex , 
+		~ poverty_level , 
+		~ cit , 
 		acs_design , 
 		svymean ,
 		na.rm = TRUE 
@@ -249,16 +265,16 @@ degf( acs_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ povpip , acs_design , na.rm = TRUE )
+svyvar( ~ poverty_level , acs_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ povpip , acs_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ poverty_level , acs_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ povpip , acs_design , na.rm = TRUE , deff = "replace" )
+svymean( ~ poverty_level , acs_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -271,13 +287,13 @@ svyciprop( ~ married , acs_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( povpip ~ married , acs_design )
+svyttest( poverty_level ~ married , acs_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
 svychisq( 
-	~ married + state_name , 
+	~ married + sex , 
 	acs_design 
 )
 ```
@@ -286,7 +302,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		povpip ~ married + state_name , 
+		poverty_level ~ married + sex , 
 		acs_design 
 	)
 
