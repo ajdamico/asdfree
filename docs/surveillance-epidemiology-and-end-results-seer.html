@@ -828,7 +828,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="" data-path="surveillance-epidemiology-and-end-results-seer.html"><a href="surveillance-epidemiology-and-end-results-seer.html"><i class="fa fa-check"></i>Surveillance Epidemiology and End Results (SEER)</a><ul>
 <li class="chapter" data-level="" data-path="surveillance-epidemiology-and-end-results-seer.html"><a href="surveillance-epidemiology-and-end-results-seer.html#simplified-download-and-importation-52"><i class="fa fa-check"></i>Simplified Download and Importation</a></li>
-<li><a href="surveillance-epidemiology-and-end-results-seer.html#analysis-examples-with-sql-and-rsqlite-7">Analysis Examples with SQL and <code>RSQLite</code>  </a><ul>
+<li class="chapter" data-level="" data-path="surveillance-epidemiology-and-end-results-seer.html"><a href="surveillance-epidemiology-and-end-results-seer.html#analysis-examples-with-base-r-5"><i class="fa fa-check"></i>Analysis Examples with base R  </a><ul>
 <li class="chapter" data-level="" data-path="surveillance-epidemiology-and-end-results-seer.html"><a href="surveillance-epidemiology-and-end-results-seer.html#variable-recoding-52"><i class="fa fa-check"></i>Variable Recoding</a></li>
 <li class="chapter" data-level="" data-path="surveillance-epidemiology-and-end-results-seer.html"><a href="surveillance-epidemiology-and-end-results-seer.html#unweighted-counts-52"><i class="fa fa-check"></i>Unweighted Counts</a></li>
 <li class="chapter" data-level="" data-path="surveillance-epidemiology-and-end-results-seer.html"><a href="surveillance-epidemiology-and-end-results-seer.html#descriptive-statistics-52"><i class="fa fa-check"></i>Descriptive Statistics</a></li>
@@ -868,7 +868,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="" data-path="social-security-administration-public-use-microdata-ssa.html"><a href="social-security-administration-public-use-microdata-ssa.html"><i class="fa fa-check"></i>Social Security Administration Public Use Microdata (SSA)</a><ul>
 <li class="chapter" data-level="" data-path="social-security-administration-public-use-microdata-ssa.html"><a href="social-security-administration-public-use-microdata-ssa.html#simplified-download-and-importation-55"><i class="fa fa-check"></i>Simplified Download and Importation</a></li>
-<li class="chapter" data-level="" data-path="social-security-administration-public-use-microdata-ssa.html"><a href="social-security-administration-public-use-microdata-ssa.html#analysis-examples-with-base-r-5"><i class="fa fa-check"></i>Analysis Examples with base R  </a><ul>
+<li class="chapter" data-level="" data-path="social-security-administration-public-use-microdata-ssa.html"><a href="social-security-administration-public-use-microdata-ssa.html#analysis-examples-with-base-r-6"><i class="fa fa-check"></i>Analysis Examples with base R  </a><ul>
 <li class="chapter" data-level="" data-path="social-security-administration-public-use-microdata-ssa.html"><a href="social-security-administration-public-use-microdata-ssa.html#variable-recoding-55"><i class="fa fa-check"></i>Variable Recoding</a></li>
 <li class="chapter" data-level="" data-path="social-security-administration-public-use-microdata-ssa.html"><a href="social-security-administration-public-use-microdata-ssa.html#unweighted-counts-55"><i class="fa fa-check"></i>Unweighted Counts</a></li>
 <li class="chapter" data-level="" data-path="social-security-administration-public-use-microdata-ssa.html"><a href="social-security-administration-public-use-microdata-ssa.html#descriptive-statistics-55"><i class="fa fa-check"></i>Descriptive Statistics</a></li>
@@ -971,14 +971,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     <span class="dt">your_username =</span> <span class="st">&quot;username&quot;</span> , 
     <span class="dt">your_password =</span> <span class="st">&quot;password&quot;</span> )</code></pre></div>
 </div>
-<div id="analysis-examples-with-sql-and-rsqlite-7" class="section level2 unnumbered">
-<h2>Analysis Examples with SQL and <code>RSQLite</code>  </h2>
-<p>Connect to a database:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DBI)
-seer_df &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">file.path</span>( 
-        <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;SEER&quot;</span> , 
-        <span class="st">&quot;incidence/yr1973_2014.seer9/LYMYLEUK.rds&quot;</span> 
+<div id="analysis-examples-with-base-r-5" class="section level2 unnumbered">
+<h2>Analysis Examples with base R  </h2>
+<p>Load a data frame:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">seer_df &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">readRDS</span>(
+        <span class="kw">file.path</span>( 
+            <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;SEER&quot;</span> , 
+            <span class="st">&quot;incidence/yr1973_2014.seer9/LYMYLEUK.rds&quot;</span> 
+        )
     )</code></pre></div>
 <div id="variable-recoding-52" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
@@ -1017,123 +1018,77 @@ seer_df &lt;-<span class="st"> </span>
 </div>
 <div id="unweighted-counts-52" class="section level3 unnumbered">
 <h3>Unweighted Counts</h3>
-<p>Count the unweighted number of records in the SQL table, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , <span class="st">&quot;SELECT COUNT(*) FROM &quot;</span> )
+<p>Count the unweighted number of records in the table, overall and by groups:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nrow</span>( seer_df )
 
-<span class="kw">dbGetQuery</span>( db ,
-    <span class="st">&quot;SELECT</span>
-<span class="st">        race_ethnicity ,</span>
-<span class="st">        COUNT(*) </span>
-<span class="st">    FROM </span>
-<span class="st">    GROUP BY race_ethnicity&quot;</span>
-)</code></pre></div>
+<span class="kw">table</span>( seer_df[ , <span class="st">&quot;race_ethnicity&quot;</span> ] , <span class="dt">useNA =</span> <span class="st">&quot;always&quot;</span> )</code></pre></div>
 </div>
 <div id="descriptive-statistics-52" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , <span class="st">&quot;SELECT AVG( survival_months ) FROM &quot;</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>( seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] )
 
-<span class="kw">dbGetQuery</span>( db , 
-    <span class="st">&quot;SELECT </span>
-<span class="st">        race_ethnicity , </span>
-<span class="st">        AVG( survival_months ) AS mean_survival_months</span>
-<span class="st">    FROM </span>
-<span class="st">    GROUP BY race_ethnicity&quot;</span> 
+<span class="kw">tapply</span>(
+    seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] ,
+    seer_df[ , <span class="st">&quot;race_ethnicity&quot;</span> ] ,
+    mean 
 )</code></pre></div>
-<p>Calculate the distribution of a categorical variable:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , 
-    <span class="st">&quot;SELECT </span>
-<span class="st">        marital_status_at_dx , </span>
-<span class="st">        COUNT(*) / ( SELECT COUNT(*) FROM ) </span>
-<span class="st">            AS share_marital_status_at_dx</span>
-<span class="st">    FROM </span>
-<span class="st">    GROUP BY marital_status_at_dx&quot;</span> 
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>( <span class="kw">table</span>( seer_df[ , <span class="st">&quot;marital_status_at_dx&quot;</span> ] ) )
+
+<span class="kw">prop.table</span>(
+    <span class="kw">table</span>( seer_df[ , <span class="kw">c</span>( <span class="st">&quot;marital_status_at_dx&quot;</span> , <span class="st">&quot;race_ethnicity&quot;</span> ) ] ) ,
+    <span class="dt">margin =</span> <span class="dv">2</span>
 )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db , <span class="st">&quot;SELECT SUM( survival_months ) FROM &quot;</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] )
 
-<span class="kw">dbGetQuery</span>( db , 
-    <span class="st">&quot;SELECT </span>
-<span class="st">        race_ethnicity , </span>
-<span class="st">        SUM( survival_months ) AS sum_survival_months </span>
-<span class="st">    FROM </span>
-<span class="st">    GROUP BY race_ethnicity&quot;</span> 
+<span class="kw">tapply</span>(
+    seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] ,
+    seer_df[ , <span class="st">&quot;race_ethnicity&quot;</span> ] ,
+    sum 
 )</code></pre></div>
-<p>Calculate the 25th, median, and 75th percentiles of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSQLite<span class="op">::</span><span class="kw">initExtension</span>( db )
+<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">quantile</span>( seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] , <span class="fl">0.5</span> )
 
-<span class="kw">dbGetQuery</span>( db , 
-    <span class="st">&quot;SELECT </span>
-<span class="st">        LOWER_QUARTILE( survival_months ) , </span>
-<span class="st">        MEDIAN( survival_months ) , </span>
-<span class="st">        UPPER_QUARTILE( survival_months ) </span>
-<span class="st">    FROM &quot;</span> 
-)
-
-<span class="kw">dbGetQuery</span>( db , 
-    <span class="st">&quot;SELECT </span>
-<span class="st">        race_ethnicity , </span>
-<span class="st">        LOWER_QUARTILE( survival_months ) AS lower_quartile_survival_months , </span>
-<span class="st">        MEDIAN( survival_months ) AS median_survival_months , </span>
-<span class="st">        UPPER_QUARTILE( survival_months ) AS upper_quartile_survival_months</span>
-<span class="st">    FROM </span>
-<span class="st">    GROUP BY race_ethnicity&quot;</span> 
+<span class="kw">tapply</span>(
+    seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] ,
+    seer_df[ , <span class="st">&quot;race_ethnicity&quot;</span> ] ,
+    quantile ,
+    <span class="fl">0.5</span> 
 )</code></pre></div>
 </div>
 <div id="subsetting-52" class="section level3 unnumbered">
 <h3>Subsetting</h3>
-<p>Limit your SQL analysis to inpatient hospital reporting source with <code>WHERE</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dbGetQuery</span>( db ,
-    <span class="st">&quot;SELECT</span>
-<span class="st">        AVG( survival_months )</span>
-<span class="st">    FROM </span>
-<span class="st">    WHERE rept_src == 1&quot;</span>
-)</code></pre></div>
+<p>Limit your <code>data.frame</code> to inpatient hospital reporting source:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_seer_df &lt;-<span class="st"> </span><span class="kw">subset</span>( seer_df , rept_src <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )</code></pre></div>
+<p>Calculate the mean (average) of this subset:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>( sub_seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-52" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
-<p>Calculate the variance and standard deviation, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RSQLite<span class="op">::</span><span class="kw">initExtension</span>( db )
+<p>Calculate the variance, overall and by groups:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">var</span>( seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] )
 
-<span class="kw">dbGetQuery</span>( db , 
-    <span class="st">&quot;SELECT </span>
-<span class="st">        VARIANCE( survival_months ) , </span>
-<span class="st">        STDEV( survival_months ) </span>
-<span class="st">    FROM &quot;</span> 
-)
-
-<span class="kw">dbGetQuery</span>( db , 
-    <span class="st">&quot;SELECT </span>
-<span class="st">        race_ethnicity , </span>
-<span class="st">        VARIANCE( survival_months ) AS var_survival_months ,</span>
-<span class="st">        STDEV( survival_months ) AS stddev_survival_months</span>
-<span class="st">    FROM </span>
-<span class="st">    GROUP BY race_ethnicity&quot;</span> 
+<span class="kw">tapply</span>(
+    seer_df[ , <span class="st">&quot;survival_months&quot;</span> ] ,
+    seer_df[ , <span class="st">&quot;race_ethnicity&quot;</span> ] ,
+    var 
 )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-52" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">seer_slim_df &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">dbGetQuery</span>( db , 
-        <span class="st">&quot;SELECT </span>
-<span class="st">            survival_months , </span>
-<span class="st">            female ,</span>
-<span class="st">            marital_status_at_dx</span>
-<span class="st">        FROM &quot;</span> 
-    )
-
-<span class="kw">t.test</span>( survival_months <span class="op">~</span><span class="st"> </span>female , seer_slim_df )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>( survival_months <span class="op">~</span><span class="st"> </span>female , seer_df )</code></pre></div>
 <p>Perform a chi-squared test of association:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-
-<span class="st">    </span><span class="kw">table</span>( seer_slim_df[ , <span class="kw">c</span>( <span class="st">&quot;female&quot;</span> , <span class="st">&quot;marital_status_at_dx&quot;</span> ) ] )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_table &lt;-<span class="st"> </span><span class="kw">table</span>( seer_df[ , <span class="kw">c</span>( <span class="st">&quot;female&quot;</span> , <span class="st">&quot;marital_status_at_dx&quot;</span> ) ] )
 
 <span class="kw">chisq.test</span>( this_table )</code></pre></div>
 <p>Perform a generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">glm</span>( 
         survival_months <span class="op">~</span><span class="st"> </span>female <span class="op">+</span><span class="st"> </span>marital_status_at_dx , 
-        <span class="dt">data =</span> seer_slim_df
+        <span class="dt">data =</span> seer_df
     )
 
 <span class="kw">summary</span>( glm_result )</code></pre></div>
@@ -1143,9 +1098,7 @@ seer_df &lt;-<span class="st"> </span>
 <h2>Analysis Examples with <code>dplyr</code>  </h2>
 <p>The R <code>dplyr</code> library offers an alternative grammar of data manipulation to base R and SQL syntax. <a href="https://github.com/tidyverse/dplyr/">dplyr</a> offers many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, and the <code>tidyverse</code> style of non-standard evaluation. <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html">This vignette</a> details the available features. As a starting point for SEER users, this code replicates previously-presented examples:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
-<span class="kw">library</span>(dbplyr)
-dplyr_db &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">src_sqlite</span>( dbdir )
-seer_tbl &lt;-<span class="st"> </span><span class="kw">tbl</span>( dplyr_db , <span class="st">&#39;&#39;</span> )</code></pre></div>
+seer_tbl &lt;-<span class="st"> </span><span class="kw">tbl_df</span>( seer_df )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">seer_tbl <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">mean</span>( survival_months ) )

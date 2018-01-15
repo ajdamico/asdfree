@@ -23,16 +23,17 @@ lodown( "seer" , output_dir = file.path( path.expand( "~" ) , "SEER" ) ,
 	your_password = "password" )
 ```
 
-## Analysis Examples with SQL and `RSQLite` \ {-}
+## Analysis Examples with base R \ {-}
 
-Connect to a database:
+Load a data frame:
 
 ```{r eval = FALSE }
-library(DBI)
 seer_df <- 
-	file.path( 
-		path.expand( "~" ) , "SEER" , 
-		"incidence/yr1973_2014.seer9/LYMYLEUK.rds" 
+	readRDS(
+		file.path( 
+			path.expand( "~" ) , "SEER" , 
+			"incidence/yr1973_2014.seer9/LYMYLEUK.rds" 
+		)
 	)
 ```
 
@@ -80,114 +81,80 @@ seer_df <-
 
 ### Unweighted Counts {-}
 
-Count the unweighted number of records in the SQL table, overall and by groups:
+Count the unweighted number of records in the table, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT COUNT(*) FROM " )
+nrow( seer_df )
 
-dbGetQuery( db ,
-	"SELECT
-		race_ethnicity ,
-		COUNT(*) 
-	FROM 
-	GROUP BY race_ethnicity"
-)
+table( seer_df[ , "race_ethnicity" ] , useNA = "always" )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT AVG( survival_months ) FROM " )
+mean( seer_df[ , "survival_months" ] )
 
-dbGetQuery( db , 
-	"SELECT 
-		race_ethnicity , 
-		AVG( survival_months ) AS mean_survival_months
-	FROM 
-	GROUP BY race_ethnicity" 
+tapply(
+	seer_df[ , "survival_months" ] ,
+	seer_df[ , "race_ethnicity" ] ,
+	mean 
 )
 ```
 
-Calculate the distribution of a categorical variable:
+Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , 
-	"SELECT 
-		marital_status_at_dx , 
-		COUNT(*) / ( SELECT COUNT(*) FROM ) 
-			AS share_marital_status_at_dx
-	FROM 
-	GROUP BY marital_status_at_dx" 
+prop.table( table( seer_df[ , "marital_status_at_dx" ] ) )
+
+prop.table(
+	table( seer_df[ , c( "marital_status_at_dx" , "race_ethnicity" ) ] ) ,
+	margin = 2
 )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT SUM( survival_months ) FROM " )
+sum( seer_df[ , "survival_months" ] )
 
-dbGetQuery( db , 
-	"SELECT 
-		race_ethnicity , 
-		SUM( survival_months ) AS sum_survival_months 
-	FROM 
-	GROUP BY race_ethnicity" 
+tapply(
+	seer_df[ , "survival_months" ] ,
+	seer_df[ , "race_ethnicity" ] ,
+	sum 
 )
 ```
 
-Calculate the 25th, median, and 75th percentiles of a linear variable, overall and by groups:
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-RSQLite::initExtension( db )
+quantile( seer_df[ , "survival_months" ] , 0.5 )
 
-dbGetQuery( db , 
-	"SELECT 
-		LOWER_QUARTILE( survival_months ) , 
-		MEDIAN( survival_months ) , 
-		UPPER_QUARTILE( survival_months ) 
-	FROM " 
-)
-
-dbGetQuery( db , 
-	"SELECT 
-		race_ethnicity , 
-		LOWER_QUARTILE( survival_months ) AS lower_quartile_survival_months , 
-		MEDIAN( survival_months ) AS median_survival_months , 
-		UPPER_QUARTILE( survival_months ) AS upper_quartile_survival_months
-	FROM 
-	GROUP BY race_ethnicity" 
+tapply(
+	seer_df[ , "survival_months" ] ,
+	seer_df[ , "race_ethnicity" ] ,
+	quantile ,
+	0.5 
 )
 ```
 
 ### Subsetting {-}
 
-Limit your SQL analysis to inpatient hospital reporting source with `WHERE`:
+Limit your `data.frame` to inpatient hospital reporting source:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db ,
-	"SELECT
-		AVG( survival_months )
-	FROM 
-	WHERE rept_src == 1"
-)
+sub_seer_df <- subset( seer_df , rept_src == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_seer_df[ , "survival_months" ] )
 ```
 
 ### Measures of Uncertainty {-}
 
-Calculate the variance and standard deviation, overall and by groups:
+Calculate the variance, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-RSQLite::initExtension( db )
+var( seer_df[ , "survival_months" ] )
 
-dbGetQuery( db , 
-	"SELECT 
-		VARIANCE( survival_months ) , 
-		STDEV( survival_months ) 
-	FROM " 
-)
-
-dbGetQuery( db , 
-	"SELECT 
-		race_ethnicity , 
-		VARIANCE( survival_months ) AS var_survival_months ,
-		STDEV( survival_months ) AS stddev_survival_months
-	FROM 
-	GROUP BY race_ethnicity" 
+tapply(
+	seer_df[ , "survival_months" ] ,
+	seer_df[ , "race_ethnicity" ] ,
+	var 
 )
 ```
 
@@ -195,22 +162,12 @@ dbGetQuery( db ,
 
 Perform a t-test:
 ```{r eval = FALSE , results = "hide" }
-seer_slim_df <- 
-	dbGetQuery( db , 
-		"SELECT 
-			survival_months , 
-			female ,
-			marital_status_at_dx
-		FROM " 
-	)
-
-t.test( survival_months ~ female , seer_slim_df )
+t.test( survival_months ~ female , seer_df )
 ```
 
 Perform a chi-squared test of association:
 ```{r eval = FALSE , results = "hide" }
-this_table <-
-	table( seer_slim_df[ , c( "female" , "marital_status_at_dx" ) ] )
+this_table <- table( seer_df[ , c( "female" , "marital_status_at_dx" ) ] )
 
 chisq.test( this_table )
 ```
@@ -220,7 +177,7 @@ Perform a generalized linear model:
 glm_result <- 
 	glm( 
 		survival_months ~ female + marital_status_at_dx , 
-		data = seer_slim_df
+		data = seer_df
 	)
 
 summary( glm_result )
@@ -232,9 +189,7 @@ The R `dplyr` library offers an alternative grammar of data manipulation to base
 
 ```{r eval = FALSE , results = "hide" }
 library(dplyr)
-library(dbplyr)
-dplyr_db <- dplyr::src_sqlite( dbdir )
-seer_tbl <- tbl( dplyr_db , '' )
+seer_tbl <- tbl_df( seer_df )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
