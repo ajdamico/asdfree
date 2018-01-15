@@ -20,8 +20,8 @@ administrative_organization: * Administered by the [ICF International](http://ww
 
 
 needs_catalog_block: yes
-catalog_subset_description: # Malawi only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , country == 'Malawi' )
+catalog_subset_description: # malawi 2004 only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , country == 'Malawi' & year == 2004 )
 
 ~~~{analysis_examples_survey_design}
 library(survey)
@@ -29,7 +29,7 @@ library(survey)
 chapter_tag_df <- 
 	readRDS( 
 		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
-		"Malawi/Standard DHS 2004/MWIR4EFL.rds" ) 
+		"Malawi/Standard DHS 2004/MWIR4EDT.rds" )
 	)
 
 # convert the weight column to a numeric type
@@ -140,7 +140,7 @@ my_project <- Sys.getenv( "my_project" )
 
 needs_travis_build_status_line: yes
 
-sample_setup_breaks: 12
+sample_setup_breaks: 10
 
 broken_sample_test_condition: any( chapter_tag_cat$year == 2004 & chapter_tag_cat$country == 'Malawi' & grepl( "MWIR4EDT" , chapter_tag_cat$full_url ) )
 
@@ -157,8 +157,8 @@ chapter_tag_cat <-
 		your_project = my_project )
 
 
-# some indian files are too large to test on 
-chapter_tag_cat <- subset( chapter_tag_cat , !grepl( "IAIR52|IABR71|IAHR71FL" , full_url ) )
+# skip flat ascii, sas, and spss files
+chapter_tag_cat <- subset( chapter_tag_cat , !grepl( "fl\\.zip|sd\\.zip|sv\\.zip" , full_url , ignore.case = TRUE ) )
 
 record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
 
