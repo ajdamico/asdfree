@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'nppes'"
+commit_memo <- "'try moving archive to suggests'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -310,6 +310,14 @@ for( this_ci_file in ci_rmd_files ){
 			
 			if( basename( this_file ) == '.travis.yml' ) if( needs_7za_install == 'yes' ) these_lines <- gsub( "# needs_7za_install" , "- p7zip-full" , these_lines ) else these_lines <- these_lines[ these_lines != "# needs_7za_install" ]
 
+			if( basename( this_file ) == 'DESCRIPTION' ) {
+				if( grepl( 'archive' , needed_libraries ) ) {
+					these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown, jimhester/archive" , these_lines )
+				} else {
+					these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown" , these_lines )
+				}
+			}
+			
 			if( grepl( 'setup\\.R$' , this_file ) ){
 
 				environment_variables <- pull_chunk( this_metadata_file , "environment_variables_block" )
@@ -397,6 +405,7 @@ for( this_ci_file in ci_rmd_files ){
 			these_lines <- gsub( "needed_libraries" , needed_libraries , these_lines )
 			these_lines <- gsub( "asdfree_file_commit" , asdfree_file_commit , these_lines )
 			these_lines <- gsub( "lodown_file_commit" , lodown_file_commit , these_lines )
+			these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown" , these_lines )
 
 			
 			writeLines( these_lines , this_file )
