@@ -405,8 +405,7 @@ for( this_ci_file in ci_rmd_files ){
 			these_lines <- gsub( "needed_libraries" , needed_libraries , these_lines )
 			these_lines <- gsub( "asdfree_file_commit" , asdfree_file_commit , these_lines )
 			these_lines <- gsub( "lodown_file_commit" , lodown_file_commit , these_lines )
-			these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown" , these_lines )
-
+			
 			
 			writeLines( these_lines , this_file )
 		
@@ -473,7 +472,8 @@ for( this_ci_file in ci_rmd_files ){
 			these_lines <- gsub( "needed_libraries" , needed_libraries , these_lines )
 			these_lines <- gsub( "asdfree_file_commit" , asdfree_file_commit , these_lines )
 			these_lines <- gsub( "lodown_file_commit" , lodown_file_commit , these_lines )
-			
+			these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown" , these_lines )
+
 			writeLines( these_lines , this_copied_file )
 		
 		}
