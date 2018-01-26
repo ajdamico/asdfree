@@ -15,44 +15,31 @@ administrative_organization: * Administered and financed by the [US Census Burea
 dependencies: library(archive)
 
 needs_catalog_block: yes
-catalog_subset_description: # 2011 single-year only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 & time_period == '1-Year' )
+catalog_subset_description: # 2011 alabama single-year only
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 & time_period == '1-Year' & stateab == 'al' )
 
 
 ~~~{analysis_examples_survey_design}
-library(DBI)
-library(RSQLite)
+# alternative subsets:
+
+# nationwide merged table including puerto rico
+# chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 & time_period == '1-Year' )
+# lodown( "chapter_tag" , chapter_tag_cat )
+
+# nationwide merged table excluding puerto rico
+# chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 & time_period == '1-Year' & stateab != 'pr' )
+# lodown( "chapter_tag" , chapter_tag_cat )
+
 library(survey)
 
+chapter_tag_df <- 
+	readRDS( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+			"2011/1-Year/merged.rds" ) 
+	)
 
-# create a nationwide survey design
-# chapter_tag_design_with_puerto_rico <-
-	# svrepdesign(
-		# weight = ~pwgtp ,
-		# repweights = 'pwgtp[0-9]+' ,
-		# scale = 4 / 80 ,
-		# rscales = rep( 1 , 80 ) ,
-		# mse = TRUE ,
-		# type = 'JK1' ,
-		# data = 'acs2011_1yr'  ,
-		# dbtype = "SQLite" ,
-		# dbname = chapter_tag_cat$dbfile
-	# )
-	
-# # workaround for a bug in survey::svrepdesign.character
-# chapter_tag_design$mse <- TRUE
-
-# # remove puerto rico from the national design
-# chapter_tag_design <- subset( chapter_tag_design_with_puerto_rico , st != 72 )
-
-
-
-# to conserve RAM, create a smaller table within the database
-db <- dbConnect( RSQLite::SQLite() , chapter_tag_cat$dbfile )
-dbSendQuery( db , "CREATE TABLE alabama_1yr_2011 AS SELECT * FROM acs2011_1yr WHERE st = '01'" )
-
-# notice the edited `data =` parameter
-# this design is alabama only
+# because of the catalog subset above
+# the `merged.rds` file is alabama only
 chapter_tag_design <-
 	svrepdesign(
 		weight = ~pwgtp ,
@@ -61,9 +48,7 @@ chapter_tag_design <-
 		rscales = rep( 1 , 80 ) ,
 		mse = TRUE ,
 		type = 'JK1' ,
-		data = 'alabama_1yr_2011'  ,
-		dbtype = "SQLite" ,
-		dbname = chapter_tag_cat$dbfile
+		data = chapter_tag_df
 	)
 	
 # workaround for a bug in survey::svrepdesign.character
@@ -195,7 +180,7 @@ svytotal(
 
 needs_travis_build_status_line: yes
 
-sample_setup_breaks: 108
+sample_setup_breaks: 50
 
 broken_sample_test_condition: any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 )
 
@@ -214,6 +199,9 @@ chapter_tag_cat <- subset( chapter_tag_cat , time_period == '1-Year' )
 record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
 
 chapter_tag_cat <- chapter_tag_cat[ record_categories == this_sample_break , ]
+
+# for alabama 2011, toss out other nearby states
+if( any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 ) ) chapter_tag_cat <- chapter_tag_cat[ chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 , ]
 
 lodown( "chapter_tag" , chapter_tag_cat )
 
