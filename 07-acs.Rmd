@@ -320,6 +320,24 @@ acs_design <- convey_prep( acs_design )
 svygini( ~ hincp , acs_design , na.rm = TRUE )
 ```
 
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ACS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+acs_srvyr_design <- as_survey( acs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+acs_srvyr_design %>%
+	summarize( mean = survey_mean( poverty_level , na.rm = TRUE ) )
+
+acs_srvyr_design %>%
+	group_by( cit ) %>%
+	summarize( mean = survey_mean( poverty_level , na.rm = TRUE ) )
+```
+
 ---
 
 ## Replication Example {-}
