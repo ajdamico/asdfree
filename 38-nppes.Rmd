@@ -21,14 +21,44 @@ library(lodown)
 lodown( "nppes" , output_dir = file.path( path.expand( "~" ) , "NPPES" ) )
 ```
 
-## Analysis Examples with SQL and `RSQLite` \ {-}
+## Analysis Examples with base R \ {-}
 
-Connect to a database:
+Load a data frame:
 
 ```{r eval = FALSE }
-library(DBI)
-dbdir <- file.path( path.expand( "~" ) , "NPPES" , "SQLite.db" )
-db <- dbConnect( RSQLite::SQLite() , dbdir )
+column_names <-
+	names( read.csv( catalog$output_filename , nrow = 1 )[ FALSE , , ] )
+
+column_names <- gsub( "\." , "_" , tolower( column_names ) )
+
+column_types <-
+	ifelse( 
+		grepl( "code" , column_names ) & 
+		!grepl( "country|state|gender|taxonomy|postal" , column_names ) , 
+		'n' , 'c' 
+	)
+
+columns_to_import <-
+	c( "entity_type_code" , "provider_gender_code" , "provider_enumeration_date" ,
+	"is_sole_proprietor" , "provider_business_practice_location_address_state_name" )
+
+stopifnot( all( columns_to_import %in% column_names ) )
+
+nppes_df <- 
+	data.frame( 
+		readr::read_csv( 
+			catalog$output_filename , 
+			col_names = columns_to_import , 
+			col_types = 
+				paste0( 
+					ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
+					collapse = "" 
+				) ,
+			skip = 1
+		) 
+	)
+	
+stopifnot( nrow( nppes_df ) == catalog$case_count )
 ```
 
 ```{r eval = FALSE }
@@ -39,133 +69,93 @@ db <- dbConnect( RSQLite::SQLite() , dbdir )
 
 Add new columns to the data set:
 ```{r eval = FALSE }
-dbSendQuery( db , "ALTER TABLE npi ADD COLUMN individual INTEGER" )
-
-dbSendQuery( db , 
-	"UPDATE npi 
-	SET individual = 
-		CASE WHEN entity_type_code = 1 THEN 1 ELSE 0 END" 
-)
-
-dbSendQuery( db , "ALTER TABLE npi ADD COLUMN provider_enumeration_year INTEGER" )
-
-dbSendQuery( db , 
-	"UPDATE npi 
-	SET provider_enumeration_year = 
-		CAST( SUBSTR( provider_enumeration_date , 7 , 10 ) AS INTEGER )" 
-)
+nppes_df <- 
+	transform( 
+		nppes_df , 
+		
+		individual = as.numeric( entity_type_code ) ,
+		
+		provider_enumeration_year = substr( provider_enumeration_date , 7 , 10 )
+		
+	)
 ```
 
 ### Unweighted Counts {-}
 
-Count the unweighted number of records in the SQL table, overall and by groups:
+Count the unweighted number of records in the table, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT COUNT(*) FROM npi" )
+nrow( nppes_df )
 
-dbGetQuery( db ,
-	"SELECT
-		provider_gender_code ,
-		COUNT(*) 
-	FROM npi
-	GROUP BY provider_gender_code"
-)
+table( nppes_df[ , "provider_gender_code" ] , useNA = "always" )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT AVG( provider_enumeration_year ) FROM npi" )
+mean( nppes_df[ , "provider_enumeration_year" ] )
 
-dbGetQuery( db , 
-	"SELECT 
-		provider_gender_code , 
-		AVG( provider_enumeration_year ) AS mean_provider_enumeration_year
-	FROM npi 
-	GROUP BY provider_gender_code" 
+tapply(
+	nppes_df[ , "provider_enumeration_year" ] ,
+	nppes_df[ , "provider_gender_code" ] ,
+	mean 
 )
 ```
 
-Calculate the distribution of a categorical variable:
+Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , 
-	"SELECT 
-		is_sole_proprietor , 
-		COUNT(*) / ( SELECT COUNT(*) FROM npi ) 
-			AS share_is_sole_proprietor
-	FROM npi 
-	GROUP BY is_sole_proprietor" 
+prop.table( table( nppes_df[ , "is_sole_proprietor" ] ) )
+
+prop.table(
+	table( nppes_df[ , c( "is_sole_proprietor" , "provider_gender_code" ) ] ) ,
+	margin = 2
 )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT SUM( provider_enumeration_year ) FROM npi" )
+sum( nppes_df[ , "provider_enumeration_year" ] )
 
-dbGetQuery( db , 
-	"SELECT 
-		provider_gender_code , 
-		SUM( provider_enumeration_year ) AS sum_provider_enumeration_year 
-	FROM npi 
-	GROUP BY provider_gender_code" 
+tapply(
+	nppes_df[ , "provider_enumeration_year" ] ,
+	nppes_df[ , "provider_gender_code" ] ,
+	sum 
 )
 ```
 
-Calculate the 25th, median, and 75th percentiles of a linear variable, overall and by groups:
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-RSQLite::initExtension( db )
+quantile( nppes_df[ , "provider_enumeration_year" ] , 0.5 )
 
-dbGetQuery( db , 
-	"SELECT 
-		LOWER_QUARTILE( provider_enumeration_year ) , 
-		MEDIAN( provider_enumeration_year ) , 
-		UPPER_QUARTILE( provider_enumeration_year ) 
-	FROM npi" 
-)
-
-dbGetQuery( db , 
-	"SELECT 
-		provider_gender_code , 
-		LOWER_QUARTILE( provider_enumeration_year ) AS lower_quartile_provider_enumeration_year , 
-		MEDIAN( provider_enumeration_year ) AS median_provider_enumeration_year , 
-		UPPER_QUARTILE( provider_enumeration_year ) AS upper_quartile_provider_enumeration_year
-	FROM npi 
-	GROUP BY provider_gender_code" 
+tapply(
+	nppes_df[ , "provider_enumeration_year" ] ,
+	nppes_df[ , "provider_gender_code" ] ,
+	quantile ,
+	0.5 
 )
 ```
 
 ### Subsetting {-}
 
-Limit your SQL analysis to California with `WHERE`:
+Limit your `data.frame` to California:
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db ,
-	"SELECT
-		AVG( provider_enumeration_year )
-	FROM npi
-	WHERE provider_business_practice_location_address_state_name = 'CA'"
-)
+sub_nppes_df <- subset( nppes_df , provider_business_practice_location_address_state_name = 'CA' )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_nppes_df[ , "provider_enumeration_year" ] )
 ```
 
 ### Measures of Uncertainty {-}
 
-Calculate the variance and standard deviation, overall and by groups:
+Calculate the variance, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-RSQLite::initExtension( db )
+var( nppes_df[ , "provider_enumeration_year" ] )
 
-dbGetQuery( db , 
-	"SELECT 
-		VARIANCE( provider_enumeration_year ) , 
-		STDEV( provider_enumeration_year ) 
-	FROM npi" 
-)
-
-dbGetQuery( db , 
-	"SELECT 
-		provider_gender_code , 
-		VARIANCE( provider_enumeration_year ) AS var_provider_enumeration_year ,
-		STDEV( provider_enumeration_year ) AS stddev_provider_enumeration_year
-	FROM npi 
-	GROUP BY provider_gender_code" 
+tapply(
+	nppes_df[ , "provider_enumeration_year" ] ,
+	nppes_df[ , "provider_gender_code" ] ,
+	var 
 )
 ```
 
@@ -173,22 +163,12 @@ dbGetQuery( db ,
 
 Perform a t-test:
 ```{r eval = FALSE , results = "hide" }
-nppes_slim_df <- 
-	dbGetQuery( db , 
-		"SELECT 
-			provider_enumeration_year , 
-			individual ,
-			is_sole_proprietor
-		FROM npi" 
-	)
-
-t.test( provider_enumeration_year ~ individual , nppes_slim_df )
+t.test( provider_enumeration_year ~ individual , nppes_df )
 ```
 
 Perform a chi-squared test of association:
 ```{r eval = FALSE , results = "hide" }
-this_table <-
-	table( nppes_slim_df[ , c( "individual" , "is_sole_proprietor" ) ] )
+this_table <- table( nppes_df[ , c( "individual" , "is_sole_proprietor" ) ] )
 
 chisq.test( this_table )
 ```
@@ -198,7 +178,7 @@ Perform a generalized linear model:
 glm_result <- 
 	glm( 
 		provider_enumeration_year ~ individual + is_sole_proprietor , 
-		data = nppes_slim_df
+		data = nppes_df
 	)
 
 summary( glm_result )
@@ -210,9 +190,7 @@ The R `dplyr` library offers an alternative grammar of data manipulation to base
 
 ```{r eval = FALSE , results = "hide" }
 library(dplyr)
-library(dbplyr)
-dplyr_db <- dplyr::src_sqlite( dbdir )
-nppes_tbl <- tbl( dplyr_db , 'npi' )
+nppes_tbl <- tbl_df( nppes_df )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
@@ -224,11 +202,4 @@ nppes_tbl %>%
 	summarize( mean = mean( provider_enumeration_year ) )
 ```
 
----
-
-## Replication Example {-}
-
-```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT COUNT(*) FROM npi" )
-```
 
