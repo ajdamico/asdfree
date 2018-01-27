@@ -113,7 +113,7 @@ cv( svytotal( ~factor( v0302 ) , chapter_tag_design ) )
 
 needs_travis_build_status_line: yes
 
-sample_setup_breaks: 13
+sample_setup_breaks: 15
 
 broken_sample_test_condition: any( chapter_tag_cat$year == 2011 )
 
@@ -129,9 +129,7 @@ chapter_tag_cat <-
 # skip 2008 because it doesn't fit
 chapter_tag_cat <- subset( chapter_tag_cat , year != 2008 )
 
-record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
-
-chapter_tag_cat <- chapter_tag_cat[ record_categories == this_sample_break , ]
+chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
 
 lodown( "chapter_tag" , chapter_tag_cat )
 ~~~
