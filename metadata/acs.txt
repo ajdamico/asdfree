@@ -180,7 +180,7 @@ svytotal(
 
 needs_travis_build_status_line: yes
 
-sample_setup_breaks: 100
+sample_setup_breaks: 50
 
 broken_sample_test_condition: any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 )
 
@@ -193,7 +193,7 @@ chapter_tag_cat <-
 	get_catalog( "chapter_tag" ,
 		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
 
-# skip the three-year and five-year files
+# skip the three-year and five-year files entirely
 chapter_tag_cat <- subset( chapter_tag_cat , time_period == '1-Year' )
 
 record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / sample_setup_breaks ) )
@@ -201,7 +201,12 @@ record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( ch
 chapter_tag_cat <- chapter_tag_cat[ record_categories == this_sample_break , ]
 
 # for alabama 2011, toss out other nearby states
-if( any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 ) ) chapter_tag_cat <- chapter_tag_cat[ chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 , ]
+if( any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 ) ){
+	chapter_tag_cat <- chapter_tag_cat[ chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 , ]
+# for all other builds, just take six records
+} else {
+	chapter_tag_cat <- head( chapter_tag_cat , 6 )
+}
 
 lodown( "chapter_tag" , chapter_tag_cat )
 
