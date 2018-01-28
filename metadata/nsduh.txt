@@ -108,3 +108,22 @@ needs_srvyr_block: yes
 
 
 needs_travis_build_status_line: yes
+
+sample_setup_breaks: 3
+
+broken_sample_test_condition: any( chapter_tag_cat$year == 2016 )
+
+~~~{sample_setup_block}
+this_sample_break <- Sys.getenv( "this_sample_break" )
+
+library(lodown)
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
+
+chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
+
+lodown( "chapter_tag" , chapter_tag_cat )
+~~~
+
