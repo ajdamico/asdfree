@@ -193,16 +193,18 @@ chapter_tag_cat <-
 	get_catalog( "chapter_tag" ,
 		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
 
-# skip the three-year and five-year files entirely
+# skip the three-year and five-year files
 chapter_tag_cat <- subset( chapter_tag_cat , time_period == '1-Year' )
+
+# skip the top ten states by population
+chapter_tag_cat <- subset( chapter_tag_cat , !( stateab %in% c( 'ca' , 'tx' , 'fl' , 'ny' , 'pa' , 'il' , 'oh' , 'ga' , 'nc' ) ) )
 
 chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
 
 # for alabama 2011, toss out other nearby states
 if( any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 ) ){
 	chapter_tag_cat <- chapter_tag_cat[ chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 , ]
-# for all other builds, just take four records
-} else chapter_tag_cat <- head( chapter_tag_cat , 4 )
+}
 
 lodown( "chapter_tag" , chapter_tag_cat )
 
