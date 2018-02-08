@@ -37,7 +37,14 @@ for( this_state in seq( nrow( chapter_tag_cat ) ) ){
 	
 	# add the design information to the columns to import
 	these_columns_to_import <-
-		unique( c( columns_to_import , as.character( chapter_tag_cat[ this_state , c( 'weight' , paste0( 'fpc' , 1:5 ) ) ] ) ) )
+		unique( 
+			c( 
+				columns_to_import , 
+				as.character( 
+					chapter_tag_cat[ this_state , c( 'weight' , paste0( 'fpc' , 1:5 ) ) ] 
+				) 
+			) 
+		)
 
 	# remove NAs
 	these_columns_to_import <- these_columns_to_import[ !is.na( these_columns_to_import ) ]
@@ -53,26 +60,54 @@ for( this_state in seq( nrow( chapter_tag_cat ) ) ){
 	this_chapter_tag_dom_df <- 
 		data.frame( readr::read_fwf(
 			chapter_tag_cat[ this_state , 'dom_file' ] ,
-			readr::fwf_widths( abs( dom_stru$width ) , col_names = dom_stru[ , 'varname' ] ) ,
-			col_types = paste0( ifelse( !( dom_stru$varname %in% these_columns_to_import ) , "_" , ifelse( dom_stru$char , "c" , "d" ) ) , collapse = "" )
+			readr::fwf_widths( 
+				abs( dom_stru$width ) , col_names = dom_stru[ , 'varname' ] 
+			) ,
+			col_types = 
+				paste0( 
+					ifelse( !( dom_stru$varname %in% these_columns_to_import ) , 
+						"_" , 
+						ifelse( dom_stru$char , "c" , "d" ) 
+					) , 
+					collapse = "" 
+				)
 		) )
 
 	this_chapter_tag_pes_df <- 
 		data.frame( readr::read_fwf(
 			chapter_tag_cat[ this_state , 'pes_file' ] ,
-			readr::fwf_widths( abs( pes_stru$width ) , col_names = pes_stru[ , 'varname' ] ) ,
-			col_types = paste0( ifelse( !( pes_stru$varname %in% these_columns_to_import ) , "_" , ifelse( pes_stru$char , "c" , "d" ) ) , collapse = "" )
+			readr::fwf_widths( 
+				abs( pes_stru$width ) , col_names = pes_stru[ , 'varname' ] 
+			) ,
+			col_types = 
+				paste0( 
+					ifelse( !( pes_stru$varname %in% these_columns_to_import ) , 
+						"_" , 
+						ifelse( pes_stru$char , "c" , "d" ) 
+					) , 
+					collapse = "" 
+				)
 		) )
 
 	# add decimals
 	for( this_variable in these_columns_to_import ) {
 	
-		if( ( this_variable %in% names( this_chapter_tag_dom_df ) ) & !isTRUE( all.equal( 1 , dom_stru[ dom_stru$varname == this_variable , 'divisor' ] ) ) ){
-			this_chapter_tag_dom_df[ , this_variable ] <- dom_stru[ dom_stru$varname == this_variable , 'divisor' ] * this_chapter_tag_dom_df[ , this_variable ]
+		if( 
+			( this_variable %in% names( this_chapter_tag_dom_df ) ) & 
+			!isTRUE( all.equal( 1 , dom_stru[ dom_stru$varname == this_variable , 'divisor' ] ) ) 
+		){
+			this_chapter_tag_dom_df[ , this_variable ] <- 
+				dom_stru[ dom_stru$varname == this_variable , 'divisor' ] * 
+				this_chapter_tag_dom_df[ , this_variable ]
 		}
 	
-		if( ( this_variable %in% names( this_chapter_tag_pes_df ) ) & !isTRUE( all.equal( 1 , pes_stru[ pes_stru$varname == this_variable , 'divisor' ] ) ) ){
-			this_chapter_tag_pes_df[ , this_variable ] <- pes_stru[ pes_stru$varname == this_variable , 'divisor' ] * this_chapter_tag_pes_df[ , this_variable ]
+		if( 
+			( this_variable %in% names( this_chapter_tag_pes_df ) ) & 
+			!isTRUE( all.equal( 1 , pes_stru[ pes_stru$varname == this_variable , 'divisor' ] ) ) 
+		){
+			this_chapter_tag_pes_df[ , this_variable ] <- 
+				pes_stru[ pes_stru$varname == this_variable , 'divisor' ] * 
+				this_chapter_tag_pes_df[ , this_variable ]
 		}
 	
 	
@@ -81,17 +116,20 @@ for( this_state in seq( nrow( chapter_tag_cat ) ) ){
 	# merge household and person tables
 	this_chapter_tag_df <- merge( this_chapter_tag_dom_df , this_chapter_tag_pes_df )
 
+	# confirm one record per person, with household information merged on
 	stopifnot( nrow( this_chapter_tag_df ) == nrow( this_chapter_tag_pes_df ) )
 	
 	rm( this_chapter_tag_dom_df , this_chapter_tag_pes_df ) ; gc()
 	
-	
-	
+	# stack the merged tables
 	chapter_tag_df <- rbind( chapter_tag_df , this_chapter_tag_df )
 	
 	rm( this_chapter_tag_df ) ; gc()
 	
 }
+
+# add a column of ones
+chapter_tag_df[ , 'one' ] <- 1
 
 # calculate the finite population correction for each stratum to construct a
 # sampling design with weighting areas as strata and households as psu
@@ -106,7 +144,7 @@ names( fpc_sums )[ 2 ] <- 'fpc'
 
 chapter_tag_df <- merge( chapter_tag_df , fpc_sums ) ; gc()
 
-bootw <-
+chapter_tag_wgts <-
 	survey::bootweights(
 		strata = chapter_tag_df[ , chapter_tag_cat[ 1 , 'fpc1' ] ] ,
 		psu = chapter_tag_df[ , chapter_tag_cat[ 1 , 'fpc4' ] ] ,
@@ -114,17 +152,19 @@ bootw <-
 		fpc = chapter_tag_df[ , 'fpc' ]
 	)
 
-
+# construct a complex survey design object
 chapter_tag_design <-
 	survey::svrepdesign(
 		weight = ~ v0010 ,
-		repweights = bootw$repweights ,
+		repweights = chapter_tag_wgts$repweights ,
 		type = "bootstrap",
 		combined.weights = FALSE ,
-		scale = bootw$scale ,
-		rscales = bootw$rscales ,
+		scale = chapter_tag_wgts$scale ,
+		rscales = chapter_tag_wgts$rscales ,
 		data = chapter_tag_df
 	)
+	
+rm( chapter_tag_df , chapter_tag_wgts , fpc_sums ) ; gc()
 ~~~
 
 
