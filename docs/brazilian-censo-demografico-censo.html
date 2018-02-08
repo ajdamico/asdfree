@@ -985,11 +985,105 @@ censo_cat &lt;-<span class="st"> </span><span class="kw">lodown</span>( <span cl
 <p>Construct a complex sample survey design:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(survey)
 
-<span class="kw">options</span>( <span class="dt">survey.lonely.psu =</span> <span class="st">&quot;adjust&quot;</span> )
+<span class="co"># choose columns to import from both household and person files</span>
+columns_to_import &lt;-
+<span class="st">    </span><span class="kw">c</span>( <span class="st">&#39;v6531&#39;</span> , <span class="st">&#39;v6033&#39;</span> , <span class="st">&#39;v0640&#39;</span> , <span class="st">&#39;v0001&#39;</span> , <span class="st">&#39;v0601&#39;</span> )
 
-censo_design &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;CENSO&quot;</span> , <span class="st">&quot;pes 2010 design.rds&quot;</span> ) )
+<span class="co"># initiate a data.frame to stack all downloaded censo states</span>
+censo_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="ot">NULL</span> )
+        
+<span class="co"># only construct one censo design at a time (2000 and 2010 should not be stacked)</span>
+<span class="kw">stopifnot</span>( <span class="kw">length</span>( <span class="kw">unique</span>( censo_cat[ , <span class="st">&#39;year&#39;</span> ] ) ) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )
+        
+<span class="co"># loop through all downloaded censo states</span>
+<span class="cf">for</span>( this_state <span class="cf">in</span> <span class="kw">seq</span>( <span class="kw">nrow</span>( censo_cat ) ) ){
+    
+    <span class="co"># add the design information to the columns to import</span>
+    these_columns_to_import &lt;-
+<span class="st">        </span><span class="kw">unique</span>( <span class="kw">c</span>( columns_to_import , <span class="kw">as.character</span>( censo_cat[ this_state , <span class="kw">c</span>( <span class="st">&#39;weight&#39;</span> , <span class="kw">paste0</span>( <span class="st">&#39;fpc&#39;</span> , <span class="dv">1</span><span class="op">:</span><span class="dv">5</span> ) ) ] ) ) )
 
-censo_design &lt;-<span class="st"> </span><span class="kw">open</span>( censo_design , <span class="dt">driver =</span> <span class="kw">SQLite</span>() )</code></pre></div>
+    <span class="co"># remove NAs</span>
+    these_columns_to_import &lt;-<span class="st"> </span>these_columns_to_import[ <span class="op">!</span><span class="kw">is.na</span>( these_columns_to_import ) ]
+
+    <span class="co"># load structure files, lowercase variable names, set unwanted columns to missing</span>
+    dom_stru &lt;-<span class="st"> </span>SAScii<span class="op">::</span><span class="kw">parse.SAScii</span>( censo_cat[ this_state , <span class="st">&#39;dom_sas&#39;</span> ] )
+    dom_stru<span class="op">$</span>varname &lt;-<span class="st"> </span><span class="kw">tolower</span>( dom_stru<span class="op">$</span>varname )
+    
+    pes_stru &lt;-<span class="st"> </span>SAScii<span class="op">::</span><span class="kw">parse.SAScii</span>( censo_cat[ this_state , <span class="st">&#39;pes_sas&#39;</span> ] )
+    pes_stru<span class="op">$</span>varname &lt;-<span class="st"> </span><span class="kw">tolower</span>( pes_stru<span class="op">$</span>varname )
+    
+    <span class="co"># import fixed-width files</span>
+    this_censo_dom_df &lt;-<span class="st"> </span>
+<span class="st">        </span><span class="kw">data.frame</span>( readr<span class="op">::</span><span class="kw">read_fwf</span>(
+            censo_cat[ this_state , <span class="st">&#39;dom_file&#39;</span> ] ,
+            readr<span class="op">::</span><span class="kw">fwf_widths</span>( <span class="kw">abs</span>( dom_stru<span class="op">$</span>width ) , <span class="dt">col_names =</span> dom_stru[ , <span class="st">&#39;varname&#39;</span> ] ) ,
+            <span class="dt">col_types =</span> <span class="kw">paste0</span>( <span class="kw">ifelse</span>( <span class="op">!</span>( dom_stru<span class="op">$</span>varname <span class="op">%in%</span><span class="st"> </span>these_columns_to_import ) , <span class="st">&quot;_&quot;</span> , <span class="kw">ifelse</span>( dom_stru<span class="op">$</span>char , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> ) ) , <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span> )
+        ) )
+
+    this_censo_pes_df &lt;-<span class="st"> </span>
+<span class="st">        </span><span class="kw">data.frame</span>( readr<span class="op">::</span><span class="kw">read_fwf</span>(
+            censo_cat[ this_state , <span class="st">&#39;pes_file&#39;</span> ] ,
+            readr<span class="op">::</span><span class="kw">fwf_widths</span>( <span class="kw">abs</span>( pes_stru<span class="op">$</span>width ) , <span class="dt">col_names =</span> pes_stru[ , <span class="st">&#39;varname&#39;</span> ] ) ,
+            <span class="dt">col_types =</span> <span class="kw">paste0</span>( <span class="kw">ifelse</span>( <span class="op">!</span>( pes_stru<span class="op">$</span>varname <span class="op">%in%</span><span class="st"> </span>these_columns_to_import ) , <span class="st">&quot;_&quot;</span> , <span class="kw">ifelse</span>( pes_stru<span class="op">$</span>char , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> ) ) , <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span> )
+        ) )
+
+    <span class="co"># add decimals</span>
+    <span class="cf">for</span>( this_variable <span class="cf">in</span> these_columns_to_import ) {
+    
+        <span class="cf">if</span>( ( this_variable <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>( this_censo_dom_df ) ) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">isTRUE</span>( <span class="kw">all.equal</span>( <span class="dv">1</span> , dom_stru[ dom_stru<span class="op">$</span>varname <span class="op">==</span><span class="st"> </span>this_variable , <span class="st">&#39;divisor&#39;</span> ] ) ) ){
+            this_censo_dom_df[ , this_variable ] &lt;-<span class="st"> </span>dom_stru[ dom_stru<span class="op">$</span>varname <span class="op">==</span><span class="st"> </span>this_variable , <span class="st">&#39;divisor&#39;</span> ] <span class="op">*</span><span class="st"> </span>this_censo_dom_df[ , this_variable ]
+        }
+    
+        <span class="cf">if</span>( ( this_variable <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>( this_censo_pes_df ) ) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">isTRUE</span>( <span class="kw">all.equal</span>( <span class="dv">1</span> , pes_stru[ pes_stru<span class="op">$</span>varname <span class="op">==</span><span class="st"> </span>this_variable , <span class="st">&#39;divisor&#39;</span> ] ) ) ){
+            this_censo_pes_df[ , this_variable ] &lt;-<span class="st"> </span>pes_stru[ pes_stru<span class="op">$</span>varname <span class="op">==</span><span class="st"> </span>this_variable , <span class="st">&#39;divisor&#39;</span> ] <span class="op">*</span><span class="st"> </span>this_censo_pes_df[ , this_variable ]
+        }
+    
+    }
+
+    <span class="co"># merge household and person tables</span>
+    this_censo_df &lt;-<span class="st"> </span><span class="kw">merge</span>( this_censo_dom_df , this_censo_pes_df )
+
+    <span class="kw">stopifnot</span>( <span class="kw">nrow</span>( this_censo_df ) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>( this_censo_pes_df ) )
+    
+    <span class="kw">rm</span>( this_censo_dom_df , this_censo_pes_df ) ; <span class="kw">gc</span>()
+    
+    censo_df &lt;-<span class="st"> </span><span class="kw">rbind</span>( censo_df , this_censo_df )
+    
+    <span class="kw">rm</span>( this_censo_df ) ; <span class="kw">gc</span>()
+    
+}
+
+<span class="co"># calculate the finite population correction for each stratum to construct a</span>
+<span class="co"># sampling design with weighting areas as strata and households as psu</span>
+
+<span class="co"># v0010 is the person or household weight</span>
+<span class="co"># v0011 is the weighting area identifier</span>
+<span class="co"># both of these are specified inside `censo_cat[ c( &#39;fpc1&#39; , &#39;weight&#39; ) ]`</span>
+
+fpc_sums &lt;-<span class="st"> </span><span class="kw">aggregate</span>( v0010 <span class="op">~</span><span class="st"> </span>v0011 , <span class="dt">data =</span> censo_df , sum )
+
+<span class="kw">names</span>( fpc_sums )[ <span class="dv">2</span> ] &lt;-<span class="st"> &#39;fpc&#39;</span>
+
+censo_df &lt;-<span class="st"> </span><span class="kw">merge</span>( censo_df , fpc_sums ) ; <span class="kw">gc</span>()
+
+bootw &lt;-
+<span class="st">    </span>survey<span class="op">::</span><span class="kw">bootweights</span>(
+        <span class="dt">strata =</span> censo_df[ , censo_cat[ <span class="dv">1</span> , <span class="st">&#39;fpc1&#39;</span> ] ] ,
+        <span class="dt">psu =</span> censo_df[ , censo_cat[ <span class="dv">1</span> , <span class="st">&#39;fpc4&#39;</span> ] ] ,
+        <span class="dt">replicates =</span> <span class="dv">80</span> ,
+        <span class="dt">fpc =</span> censo_df[ , <span class="st">&#39;fpc&#39;</span> ]
+    )
+
+censo_design &lt;-
+<span class="st">    </span>survey<span class="op">::</span><span class="kw">svrepdesign</span>(
+        <span class="dt">weight =</span> <span class="op">~</span><span class="st"> </span>v0010 ,
+        <span class="dt">repweights =</span> bootw<span class="op">$</span>repweights ,
+        <span class="dt">type =</span> <span class="st">&quot;bootstrap&quot;</span>,
+        <span class="dt">combined.weights =</span> <span class="ot">FALSE</span> ,
+        <span class="dt">scale =</span> bootw<span class="op">$</span>scale ,
+        <span class="dt">rscales =</span> bootw<span class="op">$</span>rscales ,
+        <span class="dt">data =</span> censo_df
+    )</code></pre></div>
 <div id="variable-recoding-8" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
 <p>Add new columns to the data set:</p>

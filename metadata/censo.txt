@@ -23,11 +23,109 @@ catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2010 )
 ~~~{analysis_examples_survey_design}
 library(survey)
 
-options( survey.lonely.psu = "adjust" )
+# choose columns to import from both household and person files
+columns_to_import <-
+	c( 'v6531' , 'v6033' , 'v0640' , 'v0001' , 'v0601' )
 
-chapter_tag_design <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "pes 2010 design.rds" ) )
+# initiate a data.frame to stack all downloaded censo states
+chapter_tag_df <- data.frame( NULL )
+		
+# only construct one censo design at a time (2000 and 2010 should not be stacked)
+stopifnot( length( unique( chapter_tag_cat[ , 'year' ] ) ) == 1 )
+		
+# loop through all downloaded censo states
+for( this_state in seq( nrow( chapter_tag_cat ) ) ){
+	
+	# add the design information to the columns to import
+	these_columns_to_import <-
+		unique( c( columns_to_import , as.character( chapter_tag_cat[ this_state , c( 'weight' , paste0( 'fpc' , 1:5 ) ) ] ) ) )
 
-chapter_tag_design <- open( chapter_tag_design , driver = SQLite() )
+	# remove NAs
+	these_columns_to_import <- these_columns_to_import[ !is.na( these_columns_to_import ) ]
+
+	# load structure files, lowercase variable names, set unwanted columns to missing
+	dom_stru <- SAScii::parse.SAScii( chapter_tag_cat[ this_state , 'dom_sas' ] )
+	dom_stru$varname <- tolower( dom_stru$varname )
+	
+	pes_stru <- SAScii::parse.SAScii( chapter_tag_cat[ this_state , 'pes_sas' ] )
+	pes_stru$varname <- tolower( pes_stru$varname )
+	
+	# import fixed-width files
+	this_chapter_tag_dom_df <- 
+		data.frame( readr::read_fwf(
+			chapter_tag_cat[ this_state , 'dom_file' ] ,
+			readr::fwf_widths( abs( dom_stru$width ) , col_names = dom_stru[ , 'varname' ] ) ,
+			col_types = paste0( ifelse( !( dom_stru$varname %in% these_columns_to_import ) , "_" , ifelse( dom_stru$char , "c" , "d" ) ) , collapse = "" )
+		) )
+
+	this_chapter_tag_pes_df <- 
+		data.frame( readr::read_fwf(
+			chapter_tag_cat[ this_state , 'pes_file' ] ,
+			readr::fwf_widths( abs( pes_stru$width ) , col_names = pes_stru[ , 'varname' ] ) ,
+			col_types = paste0( ifelse( !( pes_stru$varname %in% these_columns_to_import ) , "_" , ifelse( pes_stru$char , "c" , "d" ) ) , collapse = "" )
+		) )
+
+	# add decimals
+	for( this_variable in these_columns_to_import ) {
+	
+		if( ( this_variable %in% names( this_chapter_tag_dom_df ) ) & !isTRUE( all.equal( 1 , dom_stru[ dom_stru$varname == this_variable , 'divisor' ] ) ) ){
+			this_chapter_tag_dom_df[ , this_variable ] <- dom_stru[ dom_stru$varname == this_variable , 'divisor' ] * this_chapter_tag_dom_df[ , this_variable ]
+		}
+	
+		if( ( this_variable %in% names( this_chapter_tag_pes_df ) ) & !isTRUE( all.equal( 1 , pes_stru[ pes_stru$varname == this_variable , 'divisor' ] ) ) ){
+			this_chapter_tag_pes_df[ , this_variable ] <- pes_stru[ pes_stru$varname == this_variable , 'divisor' ] * this_chapter_tag_pes_df[ , this_variable ]
+		}
+	
+	
+	}
+
+	# merge household and person tables
+	this_chapter_tag_df <- merge( this_chapter_tag_dom_df , this_chapter_tag_pes_df )
+
+	stopifnot( nrow( this_chapter_tag_df ) == nrow( this_chapter_tag_pes_df ) )
+	
+	rm( this_chapter_tag_dom_df , this_chapter_tag_pes_df ) ; gc()
+	
+	
+	
+	chapter_tag_df <- rbind( chapter_tag_df , this_chapter_tag_df )
+	
+	rm( this_chapter_tag_df ) ; gc()
+	
+}
+
+# calculate the finite population correction for each stratum to construct a
+# sampling design with weighting areas as strata and households as psu
+
+# v0010 is the person or household weight
+# v0011 is the weighting area identifier
+# both of these are specified inside `chapter_tag_cat[ c( 'fpc1' , 'weight' ) ]`
+
+fpc_sums <- aggregate( v0010 ~ v0011 , data = chapter_tag_df , sum )
+
+names( fpc_sums )[ 2 ] <- 'fpc'
+
+chapter_tag_df <- merge( chapter_tag_df , fpc_sums ) ; gc()
+
+bootw <-
+	survey::bootweights(
+		strata = chapter_tag_df[ , chapter_tag_cat[ 1 , 'fpc1' ] ] ,
+		psu = chapter_tag_df[ , chapter_tag_cat[ 1 , 'fpc4' ] ] ,
+		replicates = 80 ,
+		fpc = chapter_tag_df[ , 'fpc' ]
+	)
+
+
+chapter_tag_design <-
+	survey::svrepdesign(
+		weight = ~ v0010 ,
+		repweights = bootw$repweights ,
+		type = "bootstrap",
+		combined.weights = FALSE ,
+		scale = bootw$scale ,
+		rscales = bootw$rscales ,
+		data = chapter_tag_df
+	)
 ~~~
 
 
@@ -62,6 +160,7 @@ chapter_tag_design <-
 			)
 	)
 ~~~
+
 
 
 group_by_variable: state_name
@@ -107,7 +206,9 @@ svygini( ~ v6531 , sub_chapter_tag_design , na.rm = TRUE )
 
 needs_travis_build_status_line: yes
 
-sample_setup_breaks: 11
+sample_setup_breaks: 20
+
+broken_sample_test_condition: all( chapter_tag_cat$year == 2010 )
 
 ~~~{sample_setup_block}
 this_sample_break <- Sys.getenv( "this_sample_break" )
