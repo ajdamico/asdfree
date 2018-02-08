@@ -23,6 +23,8 @@ ces: [![Build Status](https://travis-ci.org/asdfree/ces.svg?branch=master)](http
 
 chis: [![Build Status](https://travis-ci.org/asdfree/chis.svg?branch=master)](https://travis-ci.org/asdfree/chis) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chis?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chis)
 
+confidentiality: [![Build Status](https://travis-ci.org/asdfree/confidentiality.svg?branch=master)](https://travis-ci.org/asdfree/confidentiality) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/confidentiality?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/confidentiality)
+
 cpsasec: [![Build Status](https://travis-ci.org/asdfree/cpsasec.svg?branch=master)](https://travis-ci.org/asdfree/cpsasec) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/cpsasec?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/cpsasec)
 
 cpsbasic: [![Build Status](https://travis-ci.org/asdfree/cpsbasic.svg?branch=master)](https://travis-ci.org/asdfree/cpsbasic) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/cpsbasic?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/cpsbasic)
@@ -42,6 +44,8 @@ gss: [![Build Status](https://travis-ci.org/asdfree/gss.svg?branch=master)](http
 hmda: [![Build Status](https://travis-ci.org/asdfree/hmda.svg?branch=master)](https://travis-ci.org/asdfree/hmda) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/hmda?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/hmda)
 
 hrs: [![Build Status](https://travis-ci.org/asdfree/hrs.svg?branch=master)](https://travis-ci.org/asdfree/hrs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/hrs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/hrs)
+
+lavaanex: [![Build Status](https://travis-ci.org/asdfree/lavaanex.svg?branch=master)](https://travis-ci.org/asdfree/lavaanex) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/lavaanex?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/lavaanex)
 
 meps: [![Build Status](https://travis-ci.org/asdfree/meps.svg?branch=master)](https://travis-ci.org/asdfree/meps) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/meps?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/meps)
 
@@ -112,6 +116,8 @@ sipp: [![Build Status](https://travis-ci.org/asdfree/sipp.svg?branch=master)](ht
 ssa: [![Build Status](https://travis-ci.org/asdfree/ssa.svg?branch=master)](https://travis-ci.org/asdfree/ssa) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ssa?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ssa)
 
 timss: [![Build Status](https://travis-ci.org/asdfree/timss.svg?branch=master)](https://travis-ci.org/asdfree/timss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/timss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/timss)
+
+trendy: [![Build Status](https://travis-ci.org/asdfree/trendy.svg?branch=master)](https://travis-ci.org/asdfree/trendy) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/trendy?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/trendy)
 
 uspums: [![Build Status](https://travis-ci.org/asdfree/uspums.svg?branch=master)](https://travis-ci.org/asdfree/uspums) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/uspums?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/uspums)
 
