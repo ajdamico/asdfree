@@ -134,6 +134,9 @@ chapter_tag_df[ , 'one' ] <- 1
 # calculate the finite population correction for each stratum to construct a
 # sampling design with weighting areas as strata and households as psu
 
+# the real censo design is stratified with "setor censitarios" rather than 
+# "area de ponderacao" but those are not disclosed due to confidentiality
+
 # v0010 is the person or household weight
 # v0011 is the weighting area identifier
 # both of these are specified inside `chapter_tag_cat[ c( 'fpc1' , 'weight' ) ]`
@@ -245,7 +248,7 @@ svygini( ~ v6531 , sub_chapter_tag_design , na.rm = TRUE )
 
 needs_travis_build_status_line: yes
 
-sample_setup_breaks: 52
+sample_setup_breaks: 51
 
 broken_sample_test_condition: all( chapter_tag_cat$year == 2010 )
 
@@ -259,7 +262,7 @@ chapter_tag_cat <-
 		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
 
 # skip bahia, minas, and sao paulo because the 2010 files are too big
-chapter_tag_cat <- subset( chapter_tag_cat , !( state %in% c( 'ba10' , 'mg10' , 'sp110' ) ) )
+chapter_tag_cat <- subset( chapter_tag_cat , !( state %in% c( 'ba10' , 'mg10' , 'sp110' , 'rs10' ) ) )
 		
 chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
 
