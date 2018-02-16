@@ -31,7 +31,7 @@ nls_cat <-
 		output_dir = file.path( path.expand( "~" ) , "NLS" ) )
 
 # 2015 only
-nls_cat <- subset( nls_cat , year == 2015 )
+nls_cat <- subset( nls_cat , study_name == 'NLS Youth 1997 (NLSY97)' )
 # download the microdata to your local computer
 nls_cat <- lodown( "nls" , nls_cat )
 ```
@@ -47,15 +47,95 @@ Construct a complex sample survey design:
 ```{r eval = FALSE }
 library(survey)
 
-nls_df <- readRDS( file.path( path.expand( "~" ) , "NLS" , "2015 main.rds" ) )
+nlsy_files <- 
+	list.files(
+		file.path( path.expand( "~" ) , "NLS" ) ,
+		full.names = TRUE ,
+		recursive = TRUE
+	)
 
+# read in the R loading script
+nlsy97_r <- 
+	readLines( nlsy_files[ grepl( "nlsy97(.*)R$" , basename( nlsy_files ) ) ] )
+
+	
+# extract the column names from the R script
+first_line <- grep( "names(new_data) <-" , nlsy97_r , fixed = TRUE )
+close_parentheses <- grep( ")" , nlsy97_r , fixed = TRUE )
+last_line <- min( close_parentheses[ close_parentheses > first_line ] )
+column_names_lines <- nlsy97_r[ seq( first_line , last_line ) ]
+column_names_lines <- gsub( 'names(new_data) <-' , 'column_names <-' , column_names_lines , fixed = TRUE )
+eval( parse( text = column_names_lines ) )
+
+# identify the .dat file
+nlsy97_dat <- nlsy_files[ grepl( "nlsy97(.*)dat$" , basename( nlsy_files ) ) ]
+
+# choose which columns to import
+columns_to_import <-
+	c( 'T5206900' , 'R9829600' , 'R0536300' , 'Z9061800' , 'T6657200' , 'R1205300' )
+
+	
+# readr::read_delim() columns must match their order in the csv file
+columns_to_import <-
+	columns_to_import[ order( match( columns_to_import , column_names ) ) ]
+
+	
+# confirm all column names are available
+stopifnot( all( columns_to_import %in% column_names ) )
+
+nls_variables_df <- 
+	data.frame( 
+		readr::read_delim( 
+			nlsy97_dat , 
+			col_names = columns_to_import , 
+			col_types = 
+				paste0( 
+					ifelse( column_names %in% columns_to_import , 'n' , '_' ) , 
+					collapse = "" 
+				) ,
+			delim = ' '
+		) 
+	)
+
+# cluster and strata variables
+nls_psustr_df <-
+	readRDS( grep( "strpsu\.rds$" , nlsy_files , value = TRUE ) )
+	
+# you can read more about longitudinal weights here
+# http://www.nlsinfo.org/weights
+
+# the lodown:::get_nlsy_weights function returns a data.frame object
+# containing the unique person identifiers and also a column of weights.
+
+# this makes it easy to choose the correct longitudinal weight for whatever analysis you're trying to do.
+
+# view which points-in-time are available for a particular study
+# lodown:::get_nlsy_selections( "nlsy97" )
+
+# download weights for respondents in 1997
+w97 <- lodown:::nls_get_weights( "nlsy97" , 'YES' , 'SURV1997' )
+
+# download weights for respondents who were in any of the 1997, 2002, or 2007 surveys
+# w <- lodown:::nls_get_weights( "nlsy97" , 'YES' , c( 'SURV1997' , 'SURV2002' , 'SURV2007' ) )
+
+# download weights for respondents who were in all of the 1997, 2002, and 2007 surveys
+# w <- lodown:::nls_get_weights( "nlsy97" , 'NO' , c( 'SURV1997' , 'SURV2002' , 'SURV2007' ) )
+
+# download weights for respondents who are in all available surveys
+# w <- lodown:::nls_get_weights( "nlsy97" , "NO" , lodown:::nls_get_selections( "nlsy97" ) )
+
+# save those weights into an data.frame object called `w97`
+nls_survey_df <- merge( nls_psustr_df , w97 )
+
+nls_df <- merge( nls_variables_df , nls_survey_df )
+	
 nls_design <- 
 	svydesign( 
-		~ psu , 
-		strata = ~ stratum , 
-		data = nls_df , 
-		weights = ~ weight , 
-		nest = TRUE 
+		~ R1489800 , 
+		strata = ~ R1489700 , 
+		data = x ,
+		weights = ~ weight ,
+		nest = TRUE
 	)
 ```
 

@@ -975,7 +975,7 @@ nls_cat &lt;-
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;NLS&quot;</span> ) )
 
 <span class="co"># 2015 only</span>
-nls_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( nls_cat , year <span class="op">==</span><span class="st"> </span><span class="dv">2015</span> )
+nls_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( nls_cat , study_name <span class="op">==</span><span class="st"> &#39;NLS Youth 1997 (NLSY97)&#39;</span> )
 <span class="co"># download the microdata to your local computer</span>
 nls_cat &lt;-<span class="st"> </span><span class="kw">lodown</span>( <span class="st">&quot;nls&quot;</span> , nls_cat )</code></pre></div>
 </div>
@@ -984,15 +984,95 @@ nls_cat &lt;-<span class="st"> </span><span class="kw">lodown</span>( <span clas
 <p>Construct a complex sample survey design:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(survey)
 
-nls_df &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;NLS&quot;</span> , <span class="st">&quot;2015 main.rds&quot;</span> ) )
+nlsy_files &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">list.files</span>(
+        <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;NLS&quot;</span> ) ,
+        <span class="dt">full.names =</span> <span class="ot">TRUE</span> ,
+        <span class="dt">recursive =</span> <span class="ot">TRUE</span>
+    )
 
+<span class="co"># read in the R loading script</span>
+nlsy97_r &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">readLines</span>( nlsy_files[ <span class="kw">grepl</span>( <span class="st">&quot;nlsy97(.*)R$&quot;</span> , <span class="kw">basename</span>( nlsy_files ) ) ] )
+
+    
+<span class="co"># extract the column names from the R script</span>
+first_line &lt;-<span class="st"> </span><span class="kw">grep</span>( <span class="st">&quot;names(new_data) &lt;-&quot;</span> , nlsy97_r , <span class="dt">fixed =</span> <span class="ot">TRUE</span> )
+close_parentheses &lt;-<span class="st"> </span><span class="kw">grep</span>( <span class="st">&quot;)&quot;</span> , nlsy97_r , <span class="dt">fixed =</span> <span class="ot">TRUE</span> )
+last_line &lt;-<span class="st"> </span><span class="kw">min</span>( close_parentheses[ close_parentheses <span class="op">&gt;</span><span class="st"> </span>first_line ] )
+column_names_lines &lt;-<span class="st"> </span>nlsy97_r[ <span class="kw">seq</span>( first_line , last_line ) ]
+column_names_lines &lt;-<span class="st"> </span><span class="kw">gsub</span>( <span class="st">&#39;names(new_data) &lt;-&#39;</span> , <span class="st">&#39;column_names &lt;-&#39;</span> , column_names_lines , <span class="dt">fixed =</span> <span class="ot">TRUE</span> )
+<span class="kw">eval</span>( <span class="kw">parse</span>( <span class="dt">text =</span> column_names_lines ) )
+
+<span class="co"># identify the .dat file</span>
+nlsy97_dat &lt;-<span class="st"> </span>nlsy_files[ <span class="kw">grepl</span>( <span class="st">&quot;nlsy97(.*)dat$&quot;</span> , <span class="kw">basename</span>( nlsy_files ) ) ]
+
+<span class="co"># choose which columns to import</span>
+columns_to_import &lt;-
+<span class="st">    </span><span class="kw">c</span>( <span class="st">&#39;T5206900&#39;</span> , <span class="st">&#39;R9829600&#39;</span> , <span class="st">&#39;R0536300&#39;</span> , <span class="st">&#39;Z9061800&#39;</span> , <span class="st">&#39;T6657200&#39;</span> , <span class="st">&#39;R1205300&#39;</span> )
+
+    
+<span class="co"># readr::read_delim() columns must match their order in the csv file</span>
+columns_to_import &lt;-
+<span class="st">    </span>columns_to_import[ <span class="kw">order</span>( <span class="kw">match</span>( columns_to_import , column_names ) ) ]
+
+    
+<span class="co"># confirm all column names are available</span>
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( columns_to_import <span class="op">%in%</span><span class="st"> </span>column_names ) )
+
+nls_variables_df &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">data.frame</span>( 
+        readr<span class="op">::</span><span class="kw">read_delim</span>( 
+            nlsy97_dat , 
+            <span class="dt">col_names =</span> columns_to_import , 
+            <span class="dt">col_types =</span> 
+                <span class="kw">paste0</span>( 
+                    <span class="kw">ifelse</span>( column_names <span class="op">%in%</span><span class="st"> </span>columns_to_import , <span class="st">&#39;n&#39;</span> , <span class="st">&#39;_&#39;</span> ) , 
+                    <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span> 
+                ) ,
+            <span class="dt">delim =</span> <span class="st">&#39; &#39;</span>
+        ) 
+    )
+
+<span class="co"># cluster and strata variables</span>
+nls_psustr_df &lt;-
+<span class="st">    </span><span class="kw">readRDS</span>( <span class="kw">grep</span>( <span class="st">&quot;strpsu\.rds$&quot;</span> , nlsy_files , <span class="dt">value =</span> <span class="ot">TRUE</span> ) )
+    
+<span class="co"># you can read more about longitudinal weights here</span>
+<span class="co"># http://www.nlsinfo.org/weights</span>
+
+<span class="co"># the lodown:::get_nlsy_weights function returns a data.frame object</span>
+<span class="co"># containing the unique person identifiers and also a column of weights.</span>
+
+<span class="co"># this makes it easy to choose the correct longitudinal weight for whatever analysis you&#39;re trying to do.</span>
+
+<span class="co"># view which points-in-time are available for a particular study</span>
+<span class="co"># lodown:::get_nlsy_selections( &quot;nlsy97&quot; )</span>
+
+<span class="co"># download weights for respondents in 1997</span>
+w97 &lt;-<span class="st"> </span>lodown<span class="op">:::</span><span class="kw">nls_get_weights</span>( <span class="st">&quot;nlsy97&quot;</span> , <span class="st">&#39;YES&#39;</span> , <span class="st">&#39;SURV1997&#39;</span> )
+
+<span class="co"># download weights for respondents who were in any of the 1997, 2002, or 2007 surveys</span>
+<span class="co"># w &lt;- lodown:::nls_get_weights( &quot;nlsy97&quot; , &#39;YES&#39; , c( &#39;SURV1997&#39; , &#39;SURV2002&#39; , &#39;SURV2007&#39; ) )</span>
+
+<span class="co"># download weights for respondents who were in all of the 1997, 2002, and 2007 surveys</span>
+<span class="co"># w &lt;- lodown:::nls_get_weights( &quot;nlsy97&quot; , &#39;NO&#39; , c( &#39;SURV1997&#39; , &#39;SURV2002&#39; , &#39;SURV2007&#39; ) )</span>
+
+<span class="co"># download weights for respondents who are in all available surveys</span>
+<span class="co"># w &lt;- lodown:::nls_get_weights( &quot;nlsy97&quot; , &quot;NO&quot; , lodown:::nls_get_selections( &quot;nlsy97&quot; ) )</span>
+
+<span class="co"># save those weights into an data.frame object called `w97`</span>
+nls_survey_df &lt;-<span class="st"> </span><span class="kw">merge</span>( nls_psustr_df , w97 )
+
+nls_df &lt;-<span class="st"> </span><span class="kw">merge</span>( nls_variables_df , nls_survey_df )
+    
 nls_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svydesign</span>( 
-        <span class="op">~</span><span class="st"> </span>psu , 
-        <span class="dt">strata =</span> <span class="op">~</span><span class="st"> </span>stratum , 
-        <span class="dt">data =</span> nls_df , 
-        <span class="dt">weights =</span> <span class="op">~</span><span class="st"> </span>weight , 
-        <span class="dt">nest =</span> <span class="ot">TRUE</span> 
+        <span class="op">~</span><span class="st"> </span>R1489800 , 
+        <span class="dt">strata =</span> <span class="op">~</span><span class="st"> </span>R1489700 , 
+        <span class="dt">data =</span> x ,
+        <span class="dt">weights =</span> <span class="op">~</span><span class="st"> </span>weight ,
+        <span class="dt">nest =</span> <span class="ot">TRUE</span>
     )</code></pre></div>
 <div id="variable-recoding-30" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
