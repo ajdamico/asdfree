@@ -14,10 +14,12 @@ administrative_organization: * Administered by the [Centers for Disease Control 
 
 
 needs_catalog_block: yes
-catalog_subset_description: # 2015 only
+catalog_subset_description: # National Longitudinal Survey of Youth, 1997 only
 catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , study_name == 'NLS Youth 1997 (NLSY97)' )
 
 ~~~{analysis_examples_survey_design}
+options( survey.lonely.psu = "adjust" )
+
 library(survey)
 
 nlsy_files <- 
@@ -31,6 +33,8 @@ nlsy_files <-
 nlsy97_r <- 
 	readLines( nlsy_files[ grepl( "nlsy97(.*)R$" , basename( nlsy_files ) ) ] )
 
+# find all instances of "data$" in the r script
+data_dollar <- grep( "data\\$" , nlsy97_r )
 	
 # extract the column names from the R script
 first_line <- grep( "names(new_data) <-" , nlsy97_r , fixed = TRUE )
@@ -41,14 +45,20 @@ column_names_lines <- gsub( 'names(new_data) <-' , 'column_names <-' , column_na
 eval( parse( text = column_names_lines ) )
 
 
-# identify the .dat file
-nlsy97_dat <- nlsy_files[ grepl( "nlsy97(.*)dat$" , basename( nlsy_files ) ) ]
-
-
 # choose which columns to import
 columns_to_import <-
 	c( 'T5206900' , 'R9829600' , 'R0536300' , 'Z9061800' , 'T6657200' , 'R1205300' )
 
+	
+# for each column to import, look for a recoding block
+find_recoding_block <-
+	function( w ){
+		this_block_start <- min( grep( paste0( "data\\$" , w ) , nlsy97_r ) )
+		recode_lines <- seq( this_block_start , min( data_dollar[ data_dollar > this_block_start ] ) - 1 )
+		paste( nlsy97_r[ recode_lines ] , collapse = '' )
+	}
+
+recodes_to_run <- unlist( lapply( columns_to_import , find_recoding_block ) )
 	
 # readr::read_delim() columns must match their order in the csv file
 columns_to_import <-
@@ -57,6 +67,10 @@ columns_to_import <-
 	
 # confirm all column names are available
 stopifnot( all( columns_to_import %in% column_names ) )
+
+
+# identify the .dat file
+nlsy97_dat <- nlsy_files[ grepl( "nlsy97(.*)dat$" , basename( nlsy_files ) ) ]
 
 
 chapter_tag_variables_df <- 
@@ -73,9 +87,20 @@ chapter_tag_variables_df <-
 		) 
 	)
 
+recodes_to_run <- 
+	gsub( "data\\$" , "chapter_tag_variables_df$" , recodes_to_run )
+
+# align the main variables with what the R script says	
+for( this_recode in recodes_to_run ) eval( parse( text = this_recode ) )
+
+	
+# remove all missings
+chapter_tag_variables_df[ chapter_tag_variables_df < 0 ] <- NA
+
+	
 # cluster and strata variables
 chapter_tag_psustr_df <-
-	readRDS( grep( "strpsu\\.rds$" , nlsy_files , value = TRUE ) )
+	readRDS( grep( "strpsu\\\\.rds$" , nlsy_files , value = TRUE ) )
 	
 # you can read more about longitudinal weights here
 # http://www.nlsinfo.org/weights
@@ -90,7 +115,7 @@ chapter_tag_psustr_df <-
 # lodown:::get_nlsy_selections( "nlsy97" )
 
 # download weights for respondents in 1997
-w97 <- lodown:::nls_get_weights( "nlsy97" , 'YES' , 'SURV1997' )
+# w <- lodown:::nls_get_weights( "nlsy97" , 'YES' , 'SURV1997' )
 
 # download weights for respondents who were in any of the 1997, 2002, or 2007 surveys
 # w <- lodown:::nls_get_weights( "nlsy97" , 'YES' , c( 'SURV1997' , 'SURV2002' , 'SURV2007' ) )
@@ -103,13 +128,12 @@ w97 <- lodown:::nls_get_weights( "nlsy97" , 'YES' , 'SURV1997' )
 
 
 
+# merge weights with cluster and strata variables
+chapter_tag_survey_df <- merge( chapter_tag_psustr_df , w )
 
-# save those weights into an data.frame object called `w97`
-chapter_tag_survey_df <- merge( chapter_tag_psustr_df , w97 )
-
-
+# merge variables onto survey design
 chapter_tag_df <- merge( chapter_tag_variables_df , chapter_tag_survey_df )
-	
+
 chapter_tag_design <- 
 	svydesign( 
 		~ R1489800 , 
@@ -124,65 +148,32 @@ chapter_tag_design <-
 chapter_tag_design <- 
 	update( 
 		chapter_tag_design , 
-		q2 = q2 ,
-		never_rarely_wore_bike_helmet = as.numeric( qn8 == 1 ) ,
-		ever_smoked_marijuana = as.numeric( qn47 == 1 ) ,
-		ever_tried_to_quit_cigarettes = as.numeric( q36 > 2 ) ,
-		smoked_cigarettes_past_year = as.numeric( q36 > 1 )
+		bachelors_degree_or_higher = as.numeric( T6657200 >= 5 )
 	)
 ~~~
 
-group_by_variable: ever_smoked_marijuana
-group_by_variable_description: ever smoked marijuana
+group_by_variable: R1205300
+group_by_variable_description: 1997 RS RELATIONSHIP TO HOUSEHOLD PARENT FIGURE
 
-categorical_variable: q2
-categorical_variable_description: sex (1=female, 2=male)
+categorical_variable: T6657200
 categorical_narm: , na.rm = TRUE
 
-linear_variable: bmipct
-linear_variable_description: average body mass index percentile within the respondent's age and sex cohort
+linear_variable: T7545600
+linear_variable_description: 2011 total income from wages and salary in past year
 linear_narm: , na.rm = TRUE
 
-ratio_estimation_numerator: ever_tried_to_quit_cigarettes
-ratio_estimation_denominator: smoked_cigarettes_past_year
+ratio_estimation_numerator: R9829600
+ratio_estimation_denominator: T7545600
 ratio_narm: , na.rm = TRUE
 
-subset_definition: qn41 == 1
-subset_definition_description: youths who ever drank alcohol
+subset_definition: R1205300 %in% c( "Biological mother only" , "Biological father only" )
+subset_definition_description: raised by only biological mother or father
 
-binary_variable: never_rarely_wore_bike_helmet
-binary_variable_description: never or rarely wore a bicycle helmet
+binary_variable: bachelors_degree_or_higher
 binary_narm: , na.rm = TRUE
 
 needs_srvyr_block: yes
 
-~~~{replication_example_block}
----
-
-## Replication Example {-}
-
-This snippet replicates the "never/rarely wore bicycle helmet" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2015/2015_yrbs_analysis_software.pdf#page=29).
-
-```{r eval = FALSE , results = "hide" }
-
-unwtd.count( ~ never_rarely_wore_bike_helmet , yrbss_design )
-
-svytotal( ~ one , subset( yrbss_design , !is.na( never_rarely_wore_bike_helmet ) ) )
- 
-svymean( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE )
-
-svyciprop( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE , method = "beta" )
-
-```
-
-~~~
-
-
-
-
-
 
 needs_travis_build_status_line: yes
 
-
-dependencies: library(archive)

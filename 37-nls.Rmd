@@ -30,7 +30,7 @@ nls_cat <-
 	get_catalog( "nls" ,
 		output_dir = file.path( path.expand( "~" ) , "NLS" ) )
 
-# 2015 only
+# National Longitudinal Survey of Youth, 1997 only
 nls_cat <- subset( nls_cat , study_name == 'NLS Youth 1997 (NLSY97)' )
 # download the microdata to your local computer
 nls_cat <- lodown( "nls" , nls_cat )
@@ -45,6 +45,8 @@ Construct a complex sample survey design:
 ```
 
 ```{r eval = FALSE }
+options( survey.lonely.psu = "adjust" )
+
 library(survey)
 
 nlsy_files <- 
@@ -58,6 +60,8 @@ nlsy_files <-
 nlsy97_r <- 
 	readLines( nlsy_files[ grepl( "nlsy97(.*)R$" , basename( nlsy_files ) ) ] )
 
+# find all instances of "data$" in the r script
+data_dollar <- grep( "data\$" , nlsy97_r )
 	
 # extract the column names from the R script
 first_line <- grep( "names(new_data) <-" , nlsy97_r , fixed = TRUE )
@@ -67,13 +71,20 @@ column_names_lines <- nlsy97_r[ seq( first_line , last_line ) ]
 column_names_lines <- gsub( 'names(new_data) <-' , 'column_names <-' , column_names_lines , fixed = TRUE )
 eval( parse( text = column_names_lines ) )
 
-# identify the .dat file
-nlsy97_dat <- nlsy_files[ grepl( "nlsy97(.*)dat$" , basename( nlsy_files ) ) ]
-
 # choose which columns to import
 columns_to_import <-
 	c( 'T5206900' , 'R9829600' , 'R0536300' , 'Z9061800' , 'T6657200' , 'R1205300' )
 
+	
+# for each column to import, look for a recoding block
+find_recoding_block <-
+	function( w ){
+		this_block_start <- min( grep( paste0( "data\$" , w ) , nlsy97_r ) )
+		recode_lines <- seq( this_block_start , min( data_dollar[ data_dollar > this_block_start ] ) - 1 )
+		paste( nlsy97_r[ recode_lines ] , collapse = '' )
+	}
+
+recodes_to_run <- unlist( lapply( columns_to_import , find_recoding_block ) )
 	
 # readr::read_delim() columns must match their order in the csv file
 columns_to_import <-
@@ -82,6 +93,9 @@ columns_to_import <-
 	
 # confirm all column names are available
 stopifnot( all( columns_to_import %in% column_names ) )
+
+# identify the .dat file
+nlsy97_dat <- nlsy_files[ grepl( "nlsy97(.*)dat$" , basename( nlsy_files ) ) ]
 
 nls_variables_df <- 
 	data.frame( 
@@ -97,9 +111,20 @@ nls_variables_df <-
 		) 
 	)
 
+recodes_to_run <- 
+	gsub( "data\$" , "nls_variables_df$" , recodes_to_run )
+
+# align the main variables with what the R script says	
+for( this_recode in recodes_to_run ) eval( parse( text = this_recode ) )
+
+	
+# remove all missings
+nls_variables_df[ nls_variables_df < 0 ] <- NA
+
+	
 # cluster and strata variables
 nls_psustr_df <-
-	readRDS( grep( "strpsu\.rds$" , nlsy_files , value = TRUE ) )
+	readRDS( grep( "strpsu\\.rds$" , nlsy_files , value = TRUE ) )
 	
 # you can read more about longitudinal weights here
 # http://www.nlsinfo.org/weights
@@ -113,7 +138,7 @@ nls_psustr_df <-
 # lodown:::get_nlsy_selections( "nlsy97" )
 
 # download weights for respondents in 1997
-w97 <- lodown:::nls_get_weights( "nlsy97" , 'YES' , 'SURV1997' )
+# w <- lodown:::nls_get_weights( "nlsy97" , 'YES' , 'SURV1997' )
 
 # download weights for respondents who were in any of the 1997, 2002, or 2007 surveys
 # w <- lodown:::nls_get_weights( "nlsy97" , 'YES' , c( 'SURV1997' , 'SURV2002' , 'SURV2007' ) )
@@ -124,11 +149,12 @@ w97 <- lodown:::nls_get_weights( "nlsy97" , 'YES' , 'SURV1997' )
 # download weights for respondents who are in all available surveys
 # w <- lodown:::nls_get_weights( "nlsy97" , "NO" , lodown:::nls_get_selections( "nlsy97" ) )
 
-# save those weights into an data.frame object called `w97`
-nls_survey_df <- merge( nls_psustr_df , w97 )
+# merge weights with cluster and strata variables
+nls_survey_df <- merge( nls_psustr_df , w )
 
+# merge variables onto survey design
 nls_df <- merge( nls_variables_df , nls_survey_df )
-	
+
 nls_design <- 
 	svydesign( 
 		~ R1489800 , 
@@ -146,11 +172,7 @@ Add new columns to the data set:
 nls_design <- 
 	update( 
 		nls_design , 
-		q2 = q2 ,
-		never_rarely_wore_bike_helmet = as.numeric( qn8 == 1 ) ,
-		ever_smoked_marijuana = as.numeric( qn47 == 1 ) ,
-		ever_tried_to_quit_cigarettes = as.numeric( q36 > 2 ) ,
-		smoked_cigarettes_past_year = as.numeric( q36 > 1 )
+		bachelors_degree_or_higher = as.numeric( T6657200 >= 5 )
 	)
 ```
 
@@ -160,7 +182,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 sum( weights( nls_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ ever_smoked_marijuana , nls_design , unwtd.count )
+svyby( ~ one , ~ R1205300 , nls_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
@@ -168,46 +190,46 @@ Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , nls_design )
 
-svyby( ~ one , ~ ever_smoked_marijuana , nls_design , svytotal )
+svyby( ~ one , ~ R1205300 , nls_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ bmipct , nls_design , na.rm = TRUE )
+svymean( ~ T7545600 , nls_design , na.rm = TRUE )
 
-svyby( ~ bmipct , ~ ever_smoked_marijuana , nls_design , svymean , na.rm = TRUE )
+svyby( ~ T7545600 , ~ R1205300 , nls_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ q2 , nls_design , na.rm = TRUE )
+svymean( ~ T6657200 , nls_design , na.rm = TRUE )
 
-svyby( ~ q2 , ~ ever_smoked_marijuana , nls_design , svymean , na.rm = TRUE )
+svyby( ~ T6657200 , ~ R1205300 , nls_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ bmipct , nls_design , na.rm = TRUE )
+svytotal( ~ T7545600 , nls_design , na.rm = TRUE )
 
-svyby( ~ bmipct , ~ ever_smoked_marijuana , nls_design , svytotal , na.rm = TRUE )
+svyby( ~ T7545600 , ~ R1205300 , nls_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ q2 , nls_design , na.rm = TRUE )
+svytotal( ~ T6657200 , nls_design , na.rm = TRUE )
 
-svyby( ~ q2 , ~ ever_smoked_marijuana , nls_design , svytotal , na.rm = TRUE )
+svyby( ~ T6657200 , ~ R1205300 , nls_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ bmipct , nls_design , 0.5 , na.rm = TRUE )
+svyquantile( ~ T7545600 , nls_design , 0.5 , na.rm = TRUE )
 
 svyby( 
-	~ bmipct , 
-	~ ever_smoked_marijuana , 
+	~ T7545600 , 
+	~ R1205300 , 
 	nls_design , 
 	svyquantile , 
 	0.5 ,
@@ -220,8 +242,8 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ ever_tried_to_quit_cigarettes , 
-	denominator = ~ smoked_cigarettes_past_year , 
+	numerator = ~ R9829600 , 
+	denominator = ~ T7545600 , 
 	nls_design ,
 	na.rm = TRUE
 )
@@ -229,20 +251,20 @@ svyratio(
 
 ### Subsetting {-}
 
-Restrict the survey design to youths who ever drank alcohol:
+Restrict the survey design to raised by only biological mother or father:
 ```{r eval = FALSE , results = "hide" }
-sub_nls_design <- subset( nls_design , qn41 == 1 )
+sub_nls_design <- subset( nls_design , R1205300 %in% c( "Biological mother only" , "Biological father only" ) )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ bmipct , sub_nls_design , na.rm = TRUE )
+svymean( ~ T7545600 , sub_nls_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ bmipct , nls_design , na.rm = TRUE )
+this_result <- svymean( ~ T7545600 , nls_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -251,8 +273,8 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ bmipct , 
-		~ ever_smoked_marijuana , 
+		~ T7545600 , 
+		~ R1205300 , 
 		nls_design , 
 		svymean ,
 		na.rm = TRUE 
@@ -271,21 +293,21 @@ degf( nls_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ bmipct , nls_design , na.rm = TRUE )
+svyvar( ~ T7545600 , nls_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ bmipct , nls_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ T7545600 , nls_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ bmipct , nls_design , na.rm = TRUE , deff = "replace" )
+svymean( ~ T7545600 , nls_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-svyciprop( ~ never_rarely_wore_bike_helmet , nls_design ,
+svyciprop( ~ bachelors_degree_or_higher , nls_design ,
 	method = "likelihood" , na.rm = TRUE )
 ```
 
@@ -293,13 +315,13 @@ svyciprop( ~ never_rarely_wore_bike_helmet , nls_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( bmipct ~ never_rarely_wore_bike_helmet , nls_design )
+svyttest( T7545600 ~ bachelors_degree_or_higher , nls_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
 svychisq( 
-	~ never_rarely_wore_bike_helmet + q2 , 
+	~ bachelors_degree_or_higher + T6657200 , 
 	nls_design 
 )
 ```
@@ -308,7 +330,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		bmipct ~ never_rarely_wore_bike_helmet + q2 , 
+		T7545600 ~ bachelors_degree_or_higher + T6657200 , 
 		nls_design 
 	)
 
@@ -326,28 +348,11 @@ nls_srvyr_design <- as_survey( nls_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 nls_srvyr_design %>%
-	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
+	summarize( mean = survey_mean( T7545600 , na.rm = TRUE ) )
 
 nls_srvyr_design %>%
-	group_by( ever_smoked_marijuana ) %>%
-	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
+	group_by( R1205300 ) %>%
+	summarize( mean = survey_mean( T7545600 , na.rm = TRUE ) )
 ```
 
----
-
-## Replication Example {-}
-
-This snippet replicates the "never/rarely wore bicycle helmet" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2015/2015_yrbs_analysis_software.pdf#page=29).
-
-```{r eval = FALSE , results = "hide" }
-
-unwtd.count( ~ never_rarely_wore_bike_helmet , yrbss_design )
-
-svytotal( ~ one , subset( yrbss_design , !is.na( never_rarely_wore_bike_helmet ) ) )
- 
-svymean( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE )
-
-svyciprop( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE , method = "beta" )
-
-```
 
