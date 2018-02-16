@@ -997,7 +997,7 @@ nlsy97_r &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">readLines</span>( nlsy_files[ <span class="kw">grepl</span>( <span class="st">&quot;nlsy97(.*)R$&quot;</span> , <span class="kw">basename</span>( nlsy_files ) ) ] )
 
 <span class="co"># find all instances of &quot;data$&quot; in the r script</span>
-data_dollar &lt;-<span class="st"> </span><span class="kw">grep</span>( <span class="st">&quot;data\$&quot;</span> , nlsy97_r )
+data_dollar &lt;-<span class="st"> </span><span class="kw">grep</span>( <span class="st">&quot;data</span><span class="ch">\\</span><span class="st">$&quot;</span> , nlsy97_r )
     
 <span class="co"># extract the column names from the R script</span>
 first_line &lt;-<span class="st"> </span><span class="kw">grep</span>( <span class="st">&quot;names(new_data) &lt;-&quot;</span> , nlsy97_r , <span class="dt">fixed =</span> <span class="ot">TRUE</span> )
@@ -1015,7 +1015,7 @@ columns_to_import &lt;-
 <span class="co"># for each column to import, look for a recoding block</span>
 find_recoding_block &lt;-
 <span class="st">    </span><span class="cf">function</span>( w ){
-        this_block_start &lt;-<span class="st"> </span><span class="kw">min</span>( <span class="kw">grep</span>( <span class="kw">paste0</span>( <span class="st">&quot;data\$&quot;</span> , w ) , nlsy97_r ) )
+        this_block_start &lt;-<span class="st"> </span><span class="kw">min</span>( <span class="kw">grep</span>( <span class="kw">paste0</span>( <span class="st">&quot;data</span><span class="ch">\\</span><span class="st">$&quot;</span> , w ) , nlsy97_r ) )
         recode_lines &lt;-<span class="st"> </span><span class="kw">seq</span>( this_block_start , <span class="kw">min</span>( data_dollar[ data_dollar <span class="op">&gt;</span><span class="st"> </span>this_block_start ] ) <span class="op">-</span><span class="st"> </span><span class="dv">1</span> )
         <span class="kw">paste</span>( nlsy97_r[ recode_lines ] , <span class="dt">collapse =</span> <span class="st">&#39;&#39;</span> )
     }
@@ -1048,7 +1048,7 @@ nls_variables_df &lt;-<span class="st"> </span>
     )
 
 recodes_to_run &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">gsub</span>( <span class="st">&quot;data\$&quot;</span> , <span class="st">&quot;nls_variables_df$&quot;</span> , recodes_to_run )
+<span class="st">    </span><span class="kw">gsub</span>( <span class="st">&quot;data</span><span class="ch">\\</span><span class="st">$&quot;</span> , <span class="st">&quot;nls_variables_df$&quot;</span> , recodes_to_run )
 
 <span class="co"># align the main variables with what the R script says  </span>
 <span class="cf">for</span>( this_recode <span class="cf">in</span> recodes_to_run ) <span class="kw">eval</span>( <span class="kw">parse</span>( <span class="dt">text =</span> this_recode ) )

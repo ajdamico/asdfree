@@ -34,7 +34,7 @@ nlsy97_r <-
 	readLines( nlsy_files[ grepl( "nlsy97(.*)R$" , basename( nlsy_files ) ) ] )
 
 # find all instances of "data$" in the r script
-data_dollar <- grep( "data\\$" , nlsy97_r )
+data_dollar <- grep( "data\\\\$" , nlsy97_r )
 	
 # extract the column names from the R script
 first_line <- grep( "names(new_data) <-" , nlsy97_r , fixed = TRUE )
@@ -53,7 +53,7 @@ columns_to_import <-
 # for each column to import, look for a recoding block
 find_recoding_block <-
 	function( w ){
-		this_block_start <- min( grep( paste0( "data\\$" , w ) , nlsy97_r ) )
+		this_block_start <- min( grep( paste0( "data\\\\$" , w ) , nlsy97_r ) )
 		recode_lines <- seq( this_block_start , min( data_dollar[ data_dollar > this_block_start ] ) - 1 )
 		paste( nlsy97_r[ recode_lines ] , collapse = '' )
 	}
@@ -88,7 +88,7 @@ chapter_tag_variables_df <-
 	)
 
 recodes_to_run <- 
-	gsub( "data\\$" , "chapter_tag_variables_df$" , recodes_to_run )
+	gsub( "data\\\\$" , "chapter_tag_variables_df$" , recodes_to_run )
 
 # align the main variables with what the R script says	
 for( this_recode in recodes_to_run ) eval( parse( text = this_recode ) )
