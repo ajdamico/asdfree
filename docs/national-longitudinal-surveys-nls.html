@@ -958,7 +958,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul>
 <li><p>Multiple panels, each with one table with one row per sampled panel respondent.</p></li>
 <li><p>A series of complex sample surveys designed to generalize to various cohorts of Americans born during <a href="https://www.bls.gov/nls/overview.htm">designated time periods</a>.</p></li>
-<li><p>Updated biennally for most non-discontinued panels.</p></li>
+<li><p>Updated biennally for most active panels.</p></li>
 <li><p>Administered by the <a href="http://www.bls.gov/">Bureau of Labor Statistics</a>.</p></li>
 </ul>
 <div id="simplified-download-and-importation-30" class="section level2 unnumbered">
@@ -1004,7 +1004,8 @@ first_line &lt;-<span class="st"> </span><span class="kw">grep</span>( <span cla
 close_parentheses &lt;-<span class="st"> </span><span class="kw">grep</span>( <span class="st">&quot;)&quot;</span> , nlsy97_r , <span class="dt">fixed =</span> <span class="ot">TRUE</span> )
 last_line &lt;-<span class="st"> </span><span class="kw">min</span>( close_parentheses[ close_parentheses <span class="op">&gt;</span><span class="st"> </span>first_line ] )
 column_names_lines &lt;-<span class="st"> </span>nlsy97_r[ <span class="kw">seq</span>( first_line , last_line ) ]
-column_names_lines &lt;-<span class="st"> </span><span class="kw">gsub</span>( <span class="st">&#39;names(new_data) &lt;-&#39;</span> , <span class="st">&#39;column_names &lt;-&#39;</span> , column_names_lines , <span class="dt">fixed =</span> <span class="ot">TRUE</span> )
+column_names_lines &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">gsub</span>( <span class="st">&#39;names(new_data) &lt;-&#39;</span> , <span class="st">&#39;column_names &lt;-&#39;</span> , column_names_lines , <span class="dt">fixed =</span> <span class="ot">TRUE</span> )
 <span class="kw">eval</span>( <span class="kw">parse</span>( <span class="dt">text =</span> column_names_lines ) )
 
 <span class="co"># choose which columns to import</span>
@@ -1015,9 +1016,17 @@ columns_to_import &lt;-
 <span class="co"># for each column to import, look for a recoding block</span>
 find_recoding_block &lt;-
 <span class="st">    </span><span class="cf">function</span>( w ){
+        
         this_block_start &lt;-<span class="st"> </span><span class="kw">min</span>( <span class="kw">grep</span>( <span class="kw">paste0</span>( <span class="st">&quot;data</span><span class="ch">\\</span><span class="st">$&quot;</span> , w ) , nlsy97_r ) )
-        recode_lines &lt;-<span class="st"> </span><span class="kw">seq</span>( this_block_start , <span class="kw">min</span>( data_dollar[ data_dollar <span class="op">&gt;</span><span class="st"> </span>this_block_start ] ) <span class="op">-</span><span class="st"> </span><span class="dv">1</span> )
+        
+        recode_lines &lt;-<span class="st"> </span>
+<span class="st">            </span><span class="kw">seq</span>( 
+                this_block_start , 
+                <span class="kw">min</span>( data_dollar[ data_dollar <span class="op">&gt;</span><span class="st"> </span>this_block_start ] ) <span class="op">-</span><span class="st"> </span><span class="dv">1</span> 
+            )
+            
         <span class="kw">paste</span>( nlsy97_r[ recode_lines ] , <span class="dt">collapse =</span> <span class="st">&#39;&#39;</span> )
+        
     }
 
 recodes_to_run &lt;-<span class="st"> </span><span class="kw">unlist</span>( <span class="kw">lapply</span>( columns_to_import , find_recoding_block ) )
@@ -1068,8 +1077,6 @@ nls_psustr_df &lt;-
 <span class="co"># the lodown:::get_nlsy_weights function returns a data.frame object</span>
 <span class="co"># containing the unique person identifiers and also a column of weights.</span>
 
-<span class="co"># this makes it easy to choose the correct longitudinal weight for whatever analysis you&#39;re trying to do.</span>
-
 <span class="co"># view which points-in-time are available for a particular study</span>
 <span class="co"># lodown:::get_nlsy_selections( &quot;nlsy97&quot; )</span>
 
@@ -1077,13 +1084,16 @@ nls_psustr_df &lt;-
 <span class="co"># w &lt;- lodown:::nls_get_weights( &quot;nlsy97&quot; , &#39;YES&#39; , &#39;SURV1997&#39; )</span>
 
 <span class="co"># download weights for respondents who were in any of the 1997, 2002, or 2007 surveys</span>
-<span class="co"># w &lt;- lodown:::nls_get_weights( &quot;nlsy97&quot; , &#39;YES&#39; , c( &#39;SURV1997&#39; , &#39;SURV2002&#39; , &#39;SURV2007&#39; ) )</span>
+<span class="co"># w &lt;- </span>
+<span class="co">#   lodown:::nls_get_weights( &quot;nlsy97&quot; , &#39;YES&#39; , c( &#39;SURV1997&#39; , &#39;SURV2002&#39; , &#39;SURV2007&#39; ) )</span>
 
 <span class="co"># download weights for respondents who were in all of the 1997, 2002, and 2007 surveys</span>
-<span class="co"># w &lt;- lodown:::nls_get_weights( &quot;nlsy97&quot; , &#39;NO&#39; , c( &#39;SURV1997&#39; , &#39;SURV2002&#39; , &#39;SURV2007&#39; ) )</span>
+<span class="co"># w &lt;- </span>
+<span class="co">#   lodown:::nls_get_weights( &quot;nlsy97&quot; , &#39;NO&#39; , c( &#39;SURV1997&#39; , &#39;SURV2002&#39; , &#39;SURV2007&#39; ) )</span>
 
 <span class="co"># download weights for respondents who are in all available surveys</span>
-<span class="co"># w &lt;- lodown:::nls_get_weights( &quot;nlsy97&quot; , &quot;NO&quot; , lodown:::nls_get_selections( &quot;nlsy97&quot; ) )</span>
+<span class="co"># w &lt;- </span>
+<span class="co">#   lodown:::nls_get_weights( &quot;nlsy97&quot; , &quot;NO&quot; , lodown:::nls_get_selections( &quot;nlsy97&quot; ) )</span>
 
 <span class="co"># merge weights with cluster and strata variables</span>
 nls_survey_df &lt;-<span class="st"> </span><span class="kw">merge</span>( nls_psustr_df , w )
@@ -1163,8 +1173,8 @@ nls_design &lt;-<span class="st"> </span>
 </div>
 <div id="subsetting-30" class="section level3 unnumbered">
 <h3>Subsetting</h3>
-<p>Restrict the survey design to raised by only biological mother or father:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_nls_design &lt;-<span class="st"> </span><span class="kw">subset</span>( nls_design , R1205300 <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>( <span class="st">&quot;Biological mother only&quot;</span> , <span class="st">&quot;Biological father only&quot;</span> ) )</code></pre></div>
+<p>Restrict the survey design to raised by only biological mother or father in 1997:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_nls_design &lt;-<span class="st"> </span><span class="kw">subset</span>( nls_design , R1205300 <span class="op">%in%</span><span class="st"> </span><span class="dv">4</span><span class="op">:</span><span class="dv">5</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>T7545600 , sub_nls_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>

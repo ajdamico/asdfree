@@ -8,7 +8,7 @@ The National Longitudinal Surveys follow the same sample of individuals from spe
 
 * A series of complex sample surveys designed to generalize to various cohorts of Americans born during [designated time periods](https://www.bls.gov/nls/overview.htm).
 
-* Updated biennally for most non-discontinued panels.
+* Updated biennally for most active panels.
 
 * Administered by the [Bureau of Labor Statistics](http://www.bls.gov/).
 
@@ -68,7 +68,8 @@ first_line <- grep( "names(new_data) <-" , nlsy97_r , fixed = TRUE )
 close_parentheses <- grep( ")" , nlsy97_r , fixed = TRUE )
 last_line <- min( close_parentheses[ close_parentheses > first_line ] )
 column_names_lines <- nlsy97_r[ seq( first_line , last_line ) ]
-column_names_lines <- gsub( 'names(new_data) <-' , 'column_names <-' , column_names_lines , fixed = TRUE )
+column_names_lines <- 
+	gsub( 'names(new_data) <-' , 'column_names <-' , column_names_lines , fixed = TRUE )
 eval( parse( text = column_names_lines ) )
 
 # choose which columns to import
@@ -79,9 +80,17 @@ columns_to_import <-
 # for each column to import, look for a recoding block
 find_recoding_block <-
 	function( w ){
+		
 		this_block_start <- min( grep( paste0( "data\\$" , w ) , nlsy97_r ) )
-		recode_lines <- seq( this_block_start , min( data_dollar[ data_dollar > this_block_start ] ) - 1 )
+		
+		recode_lines <- 
+			seq( 
+				this_block_start , 
+				min( data_dollar[ data_dollar > this_block_start ] ) - 1 
+			)
+			
 		paste( nlsy97_r[ recode_lines ] , collapse = '' )
+		
 	}
 
 recodes_to_run <- unlist( lapply( columns_to_import , find_recoding_block ) )
@@ -132,8 +141,6 @@ nls_psustr_df <-
 # the lodown:::get_nlsy_weights function returns a data.frame object
 # containing the unique person identifiers and also a column of weights.
 
-# this makes it easy to choose the correct longitudinal weight for whatever analysis you're trying to do.
-
 # view which points-in-time are available for a particular study
 # lodown:::get_nlsy_selections( "nlsy97" )
 
@@ -141,13 +148,16 @@ nls_psustr_df <-
 # w <- lodown:::nls_get_weights( "nlsy97" , 'YES' , 'SURV1997' )
 
 # download weights for respondents who were in any of the 1997, 2002, or 2007 surveys
-# w <- lodown:::nls_get_weights( "nlsy97" , 'YES' , c( 'SURV1997' , 'SURV2002' , 'SURV2007' ) )
+# w <- 
+# 	lodown:::nls_get_weights( "nlsy97" , 'YES' , c( 'SURV1997' , 'SURV2002' , 'SURV2007' ) )
 
 # download weights for respondents who were in all of the 1997, 2002, and 2007 surveys
-# w <- lodown:::nls_get_weights( "nlsy97" , 'NO' , c( 'SURV1997' , 'SURV2002' , 'SURV2007' ) )
+# w <- 
+# 	lodown:::nls_get_weights( "nlsy97" , 'NO' , c( 'SURV1997' , 'SURV2002' , 'SURV2007' ) )
 
 # download weights for respondents who are in all available surveys
-# w <- lodown:::nls_get_weights( "nlsy97" , "NO" , lodown:::nls_get_selections( "nlsy97" ) )
+# w <- 
+# 	lodown:::nls_get_weights( "nlsy97" , "NO" , lodown:::nls_get_selections( "nlsy97" ) )
 
 # merge weights with cluster and strata variables
 nls_survey_df <- merge( nls_psustr_df , w )
@@ -251,9 +261,9 @@ svyratio(
 
 ### Subsetting {-}
 
-Restrict the survey design to raised by only biological mother or father:
+Restrict the survey design to raised by only biological mother or father in 1997:
 ```{r eval = FALSE , results = "hide" }
-sub_nls_design <- subset( nls_design , R1205300 %in% c( "Biological mother only" , "Biological father only" ) )
+sub_nls_design <- subset( nls_design , R1205300 %in% 4:5 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
