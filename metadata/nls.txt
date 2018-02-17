@@ -48,7 +48,7 @@ eval( parse( text = column_names_lines ) )
 
 # choose which columns to import
 columns_to_import <-
-	c( 'T5206900' , 'R9829600' , 'R0536300' , 'Z9061800' , 'T6657200' , 'R1205300' )
+	c( 'R0000100' , 'T5206900' , 'R9829600' , 'R0536300' , 'Z9061800' , 'T6657200' , 'R1205300' )
 
 	
 # for each column to import, look for a recoding block
@@ -96,17 +96,15 @@ chapter_tag_variables_df <-
 		) 
 	)
 
+# remove all missings
+chapter_tag_variables_df[ chapter_tag_variables_df < 0 ] <- NA
+
 recodes_to_run <- 
 	gsub( "data\\\\$" , "chapter_tag_variables_df$" , recodes_to_run )
 
 # align the main variables with what the R script says	
 for( this_recode in recodes_to_run ) eval( parse( text = this_recode ) )
 
-	
-# remove all missings
-chapter_tag_variables_df[ chapter_tag_variables_df < 0 ] <- NA
-
-	
 # cluster and strata variables
 chapter_tag_psustr_df <-
 	readRDS( grep( "strpsu\\\\.rds$" , nlsy_files , value = TRUE ) )
@@ -157,7 +155,7 @@ chapter_tag_design <-
 chapter_tag_design <- 
 	update( 
 		chapter_tag_design , 
-		bachelors_degree_or_higher = as.numeric( as.numeric( T6657200 ) >= 5 )
+		bachelors_degree_or_higher = as.numeric( T6657200 >= 5 )
 	)
 ~~~
 
@@ -183,13 +181,6 @@ binary_narm: , na.rm = TRUE
 
 needs_srvyr_block: yes
 
-
 needs_travis_build_status_line: yes
 
-
 needs_7za_install: yes
-
-
-sample_setup_breaks: 7
-
-broken_sample_test_condition: any( grepl( "nlsy97" , chapter_tag_cat$full_url ) )

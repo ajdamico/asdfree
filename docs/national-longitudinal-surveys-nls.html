@@ -1010,7 +1010,7 @@ column_names_lines &lt;-<span class="st"> </span>
 
 <span class="co"># choose which columns to import</span>
 columns_to_import &lt;-
-<span class="st">    </span><span class="kw">c</span>( <span class="st">&#39;T5206900&#39;</span> , <span class="st">&#39;R9829600&#39;</span> , <span class="st">&#39;R0536300&#39;</span> , <span class="st">&#39;Z9061800&#39;</span> , <span class="st">&#39;T6657200&#39;</span> , <span class="st">&#39;R1205300&#39;</span> )
+<span class="st">    </span><span class="kw">c</span>( <span class="st">&#39;R0000100&#39;</span> , <span class="st">&#39;T5206900&#39;</span> , <span class="st">&#39;R9829600&#39;</span> , <span class="st">&#39;R0536300&#39;</span> , <span class="st">&#39;Z9061800&#39;</span> , <span class="st">&#39;T6657200&#39;</span> , <span class="st">&#39;R1205300&#39;</span> )
 
     
 <span class="co"># for each column to import, look for a recoding block</span>
@@ -1056,17 +1056,15 @@ nls_variables_df &lt;-<span class="st"> </span>
         ) 
     )
 
+<span class="co"># remove all missings</span>
+nls_variables_df[ nls_variables_df <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span> ] &lt;-<span class="st"> </span><span class="ot">NA</span>
+
 recodes_to_run &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">gsub</span>( <span class="st">&quot;data</span><span class="ch">\\</span><span class="st">$&quot;</span> , <span class="st">&quot;nls_variables_df$&quot;</span> , recodes_to_run )
 
 <span class="co"># align the main variables with what the R script says  </span>
 <span class="cf">for</span>( this_recode <span class="cf">in</span> recodes_to_run ) <span class="kw">eval</span>( <span class="kw">parse</span>( <span class="dt">text =</span> this_recode ) )
 
-    
-<span class="co"># remove all missings</span>
-nls_variables_df[ nls_variables_df <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span> ] &lt;-<span class="st"> </span><span class="ot">NA</span>
-
-    
 <span class="co"># cluster and strata variables</span>
 nls_psustr_df &lt;-
 <span class="st">    </span><span class="kw">readRDS</span>( <span class="kw">grep</span>( <span class="st">&quot;strpsu</span><span class="ch">\\</span><span class="st">.rds$&quot;</span> , nlsy_files , <span class="dt">value =</span> <span class="ot">TRUE</span> ) )
@@ -1115,7 +1113,7 @@ nls_design &lt;-<span class="st"> </span>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nls_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">update</span>( 
         nls_design , 
-        <span class="dt">bachelors_degree_or_higher =</span> <span class="kw">as.numeric</span>( <span class="kw">as.numeric</span>( T6657200 ) <span class="op">&gt;=</span><span class="st"> </span><span class="dv">5</span> )
+        <span class="dt">bachelors_degree_or_higher =</span> <span class="kw">as.numeric</span>( T6657200 <span class="op">&gt;=</span><span class="st"> </span><span class="dv">5</span> )
     )</code></pre></div>
 </div>
 <div id="unweighted-counts-30" class="section level3 unnumbered">
