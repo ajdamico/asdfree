@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'nls delim'"
+commit_memo <- "'postprocess edit button'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 # non-survey, not database-backed (ahrf)
@@ -11,10 +11,10 @@ commit_memo <- "'nls delim'"
 # multiply-imputed, database-backed survey (pisa)
 
 
-github_password <- readLines( "C:\\Users\\anthonyd\\Documents\\github password.txt" )
-source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\descriptive_statistics_blocks.R" )
-source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\measures_of_uncertainty_blocks.R" )
-source( "C:\\Users\\anthonyd\\Documents\\GitHub\\asdfree\\vignetterator\\tests_of_association_blocks.R" )
+github_password <- readLines( file.path( path.expand( "~" ) , "github password.txt" ) )
+source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\descriptive_statistics_blocks.R" ) )
+source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\measures_of_uncertainty_blocks.R" ) )
+source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\tests_of_association_blocks.R" ) )
 
 
 needs_travis_build_status_line <- "[![Build Status](https://travis-ci.org/asdfree/chapter_tag.svg?branch=master)](https://travis-ci.org/asdfree/chapter_tag) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chapter_tag?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chapter_tag)"
@@ -246,6 +246,51 @@ setwd( book_folder )
 clean_site()
 render_site(output_format = 'bookdown::gitbook', encoding = 'UTF-8')
 # render_site( encoding = 'UTF-8' )
+
+
+# redirect "edit" buttons on metadata-driven pages #
+html_files <- 
+	grep( 
+		"html$" ,
+		list.files( 
+			file.path( path.expand( "~" ) , "Github\\asdfree\\docs" ) ,
+			full.names = TRUE ,
+			recursive = FALSE
+		) ,
+		value = TRUE
+	)
+	
+	
+for( this_metafile in metafiles ){
+
+	chapter_tag <- gsub( "\\.txt$" , "" , basename( this_metafile ) )
+	
+	link_line <-
+		paste0(
+			'"link": "https://github.com/ajdamico/asdfree/edit/master/' ,
+			stringr::str_pad( fixed_chapters + which( this_metafile == metafiles ) , pad = '0' , width = 2 ) ,
+			'-' ,
+			chapter_tag ,
+			'.Rmd",'
+		)
+
+	html_file <- html_files[ grep( paste0( '-' , chapter_tag , '.html$' ) , html_files ) ]
+
+	html_lines <- readLines( html_file )
+
+	html_lines <-
+		gsub( 
+			link_line ,
+			paste0( '"link": "https://github.com/ajdamico/asdfree/edit/master/metadata/' , chapter_tag , '.txt",' ) ,
+			html_lines ,
+			fixed = TRUE
+		)
+		
+	writeLines( html_lines , html_file )
+	
+}
+# end of redirecting "edit" buttons on metadata-driven pages #
+
 
 
 
