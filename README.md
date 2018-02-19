@@ -17,8 +17,6 @@ bsapuf: [![Build Status](https://travis-ci.org/asdfree/bsapuf.svg?branch=master)
 
 censo: [![Build Status](https://travis-ci.org/asdfree/censo.svg?branch=master)](https://travis-ci.org/asdfree/censo) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/censo?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/censo)
 
-censoescolar: [![Build Status](https://travis-ci.org/asdfree/censoescolar.svg?branch=master)](https://travis-ci.org/asdfree/censoescolar) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/censoescolar?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/censoescolar)
-
 ces: [![Build Status](https://travis-ci.org/asdfree/ces.svg?branch=master)](https://travis-ci.org/asdfree/ces) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ces?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ces)
 
 chis: [![Build Status](https://travis-ci.org/asdfree/chis.svg?branch=master)](https://travis-ci.org/asdfree/chis) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chis?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chis)
