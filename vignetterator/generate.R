@@ -308,6 +308,8 @@ rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Gith
 ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "travis|appveyor" , readLines( w ) ) & grepl( "Build Status" , readLines( w ) ) ) )
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
+# in case asdfree repo needs to be deleted and restored:
+# system( paste0( "powershell git clone https://ajdamico:" , github_password , "@github.com/ajdamico/asdfree/ 'C:/Users/AnthonyD/Documents/Github/asdfree/'" ) )
 
 for( this_ci_file in ci_rmd_files ){
 
