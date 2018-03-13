@@ -959,9 +959,20 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Construct a complex sample survey design:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(survey)
 
-gss_df &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">readRDS</span>( <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;GSS&quot;</span> , 
-        <span class="st">&quot;gss 1972 2016 cross sectional cumulative data release 2 september 29 2017.rds&quot;</span> ) )
+gss_files &lt;-
+<span class="st">    </span><span class="kw">list.files</span>(
+        <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;GSS&quot;</span> ) ,
+        <span class="dt">full.names =</span> <span class="ot">TRUE</span> 
+    )
+
+gss_rds &lt;-
+<span class="st">    </span><span class="kw">grep</span>( 
+        <span class="st">&quot;cross sectional cumulative(.*)\.rds$&quot;</span> , 
+        gss_files , 
+        <span class="dt">value =</span> <span class="ot">TRUE</span> 
+    )
+    
+gss_df &lt;-<span class="st"> </span><span class="kw">readRDS</span>( gss_rds )
 
 gss_df &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">transform</span>( 

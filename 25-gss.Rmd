@@ -32,9 +32,20 @@ Construct a complex sample survey design:
 ```{r eval = FALSE }
 library(survey)
 
-gss_df <- 
-	readRDS( file.path( path.expand( "~" ) , "GSS" , 
-		"gss 1972 2016 cross sectional cumulative data release 2 september 29 2017.rds" ) )
+gss_files <-
+	list.files(
+		file.path( path.expand( "~" ) , "GSS" ) ,
+		full.names = TRUE 
+	)
+
+gss_rds <-
+	grep( 
+		"cross sectional cumulative(.*)\.rds$" , 
+		gss_files , 
+		value = TRUE 
+	)
+	
+gss_df <- readRDS( gss_rds )
 
 gss_df <- 
 	transform( 
