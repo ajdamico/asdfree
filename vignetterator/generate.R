@@ -2,6 +2,9 @@
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
 commit_memo <- "'pnadc'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
+# source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
+
+
 
 # non-survey, not database-backed (ahrf)
 # database-backed non-survey (nppes)
