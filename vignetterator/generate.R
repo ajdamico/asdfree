@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'hrs fix'"
+commit_memo <- "'share and ahs'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
