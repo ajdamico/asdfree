@@ -39,7 +39,7 @@ MIcombine( with( chapter_tag_design ,\n\tsvymean( ~ linear_variable linear_narm 
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1.  See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-lodown:::MIsvyciprop( ~ binary_variable , chapter_tag_design ,
+MIsvyciprop( ~ binary_variable , chapter_tag_design ,
 	method = "likelihood" binary_narm )
 ```'
 

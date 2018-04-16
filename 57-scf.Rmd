@@ -96,17 +96,17 @@ scf_design <-
 
 Count the unweighted number of records in the survey sample, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design , svyby( ~ one , ~ one , unwtd.count ) ) )
+scf_MIcombine( with( scf_design , svyby( ~ one , ~ one , unwtd.count ) ) )
 
-lodown:::scf_MIcombine( with( scf_design , svyby( ~ one , ~ hhsex , unwtd.count ) ) )
+scf_MIcombine( with( scf_design , svyby( ~ one , ~ hhsex , unwtd.count ) ) )
 ```
 
 ### Weighted Counts {-}
 Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design , svytotal( ~ one ) ) )
+scf_MIcombine( with( scf_design , svytotal( ~ one ) ) )
 
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svyby( ~ one , ~ hhsex , svytotal )
 ) )
 ```
@@ -115,45 +115,45 @@ lodown:::scf_MIcombine( with( scf_design ,
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design , svymean( ~ networth ) ) )
+scf_MIcombine( with( scf_design , svymean( ~ networth ) ) )
 
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svyby( ~ networth , ~ hhsex , svymean )
 ) )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design , svymean( ~ edcl ) ) )
+scf_MIcombine( with( scf_design , svymean( ~ edcl ) ) )
 
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svyby( ~ edcl , ~ hhsex , svymean )
 ) )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design , svytotal( ~ networth ) ) )
+scf_MIcombine( with( scf_design , svytotal( ~ networth ) ) )
 
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svyby( ~ networth , ~ hhsex , svytotal )
 ) )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design , svytotal( ~ edcl ) ) )
+scf_MIcombine( with( scf_design , svytotal( ~ edcl ) ) )
 
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svyby( ~ edcl , ~ hhsex , svytotal )
 ) )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design , svyquantile( ~ networth , 0.5 , se = TRUE ) ) )
+scf_MIcombine( with( scf_design , svyquantile( ~ networth , 0.5 , se = TRUE ) ) )
 
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svyby( 
 		~ networth , ~ hhsex , svyquantile , 0.5 ,
 		se = TRUE , keep.var = TRUE , ci = TRUE 
@@ -162,7 +162,7 @@ lodown:::scf_MIcombine( with( scf_design ,
 
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svyratio( numerator = ~ income , denominator = ~ networth )
 ) )
 ```
@@ -175,7 +175,7 @@ sub_scf_design <- subset( scf_design , lf == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( sub_scf_design , svymean( ~ networth ) ) )
+scf_MIcombine( with( sub_scf_design , svymean( ~ networth ) ) )
 ```
 
 ### Measures of Uncertainty {-}
@@ -183,7 +183,7 @@ lodown:::scf_MIcombine( with( sub_scf_design , svymean( ~ networth ) ) )
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 this_result <-
-	lodown:::scf_MIcombine( with( scf_design ,
+	scf_MIcombine( with( scf_design ,
 		svymean( ~ networth )
 	) )
 
@@ -193,7 +193,7 @@ confint( this_result )
 cv( this_result )
 
 grouped_result <-
-	lodown:::scf_MIcombine( with( scf_design ,
+	scf_MIcombine( with( scf_design ,
 		svyby( ~ networth , ~ hhsex , svymean )
 	) )
 
@@ -210,25 +210,25 @@ degf( scf_design$designs[[1]] )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-lodown:::scf_MIcombine( with( scf_design , svyvar( ~ networth ) ) )
+scf_MIcombine( with( scf_design , svyvar( ~ networth ) ) )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svymean( ~ networth , deff = TRUE )
 ) )
 
 # SRS with replacement
-lodown:::scf_MIcombine( with( scf_design ,
+scf_MIcombine( with( scf_design ,
 	svymean( ~ networth , deff = "replace" )
 ) )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-lodown:::MIsvyciprop( ~ married , scf_design ,
+MIsvyciprop( ~ married , scf_design ,
 	method = "likelihood" )
 ```
 
@@ -236,18 +236,18 @@ lodown:::MIsvyciprop( ~ married , scf_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-lodown:::MIsvyttest( networth ~ married , scf_design )
+MIsvyttest( networth ~ married , scf_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
-lodown:::MIsvychisq( ~ married + edcl , scf_design )
+MIsvychisq( ~ married + edcl , scf_design )
 ```
 
 Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
-	lodown:::scf_MIcombine( with( scf_design ,
+	scf_MIcombine( with( scf_design ,
 		svyglm( networth ~ married + edcl )
 	) )
 	
@@ -262,7 +262,7 @@ The R `convey` library estimates measures of income concentration, poverty, ineq
 library(convey)
 scf_design$designs <- lapply( scf_design$designs , convey_prep )
 
-lodown:::scf_MIcombine( with( scf_design , svygini( ~ networth ) ) )
+scf_MIcombine( with( scf_design , svygini( ~ networth ) ) )
 ```
 
 ---
