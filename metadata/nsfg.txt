@@ -88,10 +88,31 @@ needs_srvyr_block: yes
 
 ## Replication Example {-}
 
+The example below matches statistics and confidence intervals from this table pulled from the [CDC](https://www.cdc.gov/nchs/data/nsfg/NSFG_2013_2015_VarEst_Ex1.pdf) variance estimation examples:
+
+`r knitr::include_graphics("images/nsfg_2013_2015_varest_ex1.png")`
+
+Match the sum of the weights:
+
 ```{r eval = FALSE , results = "hide" }
-
-
+stopifnot( round( coef( svytotal( ~ one , nsfg_design ) ) , 0 ) == 61491766 )
 ```
+	
+	
+Compute the statistics and standard errors for percentage of women currently using the pill by age:
+
+```{r eval = FALSE , results = "hide" }
+row_percents <- c( 16.1723 , 27.8173 , 18.7197 , 13.4367 , 9.0851 , 7.7224 )
+
+std_err_row_percents <- c( 1.5414 , 2.4162 , 1.9890 , 1.5074 , 1.5222 , 1.6053 )
+
+results <- svyby( ~ birth_control_pill , ~ age_categories , nsfg_design , svymean )
+
+stopifnot( all( round( coef( results ) * 100 , 4 ) == row_percents ) )
+
+stopifnot( all( round( SE( results ) * 100 , 4 ) == std_err_row_percents ) )
+```
+
 
 ~~~
 
