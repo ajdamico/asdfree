@@ -15,19 +15,19 @@ administrative_organization: * Administered and financed by the [US Census Burea
 dependencies: library(archive)
 
 needs_catalog_block: yes
-catalog_subset_description: # 2011 alabama single-year only. remove ` & stateab == 'al'` for a nationwide table
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 & time_period == '1-Year' & stateab == 'al' )
+catalog_subset_description: # 2016 alabama single-year only. remove ` & stateab == 'al'` for a nationwide table
+catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' & stateab == 'al' )
 
 
 ~~~{analysis_examples_survey_design}
 # # alternative subsets:
 
 # # nationwide merged table including puerto rico
-# chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 & time_period == '1-Year' )
+# chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' )
 # chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
 
 # # nationwide merged table excluding puerto rico
-# chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 & time_period == '1-Year' & stateab != 'pr' )
+# chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' & stateab != 'pr' )
 # chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
 
 library(survey)
@@ -35,7 +35,7 @@ library(survey)
 chapter_tag_df <- 
 	readRDS( 
 		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
-			"acs2011_1yr.rds" ) 
+			"acs2016_1yr.rds" ) 
 	)
 
 # because of the catalog subset above
@@ -180,9 +180,9 @@ svytotal(
 
 needs_travis_build_status_line: yes
 
-sample_setup_breaks: 50
+sample_setup_breaks: 13
 
-broken_sample_test_condition: any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 )
+broken_sample_test_condition: any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 & chapter_tag_cat$time_period == '1-Year' )
 
 ~~~{sample_setup_block}
 this_sample_break <- Sys.getenv( "this_sample_break" )
@@ -193,17 +193,14 @@ chapter_tag_cat <-
 	get_catalog( "chapter_tag" ,
 		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
 
-# skip the three-year and five-year files
-chapter_tag_cat <- subset( chapter_tag_cat , time_period == '1-Year' )
-
-# skip the top fifteen states by population
-chapter_tag_cat <- subset( chapter_tag_cat , !( stateab %in% c( 'ca' , 'tx' , 'fl' , 'ny' , 'pa' , 'il' , 'oh' , 'ga' , 'nc' , 'mi' , 'nj' , 'va' , 'wa' , 'az' ) ) )
+# alabama one-year and all wyoming only
+chapter_tag_cat <- subset( chapter_tag_cat , ( stateab == 'al' & time_period == '1-Year' ) | stateab == 'wy' )
 
 chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
 
-# for alabama 2011, toss out other nearby states
-if( any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 ) ){
-	chapter_tag_cat <- chapter_tag_cat[ chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2011 , ]
+# for alabama 2016, toss out other nearby states
+if( any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 ) ){
+	chapter_tag_cat <- chapter_tag_cat[ chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 , ]
 }
 
 chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
