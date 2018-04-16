@@ -50,9 +50,6 @@ chapter_tag_design <-
 		type = 'JK1' ,
 		data = chapter_tag_df
 	)
-	
-# workaround for a bug in survey::svrepdesign.character
-chapter_tag_design$mse <- TRUE
 ~~~
 
 
@@ -61,6 +58,8 @@ chapter_tag_design <-
 	update(
 		
 		chapter_tag_design ,
+		
+		relp = as.numeric( relp ) ,
 		
 		state_name =
 			factor(
@@ -135,46 +134,67 @@ svygini( ~ hincp , chapter_tag_design , na.rm = TRUE )
 ~~~
 
 
+
 ~~~{replication_example_block}
 ---
 
 ## Replication Example {-}
 
+The example below matches statistics, standard errors, and margin of errors from this table pulled from the [tallies of 2016 PUMS](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_16.lst):
+
+`r knitr::include_graphics("images/pums_estimates_16.png")`
+
+Match the sum of the weights:
+
 ```{r eval = FALSE , results = "hide" }
+stopifnot( round( coef( svytotal( ~ one , chapter_tag_design ) ) , 0 ) == 4863300 )
+```
+	
+	
+Compute the population by age:
 
-svytotal( ~I( relp %in% 0:17 ) , chapter_tag_design )						# total population
-svytotal( ~I( relp %in% 0:15 ) , chapter_tag_design )						# housing unit population
-svytotal( ~I( relp %in% 16:17 ) , chapter_tag_design )						# gq population
-svytotal( ~I( relp == 16 ) , chapter_tag_design )							# gq institutional population
-svytotal( ~I( relp == 17 ) , chapter_tag_design )							# gq noninstitutional population
-svyby( ~I( relp %in% 0:17 ) , ~ sex , chapter_tag_design , svytotal )		# total males & females
+```{r eval = FALSE , results = "hide" }
+pums_estimate <- c( 285681 , 314701 , 300814 , 334318 , 327896 , 629329 , 599719 , 644212 , 342205 , 300254 , 464893 , 231293 , 87985 )
 
+pums_standard_error <- c( 2888 , 5168 , 5009 , 3673 , 3521 , 4825 , 4088 , 4398 , 5329 , 5389 , 1938 , 3214 , 2950 )
 
-# all age categories at once #
+pums_margin_of_error <- c( 4751 , 8501 , 8240 , 6043 , 5792 , 7937 , 6725 , 7234 , 8767 , 8865 , 3188 , 5287 , 4853 )
 
-svytotal( 
-	~I( agep %in% 0:4 ) +
-	I( agep %in% 5:9 )   +
-	I( agep %in% 10:14 ) +
-	I( agep %in% 15:19 ) +
-	I( agep %in% 20:24 ) +
-	I( agep %in% 25:34 ) +
-	I( agep %in% 35:44 ) +
-	I( agep %in% 45:54 ) +
-	I( agep %in% 55:59 ) +
-	I( agep %in% 60:64 ) +
-	I( agep %in% 65:74 ) +
-	I( agep %in% 75:84 ) +
-	I( agep %in% 85:100 ) , 
-	chapter_tag_design
-)
+results <-
+	svytotal( 
+		~ as.numeric( agep %in% 0:4 ) +
+		as.numeric( agep %in% 5:9 ) +
+		as.numeric( agep %in% 10:14 ) +
+		as.numeric( agep %in% 15:19 ) +
+		as.numeric( agep %in% 20:24 ) +
+		as.numeric( agep %in% 25:34 ) +
+		as.numeric( agep %in% 35:44 ) +
+		as.numeric( agep %in% 45:54 ) +
+		as.numeric( agep %in% 55:59 ) +
+		as.numeric( agep %in% 60:64 ) +
+		as.numeric( agep %in% 65:74 ) +
+		as.numeric( agep %in% 75:84 ) +
+		as.numeric( agep %in% 85:100 ) , 
+		chapter_tag_design
+	)
 
+stopifnot( all( round( coef( results ) , 0 ) == pums_estimate ) )
 
-# note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #
+stopifnot( all( round( SE( results ) , 0 ) == pums_standard_error ) )
+
+stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
 
 ```
 
 ~~~
+
+
+
+
+
+
+
+
 
 
 

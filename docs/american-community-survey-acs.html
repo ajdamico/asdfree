@@ -997,10 +997,7 @@ acs_design &lt;-
         <span class="dt">mse =</span> <span class="ot">TRUE</span> ,
         <span class="dt">type =</span> <span class="st">&#39;JK1&#39;</span> ,
         <span class="dt">data =</span> acs_df
-    )
-    
-<span class="co"># workaround for a bug in survey::svrepdesign.character</span>
-acs_design<span class="op">$</span>mse &lt;-<span class="st"> </span><span class="ot">TRUE</span></code></pre></div>
+    )</code></pre></div>
 <div id="variable-recoding" class="section level3 unnumbered">
 <h3>Variable Recoding</h3>
 <p>Add new columns to the data set:</p>
@@ -1008,6 +1005,8 @@ acs_design<span class="op">$</span>mse &lt;-<span class="st"> </span><span class
 <span class="st">    </span><span class="kw">update</span>(
         
         acs_design ,
+        
+        <span class="dt">relp =</span> <span class="kw">as.numeric</span>( relp ) ,
         
         <span class="dt">state_name =</span>
             <span class="kw">factor</span>(
@@ -1182,33 +1181,40 @@ acs_design &lt;-<span class="st"> </span><span class="kw">convey_prep</span>( ac
 </div>
 <div id="replication-example" class="section level2 unnumbered">
 <h2>Replication Example</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">17</span> ) , acs_design )                       <span class="co"># total population</span>
-<span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">15</span> ) , acs_design )                       <span class="co"># housing unit population</span>
-<span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">%in%</span><span class="st"> </span><span class="dv">16</span><span class="op">:</span><span class="dv">17</span> ) , acs_design )                      <span class="co"># gq population</span>
-<span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">==</span><span class="st"> </span><span class="dv">16</span> ) , acs_design )                           <span class="co"># gq institutional population</span>
-<span class="kw">svytotal</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">==</span><span class="st"> </span><span class="dv">17</span> ) , acs_design )                           <span class="co"># gq noninstitutional population</span>
-<span class="kw">svyby</span>( <span class="op">~</span><span class="kw">I</span>( relp <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">17</span> ) , <span class="op">~</span><span class="st"> </span>sex , acs_design , svytotal )       <span class="co"># total males &amp; females</span>
+<p>The example below matches statistics, standard errors, and margin of errors from this table pulled from the <a href="https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_16.lst">tallies of 2016 PUMS</a>:</p>
+<p><img src="images/pums_estimates_16.png" /><!-- --></p>
+<p>Match the sum of the weights:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">coef</span>( <span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , acs_design ) ) , <span class="dv">0</span> ) <span class="op">==</span><span class="st"> </span><span class="dv">4863300</span> )</code></pre></div>
+<p>Compute the population by age:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pums_estimate &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="dv">285681</span> , <span class="dv">314701</span> , <span class="dv">300814</span> , <span class="dv">334318</span> , <span class="dv">327896</span> , <span class="dv">629329</span> , <span class="dv">599719</span> , <span class="dv">644212</span> , <span class="dv">342205</span> , <span class="dv">300254</span> , <span class="dv">464893</span> , <span class="dv">231293</span> , <span class="dv">87985</span> )
 
-<span class="co"># all age categories at once #</span>
+pums_standard_error &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="dv">2888</span> , <span class="dv">5168</span> , <span class="dv">5009</span> , <span class="dv">3673</span> , <span class="dv">3521</span> , <span class="dv">4825</span> , <span class="dv">4088</span> , <span class="dv">4398</span> , <span class="dv">5329</span> , <span class="dv">5389</span> , <span class="dv">1938</span> , <span class="dv">3214</span> , <span class="dv">2950</span> )
 
-<span class="kw">svytotal</span>( 
-    <span class="op">~</span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">4</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">5</span><span class="op">:</span><span class="dv">9</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">10</span><span class="op">:</span><span class="dv">14</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">15</span><span class="op">:</span><span class="dv">19</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">20</span><span class="op">:</span><span class="dv">24</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">25</span><span class="op">:</span><span class="dv">34</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">35</span><span class="op">:</span><span class="dv">44</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">45</span><span class="op">:</span><span class="dv">54</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">55</span><span class="op">:</span><span class="dv">59</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">60</span><span class="op">:</span><span class="dv">64</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">65</span><span class="op">:</span><span class="dv">74</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">75</span><span class="op">:</span><span class="dv">84</span> ) <span class="op">+</span>
-<span class="st">    </span><span class="kw">I</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">85</span><span class="op">:</span><span class="dv">100</span> ) , 
-    acs_design
-)
+pums_margin_of_error &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="dv">4751</span> , <span class="dv">8501</span> , <span class="dv">8240</span> , <span class="dv">6043</span> , <span class="dv">5792</span> , <span class="dv">7937</span> , <span class="dv">6725</span> , <span class="dv">7234</span> , <span class="dv">8767</span> , <span class="dv">8865</span> , <span class="dv">3188</span> , <span class="dv">5287</span> , <span class="dv">4853</span> )
 
-<span class="co"># note: the MOE (margin of error) column can be calculated as the standard error x 1.645 #</span></code></pre></div>
+results &lt;-
+<span class="st">    </span><span class="kw">svytotal</span>( 
+        <span class="op">~</span><span class="st"> </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">4</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">5</span><span class="op">:</span><span class="dv">9</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">10</span><span class="op">:</span><span class="dv">14</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">15</span><span class="op">:</span><span class="dv">19</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">20</span><span class="op">:</span><span class="dv">24</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">25</span><span class="op">:</span><span class="dv">34</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">35</span><span class="op">:</span><span class="dv">44</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">45</span><span class="op">:</span><span class="dv">54</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">55</span><span class="op">:</span><span class="dv">59</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">60</span><span class="op">:</span><span class="dv">64</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">65</span><span class="op">:</span><span class="dv">74</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">75</span><span class="op">:</span><span class="dv">84</span> ) <span class="op">+</span>
+<span class="st">        </span><span class="kw">as.numeric</span>( agep <span class="op">%in%</span><span class="st"> </span><span class="dv">85</span><span class="op">:</span><span class="dv">100</span> ) , 
+        acs_design
+    )
+
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( <span class="kw">round</span>( <span class="kw">coef</span>( results ) , <span class="dv">0</span> ) <span class="op">==</span><span class="st"> </span>pums_estimate ) )
+
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( <span class="kw">round</span>( <span class="kw">SE</span>( results ) , <span class="dv">0</span> ) <span class="op">==</span><span class="st"> </span>pums_standard_error ) )
+
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( <span class="kw">round</span>( <span class="kw">SE</span>( results ) <span class="op">*</span><span class="st"> </span><span class="fl">1.645</span> , <span class="dv">0</span> ) <span class="op">==</span><span class="st"> </span>pums_margin_of_error ) )</code></pre></div>
 
 </div>
 </div>
