@@ -30,8 +30,8 @@ ahs_cat <-
 	get_catalog( "ahs" ,
 		output_dir = file.path( path.expand( "~" ) , "AHS" ) )
 
-# 2015 only
-ahs_cat <- subset( ahs_cat , year == 2015 )
+# 2013 only
+ahs_cat <- subset( ahs_cat , year == 2013 )
 # download the microdata to your local computer
 ahs_cat <- lodown( "ahs" , ahs_cat )
 ```
@@ -50,13 +50,13 @@ library(survey)
 ahs_df <- 
 	readRDS( 
 		file.path( path.expand( "~" ) , "AHS" , 
-			"2015/national_v2.1/household.rds" 
+			"2013/national_v1.2/newhouse_repwgt.rds" 
 		) 
 	)
 
 ahs_design <- 
 	svrepdesign(
-		weights = ~weight,
+		weights = ~wgt90geo,
 		repweights = "repwgt[1-9]" ,
 		type = "Fay" ,
 		rho = ( 1 - 1 / sqrt( 4 ) ) ,
@@ -73,20 +73,31 @@ ahs_design <-
 	update( 
 		ahs_design , 
 
-		occupant = 
-			ifelse( tenure == 1 , "owner" , 
-			ifelse( tenure %in% 2:3 , "renter" , 
-				"not occupied" ) ) ,
-				
+		tenure = 
+			factor( 
+				ifelse( is.na( tenure ) , 4 , tenure ) , 
+				levels = 1:4 , 
+				labels = 
+					c( 'Owned or being bought' ,
+					'Rented for cash rent' ,
+					'Occupied without payment of cash rent' ,
+					'Not occupied' )
+			) ,
+			
+			
 		lotsize =
-			factor( lotsize , levels = 1:7 ,
+			factor( 
+				1 + findInterval( lot ,
+					c( 5500 , 11000 , 22000 , 
+					44000 , 220000 , 440000 ) ) , 
+				levels = 1:7 ,
 				labels = c( "Less then 1/8 acre" , 
 				"1/8 up to 1/4 acre" , "1/4 up to 1/2 acre" ,
 				"1/2 up to 1 acre" , "1 up to 5 acres" , 
 				"5 up to 10 acres" , "10 acres or more" ) ) ,
 				
 				
-		below_poverty = as.numeric( perpovlvl < 100 )
+		below_poverty = as.numeric( poor < 100 )
 				
 	)
 ```
@@ -97,7 +108,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 sum( weights( ahs_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ occupant , ahs_design , unwtd.count )
+svyby( ~ one , ~ tenure , ahs_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
@@ -105,46 +116,46 @@ Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , ahs_design )
 
-svyby( ~ one , ~ occupant , ahs_design , svytotal )
+svyby( ~ one , ~ tenure , ahs_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ totrooms , ahs_design )
+svymean( ~ rooms , ahs_design )
 
-svyby( ~ totrooms , ~ occupant , ahs_design , svymean )
+svyby( ~ rooms , ~ tenure , ahs_design , svymean )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svymean( ~ lotsize , ahs_design , na.rm = TRUE )
 
-svyby( ~ lotsize , ~ occupant , ahs_design , svymean , na.rm = TRUE )
+svyby( ~ lotsize , ~ tenure , ahs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ totrooms , ahs_design )
+svytotal( ~ rooms , ahs_design )
 
-svyby( ~ totrooms , ~ occupant , ahs_design , svytotal )
+svyby( ~ rooms , ~ tenure , ahs_design , svytotal )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ lotsize , ahs_design , na.rm = TRUE )
 
-svyby( ~ lotsize , ~ occupant , ahs_design , svytotal , na.rm = TRUE )
+svyby( ~ lotsize , ~ tenure , ahs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ totrooms , ahs_design , 0.5 )
+svyquantile( ~ rooms , ahs_design , 0.5 )
 
 svyby( 
-	~ totrooms , 
-	~ occupant , 
+	~ rooms , 
+	~ tenure , 
 	ahs_design , 
 	svyquantile , 
 	0.5 ,
@@ -156,7 +167,7 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ totrooms , 
+	numerator = ~ rooms , 
 	denominator = ~ rent , 
 	ahs_design ,
 	na.rm = TRUE
@@ -171,14 +182,14 @@ sub_ahs_design <- subset( ahs_design , garage == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ totrooms , sub_ahs_design )
+svymean( ~ rooms , sub_ahs_design )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ totrooms , ahs_design )
+this_result <- svymean( ~ rooms , ahs_design )
 
 coef( this_result )
 SE( this_result )
@@ -187,8 +198,8 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ totrooms , 
-		~ occupant , 
+		~ rooms , 
+		~ tenure , 
 		ahs_design , 
 		svymean 
 	)
@@ -206,16 +217,16 @@ degf( ahs_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ totrooms , ahs_design )
+svyvar( ~ rooms , ahs_design )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ totrooms , ahs_design , deff = TRUE )
+svymean( ~ rooms , ahs_design , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ totrooms , ahs_design , deff = "replace" )
+svymean( ~ rooms , ahs_design , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -228,7 +239,7 @@ svyciprop( ~ below_poverty , ahs_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( totrooms ~ below_poverty , ahs_design )
+svyttest( rooms ~ below_poverty , ahs_design )
 ```
 
 Perform a chi-squared test of association for survey data:
@@ -243,7 +254,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		totrooms ~ below_poverty + lotsize , 
+		rooms ~ below_poverty + lotsize , 
 		ahs_design 
 	)
 
@@ -261,18 +272,48 @@ ahs_srvyr_design <- as_survey( ahs_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 ahs_srvyr_design %>%
-	summarize( mean = survey_mean( totrooms ) )
+	summarize( mean = survey_mean( rooms ) )
 
 ahs_srvyr_design %>%
-	group_by( occupant ) %>%
-	summarize( mean = survey_mean( totrooms ) )
+	group_by( tenure ) %>%
+	summarize( mean = survey_mean( rooms ) )
 ```
 
 ---
 
 ## Replication Example {-}
 
-```{r eval = FALSE , results = "hide" }
+The example below matches statistics and standard errors from this table pulled from the US Census Bureau's [Quick Guide to Estimating Variance Using Replicate Weights](https://www.census.gov/content/dam/Census/programs-surveys/ahs/tech-documentation/2015/Quick%20Guide%20to%20Estimating%20Variance%20Using%20Replicate%20Weights%202009%20to%20Current.pdf):
 
+`r knitr::include_graphics("images/ahs2013.png")`
+	
+Compute the statistics and standard errors for monthly housing costs by owner/renter status of the unit:
+
+```{r eval = FALSE , results = "hide" }
+means <- c( 1241.8890 , 972.6051 , 170.0121 )
+std_err <- c( 7.3613 , 5.6956 , 6.1586 )
+ci_lb <- c( 1227.3511 , 961.3569 , 157.8495 )
+ci_ub <- c( 1256.4270 , 983.8532 , 182.1747 )
+
+results <- 
+	svyby( 
+		~ zsmhc , 
+		~ tenure , 
+		ahs_design , 
+		svymean , 
+		na.rm = TRUE , 
+		na.rm.all = TRUE 
+	)
+
+ci_res <- 
+	confint( results , df = degf( ahs_design ) + 1 )
+
+stopifnot( all( round( coef( results ) , 4 ) == means ) )
+
+stopifnot( all( round( SE( results ) , 4 ) == std_err ) )
+
+stopifnot( all( round( ci_res[ , 1 ] , 4 ) == ci_lb ) )
+
+stopifnot( all( round( ci_res[ , 2 ] , 4 ) == ci_ub ) )
 ```
 

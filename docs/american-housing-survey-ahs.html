@@ -960,8 +960,8 @@ ahs_cat &lt;-
 <span class="st">    </span><span class="kw">get_catalog</span>( <span class="st">&quot;ahs&quot;</span> ,
         <span class="dt">output_dir =</span> <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;AHS&quot;</span> ) )
 
-<span class="co"># 2015 only</span>
-ahs_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( ahs_cat , year <span class="op">==</span><span class="st"> </span><span class="dv">2015</span> )
+<span class="co"># 2013 only</span>
+ahs_cat &lt;-<span class="st"> </span><span class="kw">subset</span>( ahs_cat , year <span class="op">==</span><span class="st"> </span><span class="dv">2013</span> )
 <span class="co"># download the microdata to your local computer</span>
 ahs_cat &lt;-<span class="st"> </span><span class="kw">lodown</span>( <span class="st">&quot;ahs&quot;</span> , ahs_cat )</code></pre></div>
 </div>
@@ -973,13 +973,13 @@ ahs_cat &lt;-<span class="st"> </span><span class="kw">lodown</span>( <span clas
 ahs_df &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">readRDS</span>( 
         <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;AHS&quot;</span> , 
-            <span class="st">&quot;2015/national_v2.1/household.rds&quot;</span> 
+            <span class="st">&quot;2013/national_v1.2/newhouse_repwgt.rds&quot;</span> 
         ) 
     )
 
 ahs_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svrepdesign</span>(
-        <span class="dt">weights =</span> <span class="op">~</span>weight,
+        <span class="dt">weights =</span> <span class="op">~</span>wgt90geo,
         <span class="dt">repweights =</span> <span class="st">&quot;repwgt[1-9]&quot;</span> ,
         <span class="dt">type =</span> <span class="st">&quot;Fay&quot;</span> ,
         <span class="dt">rho =</span> ( <span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>( <span class="dv">4</span> ) ) ,
@@ -993,20 +993,31 @@ ahs_design &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">update</span>( 
         ahs_design , 
 
-        <span class="dt">occupant =</span> 
-            <span class="kw">ifelse</span>( tenure <span class="op">==</span><span class="st"> </span><span class="dv">1</span> , <span class="st">&quot;owner&quot;</span> , 
-            <span class="kw">ifelse</span>( tenure <span class="op">%in%</span><span class="st"> </span><span class="dv">2</span><span class="op">:</span><span class="dv">3</span> , <span class="st">&quot;renter&quot;</span> , 
-                <span class="st">&quot;not occupied&quot;</span> ) ) ,
-                
+        <span class="dt">tenure =</span> 
+            <span class="kw">factor</span>( 
+                <span class="kw">ifelse</span>( <span class="kw">is.na</span>( tenure ) , <span class="dv">4</span> , tenure ) , 
+                <span class="dt">levels =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">4</span> , 
+                <span class="dt">labels =</span> 
+                    <span class="kw">c</span>( <span class="st">&#39;Owned or being bought&#39;</span> ,
+                    <span class="st">&#39;Rented for cash rent&#39;</span> ,
+                    <span class="st">&#39;Occupied without payment of cash rent&#39;</span> ,
+                    <span class="st">&#39;Not occupied&#39;</span> )
+            ) ,
+            
+            
         <span class="dt">lotsize =</span>
-            <span class="kw">factor</span>( lotsize , <span class="dt">levels =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span> ,
+            <span class="kw">factor</span>( 
+                <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">findInterval</span>( lot ,
+                    <span class="kw">c</span>( <span class="dv">5500</span> , <span class="dv">11000</span> , <span class="dv">22000</span> , 
+                    <span class="dv">44000</span> , <span class="dv">220000</span> , <span class="dv">440000</span> ) ) , 
+                <span class="dt">levels =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span> ,
                 <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;Less then 1/8 acre&quot;</span> , 
                 <span class="st">&quot;1/8 up to 1/4 acre&quot;</span> , <span class="st">&quot;1/4 up to 1/2 acre&quot;</span> ,
                 <span class="st">&quot;1/2 up to 1 acre&quot;</span> , <span class="st">&quot;1 up to 5 acres&quot;</span> , 
                 <span class="st">&quot;5 up to 10 acres&quot;</span> , <span class="st">&quot;10 acres or more&quot;</span> ) ) ,
                 
                 
-        <span class="dt">below_poverty =</span> <span class="kw">as.numeric</span>( perpovlvl <span class="op">&lt;</span><span class="st"> </span><span class="dv">100</span> )
+        <span class="dt">below_poverty =</span> <span class="kw">as.numeric</span>( poor <span class="op">&lt;</span><span class="st"> </span><span class="dv">100</span> )
                 
     )</code></pre></div>
 </div>
@@ -1015,39 +1026,39 @@ ahs_design &lt;-<span class="st"> </span>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( <span class="kw">weights</span>( ahs_design , <span class="st">&quot;sampling&quot;</span> ) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> )
 
-<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>occupant , ahs_design , unwtd.count )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>tenure , ahs_design , unwtd.count )</code></pre></div>
 </div>
 <div id="weighted-counts-2" class="section level3 unnumbered">
 <h3>Weighted Counts</h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>one , ahs_design )
 
-<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>occupant , ahs_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>one , <span class="op">~</span><span class="st"> </span>tenure , ahs_design , svytotal )</code></pre></div>
 </div>
 <div id="descriptive-statistics-3" class="section level3 unnumbered">
 <h3>Descriptive Statistics</h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>totrooms , ahs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>rooms , ahs_design )
 
-<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>totrooms , <span class="op">~</span><span class="st"> </span>occupant , ahs_design , svymean )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>rooms , <span class="op">~</span><span class="st"> </span>tenure , ahs_design , svymean )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>lotsize , ahs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>lotsize , <span class="op">~</span><span class="st"> </span>occupant , ahs_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>lotsize , <span class="op">~</span><span class="st"> </span>tenure , ahs_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>totrooms , ahs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>rooms , ahs_design )
 
-<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>totrooms , <span class="op">~</span><span class="st"> </span>occupant , ahs_design , svytotal )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>rooms , <span class="op">~</span><span class="st"> </span>tenure , ahs_design , svytotal )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>lotsize , ahs_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>lotsize , <span class="op">~</span><span class="st"> </span>occupant , ahs_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>lotsize , <span class="op">~</span><span class="st"> </span>tenure , ahs_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>totrooms , ahs_design , <span class="fl">0.5</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>rooms , ahs_design , <span class="fl">0.5</span> )
 
 <span class="kw">svyby</span>( 
-    <span class="op">~</span><span class="st"> </span>totrooms , 
-    <span class="op">~</span><span class="st"> </span>occupant , 
+    <span class="op">~</span><span class="st"> </span>rooms , 
+    <span class="op">~</span><span class="st"> </span>tenure , 
     ahs_design , 
     svyquantile , 
     <span class="fl">0.5</span> ,
@@ -1056,7 +1067,7 @@ ahs_design &lt;-<span class="st"> </span>
 )</code></pre></div>
 <p>Estimate a ratio:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyratio</span>( 
-    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>totrooms , 
+    <span class="dt">numerator =</span> <span class="op">~</span><span class="st"> </span>rooms , 
     <span class="dt">denominator =</span> <span class="op">~</span><span class="st"> </span>rent , 
     ahs_design ,
     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>
@@ -1067,12 +1078,12 @@ ahs_design &lt;-<span class="st"> </span>
 <p>Restrict the survey design to homes with a garage or carport:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sub_ahs_design &lt;-<span class="st"> </span><span class="kw">subset</span>( ahs_design , garage <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )</code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>totrooms , sub_ahs_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>rooms , sub_ahs_design )</code></pre></div>
 </div>
 <div id="measures-of-uncertainty-3" class="section level3 unnumbered">
 <h3>Measures of Uncertainty</h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>totrooms , ahs_design )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">this_result &lt;-<span class="st"> </span><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>rooms , ahs_design )
 
 <span class="kw">coef</span>( this_result )
 <span class="kw">SE</span>( this_result )
@@ -1081,8 +1092,8 @@ ahs_design &lt;-<span class="st"> </span>
 
 grouped_result &lt;-
 <span class="st">    </span><span class="kw">svyby</span>( 
-        <span class="op">~</span><span class="st"> </span>totrooms , 
-        <span class="op">~</span><span class="st"> </span>occupant , 
+        <span class="op">~</span><span class="st"> </span>rooms , 
+        <span class="op">~</span><span class="st"> </span>tenure , 
         ahs_design , 
         svymean 
     )
@@ -1094,13 +1105,13 @@ grouped_result &lt;-
 <p>Calculate the degrees of freedom of any survey design object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">degf</span>( ahs_design )</code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>totrooms , ahs_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyvar</span>( <span class="op">~</span><span class="st"> </span>rooms , ahs_design )</code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SRS without replacement</span>
-<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>totrooms , ahs_design , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>rooms , ahs_design , <span class="dt">deff =</span> <span class="ot">TRUE</span> )
 
 <span class="co"># SRS with replacement</span>
-<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>totrooms , ahs_design , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
+<span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>rooms , ahs_design , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyciprop</span>( <span class="op">~</span><span class="st"> </span>below_poverty , ahs_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
@@ -1108,7 +1119,7 @@ grouped_result &lt;-
 <div id="regression-models-and-tests-of-association-3" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( totrooms <span class="op">~</span><span class="st"> </span>below_poverty , ahs_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( rooms <span class="op">~</span><span class="st"> </span>below_poverty , ahs_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
     <span class="op">~</span><span class="st"> </span>below_poverty <span class="op">+</span><span class="st"> </span>lotsize , 
@@ -1117,7 +1128,7 @@ grouped_result &lt;-
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        totrooms <span class="op">~</span><span class="st"> </span>below_poverty <span class="op">+</span><span class="st"> </span>lotsize , 
+        rooms <span class="op">~</span><span class="st"> </span>below_poverty <span class="op">+</span><span class="st"> </span>lotsize , 
         ahs_design 
     )
 
@@ -1131,15 +1142,43 @@ grouped_result &lt;-
 ahs_srvyr_design &lt;-<span class="st"> </span><span class="kw">as_survey</span>( ahs_design )</code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ahs_srvyr_design <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( totrooms ) )
+<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( rooms ) )
 
 ahs_srvyr_design <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">group_by</span>( occupant ) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( totrooms ) )</code></pre></div>
+<span class="st">    </span><span class="kw">group_by</span>( tenure ) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarize</span>( <span class="dt">mean =</span> <span class="kw">survey_mean</span>( rooms ) )</code></pre></div>
 <hr />
 </div>
 <div id="replication-example-2" class="section level2 unnumbered">
 <h2>Replication Example</h2>
+<p>The example below matches statistics and standard errors from this table pulled from the US Census Bureau’s <a href="https://www.census.gov/content/dam/Census/programs-surveys/ahs/tech-documentation/2015/Quick%20Guide%20to%20Estimating%20Variance%20Using%20Replicate%20Weights%202009%20to%20Current.pdf">Quick Guide to Estimating Variance Using Replicate Weights</a>:</p>
+<p><img src="images/ahs2013.png" /><!-- --></p>
+<p>Compute the statistics and standard errors for monthly housing costs by owner/renter status of the unit:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">means &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="fl">1241.8890</span> , <span class="fl">972.6051</span> , <span class="fl">170.0121</span> )
+std_err &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="fl">7.3613</span> , <span class="fl">5.6956</span> , <span class="fl">6.1586</span> )
+ci_lb &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="fl">1227.3511</span> , <span class="fl">961.3569</span> , <span class="fl">157.8495</span> )
+ci_ub &lt;-<span class="st"> </span><span class="kw">c</span>( <span class="fl">1256.4270</span> , <span class="fl">983.8532</span> , <span class="fl">182.1747</span> )
+
+results &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">svyby</span>( 
+        <span class="op">~</span><span class="st"> </span>zsmhc , 
+        <span class="op">~</span><span class="st"> </span>tenure , 
+        ahs_design , 
+        svymean , 
+        <span class="dt">na.rm =</span> <span class="ot">TRUE</span> , 
+        <span class="dt">na.rm.all =</span> <span class="ot">TRUE</span> 
+    )
+
+ci_res &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">confint</span>( results , <span class="dt">df =</span> <span class="kw">degf</span>( ahs_design ) <span class="op">+</span><span class="st"> </span><span class="dv">1</span> )
+
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( <span class="kw">round</span>( <span class="kw">coef</span>( results ) , <span class="dv">4</span> ) <span class="op">==</span><span class="st"> </span>means ) )
+
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( <span class="kw">round</span>( <span class="kw">SE</span>( results ) , <span class="dv">4</span> ) <span class="op">==</span><span class="st"> </span>std_err ) )
+
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( <span class="kw">round</span>( ci_res[ , <span class="dv">1</span> ] , <span class="dv">4</span> ) <span class="op">==</span><span class="st"> </span>ci_lb ) )
+
+<span class="kw">stopifnot</span>( <span class="kw">all</span>( <span class="kw">round</span>( ci_res[ , <span class="dv">2</span> ] , <span class="dv">4</span> ) <span class="op">==</span><span class="st"> </span>ci_ub ) )</code></pre></div>
 
 </div>
 </div>
