@@ -56,7 +56,7 @@ ahs_df <-
 
 ahs_design <- 
 	svrepdesign(
-		weights = ~wgt90geo,
+		weights = ~ wgt90geo ,
 		repweights = "repwgt[1-9]" ,
 		type = "Fay" ,
 		rho = ( 1 - 1 / sqrt( 4 ) ) ,
@@ -123,9 +123,9 @@ svyby( ~ one , ~ tenure , ahs_design , svytotal )
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ rooms , ahs_design )
+svymean( ~ rooms , ahs_design , na.rm = TRUE )
 
-svyby( ~ rooms , ~ tenure , ahs_design , svymean )
+svyby( ~ rooms , ~ tenure , ahs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
@@ -137,9 +137,9 @@ svyby( ~ lotsize , ~ tenure , ahs_design , svymean , na.rm = TRUE )
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ rooms , ahs_design )
+svytotal( ~ rooms , ahs_design , na.rm = TRUE )
 
-svyby( ~ rooms , ~ tenure , ahs_design , svytotal )
+svyby( ~ rooms , ~ tenure , ahs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
@@ -151,7 +151,7 @@ svyby( ~ lotsize , ~ tenure , ahs_design , svytotal , na.rm = TRUE )
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ rooms , ahs_design , 0.5 )
+svyquantile( ~ rooms , ahs_design , 0.5 , na.rm = TRUE )
 
 svyby( 
 	~ rooms , 
@@ -160,7 +160,8 @@ svyby(
 	svyquantile , 
 	0.5 ,
 	ci = TRUE ,
-	keep.var = TRUE 
+	keep.var = TRUE ,
+	na.rm = TRUE
 )
 ```
 
@@ -182,14 +183,14 @@ sub_ahs_design <- subset( ahs_design , garage == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ rooms , sub_ahs_design )
+svymean( ~ rooms , sub_ahs_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ rooms , ahs_design )
+this_result <- svymean( ~ rooms , ahs_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -201,7 +202,8 @@ grouped_result <-
 		~ rooms , 
 		~ tenure , 
 		ahs_design , 
-		svymean 
+		svymean ,
+		na.rm = TRUE 
 	)
 	
 coef( grouped_result )
@@ -217,16 +219,16 @@ degf( ahs_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ rooms , ahs_design )
+svyvar( ~ rooms , ahs_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ rooms , ahs_design , deff = TRUE )
+svymean( ~ rooms , ahs_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ rooms , ahs_design , deff = "replace" )
+svymean( ~ rooms , ahs_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -272,11 +274,11 @@ ahs_srvyr_design <- as_survey( ahs_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 ahs_srvyr_design %>%
-	summarize( mean = survey_mean( rooms ) )
+	summarize( mean = survey_mean( rooms , na.rm = TRUE ) )
 
 ahs_srvyr_design %>%
 	group_by( tenure ) %>%
-	summarize( mean = survey_mean( rooms ) )
+	summarize( mean = survey_mean( rooms , na.rm = TRUE ) )
 ```
 
 ---
