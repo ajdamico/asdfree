@@ -151,12 +151,17 @@ scf_MIcombine( with( scf_design ,
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-scf_MIcombine( with( scf_design , svyquantile( ~ networth , 0.5 , se = TRUE ) ) )
+scf_MIcombine( with( scf_design ,
+	svyquantile(
+		~ networth ,
+		0.5 , se = TRUE , method = 'constant' , interval.type = 'quantile' 
+) ) )
 
 scf_MIcombine( with( scf_design ,
-	svyby( 
-		~ networth , ~ hhsex , svyquantile , 0.5 ,
-		se = TRUE , keep.var = TRUE , ci = TRUE 
+	svyby(
+		~ networth , ~ hhsex , svyquantile ,
+		0.5 , se = TRUE , method = 'constant' , interval.type = 'quantile' ,
+		keep.var = TRUE , ci = TRUE 
 ) ) )
 ```
 
