@@ -59,7 +59,7 @@ scf_design <-
 		data = imputationList( scf_imp ) , 
 		scale = 1 ,
 		rscales = rep( 1 / 998 , 999 ) ,
-		mse = TRUE ,
+		mse = FALSE ,
 		type = "other" ,
 		combined.weights = TRUE
 	)
@@ -274,6 +274,28 @@ scf_MIcombine( with( scf_design , svygini( ~ networth ) ) )
 
 ## Replication Example {-}
 
+The statistics computed off of the public use file come very close to the net worth estimates in [Table 2 of the bulletin](https://www.federalreserve.gov/publications/files/scf17.pdf#page=13) but do not match exactly. Jesse Bricker and Richard A. Windle at the Federal Reserve re-ran the net worth calculations using the 2016 public use file to confirm that the calculations presented on this page follow the correct methodology.
+
 ```{r eval = FALSE , results = "hide" }
+
+# compute mean net worth using the 2016 PUF
+mean_net_worth <- scf_scf_MIcombine( with( scf_design , svymean( ~ networth ) ) )
+
+# confirm the estimate and standard error match FRB calculations within one dollar
+stopifnot( round( coef( mean_net_worth ) ) == 689509 )
+stopifnot( round( SE( mean_net_worth ) ) == 12670 )
+
+# compute median net worth using the 2016 PUF
+median_net_worth <-
+	scf_scf_MIcombine( with( scf_design ,
+		svyquantile(
+			~ networth ,
+			0.5 , se = TRUE , method = 'constant' , interval.type = 'quantile' , 
+			method = 'constant' , interval.type = 'quantile' 
+	) ) )
+
+# confirm the estimate and standard error match FRB calculations within one dollar
+stopifnot( round( coef( median_net_worth ) ) == 97306 )
+stopifnot( round( SE( median_net_worth ) ) == 2699 )
 
 ```
