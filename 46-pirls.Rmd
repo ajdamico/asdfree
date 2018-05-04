@@ -91,17 +91,17 @@ pirls_design <-
 
 Count the unweighted number of records in the survey sample, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design , svyby( ~ one , ~ one , unwtd.count ) ) )
+MIcombine( with( pirls_design , svyby( ~ one , ~ one , unwtd.count ) ) )
 
-pirls_MIcombine( with( pirls_design , svyby( ~ one , ~ idcntry , unwtd.count ) ) )
+MIcombine( with( pirls_design , svyby( ~ one , ~ idcntry , unwtd.count ) ) )
 ```
 
 ### Weighted Counts {-}
 Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design , svytotal( ~ one ) ) )
+MIcombine( with( pirls_design , svytotal( ~ one ) ) )
 
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svyby( ~ one , ~ idcntry , svytotal )
 ) )
 ```
@@ -110,49 +110,49 @@ pirls_MIcombine( with( pirls_design ,
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design , svymean( ~ asrrea ) ) )
+MIcombine( with( pirls_design , svymean( ~ asrrea ) ) )
 
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svyby( ~ asrrea , ~ idcntry , svymean )
 ) )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design , svymean( ~ sex , na.rm = TRUE ) ) )
+MIcombine( with( pirls_design , svymean( ~ sex , na.rm = TRUE ) ) )
 
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svyby( ~ sex , ~ idcntry , svymean , na.rm = TRUE )
 ) )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design , svytotal( ~ asrrea ) ) )
+MIcombine( with( pirls_design , svytotal( ~ asrrea ) ) )
 
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svyby( ~ asrrea , ~ idcntry , svytotal )
 ) )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design , svytotal( ~ sex , na.rm = TRUE ) ) )
+MIcombine( with( pirls_design , svytotal( ~ sex , na.rm = TRUE ) ) )
 
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svyby( ~ sex , ~ idcntry , svytotal , na.rm = TRUE )
 ) )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svyquantile(
 		~ asrrea ,
 		0.5 , se = TRUE 
 ) ) )
 
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svyby(
 		~ asrrea , ~ idcntry , svyquantile ,
 		0.5 , se = TRUE ,
@@ -162,7 +162,7 @@ pirls_MIcombine( with( pirls_design ,
 
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svyratio( numerator = ~ asrlit , denominator = ~ asrrea )
 ) )
 ```
@@ -175,7 +175,7 @@ sub_pirls_design <- subset( pirls_design , idcntry %in% c( 36 , 40 , 31 , 957 ) 
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( sub_pirls_design , svymean( ~ asrrea ) ) )
+MIcombine( with( sub_pirls_design , svymean( ~ asrrea ) ) )
 ```
 
 ### Measures of Uncertainty {-}
@@ -183,7 +183,7 @@ pirls_MIcombine( with( sub_pirls_design , svymean( ~ asrrea ) ) )
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 this_result <-
-	pirls_MIcombine( with( pirls_design ,
+	MIcombine( with( pirls_design ,
 		svymean( ~ asrrea )
 	) )
 
@@ -193,7 +193,7 @@ confint( this_result )
 cv( this_result )
 
 grouped_result <-
-	pirls_MIcombine( with( pirls_design ,
+	MIcombine( with( pirls_design ,
 		svyby( ~ asrrea , ~ idcntry , svymean )
 	) )
 
@@ -210,18 +210,18 @@ degf( pirls_design$designs[[1]] )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-pirls_MIcombine( with( pirls_design , svyvar( ~ asrrea ) ) )
+MIcombine( with( pirls_design , svyvar( ~ asrrea ) ) )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svymean( ~ asrrea , deff = TRUE )
 ) )
 
 # SRS with replacement
-pirls_MIcombine( with( pirls_design ,
+MIcombine( with( pirls_design ,
 	svymean( ~ asrrea , deff = "replace" )
 ) )
 ```
@@ -247,7 +247,7 @@ MIsvychisq( ~ age_ten_or_older + sex , pirls_design )
 Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
-	pirls_MIcombine( with( pirls_design ,
+	MIcombine( with( pirls_design ,
 		svyglm( asrrea ~ age_ten_or_older + sex )
 	) )
 	
@@ -258,6 +258,28 @@ summary( glm_result )
 
 ## Replication Example {-}
 
+These calculations reproduce the reading proficiency statistics and standard errors displayed in [Appendix 4A PDF pages 10 and 11](https://timssandpirls.bc.edu/publications/pirls/2016-methods/P16_MP_Chap4_Estimating_Standard_Errors.pdf) for both Australia and the United States.
+
 ```{r eval = FALSE , results = "hide" }
+australia_usa_design <- subset( pirls_design , idcntry %in% c( 36 , 840 ) )
+
+rm( pirls_design ) ; gc()
+
+results <-
+	MIcombine( 
+		with( 
+			australia_usa_design , 
+			svyby( 
+				~ asrrea , 
+				~ idcntry , 
+				svymean 
+			) 
+		) 
+	)
+
+stopifnot( round( coef( results )[1] , 2 ) == 544.36 )
+stopifnot( round( SE( results )[1] , 2 ) == 2.53 )
+stopifnot( round( coef( results )[2] , 2 ) == 549.44 )
+stopifnot( round( SE( results )[2] , 2 ) == 3.09 )
 
 ```

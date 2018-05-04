@@ -1,8 +1,3 @@
-~~~{replacement_block}
-MIcombine
-pirls_MIcombine
-~~~
-
 chapter_title: Progress in International Reading Literacy Study
 
 catalog_subset_description: # 2016 only
@@ -80,8 +75,30 @@ binary_narm: , na.rm = TRUE
 
 ## Replication Example {-}
 
-```{r eval = FALSE , results = "hide" }
+These calculations reproduce the reading proficiency statistics and standard errors displayed in [Appendix 4A PDF pages 10 and 11](https://timssandpirls.bc.edu/publications/pirls/2016-methods/P16_MP_Chap4_Estimating_Standard_Errors.pdf) for both Australia and the United States.
 
+```{r eval = FALSE , results = "hide" }
+australia_usa_design <- subset( chapter_tag_design , idcntry %in% c( 36 , 840 ) )
+
+rm( chapter_tag_design ) ; gc()
+
+results <-
+	MIcombine( 
+		with( 
+			australia_usa_design , 
+			svyby( 
+				~ asrrea , 
+				~ idcntry , 
+				svymean 
+			) 
+		) 
+	)
+
+
+stopifnot( round( coef( results )[1] , 2 ) == 544.36 )
+stopifnot( round( SE( results )[1] , 2 ) == 2.53 )
+stopifnot( round( coef( results )[2] , 2 ) == 549.44 )
+stopifnot( round( SE( results )[2] , 2 ) == 3.09 )
 
 ```
 ~~~
