@@ -975,7 +975,7 @@ pirls_design &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <spa
 
 <span class="co"># optional step to limit memory usage</span>
 variables_to_keep &lt;-
-<span class="st">    </span><span class="kw">c</span>( <span class="st">&#39;idcntry&#39;</span> , <span class="st">&#39;itsex&#39;</span> , <span class="st">&#39;itbirthy&#39;</span> , <span class="st">&#39;asrrea&#39;</span> , <span class="st">&#39;asrlit&#39;</span> )
+<span class="st">    </span><span class="kw">c</span>( <span class="st">&#39;idcntry&#39;</span> , <span class="st">&#39;itsex&#39;</span> , <span class="st">&#39;asdage&#39;</span> , <span class="st">&#39;asrrea&#39;</span> , <span class="st">&#39;asrlit&#39;</span> )
     
 pirls_design<span class="op">$</span>designs &lt;-
 <span class="st">    </span><span class="kw">lapply</span>( 
@@ -1000,7 +1000,7 @@ pirls_design<span class="op">$</span>designs &lt;-
         
         <span class="dt">sex =</span> <span class="kw">factor</span>( itsex , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) ) ,
         
-        <span class="dt">born_2001_or_later =</span> <span class="kw">as.numeric</span>( itbirthy <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2001</span> )
+        <span class="dt">age_ten_or_older =</span> <span class="kw">as.numeric</span>( asdage <span class="op">&gt;=</span><span class="st"> </span><span class="dv">10</span> )
 
     )</code></pre></div>
 </div>
@@ -1108,19 +1108,19 @@ grouped_result &lt;-
     <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>asrrea , <span class="dt">deff =</span> <span class="st">&quot;replace&quot;</span> )
 ) )</code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIsvyciprop</span>( <span class="op">~</span><span class="st"> </span>born_2001_or_later , pirls_design ,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIsvyciprop</span>( <span class="op">~</span><span class="st"> </span>age_ten_or_older , pirls_design ,
     <span class="dt">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-39" class="section level3 unnumbered">
 <h3>Regression Models and Tests of Association</h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIsvyttest</span>( asrrea <span class="op">~</span><span class="st"> </span>born_2001_or_later , pirls_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIsvyttest</span>( asrrea <span class="op">~</span><span class="st"> </span>age_ten_or_older , pirls_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIsvychisq</span>( <span class="op">~</span><span class="st"> </span>born_2001_or_later <span class="op">+</span><span class="st"> </span>sex , pirls_design )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MIsvychisq</span>( <span class="op">~</span><span class="st"> </span>age_ten_or_older <span class="op">+</span><span class="st"> </span>sex , pirls_design )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">pirls_MIcombine</span>( <span class="kw">with</span>( pirls_design ,
-        <span class="kw">svyglm</span>( asrrea <span class="op">~</span><span class="st"> </span>born_2001_or_later <span class="op">+</span><span class="st"> </span>sex )
+        <span class="kw">svyglm</span>( asrrea <span class="op">~</span><span class="st"> </span>age_ten_or_older <span class="op">+</span><span class="st"> </span>sex )
     ) )
     
 <span class="kw">summary</span>( glm_result )</code></pre></div>

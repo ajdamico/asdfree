@@ -53,7 +53,7 @@ pirls_design <- readRDS( file.path( path.expand( "~" ) , "PIRLS" , "2016/asg_des
 
 # optional step to limit memory usage
 variables_to_keep <-
-	c( 'idcntry' , 'itsex' , 'itbirthy' , 'asrrea' , 'asrlit' )
+	c( 'idcntry' , 'itsex' , 'asdage' , 'asrrea' , 'asrlit' )
 	
 pirls_design$designs <-
 	lapply( 
@@ -82,7 +82,7 @@ pirls_design <-
 		
 		sex = factor( itsex , labels = c( "male" , "female" ) ) ,
 		
-		born_2001_or_later = as.numeric( itbirthy >= 2001 )
+		age_ten_or_older = as.numeric( asdage >= 10 )
 
 	)
 ```
@@ -228,7 +228,7 @@ pirls_MIcombine( with( pirls_design ,
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-MIsvyciprop( ~ born_2001_or_later , pirls_design ,
+MIsvyciprop( ~ age_ten_or_older , pirls_design ,
 	method = "likelihood" , na.rm = TRUE )
 ```
 
@@ -236,19 +236,19 @@ MIsvyciprop( ~ born_2001_or_later , pirls_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-MIsvyttest( asrrea ~ born_2001_or_later , pirls_design )
+MIsvyttest( asrrea ~ age_ten_or_older , pirls_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
-MIsvychisq( ~ born_2001_or_later + sex , pirls_design )
+MIsvychisq( ~ age_ten_or_older + sex , pirls_design )
 ```
 
 Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	pirls_MIcombine( with( pirls_design ,
-		svyglm( asrrea ~ born_2001_or_later + sex )
+		svyglm( asrrea ~ age_ten_or_older + sex )
 	) )
 	
 summary( glm_result )
