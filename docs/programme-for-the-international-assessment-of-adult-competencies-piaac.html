@@ -981,7 +981,12 @@ piaac_design &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <spa
         
         <span class="dt">sex =</span> <span class="kw">factor</span>( gender_r , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) ) ,
 
-        <span class="dt">age_categories =</span> <span class="kw">factor</span>( ageg10lfs , <span class="dt">levels =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span> , <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;24 or less&quot;</span> , <span class="st">&quot;25-34&quot;</span> , <span class="st">&quot;35-44&quot;</span> , <span class="st">&quot;45-54&quot;</span> , <span class="st">&quot;55 plus&quot;</span> ) ) ,
+        <span class="dt">age_categories =</span> 
+            <span class="kw">factor</span>( 
+                ageg10lfs , 
+                <span class="dt">levels =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span> , 
+                <span class="dt">labels =</span> <span class="kw">c</span>( <span class="st">&quot;24 or less&quot;</span> , <span class="st">&quot;25-34&quot;</span> , <span class="st">&quot;35-44&quot;</span> , <span class="st">&quot;45-54&quot;</span> , <span class="st">&quot;55 plus&quot;</span> ) 
+            ) ,
         
         <span class="dt">working_at_paid_job_last_week =</span> <span class="kw">as.numeric</span>( c_q01a <span class="op">==</span><span class="st"> </span><span class="dv">1</span> )
         
@@ -1112,6 +1117,25 @@ grouped_result &lt;-
 </div>
 <div id="replication-example-32" class="section level2 unnumbered">
 <h2>Replication Example</h2>
+<p>The <a href="https://www.oecd.org/skills/piaac/_Technical%20Report_17OCT13.pdf#page=455">OECD’s Technical Report Table 18.9 on PDF page 455</a> includes statistics and standard errors for the three PIAAC domains. This code precisely replicates the Austria row shown in that official table.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">austria_design &lt;-<span class="st"> </span><span class="kw">readRDS</span>( <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;PIAAC&quot;</span> , <span class="st">&quot;prgautp1 design.rds&quot;</span> ) )
+
+austria_pvlit &lt;-
+<span class="st">    </span><span class="kw">MIcombine</span>( <span class="kw">with</span>( austria_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>pvlit , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) ) )
+    
+austria_pvnum &lt;-
+<span class="st">    </span><span class="kw">MIcombine</span>( <span class="kw">with</span>( austria_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>pvnum , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) ) )
+
+austria_pvpsl &lt;-
+<span class="st">    </span><span class="kw">MIcombine</span>( <span class="kw">with</span>( austria_design , <span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>pvpsl , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> ) ) )
+    
+<span class="co"># confirm each estimate and standard error matches the published statistics</span>
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">coef</span>( austria_pvlit ) ) <span class="op">==</span><span class="st"> </span><span class="dv">269</span> )
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">SE</span>( austria_pvlit ) , <span class="dv">1</span> ) <span class="op">==</span><span class="st"> </span><span class="fl">0.7</span> )
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">coef</span>( austria_pvnum ) ) <span class="op">==</span><span class="st"> </span><span class="dv">275</span> )
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">SE</span>( austria_pvnum ) , <span class="dv">1</span> ) <span class="op">==</span><span class="st"> </span><span class="fl">0.9</span> )
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">coef</span>( austria_pvpsl ) ) <span class="op">==</span><span class="st"> </span><span class="dv">284</span> )
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">SE</span>( austria_pvpsl ) , <span class="dv">1</span> ) <span class="op">==</span><span class="st"> </span><span class="fl">0.7</span> )</code></pre></div>
 
 </div>
 </div>
