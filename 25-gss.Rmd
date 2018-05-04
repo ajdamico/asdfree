@@ -47,41 +47,22 @@ gss_rds <-
 	
 gss_df <- readRDS( gss_rds )
 
-gss_df <- 
-	transform( 
-		gss_df , 
-		
-		# the calculation for compwt comes from
-		# http://sda.berkeley.edu/D3/GSS10/Doc/gs100195.htm#COMPWT
-		compwt = oversamp * formwt * wtssall , 
-		
-		# the calculation for samplerc comes from
-		# http://sda.berkeley.edu/D3/GSS10/Doc/gs100195.htm#SAMPLERC
-		samplerc = 
-			# if sample is a three or a four, samplerc should be a three
-			ifelse( sample %in% 3:4 , 3 , 
-			# if sample is a six or a seven, samplerc should be a six
-			ifelse( sample %in% 6:7 , 6 , 
-			# otherwise, samplerc should just be set to sample
-				sample ) )
-
-	)
-
 # keep only the variables you need
 keep_vars <- 
-	c( "sampcode" , "samplerc" , "compwt" , "polviews" , 
+	c( "vpsu" , "vstrat" , "compwt" , "polviews" , 
 		"born" , "adults" , "hompop" , "race" , "region" ,
 		"age" , "sex" , "one" )
 		
 gss_df <- gss_df[ keep_vars ] ; gc()
 # this step conserves RAM
 
+# https://gssdataexplorer.norc.org/pages/show?page=gss%2Fstandard_error
 gss_design <- 
 	svydesign( 
-		~sampcode , 
-		strata = ~samplerc , 
-		data = subset( gss_df , !is.na( sampcode ) ) , 
-		weights = ~compwt , 
+		~ vpsu , 
+		strata = ~ vstrat , 
+		data = gss_df , 
+		weights = ~ wtssall , 
 		nest = TRUE 
 	)
 ```
@@ -300,11 +281,4 @@ gss_srvyr_design %>%
 	summarize( mean = survey_mean( age , na.rm = TRUE ) )
 ```
 
----
-
-## Replication Example {-}
-
-```{r eval = FALSE , results = "hide" }
-
-```
 
