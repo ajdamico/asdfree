@@ -84,7 +84,7 @@ addhealth_design <-
 		
 		how_many_hours_of_computer_games = ifelse( h1da10 > 99 , NA , h1da10 ) ,
 		
-		how_many_hours_of_television = ifelse( h1da8 > 99 , NA , h1da8 )
+		hours_of_television = ifelse( h1da8 > 99 , NA , h1da8 )
 		
 	)
 ```
@@ -156,7 +156,7 @@ Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
 	numerator = ~ how_many_hours_of_computer_games , 
-	denominator = ~ how_many_hours_of_television , 
+	denominator = ~ hours_of_television , 
 	addhealth_design ,
 	na.rm = TRUE
 )
@@ -272,7 +272,41 @@ addhealth_srvyr_design %>%
 
 ## Replication Example {-}
 
+A member of the AddHealth staff at UNC ran the mean hours of television using the wave one public use file to confirm that the calculations presented on this page follow the correct methodology.
+
 ```{r eval = FALSE , results = "hide" }
+
+svyset cluster2 [pweight=gswgt1]
+svy: mean w1hrtv
+
+/*
+
+Survey: Mean estimation
+
+Number of strata = 1 Number of obs = 6477
+Number of PSUs = 132 Population size = 22159516
+ Design df = 131
+
+--------------------------------------------------------------
+ | Linearized
+ | Mean Std. Err. [95% Conf. Interval]
+-------------+------------------------------------------------
+ w1hrtv | 15.64193 .3902066 14.87 16.41385
+--------------------------------------------------------------
+*/
+
+```
+
+```{r eval = FALSE , results = "hide" }
+
+result <-
+	svymean( 
+		~ hours_of_television ,
+		addhealth_design
+	)
+	
+stopifnot( round( coef( result ) , 3 ) == 15.642 )
+stopifnot( round( SE( result ) , 4 ) == 0.3902 )
 
 ```
 

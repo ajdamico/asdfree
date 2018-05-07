@@ -54,7 +54,7 @@ chapter_tag_design <-
 		
 		how_many_hours_of_computer_games = ifelse( h1da10 > 99 , NA , h1da10 ) ,
 		
-		how_many_hours_of_television = ifelse( h1da8 > 99 , NA , h1da8 )
+		hours_of_television = ifelse( h1da8 > 99 , NA , h1da8 )
 		
 	)
 ~~~
@@ -70,7 +70,7 @@ linear_variable: how_many_hours_of_computer_games
 linear_narm: , na.rm = TRUE
 
 ratio_estimation_numerator: how_many_hours_of_computer_games
-ratio_estimation_denominator: how_many_hours_of_television
+ratio_estimation_denominator: hours_of_television
 ratio_narm: , na.rm = TRUE
 
 subset_definition: as.numeric( h1gh1 ) %in% c( 4 , 5 )
@@ -85,7 +85,44 @@ needs_srvyr_block: yes
 
 ## Replication Example {-}
 
+A member of the AddHealth staff at UNC ran the mean hours of television using the wave one public use file to confirm that the calculations presented on this page follow the correct methodology.
+
+
 ```{r eval = FALSE , results = "hide" }
+
+svyset cluster2 [pweight=gswgt1]
+svy: mean w1hrtv
+
+/*
+
+Survey: Mean estimation
+
+Number of strata =       1        Number of obs    =      6477
+Number of PSUs   =     132        Population size  =  22159516
+                                  Design df        =       131
+
+--------------------------------------------------------------
+             |             Linearized
+             |       Mean   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+      w1hrtv |   15.64193   .3902066         14.87    16.41385
+--------------------------------------------------------------
+*/
+
+```
+
+
+```{r eval = FALSE , results = "hide" }
+
+result <-
+	svymean( 
+		~ hours_of_television ,
+		chapter_tag_design
+	)
+	
+stopifnot( round( coef( result ) , 3 ) == 15.642 )
+stopifnot( round( SE( result ) , 4 ) == 0.3902 )
+
 
 ```
 
