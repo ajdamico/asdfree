@@ -52,7 +52,7 @@ chapter_tag_design <-
 		
 		male = as.numeric( as.numeric( bio_sex ) == 1 ) ,
 		
-		how_many_hours_of_computer_games = ifelse( h1da10 > 99 , NA , h1da10 ) ,
+		hours_of_computer_games = ifelse( h1da10 > 99 , NA , h1da10 ) ,
 		
 		hours_of_television = ifelse( h1da8 > 99 , NA , h1da8 )
 		
@@ -66,10 +66,10 @@ categorical_variable: h1gh24
 categorical_variable_description: most recent physician visit
 categorical_narm: , na.rm = TRUE
 
-linear_variable: how_many_hours_of_computer_games
+linear_variable: hours_of_computer_games
 linear_narm: , na.rm = TRUE
 
-ratio_estimation_numerator: how_many_hours_of_computer_games
+ratio_estimation_numerator: hours_of_computer_games
 ratio_estimation_denominator: hours_of_television
 ratio_narm: , na.rm = TRUE
 
@@ -111,7 +111,8 @@ A member of the AddHealth staff at UNC ran the mean hours of television using th
 result <-
 	svymean( 
 		~ hours_of_television ,
-		chapter_tag_design
+		chapter_tag_design ,
+		na.rm = TRUE
 	)
 	
 stopifnot( round( coef( result ) , 3 ) == 15.642 )

@@ -82,7 +82,7 @@ addhealth_design <-
 		
 		male = as.numeric( as.numeric( bio_sex ) == 1 ) ,
 		
-		how_many_hours_of_computer_games = ifelse( h1da10 > 99 , NA , h1da10 ) ,
+		hours_of_computer_games = ifelse( h1da10 > 99 , NA , h1da10 ) ,
 		
 		hours_of_television = ifelse( h1da8 > 99 , NA , h1da8 )
 		
@@ -110,9 +110,9 @@ svyby( ~ one , ~ h1gh25 , addhealth_design , svytotal )
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ how_many_hours_of_computer_games , addhealth_design , na.rm = TRUE )
+svymean( ~ hours_of_computer_games , addhealth_design , na.rm = TRUE )
 
-svyby( ~ how_many_hours_of_computer_games , ~ h1gh25 , addhealth_design , svymean , na.rm = TRUE )
+svyby( ~ hours_of_computer_games , ~ h1gh25 , addhealth_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
@@ -124,9 +124,9 @@ svyby( ~ h1gh24 , ~ h1gh25 , addhealth_design , svymean , na.rm = TRUE )
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ how_many_hours_of_computer_games , addhealth_design , na.rm = TRUE )
+svytotal( ~ hours_of_computer_games , addhealth_design , na.rm = TRUE )
 
-svyby( ~ how_many_hours_of_computer_games , ~ h1gh25 , addhealth_design , svytotal , na.rm = TRUE )
+svyby( ~ hours_of_computer_games , ~ h1gh25 , addhealth_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
@@ -138,10 +138,10 @@ svyby( ~ h1gh24 , ~ h1gh25 , addhealth_design , svytotal , na.rm = TRUE )
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ how_many_hours_of_computer_games , addhealth_design , 0.5 , na.rm = TRUE )
+svyquantile( ~ hours_of_computer_games , addhealth_design , 0.5 , na.rm = TRUE )
 
 svyby( 
-	~ how_many_hours_of_computer_games , 
+	~ hours_of_computer_games , 
 	~ h1gh25 , 
 	addhealth_design , 
 	svyquantile , 
@@ -155,7 +155,7 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ how_many_hours_of_computer_games , 
+	numerator = ~ hours_of_computer_games , 
 	denominator = ~ hours_of_television , 
 	addhealth_design ,
 	na.rm = TRUE
@@ -170,14 +170,14 @@ sub_addhealth_design <- subset( addhealth_design , as.numeric( h1gh1 ) %in% c( 4
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ how_many_hours_of_computer_games , sub_addhealth_design , na.rm = TRUE )
+svymean( ~ hours_of_computer_games , sub_addhealth_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ how_many_hours_of_computer_games , addhealth_design , na.rm = TRUE )
+this_result <- svymean( ~ hours_of_computer_games , addhealth_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -186,7 +186,7 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ how_many_hours_of_computer_games , 
+		~ hours_of_computer_games , 
 		~ h1gh25 , 
 		addhealth_design , 
 		svymean ,
@@ -206,16 +206,16 @@ degf( addhealth_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ how_many_hours_of_computer_games , addhealth_design , na.rm = TRUE )
+svyvar( ~ hours_of_computer_games , addhealth_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ how_many_hours_of_computer_games , addhealth_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ hours_of_computer_games , addhealth_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ how_many_hours_of_computer_games , addhealth_design , na.rm = TRUE , deff = "replace" )
+svymean( ~ hours_of_computer_games , addhealth_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -228,7 +228,7 @@ svyciprop( ~ male , addhealth_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( how_many_hours_of_computer_games ~ male , addhealth_design )
+svyttest( hours_of_computer_games ~ male , addhealth_design )
 ```
 
 Perform a chi-squared test of association for survey data:
@@ -243,7 +243,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		how_many_hours_of_computer_games ~ male + h1gh24 , 
+		hours_of_computer_games ~ male + h1gh24 , 
 		addhealth_design 
 	)
 
@@ -261,23 +261,21 @@ addhealth_srvyr_design <- as_survey( addhealth_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 addhealth_srvyr_design %>%
-	summarize( mean = survey_mean( how_many_hours_of_computer_games , na.rm = TRUE ) )
+	summarize( mean = survey_mean( hours_of_computer_games , na.rm = TRUE ) )
 
 addhealth_srvyr_design %>%
 	group_by( h1gh25 ) %>%
-	summarize( mean = survey_mean( how_many_hours_of_computer_games , na.rm = TRUE ) )
+	summarize( mean = survey_mean( hours_of_computer_games , na.rm = TRUE ) )
 ```
 
 ---
 
 ## Replication Example {-}
 
-A member of the AddHealth staff at UNC ran the mean hours of television using the wave one public use file to confirm that the calculations presented on this page follow the correct methodology.
+A member of the AddHealth staff at UNC ran the mean hours of television using the wave one public use file with stata to confirm that the calculations presented on this page follow the correct methodology.
 
 	svyset cluster2 [pweight=gswgt1]
 	svy: mean w1hrtv
-
-	/*
 
 	Survey: Mean estimation
 
@@ -291,7 +289,6 @@ A member of the AddHealth staff at UNC ran the mean hours of television using th
 	-------------+------------------------------------------------
 		 w1hrtv | 15.64193 .3902066 14.87 16.41385
 	--------------------------------------------------------------
-	*/
 
 	
 ```{r eval = FALSE , results = "hide" }
@@ -299,7 +296,8 @@ A member of the AddHealth staff at UNC ran the mean hours of television using th
 result <-
 	svymean( 
 		~ hours_of_television ,
-		addhealth_design
+		addhealth_design ,
+		na.rm = TRUE
 	)
 	
 stopifnot( round( coef( result ) , 3 ) == 15.642 )
