@@ -996,7 +996,7 @@ brfss_design &lt;-
         
         <span class="dt">fair_or_poor_health =</span> <span class="kw">ifelse</span>( genhlth <span class="op">%in%</span><span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">5</span> , <span class="kw">as.numeric</span>( genhlth <span class="op">&gt;</span><span class="st"> </span><span class="dv">3</span> ) , <span class="ot">NA</span> ) ,
         
-        <span class="dt">could_not_see_doctor_due_to_cost =</span> 
+        <span class="dt">couldnt_see_doc_due_to_cost =</span> 
             <span class="kw">factor</span>( 
                 medcost , 
                 <span class="dt">levels =</span> <span class="kw">c</span>( <span class="dv">1</span> , <span class="dv">2</span> , <span class="dv">7</span> , <span class="dv">9</span> ) , 
@@ -1053,17 +1053,17 @@ brfss_design &lt;-
 
 <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>xage80 , <span class="op">~</span><span class="st"> </span>state_name , brfss_design , svymean )</code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>could_not_see_doctor_due_to_cost , brfss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svymean</span>( <span class="op">~</span><span class="st"> </span>couldnt_see_doc_due_to_cost , brfss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>could_not_see_doctor_due_to_cost , <span class="op">~</span><span class="st"> </span>state_name , brfss_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>couldnt_see_doc_due_to_cost , <span class="op">~</span><span class="st"> </span>state_name , brfss_design , svymean , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>xage80 , brfss_design )
 
 <span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>xage80 , <span class="op">~</span><span class="st"> </span>state_name , brfss_design , svytotal )</code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>could_not_see_doctor_due_to_cost , brfss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svytotal</span>( <span class="op">~</span><span class="st"> </span>couldnt_see_doc_due_to_cost , brfss_design , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )
 
-<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>could_not_see_doctor_due_to_cost , <span class="op">~</span><span class="st"> </span>state_name , brfss_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
+<span class="kw">svyby</span>( <span class="op">~</span><span class="st"> </span>couldnt_see_doc_due_to_cost , <span class="op">~</span><span class="st"> </span>state_name , brfss_design , svytotal , <span class="dt">na.rm =</span> <span class="ot">TRUE</span> )</code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyquantile</span>( <span class="op">~</span><span class="st"> </span>xage80 , brfss_design , <span class="fl">0.5</span> )
 
@@ -1133,22 +1133,40 @@ grouped_result &lt;-
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svyttest</span>( xage80 <span class="op">~</span><span class="st"> </span>fair_or_poor_health , brfss_design )</code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">svychisq</span>( 
-    <span class="op">~</span><span class="st"> </span>fair_or_poor_health <span class="op">+</span><span class="st"> </span>could_not_see_doctor_due_to_cost , 
+    <span class="op">~</span><span class="st"> </span>fair_or_poor_health <span class="op">+</span><span class="st"> </span>couldnt_see_doc_due_to_cost , 
     brfss_design 
 )</code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glm_result &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">svyglm</span>( 
-        xage80 <span class="op">~</span><span class="st"> </span>fair_or_poor_health <span class="op">+</span><span class="st"> </span>could_not_see_doctor_due_to_cost , 
+        xage80 <span class="op">~</span><span class="st"> </span>fair_or_poor_health <span class="op">+</span><span class="st"> </span>couldnt_see_doc_due_to_cost , 
         brfss_design 
     )
 
 <span class="kw">summary</span>( glm_result )</code></pre></div>
 <hr />
+<p>The example below matches confidence intervals from this table pulled from the BRFSS <a href="https://nccd.cdc.gov/weat/index.html">Web Enabled Analysis Tool</a>:</p>
+<p><img src="images/brfss2016.png" /><!-- --></p>
+<p>Match the C.I. for Row %:</p>
 </div>
 </div>
 <div id="replication-example-5" class="section level2 unnumbered">
 <h2>Replication Example</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">result &lt;-
+<span class="st">    </span><span class="kw">svymean</span>(
+        <span class="op">~</span><span class="st"> </span>couldnt_see_doc_due_to_cost ,
+        <span class="kw">subset</span>(
+            brfss_design ,
+            couldnt_see_doc_due_to_cost <span class="op">%in%</span>
+<span class="st">                </span><span class="kw">c</span>( <span class="st">&#39;yes&#39;</span> , <span class="st">&#39;no&#39;</span> )
+        ) ,
+        <span class="dt">na.rm =</span> <span class="ot">TRUE</span>
+    )
+
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">confint</span>( result )[ <span class="dv">1</span> , <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="op">==</span><span class="st"> </span><span class="fl">0.128</span> )
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">confint</span>( result )[ <span class="dv">1</span> , <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="op">==</span><span class="st"> </span><span class="fl">0.133</span> )
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">confint</span>( result )[ <span class="dv">2</span> , <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="op">==</span><span class="st"> </span><span class="fl">0.867</span> )
+<span class="kw">stopifnot</span>( <span class="kw">round</span>( <span class="kw">confint</span>( result )[ <span class="dv">2</span> , <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="op">==</span><span class="st"> </span><span class="fl">0.872</span> )</code></pre></div>
 
 </div>
 </div>
