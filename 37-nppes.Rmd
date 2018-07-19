@@ -26,10 +26,20 @@ lodown( "nppes" , output_dir = file.path( path.expand( "~" ) , "NPPES" ) )
 Load a data frame:
 
 ```{r eval = FALSE }
+npi_filepath <-
+	grep(
+		"npidata_pfile_20050523-([0-9]+)\.csv" ,
+		list.files(
+			file.path( path.expand( "~" ) , "NPPES" ) ,
+			full.names = TRUE
+		) ,
+		value = TRUE
+	)
+	
 column_names <-
 	names( 
 		read.csv( 
-			file.path( path.expand( "~" ) , "NPPES" , "nppes.csv" ) , 
+			npi_filepath , 
 			nrow = 1 )[ FALSE , , ] 
 	)
 
@@ -55,8 +65,7 @@ columns_to_import <-
 nppes_df <- 
 	data.frame( 
 		readr::read_csv( 
-			file.path( path.expand( "~" ) , "NPPES" , 
-				"nppes.csv" ) , 
+			npi_filepath , 
 			col_names = columns_to_import , 
 			col_types = 
 				paste0( 

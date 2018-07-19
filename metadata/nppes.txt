@@ -12,10 +12,20 @@ publication_period: * Updated monthly with new providers.
 administrative_organization: * Maintained by the United States [Centers for Medicare & Medicaid Services (CMS)](http://www.cms.gov/)
 
 ~~~{analysis_examples_loading_block}
+npi_filepath <-
+	grep(
+		"npidata_pfile_20050523-([0-9]+)\\.csv" ,
+		list.files(
+			file.path( path.expand( "~" ) , "NPPES" ) ,
+			full.names = TRUE
+		) ,
+		value = TRUE
+	)
+	
 column_names <-
 	names( 
 		read.csv( 
-			file.path( path.expand( "~" ) , "NPPES" , "nppes.csv" ) , 
+			npi_filepath , 
 			nrow = 1 )[ FALSE , , ] 
 	)
 
@@ -41,8 +51,7 @@ columns_to_import <-
 chapter_tag_df <- 
 	data.frame( 
 		readr::read_csv( 
-			file.path( path.expand( "~" ) , "NPPES" , 
-				"nppes.csv" ) , 
+			npi_filepath , 
 			col_names = columns_to_import , 
 			col_types = 
 				paste0( 

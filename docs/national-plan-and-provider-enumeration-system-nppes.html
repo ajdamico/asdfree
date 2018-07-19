@@ -955,10 +955,20 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="analysis-examples-with-base-r-4" class="section level2 unnumbered">
 <h2>Analysis Examples with base R  </h2>
 <p>Load a data frame:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">column_names &lt;-
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">npi_filepath &lt;-
+<span class="st">    </span><span class="kw">grep</span>(
+        <span class="st">&quot;npidata_pfile_20050523-([0-9]+)\.csv&quot;</span> ,
+        <span class="kw">list.files</span>(
+            <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;NPPES&quot;</span> ) ,
+            <span class="dt">full.names =</span> <span class="ot">TRUE</span>
+        ) ,
+        <span class="dt">value =</span> <span class="ot">TRUE</span>
+    )
+    
+column_names &lt;-
 <span class="st">    </span><span class="kw">names</span>( 
         <span class="kw">read.csv</span>( 
-            <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;NPPES&quot;</span> , <span class="st">&quot;nppes.csv&quot;</span> ) , 
+            npi_filepath , 
             <span class="dt">nrow =</span> <span class="dv">1</span> )[ <span class="ot">FALSE</span> , , ] 
     )
 
@@ -984,8 +994,7 @@ columns_to_import &lt;-
 nppes_df &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">data.frame</span>( 
         readr<span class="op">::</span><span class="kw">read_csv</span>( 
-            <span class="kw">file.path</span>( <span class="kw">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;NPPES&quot;</span> , 
-                <span class="st">&quot;nppes.csv&quot;</span> ) , 
+            npi_filepath , 
             <span class="dt">col_names =</span> columns_to_import , 
             <span class="dt">col_types =</span> 
                 <span class="kw">paste0</span>( 

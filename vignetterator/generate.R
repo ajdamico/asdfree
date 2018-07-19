@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'ssl.verifypeer'"
+commit_memo <- "'nppes'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
