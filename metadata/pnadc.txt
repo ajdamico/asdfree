@@ -129,17 +129,19 @@ The R `convey` library estimates measures of income concentration, poverty, ineq
 ```{r eval = FALSE , results = "hide" }
 
 library(convey)
-chapter_tag_cat <-
-  get_catalog( "pnadc" ,
-               output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
 
 # read pnadc microdata for the year 2017 visita 1 
 
-chapter_tag_cat <- subset( chapter_tag_cat , year == 2017 & interview == 1 )
+repeated_cat <- 
+	get_catalog( "pnadc" , 
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) 
+	)
 
-chapter_tag_cat <- lodown( "pnadc" , chapter_tag_cat )
+repeated_cat <- subset( repeated_cat , year == 2017 & interview == 1 )
 
-chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "pnadc 2017 visita_1.rds" ) )
+repeated_cat <- lodown( "pnadc" , repeated_cat )
+
+visita_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "pnadc 2017 visita_1.rds" ) )
 
 
 # read deflators file
@@ -150,9 +152,9 @@ annual.ftp <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por
 
 tf <- tempfile()
 
-download.file(paste0(annual.ftp,"deflator_2017_pnadc.xls" ), tf, mode="wb")
+download.file( paste0( annual.ftp , "deflator_2017_pnadc.xls" ) , tf , mode = "wb" )
 
-deflator_2017_pnadc <- read_excel(path = tf)
+deflator_2017_pnadc <- read_excel( path = tf )
 
 names(deflator_2017_pnadc)[2]<- "trimestre"
 
@@ -160,17 +162,17 @@ names(deflator_2017_pnadc)<- tolower(names(deflator_2017_pnadc))
 
 # merge the two files using the variables ano, trimestre, uf
 
-chapter_tag_df <- merge(chapter_tag_df, deflator_2017_pnadc, by= c("ano","trimestre", "uf") )
+visita_df <- merge(visita_df, deflator_2017_pnadc, by= c("ano","trimestre", "uf") )
 
 # define region variable
 
-chapter_tag_dff$region <- factor(substring(chapter_tag_df$uf, 1, 1),
+chapter_tag_dff$region <- factor(substring(visita_df$uf, 1, 1),
  levels = 1:5,
  labels = c("North", "Northeast", "Southeast", "South", "Center-West")
 )
                           
 
-chapter_tag_df$state_name <- factor( chapter_tag_dff$uf , 
+visita_df$state_name <- factor( visita_dff$uf , 
     levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
     labels = c( "Rondonia" , "Acre" , "Amazonas" , 
                 "Roraima" , "Para" , "Amapa" , "Tocantins" , 
@@ -186,10 +188,10 @@ chapter_tag_df$state_name <- factor( chapter_tag_dff$uf ,
 
 
 # define deflated effective working income variable:
-chapter_tag_df$vd4020_def <- chapter_tag_df$vd4020 * chapter_tag_df$co2
+visita_df$vd4020_def <- visita_df$vd4020 * visita_df$co2
  
 # dedeflated effective per capita household income variable:
-chapter_tag_df$vd5002_def<- chapter_tag_df$vd5002 * chapter_tag_df$co2
+visita_df$vd5002_def<- visita_df$vd5002 * visita_df$co2
 
 
 
@@ -198,53 +200,51 @@ options(survey.lonely.psu = "adjust")
 
 
 # preliminary survey design
-pre_stratified <- svydesign(id=~upa, strata =~estrato , weights =~v1031, nest=T, data = chapter_tag_df)
+pre_stratified <- svydesign(id=~upa, strata =~estrato , weights =~v1031, nest=T, data = visita_df)
 
 # post-stratification targets
-df.pos <- data.frame(posest = as.character(unique(chapter_tag_df[,"posest"])),
-                         Freq = as.numeric(unique(chapter_tag_df[,"v1030"])))
+df.pos <- data.frame(posest = as.character(unique(visita_df[,"posest"])),
+                         Freq = as.numeric(unique(visita_df[,"v1030"])))
 
 # final survey design object
-chapter_tag_design <- postStratify( pre_stratified, ~ posest,  df.pos)
+visita_design <- postStratify( pre_stratified, ~ posest,  df.pos)
 
-library(convey)
-
-chapter_tag_design <- convey_prep(chapter_tag_design)
+visita_design <- convey_prep(visita_design)
 
 # estimating Gini index based on the efective income from all jobs
 # defining the filter - ocupied people
 
-sub_chapter_tag_design <-
-   subset(chapter_tag_design, vd4018==1 & vd4002==1 & v2009>=14)
+sub_visita_design <-
+   subset(visita_design, vd4018==1 & vd4002==1 & v2009>=14)
 
 # for the whole country
-svygini(~ vd4020_def, sub_chapter_tag_design, na.rm=TRUE)
+svygini(~ vd4020_def, sub_visita_design, na.rm=TRUE)
 
 # by regions
 
-svyby(~vd4020_def, ~region, sub_chapter_tag_design, svygini, na.rm=TRUE )
+svyby(~vd4020_def, ~region, sub_visita_design, svygini, na.rm=TRUE )
 
 # by states
 
-svyby(~vd4020_def, ~state_name, sub_chapter_tag_design, svygini, na.rm=TRUE )
+svyby(~vd4020_def, ~state_name, sub_visita_design, svygini, na.rm=TRUE )
 
 
 # estimating the Gini index based on the per capita household income
 # defining the filter - people in the households
 
-sub_chapter_tag_design<-subset(chapter_tag_design, vd2002<=14)
+sub_visita_design<-subset(visita_design, vd2002<=14)
 
 # for the whole country
 
-svygini (~vd5002_def, sub_chapter_tag_design, na.rm=TRUE)
+svygini (~vd5002_def, sub_visita_design, na.rm=TRUE)
 
 # by regions 
 
-svyby(~vd5002_def, ~region, sub_chapter_tag_design, svygini, na.rm=TRUE )
+svyby(~vd5002_def, ~region, sub_visita_design, svygini, na.rm=TRUE )
 
 # by states
 
-svyby(~vd5002_def, ~state_name, sub_chapter_tag_design, svygini, na.rm=TRUE )
+svyby(~vd5002_def, ~state_name, sub_visita_design, svygini, na.rm=TRUE )
 
 
 # to check the results see:

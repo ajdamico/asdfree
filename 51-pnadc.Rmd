@@ -304,13 +304,122 @@ summary( glm_result )
 The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for PNADC users, this code calculates the gini coefficient on complex sample survey data:
 
 ```{r eval = FALSE , results = "hide" }
+
 library(convey)
-pnadc_design <- convey_prep( pnadc_design )
 
-sub_pnadc_design <- 
-	subset( pnadc_design , pia == 1 )
+# read pnadc microdata for the year 2017 visita 1 
 
-svygini( ~ vd4020n , sub_pnadc_design , na.rm = TRUE )
+repeated_cat <- 
+	get_catalog( "pnadc" , 
+		output_dir = file.path( path.expand( "~" ) , "PNADC" ) 
+	)
+
+repeated_cat <- subset( repeated_cat , year == 2017 & interview == 1 )
+
+repeated_cat <- lodown( "pnadc" , repeated_cat )
+
+visita_df <- readRDS( file.path( path.expand( "~" ) , "PNADC" , "pnadc 2017 visita_1.rds" ) )
+
+# read deflators file
+
+library(readxl)
+
+annual.ftp <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Anual/Microdados/Documentacao/"
+
+tf <- tempfile()
+
+download.file( paste0( annual.ftp , "deflator_2017_pnadc.xls" ) , tf , mode = "wb" )
+
+deflator_2017_pnadc <- read_excel( path = tf )
+
+names(deflator_2017_pnadc)[2]<- "trimestre"
+
+names(deflator_2017_pnadc)<- tolower(names(deflator_2017_pnadc))
+
+# merge the two files using the variables ano, trimestre, uf
+
+visita_df <- merge(visita_df, deflator_2017_pnadc, by= c("ano","trimestre", "uf") )
+
+# define region variable
+
+pnadc_dff$region <- factor(substring(visita_df$uf, 1, 1),
+ levels = 1:5,
+ labels = c("North", "Northeast", "Southeast", "South", "Center-West")
+)
+ 
+
+visita_df$state_name <- factor( visita_dff$uf , 
+ levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+ labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+ "Roraima" , "Para" , "Amapa" , "Tocantins" , 
+ "Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+ "Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+ "Bahia" , "Minas Gerais" , "Espirito Santo" , 
+ "Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+ "Santa Catarina" , "Rio Grande do Sul" , 
+ "Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+ "Distrito Federal" )
+ )
+
+# define deflated effective working income variable:
+visita_df$vd4020_def <- visita_df$vd4020 * visita_df$co2
+ 
+# dedeflated effective per capita household income variable:
+visita_df$vd5002_def<- visita_df$vd5002 * visita_df$co2
+
+# lonely psu
+options(survey.lonely.psu = "adjust")
+
+# preliminary survey design
+pre_stratified <- svydesign(id=~upa, strata =~estrato , weights =~v1031, nest=T, data = visita_df)
+
+# post-stratification targets
+df.pos <- data.frame(posest = as.character(unique(visita_df[,"posest"])),
+ Freq = as.numeric(unique(visita_df[,"v1030"])))
+
+# final survey design object
+visita_design <- postStratify( pre_stratified, ~ posest, df.pos)
+
+visita_design <- convey_prep(visita_design)
+
+# estimating Gini index based on the efective income from all jobs
+# defining the filter - ocupied people
+
+sub_visita_design <-
+ subset(visita_design, vd4018==1 & vd4002==1 & v2009>=14)
+
+# for the whole country
+svygini(~ vd4020_def, sub_visita_design, na.rm=TRUE)
+
+# by regions
+
+svyby(~vd4020_def, ~region, sub_visita_design, svygini, na.rm=TRUE )
+
+# by states
+
+svyby(~vd4020_def, ~state_name, sub_visita_design, svygini, na.rm=TRUE )
+
+# estimating the Gini index based on the per capita household income
+# defining the filter - people in the households
+
+sub_visita_design<-subset(visita_design, vd2002<=14)
+
+# for the whole country
+
+svygini (~vd5002_def, sub_visita_design, na.rm=TRUE)
+
+# by regions 
+
+svyby(~vd5002_def, ~region, sub_visita_design, svygini, na.rm=TRUE )
+
+# by states
+
+svyby(~vd5002_def, ~state_name, sub_visita_design, svygini, na.rm=TRUE )
+
+# to check the results see:
+
+# https://www.ibge.gov.br/estatisticas-novoportal/sociais/trabalho/17270-pnad-continua.html?edicao=20635&t=resultados
+
 ```
 
 ---
