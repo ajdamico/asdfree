@@ -114,7 +114,10 @@ for( this_state in seq( nrow( chapter_tag_cat ) ) ){
 	}
 
 	# merge household and person tables
-	this_chapter_tag_df <- merge( this_chapter_tag_dom_df , this_chapter_tag_pes_df )
+	var_names_diff <- setdiff(names(this_censo_pes_df),names(this_censo_dom_df) )
+  
+  	this_censo_df <- merge( this_censo_dom_df , this_censo_pes_df[, c("v0001","v0300",var_names_diff)],
+                           by.x = c("v0001","v0300") , by.y = c("v0001", "v0300" ))
 
 	# confirm one record per person, with household information merged on
 	stopifnot( nrow( this_chapter_tag_df ) == nrow( this_chapter_tag_pes_df ) )
