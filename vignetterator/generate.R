@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'pnadc'"
+commit_memo <- "'workflows'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -15,6 +15,7 @@ commit_memo <- "'pnadc'"
 
 
 github_password <- readLines( file.path( path.expand( "~" ) , "github password.txt" ) )
+github_token <- readLines( file.path( path.expand( "~" ) , "github token.txt" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\descriptive_statistics_blocks.R" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\measures_of_uncertainty_blocks.R" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\tests_of_association_blocks.R" ) )
@@ -321,7 +322,7 @@ for( this_ci_file in ci_rmd_files ){
 	if( dir.exists( paste0( "C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag ) ) ){
 		system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' pull" ) )
 	} else {
-		system( paste0( "powershell git clone https://ajdamico:" , github_password , "@github.com/asdfree/" , chapter_tag , "/ 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "'" ) )
+		system( paste0( "powershell git clone https://github.com/asdfree/" , chapter_tag , "/ 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "'" ) )
 	}
 	
 	this_metadata_file <- gsub( paste0( "/([0-9]+)-" , chapter_tag , ".Rmd$" ) , paste0( "/metadata/" , chapter_tag , ".txt" ) , this_ci_file )
@@ -346,7 +347,7 @@ for( this_ci_file in ci_rmd_files ){
 	
 	this_repo_dirs <- unique( dirname( copied_files ) )
 	
-	lapply( this_repo_dirs , dir.create , showWarnings = FALSE )
+	lapply( this_repo_dirs , dir.create , showWarnings = FALSE , recursive = TRUE )
 	
 	file.copy( repo_files , copied_files , overwrite = TRUE )
 		
@@ -533,8 +534,7 @@ for( this_ci_file in ci_rmd_files ){
 	}
 	
 	
-	
-	
+		
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' add -u" ) )
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' add ." ) )
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' commit -m " , commit_memo ) )
@@ -550,4 +550,4 @@ system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' 
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add ." ) )
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' commit -m " , commit_memo ) )
 # system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' remote add origin https://ajdamico:" , github_password , "@github.com/ajdamico/asdfree.git" ) )
-system( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' push origin master" )
+system( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' push origin dev" )
