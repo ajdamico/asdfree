@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'workflows'"
+commit_memo <- "'replace travis and appveyor with github actions; remove sample_setup_breaks'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -21,7 +21,7 @@ source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\measure
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\tests_of_association_blocks.R" ) )
 
 
-needs_travis_build_status_line <- "[![Build Status](https://travis-ci.org/asdfree/chapter_tag.svg?branch=master)](https://travis-ci.org/asdfree/chapter_tag) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chapter_tag?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chapter_tag)"
+needs_actions_build_status_line <- "[![Build Status](https://github.com/asdfree/chapter_tag/actions/workflows/r.yml/badge.svg)]"
 
 
 needs_catalog_block <- '`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function.  After requesting the CHAPTER_TAG catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).\n\n```{r eval = FALSE , results = "hide" }\nlibrary(lodown)\n# examine all available CHAPTER_TAG microdata files\nchapter_tag_cat <-\n\tget_catalog( "chapter_tag" ,\n\t\toutput_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) get_catalog_password_parameters )\n\ncatalog_subset_description\ncatalog_subset\n# download the microdata to your local computer\nchapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat lodown_password_parameters )\n```'
@@ -53,7 +53,7 @@ pull_line <-
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "lodown_password_parameters" , "get_catalog_password_parameters" , "authorship_line" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "catalog_subset_description" , "catalog_subset" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
 sub_chunks <- c( "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "convey_block" , "replacement_block" )
-needs_this_block <- c( "needs_catalog_block" , "needs_srvyr_block" , "needs_dplyr_block" , "needs_travis_build_status_line" )
+needs_this_block <- c( "needs_catalog_block" , "needs_srvyr_block" , "needs_dplyr_block" , "needs_actions_build_status_line" )
 
 
 library(bookdown)
@@ -107,8 +107,8 @@ for ( i in seq_along( chapter_tag ) ){
 	}
 	
 	# store the build status badges
-	if( any( grepl( "^needs_travis_build_status_line: yes" , tolower( full_text[[i]] ) ) ) ) {
-		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , needs_travis_build_status_line ) , '\n' ) )
+	if( any( grepl( "^needs_actions_build_status_line: yes" , tolower( full_text[[i]] ) ) ) ) {
+		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , needs_actions_build_status_line ) , '\n' ) )
 	}
 	
 	
@@ -301,15 +301,13 @@ for( this_metafile in metafiles ){
 # delete the datasets folder
 datasets_path <- normalizePath( file.path( path.expand( "~" ) , "Github/datasets/" ) , winslash = '/' )
 file.remove( list.files( datasets_path , recursive = TRUE , full.names = TRUE , include.dirs = TRUE ) )
-travis_ymls <- grep( "\\.travis\\.yml$" , list.files( file.path( path.expand( "~" ) , "Github/datasets/" ) , recursive = TRUE , full.names = TRUE , include.dirs = TRUE , all.files = TRUE ) , value = TRUE )
-file.remove( travis_ymls )
 
 # create github repository for dataset
 repo_files <- list.files( normalizePath( file.path( path.expand( "~" ) , "Github/asdfree/repo/" ) , winslash = '/' ) , recursive = TRUE , full.names = TRUE , all.files = TRUE )
 
 rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
 
-ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "travis|appveyor" , readLines( w ) ) & grepl( "Build Status" , readLines( w ) ) ) )
+ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "\\[Build Status\\]" , readLines( w ) ) ) )
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
 # in case asdfree repo needs to be deleted and restored:
@@ -358,11 +356,8 @@ for( this_ci_file in ci_rmd_files ){
 		
 			these_lines <- readLines( this_file )
 
-			sample_setup_breaks <- pull_line( this_metadata_file , "sample_setup_breaks" )
 			needs_7za_install <- pull_line( this_metadata_file , "needs_7za_install" )
 			
-			if( basename( this_file ) == '.travis.yml' ) if( needs_7za_install == 'yes' ) these_lines <- gsub( "# needs_7za_install" , "- p7zip-full" , these_lines ) else these_lines <- these_lines[ these_lines != "# needs_7za_install" ]
-
 			if( basename( this_file ) == 'DESCRIPTION' ) {
 				if( grepl( 'archive' , needed_libraries ) ) {
 					these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown, jimhester/archive" , these_lines )
@@ -406,7 +401,6 @@ for( this_ci_file in ci_rmd_files ){
 							chapter_tag , 
 							replacements = machine_specific_replacements , 
 							setup_rmd = identical( sample_setup_block , '' ) ,
-							sample_setup_breaks = if( !identical( sample_setup_breaks , '' ) ) sample_setup_breaks ,
 							broken_sample_test_condition = if( !identical( broken_sample_test_condition , '' ) ) broken_sample_test_condition
 						)
 						
@@ -416,43 +410,7 @@ for( this_ci_file in ci_rmd_files ){
 				
 			}
 			
-			
-			if( sample_setup_breaks != '' ){
-				
-				if( basename( this_file ) == 'appveyor.yml' ){
-				
-					these_lines <-
-						gsub( 
-							"# this_build_matrix" ,
-							paste0( 
-								"    matrix:\n" ,
-								paste0( "    - this_sample_break: " , seq( as.integer( sample_setup_breaks ) ) , collapse = "\n" ) ,
-								collapse = "\n"
-							) , 
-							these_lines 
-						)
-						
-				}
-				
-				if( basename( this_file ) == '.travis.yml' ){
-					
-					these_lines <-
-						gsub( 
-							"# this_build_matrix" ,
-							paste0( 
-								"env:\n" ,
-								paste0( " - this_sample_break=" , seq( as.integer( sample_setup_breaks ) ) , collapse = "\n" ) ,
-								collapse = "\n"
-							) , 
-							these_lines 
-						)
-							
-				}
-			
-			}
-		
 
-			these_lines <- gsub( "sample_setup_breaks" , sample_setup_breaks , these_lines )
 			these_lines <- gsub( "chapter_tag" , chapter_tag , these_lines )
 			these_lines <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , these_lines )
 			these_lines <- gsub( "needed_libraries" , needed_libraries , these_lines )
@@ -471,7 +429,7 @@ for( this_ci_file in ci_rmd_files ){
 		readme_md_text <- 
 			sort( c( 
 				readme_md_text , 
-				paste0( chapter_tag , ": [![Build Status](https://travis-ci.org/asdfree/" , chapter_tag , ".svg?branch=master)](https://travis-ci.org/asdfree/" , chapter_tag , ") [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/" , chapter_tag , "?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/" , chapter_tag , ")\n" )
+				paste0( chapter_tag , ": [![Build Status](https://github.com/asdfree/" , chapter_tag , "/actions/workflows/r.yml/badge.svg)\n" )
 			) )
 	
 		if( chapter_tag == "lavaanex" ){
@@ -518,7 +476,7 @@ for( this_ci_file in ci_rmd_files ){
 			
 			these_lines <- readLines( this_copied_file )
 			
-			# install.packages() lines should be skipped on travis/appveyor
+			# install.packages() lines should be skipped on continuous integration
 			these_lines <- these_lines[ !grepl( "^install\\.packages" , these_lines ) ]
 			these_lines <- gsub( "chapter_tag" , chapter_tag , these_lines )
 			these_lines <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , these_lines )
