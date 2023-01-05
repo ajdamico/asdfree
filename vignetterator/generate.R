@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'badge fixes'"
+commit_memo <- "'badge fixes and syntaxtractor addition'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -19,6 +19,7 @@ github_token <- readLines( file.path( path.expand( "~" ) , "github token.txt" ) 
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\descriptive_statistics_blocks.R" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\measures_of_uncertainty_blocks.R" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\tests_of_association_blocks.R" ) )
+source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\syntaxtractor.R" ) )
 
 
 needs_actions_build_status_line <- '<a href="https://github.com/asdfree/chapter_tag/actions"><img src="https://github.com/asdfree/chapter_tag/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>'
@@ -397,7 +398,7 @@ for( this_ci_file in ci_rmd_files ){
 
 						these_lines , 
 						
-						lodown::syntaxtractor( 
+						syntaxtractor( 
 							chapter_tag , 
 							replacements = machine_specific_replacements , 
 							setup_rmd = identical( sample_setup_block , '' ) ,
@@ -469,7 +470,7 @@ for( this_ci_file in ci_rmd_files ){
 		these_lines <- 
 			c(
 				readLines( setup_fn ) ,
-				lodown::syntaxtractor( chapter_tag , replacements = machine_specific_replacements , test_rmd = FALSE )
+				syntaxtractor( chapter_tag , replacements = machine_specific_replacements , test_rmd = FALSE )
 			)
 			
 		writeLines( these_lines , setup_fn )
