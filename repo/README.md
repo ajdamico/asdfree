@@ -1,4 +1,1 @@
-
-<!-- badges: start -->
-[![R-CMD-check](https://github.com/asdfree/chapter_tag/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/asdfree/chapter_tag/actions/workflows/R-CMD-check.yaml)
-<!-- badges: end -->
+<a href="https://github.com/asdfree/chapter_tag/actions"><img src="https://github.com/asdfree/chapter_tag/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
