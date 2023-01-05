@@ -534,6 +534,18 @@ for( this_ci_file in ci_rmd_files ){
 	}
 	
 	
+	
+	# test whether the repository exists
+	repo_does_not_exist <-
+		system( paste0( "powershell git ls-remote https://github.com/asdfree/" , chapter_tag , " HEAD" ) )
+		
+	# if the repository does not exist, ls-remote returns a 1.  in that case, create the repo
+	if( repo_does_not_exist ){
+	
+		system( paste0( "powershell gh repo create asdfree/" , chapter_tag , " --public" ) )
+	
+	}
+	
 		
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' add -u" ) )
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' add ." ) )
