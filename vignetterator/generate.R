@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'badge fixes and syntaxtractor addition'"
+commit_memo <- "'badge fixes'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -308,7 +308,7 @@ repo_files <- list.files( normalizePath( file.path( path.expand( "~" ) , "Github
 
 rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
 
-ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "\\[Build Status\\]" , readLines( w ) ) ) )
+ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Github Actions Badge" , readLines( w ) ) ) )
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
 # in case asdfree repo needs to be deleted and restored:
