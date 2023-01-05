@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'replace travis and appveyor with github actions; remove sample_setup_breaks'"
+commit_memo <- "'badge fixes'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -21,7 +21,7 @@ source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\measure
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\tests_of_association_blocks.R" ) )
 
 
-needs_actions_build_status_line <- "[![Build Status](https://github.com/asdfree/chapter_tag/actions/workflows/r.yml/badge.svg)]"
+needs_actions_build_status_line <- '<a href="https://github.com/asdfree/chapter_tag/actions"><img src="https://github.com/asdfree/chapter_tag/actions/workflows/R.yml/badge.svg" alt="Github Actions Badge"></a>'
 
 
 needs_catalog_block <- '`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function.  After requesting the CHAPTER_TAG catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).\n\n```{r eval = FALSE , results = "hide" }\nlibrary(lodown)\n# examine all available CHAPTER_TAG microdata files\nchapter_tag_cat <-\n\tget_catalog( "chapter_tag" ,\n\t\toutput_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) get_catalog_password_parameters )\n\ncatalog_subset_description\ncatalog_subset\n# download the microdata to your local computer\nchapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat lodown_password_parameters )\n```'
@@ -429,8 +429,10 @@ for( this_ci_file in ci_rmd_files ){
 		readme_md_text <- 
 			sort( c( 
 				readme_md_text , 
-				paste0( chapter_tag , ": [![Build Status](https://github.com/asdfree/" , chapter_tag , "/actions/workflows/r.yml/badge.svg)\n" )
+				paste0( chapter_tag , ": " , ' <a href="https://github.com/asdfree/' , chapter_tag , '/actions"><img src="https://github.com/asdfree/' , chapter_tag , '/actions/workflows/R.yml/badge.svg" alt="Github Actions Badge"></a>\n' )
 			) )
+			
+			 
 	
 		if( chapter_tag == "lavaanex" ){
 		
