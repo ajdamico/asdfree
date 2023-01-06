@@ -1,6 +1,6 @@
 # Sys.getenv("RSTUDIO_PANDOC")
 Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'badge fixes'"
+commit_memo <- "'remove numbering system & move most posts to unpublished'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -80,16 +80,18 @@ for( this_chunk in sub_chunks ){
 }
 
 
+# delete all rmd files except for the index
+rmd_files <- grep( "\\.Rmd$" , list.files( book_folder , full.names = TRUE ) , value = TRUE )
+file.remove( rmd_files[ basename( rmd_files ) != 'index.Rmd' ] )
 
-fixed_chapters <- 6
+# move all rmd files in /posts/ to the main folder
+rmd_posts <- list.files( paste0( book_folder , "posts/" ) , full.names = TRUE )
+file.copy( rmd_posts , gsub( "posts\\/" , "" , rmd_posts ) )
 
-rmds_to_clear <- paste0( str_pad( ( fixed_chapters + 1 ):99 , 2 , pad = '0' ) , "\\-" , collapse = "|" )
-
-file.remove( grep( rmds_to_clear , list.files( book_folder , full.names = TRUE ) , value = TRUE ) )
 
 for ( i in seq_along( chapter_tag ) ){
 
-	this_rmd <- paste0( book_folder , str_pad( fixed_chapters + i , 2 , pad = '0' ) , "-" , chapter_tag[ i ] , ".Rmd" )
+	this_rmd <- paste0( book_folder , chapter_tag[ i ] , ".Rmd" )
 
 	rmd_lines <- readLines( paste0( book_folder , "skeleton/skeleton.Rmd" ) )
 	
@@ -245,7 +247,7 @@ for ( i in seq_along( chapter_tag ) ){
 
 }
 
-# writeLines( "`r if (knitr:::is_html_output()) '# References {-}'`" , paste0( book_folder , str_pad( fixed_chapters + i + 1 , 2 , pad = '0' ) , "-references.Rmd" ) )
+# writeLines( "`r if (knitr:::is_html_output()) '# References {-}'`" , paste0( book_folder , "references.Rmd" ) )
 
 setwd( book_folder )
 clean_site()
@@ -273,8 +275,6 @@ for( this_metafile in metafiles ){
 	link_line <-
 		paste0(
 			'"link": "https://github.com/ajdamico/asdfree/edit/master/' ,
-			stringr::str_pad( fixed_chapters + which( this_metafile == metafiles ) , pad = '0' , width = 2 ) ,
-			'-' ,
 			chapter_tag ,
 			'.Rmd",'
 		)
@@ -316,7 +316,7 @@ ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
 for( this_ci_file in ci_rmd_files ){
 
-	chapter_tag <- gsub( "(.*)-(.*)\\.Rmd" , "\\2" , basename( this_ci_file ) )
+	chapter_tag <- gsub( "\\.Rmd$" , "" , basename( this_ci_file ) )
 
 	if( dir.exists( paste0( "C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag ) ) ){
 		system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' pull" ) )
@@ -324,7 +324,7 @@ for( this_ci_file in ci_rmd_files ){
 		system( paste0( "powershell git clone https://github.com/asdfree/" , chapter_tag , "/ 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "'" ) )
 	}
 	
-	this_metadata_file <- gsub( paste0( "/([0-9]+)-" , chapter_tag , ".Rmd$" ) , paste0( "/metadata/" , chapter_tag , ".txt" ) , this_ci_file )
+	this_metadata_file <- gsub( paste0( "/" , chapter_tag , ".Rmd$" ) , paste0( "/metadata/" , chapter_tag , ".txt" ) , this_ci_file )
 
 	needed_libraries <- paste( gsub( "^(dependencies: )?library\\(|\\)" , "" , unique( grep( "^(dependencies: )?library\\(" , c( if( file.exists( this_metadata_file ) ) readLines( this_metadata_file ) , readLines( this_ci_file ) ) , value = TRUE ) ) ) , collapse = ", " )
 	
@@ -515,7 +515,6 @@ for( this_ci_file in ci_rmd_files ){
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' push origin master" ) )
 
 }
-
 
 writeLines( readme_md_text , file.path( path.expand( "~" ) , "Github/asdfree/README.md" ) )
 

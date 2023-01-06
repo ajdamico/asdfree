@@ -38,7 +38,7 @@
 syntaxtractor <-
 	function( data_name , repo = "ajdamico/asdfree" , ref = "master" , replacements = NULL , setup_rmd = TRUE , test_rmd = TRUE , sample_setup_breaks = NULL , broken_sample_test_condition = NULL ){
 
-		this_rmd <- grep( paste0( "-" , data_name , "\\.Rmd$" ) , list.files( "C:/Users/anthonyd/Documents/GitHub/asdfree/" , full.names = TRUE ) , value = TRUE )
+		this_rmd <- grep( paste0( "/" , data_name , "\\.Rmd$" ) , list.files( "C:/Users/anthonyd/Documents/GitHub/asdfree/" , full.names = TRUE ) , value = TRUE )
 		
 		rmd_page <- readLines( this_rmd )
 	
