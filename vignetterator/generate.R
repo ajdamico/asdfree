@@ -343,9 +343,7 @@ for( this_ci_file in ci_rmd_files ){
 			
 			if( basename( this_file ) == 'DESCRIPTION' ) {
 				if( grepl( 'archive' , needed_libraries ) ) {
-					these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown, jimhester/archive" , these_lines )
-				} else {
-					these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown" , these_lines )
+					these_lines <- gsub( "desc_remotes_line" , "Remotes: jimhester/archive" , these_lines )
 				}
 			}
 			
@@ -363,16 +361,6 @@ for( this_ci_file in ci_rmd_files ){
 
 				eval( parse( text = msrb ) )
 			
-				download_and_import_block <- pull_chunk( this_metadata_file , "download_and_import_block" )
-
-				if( !identical( download_and_import_block , '' ) ){
-			
-					download_and_import_block <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , download_and_import_block )
-					for ( this_replacement in machine_specific_replacements ) download_and_import_block <- gsub( this_replacement[ 1 ] , this_replacement[ 2 ] , download_and_import_block , fixed = TRUE )
-					these_lines <- c( these_lines , download_and_import_block )
-				
-				}
-				
 				these_lines <- 
 					c( 
 
