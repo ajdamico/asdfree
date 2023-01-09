@@ -1,4 +1,4 @@
-commit_memo <- "'remove file commits'"
+commit_memo <- "'remove get_catalog_password_parameters'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -50,7 +50,7 @@ pull_line <-
 	}
 
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
-sub_lines <- c( "chapter_title" , "lodown_password_parameters" , "get_catalog_password_parameters" , "authorship_line" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "catalog_subset_description" , "catalog_subset" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
+sub_lines <- c( "chapter_title" , "password_parameters" , "authorship_line" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "catalog_subset_description" , "catalog_subset" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
 sub_chunks <- c( "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "convey_block" , "replacement_block" )
 needs_this_block <- c( "needs_catalog_block" , "needs_srvyr_block" , "needs_dplyr_block" , "needs_actions_build_status_line" )
 
