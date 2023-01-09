@@ -36,7 +36,7 @@
 #'
 #' @export
 syntaxtractor <-
-	function( data_name , repo = "ajdamico/asdfree" , ref = "master" , replacements = NULL , test_rmd = TRUE ){
+	function( data_name , repo = "ajdamico/asdfree" , replacements = NULL ){
 
 		this_rmd <- grep( paste0( "/" , data_name , "\\.Rmd$" ) , list.files( "C:/Users/anthonyd/Documents/GitHub/asdfree/" , full.names = TRUE ) , value = TRUE )
 		
@@ -48,33 +48,6 @@ syntaxtractor <-
 		
 		rmd_page <- rmd_page[ lines_to_eval ]
 	
-		# find the second `library(lodown)` line
-		second_library_lodown_line <- grep( "^library\\(lodown\\)$" , rmd_page )[ 2 ]
-		
-		# if that line does not exist, simply use the first two lines of code
-		if( is.na( second_library_lodown_line ) ){
-			second_library_lodown_line <- 3
-		}
-	
-		test_rmd_page <- rmd_page[ seq_along( rmd_page ) >= second_library_lodown_line ]
-		
-		if( test_rmd ){
-
-			lodown_command_line <- grep( paste0( "^" , data_name , "_cat <\\- lodown\\(" ) , test_rmd_page )
-
-			if( length( lodown_command_line ) > 0 ){
-				
-				# following few lines might include usernames/passwords
-				if( grepl( "your_" , test_rmd_page[ lodown_command_line + 1 ] ) ) test_rmd_page[ lodown_command_line + 1 ] <- ""
-				if( grepl( "your_" , test_rmd_page[ lodown_command_line + 2 ] ) ) test_rmd_page[ lodown_command_line + 2 ] <- ""
-				if( grepl( "your_" , test_rmd_page[ lodown_command_line + 3 ] ) ) test_rmd_page[ lodown_command_line + 3 ] <- ""
-				
-			}
-			
-		}
-		
-		rmd_page <- test_rmd_page
-				
 		temp_script <- tempfile()
 
 		for ( this_replacement in replacements ) rmd_page <- gsub( this_replacement[ 1 ] , this_replacement[ 2 ] , rmd_page , fixed = TRUE )

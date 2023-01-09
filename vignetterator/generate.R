@@ -438,7 +438,7 @@ for( this_ci_file in ci_rmd_files ){
 		these_lines <- 
 			c(
 				readLines( setup_fn ) ,
-				syntaxtractor( chapter_tag , replacements = machine_specific_replacements , test_rmd = FALSE )
+				syntaxtractor( chapter_tag , replacements = machine_specific_replacements )
 			)
 			
 		writeLines( these_lines , setup_fn )
