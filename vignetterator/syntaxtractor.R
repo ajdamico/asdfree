@@ -36,7 +36,7 @@
 #'
 #' @export
 syntaxtractor <-
-	function( data_name , repo = "ajdamico/asdfree" , ref = "master" , replacements = NULL , setup_rmd = TRUE , test_rmd = TRUE , broken_sample_test_condition = NULL ){
+	function( data_name , repo = "ajdamico/asdfree" , ref = "master" , replacements = NULL , setup_rmd = TRUE , test_rmd = TRUE ){
 
 		this_rmd <- grep( paste0( "/" , data_name , "\\.Rmd$" ) , list.files( "C:/Users/anthonyd/Documents/GitHub/asdfree/" , full.names = TRUE ) , value = TRUE )
 		
@@ -64,18 +64,11 @@ syntaxtractor <-
 	
 		test_rmd_page <- rmd_page[ seq_along( rmd_page ) >= second_library_lodown_line ]
 		
-		
-		
-		if( !is.null( broken_sample_test_condition ) ) test_rmd_page <- c( paste0( "if( " , broken_sample_test_condition , " ){" ) , test_rmd_page , "}" )
-		
 		if( test_rmd ){
 
 			lodown_command_line <- grep( paste0( "^" , data_name , "_cat <\\- lodown\\(" ) , test_rmd_page )
 
 			if( length( lodown_command_line ) > 0 ){
-
-				# skip the second `get_catalog` for broken samples, since sometimes `chapter_tag_cat <- lodown(...)` stores needed file information
-				if( !is.null( broken_sample_test_condition ) ) test_rmd_page[ seq( 2 , lodown_command_line ) ] <- "" else test_rmd_page[ lodown_command_line ] <- ""
 				
 				# following few lines might include usernames/passwords
 				if( grepl( "your_" , test_rmd_page[ lodown_command_line + 1 ] ) ) test_rmd_page[ lodown_command_line + 1 ] <- ""

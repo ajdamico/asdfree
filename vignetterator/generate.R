@@ -1,4 +1,4 @@
-commit_memo <- "'remove setup_sample_breaks'"
+commit_memo <- "'remove broken_sample_test_condition'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -380,8 +380,6 @@ for( this_ci_file in ci_rmd_files ){
 			
 				sample_setup_block <- pull_chunk( this_metadata_file , "sample_setup_block" )
 
-				broken_sample_test_condition <- pull_line( this_metadata_file , "broken_sample_test_condition" )
-
 				if( !identical( sample_setup_block , '' ) ){
 			
 					sample_setup_block <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , sample_setup_block )
@@ -398,8 +396,7 @@ for( this_ci_file in ci_rmd_files ){
 						syntaxtractor( 
 							chapter_tag , 
 							replacements = machine_specific_replacements , 
-							setup_rmd = identical( sample_setup_block , '' ) ,
-							broken_sample_test_condition = if( !identical( broken_sample_test_condition , '' ) ) broken_sample_test_condition
+							setup_rmd = identical( sample_setup_block , '' )
 						)
 						
 					)
