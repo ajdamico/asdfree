@@ -1,4 +1,4 @@
-commit_memo <- "'remove broken_sample_test_condition'"
+commit_memo <- "'remove file commits'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -324,19 +324,7 @@ for( this_ci_file in ci_rmd_files ){
 	this_metadata_file <- gsub( paste0( "/" , chapter_tag , ".Rmd$" ) , paste0( "/metadata/" , chapter_tag , ".txt" ) , this_ci_file )
 
 	needed_libraries <- paste( gsub( "^(dependencies: )?library\\(|\\)" , "" , unique( grep( "^(dependencies: )?library\\(" , c( if( file.exists( this_metadata_file ) ) readLines( this_metadata_file ) , readLines( this_ci_file ) ) , value = TRUE ) ) ) , collapse = ", " )
-	
-	
-	# pull the latest commit from ajdamico/lodown affecting this repository
-	lodown_r_file_edit <- system( paste0( "powershell git --git-dir='C:/Users/AnthonyD/Documents/Github/lodown/.git' log -n 1 -- R/" , chapter_tag , ".R" ) , intern = TRUE )
-	lodown_file_commit <- grep( "commit" , lodown_r_file_edit , value = TRUE )
-	lodown_file_commit <- if( length( lodown_file_commit > 0 ) ) paste( "ajdamico/lodown" , lodown_file_commit ) else ""
-	
-	asdfree_r_file_edit <- system( paste0( "powershell git --git-dir='C:/Users/AnthonyD/Documents/Github/asdfree/.git' log -n 1 -- " , basename( this_ci_file ) ) , intern = TRUE )
-	asdfree_file_commit <- grep( "commit" , asdfree_r_file_edit , value = TRUE )
-	asdfree_file_commit <- if( length( asdfree_file_commit > 0 ) ) paste( "ajdamico/asdfree" , asdfree_file_commit ) else ""
-
-	
-	
+		
 	this_repo_path <- normalizePath( file.path( datasets_path , chapter_tag ) , winslash = '/' , mustWork = FALSE )
 	
 	copied_files <- gsub( normalizePath( file.path( path.expand( "~" ) , "Github/asdfree/repo/" ) , winslash = '/' ) , this_repo_path , repo_files )
