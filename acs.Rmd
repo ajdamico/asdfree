@@ -12,28 +12,25 @@ The US Census Bureau's annual replacement for the long-form decennial census.
 
 * Administered and financed by the [US Census Bureau](http://www.census.gov/).
 
-## Simplified Download and Importation {-}
+## Download and Importation {-}
 
-The R `lodown` package easily downloads and imports all available ACS microdata by simply specifying `"acs"` with an `output_dir =` parameter in the `lodown()` function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.
-
+alabama only!
 ```{r eval = FALSE }
-library(lodown)
-lodown( "acs" , output_dir = file.path( path.expand( "~" ) , "ACS" ) lodown_ )
-```
+tf <- tempfile()
 
-`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function. After requesting the ACS catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).
+this_url <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/csv_pal.zip"
 
-```{r eval = FALSE , results = "hide" }
-library(lodown)
-# examine all available ACS microdata files
-acs_cat <-
-	get_catalog( "acs" ,
-		output_dir = file.path( path.expand( "~" ) , "ACS" ) get_catalog_ )
+download.file( this_url , tf , mode = 'wb' )
 
-# 2016 alabama single-year only. remove ` & stateab == 'al'` for a nationwide table
-acs_cat <- subset( acs_cat , year == 2016 & time_period == '1-Year' & stateab == 'al' )
-# download the microdata to your local computer
-acs_cat <- lodown( "acs" , acs_cat lodown_ )
+unzipped_files <- unzip( tf , exdir = tempdir() )
+
+acs_csv <-
+	grep( '\\.csv$' , unzipped_files , value = TRUE )
+
+acs_df <- read.csv( acs_csv )
+
+names( acs_df ) <- tolower( names( acs_df ) )
 ```
 
 ## Analysis Examples with the `survey` library \ {-}
@@ -45,23 +42,7 @@ Construct a complex sample survey design:
 ```
 
 ```{r eval = FALSE }
-# # alternative subsets:
-
-# # nationwide merged table including puerto rico
-# acs_cat <- subset( acs_cat , year == 2016 & time_period == '1-Year' )
-# acs_cat <- lodown( "acs" , acs_cat )
-
-# # nationwide merged table excluding puerto rico
-# acs_cat <- subset( acs_cat , year == 2016 & time_period == '1-Year' & stateab != 'pr' )
-# acs_cat <- lodown( "acs" , acs_cat )
-
 library(survey)
-
-acs_df <- 
-	readRDS( 
-		file.path( path.expand( "~" ) , "ACS" , 
-			"acs2016_1yr.rds" ) 
-	)
 
 # because of the catalog subset above
 # the `merged.rds` file is alabama only

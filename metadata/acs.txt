@@ -12,29 +12,13 @@ publication_period: * Released annually since 2005.
 
 administrative_organization: * Administered and financed by the [US Census Bureau](http://www.census.gov/).
 
-needs_catalog_block: yes
+
 catalog_subset_description: # 2016 alabama single-year only. remove ` & stateab == 'al'` for a nationwide table
 catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' & stateab == 'al' )
 
 
 ~~~{analysis_examples_survey_design}
-# # alternative subsets:
-
-# # nationwide merged table including puerto rico
-# chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' )
-# chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
-
-# # nationwide merged table excluding puerto rico
-# chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' & stateab != 'pr' )
-# chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
-
 library(survey)
-
-chapter_tag_df <- 
-	readRDS( 
-		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
-			"acs2016_1yr.rds" ) 
-	)
 
 # because of the catalog subset above
 # the `merged.rds` file is alabama only
@@ -207,19 +191,25 @@ stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
 
 needs_actions_build_status_line: yes
 
-~~~{sample_setup_block}
-this_sample_break <- Sys.getenv( "this_sample_break" )
+~~~{download_and_import_block}
 
-library(lodown)
+alabama only!
+```{r eval = FALSE }
+tf <- tempfile()
 
-chapter_tag_cat <-
-	get_catalog( "chapter_tag" ,
-		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
+this_url <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/csv_pal.zip"
 
-# alabama one-year and all wyoming only
-chapter_tag_cat <- subset( chapter_tag_cat , ( stateab == 'al' & time_period == '1-Year' ) | stateab == 'wy' )
+download.file( this_url , tf , mode = 'wb' )
 
-chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
+unzipped_files <- unzip( tf , exdir = tempdir() )
 
+chapter_tag_csv <-
+	grep( '\\\\.csv$' , unzipped_files , value = TRUE )
+
+chapter_tag_df <- read.csv( chapter_tag_csv )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
 ~~~
 

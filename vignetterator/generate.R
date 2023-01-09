@@ -1,4 +1,4 @@
-commit_memo <- "'remove get_catalog_password_parameters'"
+commit_memo <- "'download and import block'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -21,9 +21,6 @@ source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\syntaxt
 
 
 needs_actions_build_status_line <- '<a href="https://github.com/asdfree/chapter_tag/actions"><img src="https://github.com/asdfree/chapter_tag/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>'
-
-
-needs_catalog_block <- '`lodown` also provides a catalog of available microdata extracts with the `get_catalog()` function.  After requesting the CHAPTER_TAG catalog, you could pass a subsetted catalog through the `lodown()` function in order to download and import specific extracts (rather than all available extracts).\n\n```{r eval = FALSE , results = "hide" }\nlibrary(lodown)\n# examine all available CHAPTER_TAG microdata files\nchapter_tag_cat <-\n\tget_catalog( "chapter_tag" ,\n\t\toutput_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) get_catalog_password_parameters )\n\ncatalog_subset_description\ncatalog_subset\n# download the microdata to your local computer\nchapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat lodown_password_parameters )\n```'
 
 needs_dplyr_block <- '## Analysis Examples with `dplyr` \\\\ {-}\n\nThe R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax.  [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation.  [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = "hide" }\nlibrary(dplyr)\ntbl_initiation_line\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = "hide" }\nchapter_tag_tbl %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n\nchapter_tag_tbl %>%\n\tgroup_by( group_by_variable ) %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n```'
 
@@ -51,8 +48,8 @@ pull_line <-
 
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "password_parameters" , "authorship_line" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "catalog_subset_description" , "catalog_subset" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
-sub_chunks <- c( "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "convey_block" , "replacement_block" )
-needs_this_block <- c( "needs_catalog_block" , "needs_srvyr_block" , "needs_dplyr_block" , "needs_actions_build_status_line" )
+sub_chunks <- c( "download_and_import_block" , "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "convey_block" , "replacement_block" )
+needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_actions_build_status_line" )
 
 
 library(bookdown)
@@ -366,13 +363,13 @@ for( this_ci_file in ci_rmd_files ){
 
 				eval( parse( text = msrb ) )
 			
-				sample_setup_block <- pull_chunk( this_metadata_file , "sample_setup_block" )
+				download_and_import_block <- pull_chunk( this_metadata_file , "download_and_import_block" )
 
-				if( !identical( sample_setup_block , '' ) ){
+				if( !identical( download_and_import_block , '' ) ){
 			
-					sample_setup_block <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , sample_setup_block )
-					for ( this_replacement in machine_specific_replacements ) sample_setup_block <- gsub( this_replacement[ 1 ] , this_replacement[ 2 ] , sample_setup_block , fixed = TRUE )
-					these_lines <- c( these_lines , sample_setup_block )
+					download_and_import_block <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , download_and_import_block )
+					for ( this_replacement in machine_specific_replacements ) download_and_import_block <- gsub( this_replacement[ 1 ] , this_replacement[ 2 ] , download_and_import_block , fixed = TRUE )
+					these_lines <- c( these_lines , download_and_import_block )
 				
 				}
 				
@@ -383,8 +380,7 @@ for( this_ci_file in ci_rmd_files ){
 						
 						syntaxtractor( 
 							chapter_tag , 
-							replacements = machine_specific_replacements , 
-							setup_rmd = identical( sample_setup_block , '' )
+							replacements = machine_specific_replacements
 						)
 						
 					)
@@ -397,8 +393,6 @@ for( this_ci_file in ci_rmd_files ){
 			these_lines <- gsub( "chapter_tag" , chapter_tag , these_lines )
 			these_lines <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , these_lines )
 			these_lines <- gsub( "needed_libraries" , needed_libraries , these_lines )
-			these_lines <- gsub( "asdfree_file_commit" , asdfree_file_commit , these_lines )
-			these_lines <- gsub( "lodown_file_commit" , lodown_file_commit , these_lines )
 			
 			
 			writeLines( these_lines , this_file )
@@ -466,8 +460,6 @@ for( this_ci_file in ci_rmd_files ){
 			these_lines <- gsub( "chapter_tag" , chapter_tag , these_lines )
 			these_lines <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , these_lines )
 			these_lines <- gsub( "needed_libraries" , needed_libraries , these_lines )
-			these_lines <- gsub( "asdfree_file_commit" , asdfree_file_commit , these_lines )
-			these_lines <- gsub( "lodown_file_commit" , lodown_file_commit , these_lines )
 			these_lines <- gsub( "desc_remotes_line" , "Remotes: ajdamico/lodown" , these_lines )
 
 			writeLines( these_lines , this_copied_file )

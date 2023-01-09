@@ -36,7 +36,7 @@
 #'
 #' @export
 syntaxtractor <-
-	function( data_name , repo = "ajdamico/asdfree" , ref = "master" , replacements = NULL , setup_rmd = TRUE , test_rmd = TRUE ){
+	function( data_name , repo = "ajdamico/asdfree" , ref = "master" , replacements = NULL , test_rmd = TRUE ){
 
 		this_rmd <- grep( paste0( "/" , data_name , "\\.Rmd$" ) , list.files( "C:/Users/anthonyd/Documents/GitHub/asdfree/" , full.names = TRUE ) , value = TRUE )
 		
@@ -56,12 +56,6 @@ syntaxtractor <-
 			second_library_lodown_line <- 3
 		}
 	
-		if( setup_rmd ){
-
-			setup_rmd_page <- rmd_page[ seq_along( rmd_page ) < second_library_lodown_line ]
-			
-		} else setup_rmd_page <- NULL
-	
 		test_rmd_page <- rmd_page[ seq_along( rmd_page ) >= second_library_lodown_line ]
 		
 		if( test_rmd ){
@@ -79,7 +73,7 @@ syntaxtractor <-
 			
 		}
 		
-		rmd_page <- c( setup_rmd_page , test_rmd_page )
+		rmd_page <- test_rmd_page
 				
 		temp_script <- tempfile()
 

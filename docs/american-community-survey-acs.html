@@ -137,7 +137,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Public Microdata, Easy to Type Website</a></li>
 <li class="chapter" data-level="" data-path="american-community-survey-acs.html"><a href="american-community-survey-acs.html"><i class="fa fa-check"></i>American Community Survey (ACS)</a>
 <ul>
-<li class="chapter" data-level="" data-path="american-community-survey-acs.html"><a href="american-community-survey-acs.html#simplified-download-and-importation"><i class="fa fa-check"></i>Simplified Download and Importation</a></li>
+<li class="chapter" data-level="" data-path="american-community-survey-acs.html"><a href="american-community-survey-acs.html#download-and-importation"><i class="fa fa-check"></i>Download and Importation</a></li>
 <li class="chapter" data-level="" data-path="american-community-survey-acs.html"><a href="american-community-survey-acs.html#analysis-examples-with-the-survey-library"><i class="fa fa-check"></i>Analysis Examples with the <code>survey</code> library  </a>
 <ul>
 <li class="chapter" data-level="" data-path="american-community-survey-acs.html"><a href="american-community-survey-acs.html#variable-recoding"><i class="fa fa-check"></i>Variable Recoding</a></li>
@@ -173,7 +173,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html"><i class="fa fa-check"></i>Youth Risk Behavior Surveillance System (YRBSS)</a>
 <ul>
-<li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#simplified-download-and-importation-1"><i class="fa fa-check"></i>Simplified Download and Importation</a></li>
+<li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#download-and-importation-1"><i class="fa fa-check"></i>Download and Importation</a></li>
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#analysis-examples-with-the-survey-library-1"><i class="fa fa-check"></i>Analysis Examples with the <code>survey</code> library  </a>
 <ul>
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#variable-recoding-1"><i class="fa fa-check"></i>Variable Recoding</a></li>
@@ -217,235 +217,221 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>Released annually since 2005.</p></li>
 <li><p>Administered and financed by the <a href="http://www.census.gov/">US Census Bureau</a>.</p></li>
 </ul>
-<div id="simplified-download-and-importation" class="section level2 unnumbered hasAnchor">
-<h2>Simplified Download and Importation<a href="american-community-survey-acs.html#simplified-download-and-importation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The R <code>lodown</code> package easily downloads and imports all available ACS microdata by simply specifying <code>"acs"</code> with an <code>output_dir =</code> parameter in the <code>lodown()</code> function. Depending on your internet connection and computer processing speed, you might prefer to run this step overnight.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="american-community-survey-acs.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lodown)</span>
-<span id="cb1-2"><a href="american-community-survey-acs.html#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lodown</span>( <span class="st">&quot;acs&quot;</span> , <span class="at">output_dir =</span> <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ACS&quot;</span> ) lodown_ )</span></code></pre></div>
-<p><code>lodown</code> also provides a catalog of available microdata extracts with the <code>get_catalog()</code> function. After requesting the ACS catalog, you could pass a subsetted catalog through the <code>lodown()</code> function in order to download and import specific extracts (rather than all available extracts).</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="american-community-survey-acs.html#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lodown)</span>
-<span id="cb2-2"><a href="american-community-survey-acs.html#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># examine all available ACS microdata files</span></span>
-<span id="cb2-3"><a href="american-community-survey-acs.html#cb2-3" aria-hidden="true" tabindex="-1"></a>acs_cat <span class="ot">&lt;-</span></span>
-<span id="cb2-4"><a href="american-community-survey-acs.html#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">get_catalog</span>( <span class="st">&quot;acs&quot;</span> ,</span>
-<span id="cb2-5"><a href="american-community-survey-acs.html#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">output_dir =</span> <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ACS&quot;</span> ) get_catalog_ )</span>
-<span id="cb2-6"><a href="american-community-survey-acs.html#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="american-community-survey-acs.html#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2016 alabama single-year only. remove ` &amp; stateab == &#39;al&#39;` for a nationwide table</span></span>
-<span id="cb2-8"><a href="american-community-survey-acs.html#cb2-8" aria-hidden="true" tabindex="-1"></a>acs_cat <span class="ot">&lt;-</span> <span class="fu">subset</span>( acs_cat , year <span class="sc">==</span> <span class="dv">2016</span> <span class="sc">&amp;</span> time_period <span class="sc">==</span> <span class="st">&#39;1-Year&#39;</span> <span class="sc">&amp;</span> stateab <span class="sc">==</span> <span class="st">&#39;al&#39;</span> )</span>
-<span id="cb2-9"><a href="american-community-survey-acs.html#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># download the microdata to your local computer</span></span>
-<span id="cb2-10"><a href="american-community-survey-acs.html#cb2-10" aria-hidden="true" tabindex="-1"></a>acs_cat <span class="ot">&lt;-</span> <span class="fu">lodown</span>( <span class="st">&quot;acs&quot;</span> , acs_cat lodown_ )</span></code></pre></div>
+<div id="download-and-importation" class="section level2 unnumbered hasAnchor">
+<h2>Download and Importation<a href="american-community-survey-acs.html#download-and-importation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>alabama only!</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="american-community-survey-acs.html#cb1-1" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb1-2"><a href="american-community-survey-acs.html#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="american-community-survey-acs.html#cb1-3" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span></span>
+<span id="cb1-4"><a href="american-community-survey-acs.html#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/csv_pal.zip&quot;</span></span>
+<span id="cb1-5"><a href="american-community-survey-acs.html#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="american-community-survey-acs.html#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb1-7"><a href="american-community-survey-acs.html#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="american-community-survey-acs.html#cb1-8" aria-hidden="true" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb1-9"><a href="american-community-survey-acs.html#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="american-community-survey-acs.html#cb1-10" aria-hidden="true" tabindex="-1"></a>acs_csv <span class="ot">&lt;-</span></span>
+<span id="cb1-11"><a href="american-community-survey-acs.html#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.csv$&#39;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1-12"><a href="american-community-survey-acs.html#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="american-community-survey-acs.html#cb1-13" aria-hidden="true" tabindex="-1"></a>acs_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( acs_csv )</span>
+<span id="cb1-14"><a href="american-community-survey-acs.html#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="american-community-survey-acs.html#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( acs_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( acs_df ) )</span></code></pre></div>
 </div>
 <div id="analysis-examples-with-the-survey-library" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with the <code>survey</code> library  <a href="american-community-survey-acs.html#analysis-examples-with-the-survey-library" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Construct a complex sample survey design:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="american-community-survey-acs.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # alternative subsets:</span></span>
-<span id="cb3-2"><a href="american-community-survey-acs.html#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="american-community-survey-acs.html#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># # nationwide merged table including puerto rico</span></span>
-<span id="cb3-4"><a href="american-community-survey-acs.html#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># acs_cat &lt;- subset( acs_cat , year == 2016 &amp; time_period == &#39;1-Year&#39; )</span></span>
-<span id="cb3-5"><a href="american-community-survey-acs.html#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># acs_cat &lt;- lodown( &quot;acs&quot; , acs_cat )</span></span>
-<span id="cb3-6"><a href="american-community-survey-acs.html#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="american-community-survey-acs.html#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># # nationwide merged table excluding puerto rico</span></span>
-<span id="cb3-8"><a href="american-community-survey-acs.html#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># acs_cat &lt;- subset( acs_cat , year == 2016 &amp; time_period == &#39;1-Year&#39; &amp; stateab != &#39;pr&#39; )</span></span>
-<span id="cb3-9"><a href="american-community-survey-acs.html#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># acs_cat &lt;- lodown( &quot;acs&quot; , acs_cat )</span></span>
-<span id="cb3-10"><a href="american-community-survey-acs.html#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="american-community-survey-acs.html#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb3-12"><a href="american-community-survey-acs.html#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="american-community-survey-acs.html#cb3-13" aria-hidden="true" tabindex="-1"></a>acs_df <span class="ot">&lt;-</span> </span>
-<span id="cb3-14"><a href="american-community-survey-acs.html#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">readRDS</span>( </span>
-<span id="cb3-15"><a href="american-community-survey-acs.html#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ACS&quot;</span> , </span>
-<span id="cb3-16"><a href="american-community-survey-acs.html#cb3-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;acs2016_1yr.rds&quot;</span> ) </span>
-<span id="cb3-17"><a href="american-community-survey-acs.html#cb3-17" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-18"><a href="american-community-survey-acs.html#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="american-community-survey-acs.html#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># because of the catalog subset above</span></span>
-<span id="cb3-20"><a href="american-community-survey-acs.html#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># the `merged.rds` file is alabama only</span></span>
-<span id="cb3-21"><a href="american-community-survey-acs.html#cb3-21" aria-hidden="true" tabindex="-1"></a>acs_design <span class="ot">&lt;-</span></span>
-<span id="cb3-22"><a href="american-community-survey-acs.html#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>(</span>
-<span id="cb3-23"><a href="american-community-survey-acs.html#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span>pwgtp ,</span>
-<span id="cb3-24"><a href="american-community-survey-acs.html#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span> <span class="st">&#39;pwgtp[0-9]+&#39;</span> ,</span>
-<span id="cb3-25"><a href="american-community-survey-acs.html#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">4</span> <span class="sc">/</span> <span class="dv">80</span> ,</span>
-<span id="cb3-26"><a href="american-community-survey-acs.html#cb3-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="fu">rep</span>( <span class="dv">1</span> , <span class="dv">80</span> ) ,</span>
-<span id="cb3-27"><a href="american-community-survey-acs.html#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb3-28"><a href="american-community-survey-acs.html#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;JK1&#39;</span> ,</span>
-<span id="cb3-29"><a href="american-community-survey-acs.html#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> acs_df</span>
-<span id="cb3-30"><a href="american-community-survey-acs.html#cb3-30" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="american-community-survey-acs.html#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb2-2"><a href="american-community-survey-acs.html#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="american-community-survey-acs.html#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># because of the catalog subset above</span></span>
+<span id="cb2-4"><a href="american-community-survey-acs.html#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># the `merged.rds` file is alabama only</span></span>
+<span id="cb2-5"><a href="american-community-survey-acs.html#cb2-5" aria-hidden="true" tabindex="-1"></a>acs_design <span class="ot">&lt;-</span></span>
+<span id="cb2-6"><a href="american-community-survey-acs.html#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>(</span>
+<span id="cb2-7"><a href="american-community-survey-acs.html#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span>pwgtp ,</span>
+<span id="cb2-8"><a href="american-community-survey-acs.html#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span> <span class="st">&#39;pwgtp[0-9]+&#39;</span> ,</span>
+<span id="cb2-9"><a href="american-community-survey-acs.html#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">4</span> <span class="sc">/</span> <span class="dv">80</span> ,</span>
+<span id="cb2-10"><a href="american-community-survey-acs.html#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="fu">rep</span>( <span class="dv">1</span> , <span class="dv">80</span> ) ,</span>
+<span id="cb2-11"><a href="american-community-survey-acs.html#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb2-12"><a href="american-community-survey-acs.html#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;JK1&#39;</span> ,</span>
+<span id="cb2-13"><a href="american-community-survey-acs.html#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> acs_df</span>
+<span id="cb2-14"><a href="american-community-survey-acs.html#cb2-14" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <div id="variable-recoding" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="american-community-survey-acs.html#variable-recoding" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="american-community-survey-acs.html#cb4-1" aria-hidden="true" tabindex="-1"></a>acs_design <span class="ot">&lt;-</span></span>
-<span id="cb4-2"><a href="american-community-survey-acs.html#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>(</span>
-<span id="cb4-3"><a href="american-community-survey-acs.html#cb4-3" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-4"><a href="american-community-survey-acs.html#cb4-4" aria-hidden="true" tabindex="-1"></a>        acs_design ,</span>
-<span id="cb4-5"><a href="american-community-survey-acs.html#cb4-5" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-6"><a href="american-community-survey-acs.html#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">relp =</span> <span class="fu">as.numeric</span>( relp ) ,</span>
-<span id="cb4-7"><a href="american-community-survey-acs.html#cb4-7" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-8"><a href="american-community-survey-acs.html#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_name =</span></span>
-<span id="cb4-9"><a href="american-community-survey-acs.html#cb4-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
-<span id="cb4-10"><a href="american-community-survey-acs.html#cb4-10" aria-hidden="true" tabindex="-1"></a>                <span class="fu">as.numeric</span>( st ) ,</span>
-<span id="cb4-11"><a href="american-community-survey-acs.html#cb4-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> </span>
-<span id="cb4-12"><a href="american-community-survey-acs.html#cb4-12" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, </span>
-<span id="cb4-13"><a href="american-community-survey-acs.html#cb4-13" aria-hidden="true" tabindex="-1"></a>                    11L, 12L, 13L, 15L, 16L, 17L, 18L, </span>
-<span id="cb4-14"><a href="american-community-survey-acs.html#cb4-14" aria-hidden="true" tabindex="-1"></a>                    19L, 20L, 21L, 22L, 23L, 24L, 25L, </span>
-<span id="cb4-15"><a href="american-community-survey-acs.html#cb4-15" aria-hidden="true" tabindex="-1"></a>                    26L, 27L, 28L, 29L, 30L, 31L, 32L, </span>
-<span id="cb4-16"><a href="american-community-survey-acs.html#cb4-16" aria-hidden="true" tabindex="-1"></a>                    33L, 34L, 35L, 36L, 37L, 38L, 39L, </span>
-<span id="cb4-17"><a href="american-community-survey-acs.html#cb4-17" aria-hidden="true" tabindex="-1"></a>                    40L, 41L, 42L, 44L, 45L, 46L, 47L, </span>
-<span id="cb4-18"><a href="american-community-survey-acs.html#cb4-18" aria-hidden="true" tabindex="-1"></a>                    48L, 49L, 50L, 51L, 53L, 54L, 55L, </span>
-<span id="cb4-19"><a href="american-community-survey-acs.html#cb4-19" aria-hidden="true" tabindex="-1"></a>                    56L, 72L) ,</span>
-<span id="cb4-20"><a href="american-community-survey-acs.html#cb4-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span></span>
-<span id="cb4-21"><a href="american-community-survey-acs.html#cb4-21" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;Alabama&quot;</span>, <span class="st">&quot;Alaska&quot;</span>, <span class="st">&quot;Arizona&quot;</span>, <span class="st">&quot;Arkansas&quot;</span>, <span class="st">&quot;California&quot;</span>, </span>
-<span id="cb4-22"><a href="american-community-survey-acs.html#cb4-22" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Colorado&quot;</span>, <span class="st">&quot;Connecticut&quot;</span>, <span class="st">&quot;Delaware&quot;</span>, <span class="st">&quot;District of Columbia&quot;</span>, </span>
-<span id="cb4-23"><a href="american-community-survey-acs.html#cb4-23" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Florida&quot;</span>, <span class="st">&quot;Georgia&quot;</span>, <span class="st">&quot;Hawaii&quot;</span>, <span class="st">&quot;Idaho&quot;</span>, <span class="st">&quot;Illinois&quot;</span>, <span class="st">&quot;Indiana&quot;</span>, </span>
-<span id="cb4-24"><a href="american-community-survey-acs.html#cb4-24" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Iowa&quot;</span>, <span class="st">&quot;Kansas&quot;</span>, <span class="st">&quot;Kentucky&quot;</span>, <span class="st">&quot;Louisiana&quot;</span>, <span class="st">&quot;Maine&quot;</span>, <span class="st">&quot;Maryland&quot;</span>, </span>
-<span id="cb4-25"><a href="american-community-survey-acs.html#cb4-25" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Massachusetts&quot;</span>, <span class="st">&quot;Michigan&quot;</span>, <span class="st">&quot;Minnesota&quot;</span>, <span class="st">&quot;Mississippi&quot;</span>, <span class="st">&quot;Missouri&quot;</span>, </span>
-<span id="cb4-26"><a href="american-community-survey-acs.html#cb4-26" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Montana&quot;</span>, <span class="st">&quot;Nebraska&quot;</span>, <span class="st">&quot;Nevada&quot;</span>, <span class="st">&quot;New Hampshire&quot;</span>, <span class="st">&quot;New Jersey&quot;</span>, </span>
-<span id="cb4-27"><a href="american-community-survey-acs.html#cb4-27" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;New Mexico&quot;</span>, <span class="st">&quot;New York&quot;</span>, <span class="st">&quot;North Carolina&quot;</span>, <span class="st">&quot;North Dakota&quot;</span>, <span class="st">&quot;Ohio&quot;</span>, </span>
-<span id="cb4-28"><a href="american-community-survey-acs.html#cb4-28" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Oklahoma&quot;</span>, <span class="st">&quot;Oregon&quot;</span>, <span class="st">&quot;Pennsylvania&quot;</span>, <span class="st">&quot;Rhode Island&quot;</span>, <span class="st">&quot;South Carolina&quot;</span>, </span>
-<span id="cb4-29"><a href="american-community-survey-acs.html#cb4-29" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;South Dakota&quot;</span>, <span class="st">&quot;Tennessee&quot;</span>, <span class="st">&quot;Texas&quot;</span>, <span class="st">&quot;Utah&quot;</span>, <span class="st">&quot;Vermont&quot;</span>, <span class="st">&quot;Virginia&quot;</span>, </span>
-<span id="cb4-30"><a href="american-community-survey-acs.html#cb4-30" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Washington&quot;</span>, <span class="st">&quot;West Virginia&quot;</span>, <span class="st">&quot;Wisconsin&quot;</span>, <span class="st">&quot;Wyoming&quot;</span>, <span class="st">&quot;Puerto Rico&quot;</span>)</span>
-<span id="cb4-31"><a href="american-community-survey-acs.html#cb4-31" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
-<span id="cb4-32"><a href="american-community-survey-acs.html#cb4-32" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-33"><a href="american-community-survey-acs.html#cb4-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">cit =</span></span>
-<span id="cb4-34"><a href="american-community-survey-acs.html#cb4-34" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb4-35"><a href="american-community-survey-acs.html#cb4-35" aria-hidden="true" tabindex="-1"></a>                cit , </span>
-<span id="cb4-36"><a href="american-community-survey-acs.html#cb4-36" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> , </span>
-<span id="cb4-37"><a href="american-community-survey-acs.html#cb4-37" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> </span>
-<span id="cb4-38"><a href="american-community-survey-acs.html#cb4-38" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>( </span>
-<span id="cb4-39"><a href="american-community-survey-acs.html#cb4-39" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;born in the u.s.&#39;</span> ,</span>
-<span id="cb4-40"><a href="american-community-survey-acs.html#cb4-40" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;born in the territories&#39;</span> ,</span>
-<span id="cb4-41"><a href="american-community-survey-acs.html#cb4-41" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;born abroad to american parents&#39;</span> ,</span>
-<span id="cb4-42"><a href="american-community-survey-acs.html#cb4-42" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;naturalized citizen&#39;</span> ,</span>
-<span id="cb4-43"><a href="american-community-survey-acs.html#cb4-43" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;non-citizen&#39;</span></span>
-<span id="cb4-44"><a href="american-community-survey-acs.html#cb4-44" aria-hidden="true" tabindex="-1"></a>                    )</span>
-<span id="cb4-45"><a href="american-community-survey-acs.html#cb4-45" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
-<span id="cb4-46"><a href="american-community-survey-acs.html#cb4-46" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-47"><a href="american-community-survey-acs.html#cb4-47" aria-hidden="true" tabindex="-1"></a>        <span class="at">poverty_level =</span> <span class="fu">as.numeric</span>( povpip ) ,</span>
-<span id="cb4-48"><a href="american-community-survey-acs.html#cb4-48" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-49"><a href="american-community-survey-acs.html#cb4-49" aria-hidden="true" tabindex="-1"></a>        <span class="at">married =</span> <span class="fu">as.numeric</span>( mar <span class="sc">%in%</span> <span class="dv">1</span> ) ,</span>
-<span id="cb4-50"><a href="american-community-survey-acs.html#cb4-50" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-51"><a href="american-community-survey-acs.html#cb4-51" aria-hidden="true" tabindex="-1"></a>        <span class="at">sex =</span> <span class="fu">factor</span>( sex , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) )</span>
-<span id="cb4-52"><a href="american-community-survey-acs.html#cb4-52" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="american-community-survey-acs.html#cb3-1" aria-hidden="true" tabindex="-1"></a>acs_design <span class="ot">&lt;-</span></span>
+<span id="cb3-2"><a href="american-community-survey-acs.html#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>(</span>
+<span id="cb3-3"><a href="american-community-survey-acs.html#cb3-3" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-4"><a href="american-community-survey-acs.html#cb3-4" aria-hidden="true" tabindex="-1"></a>        acs_design ,</span>
+<span id="cb3-5"><a href="american-community-survey-acs.html#cb3-5" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-6"><a href="american-community-survey-acs.html#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">relp =</span> <span class="fu">as.numeric</span>( relp ) ,</span>
+<span id="cb3-7"><a href="american-community-survey-acs.html#cb3-7" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-8"><a href="american-community-survey-acs.html#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_name =</span></span>
+<span id="cb3-9"><a href="american-community-survey-acs.html#cb3-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
+<span id="cb3-10"><a href="american-community-survey-acs.html#cb3-10" aria-hidden="true" tabindex="-1"></a>                <span class="fu">as.numeric</span>( st ) ,</span>
+<span id="cb3-11"><a href="american-community-survey-acs.html#cb3-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> </span>
+<span id="cb3-12"><a href="american-community-survey-acs.html#cb3-12" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, </span>
+<span id="cb3-13"><a href="american-community-survey-acs.html#cb3-13" aria-hidden="true" tabindex="-1"></a>                    11L, 12L, 13L, 15L, 16L, 17L, 18L, </span>
+<span id="cb3-14"><a href="american-community-survey-acs.html#cb3-14" aria-hidden="true" tabindex="-1"></a>                    19L, 20L, 21L, 22L, 23L, 24L, 25L, </span>
+<span id="cb3-15"><a href="american-community-survey-acs.html#cb3-15" aria-hidden="true" tabindex="-1"></a>                    26L, 27L, 28L, 29L, 30L, 31L, 32L, </span>
+<span id="cb3-16"><a href="american-community-survey-acs.html#cb3-16" aria-hidden="true" tabindex="-1"></a>                    33L, 34L, 35L, 36L, 37L, 38L, 39L, </span>
+<span id="cb3-17"><a href="american-community-survey-acs.html#cb3-17" aria-hidden="true" tabindex="-1"></a>                    40L, 41L, 42L, 44L, 45L, 46L, 47L, </span>
+<span id="cb3-18"><a href="american-community-survey-acs.html#cb3-18" aria-hidden="true" tabindex="-1"></a>                    48L, 49L, 50L, 51L, 53L, 54L, 55L, </span>
+<span id="cb3-19"><a href="american-community-survey-acs.html#cb3-19" aria-hidden="true" tabindex="-1"></a>                    56L, 72L) ,</span>
+<span id="cb3-20"><a href="american-community-survey-acs.html#cb3-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span></span>
+<span id="cb3-21"><a href="american-community-survey-acs.html#cb3-21" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;Alabama&quot;</span>, <span class="st">&quot;Alaska&quot;</span>, <span class="st">&quot;Arizona&quot;</span>, <span class="st">&quot;Arkansas&quot;</span>, <span class="st">&quot;California&quot;</span>, </span>
+<span id="cb3-22"><a href="american-community-survey-acs.html#cb3-22" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Colorado&quot;</span>, <span class="st">&quot;Connecticut&quot;</span>, <span class="st">&quot;Delaware&quot;</span>, <span class="st">&quot;District of Columbia&quot;</span>, </span>
+<span id="cb3-23"><a href="american-community-survey-acs.html#cb3-23" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Florida&quot;</span>, <span class="st">&quot;Georgia&quot;</span>, <span class="st">&quot;Hawaii&quot;</span>, <span class="st">&quot;Idaho&quot;</span>, <span class="st">&quot;Illinois&quot;</span>, <span class="st">&quot;Indiana&quot;</span>, </span>
+<span id="cb3-24"><a href="american-community-survey-acs.html#cb3-24" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Iowa&quot;</span>, <span class="st">&quot;Kansas&quot;</span>, <span class="st">&quot;Kentucky&quot;</span>, <span class="st">&quot;Louisiana&quot;</span>, <span class="st">&quot;Maine&quot;</span>, <span class="st">&quot;Maryland&quot;</span>, </span>
+<span id="cb3-25"><a href="american-community-survey-acs.html#cb3-25" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Massachusetts&quot;</span>, <span class="st">&quot;Michigan&quot;</span>, <span class="st">&quot;Minnesota&quot;</span>, <span class="st">&quot;Mississippi&quot;</span>, <span class="st">&quot;Missouri&quot;</span>, </span>
+<span id="cb3-26"><a href="american-community-survey-acs.html#cb3-26" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Montana&quot;</span>, <span class="st">&quot;Nebraska&quot;</span>, <span class="st">&quot;Nevada&quot;</span>, <span class="st">&quot;New Hampshire&quot;</span>, <span class="st">&quot;New Jersey&quot;</span>, </span>
+<span id="cb3-27"><a href="american-community-survey-acs.html#cb3-27" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;New Mexico&quot;</span>, <span class="st">&quot;New York&quot;</span>, <span class="st">&quot;North Carolina&quot;</span>, <span class="st">&quot;North Dakota&quot;</span>, <span class="st">&quot;Ohio&quot;</span>, </span>
+<span id="cb3-28"><a href="american-community-survey-acs.html#cb3-28" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Oklahoma&quot;</span>, <span class="st">&quot;Oregon&quot;</span>, <span class="st">&quot;Pennsylvania&quot;</span>, <span class="st">&quot;Rhode Island&quot;</span>, <span class="st">&quot;South Carolina&quot;</span>, </span>
+<span id="cb3-29"><a href="american-community-survey-acs.html#cb3-29" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;South Dakota&quot;</span>, <span class="st">&quot;Tennessee&quot;</span>, <span class="st">&quot;Texas&quot;</span>, <span class="st">&quot;Utah&quot;</span>, <span class="st">&quot;Vermont&quot;</span>, <span class="st">&quot;Virginia&quot;</span>, </span>
+<span id="cb3-30"><a href="american-community-survey-acs.html#cb3-30" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;Washington&quot;</span>, <span class="st">&quot;West Virginia&quot;</span>, <span class="st">&quot;Wisconsin&quot;</span>, <span class="st">&quot;Wyoming&quot;</span>, <span class="st">&quot;Puerto Rico&quot;</span>)</span>
+<span id="cb3-31"><a href="american-community-survey-acs.html#cb3-31" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
+<span id="cb3-32"><a href="american-community-survey-acs.html#cb3-32" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-33"><a href="american-community-survey-acs.html#cb3-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">cit =</span></span>
+<span id="cb3-34"><a href="american-community-survey-acs.html#cb3-34" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
+<span id="cb3-35"><a href="american-community-survey-acs.html#cb3-35" aria-hidden="true" tabindex="-1"></a>                cit , </span>
+<span id="cb3-36"><a href="american-community-survey-acs.html#cb3-36" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> , </span>
+<span id="cb3-37"><a href="american-community-survey-acs.html#cb3-37" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> </span>
+<span id="cb3-38"><a href="american-community-survey-acs.html#cb3-38" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>( </span>
+<span id="cb3-39"><a href="american-community-survey-acs.html#cb3-39" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;born in the u.s.&#39;</span> ,</span>
+<span id="cb3-40"><a href="american-community-survey-acs.html#cb3-40" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;born in the territories&#39;</span> ,</span>
+<span id="cb3-41"><a href="american-community-survey-acs.html#cb3-41" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;born abroad to american parents&#39;</span> ,</span>
+<span id="cb3-42"><a href="american-community-survey-acs.html#cb3-42" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;naturalized citizen&#39;</span> ,</span>
+<span id="cb3-43"><a href="american-community-survey-acs.html#cb3-43" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;non-citizen&#39;</span></span>
+<span id="cb3-44"><a href="american-community-survey-acs.html#cb3-44" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb3-45"><a href="american-community-survey-acs.html#cb3-45" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
+<span id="cb3-46"><a href="american-community-survey-acs.html#cb3-46" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-47"><a href="american-community-survey-acs.html#cb3-47" aria-hidden="true" tabindex="-1"></a>        <span class="at">poverty_level =</span> <span class="fu">as.numeric</span>( povpip ) ,</span>
+<span id="cb3-48"><a href="american-community-survey-acs.html#cb3-48" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-49"><a href="american-community-survey-acs.html#cb3-49" aria-hidden="true" tabindex="-1"></a>        <span class="at">married =</span> <span class="fu">as.numeric</span>( mar <span class="sc">%in%</span> <span class="dv">1</span> ) ,</span>
+<span id="cb3-50"><a href="american-community-survey-acs.html#cb3-50" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-51"><a href="american-community-survey-acs.html#cb3-51" aria-hidden="true" tabindex="-1"></a>        <span class="at">sex =</span> <span class="fu">factor</span>( sex , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) )</span>
+<span id="cb3-52"><a href="american-community-survey-acs.html#cb3-52" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="unweighted-counts" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="american-community-survey-acs.html#unweighted-counts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="american-community-survey-acs.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( acs_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
-<span id="cb5-2"><a href="american-community-survey-acs.html#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="american-community-survey-acs.html#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> cit , acs_design , unwtd.count )</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="american-community-survey-acs.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( acs_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
+<span id="cb4-2"><a href="american-community-survey-acs.html#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="american-community-survey-acs.html#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> cit , acs_design , unwtd.count )</span></code></pre></div>
 </div>
 <div id="weighted-counts" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="american-community-survey-acs.html#weighted-counts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="american-community-survey-acs.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , acs_design )</span>
-<span id="cb6-2"><a href="american-community-survey-acs.html#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="american-community-survey-acs.html#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> cit , acs_design , svytotal )</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="american-community-survey-acs.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , acs_design )</span>
+<span id="cb5-2"><a href="american-community-survey-acs.html#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="american-community-survey-acs.html#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> cit , acs_design , svytotal )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="american-community-survey-acs.html#descriptive-statistics" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="american-community-survey-acs.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb7-2"><a href="american-community-survey-acs.html#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="american-community-survey-acs.html#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> poverty_level , <span class="sc">~</span> cit , acs_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="american-community-survey-acs.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb6-2"><a href="american-community-survey-acs.html#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="american-community-survey-acs.html#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> poverty_level , <span class="sc">~</span> cit , acs_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="american-community-survey-acs.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> sex , acs_design )</span>
-<span id="cb8-2"><a href="american-community-survey-acs.html#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="american-community-survey-acs.html#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> cit , acs_design , svymean )</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="american-community-survey-acs.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> sex , acs_design )</span>
+<span id="cb7-2"><a href="american-community-survey-acs.html#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="american-community-survey-acs.html#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> cit , acs_design , svymean )</span></code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="american-community-survey-acs.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb9-2"><a href="american-community-survey-acs.html#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="american-community-survey-acs.html#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> poverty_level , <span class="sc">~</span> cit , acs_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="american-community-survey-acs.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb8-2"><a href="american-community-survey-acs.html#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="american-community-survey-acs.html#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> poverty_level , <span class="sc">~</span> cit , acs_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="american-community-survey-acs.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> sex , acs_design )</span>
-<span id="cb10-2"><a href="american-community-survey-acs.html#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="american-community-survey-acs.html#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> cit , acs_design , svytotal )</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="american-community-survey-acs.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> sex , acs_design )</span>
+<span id="cb9-2"><a href="american-community-survey-acs.html#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="american-community-survey-acs.html#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> cit , acs_design , svytotal )</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="american-community-survey-acs.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb11-2"><a href="american-community-survey-acs.html#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="american-community-survey-acs.html#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
-<span id="cb11-4"><a href="american-community-survey-acs.html#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> poverty_level , </span>
-<span id="cb11-5"><a href="american-community-survey-acs.html#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> cit , </span>
-<span id="cb11-6"><a href="american-community-survey-acs.html#cb11-6" aria-hidden="true" tabindex="-1"></a>    acs_design , </span>
-<span id="cb11-7"><a href="american-community-survey-acs.html#cb11-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
-<span id="cb11-8"><a href="american-community-survey-acs.html#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb11-9"><a href="american-community-survey-acs.html#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb11-10"><a href="american-community-survey-acs.html#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">keep.var =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb11-11"><a href="american-community-survey-acs.html#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb11-12"><a href="american-community-survey-acs.html#cb11-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="american-community-survey-acs.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb10-2"><a href="american-community-survey-acs.html#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="american-community-survey-acs.html#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
+<span id="cb10-4"><a href="american-community-survey-acs.html#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> poverty_level , </span>
+<span id="cb10-5"><a href="american-community-survey-acs.html#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> cit , </span>
+<span id="cb10-6"><a href="american-community-survey-acs.html#cb10-6" aria-hidden="true" tabindex="-1"></a>    acs_design , </span>
+<span id="cb10-7"><a href="american-community-survey-acs.html#cb10-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
+<span id="cb10-8"><a href="american-community-survey-acs.html#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
+<span id="cb10-9"><a href="american-community-survey-acs.html#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb10-10"><a href="american-community-survey-acs.html#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">keep.var =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb10-11"><a href="american-community-survey-acs.html#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
+<span id="cb10-12"><a href="american-community-survey-acs.html#cb10-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="american-community-survey-acs.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
-<span id="cb12-2"><a href="american-community-survey-acs.html#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> ssip , </span>
-<span id="cb12-3"><a href="american-community-survey-acs.html#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> pincp , </span>
-<span id="cb12-4"><a href="american-community-survey-acs.html#cb12-4" aria-hidden="true" tabindex="-1"></a>    acs_design ,</span>
-<span id="cb12-5"><a href="american-community-survey-acs.html#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb12-6"><a href="american-community-survey-acs.html#cb12-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="american-community-survey-acs.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
+<span id="cb11-2"><a href="american-community-survey-acs.html#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> ssip , </span>
+<span id="cb11-3"><a href="american-community-survey-acs.html#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> pincp , </span>
+<span id="cb11-4"><a href="american-community-survey-acs.html#cb11-4" aria-hidden="true" tabindex="-1"></a>    acs_design ,</span>
+<span id="cb11-5"><a href="american-community-survey-acs.html#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
+<span id="cb11-6"><a href="american-community-survey-acs.html#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="american-community-survey-acs.html#subsetting" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to senior citizens:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="american-community-survey-acs.html#cb13-1" aria-hidden="true" tabindex="-1"></a>sub_acs_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( acs_design , agep <span class="sc">&gt;=</span> <span class="dv">65</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="american-community-survey-acs.html#cb12-1" aria-hidden="true" tabindex="-1"></a>sub_acs_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( acs_design , agep <span class="sc">&gt;=</span> <span class="dv">65</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="american-community-survey-acs.html#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , sub_acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="american-community-survey-acs.html#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , sub_acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="american-community-survey-acs.html#measures-of-uncertainty" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="american-community-survey-acs.html#cb15-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb15-2"><a href="american-community-survey-acs.html#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="american-community-survey-acs.html#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb15-4"><a href="american-community-survey-acs.html#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb15-5"><a href="american-community-survey-acs.html#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb15-6"><a href="american-community-survey-acs.html#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb15-7"><a href="american-community-survey-acs.html#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="american-community-survey-acs.html#cb15-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb15-9"><a href="american-community-survey-acs.html#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb15-10"><a href="american-community-survey-acs.html#cb15-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> poverty_level , </span>
-<span id="cb15-11"><a href="american-community-survey-acs.html#cb15-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> cit , </span>
-<span id="cb15-12"><a href="american-community-survey-acs.html#cb15-12" aria-hidden="true" tabindex="-1"></a>        acs_design , </span>
-<span id="cb15-13"><a href="american-community-survey-acs.html#cb15-13" aria-hidden="true" tabindex="-1"></a>        svymean ,</span>
-<span id="cb15-14"><a href="american-community-survey-acs.html#cb15-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb15-15"><a href="american-community-survey-acs.html#cb15-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb15-16"><a href="american-community-survey-acs.html#cb15-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-17"><a href="american-community-survey-acs.html#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb15-18"><a href="american-community-survey-acs.html#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb15-19"><a href="american-community-survey-acs.html#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb15-20"><a href="american-community-survey-acs.html#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="american-community-survey-acs.html#cb14-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb14-2"><a href="american-community-survey-acs.html#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="american-community-survey-acs.html#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb14-4"><a href="american-community-survey-acs.html#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb14-5"><a href="american-community-survey-acs.html#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb14-6"><a href="american-community-survey-acs.html#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb14-7"><a href="american-community-survey-acs.html#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="american-community-survey-acs.html#cb14-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb14-9"><a href="american-community-survey-acs.html#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb14-10"><a href="american-community-survey-acs.html#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> poverty_level , </span>
+<span id="cb14-11"><a href="american-community-survey-acs.html#cb14-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> cit , </span>
+<span id="cb14-12"><a href="american-community-survey-acs.html#cb14-12" aria-hidden="true" tabindex="-1"></a>        acs_design , </span>
+<span id="cb14-13"><a href="american-community-survey-acs.html#cb14-13" aria-hidden="true" tabindex="-1"></a>        svymean ,</span>
+<span id="cb14-14"><a href="american-community-survey-acs.html#cb14-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb14-15"><a href="american-community-survey-acs.html#cb14-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-16"><a href="american-community-survey-acs.html#cb14-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-17"><a href="american-community-survey-acs.html#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb14-18"><a href="american-community-survey-acs.html#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb14-19"><a href="american-community-survey-acs.html#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb14-20"><a href="american-community-survey-acs.html#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="american-community-survey-acs.html#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( acs_design )</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="american-community-survey-acs.html#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( acs_design )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="american-community-survey-acs.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="american-community-survey-acs.html#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="american-community-survey-acs.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb18-2"><a href="american-community-survey-acs.html#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb18-3"><a href="american-community-survey-acs.html#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="american-community-survey-acs.html#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb18-5"><a href="american-community-survey-acs.html#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="american-community-survey-acs.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb17-2"><a href="american-community-survey-acs.html#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb17-3"><a href="american-community-survey-acs.html#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="american-community-survey-acs.html#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb17-5"><a href="american-community-survey-acs.html#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> poverty_level , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="american-community-survey-acs.html#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> married , acs_design ,</span>
-<span id="cb19-2"><a href="american-community-survey-acs.html#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="american-community-survey-acs.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> married , acs_design ,</span>
+<span id="cb18-2"><a href="american-community-survey-acs.html#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> )</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="american-community-survey-acs.html#regression-models-and-tests-of-association" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="american-community-survey-acs.html#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( poverty_level <span class="sc">~</span> married , acs_design )</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="american-community-survey-acs.html#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( poverty_level <span class="sc">~</span> married , acs_design )</span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="american-community-survey-acs.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
-<span id="cb21-2"><a href="american-community-survey-acs.html#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> married <span class="sc">+</span> sex , </span>
-<span id="cb21-3"><a href="american-community-survey-acs.html#cb21-3" aria-hidden="true" tabindex="-1"></a>    acs_design </span>
-<span id="cb21-4"><a href="american-community-survey-acs.html#cb21-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="american-community-survey-acs.html#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
+<span id="cb20-2"><a href="american-community-survey-acs.html#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> married <span class="sc">+</span> sex , </span>
+<span id="cb20-3"><a href="american-community-survey-acs.html#cb20-3" aria-hidden="true" tabindex="-1"></a>    acs_design </span>
+<span id="cb20-4"><a href="american-community-survey-acs.html#cb20-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="american-community-survey-acs.html#cb22-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb22-2"><a href="american-community-survey-acs.html#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
-<span id="cb22-3"><a href="american-community-survey-acs.html#cb22-3" aria-hidden="true" tabindex="-1"></a>        poverty_level <span class="sc">~</span> married <span class="sc">+</span> sex , </span>
-<span id="cb22-4"><a href="american-community-survey-acs.html#cb22-4" aria-hidden="true" tabindex="-1"></a>        acs_design </span>
-<span id="cb22-5"><a href="american-community-survey-acs.html#cb22-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb22-6"><a href="american-community-survey-acs.html#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="american-community-survey-acs.html#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="american-community-survey-acs.html#cb21-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb21-2"><a href="american-community-survey-acs.html#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
+<span id="cb21-3"><a href="american-community-survey-acs.html#cb21-3" aria-hidden="true" tabindex="-1"></a>        poverty_level <span class="sc">~</span> married <span class="sc">+</span> sex , </span>
+<span id="cb21-4"><a href="american-community-survey-acs.html#cb21-4" aria-hidden="true" tabindex="-1"></a>        acs_design </span>
+<span id="cb21-5"><a href="american-community-survey-acs.html#cb21-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb21-6"><a href="american-community-survey-acs.html#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="american-community-survey-acs.html#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 </div>
 </div>
 <div id="poverty-and-inequality-estimation-with-convey" class="section level2 unnumbered hasAnchor">
 <h2>Poverty and Inequality Estimation with <code>convey</code>  <a href="american-community-survey-acs.html#poverty-and-inequality-estimation-with-convey" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>convey</code> library estimates measures of income concentration, poverty, inequality, and wellbeing. <a href="https://guilhermejacob.github.io/context/">This textbook</a> details the available features. As a starting point for ACS users, this code calculates the gini coefficient on complex sample survey data:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="american-community-survey-acs.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(convey)</span>
-<span id="cb23-2"><a href="american-community-survey-acs.html#cb23-2" aria-hidden="true" tabindex="-1"></a>acs_design <span class="ot">&lt;-</span> <span class="fu">convey_prep</span>( acs_design )</span>
-<span id="cb23-3"><a href="american-community-survey-acs.html#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="american-community-survey-acs.html#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">svygini</span>( <span class="sc">~</span> hincp , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="american-community-survey-acs.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(convey)</span>
+<span id="cb22-2"><a href="american-community-survey-acs.html#cb22-2" aria-hidden="true" tabindex="-1"></a>acs_design <span class="ot">&lt;-</span> <span class="fu">convey_prep</span>( acs_design )</span>
+<span id="cb22-3"><a href="american-community-survey-acs.html#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="american-community-survey-acs.html#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">svygini</span>( <span class="sc">~</span> hincp , acs_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="replication-example" class="section level2 unnumbered hasAnchor">
@@ -453,43 +439,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The example below matches statistics, standard errors, and margin of errors from this table pulled from the <a href="https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_16.lst">tallies of 2016 PUMS</a>:</p>
 <p><img src="images/pums_estimates_16.png" /><!-- --></p>
 <p>Match the sum of the weights:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="american-community-survey-acs.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( <span class="fu">svytotal</span>( <span class="sc">~</span> one , acs_design ) ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">4863300</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="american-community-survey-acs.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( <span class="fu">svytotal</span>( <span class="sc">~</span> one , acs_design ) ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">4863300</span> )</span></code></pre></div>
 <p>Compute the population by age:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="american-community-survey-acs.html#cb25-1" aria-hidden="true" tabindex="-1"></a>pums_estimate <span class="ot">&lt;-</span> </span>
-<span id="cb25-2"><a href="american-community-survey-acs.html#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="dv">285681</span> , <span class="dv">314701</span> , <span class="dv">300814</span> , <span class="dv">334318</span> , <span class="dv">327896</span> , <span class="dv">629329</span> , <span class="dv">599719</span> , <span class="dv">644212</span> , </span>
-<span id="cb25-3"><a href="american-community-survey-acs.html#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">342205</span> , <span class="dv">300254</span> , <span class="dv">464893</span> , <span class="dv">231293</span> , <span class="dv">87985</span> )</span>
-<span id="cb25-4"><a href="american-community-survey-acs.html#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="american-community-survey-acs.html#cb25-5" aria-hidden="true" tabindex="-1"></a>pums_standard_error <span class="ot">&lt;-</span> </span>
-<span id="cb25-6"><a href="american-community-survey-acs.html#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="dv">2888</span> , <span class="dv">5168</span> , <span class="dv">5009</span> , <span class="dv">3673</span> , <span class="dv">3521</span> , <span class="dv">4825</span> , <span class="dv">4088</span> , </span>
-<span id="cb25-7"><a href="american-community-survey-acs.html#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">4398</span> , <span class="dv">5329</span> , <span class="dv">5389</span> , <span class="dv">1938</span> , <span class="dv">3214</span> , <span class="dv">2950</span> )</span>
-<span id="cb25-8"><a href="american-community-survey-acs.html#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-9"><a href="american-community-survey-acs.html#cb25-9" aria-hidden="true" tabindex="-1"></a>pums_margin_of_error <span class="ot">&lt;-</span> </span>
-<span id="cb25-10"><a href="american-community-survey-acs.html#cb25-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="dv">4751</span> , <span class="dv">8501</span> , <span class="dv">8240</span> , <span class="dv">6043</span> , <span class="dv">5792</span> , <span class="dv">7937</span> , <span class="dv">6725</span> , </span>
-<span id="cb25-11"><a href="american-community-survey-acs.html#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">7234</span> , <span class="dv">8767</span> , <span class="dv">8865</span> , <span class="dv">3188</span> , <span class="dv">5287</span> , <span class="dv">4853</span> )</span>
-<span id="cb25-12"><a href="american-community-survey-acs.html#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-13"><a href="american-community-survey-acs.html#cb25-13" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
-<span id="cb25-14"><a href="american-community-survey-acs.html#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svytotal</span>( </span>
-<span id="cb25-15"><a href="american-community-survey-acs.html#cb25-15" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">4</span> ) <span class="sc">+</span></span>
-<span id="cb25-16"><a href="american-community-survey-acs.html#cb25-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">9</span> ) <span class="sc">+</span></span>
-<span id="cb25-17"><a href="american-community-survey-acs.html#cb25-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">10</span><span class="sc">:</span><span class="dv">14</span> ) <span class="sc">+</span></span>
-<span id="cb25-18"><a href="american-community-survey-acs.html#cb25-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">15</span><span class="sc">:</span><span class="dv">19</span> ) <span class="sc">+</span></span>
-<span id="cb25-19"><a href="american-community-survey-acs.html#cb25-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">20</span><span class="sc">:</span><span class="dv">24</span> ) <span class="sc">+</span></span>
-<span id="cb25-20"><a href="american-community-survey-acs.html#cb25-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">25</span><span class="sc">:</span><span class="dv">34</span> ) <span class="sc">+</span></span>
-<span id="cb25-21"><a href="american-community-survey-acs.html#cb25-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">35</span><span class="sc">:</span><span class="dv">44</span> ) <span class="sc">+</span></span>
-<span id="cb25-22"><a href="american-community-survey-acs.html#cb25-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">45</span><span class="sc">:</span><span class="dv">54</span> ) <span class="sc">+</span></span>
-<span id="cb25-23"><a href="american-community-survey-acs.html#cb25-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">55</span><span class="sc">:</span><span class="dv">59</span> ) <span class="sc">+</span></span>
-<span id="cb25-24"><a href="american-community-survey-acs.html#cb25-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">60</span><span class="sc">:</span><span class="dv">64</span> ) <span class="sc">+</span></span>
-<span id="cb25-25"><a href="american-community-survey-acs.html#cb25-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">65</span><span class="sc">:</span><span class="dv">74</span> ) <span class="sc">+</span></span>
-<span id="cb25-26"><a href="american-community-survey-acs.html#cb25-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">75</span><span class="sc">:</span><span class="dv">84</span> ) <span class="sc">+</span></span>
-<span id="cb25-27"><a href="american-community-survey-acs.html#cb25-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">85</span><span class="sc">:</span><span class="dv">100</span> ) , </span>
-<span id="cb25-28"><a href="american-community-survey-acs.html#cb25-28" aria-hidden="true" tabindex="-1"></a>        acs_design</span>
-<span id="cb25-29"><a href="american-community-survey-acs.html#cb25-29" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb25-30"><a href="american-community-survey-acs.html#cb25-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-31"><a href="american-community-survey-acs.html#cb25-31" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results ) , <span class="dv">0</span> ) <span class="sc">==</span> pums_estimate ) )</span>
-<span id="cb25-32"><a href="american-community-survey-acs.html#cb25-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-33"><a href="american-community-survey-acs.html#cb25-33" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results ) , <span class="dv">0</span> ) <span class="sc">==</span> pums_standard_error ) )</span>
-<span id="cb25-34"><a href="american-community-survey-acs.html#cb25-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-35"><a href="american-community-survey-acs.html#cb25-35" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results ) <span class="sc">*</span> <span class="fl">1.645</span> , <span class="dv">0</span> ) <span class="sc">==</span> pums_margin_of_error ) )</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="american-community-survey-acs.html#cb24-1" aria-hidden="true" tabindex="-1"></a>pums_estimate <span class="ot">&lt;-</span> </span>
+<span id="cb24-2"><a href="american-community-survey-acs.html#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="dv">285681</span> , <span class="dv">314701</span> , <span class="dv">300814</span> , <span class="dv">334318</span> , <span class="dv">327896</span> , <span class="dv">629329</span> , <span class="dv">599719</span> , <span class="dv">644212</span> , </span>
+<span id="cb24-3"><a href="american-community-survey-acs.html#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">342205</span> , <span class="dv">300254</span> , <span class="dv">464893</span> , <span class="dv">231293</span> , <span class="dv">87985</span> )</span>
+<span id="cb24-4"><a href="american-community-survey-acs.html#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="american-community-survey-acs.html#cb24-5" aria-hidden="true" tabindex="-1"></a>pums_standard_error <span class="ot">&lt;-</span> </span>
+<span id="cb24-6"><a href="american-community-survey-acs.html#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="dv">2888</span> , <span class="dv">5168</span> , <span class="dv">5009</span> , <span class="dv">3673</span> , <span class="dv">3521</span> , <span class="dv">4825</span> , <span class="dv">4088</span> , </span>
+<span id="cb24-7"><a href="american-community-survey-acs.html#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">4398</span> , <span class="dv">5329</span> , <span class="dv">5389</span> , <span class="dv">1938</span> , <span class="dv">3214</span> , <span class="dv">2950</span> )</span>
+<span id="cb24-8"><a href="american-community-survey-acs.html#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="american-community-survey-acs.html#cb24-9" aria-hidden="true" tabindex="-1"></a>pums_margin_of_error <span class="ot">&lt;-</span> </span>
+<span id="cb24-10"><a href="american-community-survey-acs.html#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="dv">4751</span> , <span class="dv">8501</span> , <span class="dv">8240</span> , <span class="dv">6043</span> , <span class="dv">5792</span> , <span class="dv">7937</span> , <span class="dv">6725</span> , </span>
+<span id="cb24-11"><a href="american-community-survey-acs.html#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">7234</span> , <span class="dv">8767</span> , <span class="dv">8865</span> , <span class="dv">3188</span> , <span class="dv">5287</span> , <span class="dv">4853</span> )</span>
+<span id="cb24-12"><a href="american-community-survey-acs.html#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="american-community-survey-acs.html#cb24-13" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
+<span id="cb24-14"><a href="american-community-survey-acs.html#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svytotal</span>( </span>
+<span id="cb24-15"><a href="american-community-survey-acs.html#cb24-15" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">4</span> ) <span class="sc">+</span></span>
+<span id="cb24-16"><a href="american-community-survey-acs.html#cb24-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">9</span> ) <span class="sc">+</span></span>
+<span id="cb24-17"><a href="american-community-survey-acs.html#cb24-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">10</span><span class="sc">:</span><span class="dv">14</span> ) <span class="sc">+</span></span>
+<span id="cb24-18"><a href="american-community-survey-acs.html#cb24-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">15</span><span class="sc">:</span><span class="dv">19</span> ) <span class="sc">+</span></span>
+<span id="cb24-19"><a href="american-community-survey-acs.html#cb24-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">20</span><span class="sc">:</span><span class="dv">24</span> ) <span class="sc">+</span></span>
+<span id="cb24-20"><a href="american-community-survey-acs.html#cb24-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">25</span><span class="sc">:</span><span class="dv">34</span> ) <span class="sc">+</span></span>
+<span id="cb24-21"><a href="american-community-survey-acs.html#cb24-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">35</span><span class="sc">:</span><span class="dv">44</span> ) <span class="sc">+</span></span>
+<span id="cb24-22"><a href="american-community-survey-acs.html#cb24-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">45</span><span class="sc">:</span><span class="dv">54</span> ) <span class="sc">+</span></span>
+<span id="cb24-23"><a href="american-community-survey-acs.html#cb24-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">55</span><span class="sc">:</span><span class="dv">59</span> ) <span class="sc">+</span></span>
+<span id="cb24-24"><a href="american-community-survey-acs.html#cb24-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">60</span><span class="sc">:</span><span class="dv">64</span> ) <span class="sc">+</span></span>
+<span id="cb24-25"><a href="american-community-survey-acs.html#cb24-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">65</span><span class="sc">:</span><span class="dv">74</span> ) <span class="sc">+</span></span>
+<span id="cb24-26"><a href="american-community-survey-acs.html#cb24-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">75</span><span class="sc">:</span><span class="dv">84</span> ) <span class="sc">+</span></span>
+<span id="cb24-27"><a href="american-community-survey-acs.html#cb24-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( agep <span class="sc">%in%</span> <span class="dv">85</span><span class="sc">:</span><span class="dv">100</span> ) , </span>
+<span id="cb24-28"><a href="american-community-survey-acs.html#cb24-28" aria-hidden="true" tabindex="-1"></a>        acs_design</span>
+<span id="cb24-29"><a href="american-community-survey-acs.html#cb24-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-30"><a href="american-community-survey-acs.html#cb24-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-31"><a href="american-community-survey-acs.html#cb24-31" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results ) , <span class="dv">0</span> ) <span class="sc">==</span> pums_estimate ) )</span>
+<span id="cb24-32"><a href="american-community-survey-acs.html#cb24-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-33"><a href="american-community-survey-acs.html#cb24-33" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results ) , <span class="dv">0</span> ) <span class="sc">==</span> pums_standard_error ) )</span>
+<span id="cb24-34"><a href="american-community-survey-acs.html#cb24-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-35"><a href="american-community-survey-acs.html#cb24-35" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results ) <span class="sc">*</span> <span class="fl">1.645</span> , <span class="dv">0</span> ) <span class="sc">==</span> pums_margin_of_error ) )</span></code></pre></div>
 
 </div>
 </div>
