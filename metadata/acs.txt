@@ -207,10 +207,6 @@ stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
 
 needs_actions_build_status_line: yes
 
-sample_setup_breaks: 13
-
-broken_sample_test_condition: any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 & chapter_tag_cat$time_period == '1-Year' )
-
 ~~~{sample_setup_block}
 this_sample_break <- Sys.getenv( "this_sample_break" )
 
@@ -222,13 +218,6 @@ chapter_tag_cat <-
 
 # alabama one-year and all wyoming only
 chapter_tag_cat <- subset( chapter_tag_cat , ( stateab == 'al' & time_period == '1-Year' ) | stateab == 'wy' )
-
-chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
-
-# for alabama 2016, toss out other nearby states
-if( any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 ) ){
-	chapter_tag_cat <- chapter_tag_cat[ chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 , ]
-}
 
 chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
 

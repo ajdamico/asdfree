@@ -36,7 +36,7 @@
 #'
 #' @export
 syntaxtractor <-
-	function( data_name , repo = "ajdamico/asdfree" , ref = "master" , replacements = NULL , setup_rmd = TRUE , test_rmd = TRUE , sample_setup_breaks = NULL , broken_sample_test_condition = NULL ){
+	function( data_name , repo = "ajdamico/asdfree" , ref = "master" , replacements = NULL , setup_rmd = TRUE , test_rmd = TRUE , broken_sample_test_condition = NULL ){
 
 		this_rmd <- grep( paste0( "/" , data_name , "\\.Rmd$" ) , list.files( "C:/Users/anthonyd/Documents/GitHub/asdfree/" , full.names = TRUE ) , value = TRUE )
 		
@@ -56,7 +56,7 @@ syntaxtractor <-
 			second_library_lodown_line <- 3
 		}
 	
-		if( is.null( sample_setup_breaks ) & setup_rmd ){
+		if( setup_rmd ){
 
 			setup_rmd_page <- rmd_page[ seq_along( rmd_page ) < second_library_lodown_line ]
 			
@@ -64,22 +64,7 @@ syntaxtractor <-
 	
 		test_rmd_page <- rmd_page[ seq_along( rmd_page ) >= second_library_lodown_line ]
 		
-		if( !is.null( sample_setup_breaks ) & setup_rmd ){
 		
-			sample_break_block <-				
-				c(
-					"library(lodown)" ,
-					"this_sample_break <- Sys.getenv( \"this_sample_break\" )" , 
-					"chapter_tag_cat <- get_catalog( \"chapter_tag\" , output_dir = file.path( getwd() ) )" ,
-					paste0( "record_categories <- ceiling( seq( nrow( chapter_tag_cat ) ) / ceiling( nrow( chapter_tag_cat ) / " , sample_setup_breaks , " ) )" ) ,
-					"chapter_tag_cat <- chapter_tag_cat[ record_categories == this_sample_break , ]" ,
-					"chapter_tag_cat <- lodown( \"chapter_tag\" , chapter_tag_cat )"
-				)
-
-			sample_break_block <- gsub( "chapter_tag" , data_name , sample_break_block )
-			
-			setup_rmd_page <- c( setup_rmd_page , sample_break_block )
-		}
 		
 		if( !is.null( broken_sample_test_condition ) ) test_rmd_page <- c( paste0( "if( " , broken_sample_test_condition , " ){" ) , test_rmd_page , "}" )
 		

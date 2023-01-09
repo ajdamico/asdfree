@@ -1,4 +1,4 @@
-commit_memo <- "'laptop update'"
+commit_memo <- "'remove setup_sample_breaks'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -251,7 +251,6 @@ setwd( book_folder )
 clean_site()
 render_site(output_format = 'bookdown::gitbook', encoding = 'UTF-8')
 # render_site( encoding = 'UTF-8' )
-
 
 # redirect "edit" buttons on metadata-driven pages #
 html_files <- 
