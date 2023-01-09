@@ -1,4 +1,4 @@
-commit_memo <- "'reformat link to old sites'"
+commit_memo <- "'laptop update'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
