@@ -1,7 +1,5 @@
-# Sys.getenv("RSTUDIO_PANDOC")
-Sys.setenv("RSTUDIO_PANDOC"="C:/Program Files/RStudio/bin/pandoc")
-commit_memo <- "'remove unpublished repos'"
-# source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
+commit_memo <- "'reformat link to old sites'"
+
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 
