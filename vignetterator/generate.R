@@ -342,9 +342,13 @@ for( this_ci_file in ci_rmd_files ){
 			needs_7za_install <- pull_line( this_metadata_file , "needs_7za_install" )
 			
 			if( basename( this_file ) == 'DESCRIPTION' ) {
+				
 				if( grepl( 'archive' , needed_libraries ) ) {
+				
 					these_lines <- gsub( "desc_remotes_line" , "Remotes: jimhester/archive" , these_lines )
-				}
+					
+				} else these_lines <- gsub( "desc_remotes_line" , "" , these_lines )
+				
 			}
 			
 			if( grepl( 'setup\\.R$' , this_file ) ){
