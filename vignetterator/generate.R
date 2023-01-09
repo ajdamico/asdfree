@@ -1,4 +1,4 @@
-commit_memo <- "'download and import block'"
+commit_memo <- "'other laptop test'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 

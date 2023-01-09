@@ -9,9 +9,7 @@ gitbook.require(["gitbook", "jQuery"], function(gitbook, $) {
 
     // the page.change event is thrown twice: before and after the page changes
     if (clipboard) {
-      // clipboard is already defined but we are on the same page
-      if (clipboard._prevPage === window.location.pathname) return;
-      // clipboard is already defined and url path change
+      // clipboard is already defined
       // we can deduct that we are before page changes
       clipboard.destroy(); // destroy the previous events listeners
       clipboard = undefined; // reset the clipboard object
@@ -25,8 +23,6 @@ gitbook.require(["gitbook", "jQuery"], function(gitbook, $) {
         return trigger.parentNode.textContent;
       }
     });
-
-    clipboard._prevPage = window.location.pathname
 
   });
 
