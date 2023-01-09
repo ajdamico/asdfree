@@ -20,7 +20,8 @@ load the haven library to import sas files
 library(haven)
 ```
 
-download and import the household file
+download and import the alabama household file
+(switch `unix_hal` to `unix_hus` for the entire country)
 ```{r eval = FALSE }
 tf_household <- tempfile()
 
@@ -39,7 +40,8 @@ acs_df_household <- haven::read_sas( acs_sas_household )
 names( acs_df_household ) <- tolower( names( acs_df_household ) )
 ```
 
-download and import the person file
+download and import the alabama person file
+(switch `unix_pal` to `unix_pus` for the entire country)
 ```{r eval = FALSE }
 tf_person <- tempfile()
 
@@ -58,7 +60,7 @@ acs_df_person <- haven::read_sas( acs_sas_person )
 names( acs_df_person ) <- tolower( names( acs_df_person ) )
 ```
 
-download and import the person file
+remove overlapping columns and merge
 ```{r eval = FALSE }
 
 acs_df_household[ , 'rt' ] <- NULL
@@ -67,6 +69,8 @@ acs_df_person[ , 'rt' ] <- NULL
 
 acs_df <-
 	merge( acs_df_household , acs_df_person )
+	
+acs_df[ , 'one' ] <- 1
 ```
 
 ## Analysis Examples with the `survey` library \ {-}

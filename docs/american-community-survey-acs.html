@@ -222,7 +222,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>load the haven library to import sas files</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="american-community-survey-acs.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages( &#39;haven&#39; )</span></span>
 <span id="cb1-2"><a href="american-community-survey-acs.html#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span></code></pre></div>
-<p>download and import the household file</p>
+<p>download and import the alabama household file
+(switch <code>unix_hal</code> to <code>unix_hus</code> for the entire country)</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="american-community-survey-acs.html#cb2-1" aria-hidden="true" tabindex="-1"></a>tf_household <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb2-2"><a href="american-community-survey-acs.html#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="american-community-survey-acs.html#cb2-3" aria-hidden="true" tabindex="-1"></a>this_url_household <span class="ot">&lt;-</span></span>
@@ -238,7 +239,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-13"><a href="american-community-survey-acs.html#cb2-13" aria-hidden="true" tabindex="-1"></a>acs_df_household <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_sas</span>( acs_sas_household )</span>
 <span id="cb2-14"><a href="american-community-survey-acs.html#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-15"><a href="american-community-survey-acs.html#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( acs_df_household ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( acs_df_household ) )</span></code></pre></div>
-<p>download and import the person file</p>
+<p>download and import the alabama person file
+(switch <code>unix_pal</code> to <code>unix_pus</code> for the entire country)</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="american-community-survey-acs.html#cb3-1" aria-hidden="true" tabindex="-1"></a>tf_person <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb3-2"><a href="american-community-survey-acs.html#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="american-community-survey-acs.html#cb3-3" aria-hidden="true" tabindex="-1"></a>this_url_person <span class="ot">&lt;-</span></span>
@@ -254,13 +256,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-13"><a href="american-community-survey-acs.html#cb3-13" aria-hidden="true" tabindex="-1"></a>acs_df_person <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_sas</span>( acs_sas_person )</span>
 <span id="cb3-14"><a href="american-community-survey-acs.html#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-15"><a href="american-community-survey-acs.html#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( acs_df_person ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( acs_df_person ) )</span></code></pre></div>
-<p>download and import the person file</p>
+<p>remove overlapping columns and merge</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="american-community-survey-acs.html#cb4-1" aria-hidden="true" tabindex="-1"></a>acs_df_household[ , <span class="st">&#39;rt&#39;</span> ] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
 <span id="cb4-2"><a href="american-community-survey-acs.html#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="american-community-survey-acs.html#cb4-3" aria-hidden="true" tabindex="-1"></a>acs_df_person[ , <span class="st">&#39;rt&#39;</span> ] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
 <span id="cb4-4"><a href="american-community-survey-acs.html#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="american-community-survey-acs.html#cb4-5" aria-hidden="true" tabindex="-1"></a>acs_df <span class="ot">&lt;-</span></span>
-<span id="cb4-6"><a href="american-community-survey-acs.html#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">merge</span>( acs_df_household , acs_df_person )</span></code></pre></div>
+<span id="cb4-6"><a href="american-community-survey-acs.html#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">merge</span>( acs_df_household , acs_df_person )</span>
+<span id="cb4-7"><a href="american-community-survey-acs.html#cb4-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-8"><a href="american-community-survey-acs.html#cb4-8" aria-hidden="true" tabindex="-1"></a>acs_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
 </div>
 <div id="analysis-examples-with-the-survey-library" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with the <code>survey</code> library  <a href="american-community-survey-acs.html#analysis-examples-with-the-survey-library" class="anchor-section" aria-label="Anchor link to header"></a></h2>
