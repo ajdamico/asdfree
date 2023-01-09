@@ -14,23 +14,59 @@ The US Census Bureau's annual replacement for the long-form decennial census.
 
 ## Download and Importation {-}
 
-alabama only!
+load the haven library to import sas files
 ```{r eval = FALSE }
-tf <- tempfile()
+# install.packages( 'haven' )
+library(haven)
+```
 
-this_url <-
-	"https://www2.census.gov/programs-surveys/acs/data/pums/2016/1-Year/csv_pal.zip"
+download and import the household file
+```{r eval = FALSE }
+tf_household <- tempfile()
 
-download.file( this_url , tf , mode = 'wb' )
+this_url_household <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2016/1-Year/unix_hal.zip"
 
-unzipped_files <- unzip( tf , exdir = tempdir() )
+download.file( this_url_household , tf_household , mode = 'wb' )
 
-acs_csv <-
-	grep( '\\.csv$' , unzipped_files , value = TRUE )
+unzipped_files_household <- unzip( tf_household , exdir = tempdir() )
 
-acs_df <- read.csv( acs_csv )
+acs_sas_household <-
+	grep( '\\.sas7bdat$' , unzipped_files_household , value = TRUE )
 
-names( acs_df ) <- tolower( names( acs_df ) )
+acs_df_household <- haven::read_sas( acs_sas_household )
+
+names( acs_df_household ) <- tolower( names( acs_df_household ) )
+```
+
+download and import the person file
+```{r eval = FALSE }
+tf_person <- tempfile()
+
+this_url_person <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2016/1-Year/unix_pal.zip"
+
+download.file( this_url_person , tf_person , mode = 'wb' )
+
+unzipped_files_person <- unzip( tf_person , exdir = tempdir() )
+
+acs_sas_person <-
+	grep( '\\.sas7bdat$' , unzipped_files_person , value = TRUE )
+
+acs_df_person <- haven::read_sas( acs_sas_person )
+
+names( acs_df_person ) <- tolower( names( acs_df_person ) )
+```
+
+download and import the person file
+```{r eval = FALSE }
+
+acs_df_household[ , 'rt' ] <- NULL
+
+acs_df_person[ , 'rt' ] <- NULL
+
+acs_df <-
+	merge( acs_df_household , acs_df_person )
 ```
 
 ## Analysis Examples with the `survey` library \ {-}
