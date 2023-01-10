@@ -15,6 +15,73 @@ administrative_organization: * Administered and financed by the [US Census Burea
 
 
 
+needs_actions_build_status_line: yes
+
+~~~{download_and_import_block}
+
+Load the `haven` library to import sas files:
+```{r eval = FALSE }
+# install.packages( 'haven' )
+library(haven)
+```
+
+
+Download and import the Alabama household file:
+
+(switch `sas_hal` to `sas_hus` for the entire country)
+```{r eval = FALSE }
+tf_household <- tempfile()
+
+this_url_household <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_hal.zip"
+
+download.file( this_url_household , tf_household , mode = 'wb' )
+
+unzipped_files_household <- unzip( tf_household , exdir = tempdir() )
+
+chapter_tag_sas_household <-
+	grep( '\\\\.sas7bdat$' , unzipped_files_household , value = TRUE )
+
+chapter_tag_df_household <- haven::read_sas( chapter_tag_sas_household )
+
+names( chapter_tag_df_household ) <- tolower( names( chapter_tag_df_household ) )
+```
+
+Download and import the Alabama person file:
+
+(switch `sas_pal` to `sas_pus` for the entire country)
+```{r eval = FALSE }
+tf_person <- tempfile()
+
+this_url_person <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_pal.zip"
+
+download.file( this_url_person , tf_person , mode = 'wb' )
+
+unzipped_files_person <- unzip( tf_person , exdir = tempdir() )
+
+chapter_tag_sas_person <-
+	grep( '\\\\.sas7bdat$' , unzipped_files_person , value = TRUE )
+
+chapter_tag_df_person <- haven::read_sas( chapter_tag_sas_person )
+
+names( chapter_tag_df_person ) <- tolower( names( chapter_tag_df_person ) )
+```
+
+
+Remove overlapping column and merge household + person files:
+```{r eval = FALSE }
+
+chapter_tag_df_household[ , 'rt' ] <- NULL
+
+chapter_tag_df_person[ , 'rt' ] <- NULL
+
+chapter_tag_df <- merge( chapter_tag_df_household , chapter_tag_df_person )
+	
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
 
 
 ~~~{analysis_examples_survey_design}
@@ -187,71 +254,8 @@ stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
 
 
 
-needs_actions_build_status_line: yes
 
 needs_srvyr_block: yes
 
 
-~~~{download_and_import_block}
-
-load the haven library to import sas files
-```{r eval = FALSE }
-# install.packages( 'haven' )
-library(haven)
-```
-
-
-Download and import the Alabama household file:
-(switch `sas_hal` to `sas_hus` for the entire country)
-```{r eval = FALSE }
-tf_household <- tempfile()
-
-this_url_household <-
-	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_hal.zip"
-
-download.file( this_url_household , tf_household , mode = 'wb' )
-
-unzipped_files_household <- unzip( tf_household , exdir = tempdir() )
-
-chapter_tag_sas_household <-
-	grep( '\\\\.sas7bdat$' , unzipped_files_household , value = TRUE )
-
-chapter_tag_df_household <- haven::read_sas( chapter_tag_sas_household )
-
-names( chapter_tag_df_household ) <- tolower( names( chapter_tag_df_household ) )
-```
-
-Download and import the Alabama person file:
-(switch `sas_pal` to `sas_pus` for the entire country)
-```{r eval = FALSE }
-tf_person <- tempfile()
-
-this_url_person <-
-	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_pal.zip"
-
-download.file( this_url_person , tf_person , mode = 'wb' )
-
-unzipped_files_person <- unzip( tf_person , exdir = tempdir() )
-
-chapter_tag_sas_person <-
-	grep( '\\\\.sas7bdat$' , unzipped_files_person , value = TRUE )
-
-chapter_tag_df_person <- haven::read_sas( chapter_tag_sas_person )
-
-names( chapter_tag_df_person ) <- tolower( names( chapter_tag_df_person ) )
-```
-
-
-Remove overlapping column and merge household + person files:
-```{r eval = FALSE }
-
-chapter_tag_df_household[ , 'rt' ] <- NULL
-
-chapter_tag_df_person[ , 'rt' ] <- NULL
-
-chapter_tag_df <- merge( chapter_tag_df_household , chapter_tag_df_person )
-	
-chapter_tag_df[ , 'one' ] <- 1
-```
-~~~
 
