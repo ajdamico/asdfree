@@ -71,6 +71,8 @@ acs_df_person[ , 'rt' ] <- NULL
 
 acs_df <- merge( acs_df_household , acs_df_person )
 	
+stopifnot( nrow( acs_df ) == nrow( acs_df_person ) )
+
 acs_df[ , 'one' ] <- 1
 ```
 
@@ -84,19 +86,6 @@ Construct a complex sample survey design:
 
 ```{r eval = FALSE }
 library(survey)
-
-# because of the catalog subset above
-# the `merged.rds` file is alabama only
-acs_design <-
-	svrepdesign(
-		weight = ~pwgtp ,
-		repweights = 'pwgtp[0-9]+' ,
-		scale = 4 / 80 ,
-		rscales = rep( 1 , 80 ) ,
-		mse = TRUE ,
-		type = 'JK1' ,
-		data = acs_df
-	)
 ```
 
 ### Variable Recoding {-}
@@ -107,8 +96,6 @@ acs_design <-
 	update(
 		
 		acs_design ,
-		
-		relp = as.numeric( relp ) ,
 		
 		state_name =
 			factor(

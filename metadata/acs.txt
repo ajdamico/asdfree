@@ -78,6 +78,8 @@ chapter_tag_df_person[ , 'rt' ] <- NULL
 
 chapter_tag_df <- merge( chapter_tag_df_household , chapter_tag_df_person )
 	
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_df_person ) )
+
 chapter_tag_df[ , 'one' ] <- 1
 ```
 ~~~
@@ -87,8 +89,6 @@ chapter_tag_df[ , 'one' ] <- 1
 ~~~{analysis_examples_survey_design}
 library(survey)
 
-# because of the catalog subset above
-# the `merged.rds` file is alabama only
 chapter_tag_design <-
 	svrepdesign(
 		weight = ~pwgtp ,
@@ -107,8 +107,6 @@ chapter_tag_design <-
 	update(
 		
 		chapter_tag_design ,
-		
-		relp = as.numeric( relp ) ,
 		
 		state_name =
 			factor(
@@ -169,6 +167,11 @@ subset_definition: agep >= 65
 subset_definition_description: senior citizens
 binary_variable: married
 
+
+
+
+
+needs_srvyr_block: yes
 
 
 
@@ -251,11 +254,6 @@ stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
 
 
 
-
-
-
-
-needs_srvyr_block: yes
 
 
 

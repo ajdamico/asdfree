@@ -1,4 +1,4 @@
-commit_memo <- "'remove authorship'"
+commit_memo <- "'acs cleanup'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
