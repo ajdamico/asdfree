@@ -1,4 +1,4 @@
-commit_memo <- "'skim block'"
+commit_memo <- "'sharing null'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
