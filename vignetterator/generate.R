@@ -64,13 +64,13 @@ chapter_tag <- gsub( "\\.txt" , "" , basename( metafiles ) )
 
 for( this_line in sub_lines ){
 
-	assign( this_line , sapply( metafiles , function( fn ) pull_line( fn , this_line ) ) )
+	assign( this_line , lapply( metafiles , function( fn ) pull_line( fn , this_line ) ) )
 
 }
 
 for( this_chunk in sub_chunks ){
 
-	assign( this_chunk , sapply( metafiles , function( fn ) pull_chunk( fn , this_chunk ) ) )
+	assign( this_chunk , lapply( metafiles , function( fn ) pull_chunk( fn , this_chunk ) ) )
 
 }
 
@@ -273,7 +273,7 @@ for( this_metafile in metafiles ){
 			'.Rmd",'
 		)
 
-	html_file <- html_files[ grep( paste0( '-' , chapter_tag , '.html$' ) , html_files ) ]
+	html_file <- grep( paste0( '-' , chapter_tag , '.html$' ) , html_files , value = TRUE )
 
 	html_lines <- readLines( html_file )
 
@@ -289,8 +289,6 @@ for( this_metafile in metafiles ){
 	
 }
 # end of redirecting "edit" buttons on metadata-driven pages #
-
-
 
 
 # delete the datasets folder
