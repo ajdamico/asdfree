@@ -1,4 +1,4 @@
-commit_memo <- "'acs replication'"
+commit_memo <- "'remove 7za'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -339,8 +339,6 @@ for( this_ci_file in ci_rmd_files ){
 		
 			these_lines <- readLines( this_file )
 
-			needs_7za_install <- pull_line( this_metadata_file , "needs_7za_install" )
-			
 			if( basename( this_file ) == 'DESCRIPTION' ) {
 				
 				if( grepl( 'archive' , needed_libraries ) ) {
