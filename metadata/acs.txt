@@ -125,14 +125,12 @@ svygini( ~ hincp , chapter_tag_design , na.rm = TRUE )
 
 ## Replication Example {-}
 
-The example below matches statistics, standard errors, and margin of errors from this table pulled from the [tallies of 2016 PUMS](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_16.lst):
-
-`r knitr::include_graphics("images/pums_estimates_16.png")`
+The example below matches statistics, standard errors, and margin of errors from this table pulled from the [tallies of 2021 PUMS](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_21.csv):
 
 Match the sum of the weights:
 
 ```{r eval = FALSE , results = "hide" }
-stopifnot( round( coef( svytotal( ~ one , chapter_tag_design ) ) , 0 ) == 4863300 )
+stopifnot( round( coef( svytotal( ~ one , chapter_tag_design ) ) , 0 ) == 5039877 )
 ```
 	
 	
@@ -140,16 +138,16 @@ Compute the population by age:
 
 ```{r eval = FALSE , results = "hide" }
 pums_estimate <- 
-	c( 285681 , 314701 , 300814 , 334318 , 327896 , 629329 , 599719 , 644212 , 
-	342205 , 300254 , 464893 , 231293 , 87985 )
+	c(288139L, 299245L, 336727L, 334606L, 327102L, 635004L, 641405L, 
+	615709L, 335431L, 341926L, 538367L, 265742L, 80474L)
 
 pums_standard_error <- 
-	c( 2888 , 5168 , 5009 , 3673 , 3521 , 4825 , 4088 , 
-	4398 , 5329 , 5389 , 1938 , 3214 , 2950 )
+	c(2727L, 5368L, 6067L, 4082L, 4485L, 5716L, 4420L, 3706L, 4836L, 
+	5100L, 2158L, 3363L, 3186L)
 
 pums_margin_of_error <- 
-	c( 4751 , 8501 , 8240 , 6043 , 5792 , 7937 , 6725 , 
-	7234 , 8767 , 8865 , 3188 , 5287 , 4853 )
+	c(4486L, 8830L, 9981L, 6715L, 7378L, 9402L, 7271L, 6096L, 7956L, 
+	8389L, 3550L, 5532L, 5240L)
 
 results <-
 	svytotal( 
@@ -191,6 +189,9 @@ stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
 
 needs_actions_build_status_line: yes
 
+needs_srvyr_block: yes
+
+
 ~~~{download_and_import_block}
 
 load the haven library to import sas files
@@ -200,7 +201,7 @@ library(haven)
 ```
 
 
-download and import the alabama household file
+Download and import the Alabama household file:
 (switch `unix_hal` to `unix_hus` for the entire country)
 ```{r eval = FALSE }
 tf_household <- tempfile()
@@ -220,7 +221,7 @@ chapter_tag_df_household <- haven::read_sas( chapter_tag_sas_household )
 names( chapter_tag_df_household ) <- tolower( names( chapter_tag_df_household ) )
 ```
 
-download and import the alabama person file
+Download and import the Alabama person file:
 (switch `unix_pal` to `unix_pus` for the entire country)
 ```{r eval = FALSE }
 tf_person <- tempfile()
@@ -241,15 +242,14 @@ names( chapter_tag_df_person ) <- tolower( names( chapter_tag_df_person ) )
 ```
 
 
-remove overlapping columns and merge
+Remove overlapping column and merge household + person files:
 ```{r eval = FALSE }
 
 chapter_tag_df_household[ , 'rt' ] <- NULL
 
 chapter_tag_df_person[ , 'rt' ] <- NULL
 
-chapter_tag_df <-
-	merge( chapter_tag_df_household , chapter_tag_df_person )
+chapter_tag_df <- merge( chapter_tag_df_household , chapter_tag_df_person )
 	
 chapter_tag_df[ , 'one' ] <- 1
 ```
