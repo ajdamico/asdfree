@@ -1,4 +1,4 @@
-commit_memo <- "'intermission & horizontal line'"
+commit_memo <- "'intermish'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
