@@ -1,4 +1,4 @@
-commit_memo <- "'sharing null'"
+commit_memo <- "'intermission & horizontal line'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -48,7 +48,7 @@ pull_line <-
 
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "password_parameters" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
-sub_chunks <- c( "reading_block" , "download_and_import_block" , "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "convey_block" , "replacement_block" )
+sub_chunks <- c( "reading_block" , "download_and_import_block" , "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "intermission_block" , "convey_block" , "replacement_block" )
 needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_actions_build_status_line" )
 
 
@@ -68,11 +68,29 @@ for( this_line in sub_lines ){
 
 }
 
+
+# add horizontal lines on top of certain chunks
+horizontal_line_chunks <-
+	c( "convey_block" , "replication_example_block" )
+
 for( this_chunk in sub_chunks ){
 
-	assign( this_chunk , lapply( metafiles , function( fn ) pull_chunk( fn , this_chunk ) ) )
+	current_chunk <- lapply( metafiles , function( fn ) pull_chunk( fn , this_chunk ) )
+
+	if( this_chunk %in% horizontal_line_chunks ){
+		
+		current_chunk[ current_chunk != "" ] <-
+			lapply( 
+				current_chunk[ current_chunk != "" ] ,
+				function( w ) c( "---\n\n" , w )
+			)
+			
+	}
+
+	assign( this_chunk , current_chunk )
 
 }
+
 
 
 # delete all rmd files except for the index
@@ -289,8 +307,6 @@ for( this_metafile in metafiles ){
 	
 }
 # end of redirecting "edit" buttons on metadata-driven pages #
-
-
 
 # delete the datasets folder
 datasets_path <- normalizePath( file.path( path.expand( "~" ) , "Github/datasets/" ) , winslash = '/' )
