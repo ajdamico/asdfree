@@ -2,7 +2,7 @@
 
 <a href="https://github.com/asdfree/yrbss/actions"><img src="https://github.com/asdfree/yrbss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-The Youth Risk Behavior Surveillance System is the high school edition of the Behavioral Risk Factor Surveillance System (BRFSS), a scientific study of good kids who do bad things.
+The high school edition of the Behavioral Risk Factor Surveillance System (BRFSS), a scientific study of good kids who do bad things.
 
 * One table with one row per sampled youth respondent.
 
@@ -14,9 +14,76 @@ The Youth Risk Behavior Surveillance System is the high school edition of the Be
 
 ---
 
+Please skim before you begin:
+
+1. [Methodology of the Youth Risk Behavior Surveillance System](https://www.cdc.gov/mmwr/pdf/rr/rr6201.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Youth_Risk_Behavior_Surveillance_System)
+
+3. This poem
+
+```{r}
+#
+#
+#
+```
+
 ---
 
 ## Download, Import, Preparation {-}
+
+Load the `SAScii` library to import dat files and re-arrange SAS input program:
+```{r eval = FALSE }
+library(SAScii)
+
+sas_url <-
+	"https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/2019XXH-SAS-Input-Program.sas"
+
+sas_text <- tolower( readLines( sas_url ) )
+
+# find the site location
+site.location <- which( sas_text == '@1 site $3.' )
+
+# find the start field location
+input.location <- which( sas_text == "input" )
+
+# create a vector from 1 to the length of the text file
+sas_length <- seq( length( sas_text ) )
+
+# remove the site location
+sas_length <- sas_length[ -site.location ]
+
+# re-insert the site location right after input
+sas_reorder <- 
+	c( 
+		sas_length[ seq( input.location ) ] , 
+		site.location , 
+		sas_length[ seq( input.location + 1 , length( sas_length ) ) ] 
+	)
+
+# re-order the sas text file
+sas_text <- sas_text[ sas_reorder ]
+
+sas_tf <- tempfile()
+
+writeLines( sas_text , sas_tf )
+```
+
+Download and import the national file:
+```{r eval = FALSE }
+dat_tf <- tempfile()
+
+dat_url <-
+	"https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/XXH2019_YRBS_Data.dat"
+	
+download.file( dat_url , dat_tf , mode = 'wb' )
+
+yrbss_df <- read.SAScii( dat_tf , sas_tf )
+
+names( yrbss_df ) <- tolower( names( yrbss_df ) )
+
+yrbss_df[ , 'one' ] <- 1
+```
 
 ---
 
@@ -30,8 +97,6 @@ Construct a complex sample survey design:
 
 ```{r eval = FALSE }
 library(survey)
-
-yrbss_df <- readRDS( file.path( path.expand( "~" ) , "YRBSS" , "2015 main.rds" ) )
 
 yrbss_design <- 
 	svydesign( 
@@ -51,10 +116,10 @@ yrbss_design <-
 	update( 
 		yrbss_design , 
 		q2 = q2 ,
-		never_rarely_wore_bike_helmet = as.numeric( qn8 == 1 ) ,
-		ever_smoked_marijuana = as.numeric( qn47 == 1 ) ,
-		ever_tried_to_quit_cigarettes = as.numeric( q36 > 2 ) ,
-		smoked_cigarettes_past_year = as.numeric( q36 > 1 )
+		never_rarely_wore_seat_belt = as.numeric( qn8 == 1 ) ,
+		ever_used_marijuana = as.numeric( qn45 == 1 ) ,
+		tried_to_quit_tobacco_past_year = as.numeric( q39 == 2 ) ,
+		used_tobacco_past_year = as.numeric( q39 > 1 )
 	)
 ```
 
@@ -64,7 +129,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 sum( weights( yrbss_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ ever_smoked_marijuana , yrbss_design , unwtd.count )
+svyby( ~ one , ~ ever_used_marijuana , yrbss_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
@@ -72,7 +137,7 @@ Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , yrbss_design )
 
-svyby( ~ one , ~ ever_smoked_marijuana , yrbss_design , svytotal )
+svyby( ~ one , ~ ever_used_marijuana , yrbss_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
@@ -81,28 +146,28 @@ Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svymean( ~ bmipct , yrbss_design , na.rm = TRUE )
 
-svyby( ~ bmipct , ~ ever_smoked_marijuana , yrbss_design , svymean , na.rm = TRUE )
+svyby( ~ bmipct , ~ ever_used_marijuana , yrbss_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svymean( ~ q2 , yrbss_design , na.rm = TRUE )
 
-svyby( ~ q2 , ~ ever_smoked_marijuana , yrbss_design , svymean , na.rm = TRUE )
+svyby( ~ q2 , ~ ever_used_marijuana , yrbss_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ bmipct , yrbss_design , na.rm = TRUE )
 
-svyby( ~ bmipct , ~ ever_smoked_marijuana , yrbss_design , svytotal , na.rm = TRUE )
+svyby( ~ bmipct , ~ ever_used_marijuana , yrbss_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ q2 , yrbss_design , na.rm = TRUE )
 
-svyby( ~ q2 , ~ ever_smoked_marijuana , yrbss_design , svytotal , na.rm = TRUE )
+svyby( ~ q2 , ~ ever_used_marijuana , yrbss_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
@@ -111,7 +176,7 @@ svyquantile( ~ bmipct , yrbss_design , 0.5 , na.rm = TRUE )
 
 svyby( 
 	~ bmipct , 
-	~ ever_smoked_marijuana , 
+	~ ever_used_marijuana , 
 	yrbss_design , 
 	svyquantile , 
 	0.5 ,
@@ -124,8 +189,8 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ ever_tried_to_quit_cigarettes , 
-	denominator = ~ smoked_cigarettes_past_year , 
+	numerator = ~ tried_to_quit_tobacco_past_year , 
+	denominator = ~ used_tobacco_past_year , 
 	yrbss_design ,
 	na.rm = TRUE
 )
@@ -135,7 +200,7 @@ svyratio(
 
 Restrict the survey design to youths who ever drank alcohol:
 ```{r eval = FALSE , results = "hide" }
-sub_yrbss_design <- subset( yrbss_design , qn41 == 1 )
+sub_yrbss_design <- subset( yrbss_design , qn40 > 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
@@ -156,7 +221,7 @@ cv( this_result )
 grouped_result <-
 	svyby( 
 		~ bmipct , 
-		~ ever_smoked_marijuana , 
+		~ ever_used_marijuana , 
 		yrbss_design , 
 		svymean ,
 		na.rm = TRUE 
@@ -189,7 +254,7 @@ svymean( ~ bmipct , yrbss_design , na.rm = TRUE , deff = "replace" )
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-svyciprop( ~ never_rarely_wore_bike_helmet , yrbss_design ,
+svyciprop( ~ never_rarely_wore_seat_belt , yrbss_design ,
 	method = "likelihood" , na.rm = TRUE )
 ```
 
@@ -197,13 +262,13 @@ svyciprop( ~ never_rarely_wore_bike_helmet , yrbss_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( bmipct ~ never_rarely_wore_bike_helmet , yrbss_design )
+svyttest( bmipct ~ never_rarely_wore_seat_belt , yrbss_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
 svychisq( 
-	~ never_rarely_wore_bike_helmet + q2 , 
+	~ never_rarely_wore_seat_belt + q2 , 
 	yrbss_design 
 )
 ```
@@ -212,7 +277,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		bmipct ~ never_rarely_wore_bike_helmet + q2 , 
+		bmipct ~ never_rarely_wore_seat_belt + q2 , 
 		yrbss_design 
 	)
 
@@ -222,6 +287,8 @@ summary( glm_result )
 ---
 
 ## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
 
 ---
 
@@ -239,7 +306,7 @@ yrbss_srvyr_design %>%
 	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
 
 yrbss_srvyr_design %>%
-	group_by( ever_smoked_marijuana ) %>%
+	group_by( ever_used_marijuana ) %>%
 	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
 ```
 
@@ -247,17 +314,17 @@ yrbss_srvyr_design %>%
 
 ## Replication Example {-}
 
-This snippet replicates the "never/rarely wore bicycle helmet" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2015/2015_yrbs_analysis_software.pdf#page=29).
+This snippet replicates the "never/rarely wore seat belt" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2019/2019_yrbs_analysis_software.pdf#page=29).
 
 ```{r eval = FALSE , results = "hide" }
 
-unwtd.count( ~ never_rarely_wore_bike_helmet , yrbss_design )
+unwtd.count( ~ never_rarely_wore_seat_belt , yrbss_design )
 
-svytotal( ~ one , subset( yrbss_design , !is.na( never_rarely_wore_bike_helmet ) ) )
+svytotal( ~ one , subset( yrbss_design , !is.na( never_rarely_wore_seat_belt ) ) )
  
-svymean( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE )
+svymean( ~ never_rarely_wore_seat_belt , yrbss_design , na.rm = TRUE )
 
-svyciprop( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE , method = "beta" )
+svyciprop( ~ never_rarely_wore_seat_belt , yrbss_design , na.rm = TRUE , method = "beta" )
 
 ```
 
