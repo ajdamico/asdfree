@@ -35,7 +35,7 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-Load the `SAScii` library to import dat files and also re-arrange the SAS input program:
+Load the `SAScii` library to interpret a SAS input program, and also re-arrange the SAS input program:
 ```{r eval = FALSE }
 library(SAScii)
 
@@ -44,24 +44,28 @@ sas_url <-
 
 sas_text <- tolower( readLines( sas_url ) )
 
-# find the site location
-site.location <- which( sas_text == '@1 site $3.' )
+# find the (out of numerical order)
+# `site` location variable's position
+# within the SAS input program
+site_location <- which( sas_text == '@1 site $3.' )
 
-# find the start field location
-input.location <- which( sas_text == "input" )
+# find the start field's position
+# within the SAS input program
+input_location <- which( sas_text == "input" )
 
 # create a vector from 1 to the length of the text file
 sas_length <- seq( length( sas_text ) )
 
-# remove the site location
-sas_length <- sas_length[ -site.location ]
+# remove the site_location
+sas_length <- sas_length[ -site_location ]
 
-# re-insert the site location right after input
+# re-insert the site variable's location
+# immediately after the starting position
 sas_reorder <- 
 	c( 
-		sas_length[ seq( input.location ) ] , 
-		site.location , 
-		sas_length[ seq( input.location + 1 , length( sas_length ) ) ] 
+		sas_length[ seq( input_location ) ] , 
+		site_location , 
+		sas_length[ seq( input_location + 1 , length( sas_length ) ) ] 
 	)
 
 # re-order the sas text file

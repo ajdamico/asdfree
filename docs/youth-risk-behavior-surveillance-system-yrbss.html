@@ -232,7 +232,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-1" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="youth-risk-behavior-surveillance-system-yrbss.html#download-import-preparation-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Load the <code>SAScii</code> library to import dat files and also re-arrange the SAS input program:</p>
+<p>Load the <code>SAScii</code> library to interpret a SAS input program, and also re-arrange the SAS input program:</p>
 <div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SAScii)</span>
 <span id="cb81-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb81-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-3" aria-hidden="true" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
@@ -240,32 +240,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb81-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb81-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-6" aria-hidden="true" tabindex="-1"></a>sas_text <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">readLines</span>( sas_url ) )</span>
 <span id="cb81-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-8" aria-hidden="true" tabindex="-1"></a><span class="co"># find the site location</span></span>
-<span id="cb81-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-9" aria-hidden="true" tabindex="-1"></a>site.location <span class="ot">&lt;-</span> <span class="fu">which</span>( sas_text <span class="sc">==</span> <span class="st">&#39;@1 site $3.&#39;</span> )</span>
-<span id="cb81-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-11" aria-hidden="true" tabindex="-1"></a><span class="co"># find the start field location</span></span>
-<span id="cb81-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-12" aria-hidden="true" tabindex="-1"></a>input.location <span class="ot">&lt;-</span> <span class="fu">which</span>( sas_text <span class="sc">==</span> <span class="st">&quot;input&quot;</span> )</span>
-<span id="cb81-13"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-14"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-14" aria-hidden="true" tabindex="-1"></a><span class="co"># create a vector from 1 to the length of the text file</span></span>
-<span id="cb81-15"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-15" aria-hidden="true" tabindex="-1"></a>sas_length <span class="ot">&lt;-</span> <span class="fu">seq</span>( <span class="fu">length</span>( sas_text ) )</span>
+<span id="cb81-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-8" aria-hidden="true" tabindex="-1"></a><span class="co"># find the (out of numerical order)</span></span>
+<span id="cb81-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-9" aria-hidden="true" tabindex="-1"></a><span class="co"># `site` location variable&#39;s position</span></span>
+<span id="cb81-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-10" aria-hidden="true" tabindex="-1"></a><span class="co"># within the SAS input program</span></span>
+<span id="cb81-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-11" aria-hidden="true" tabindex="-1"></a>site_location <span class="ot">&lt;-</span> <span class="fu">which</span>( sas_text <span class="sc">==</span> <span class="st">&#39;@1 site $3.&#39;</span> )</span>
+<span id="cb81-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-13"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-13" aria-hidden="true" tabindex="-1"></a><span class="co"># find the start field&#39;s position</span></span>
+<span id="cb81-14"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-14" aria-hidden="true" tabindex="-1"></a><span class="co"># within the SAS input program</span></span>
+<span id="cb81-15"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-15" aria-hidden="true" tabindex="-1"></a>input_location <span class="ot">&lt;-</span> <span class="fu">which</span>( sas_text <span class="sc">==</span> <span class="st">&quot;input&quot;</span> )</span>
 <span id="cb81-16"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-17"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-17" aria-hidden="true" tabindex="-1"></a><span class="co"># remove the site location</span></span>
-<span id="cb81-18"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-18" aria-hidden="true" tabindex="-1"></a>sas_length <span class="ot">&lt;-</span> sas_length[ <span class="sc">-</span>site.location ]</span>
+<span id="cb81-17"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-17" aria-hidden="true" tabindex="-1"></a><span class="co"># create a vector from 1 to the length of the text file</span></span>
+<span id="cb81-18"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-18" aria-hidden="true" tabindex="-1"></a>sas_length <span class="ot">&lt;-</span> <span class="fu">seq</span>( <span class="fu">length</span>( sas_text ) )</span>
 <span id="cb81-19"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-20"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-20" aria-hidden="true" tabindex="-1"></a><span class="co"># re-insert the site location right after input</span></span>
-<span id="cb81-21"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-21" aria-hidden="true" tabindex="-1"></a>sas_reorder <span class="ot">&lt;-</span> </span>
-<span id="cb81-22"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( </span>
-<span id="cb81-23"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-23" aria-hidden="true" tabindex="-1"></a>        sas_length[ <span class="fu">seq</span>( input.location ) ] , </span>
-<span id="cb81-24"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-24" aria-hidden="true" tabindex="-1"></a>        site.location , </span>
-<span id="cb81-25"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-25" aria-hidden="true" tabindex="-1"></a>        sas_length[ <span class="fu">seq</span>( input.location <span class="sc">+</span> <span class="dv">1</span> , <span class="fu">length</span>( sas_length ) ) ] </span>
-<span id="cb81-26"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-26" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb81-27"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-28"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-28" aria-hidden="true" tabindex="-1"></a><span class="co"># re-order the sas text file</span></span>
-<span id="cb81-29"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-29" aria-hidden="true" tabindex="-1"></a>sas_text <span class="ot">&lt;-</span> sas_text[ sas_reorder ]</span>
-<span id="cb81-30"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-31"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-31" aria-hidden="true" tabindex="-1"></a>sas_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb81-32"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-33"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-33" aria-hidden="true" tabindex="-1"></a><span class="fu">writeLines</span>( sas_text , sas_tf )</span></code></pre></div>
+<span id="cb81-20"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-20" aria-hidden="true" tabindex="-1"></a><span class="co"># remove the site_location</span></span>
+<span id="cb81-21"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-21" aria-hidden="true" tabindex="-1"></a>sas_length <span class="ot">&lt;-</span> sas_length[ <span class="sc">-</span>site_location ]</span>
+<span id="cb81-22"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-23"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-23" aria-hidden="true" tabindex="-1"></a><span class="co"># re-insert the site variable&#39;s location</span></span>
+<span id="cb81-24"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-24" aria-hidden="true" tabindex="-1"></a><span class="co"># immediately after the starting position</span></span>
+<span id="cb81-25"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-25" aria-hidden="true" tabindex="-1"></a>sas_reorder <span class="ot">&lt;-</span> </span>
+<span id="cb81-26"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( </span>
+<span id="cb81-27"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-27" aria-hidden="true" tabindex="-1"></a>        sas_length[ <span class="fu">seq</span>( input_location ) ] , </span>
+<span id="cb81-28"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-28" aria-hidden="true" tabindex="-1"></a>        site_location , </span>
+<span id="cb81-29"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-29" aria-hidden="true" tabindex="-1"></a>        sas_length[ <span class="fu">seq</span>( input_location <span class="sc">+</span> <span class="dv">1</span> , <span class="fu">length</span>( sas_length ) ) ] </span>
+<span id="cb81-30"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-30" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb81-31"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-32"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-32" aria-hidden="true" tabindex="-1"></a><span class="co"># re-order the sas text file</span></span>
+<span id="cb81-33"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-33" aria-hidden="true" tabindex="-1"></a>sas_text <span class="ot">&lt;-</span> sas_text[ sas_reorder ]</span>
+<span id="cb81-34"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-35"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-35" aria-hidden="true" tabindex="-1"></a>sas_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb81-36"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-37"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb81-37" aria-hidden="true" tabindex="-1"></a><span class="fu">writeLines</span>( sas_text , sas_tf )</span></code></pre></div>
 <p>Download and import the national file:</p>
 <div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb82-1" aria-hidden="true" tabindex="-1"></a>dat_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb82-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb82-2" aria-hidden="true" tabindex="-1"></a></span>
