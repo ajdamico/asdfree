@@ -1,4 +1,4 @@
-commit_memo <- "'intermish'"
+commit_memo <- "'remove confidentiality'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
