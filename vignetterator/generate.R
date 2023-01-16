@@ -263,7 +263,7 @@ for ( i in seq_along( chapter_tag ) ){
 # writeLines( "`r if (knitr:::is_html_output()) '# References {-}'`" , paste0( book_folder , "references.Rmd" ) )
 
 setwd( book_folder )
-clean_site()
+clean_site( preview = FALSE )
 render_site(output_format = 'bookdown::gitbook', encoding = 'UTF-8')
 # render_site( encoding = 'UTF-8' )
 
