@@ -9,7 +9,7 @@ Professor [Vito Muggeo](mailto:vito.muggeo@unipa.it) wrote the joinpoint analysi
 
 The purpose of this analysis is to make statistically valid statements such as, *"there was a significant linear decrease in the prevalence of high school aged americans who have ever smoked a cigarette across the period 1999-2011"* with complex sample survey data.
 
-This step-by-step walkthrough exactly reproduces the statistics presented in the [Center for Disease Control & Prevention's (CDC) linear trend analysis](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf).
+This step-by-step walkthrough exactly reproduces the statistics presented in the [Center for Disease Control & Prevention's (CDC) linear trend analysis](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf).  This analysis may complement qualitative evaluation on prevalence changes observed from surveillance data by providing quantitative evidence, such as when a joinpoint (also called breakpoint or changepoint) occurred; however, this analysis does not explain why or how changes in trends occur.
 
 
 ## Download, Import, Preparation {-}
@@ -130,7 +130,8 @@ prevalence_over_time <-
 		na.rm = TRUE 
 	)
 
-# confirm prevalence rates match published estimates of high school students that ever smoked
+# confirm prevalence rates match published estimates
+# of high school students that ever smoked
 stopifnot(
 	all.equal( 
 		round( coef( prevalence_over_time ) , 3 ) , 
@@ -146,7 +147,7 @@ Using the orthogonal coefficients (linear, quadratic, cubic terms) that we previ
 
 Epidemiological models typically control for possible confounding variables such as age, sex, and race/ethnicity, so those have been included alongside the linear, cubic, and quadratic year terms.
 
-Calculate the "ever smoked" binomial regression, adjusted by sex, grade, race/ethnicity, and a linear year contrast:
+Calculate the "ever smoked" regression, adjusted by sex, grade, race/ethnicity, and linear year contrast:
 ```{r eval = FALSE }
 linyear <- 
 	svyglm(
@@ -164,13 +165,13 @@ Since the linear trend is significant, we know there is at least one change acro
 
 -----
 
-**Interpretation note** about segments of time: The linear term `t11l` was significant, so we probably have a significant linear trend somewhere to report.  Now we need to figure out when that significant linear trend started and when it ended.  It might be semantically true that there was a significant linear decrease in high school aged smoking over the entire period of our data 1991-2011; however, it's inexact to end this analysis after only detecting a linear trend.  The purpose of the following few steps is really to *cordon off* different time points from one another.  As you'll see later, there actually was not any detectable decrease from 1991-1999.  The entirety of the decline in smoking occurred over the period from 1999-2011.  So these next (methodologically tricky) steps serve to provide you and your audience with a more careful statement of statistical significance.  It's not technically wrong to conclude that smoking declined over the period of 1991-2011, it's just verbose.
+**Interpretation note** about segments of time: The linear term `t11l` was significant, so we probably have a significant linear trend somewhere to report.  Now we need to figure out when that significant linear trend started and when it ended.  It might be semantically true that there was a significant linear decrease in high school aged smoking over the entire period of our data 1991-2011; however, it's inexact to end this analysis after only detecting a linear trend.  The purpose of the following few steps is to *cordon off* different time points from one another.  As you'll see later, there actually was not any detectable decrease from 1991-1999.  The entirety of the decline in smoking occurred over the period from 1999-2011.  So these next (methodologically tricky) steps serve to provide you and your audience with a more careful statement of statistical significance.  It's not technically wrong to conclude that smoking declined over the period of 1991-2011, it's just verbose.
 
 Think of it as the difference between "humans first walked on the moon in the sixties" and "humans first walked on the moon in 1969" - both statements are correct, but the latter exhibits greater scientific precision.
 
 -----
 
-Calculate the "ever smoked" binomial regression, adjusted by sex, grade, race/ethnicity, and both linear and quadratic year contrasts.  Notice the addition of `t11q`.
+Calculate the "ever smoked" binomial regression, adjusted by sex, grade, race/ethnicity, and both linear and quadratic year contrasts.  Notice the addition of `t11q`:
 
 ```{r eval = FALSE }
 quadyear <-
@@ -186,7 +187,7 @@ The linear year-contrast variable is significant but the quadratic year-contrast
 
 Since both linear and quadratic terms are significant, we can also move ahead and test whether the cubic term is also significant.
 
-Calculate the "ever smoked" binomial regression, adjusted by sex, grade, race/ethnicity, and linear, quadratic, and cubic year contrasts.  Notice the addition of `t11c`.
+Calculate the "ever smoked" binomial regression, adjusted by sex, grade, race/ethnicity, and linear, quadratic, and cubic year contrasts.  Notice the addition of `t11c`:
 ```{r eval = FALSE }
 cubyear <-
 	svyglm(
@@ -199,7 +200,7 @@ summary( cubyear )
 ```
 The cubic year-contrast term is also significant in this model.  Therefore, we might potentially evaluate this trend using two joinpoints.  In other words, a significant result for all linear, quadratic, and cubic year contrasts at this point means we might be able to evaluate three distinct trends (separated by our two joinpoints) across the broader 1991 - 2011 time period of analysis.
 
-Although we might have the statistical ability to analyze three distinct time periods (separated by two joinpoints) across our data, the utility of this depends on the circumstances.  Cubic and higher polynomials account for not only the direction of change but also the pace of that change, allowing statistical statements that might not be of interest to an audience:  While it might be an exercise in precision to conclude that smoking rates dropped quickest across 1999-2003 and less quick across 2003-2011 and not at all across 1991-1999, that scientific finding may not be as compelling as the simpler (quadratic but not cubic) statement that smoking rates have dropped across the period of 1999-2011.
+Although we might now have the statistical ability to analyze three distinct time periods (separated by two joinpoints) across our data, the utility of this depends on the circumstances.  Cubic and higher polynomials account for not only the direction of change but also the pace of that change, allowing statistical statements that might not be of interest to an audience:  While it might be an exercise in precision to conclude that smoking rates dropped quickest across 1999-2003 and less quickly across 2003-2011, that scientific pair of findings may not be as compelling as the simpler (quadratic but not cubic) statement that smoking rates have dropped across the period of 1999-2011.
 
 
 ## Calculate Predicted Marginals {-}
@@ -214,7 +215,7 @@ marginals <-
 	)
 ```
 
-Run these marginals through the `svypredmeans` function written by Dr. Thomas Lumley.  For any archaeology fans out there, this function emulates the `PREDMARG` statement in the ancient language of SUDAAN.
+Run these marginals through the `svypredmeans` function.  For archaeology fans out there, this function emulates the `PREDMARG` statement in the ancient language of SUDAAN:
 ```{r eval = FALSE }
 ( means_for_joinpoint <- svypredmeans( marginals , ~factor( year ) ) )
 ```
@@ -233,11 +234,9 @@ means_for_joinpoint <- means_for_joinpoint[ order( means_for_joinpoint[ , "year"
 
 
 
-## Identify the Joinpoint(s), Breakpoint(s), or Changepoint(s) {-}
+## Identify Joinpoint(s) or Breakpoint(s) {-}
 
-The original CDC analysis recommended some [external software from the National Cancer Institute](http://surveillance.cancer.gov/joinpoint/), which only runs on selected platforms. Dr. Vito Muggeo wrote this within-R solution using his [segmented](https://cran.r-project.org/web/packages/segmented/index.html) package available on CRAN.  Let's take a look at how confident we are in the value at each adjusted timepoint.  Carrying out a trend analysis requires creating new weights to fit a piecewise linear regression.
-
-First, create that weight variable:
+Let's take a look at how confident we are in the value at each adjusted timepoint.  Carrying out a trend analysis requires creating new weights to fit a piecewise linear regression.  First, create that weight variable:
 
 ```{r eval = FALSE }
 means_for_joinpoint[ , "wgt" ] <- with( means_for_joinpoint, ( mean / SE ) ^ 2 ) 
@@ -258,20 +257,20 @@ os <- segmented( o , ~year )
 summary( os )
 ```
 
-See the `Estimated Break-Point(s)` in that result?  That's the critical number from this joinpoint analysis.  The [R `segmented` package](https://cran.r-project.org/web/packages/segmented/index.html) uses an iterative procedure (described in the article below) and therefore between-year solutions are returned.  The joinpoint software implements two estimating algorithms: the grid-search and the Hudson algorithm.  For more detail about these methods, see [Muggeo V. (2003) Estimating regression models with unknown break-points. Statistics in Medicine, 22: 3055-3071.](http://onlinelibrary.wiley.com/doi/10.1002/sim.1545/abstract).
+Look for the `Estimated Break-Point(s)` in that result - that's the critical number from this joinpoint analysis.  The `segmented` package uses an iterative procedure (described in the article below); between-year solutions are returned and should be rounded to the nearest time point in the analysis.  The joinpoint software implements two estimating algorithms: the grid-search and the Hudson algorithm.  For more detail about these methods, see [Muggeo V. (2003) Estimating regression models with unknown break-points. Statistics in Medicine, 22: 3055-3071.](http://onlinelibrary.wiley.com/doi/10.1002/sim.1545/abstract).
 
-Obtain the annual percent change (APC=) estimates for each time point:
+Obtain the annual percent change estimates for each time point:
 ```{r eval = FALSE }
 slope( os , APC = TRUE )
 ```
 
-The returned CIs for the annual percent change (APC) may be different from the ones returned by [NCI's Joinpoint Software](surveillance.cancer.gov/joinpoint/); for further details, check out [Muggeo V. (2010) A Comment on `Estimating average annual per cent change in trend analysis' by Clegg et al., Statistics in Medicine; 28, 3670-3682. Statistics in Medicine, 29, 1958-1960.](http://onlinelibrary.wiley.com/doi/10.1002/sim.3850/abstract)
+The confidence intervals for the annual percent change (APC) may be different from the ones returned by [NCI's Joinpoint Software](surveillance.cancer.gov/joinpoint/); for further details, check out [Muggeo V. (2010) A Comment on `Estimating average annual per cent change in trend analysis' by Clegg et al., Statistics in Medicine; 28, 3670-3682. Statistics in Medicine, 29, 1958-1960.](http://onlinelibrary.wiley.com/doi/10.1002/sim.3850/abstract)
 
-This analysis returned similar results to the NCI's Joinpoint Regression Program by estimating a changepoint at `year=1999` - and, more precisely, that the start of that decreasing trend in smoking prevalence happened at an APC of -3.92 percent.  That is, `slope2` from the output above.
+This analysis returned similar results to the NCI's Joinpoint Regression Program by estimating a joinpoint at `year=1999` - and, more precisely, that the start of that decreasing trend in smoking prevalence happened at an APC of -3.92 percent.  That is, `slope2` from the output above.
 
-Remember that the cubic-year model above had significant terms.  Therefore, it would be statistically defensible to calculate two joinpoints rather than only one.  However, for this analyses, breaking the 1999-2011 trend into two separate downward trends might not be of interest to the audience.  Looking at the `slope2` and `slope3` estimates and confidence intervals, we might be able to conclude that "ever smoking" decreased across 1999-2003 and also decreased (albeit less rapidly) across 2003-2011.  Communicating two consecutive downward trends might not be of much interest to a lay audience.  Forgoing this second possible joinpoint makes sense when the direction of change is more compelling than the pace of change:
+Remember that the cubic-year model above had significant terms as well.  Therefore, it would be statistically defensible to calculate two joinpoints rather than only one.  However, for this analyses, breaking the 1999-2011 trend into two separate downward trends might not be of interest to the audience.  Looking at the `slope2` and `slope3` estimates and confidence intervals, we might be able to conclude that "ever smoking" decreased across 1999-2003 and also decreased (albeit less rapidly) across 2003-2011.  However, communicating two *consecutive* downward trends might not be of much interest to a lay audience.  Forgoing a second possible joinpoint makes sense when the direction of change is more compelling than the pace of change:
 ```{r eval = FALSE }
-# find two joinpoints
+# find two joinpoints rather than only one
 os2 <- segmented( o , ~year , npsi = 2 )
 
 summary( os2 )
@@ -283,9 +282,9 @@ slope( os2 , APC = TRUE )
 
 
 
-## Make statistically defensible statements about linear trends with complex survey data {-}
+## Make statistically defensible conclusions {-}
 
-After identifying the change point for smoking prevalence, we can create two regression models (one for each time segment).  (If we had two joinpoints, we would need three regression models.)  The first model covers the years leading up to (and including) the changepoint (i.e., 1991 to 1999).  The second model includes the years from the changepoint forward (i.e., 1999 to 2011).  So start with 1991, 1993, 1995, 1997, 1999, the five year-points before (and including 1999).
+After identifying the change point for smoking prevalence, we can create two regression models (one for each time segment - if we had two joinpoints, we would need three regression models).  The first model covers the years leading up to (and including) the joinpoint (i.e., 1991 to 1999).  The second model includes the years from the joinpoint forward (i.e., 1999 to 2011).  So start with 1991, 1993, 1995, 1997, 1999, the five year-points before (and including) 1999:
 
 ```{r eval = FALSE }
 # calculate a five-timepoint linear contrast vector
@@ -307,11 +306,10 @@ summary( pre_91_99 )
 stopifnot( round( pre_91_99$coefficients['t5l'] , 5 ) == .03704 )
 ```
 
-Reproduce the sentence on [pdf page 6 of the original document](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6).  **In this example, T5L_L had a p-value=0.52261 and beta=0.03704. Therefore, there was "no significant change in the prevalence of ever smoking a cigarette during 1991-1999."**
+This reproduces the calculations behind the sentence on [pdf page 6 of the original document](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6):  **In this example, T5L_L had a p-value=0.52261 and beta=0.03704. Therefore, there was "no significant change in the prevalence of ever smoking a cigarette during 1991-1999."**
 
 
-Then move on to 1999, 2001, 2003, 2005, 2007, 2009, and 2011, the seven year-points after (and including 1999).
-
+Then move on to 1999, 2001, 2003, 2005, 2007, 2009, and 2011, the seven year-points after (and including) 1999:
 
 ```{r eval = FALSE }
 # calculate a seven-timepoint linear contrast vector
@@ -333,5 +331,4 @@ summary( post_99_11 )
 stopifnot( round( post_99_11$coefficients['t7l'] , 5 ) == -0.99165 )
 ``` 
 
-
-Reproduce the sentence on [pdf page 6 of the original document](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6).  **In this example, T7L_R had a p-value<0.0001 and beta=-0.99165. Therefore, there was a "significant linear decrease in the prevalence of ever smoking a cigarette during 1999-2011."**
+This reproduces the calculations behind the sentence on [pdf page 6 of the original document](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6):  **In this example, T7L_R had a p-value<0.0001 and beta=-0.99165. Therefore, there was a "significant linear decrease in the prevalence of ever smoking a cigarette during 1999-2011."**
