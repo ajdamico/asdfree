@@ -1,0 +1,301 @@
+# European Social Survey (ESS) {-}
+
+```{r , echo = FALSE }
+
+most_recent_build_date <- gsub( "-" , " " , as.Date( file.info( "ess.Rmd" )$mtime ) )
+
+ess_badge <- paste0( "<img src='https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-" , most_recent_build_date , "-brightgreen' alt='Local Testing Badge'>" )
+
+```
+
+`r ess_badge`
+
+The European Social Survey measures political opinion and behavior across the continent.
+
+* One table per country with one row per sampled respondent.
+
+* A complex sample survey designed to generalize to residents aged 15 and older in participating nations.
+
+* Released biennially since 2002.
+
+* Headquartered at [City, University of London](http://www.city.ac.uk/) and governed by [a scientific team across Europe](http://www.europeansocialsurvey.org/about/structure_and_governance.html).
+
+---
+
+Please skim before you begin:
+
+1. 
+
+2. 
+
+3. This poem
+
+```{r}
+# 
+# 
+# 
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+```{r , cache = TRUE , cache.extra = getRversion() }
+library(lodown)
+library(lavaan.survey)	
+options( survey.lonely.psu = "adjust" )
+
+print('test')
+
+print( system.time( x <- haven::read_spss( file.path( path.expand( "~" ) , "ESS4e04_5.sav/ESS4e04_5.sav" ) ) ) )
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+Construct a complex sample survey design:
+
+```{r eval = FALSE }
+
+```
+
+```{r eval = FALSE }
+library(survey)
+
+ess_be_df <- 
+	readRDS( file.path( path.expand( "~" ) , "ESS" , "2014/ESS7BE.rds" ) )
+
+ess_sddf_df <- 
+	readRDS( file.path( path.expand( "~" ) , "ESS" , "2014/ESS7SDDFe01_1.rds" ) )
+
+ess_df <-
+	merge( 
+		ess_be_df , 
+		ess_sddf_df , 
+		by = c( 'cntry' , 'idno' ) 
+	)
+
+stopifnot( nrow( ess_df ) == nrow( ess_be_df ) )
+
+ess_design <- 
+	svydesign(
+		ids = ~psu ,
+		strata = ~stratify ,
+		probs = ~prob ,
+		data = ess_df
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+ess_design <- 
+	update( 
+		ess_design , 
+		
+		one = 1 ,
+		
+		non_european_immigrants =
+			factor( impcntr ,
+				labels = c( 'Allow many to come and live here' , 
+				'Allow some' , 'Allow a few' , 'Allow none' )
+			) ,
+		
+		sex = factor( icgndra , labels = c( 'male' , 'female' ) ) ,
+			
+		more_than_one_hour_tv_daily = as.numeric( tvtot >= 3 )
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( ess_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ non_european_immigrants , ess_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , ess_design )
+
+svyby( ~ one , ~ non_european_immigrants , ess_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ ppltrst , ess_design )
+
+svyby( ~ ppltrst , ~ non_european_immigrants , ess_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ sex , ess_design , na.rm = TRUE )
+
+svyby( ~ sex , ~ non_european_immigrants , ess_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ ppltrst , ess_design )
+
+svyby( ~ ppltrst , ~ non_european_immigrants , ess_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ sex , ess_design , na.rm = TRUE )
+
+svyby( ~ sex , ~ non_european_immigrants , ess_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ ppltrst , ess_design , 0.5 )
+
+svyby( 
+	~ ppltrst , 
+	~ non_european_immigrants , 
+	ess_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE ,
+	keep.var = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ ppltrst , 
+	denominator = ~ pplfair , 
+	ess_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to voters:
+```{r eval = FALSE , results = "hide" }
+sub_ess_design <- subset( ess_design , vote == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ ppltrst , sub_ess_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ ppltrst , ess_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ ppltrst , 
+		~ non_european_immigrants , 
+		ess_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( ess_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ ppltrst , ess_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ ppltrst , ess_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ ppltrst , ess_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ more_than_one_hour_tv_daily , ess_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( ppltrst ~ more_than_one_hour_tv_daily , ess_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ more_than_one_hour_tv_daily + sex , 
+	ess_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		ppltrst ~ more_than_one_hour_tv_daily + sex , 
+		ess_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ESS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+ess_srvyr_design <- as_survey( ess_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+ess_srvyr_design %>%
+	summarize( mean = survey_mean( ppltrst ) )
+
+ess_srvyr_design %>%
+	group_by( non_european_immigrants ) %>%
+	summarize( mean = survey_mean( ppltrst ) )
+```
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+

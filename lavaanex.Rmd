@@ -1,7 +1,16 @@
 # Structural Equation Models (SEM) with Complex Survey Data {-}
  
-<a href="https://github.com/asdfree/lavaanex/actions"><img src="https://github.com/asdfree/lavaanex/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
  
+```{r , echo = FALSE }
+most_recent_build_date <- gsub( "\\-" , " " , as.Date( file.info( "lavaanex.Rmd" )$mtime ) )
+
+lavaanex_badge <- paste0( '<img src="https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-' , most_recent_build_date , '-brightgreen" alt="Local Testing Badge">' )
+```
+
+`r lavaanex_badge`
+
+
+
 *Contributed by Dr. Daniel Oberski <<daniel.oberski@gmail.com>>*
 
 The R `lavaan.survey` package by [Dr. Daniel Oberski](http://daob.nl) fits structural equation models to complex survey microdata, described in his [JSS article](https://www.jstatsoft.org/article/view/v057i01).
@@ -11,19 +20,24 @@ install.packages( "lavaan.survey" , repos = "http://cran.rstudio.com/" )
 ```
 
 ## Load the 2008 Wave of the European Social Survey German and Spanish Microdata {-}
-```{r eval = FALSE}
+```{r , cache = TRUE , cache.extra = getRversion()  }
 library(lodown)
 library(lavaan.survey)	
 options( survey.lonely.psu = "adjust" )
 
+print('test')
+
+print( system.time( x <- haven::read_spss( file.path( path.expand( "~" ) , "ESS4e04_5.sav/ESS4e04_5.sav" ) ) ) )
+
 # retrieve a listing of all available extracts for the european social survey
-ess_cat <- get_catalog( "ess" , output_dir = file.path( path.expand( "~" ) , "ESS" ) )
+# ess_cat <- get_catalog( "ess" , output_dir = file.path( path.expand( "~" ) , "ESS" ) )
 
 # limit the catalog to only wave #4 for germany and spain
-ess_cat <- subset( ess_cat , wave == 4 & grepl( "c=DE|c=ES" , full_url ) )
+# ess_cat <- subset( ess_cat , wave == 4 & grepl( "c=DE|c=ES" , full_url ) )
 
 # download the ess microdata
-lodown( "ess" , ess_cat , your_email = "email@address.com" )
+# lodown( "ess" , ess_cat , your_email = "email@address.com" )
+
 ```
 
 Immediately pull the German files into the workspace:

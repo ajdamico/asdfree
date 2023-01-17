@@ -1,4 +1,4 @@
-commit_memo <- "'trendy mostly ready'"
+commit_memo <- "'cache tests and local testing'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -22,10 +22,10 @@ source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\syntaxt
 
 needs_actions_build_status_line <- '<a href="https://github.com/asdfree/chapter_tag/actions"><img src="https://github.com/asdfree/chapter_tag/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>'
 
+needs_local_build_status_line <- '```{r , echo = FALSE }\n\nmost_recent_build_date <- gsub( "\\-" , " " , as.Date( file.info( "chapter_tag.Rmd" )$mtime ) )\n\nchapter_tag_badge <- paste0( "<img src=\'https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-" , most_recent_build_date , "-brightgreen\' alt=\'Local Testing Badge\'>" )\n\n```\n\n`r chapter_tag_badge`\n\n'
+
+
 needs_dplyr_block <- '---\n\n## Analysis Examples with `dplyr` \\\\ {-}\n\nThe R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax.  [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation.  [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = "hide" }\nlibrary(dplyr)\ntbl_initiation_line\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = "hide" }\nchapter_tag_tbl %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n\nchapter_tag_tbl %>%\n\tgroup_by( group_by_variable ) %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n```'
-
-
-readme_md_text <- "# You can find the book at http://asdfree.com/"
 
 
 pull_chunk <-
@@ -49,7 +49,7 @@ pull_line <-
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "password_parameters" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
 sub_chunks <- c( "reading_block" , "download_and_import_block" , "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "intermission_block" , "convey_block" , "replacement_block" )
-needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_actions_build_status_line" )
+needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_actions_build_status_line" , "needs_local_build_status_line" )
 
 
 library(bookdown)
@@ -92,14 +92,33 @@ for( this_chunk in sub_chunks ){
 }
 
 
+# # invalidate all caches and delete all rmd files except for the index
+# rmd_files <- grep( "\\.Rmd$" , list.files( book_folder , full.names = TRUE ) , value = TRUE )
+# file.remove( rmd_files[ basename( rmd_files ) != 'index.Rmd' ] )
 
-# delete all rmd files except for the index
-rmd_files <- grep( "\\.Rmd$" , list.files( book_folder , full.names = TRUE ) , value = TRUE )
-file.remove( rmd_files[ basename( rmd_files ) != 'index.Rmd' ] )
 
 # move all rmd files in /posts/ to the main folder
 rmd_posts <- list.files( paste0( book_folder , "posts/" ) , full.names = TRUE )
-file.copy( rmd_posts , gsub( "posts\\/" , "" , rmd_posts ) )
+# overwrite only posts that have changed (so as not to invalidate the cache)
+for( this_post in rmd_posts ){
+	if(
+		is.na( tools::md5sum( gsub( "posts\\/" , "" , this_post ) ) )
+		
+		||
+		
+		( tools::md5sum( this_post ) != tools::md5sum( gsub( "posts\\/" , "" , this_post ) ) )
+		
+	){
+		
+			file.copy(
+				this_post ,
+				gsub( "posts\\/" , "" , this_post ) ,
+				overwrite = TRUE
+			)
+	}
+}
+
+
 
 
 for ( i in seq_along( chapter_tag ) ){
@@ -121,12 +140,6 @@ for ( i in seq_along( chapter_tag ) ){
 	for( this_block in needs_this_block ){
 		rmd_lines <- gsub( this_block , if( any( grepl( paste0( "^" , this_block , ": yes" ) , tolower( full_text[[i]] ) ) ) ) get( this_block ) else "" , rmd_lines )
 	}
-	
-	# store the build status badges
-	if( any( grepl( "^needs_actions_build_status_line: yes" , tolower( full_text[[i]] ) ) ) ) {
-		readme_md_text <- c( readme_md_text , paste0( chapter_tag[ i ] , ": " , gsub( "chapter_tag" , chapter_tag[ i ] , needs_actions_build_status_line ) , '\n' ) )
-	}
-	
 	
 	if( !is_survey ) rmd_lines <- gsub( "tbl_initiation_line" , if( is_db ) "library(dbplyr)\ndplyr_db <- dplyr::src_sqlite( dbdir )\nchapter_tag_tbl <- tbl( dplyr_db , 'sql_tablename' )" else "chapter_tag_tbl <- tbl_df( chapter_tag_df )" , rmd_lines )
 	
@@ -256,7 +269,29 @@ for ( i in seq_along( chapter_tag ) ){
 		for( this_replacement in seq( 2 , length( replacement_block[[i]] ) , by = 2 ) ) rmd_lines <- gsub( replacement_block[[i]][ this_replacement - 1 ] , replacement_block[[i]][ this_replacement ] , rmd_lines , fixed = TRUE )
 	}
 	
-	writeLines( rmd_lines , this_rmd )
+	
+	temp_rmd <- tempfile()
+	writeLines( rmd_lines , temp_rmd )
+		
+	# overwrite only posts that have changed (so as not to invalidate the cache)
+	if(
+		is.na( tools::md5sum( this_rmd ) )
+		
+		||
+		
+		( tools::md5sum( this_rmd ) != tools::md5sum( temp_rmd ) )
+		
+	){
+		
+			file.copy(
+				temp_rmd ,
+				this_rmd ,
+				overwrite = TRUE
+			)
+	}
+
+
+	
 
 }
 
@@ -308,6 +343,7 @@ for( this_metafile in metafiles ){
 }
 # end of redirecting "edit" buttons on metadata-driven pages #
 
+
 # delete the datasets folder
 datasets_path <- normalizePath( file.path( path.expand( "~" ) , "Github/datasets/" ) , winslash = '/' )
 file.remove( list.files( datasets_path , recursive = TRUE , full.names = TRUE , include.dirs = TRUE ) )
@@ -353,40 +389,15 @@ for( this_ci_file in ci_rmd_files ){
 		for( this_file in copied_files ){
 		
 			these_lines <- readLines( this_file )
-
-			if( basename( this_file ) == 'DESCRIPTION' ) {
-				
-				if( grepl( 'archive' , needed_libraries ) ) {
-				
-					these_lines <- gsub( "desc_remotes_line" , "Remotes: jimhester/archive" , these_lines )
-					
-				} else these_lines <- gsub( "desc_remotes_line" , "" , these_lines )
-				
-			}
 			
 			if( grepl( 'setup\\.R$' , this_file ) ){
-
-				environment_variables <- pull_chunk( this_metadata_file , "environment_variables_block" )
-
-				these_lines <- c( these_lines , environment_variables )
-				
-				msrb <- pull_chunk( this_metadata_file , "machine_specific_replacements_block" )
-			
-				msrb <- gsub( "CHAPTER_TAG" , toupper( chapter_tag ) , msrb )
-					
-				if( identical( msrb , '' ) ) msrb <- c("machine_specific_replacements <- ", "\tlist( ", "\t\t", "\t\t# replace the folder path on macnix", paste0( "\t\tc( 'path.expand( \\\"~\\\" ) , \\\"" , toupper( chapter_tag ) , "\\\"' , 'getwd()' ) ," ), "\t\t", "\t\t# change other things in the script to be run", "\t\tc( \"hello\" , \"howdy\" )", "\t)")
-
-				eval( parse( text = msrb ) )
 			
 				these_lines <- 
 					c( 
 
 						these_lines , 
 						
-						syntaxtractor( 
-							chapter_tag , 
-							replacements = machine_specific_replacements
-						)
+						syntaxtractor( chapter_tag )
 						
 					)
 				
@@ -408,50 +419,12 @@ for( this_ci_file in ci_rmd_files ){
 	# do this for tutorial pages
 	} else {
 
-		readme_md_text <- 
-			sort( c( 
-				readme_md_text , 
-				paste0( chapter_tag , ": " , ' <a href="https://github.com/asdfree/' , chapter_tag , '/actions"><img src="https://github.com/asdfree/' , chapter_tag , '/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>\n' )
-			) )
-			
-			 
-	
-		if( chapter_tag == "lavaanex" ){
-		
-			needed_libraries <- paste( needed_libraries , "memisc" , sep = ", " )
-		
-			machine_specific_replacements <- 
-				list( 
-					
-					# replace the folder path on macnix
-					c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
-					
-					# change other things in the script to be run
-					c( "hello" , "howdy" ) ,
-					
-					c( '"email@address.com"' , 'Sys.getenv( "my_email_address" )' )
-					
-				)
-		} else {
-			machine_specific_replacements <- 
-				list( 
-					
-					# replace the folder path on macnix
-					c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
-					
-					# change other things in the script to be run
-					c( "hello" , "howdy" )
-					
-				)
-		}
-		
-
 		setup_fn <- grep( "setup\\.R$" , copied_files , value = TRUE )
 		
 		these_lines <- 
 			c(
 				readLines( setup_fn ) ,
-				syntaxtractor( chapter_tag , replacements = machine_specific_replacements )
+				syntaxtractor( chapter_tag )
 			)
 			
 		writeLines( these_lines , setup_fn )
@@ -495,7 +468,27 @@ for( this_ci_file in ci_rmd_files ){
 
 }
 
+
+
+# collect all build status badges:
+readme_md_text <- 
+	c(
+		"# You can find the book at http://asdfree.com/" ,
+		unlist( 
+			lapply( 
+				grep( "\\html$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/docs" ) , full.names = TRUE ) , value = TRUE ) , 
+				function( w ){
+					v <- grep( 'Github Actions Badge|Local Testing Badge' , readLines( w ) , value = TRUE )
+					if( length( v ) > 0 ) paste( gsub( "\\.html" , ":" , basename( w ) ) , v ) else NULL
+				}
+			)
+		)
+	)
+
+
 writeLines( readme_md_text , file.path( path.expand( "~" ) , "Github/asdfree/README.md" ) )
+
+
 
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add -u" ) )
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add ." ) )
