@@ -29,7 +29,7 @@
   
   
 <link rel="prev" href="american-community-survey-acs.html"/>
-<link rel="next" href="structural-equation-models-sem-with-complex-survey-data.html"/>
+<link rel="next" href="trend-analysis-of-complex-survey-data.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -170,13 +170,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="european-social-survey-ess.html"><a href="european-social-survey-ess.html#analysis-examples-with-srvyr-1"><i class="fa fa-check"></i>Analysis Examples with <code>srvyr</code>  </a></li>
 <li class="chapter" data-level="" data-path="european-social-survey-ess.html"><a href="european-social-survey-ess.html#replication-example"><i class="fa fa-check"></i>Replication Example</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="structural-equation-models-sem-with-complex-survey-data.html"><a href="structural-equation-models-sem-with-complex-survey-data.html"><i class="fa fa-check"></i>Structural Equation Models (SEM) with Complex Survey Data</a>
-<ul>
-<li class="chapter" data-level="" data-path="structural-equation-models-sem-with-complex-survey-data.html"><a href="structural-equation-models-sem-with-complex-survey-data.html#load-the-2008-wave-of-the-european-social-survey-german-and-spanish-microdata"><i class="fa fa-check"></i>Load the 2008 Wave of the European Social Survey German and Spanish Microdata</a></li>
-<li class="chapter" data-level="" data-path="structural-equation-models-sem-with-complex-survey-data.html"><a href="structural-equation-models-sem-with-complex-survey-data.html#two-factor-cfa-of-attitudes-toward-the-welfare-state"><i class="fa fa-check"></i>Two-factor CFA of attitudes toward the welfare state</a></li>
-<li class="chapter" data-level="" data-path="structural-equation-models-sem-with-complex-survey-data.html"><a href="structural-equation-models-sem-with-complex-survey-data.html#invariance-testing-on-schwarz-human-values-while-accounting-for-the-survey-design."><i class="fa fa-check"></i>Invariance testing on Schwarz human values while accounting for the survey design.</a></li>
-<li class="chapter" data-level="" data-path="structural-equation-models-sem-with-complex-survey-data.html"><a href="structural-equation-models-sem-with-complex-survey-data.html#an-example-with-a-latent-variable-regression"><i class="fa fa-check"></i>An example with a Latent Variable Regression</a></li>
-</ul></li>
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html"><i class="fa fa-check"></i>Trend Analysis of Complex Survey Data</a>
 <ul>
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html#download-import-preparation-2"><i class="fa fa-check"></i>Download, Import, Preparation</a></li>
@@ -247,175 +240,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-1" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="european-social-survey-ess.html#download-import-preparation-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="european-social-survey-ess.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lodown)</span>
-<span id="cb31-2"><a href="european-social-survey-ess.html#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan.survey)  </span>
-<span id="cb31-3"><a href="european-social-survey-ess.html#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>( <span class="at">survey.lonely.psu =</span> <span class="st">&quot;adjust&quot;</span> )</span>
-<span id="cb31-4"><a href="european-social-survey-ess.html#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-5"><a href="european-social-survey-ess.html#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&#39;test&#39;</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;test&quot;</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="european-social-survey-ess.html#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>( <span class="fu">system.time</span>( x <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_spss</span>( <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ESS4e04_5.sav/ESS4e04_5.sav&quot;</span> ) ) ) )</span></code></pre></div>
-<pre><code>##    user  system elapsed 
-##    8.26    0.17    8.47</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="european-social-survey-ess.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(foreign)</span>
+<span id="cb31-2"><a href="european-social-survey-ess.html#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="european-social-survey-ess.html#cb31-3" aria-hidden="true" tabindex="-1"></a>ess_be_df <span class="ot">&lt;-</span> </span>
+<span id="cb31-4"><a href="european-social-survey-ess.html#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read.spss</span>( </span>
+<span id="cb31-5"><a href="european-social-survey-ess.html#cb31-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">file.path</span>( </span>
+<span id="cb31-6"><a href="european-social-survey-ess.html#cb31-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , </span>
+<span id="cb31-7"><a href="european-social-survey-ess.html#cb31-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;ESS-Data-Wizard-subset-2023-01-17.sav/ESS-Data-Wizard-subset-2023-01-17.sav&quot;</span> </span>
+<span id="cb31-8"><a href="european-social-survey-ess.html#cb31-8" aria-hidden="true" tabindex="-1"></a>        ) ,</span>
+<span id="cb31-9"><a href="european-social-survey-ess.html#cb31-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">to.data.frame =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb31-10"><a href="european-social-survey-ess.html#cb31-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">use.value.labels =</span> <span class="cn">FALSE</span></span>
+<span id="cb31-11"><a href="european-social-survey-ess.html#cb31-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb31-12"><a href="european-social-survey-ess.html#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="european-social-survey-ess.html#cb31-13" aria-hidden="true" tabindex="-1"></a>ess_sddf_df <span class="ot">&lt;-</span></span>
+<span id="cb31-14"><a href="european-social-survey-ess.html#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read.spss</span>(</span>
+<span id="cb31-15"><a href="european-social-survey-ess.html#cb31-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">file.path</span>(</span>
+<span id="cb31-16"><a href="european-social-survey-ess.html#cb31-16" aria-hidden="true" tabindex="-1"></a>            <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) ,</span>
+<span id="cb31-17"><a href="european-social-survey-ess.html#cb31-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;ESS7SDDFe1_2.sav/ESS7SDDFe1_2.sav&quot;</span></span>
+<span id="cb31-18"><a href="european-social-survey-ess.html#cb31-18" aria-hidden="true" tabindex="-1"></a>        ) ,</span>
+<span id="cb31-19"><a href="european-social-survey-ess.html#cb31-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">to.data.frame =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb31-20"><a href="european-social-survey-ess.html#cb31-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">use.value.labels =</span> <span class="cn">FALSE</span></span>
+<span id="cb31-21"><a href="european-social-survey-ess.html#cb31-21" aria-hidden="true" tabindex="-1"></a>    )   </span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-the-survey-library-1" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with the <code>survey</code> library  <a href="european-social-survey-ess.html#analysis-examples-with-the-survey-library-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Construct a complex sample survey design:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="european-social-survey-ess.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb35-2"><a href="european-social-survey-ess.html#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-3"><a href="european-social-survey-ess.html#cb35-3" aria-hidden="true" tabindex="-1"></a>ess_be_df <span class="ot">&lt;-</span> </span>
-<span id="cb35-4"><a href="european-social-survey-ess.html#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">readRDS</span>( <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ESS&quot;</span> , <span class="st">&quot;2014/ESS7BE.rds&quot;</span> ) )</span>
-<span id="cb35-5"><a href="european-social-survey-ess.html#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-6"><a href="european-social-survey-ess.html#cb35-6" aria-hidden="true" tabindex="-1"></a>ess_sddf_df <span class="ot">&lt;-</span> </span>
-<span id="cb35-7"><a href="european-social-survey-ess.html#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">readRDS</span>( <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;ESS&quot;</span> , <span class="st">&quot;2014/ESS7SDDFe01_1.rds&quot;</span> ) )</span>
-<span id="cb35-8"><a href="european-social-survey-ess.html#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-9"><a href="european-social-survey-ess.html#cb35-9" aria-hidden="true" tabindex="-1"></a>ess_df <span class="ot">&lt;-</span></span>
-<span id="cb35-10"><a href="european-social-survey-ess.html#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">merge</span>( </span>
-<span id="cb35-11"><a href="european-social-survey-ess.html#cb35-11" aria-hidden="true" tabindex="-1"></a>        ess_be_df , </span>
-<span id="cb35-12"><a href="european-social-survey-ess.html#cb35-12" aria-hidden="true" tabindex="-1"></a>        ess_sddf_df , </span>
-<span id="cb35-13"><a href="european-social-survey-ess.html#cb35-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">by =</span> <span class="fu">c</span>( <span class="st">&#39;cntry&#39;</span> , <span class="st">&#39;idno&#39;</span> ) </span>
-<span id="cb35-14"><a href="european-social-survey-ess.html#cb35-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb35-15"><a href="european-social-survey-ess.html#cb35-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-16"><a href="european-social-survey-ess.html#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( ess_df ) <span class="sc">==</span> <span class="fu">nrow</span>( ess_be_df ) )</span>
-<span id="cb35-17"><a href="european-social-survey-ess.html#cb35-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-18"><a href="european-social-survey-ess.html#cb35-18" aria-hidden="true" tabindex="-1"></a>ess_design <span class="ot">&lt;-</span> </span>
-<span id="cb35-19"><a href="european-social-survey-ess.html#cb35-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
-<span id="cb35-20"><a href="european-social-survey-ess.html#cb35-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">ids =</span> <span class="sc">~</span>psu ,</span>
-<span id="cb35-21"><a href="european-social-survey-ess.html#cb35-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span>stratify ,</span>
-<span id="cb35-22"><a href="european-social-survey-ess.html#cb35-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">probs =</span> <span class="sc">~</span>prob ,</span>
-<span id="cb35-23"><a href="european-social-survey-ess.html#cb35-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> ess_df</span>
-<span id="cb35-24"><a href="european-social-survey-ess.html#cb35-24" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="european-social-survey-ess.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span></code></pre></div>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## Loading required package: survival</code></pre>
+<pre><code>## 
+## Attaching package: &#39;survey&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     dotchart</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="european-social-survey-ess.html#cb38-1" aria-hidden="true" tabindex="-1"></a>ess_df <span class="ot">&lt;-</span></span>
+<span id="cb38-2"><a href="european-social-survey-ess.html#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">merge</span>( </span>
+<span id="cb38-3"><a href="european-social-survey-ess.html#cb38-3" aria-hidden="true" tabindex="-1"></a>        ess_be_df , </span>
+<span id="cb38-4"><a href="european-social-survey-ess.html#cb38-4" aria-hidden="true" tabindex="-1"></a>        ess_sddf_df , </span>
+<span id="cb38-5"><a href="european-social-survey-ess.html#cb38-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">by =</span> <span class="fu">c</span>( <span class="st">&#39;cntry&#39;</span> , <span class="st">&#39;idno&#39;</span> ) </span>
+<span id="cb38-6"><a href="european-social-survey-ess.html#cb38-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb38-7"><a href="european-social-survey-ess.html#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="european-social-survey-ess.html#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( ess_df ) <span class="sc">==</span> <span class="fu">nrow</span>( ess_be_df ) )</span>
+<span id="cb38-9"><a href="european-social-survey-ess.html#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-10"><a href="european-social-survey-ess.html#cb38-10" aria-hidden="true" tabindex="-1"></a>ess_design <span class="ot">&lt;-</span> </span>
+<span id="cb38-11"><a href="european-social-survey-ess.html#cb38-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
+<span id="cb38-12"><a href="european-social-survey-ess.html#cb38-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">ids =</span> <span class="sc">~</span>psu ,</span>
+<span id="cb38-13"><a href="european-social-survey-ess.html#cb38-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span>stratum ,</span>
+<span id="cb38-14"><a href="european-social-survey-ess.html#cb38-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">probs =</span> <span class="sc">~</span>prob ,</span>
+<span id="cb38-15"><a href="european-social-survey-ess.html#cb38-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> ess_df</span>
+<span id="cb38-16"><a href="european-social-survey-ess.html#cb38-16" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <div id="variable-recoding-1" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="european-social-survey-ess.html#variable-recoding-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="european-social-survey-ess.html#cb36-1" aria-hidden="true" tabindex="-1"></a>ess_design <span class="ot">&lt;-</span> </span>
-<span id="cb36-2"><a href="european-social-survey-ess.html#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb36-3"><a href="european-social-survey-ess.html#cb36-3" aria-hidden="true" tabindex="-1"></a>        ess_design , </span>
-<span id="cb36-4"><a href="european-social-survey-ess.html#cb36-4" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb36-5"><a href="european-social-survey-ess.html#cb36-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
-<span id="cb36-6"><a href="european-social-survey-ess.html#cb36-6" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb36-7"><a href="european-social-survey-ess.html#cb36-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">non_european_immigrants =</span></span>
-<span id="cb36-8"><a href="european-social-survey-ess.html#cb36-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( impcntr ,</span>
-<span id="cb36-9"><a href="european-social-survey-ess.html#cb36-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;Allow many to come and live here&#39;</span> , </span>
-<span id="cb36-10"><a href="european-social-survey-ess.html#cb36-10" aria-hidden="true" tabindex="-1"></a>                <span class="st">&#39;Allow some&#39;</span> , <span class="st">&#39;Allow a few&#39;</span> , <span class="st">&#39;Allow none&#39;</span> )</span>
-<span id="cb36-11"><a href="european-social-survey-ess.html#cb36-11" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
-<span id="cb36-12"><a href="european-social-survey-ess.html#cb36-12" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb36-13"><a href="european-social-survey-ess.html#cb36-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">sex =</span> <span class="fu">factor</span>( icgndra , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,</span>
-<span id="cb36-14"><a href="european-social-survey-ess.html#cb36-14" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb36-15"><a href="european-social-survey-ess.html#cb36-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">more_than_one_hour_tv_daily =</span> <span class="fu">as.numeric</span>( tvtot <span class="sc">&gt;=</span> <span class="dv">3</span> )</span>
-<span id="cb36-16"><a href="european-social-survey-ess.html#cb36-16" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="european-social-survey-ess.html#cb39-1" aria-hidden="true" tabindex="-1"></a>ess_design <span class="ot">&lt;-</span> </span>
+<span id="cb39-2"><a href="european-social-survey-ess.html#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb39-3"><a href="european-social-survey-ess.html#cb39-3" aria-hidden="true" tabindex="-1"></a>        ess_design , </span>
+<span id="cb39-4"><a href="european-social-survey-ess.html#cb39-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb39-5"><a href="european-social-survey-ess.html#cb39-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
+<span id="cb39-6"><a href="european-social-survey-ess.html#cb39-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb39-7"><a href="european-social-survey-ess.html#cb39-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">non_european_immigrants =</span></span>
+<span id="cb39-8"><a href="european-social-survey-ess.html#cb39-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( impcntr ,</span>
+<span id="cb39-9"><a href="european-social-survey-ess.html#cb39-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;Allow many to come and live here&#39;</span> , </span>
+<span id="cb39-10"><a href="european-social-survey-ess.html#cb39-10" aria-hidden="true" tabindex="-1"></a>                <span class="st">&#39;Allow some&#39;</span> , <span class="st">&#39;Allow a few&#39;</span> , <span class="st">&#39;Allow none&#39;</span> )</span>
+<span id="cb39-11"><a href="european-social-survey-ess.html#cb39-11" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
+<span id="cb39-12"><a href="european-social-survey-ess.html#cb39-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb39-13"><a href="european-social-survey-ess.html#cb39-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">sex =</span> <span class="fu">factor</span>( icgndra , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,</span>
+<span id="cb39-14"><a href="european-social-survey-ess.html#cb39-14" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb39-15"><a href="european-social-survey-ess.html#cb39-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">more_than_one_hour_tv_daily =</span> <span class="fu">as.numeric</span>( tvtot <span class="sc">&gt;=</span> <span class="dv">3</span> )</span>
+<span id="cb39-16"><a href="european-social-survey-ess.html#cb39-16" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="unweighted-counts-1" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="european-social-survey-ess.html#unweighted-counts-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="european-social-survey-ess.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( ess_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
-<span id="cb37-2"><a href="european-social-survey-ess.html#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-3"><a href="european-social-survey-ess.html#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> non_european_immigrants , ess_design , unwtd.count )</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="european-social-survey-ess.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( ess_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
+<span id="cb40-2"><a href="european-social-survey-ess.html#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="european-social-survey-ess.html#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> non_european_immigrants , ess_design , unwtd.count )</span></code></pre></div>
 </div>
 <div id="weighted-counts-1" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="european-social-survey-ess.html#weighted-counts-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="european-social-survey-ess.html#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , ess_design )</span>
-<span id="cb38-2"><a href="european-social-survey-ess.html#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-3"><a href="european-social-survey-ess.html#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> non_european_immigrants , ess_design , svytotal )</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="european-social-survey-ess.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , ess_design )</span>
+<span id="cb41-2"><a href="european-social-survey-ess.html#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="european-social-survey-ess.html#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> non_european_immigrants , ess_design , svytotal )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-1" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="european-social-survey-ess.html#descriptive-statistics-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="european-social-survey-ess.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , ess_design )</span>
-<span id="cb39-2"><a href="european-social-survey-ess.html#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-3"><a href="european-social-survey-ess.html#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> ppltrst , <span class="sc">~</span> non_european_immigrants , ess_design , svymean )</span></code></pre></div>
-<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="european-social-survey-ess.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> sex , ess_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb40-2"><a href="european-social-survey-ess.html#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-3"><a href="european-social-survey-ess.html#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> non_european_immigrants , ess_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="european-social-survey-ess.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> ppltrst , ess_design )</span>
-<span id="cb41-2"><a href="european-social-survey-ess.html#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-3"><a href="european-social-survey-ess.html#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> ppltrst , <span class="sc">~</span> non_european_immigrants , ess_design , svytotal )</span></code></pre></div>
-<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="european-social-survey-ess.html#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> sex , ess_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="european-social-survey-ess.html#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , ess_design )</span>
 <span id="cb42-2"><a href="european-social-survey-ess.html#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-3"><a href="european-social-survey-ess.html#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> non_european_immigrants , ess_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="european-social-survey-ess.html#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> ppltrst , ess_design , <span class="fl">0.5</span> )</span>
+<span id="cb42-3"><a href="european-social-survey-ess.html#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> ppltrst , <span class="sc">~</span> non_european_immigrants , ess_design , svymean )</span></code></pre></div>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="european-social-survey-ess.html#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> sex , ess_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb43-2"><a href="european-social-survey-ess.html#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-3"><a href="european-social-survey-ess.html#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
-<span id="cb43-4"><a href="european-social-survey-ess.html#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> ppltrst , </span>
-<span id="cb43-5"><a href="european-social-survey-ess.html#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> non_european_immigrants , </span>
-<span id="cb43-6"><a href="european-social-survey-ess.html#cb43-6" aria-hidden="true" tabindex="-1"></a>    ess_design , </span>
-<span id="cb43-7"><a href="european-social-survey-ess.html#cb43-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
-<span id="cb43-8"><a href="european-social-survey-ess.html#cb43-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb43-9"><a href="european-social-survey-ess.html#cb43-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb43-10"><a href="european-social-survey-ess.html#cb43-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">keep.var =</span> <span class="cn">TRUE</span> </span>
-<span id="cb43-11"><a href="european-social-survey-ess.html#cb43-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb43-3"><a href="european-social-survey-ess.html#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> non_european_immigrants , ess_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="european-social-survey-ess.html#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> ppltrst , ess_design )</span>
+<span id="cb44-2"><a href="european-social-survey-ess.html#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="european-social-survey-ess.html#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> ppltrst , <span class="sc">~</span> non_european_immigrants , ess_design , svytotal )</span></code></pre></div>
+<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="european-social-survey-ess.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> sex , ess_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb45-2"><a href="european-social-survey-ess.html#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="european-social-survey-ess.html#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> non_european_immigrants , ess_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="european-social-survey-ess.html#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> ppltrst , ess_design , <span class="fl">0.5</span> )</span>
+<span id="cb46-2"><a href="european-social-survey-ess.html#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="european-social-survey-ess.html#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
+<span id="cb46-4"><a href="european-social-survey-ess.html#cb46-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> ppltrst , </span>
+<span id="cb46-5"><a href="european-social-survey-ess.html#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> non_european_immigrants , </span>
+<span id="cb46-6"><a href="european-social-survey-ess.html#cb46-6" aria-hidden="true" tabindex="-1"></a>    ess_design , </span>
+<span id="cb46-7"><a href="european-social-survey-ess.html#cb46-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
+<span id="cb46-8"><a href="european-social-survey-ess.html#cb46-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
+<span id="cb46-9"><a href="european-social-survey-ess.html#cb46-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
+<span id="cb46-10"><a href="european-social-survey-ess.html#cb46-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="european-social-survey-ess.html#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
-<span id="cb44-2"><a href="european-social-survey-ess.html#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> ppltrst , </span>
-<span id="cb44-3"><a href="european-social-survey-ess.html#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> pplfair , </span>
-<span id="cb44-4"><a href="european-social-survey-ess.html#cb44-4" aria-hidden="true" tabindex="-1"></a>    ess_design </span>
-<span id="cb44-5"><a href="european-social-survey-ess.html#cb44-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="european-social-survey-ess.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
+<span id="cb47-2"><a href="european-social-survey-ess.html#cb47-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> ppltrst , </span>
+<span id="cb47-3"><a href="european-social-survey-ess.html#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> pplfair , </span>
+<span id="cb47-4"><a href="european-social-survey-ess.html#cb47-4" aria-hidden="true" tabindex="-1"></a>    ess_design </span>
+<span id="cb47-5"><a href="european-social-survey-ess.html#cb47-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting-1" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="european-social-survey-ess.html#subsetting-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to voters:</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="european-social-survey-ess.html#cb45-1" aria-hidden="true" tabindex="-1"></a>sub_ess_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( ess_design , vote <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="european-social-survey-ess.html#cb48-1" aria-hidden="true" tabindex="-1"></a>sub_ess_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( ess_design , vote <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="european-social-survey-ess.html#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , sub_ess_design )</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="european-social-survey-ess.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , sub_ess_design )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-1" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="european-social-survey-ess.html#measures-of-uncertainty-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="european-social-survey-ess.html#cb47-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , ess_design )</span>
-<span id="cb47-2"><a href="european-social-survey-ess.html#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-3"><a href="european-social-survey-ess.html#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb47-4"><a href="european-social-survey-ess.html#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb47-5"><a href="european-social-survey-ess.html#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb47-6"><a href="european-social-survey-ess.html#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb47-7"><a href="european-social-survey-ess.html#cb47-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-8"><a href="european-social-survey-ess.html#cb47-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb47-9"><a href="european-social-survey-ess.html#cb47-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb47-10"><a href="european-social-survey-ess.html#cb47-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> ppltrst , </span>
-<span id="cb47-11"><a href="european-social-survey-ess.html#cb47-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> non_european_immigrants , </span>
-<span id="cb47-12"><a href="european-social-survey-ess.html#cb47-12" aria-hidden="true" tabindex="-1"></a>        ess_design , </span>
-<span id="cb47-13"><a href="european-social-survey-ess.html#cb47-13" aria-hidden="true" tabindex="-1"></a>        svymean </span>
-<span id="cb47-14"><a href="european-social-survey-ess.html#cb47-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb47-15"><a href="european-social-survey-ess.html#cb47-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb47-16"><a href="european-social-survey-ess.html#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb47-17"><a href="european-social-survey-ess.html#cb47-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb47-18"><a href="european-social-survey-ess.html#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb47-19"><a href="european-social-survey-ess.html#cb47-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="european-social-survey-ess.html#cb50-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , ess_design )</span>
+<span id="cb50-2"><a href="european-social-survey-ess.html#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-3"><a href="european-social-survey-ess.html#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb50-4"><a href="european-social-survey-ess.html#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb50-5"><a href="european-social-survey-ess.html#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb50-6"><a href="european-social-survey-ess.html#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb50-7"><a href="european-social-survey-ess.html#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-8"><a href="european-social-survey-ess.html#cb50-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb50-9"><a href="european-social-survey-ess.html#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb50-10"><a href="european-social-survey-ess.html#cb50-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> ppltrst , </span>
+<span id="cb50-11"><a href="european-social-survey-ess.html#cb50-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> non_european_immigrants , </span>
+<span id="cb50-12"><a href="european-social-survey-ess.html#cb50-12" aria-hidden="true" tabindex="-1"></a>        ess_design , </span>
+<span id="cb50-13"><a href="european-social-survey-ess.html#cb50-13" aria-hidden="true" tabindex="-1"></a>        svymean </span>
+<span id="cb50-14"><a href="european-social-survey-ess.html#cb50-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb50-15"><a href="european-social-survey-ess.html#cb50-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-16"><a href="european-social-survey-ess.html#cb50-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb50-17"><a href="european-social-survey-ess.html#cb50-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb50-18"><a href="european-social-survey-ess.html#cb50-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb50-19"><a href="european-social-survey-ess.html#cb50-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="european-social-survey-ess.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( ess_design )</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="european-social-survey-ess.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( ess_design )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="european-social-survey-ess.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> ppltrst , ess_design )</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="european-social-survey-ess.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> ppltrst , ess_design )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="european-social-survey-ess.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb50-2"><a href="european-social-survey-ess.html#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , ess_design , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb50-3"><a href="european-social-survey-ess.html#cb50-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-4"><a href="european-social-survey-ess.html#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb50-5"><a href="european-social-survey-ess.html#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , ess_design , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="european-social-survey-ess.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb53-2"><a href="european-social-survey-ess.html#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , ess_design , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb53-3"><a href="european-social-survey-ess.html#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-4"><a href="european-social-survey-ess.html#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb53-5"><a href="european-social-survey-ess.html#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> ppltrst , ess_design , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="european-social-survey-ess.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> more_than_one_hour_tv_daily , ess_design ,</span>
-<span id="cb51-2"><a href="european-social-survey-ess.html#cb51-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="european-social-survey-ess.html#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> more_than_one_hour_tv_daily , ess_design ,</span>
+<span id="cb54-2"><a href="european-social-survey-ess.html#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-1" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="european-social-survey-ess.html#regression-models-and-tests-of-association-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="european-social-survey-ess.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( ppltrst <span class="sc">~</span> more_than_one_hour_tv_daily , ess_design )</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="european-social-survey-ess.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( ppltrst <span class="sc">~</span> more_than_one_hour_tv_daily , ess_design )</span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="european-social-survey-ess.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
-<span id="cb53-2"><a href="european-social-survey-ess.html#cb53-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> more_than_one_hour_tv_daily <span class="sc">+</span> sex , </span>
-<span id="cb53-3"><a href="european-social-survey-ess.html#cb53-3" aria-hidden="true" tabindex="-1"></a>    ess_design </span>
-<span id="cb53-4"><a href="european-social-survey-ess.html#cb53-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="european-social-survey-ess.html#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
+<span id="cb56-2"><a href="european-social-survey-ess.html#cb56-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> more_than_one_hour_tv_daily <span class="sc">+</span> sex , </span>
+<span id="cb56-3"><a href="european-social-survey-ess.html#cb56-3" aria-hidden="true" tabindex="-1"></a>    ess_design </span>
+<span id="cb56-4"><a href="european-social-survey-ess.html#cb56-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="european-social-survey-ess.html#cb54-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb54-2"><a href="european-social-survey-ess.html#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
-<span id="cb54-3"><a href="european-social-survey-ess.html#cb54-3" aria-hidden="true" tabindex="-1"></a>        ppltrst <span class="sc">~</span> more_than_one_hour_tv_daily <span class="sc">+</span> sex , </span>
-<span id="cb54-4"><a href="european-social-survey-ess.html#cb54-4" aria-hidden="true" tabindex="-1"></a>        ess_design </span>
-<span id="cb54-5"><a href="european-social-survey-ess.html#cb54-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb54-6"><a href="european-social-survey-ess.html#cb54-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-7"><a href="european-social-survey-ess.html#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="european-social-survey-ess.html#cb57-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb57-2"><a href="european-social-survey-ess.html#cb57-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
+<span id="cb57-3"><a href="european-social-survey-ess.html#cb57-3" aria-hidden="true" tabindex="-1"></a>        ppltrst <span class="sc">~</span> more_than_one_hour_tv_daily <span class="sc">+</span> sex , </span>
+<span id="cb57-4"><a href="european-social-survey-ess.html#cb57-4" aria-hidden="true" tabindex="-1"></a>        ess_design </span>
+<span id="cb57-5"><a href="european-social-survey-ess.html#cb57-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb57-6"><a href="european-social-survey-ess.html#cb57-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-7"><a href="european-social-survey-ess.html#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -426,15 +431,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="analysis-examples-with-srvyr-1" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>srvyr</code>  <a href="european-social-survey-ess.html#analysis-examples-with-srvyr-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>srvyr</code> library calculates summary statistics from survey data, such as the mean, total or quantile using <a href="https://github.com/tidyverse/dplyr/">dplyr</a>-like syntax. <a href="https://github.com/gergness/srvyr">srvyr</a> allows for the use of many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, the <code>tidyverse</code> style of non-standard evaluation and more consistent return types than the <code>survey</code> package. <a href="https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html">This vignette</a> details the available features. As a starting point for ESS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="european-social-survey-ess.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
-<span id="cb55-2"><a href="european-social-survey-ess.html#cb55-2" aria-hidden="true" tabindex="-1"></a>ess_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( ess_design )</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="european-social-survey-ess.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;srvyr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="european-social-survey-ess.html#cb61-1" aria-hidden="true" tabindex="-1"></a>ess_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( ess_design )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="european-social-survey-ess.html#cb56-1" aria-hidden="true" tabindex="-1"></a>ess_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb56-2"><a href="european-social-survey-ess.html#cb56-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( ppltrst ) )</span>
-<span id="cb56-3"><a href="european-social-survey-ess.html#cb56-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-4"><a href="european-social-survey-ess.html#cb56-4" aria-hidden="true" tabindex="-1"></a>ess_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb56-5"><a href="european-social-survey-ess.html#cb56-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( non_european_immigrants ) <span class="sc">%&gt;%</span></span>
-<span id="cb56-6"><a href="european-social-survey-ess.html#cb56-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( ppltrst ) )</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="european-social-survey-ess.html#cb62-1" aria-hidden="true" tabindex="-1"></a>ess_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb62-2"><a href="european-social-survey-ess.html#cb62-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( ppltrst ) )</span>
+<span id="cb62-3"><a href="european-social-survey-ess.html#cb62-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-4"><a href="european-social-survey-ess.html#cb62-4" aria-hidden="true" tabindex="-1"></a>ess_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb62-5"><a href="european-social-survey-ess.html#cb62-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( non_european_immigrants ) <span class="sc">%&gt;%</span></span>
+<span id="cb62-6"><a href="european-social-survey-ess.html#cb62-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( ppltrst ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="replication-example" class="section level2 unnumbered hasAnchor">
@@ -448,7 +458,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
         </div>
       </div>
 <a href="american-community-survey-acs.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="structural-equation-models-sem-with-complex-survey-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="trend-analysis-of-complex-survey-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -257,7 +257,6 @@ for ( i in seq_along( chapter_tag ) ){
 	while( grepl( "  " , rmd_lines ) ) rmd_lines <- gsub( "  " , " " , rmd_lines )
 	
 	rmd_lines <- gsub( "\t0.5 , na.rm = TRUE" , "\t0.5 ,\n\tna.rm = TRUE" , rmd_lines )
-	rmd_lines <- gsub( "\tkeep.var = TRUE , na.rm = TRUE" , "\tkeep.var = TRUE ,\n\tna.rm = TRUE" , rmd_lines )
 	rmd_lines <- gsub( "\t\tsvymean , na.rm = TRUE" , "\t\tsvymean ,\n\t\tna.rm = TRUE" , rmd_lines )
 	rmd_lines <- gsub( "\tsvymean , na.rm = TRUE" , "\tsvymean ,\n\tna.rm = TRUE" , rmd_lines )
 	rmd_lines <- gsub( "\tmean , na.rm = TRUE" , "\tmean ,\n\tna.rm = TRUE" , rmd_lines )
@@ -294,6 +293,16 @@ for ( i in seq_along( chapter_tag ) ){
 	
 
 }
+
+
+# overwrite non-evaluation with run + cache
+rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
+local_testing_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Local Testing Badge" , readLines( w ) ) ) )
+local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_files ] )
+for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE" , readLines( this_rmd ) ) , this_rmd )
+
+
+
 
 # writeLines( "`r if (knitr:::is_html_output()) '# References {-}'`" , paste0( book_folder , "references.Rmd" ) )
 

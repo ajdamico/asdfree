@@ -36,15 +36,28 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-```{r , cache = TRUE , cache.extra = getRversion() }
-library(lodown)
-library(lavaan.survey)	
-options( survey.lonely.psu = "adjust" )
+```{r , cache = TRUE }
+library(foreign)
 
+chapter_tag_be_df <- 
+	read.spss( 
+		file.path( 
+			path.expand( "~" ) , 
+			"ESS-Data-Wizard-subset-2023-01-17.sav/ESS-Data-Wizard-subset-2023-01-17.sav" 
+		) ,
+		to.data.frame = TRUE ,
+		use.value.labels = FALSE
+	)
 
-print('test')
-
-print( system.time( x <- haven::read_spss( file.path( path.expand( "~" ) , "ESS4e04_5.sav/ESS4e04_5.sav" ) ) ) )
+chapter_tag_sddf_df <-
+	read.spss(
+		file.path(
+			path.expand( "~" ) ,
+			"ESS7SDDFe1_2.sav/ESS7SDDFe1_2.sav"
+		) ,
+		to.data.frame = TRUE ,
+		use.value.labels = FALSE
+	)	
 ```
 
 ~~~
@@ -55,12 +68,6 @@ print( system.time( x <- haven::read_spss( file.path( path.expand( "~" ) , "ESS4
 
 ~~~{analysis_examples_survey_design}
 library(survey)
-
-chapter_tag_be_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014/ESS7BE.rds" ) )
-
-chapter_tag_sddf_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014/ESS7SDDFe01_1.rds" ) )
 
 chapter_tag_df <-
 	merge( 
@@ -74,7 +81,7 @@ stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_be_df ) )
 chapter_tag_design <- 
 	svydesign(
 		ids = ~psu ,
-		strata = ~stratify ,
+		strata = ~stratum ,
 		probs = ~prob ,
 		data = chapter_tag_df
 	)

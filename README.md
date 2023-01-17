@@ -1,6 +1,5 @@
 # You can find the book at http://asdfree.com/
 american-community-survey-acs: <p><a href="https://github.com/asdfree/acs/actions"><img src="https://github.com/asdfree/acs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-2023 01 17-brightgreen' alt='Local Testing Badge'></p>
-structural-equation-models-sem-with-complex-survey-data: <p><img src="https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-2023 01 17-brightgreen" alt="Local Testing Badge"></p>
 trend-analysis-of-complex-survey-data: <p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 youth-risk-behavior-surveillance-system-yrbss: <p><a href="https://github.com/asdfree/yrbss/actions"><img src="https://github.com/asdfree/yrbss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
