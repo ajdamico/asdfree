@@ -14,15 +14,12 @@ publication_period: * Released biennially since 2002.
 
 administrative_organization: * Headquartered at [City, University of London](http://www.city.ac.uk/) and governed by [a scientific team across Europe](http://www.europeansocialsurvey.org/about/structure_and_governance.html).
 
-
-
-
 ~~~{reading_block}
 Please skim before you begin:
 
-1. 
+1. [Findings from the European Social Survey](https://www.europeansocialsurvey.org/findings/)
 
-2. 
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/European_Social_Survey)
 
 3. This poem
 
@@ -36,14 +33,20 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
+1. Register at the ESS Data Portal at https://ess-search.nsd.no/.
+
+2. Choose `ESS round 8 - 2016. Welfare attitudes, Attitudes to climate change`.
+
+3. Download the integrated file and also the sample design (SDDF) files as `SAV` (SPSS) files:
+
 ```{r , cache = TRUE }
 library(foreign)
 
-chapter_tag_be_df <- 
+chapter_tag_int_df <- 
 	read.spss( 
 		file.path( 
 			path.expand( "~" ) , 
-			"ESS-Data-Wizard-subset-2023-01-17.sav/ESS-Data-Wizard-subset-2023-01-17.sav" 
+			"ESS8e02_2.sav" 
 		) ,
 		to.data.frame = TRUE ,
 		use.value.labels = FALSE
@@ -53,13 +56,22 @@ chapter_tag_sddf_df <-
 	read.spss(
 		file.path(
 			path.expand( "~" ) ,
-			"ESS7SDDFe1_2.sav/ESS7SDDFe1_2.sav"
+			"ESS8SDDFe01_1.sav"
 		) ,
 		to.data.frame = TRUE ,
 		use.value.labels = FALSE
-	)	
-```
+	)
+	
 
+chapter_tag_df <-
+	merge( 
+		chapter_tag_int_df , 
+		chapter_tag_sddf_df , 
+		by = c( 'cntry' , 'idno' ) 
+	)
+
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_int_df ) )
+```
 ~~~
 
 
@@ -69,21 +81,20 @@ chapter_tag_sddf_df <-
 ~~~{analysis_examples_survey_design}
 library(survey)
 
-chapter_tag_df <-
-	merge( 
-		chapter_tag_be_df , 
-		chapter_tag_sddf_df , 
-		by = c( 'cntry' , 'idno' ) 
-	)
+options( survey.lonely.psu = "adjust" )
 
-stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_be_df ) )
+chapter_tag_df[ , 'anweight' ] <-
+	chapter_tag_df[ , 'pspwght' ] *
+	chapter_tag_df[ , 'pweight' ] *
+	10000
 
 chapter_tag_design <- 
 	svydesign(
 		ids = ~psu ,
 		strata = ~stratum ,
-		probs = ~prob ,
-		data = chapter_tag_df
+		weights = ~anweight ,
+		data = chapter_tag_df ,
+		nest = TRUE
 	)
 ~~~
 
@@ -94,46 +105,70 @@ chapter_tag_design <-
 		
 		one = 1 ,
 		
-		non_european_immigrants =
-			factor( impcntr ,
-				labels = c( 'Allow many to come and live here' , 
-				'Allow some' , 'Allow a few' , 'Allow none' )
-			) ,
+		gndr = factor( gndr , labels = c( 'male' , 'female' ) ) ,
 		
-		sex = factor( icgndra , labels = c( 'male' , 'female' ) ) ,
+		netusoft =
+			factor(
+				netusoft ,
+				levels = 1:5 ,
+				labels = c( 'Never' , 'Only occasionally' ,
+					'A few times a week' , 'Most days' , 'Every day' )
+			) ,
 			
-		more_than_one_hour_tv_daily = as.numeric( tvtot >= 3 )
+		belonging_to_particular_religion = as.numeric( rlgblg == 1 )
 	)
 ~~~
 
-group_by_variable: non_european_immigrants
+group_by_variable: cntry
 
-categorical_variable: sex
+categorical_variable: gndr
 categorical_narm: , na.rm = TRUE
 
 linear_variable: ppltrst
+linear_narm: , na.rm = TRUE
 linear_variable_description: Please tell me on a score of 0 to 10, where 0 means you can't be too careful and 10 means that most people can be trusted.
 
 ratio_estimation_numerator: ppltrst
 ratio_estimation_denominator: pplfair
-
+ratio_narm: , na.rm = TRUE
 
 subset_definition: vote == 1
 subset_definition_description: voters
 
-binary_variable: more_than_one_hour_tv_daily
+binary_variable: belonging_to_particular_religion
 binary_narm: , na.rm = TRUE
+
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
 
 needs_srvyr_block: yes
 
 ~~~{replication_example_block}
-## Replication Example {-}
+## Technical Documentation Replication Example {-}
 
+This example below matches statistics and confidence intervals within 0.1% from the [Guide to Using Weights and Sample Design Indicators with ESS Data](https://stessrelpubprodwe.blob.core.windows.net/data/round10/survey/ESS_weighting_data_1_1.pdf#page=13)
 
 ```{r eval = FALSE , results = "hide" }
+published_proportions <- c( 0.166 , 0.055 , 0.085 , 0.115 , 0.578 )
 
+published_lb <- c( 0.146 , 0.045 , 0.072 , 0.099 , 0.550 )
+
+published_ub <- c( 0.188 , 0.068 , 0.100 , 0.134 , 0.605 )
+
+austrians <- subset( chapter_tag_design , cntry == 'AT' )
+
+( results <- svymean( ~ netusoft , austrians , na.rm = TRUE ) )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_proportions ) )
+
+( ci_results <- confint( results ) )
+
+stopifnot( all( abs( ci_results[ , 1 ] - published_lb ) < 0.0015 ) )
+
+stopifnot( all( abs( ci_results[ , 2 ] - published_ub ) < 0.0015 ) )
 ```
-
 ~~~
 
 

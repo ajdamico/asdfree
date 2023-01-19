@@ -24,9 +24,9 @@ The European Social Survey measures political opinion and behavior across the co
 
 Please skim before you begin:
 
-1. 
+1. [Findings from the European Social Survey](https://www.europeansocialsurvey.org/findings/)
 
-2. 
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/European_Social_Survey)
 
 3. This poem
 
@@ -40,14 +40,20 @@ Please skim before you begin:
 
 ## Download, Import, Preparation {-}
 
+1. Register at the ESS Data Portal at https://ess-search.nsd.no/.
+
+2. Choose `ESS round 8 - 2016. Welfare attitudes, Attitudes to climate change`.
+
+3. Download the integrated file and also the sample design (SDDF) files as `SAV` (SPSS) files:
+
 ```{r , cache = TRUE }
 library(foreign)
 
-ess_be_df <- 
+ess_int_df <- 
 	read.spss( 
 		file.path( 
 			path.expand( "~" ) , 
-			"ESS-Data-Wizard-subset-2023-01-17.sav/ESS-Data-Wizard-subset-2023-01-17.sav" 
+			"ESS8e02_2.sav" 
 		) ,
 		to.data.frame = TRUE ,
 		use.value.labels = FALSE
@@ -57,11 +63,21 @@ ess_sddf_df <-
 	read.spss(
 		file.path(
 			path.expand( "~" ) ,
-			"ESS7SDDFe1_2.sav/ESS7SDDFe1_2.sav"
+			"ESS8SDDFe01_1.sav"
 		) ,
 		to.data.frame = TRUE ,
 		use.value.labels = FALSE
-	)	
+	)
+	
+
+ess_df <-
+	merge( 
+		ess_int_df , 
+		ess_sddf_df , 
+		by = c( 'cntry' , 'idno' ) 
+	)
+
+stopifnot( nrow( ess_df ) == nrow( ess_int_df ) )
 ```
 
 ---
@@ -77,21 +93,20 @@ Construct a complex sample survey design:
 ```{r messages = FALSE , cache = TRUE }
 library(survey)
 
-ess_df <-
-	merge( 
-		ess_be_df , 
-		ess_sddf_df , 
-		by = c( 'cntry' , 'idno' ) 
-	)
+options( survey.lonely.psu = "adjust" )
 
-stopifnot( nrow( ess_df ) == nrow( ess_be_df ) )
+ess_df[ , 'anweight' ] <-
+	ess_df[ , 'pspwght' ] *
+	ess_df[ , 'pweight' ] *
+	10000
 
 ess_design <- 
 	svydesign(
 		ids = ~psu ,
 		strata = ~stratum ,
-		probs = ~prob ,
-		data = ess_df
+		weights = ~anweight ,
+		data = ess_df ,
+		nest = TRUE
 	)
 ```
 
@@ -105,15 +120,17 @@ ess_design <-
 		
 		one = 1 ,
 		
-		non_european_immigrants =
-			factor( impcntr ,
-				labels = c( 'Allow many to come and live here' , 
-				'Allow some' , 'Allow a few' , 'Allow none' )
-			) ,
+		gndr = factor( gndr , labels = c( 'male' , 'female' ) ) ,
 		
-		sex = factor( icgndra , labels = c( 'male' , 'female' ) ) ,
+		netusoft =
+			factor(
+				netusoft ,
+				levels = 1:5 ,
+				labels = c( 'Never' , 'Only occasionally' ,
+					'A few times a week' , 'Most days' , 'Every day' )
+			) ,
 			
-		more_than_one_hour_tv_daily = as.numeric( tvtot >= 3 )
+		belonging_to_particular_religion = as.numeric( rlgblg == 1 )
 	)
 ```
 
@@ -123,7 +140,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r cache = TRUE , results = "hide" }
 sum( weights( ess_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ non_european_immigrants , ess_design , unwtd.count )
+svyby( ~ one , ~ cntry , ess_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
@@ -131,50 +148,50 @@ Count the weighted size of the generalizable population, overall and by groups:
 ```{r cache = TRUE , results = "hide" }
 svytotal( ~ one , ess_design )
 
-svyby( ~ one , ~ non_european_immigrants , ess_design , svytotal )
+svyby( ~ one , ~ cntry , ess_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r cache = TRUE , results = "hide" }
-svymean( ~ ppltrst , ess_design )
+svymean( ~ ppltrst , ess_design , na.rm = TRUE )
 
-svyby( ~ ppltrst , ~ non_european_immigrants , ess_design , svymean )
+svyby( ~ ppltrst , ~ cntry , ess_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r cache = TRUE , results = "hide" }
-svymean( ~ sex , ess_design , na.rm = TRUE )
+svymean( ~ gndr , ess_design , na.rm = TRUE )
 
-svyby( ~ sex , ~ non_european_immigrants , ess_design , svymean , na.rm = TRUE )
+svyby( ~ gndr , ~ cntry , ess_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r cache = TRUE , results = "hide" }
-svytotal( ~ ppltrst , ess_design )
+svytotal( ~ ppltrst , ess_design , na.rm = TRUE )
 
-svyby( ~ ppltrst , ~ non_european_immigrants , ess_design , svytotal )
+svyby( ~ ppltrst , ~ cntry , ess_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r cache = TRUE , results = "hide" }
-svytotal( ~ sex , ess_design , na.rm = TRUE )
+svytotal( ~ gndr , ess_design , na.rm = TRUE )
 
-svyby( ~ sex , ~ non_european_immigrants , ess_design , svytotal , na.rm = TRUE )
+svyby( ~ gndr , ~ cntry , ess_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r cache = TRUE , results = "hide" }
-svyquantile( ~ ppltrst , ess_design , 0.5 )
+svyquantile( ~ ppltrst , ess_design , 0.5 , na.rm = TRUE )
 
 svyby( 
 	~ ppltrst , 
-	~ non_european_immigrants , 
+	~ cntry , 
 	ess_design , 
 	svyquantile , 
 	0.5 ,
-	ci = TRUE 
+	ci = TRUE , na.rm = TRUE
 )
 ```
 
@@ -183,7 +200,8 @@ Estimate a ratio:
 svyratio( 
 	numerator = ~ ppltrst , 
 	denominator = ~ pplfair , 
-	ess_design 
+	ess_design ,
+	na.rm = TRUE
 )
 ```
 
@@ -195,14 +213,14 @@ sub_ess_design <- subset( ess_design , vote == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r cache = TRUE , results = "hide" }
-svymean( ~ ppltrst , sub_ess_design )
+svymean( ~ ppltrst , sub_ess_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r cache = TRUE , results = "hide" }
-this_result <- svymean( ~ ppltrst , ess_design )
+this_result <- svymean( ~ ppltrst , ess_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -212,9 +230,10 @@ cv( this_result )
 grouped_result <-
 	svyby( 
 		~ ppltrst , 
-		~ non_european_immigrants , 
+		~ cntry , 
 		ess_design , 
-		svymean 
+		svymean ,
+		na.rm = TRUE 
 	)
 	
 coef( grouped_result )
@@ -230,21 +249,21 @@ degf( ess_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r cache = TRUE , results = "hide" }
-svyvar( ~ ppltrst , ess_design )
+svyvar( ~ ppltrst , ess_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r cache = TRUE , results = "hide" }
 # SRS without replacement
-svymean( ~ ppltrst , ess_design , deff = TRUE )
+svymean( ~ ppltrst , ess_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ ppltrst , ess_design , deff = "replace" )
+svymean( ~ ppltrst , ess_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r cache = TRUE , results = "hide" }
-svyciprop( ~ more_than_one_hour_tv_daily , ess_design ,
+svyciprop( ~ belonging_to_particular_religion , ess_design ,
 	method = "likelihood" , na.rm = TRUE )
 ```
 
@@ -252,13 +271,13 @@ svyciprop( ~ more_than_one_hour_tv_daily , ess_design ,
 
 Perform a design-based t-test:
 ```{r cache = TRUE , results = "hide" }
-svyttest( ppltrst ~ more_than_one_hour_tv_daily , ess_design )
+svyttest( ppltrst ~ belonging_to_particular_religion , ess_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r cache = TRUE , results = "hide" }
 svychisq( 
-	~ more_than_one_hour_tv_daily + sex , 
+	~ belonging_to_particular_religion + gndr , 
 	ess_design 
 )
 ```
@@ -267,7 +286,7 @@ Perform a survey-weighted generalized linear model:
 ```{r cache = TRUE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		ppltrst ~ more_than_one_hour_tv_daily + sex , 
+		ppltrst ~ belonging_to_particular_religion + gndr , 
 		ess_design 
 	)
 
@@ -277,6 +296,8 @@ summary( glm_result )
 ---
 
 ## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
 
 ---
 
@@ -291,18 +312,35 @@ ess_srvyr_design <- as_survey( ess_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r cache = TRUE , results = "hide" , messages = FALSE }
 ess_srvyr_design %>%
-	summarize( mean = survey_mean( ppltrst ) )
+	summarize( mean = survey_mean( ppltrst , na.rm = TRUE ) )
 
 ess_srvyr_design %>%
-	group_by( non_european_immigrants ) %>%
-	summarize( mean = survey_mean( ppltrst ) )
+	group_by( cntry ) %>%
+	summarize( mean = survey_mean( ppltrst , na.rm = TRUE ) )
 ```
 
 ---
 
-## Replication Example {-}
+## Technical Documentation Replication Example {-}
+
+This example below matches statistics and confidence intervals within 0.1% from the [Guide to Using Weights and Sample Design Indicators with ESS Data](https://stessrelpubprodwe.blob.core.windows.net/data/round10/survey/ESS_weighting_data_1_1.pdf#page=13)
 
 ```{r cache = TRUE , results = "hide" }
+published_proportions <- c( 0.166 , 0.055 , 0.085 , 0.115 , 0.578 )
 
+published_lb <- c( 0.146 , 0.045 , 0.072 , 0.099 , 0.550 )
+
+published_ub <- c( 0.188 , 0.068 , 0.100 , 0.134 , 0.605 )
+
+austrians <- subset( ess_design , cntry == 'AT' )
+
+( results <- svymean( ~ netusoft , austrians , na.rm = TRUE ) )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_proportions ) )
+
+( ci_results <- confint( results ) )
+
+stopifnot( all( abs( ci_results[ , 1 ] - published_lb ) < 0.0015 ) )
+
+stopifnot( all( abs( ci_results[ , 2 ] - published_ub ) < 0.0015 ) )
 ```
-
