@@ -1,4 +1,4 @@
-commit_memo <- "'cache tests and local testing'"
+commit_memo <- "'ess haiku'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
