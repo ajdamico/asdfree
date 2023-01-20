@@ -1,4 +1,4 @@
-commit_memo <- "'mcbs draft'"
+commit_memo <- "'cache testing'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -12,8 +12,6 @@ commit_memo <- "'mcbs draft'"
 # multiply-imputed, database-backed survey (pisa)
 
 
-github_password <- readLines( file.path( path.expand( "~" ) , "github password.txt" ) )
-github_token <- readLines( file.path( path.expand( "~" ) , "github token.txt" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\descriptive_statistics_blocks.R" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\measures_of_uncertainty_blocks.R" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\tests_of_association_blocks.R" ) )
@@ -22,7 +20,7 @@ source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\syntaxt
 
 needs_actions_build_status_line <- '<a href="https://github.com/asdfree/chapter_tag/actions"><img src="https://github.com/asdfree/chapter_tag/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>'
 
-needs_local_build_status_line <- '```{r , echo = FALSE }\n\nmost_recent_build_date <- gsub( "\\-" , " " , as.Date( file.info( "chapter_tag.Rmd" )$mtime ) )\n\nchapter_tag_badge <- paste0( "<img src=\'https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-" , most_recent_build_date , "-brightgreen\' alt=\'Local Testing Badge\'>" )\n\n```\n\n`r chapter_tag_badge`\n\n'
+needs_local_build_status_line <- '```{r , echo = FALSE }\n\nmost_recent_build_date <- gsub( "\\-" , " " , as.Date( file.info( "metadata/chapter_tag.txt" )$mtime ) )\n\nchapter_tag_badge <- paste0( "<img src=\'https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-" , most_recent_build_date , "-brightgreen\' alt=\'Local Testing Badge\'>" )\n\n```\n\n`r chapter_tag_badge`\n\n'
 
 
 needs_dplyr_block <- '---\n\n## Analysis Examples with `dplyr` \\\\ {-}\n\nThe R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax.  [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation.  [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = "hide" }\nlibrary(dplyr)\ntbl_initiation_line\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = "hide" }\nchapter_tag_tbl %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n\nchapter_tag_tbl %>%\n\tgroup_by( group_by_variable ) %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n```'
@@ -91,10 +89,6 @@ for( this_chunk in sub_chunks ){
 
 }
 
-
-# # invalidate all caches and delete all rmd files except for the index
-# rmd_files <- grep( "\\.Rmd$" , list.files( book_folder , full.names = TRUE ) , value = TRUE )
-# file.remove( rmd_files[ basename( rmd_files ) != 'index.Rmd' ] )
 
 
 # move all rmd files in /posts/ to the main folder
@@ -268,30 +262,8 @@ for ( i in seq_along( chapter_tag ) ){
 		for( this_replacement in seq( 2 , length( replacement_block[[i]] ) , by = 2 ) ) rmd_lines <- gsub( replacement_block[[i]][ this_replacement - 1 ] , replacement_block[[i]][ this_replacement ] , rmd_lines , fixed = TRUE )
 	}
 	
+	writeLines( rmd_lines , this_rmd )
 	
-	temp_rmd <- tempfile()
-	writeLines( rmd_lines , temp_rmd )
-		
-	# overwrite only posts that have changed (so as not to invalidate the cache)
-	if(
-		is.na( tools::md5sum( this_rmd ) )
-		
-		||
-		
-		( tools::md5sum( this_rmd ) != tools::md5sum( temp_rmd ) )
-		
-	){
-		
-			file.copy(
-				temp_rmd ,
-				this_rmd ,
-				overwrite = TRUE
-			)
-	}
-
-
-	
-
 }
 
 
@@ -302,9 +274,6 @@ local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_fil
 for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE" , readLines( this_rmd ) ) , this_rmd )
 
 
-
-
-# writeLines( "`r if (knitr:::is_html_output()) '# References {-}'`" , paste0( book_folder , "references.Rmd" ) )
 
 setwd( book_folder )
 clean_site( preview = FALSE )
@@ -364,9 +333,6 @@ rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Gith
 
 ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Github Actions Badge" , readLines( w ) ) ) )
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
-
-# in case asdfree repo needs to be deleted and restored:
-# system( paste0( "powershell git clone https://ajdamico:" , github_password , "@github.com/ajdamico/asdfree/ 'C:/Users/AnthonyD/Documents/Github/asdfree/'" ) )
 
 for( this_ci_file in ci_rmd_files ){
 
@@ -507,5 +473,4 @@ writeLines( readme_md_text , file.path( path.expand( "~" ) , "Github/asdfree/REA
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add -u" ) )
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add ." ) )
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' commit -m " , commit_memo ) )
-# system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' remote add origin https://ajdamico:" , github_password , "@github.com/ajdamico/asdfree.git" ) )
 system( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' push origin dev" )
