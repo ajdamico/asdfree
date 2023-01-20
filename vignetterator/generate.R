@@ -372,11 +372,28 @@ for( this_ci_file in ci_rmd_files ){
 
 	chapter_tag <- gsub( "\\.Rmd$" , "" , basename( this_ci_file ) )
 
+
+	# test whether the repository exists
+	repo_does_not_exist <-
+		system( paste0( "powershell git ls-remote https://github.com/asdfree/" , chapter_tag , " HEAD" ) )
+		
+	# if the repository does not exist, ls-remote returns a 1.  in that case, create the repo
+	if( repo_does_not_exist ){
+	
+		system( paste0( "powershell gh repo create asdfree/" , chapter_tag , " --public" ) )
+		system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' init" ) )
+		
+	}
+	
 	if( dir.exists( paste0( "C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag ) ) ){
 		system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' pull" ) )
 	} else {
 		system( paste0( "powershell git clone https://github.com/asdfree/" , chapter_tag , "/ 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "'" ) )
 	}
+	
+	
+	
+	
 	
 	this_metadata_file <- gsub( paste0( "/" , chapter_tag , ".Rmd$" ) , paste0( "/metadata/" , chapter_tag , ".txt" ) , this_ci_file )
 
@@ -457,25 +474,11 @@ for( this_ci_file in ci_rmd_files ){
 	
 	
 	
-	# test whether the repository exists
-	repo_does_not_exist <-
-		system( paste0( "powershell git ls-remote https://github.com/asdfree/" , chapter_tag , " HEAD" ) )
-		
-	# if the repository does not exist, ls-remote returns a 1.  in that case, create the repo
-	if( repo_does_not_exist ){
-	
-		system( paste0( "powershell gh repo create asdfree/" , chapter_tag , " --public" ) )
-		system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' init" ) )
-		system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' branch -M main" ) )
-		
-	}
-	
 		
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' add -u" ) )
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' add ." ) )
 	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' commit -m " , commit_memo ) )
-	if( repo_does_not_exist ) system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' remote add origin git@github.com:asdfree/" , chapter_tag , ".git" ) )
-	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' push origin master" ) )
+	system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' push origin HEAD:master" ) )
 
 }
 
