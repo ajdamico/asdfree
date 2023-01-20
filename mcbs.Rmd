@@ -1,0 +1,283 @@
+# Medicare Current Beneficiary Survey (MCBS) {-}
+
+<a href="https://github.com/asdfree/mcbs/actions"><img src="https://github.com/asdfree/mcbs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+*
+
+*
+
+*
+
+*
+
+---
+
+Please skim before you begin:
+
+1.
+
+2.
+
+3. This poem
+
+```{r}
+# 
+# 
+# 
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+```{r eval = FALSE }
+tf <- tempfile()
+
+this_url <- "https://www.cms.gov/files/zip/cspuf2019.zip"
+
+download.file( this_url , tf , mode = 'wb' )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+
+mcbs_csv <- grep( '\.csv$' , unzipped_files , value = TRUE )
+
+mcbs_df <- read.csv( mcbs_csv )
+
+names( mcbs_df ) <- tolower( names( mcbs_df ) )
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+Construct a complex sample survey design:
+
+```{r messages = FALSE , eval = FALSE }
+
+```
+
+```{r messages = FALSE , eval = FALSE }
+library(survey)
+
+mcbs_design <-
+	svrepdesign(
+		weight = ~cspufwgt ,
+		repweights = 'cspuf[0-9]+' ,
+		mse = TRUE ,
+		type = 'Fay' ,
+		rho = 0.3 ,
+		data = mcbs_df
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+mcbs_design <-
+	update(
+		
+		mcbs_design ,
+		
+		csp_age =
+			factor( 
+				csp_age , 
+				levels = 1:3 , 
+				labels = 
+					c( 
+						'01: younger than 65' ,
+						'02: 65 to 74' ,
+						'03: 75 or older'
+					)
+			) ,
+ 		
+		two_or_more_chronic_conditions = as.numeric( csp_nchrncnd > 1 ) ,
+
+		csp_sex = factor( csp_sex , labels = c( 'male' , 'female' ) )
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( mcbs_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ csp_age , mcbs_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , mcbs_design )
+
+svyby( ~ one , ~ csp_age , mcbs_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ pamtoop , mcbs_design )
+
+svyby( ~ pamtoop , ~ csp_age , mcbs_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ csp_sex , mcbs_design )
+
+svyby( ~ csp_sex , ~ csp_age , mcbs_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ pamtoop , mcbs_design )
+
+svyby( ~ pamtoop , ~ csp_age , mcbs_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ csp_sex , mcbs_design )
+
+svyby( ~ csp_sex , ~ csp_age , mcbs_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ pamtoop , mcbs_design , 0.5 )
+
+svyby( 
+	~ pamtoop , 
+	~ csp_age , 
+	mcbs_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ pamtoop , 
+	denominator = ~ pamttot , 
+	mcbs_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to household income below $25,000:
+```{r eval = FALSE , results = "hide" }
+sub_mcbs_design <- subset( mcbs_design , csp_income == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ pamtoop , sub_mcbs_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ pamtoop , mcbs_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ pamtoop , 
+		~ csp_age , 
+		mcbs_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( mcbs_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ pamtoop , mcbs_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ pamtoop , mcbs_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ pamtoop , mcbs_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ two_or_more_chronic_conditions , mcbs_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( pamtoop ~ two_or_more_chronic_conditions , mcbs_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ two_or_more_chronic_conditions + csp_sex , 
+	mcbs_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		pamtoop ~ two_or_more_chronic_conditions + csp_sex , 
+		mcbs_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for MCBS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+library(srvyr)
+mcbs_srvyr_design <- as_survey( mcbs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+mcbs_srvyr_design %>%
+	summarize( mean = survey_mean( pamtoop ) )
+
+mcbs_srvyr_design %>%
+	group_by( csp_age ) %>%
+	summarize( mean = survey_mean( pamtoop ) )
+```
+
+
