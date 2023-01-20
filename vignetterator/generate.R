@@ -465,6 +465,7 @@ for( this_ci_file in ci_rmd_files ){
 	if( repo_does_not_exist ){
 	
 		system( paste0( "powershell gh repo create asdfree/" , chapter_tag , " --public" ) )
+		system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/datasets/" , chapter_tag , "' init" ) )
 	
 	}
 	
