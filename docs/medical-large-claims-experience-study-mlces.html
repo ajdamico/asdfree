@@ -252,7 +252,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="medical-large-claims-experience-study-mlces" class="section level1 unnumbered hasAnchor">
 <h1>Medical Large Claims Experience Study (MLCES)<a href="medical-large-claims-experience-study-mlces.html#medical-large-claims-experience-study-mlces" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/mlces/actions"><img src="https://github.com/asdfree/mlces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>The Medical Large Claims Experience Study (MLCES) might be the best private health insurance claims data available to the public. This data should be used to calibrate other data sets, and probably nothing more.</p>
+<p>The best private health insurance claims data available to the public. This data should be used to calibrate other data sets, probably nothing more.</p>
 <ul>
 <li><p>One table with one row per individual with nonzero total paid charges.</p></li>
 <li><p>A convenience sample of group (employer-sponsored) health insurance claims from seven private health insurers in the United States.</p></li>
@@ -262,9 +262,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <p>Please skim before you begin:</p>
 <ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li>This poem</li>
+<li><p><a href="https://www.soa.org/4937d6/globalassets/assets/files/research/exp-study/large_claims_report.pdf">Group Medical Insurance Claims Database Collection and Analysis Report</a></p></li>
+<li><p><a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1412243">Claim Severities, Claim Relativities, and Age: Evidence from SOA Group Health Data</a></p></li>
+<li><p>This poem</p></li>
 </ol>
 <div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="medical-large-claims-experience-study-mlces.html#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="co"># skewed by black swan tails</span></span>
 <span id="cb89-2"><a href="medical-large-claims-experience-study-mlces.html#cb89-2" aria-hidden="true" tabindex="-1"></a><span class="co"># means, medians sing adieu</span></span>
@@ -272,12 +272,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-3" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="medical-large-claims-experience-study-mlces.html#download-import-preparation-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Download and import the Alabama household file:</p>
+<p>(switch <code>sas_hal</code> to <code>sas_hak</code> for Alaska or <code>sas_hus</code> for the entire country)</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="medical-large-claims-experience-study-mlces.html#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb90-2"><a href="medical-large-claims-experience-study-mlces.html#cb90-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-3"><a href="medical-large-claims-experience-study-mlces.html#cb90-3" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb90-4"><a href="medical-large-claims-experience-study-mlces.html#cb90-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-5"><a href="medical-large-claims-experience-study-mlces.html#cb90-5" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span></span>
+<span id="cb90-6"><a href="medical-large-claims-experience-study-mlces.html#cb90-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://www.soa.org/Files/Research/1999.zip&quot;</span></span>
+<span id="cb90-7"><a href="medical-large-claims-experience-study-mlces.html#cb90-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-8"><a href="medical-large-claims-experience-study-mlces.html#cb90-8" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb90-9"><a href="medical-large-claims-experience-study-mlces.html#cb90-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-10"><a href="medical-large-claims-experience-study-mlces.html#cb90-10" aria-hidden="true" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb90-11"><a href="medical-large-claims-experience-study-mlces.html#cb90-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-12"><a href="medical-large-claims-experience-study-mlces.html#cb90-12" aria-hidden="true" tabindex="-1"></a>mlces_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( unzipped_files )</span>
+<span id="cb90-13"><a href="medical-large-claims-experience-study-mlces.html#cb90-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-14"><a href="medical-large-claims-experience-study-mlces.html#cb90-14" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( mlces_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( mlces_df ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-base-r" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with base R  <a href="medical-large-claims-experience-study-mlces.html#analysis-examples-with-base-r" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Load a data frame:</p>
-<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="medical-large-claims-experience-study-mlces.html#cb90-1" aria-hidden="true" tabindex="-1"></a>mlces_df <span class="ot">&lt;-</span> <span class="fu">readRDS</span>( <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;MLCES&quot;</span> , <span class="st">&quot;mlces1997.rds&quot;</span> ) )</span></code></pre></div>
 <div id="variable-recoding-3" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="medical-large-claims-experience-study-mlces.html#variable-recoding-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
@@ -374,6 +389,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="intermish-3" class="section level2 unnumbered hasAnchor">
 <h2>Intermish<a href="medical-large-claims-experience-study-mlces.html#intermish-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<center>
+<a href="https://en.wikipedia.org/wiki/Lorem_ipsum" class="uri">https://en.wikipedia.org/wiki/Lorem_ipsum</a>
+</center>
 <hr />
 </div>
 <div id="analysis-examples-with-dplyr" class="section level2 unnumbered hasAnchor">
