@@ -34,12 +34,9 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-Download and import the Alabama household file:
+Download and import the 1999 medical claims file:
 
-(switch `sas_hal` to `sas_hak` for Alaska or `sas_hus` for the entire country)
 ```{r eval = FALSE }
-library(haven)
-
 tf <- tempfile()
 
 this_url <-
@@ -90,3 +87,32 @@ needs_dplyr_block: yes
 ~~~
 
 
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+The example below matches statistics in Table II-A's 1999 row numbers 52 and 53 from the [Tables II – XI 1997–1999 Database](https://www.soa.org/4937cc/globalassets/assets/files/research/tables.zip):
+
+Match Claimants Exceeding Deductible:
+
+```{r eval = FALSE , results = "hide" }
+# $0 deductible
+stopifnot( nrow( chapter_tag_df ) == 1591738 )
+
+# $1,000 deductible
+charges_above_1000 <- subset( chapter_tag_df , totpdchg > 1000 )
+stopifnot( nrow( charges_above_1000 ) == 402550 )
+```
+
+
+Match the Excess Charges Above Deductible:
+
+```{r eval = FALSE , results = "hide" }
+# $0 deductible
+stopifnot( round( sum( chapter_tag_df[ , 'totpdchg' ] ) , 0 ) == 2599356658 )
+
+# $1,000 deductible
+stopifnot( round( sum( charges_above_1000[ , 'totpdchg' ] - 1000 ) , 0 ) == 1883768786 )
+```
+~~~

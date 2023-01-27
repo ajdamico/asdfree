@@ -201,6 +201,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="" data-path="medical-large-claims-experience-study-mlces.html"><a href="medical-large-claims-experience-study-mlces.html#intermish-3"><i class="fa fa-check"></i>Intermish</a></li>
 <li class="chapter" data-level="" data-path="medical-large-claims-experience-study-mlces.html"><a href="medical-large-claims-experience-study-mlces.html#analysis-examples-with-dplyr"><i class="fa fa-check"></i>Analysis Examples with <code>dplyr</code>  </a></li>
+<li class="chapter" data-level="" data-path="medical-large-claims-experience-study-mlces.html"><a href="medical-large-claims-experience-study-mlces.html#replication-example-3"><i class="fa fa-check"></i>Replication Example</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html"><i class="fa fa-check"></i>Trend Analysis of Complex Survey Data</a>
 <ul>
@@ -227,7 +228,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#intermish-4"><i class="fa fa-check"></i>Intermish</a></li>
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#analysis-examples-with-srvyr-3"><i class="fa fa-check"></i>Analysis Examples with <code>srvyr</code>  </a></li>
-<li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#replication-example-3"><i class="fa fa-check"></i>Replication Example</a></li>
+<li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#replication-example-4"><i class="fa fa-check"></i>Replication Example</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -272,22 +273,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-3" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="medical-large-claims-experience-study-mlces.html#download-import-preparation-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Download and import the Alabama household file:</p>
-<p>(switch <code>sas_hal</code> to <code>sas_hak</code> for Alaska or <code>sas_hus</code> for the entire country)</p>
-<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="medical-large-claims-experience-study-mlces.html#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<p>Download and import the 1999 medical claims file:</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="medical-large-claims-experience-study-mlces.html#cb90-1" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb90-2"><a href="medical-large-claims-experience-study-mlces.html#cb90-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb90-3"><a href="medical-large-claims-experience-study-mlces.html#cb90-3" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb90-4"><a href="medical-large-claims-experience-study-mlces.html#cb90-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb90-5"><a href="medical-large-claims-experience-study-mlces.html#cb90-5" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span></span>
-<span id="cb90-6"><a href="medical-large-claims-experience-study-mlces.html#cb90-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://www.soa.org/Files/Research/1999.zip&quot;</span></span>
+<span id="cb90-3"><a href="medical-large-claims-experience-study-mlces.html#cb90-3" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span></span>
+<span id="cb90-4"><a href="medical-large-claims-experience-study-mlces.html#cb90-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://www.soa.org/Files/Research/1999.zip&quot;</span></span>
+<span id="cb90-5"><a href="medical-large-claims-experience-study-mlces.html#cb90-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-6"><a href="medical-large-claims-experience-study-mlces.html#cb90-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
 <span id="cb90-7"><a href="medical-large-claims-experience-study-mlces.html#cb90-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb90-8"><a href="medical-large-claims-experience-study-mlces.html#cb90-8" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb90-8"><a href="medical-large-claims-experience-study-mlces.html#cb90-8" aria-hidden="true" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb90-9"><a href="medical-large-claims-experience-study-mlces.html#cb90-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb90-10"><a href="medical-large-claims-experience-study-mlces.html#cb90-10" aria-hidden="true" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb90-10"><a href="medical-large-claims-experience-study-mlces.html#cb90-10" aria-hidden="true" tabindex="-1"></a>mlces_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( unzipped_files )</span>
 <span id="cb90-11"><a href="medical-large-claims-experience-study-mlces.html#cb90-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb90-12"><a href="medical-large-claims-experience-study-mlces.html#cb90-12" aria-hidden="true" tabindex="-1"></a>mlces_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( unzipped_files )</span>
-<span id="cb90-13"><a href="medical-large-claims-experience-study-mlces.html#cb90-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb90-14"><a href="medical-large-claims-experience-study-mlces.html#cb90-14" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( mlces_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( mlces_df ) )</span></code></pre></div>
+<span id="cb90-12"><a href="medical-large-claims-experience-study-mlces.html#cb90-12" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( mlces_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( mlces_df ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-base-r" class="section level2 unnumbered hasAnchor">
@@ -406,6 +404,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb104-4"><a href="medical-large-claims-experience-study-mlces.html#cb104-4" aria-hidden="true" tabindex="-1"></a>mlces_tbl <span class="sc">%&gt;%</span></span>
 <span id="cb104-5"><a href="medical-large-claims-experience-study-mlces.html#cb104-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( claimant_relationship_to_policyholder ) <span class="sc">%&gt;%</span></span>
 <span id="cb104-6"><a href="medical-large-claims-experience-study-mlces.html#cb104-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( totpdchg ) )</span></code></pre></div>
+<hr />
+</div>
+<div id="replication-example-3" class="section level2 unnumbered hasAnchor">
+<h2>Replication Example<a href="medical-large-claims-experience-study-mlces.html#replication-example-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The example below matches statistics in Table II-A’s 1999 row numbers 52 and 53 from the <a href="https://www.soa.org/4937cc/globalassets/assets/files/research/tables.zip">Tables II – XI 1997–1999 Database</a>:</p>
+<p>Match Claimants Exceeding Deductible:</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="medical-large-claims-experience-study-mlces.html#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="co"># $0 deductible</span></span>
+<span id="cb105-2"><a href="medical-large-claims-experience-study-mlces.html#cb105-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( mlces_df ) <span class="sc">==</span> <span class="dv">1591738</span> )</span>
+<span id="cb105-3"><a href="medical-large-claims-experience-study-mlces.html#cb105-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-4"><a href="medical-large-claims-experience-study-mlces.html#cb105-4" aria-hidden="true" tabindex="-1"></a><span class="co"># $1,000 deductible</span></span>
+<span id="cb105-5"><a href="medical-large-claims-experience-study-mlces.html#cb105-5" aria-hidden="true" tabindex="-1"></a>charges_above_1000 <span class="ot">&lt;-</span> <span class="fu">subset</span>( mlces_df , totpdchg <span class="sc">&gt;</span> <span class="dv">1000</span> )</span>
+<span id="cb105-6"><a href="medical-large-claims-experience-study-mlces.html#cb105-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( charges_above_1000 ) <span class="sc">==</span> <span class="dv">402550</span> )</span></code></pre></div>
+<p>Match the Excess Charges Above Deductible:</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="medical-large-claims-experience-study-mlces.html#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="co"># $0 deductible</span></span>
+<span id="cb106-2"><a href="medical-large-claims-experience-study-mlces.html#cb106-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">sum</span>( mlces_df[ , <span class="st">&#39;totpdchg&#39;</span> ] ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">2599356658</span> )</span>
+<span id="cb106-3"><a href="medical-large-claims-experience-study-mlces.html#cb106-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb106-4"><a href="medical-large-claims-experience-study-mlces.html#cb106-4" aria-hidden="true" tabindex="-1"></a><span class="co"># $1,000 deductible</span></span>
+<span id="cb106-5"><a href="medical-large-claims-experience-study-mlces.html#cb106-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">sum</span>( charges_above_1000[ , <span class="st">&#39;totpdchg&#39;</span> ] <span class="sc">-</span> <span class="dv">1000</span> ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">1883768786</span> )</span></code></pre></div>
 
 </div>
 </div>
