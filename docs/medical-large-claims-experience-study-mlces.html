@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Page not found | Analyze Survey Data for Free</title>
-  <meta name="description" content="Page not found | Analyze Survey Data for Free" />
+  <title>Medical Large Claims Experience Study (MLCES) | Analyze Survey Data for Free</title>
+  <meta name="description" content="Medical Large Claims Experience Study (MLCES) | Analyze Survey Data for Free" />
   <meta name="generator" content="bookdown 0.31 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Page not found | Analyze Survey Data for Free" />
+  <meta property="og:title" content="Medical Large Claims Experience Study (MLCES) | Analyze Survey Data for Free" />
   <meta property="og:type" content="book" />
   
   
   <meta name="github-repo" content="ajdamico/asdfree" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Page not found | Analyze Survey Data for Free" />
+  <meta name="twitter:title" content="Medical Large Claims Experience Study (MLCES) | Analyze Survey Data for Free" />
   
   
   
@@ -28,8 +28,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-
+<link rel="prev" href="medicare-current-beneficiary-survey-mcbs.html"/>
+<link rel="next" href="trend-analysis-of-complex-survey-data.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -249,19 +249,155 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="page-not-found" class="section level1">
-<h1>Page not found</h1>
-<p>The page you requested cannot be found (perhaps it was moved or renamed).</p>
-<p>You may want to try searching to find the page's new location, or use
-the table of contents to find the page you are looking for.</p>
+<div id="medical-large-claims-experience-study-mlces" class="section level1 unnumbered hasAnchor">
+<h1>Medical Large Claims Experience Study (MLCES)<a href="medical-large-claims-experience-study-mlces.html#medical-large-claims-experience-study-mlces" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><a href="https://github.com/asdfree/mlces/actions"><img src="https://github.com/asdfree/mlces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+<p>The Medical Large Claims Experience Study (MLCES) might be the best private health insurance claims data available to the public. This data should be used to calibrate other data sets, and probably nothing more.</p>
+<ul>
+<li><p>One table with one row per individual with nonzero total paid charges.</p></li>
+<li><p>A convenience sample of group (employer-sponsored) health insurance claims from seven private health insurers in the United States.</p></li>
+<li><p>1997 thru 1999 with no expected updates in the future.</p></li>
+<li><p>Provided by the <a href="http://www.soa.org/">Society of Actuaries (SOA)</a>.</p></li>
+</ul>
+<hr />
+<p>Please skim before you begin:</p>
+<ol style="list-style-type: decimal">
+<li></li>
+<li></li>
+<li>This poem</li>
+</ol>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="medical-large-claims-experience-study-mlces.html#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="co"># skewed by black swan tails</span></span>
+<span id="cb89-2"><a href="medical-large-claims-experience-study-mlces.html#cb89-2" aria-hidden="true" tabindex="-1"></a><span class="co"># means, medians sing adieu</span></span>
+<span id="cb89-3"><a href="medical-large-claims-experience-study-mlces.html#cb89-3" aria-hidden="true" tabindex="-1"></a><span class="co"># claims distribution</span></span></code></pre></div>
+<hr />
+<div id="download-import-preparation-3" class="section level2 unnumbered hasAnchor">
+<h2>Download, Import, Preparation<a href="medical-large-claims-experience-study-mlces.html#download-import-preparation-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<hr />
+</div>
+<div id="analysis-examples-with-base-r" class="section level2 unnumbered hasAnchor">
+<h2>Analysis Examples with base R  <a href="medical-large-claims-experience-study-mlces.html#analysis-examples-with-base-r" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Load a data frame:</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="medical-large-claims-experience-study-mlces.html#cb90-1" aria-hidden="true" tabindex="-1"></a>mlces_df <span class="ot">&lt;-</span> <span class="fu">readRDS</span>( <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;MLCES&quot;</span> , <span class="st">&quot;mlces1997.rds&quot;</span> ) )</span></code></pre></div>
+<div id="variable-recoding-3" class="section level3 unnumbered hasAnchor">
+<h3>Variable Recoding<a href="medical-large-claims-experience-study-mlces.html#variable-recoding-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Add new columns to the data set:</p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="medical-large-claims-experience-study-mlces.html#cb91-1" aria-hidden="true" tabindex="-1"></a>mlces_df <span class="ot">&lt;-</span> </span>
+<span id="cb91-2"><a href="medical-large-claims-experience-study-mlces.html#cb91-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transform</span>( </span>
+<span id="cb91-3"><a href="medical-large-claims-experience-study-mlces.html#cb91-3" aria-hidden="true" tabindex="-1"></a>        mlces_df , </span>
+<span id="cb91-4"><a href="medical-large-claims-experience-study-mlces.html#cb91-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb91-5"><a href="medical-large-claims-experience-study-mlces.html#cb91-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">claimant_relationship_to_policyholder =</span></span>
+<span id="cb91-6"><a href="medical-large-claims-experience-study-mlces.html#cb91-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">ifelse</span>( relation <span class="sc">==</span> <span class="st">&quot;E&quot;</span> , <span class="st">&quot;covered employee&quot;</span> ,</span>
+<span id="cb91-7"><a href="medical-large-claims-experience-study-mlces.html#cb91-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">ifelse</span>( relation <span class="sc">==</span> <span class="st">&quot;S&quot;</span> , <span class="st">&quot;spouse of covered employee&quot;</span> ,</span>
+<span id="cb91-8"><a href="medical-large-claims-experience-study-mlces.html#cb91-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">ifelse</span>( relation <span class="sc">==</span> <span class="st">&quot;D&quot;</span> , <span class="st">&quot;dependent of covered employee&quot;</span> , <span class="cn">NA</span> ) ) ) ,</span>
+<span id="cb91-9"><a href="medical-large-claims-experience-study-mlces.html#cb91-9" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb91-10"><a href="medical-large-claims-experience-study-mlces.html#cb91-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">ppo_plan =</span> <span class="fu">as.numeric</span>( ppo <span class="sc">==</span> <span class="st">&#39;Y&#39;</span> )</span>
+<span id="cb91-11"><a href="medical-large-claims-experience-study-mlces.html#cb91-11" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+</div>
+<div id="unweighted-counts-3" class="section level3 unnumbered hasAnchor">
+<h3>Unweighted Counts<a href="medical-large-claims-experience-study-mlces.html#unweighted-counts-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Count the unweighted number of records in the table, overall and by groups:</p>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="medical-large-claims-experience-study-mlces.html#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>( mlces_df )</span>
+<span id="cb92-2"><a href="medical-large-claims-experience-study-mlces.html#cb92-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-3"><a href="medical-large-claims-experience-study-mlces.html#cb92-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>( mlces_df[ , <span class="st">&quot;claimant_relationship_to_policyholder&quot;</span> ] , <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span> )</span></code></pre></div>
+</div>
+<div id="descriptive-statistics-3" class="section level3 unnumbered hasAnchor">
+<h3>Descriptive Statistics<a href="medical-large-claims-experience-study-mlces.html#descriptive-statistics-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="medical-large-claims-experience-study-mlces.html#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] )</span>
+<span id="cb93-2"><a href="medical-large-claims-experience-study-mlces.html#cb93-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-3"><a href="medical-large-claims-experience-study-mlces.html#cb93-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb93-4"><a href="medical-large-claims-experience-study-mlces.html#cb93-4" aria-hidden="true" tabindex="-1"></a>    mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] ,</span>
+<span id="cb93-5"><a href="medical-large-claims-experience-study-mlces.html#cb93-5" aria-hidden="true" tabindex="-1"></a>    mlces_df[ , <span class="st">&quot;claimant_relationship_to_policyholder&quot;</span> ] ,</span>
+<span id="cb93-6"><a href="medical-large-claims-experience-study-mlces.html#cb93-6" aria-hidden="true" tabindex="-1"></a>    mean </span>
+<span id="cb93-7"><a href="medical-large-claims-experience-study-mlces.html#cb93-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="medical-large-claims-experience-study-mlces.html#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>( <span class="fu">table</span>( mlces_df[ , <span class="st">&quot;patsex&quot;</span> ] ) )</span>
+<span id="cb94-2"><a href="medical-large-claims-experience-study-mlces.html#cb94-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb94-3"><a href="medical-large-claims-experience-study-mlces.html#cb94-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(</span>
+<span id="cb94-4"><a href="medical-large-claims-experience-study-mlces.html#cb94-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">table</span>( mlces_df[ , <span class="fu">c</span>( <span class="st">&quot;patsex&quot;</span> , <span class="st">&quot;claimant_relationship_to_policyholder&quot;</span> ) ] ) ,</span>
+<span id="cb94-5"><a href="medical-large-claims-experience-study-mlces.html#cb94-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">margin =</span> <span class="dv">2</span></span>
+<span id="cb94-6"><a href="medical-large-claims-experience-study-mlces.html#cb94-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="medical-large-claims-experience-study-mlces.html#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] )</span>
+<span id="cb95-2"><a href="medical-large-claims-experience-study-mlces.html#cb95-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-3"><a href="medical-large-claims-experience-study-mlces.html#cb95-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb95-4"><a href="medical-large-claims-experience-study-mlces.html#cb95-4" aria-hidden="true" tabindex="-1"></a>    mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] ,</span>
+<span id="cb95-5"><a href="medical-large-claims-experience-study-mlces.html#cb95-5" aria-hidden="true" tabindex="-1"></a>    mlces_df[ , <span class="st">&quot;claimant_relationship_to_policyholder&quot;</span> ] ,</span>
+<span id="cb95-6"><a href="medical-large-claims-experience-study-mlces.html#cb95-6" aria-hidden="true" tabindex="-1"></a>    sum </span>
+<span id="cb95-7"><a href="medical-large-claims-experience-study-mlces.html#cb95-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="medical-large-claims-experience-study-mlces.html#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>( mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] , <span class="fl">0.5</span> )</span>
+<span id="cb96-2"><a href="medical-large-claims-experience-study-mlces.html#cb96-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-3"><a href="medical-large-claims-experience-study-mlces.html#cb96-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb96-4"><a href="medical-large-claims-experience-study-mlces.html#cb96-4" aria-hidden="true" tabindex="-1"></a>    mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] ,</span>
+<span id="cb96-5"><a href="medical-large-claims-experience-study-mlces.html#cb96-5" aria-hidden="true" tabindex="-1"></a>    mlces_df[ , <span class="st">&quot;claimant_relationship_to_policyholder&quot;</span> ] ,</span>
+<span id="cb96-6"><a href="medical-large-claims-experience-study-mlces.html#cb96-6" aria-hidden="true" tabindex="-1"></a>    quantile ,</span>
+<span id="cb96-7"><a href="medical-large-claims-experience-study-mlces.html#cb96-7" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> </span>
+<span id="cb96-8"><a href="medical-large-claims-experience-study-mlces.html#cb96-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="subsetting-3" class="section level3 unnumbered hasAnchor">
+<h3>Subsetting<a href="medical-large-claims-experience-study-mlces.html#subsetting-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Limit your <code>data.frame</code> to persons under 18:</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="medical-large-claims-experience-study-mlces.html#cb97-1" aria-hidden="true" tabindex="-1"></a>sub_mlces_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( mlces_df , ( ( claimyr <span class="sc">-</span> patbrtyr ) <span class="sc">&lt;</span> <span class="dv">18</span> ) )</span></code></pre></div>
+<p>Calculate the mean (average) of this subset:</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="medical-large-claims-experience-study-mlces.html#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( sub_mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] )</span></code></pre></div>
+</div>
+<div id="measures-of-uncertainty-3" class="section level3 unnumbered hasAnchor">
+<h3>Measures of Uncertainty<a href="medical-large-claims-experience-study-mlces.html#measures-of-uncertainty-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Calculate the variance, overall and by groups:</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="medical-large-claims-experience-study-mlces.html#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>( mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] )</span>
+<span id="cb99-2"><a href="medical-large-claims-experience-study-mlces.html#cb99-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-3"><a href="medical-large-claims-experience-study-mlces.html#cb99-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb99-4"><a href="medical-large-claims-experience-study-mlces.html#cb99-4" aria-hidden="true" tabindex="-1"></a>    mlces_df[ , <span class="st">&quot;totpdchg&quot;</span> ] ,</span>
+<span id="cb99-5"><a href="medical-large-claims-experience-study-mlces.html#cb99-5" aria-hidden="true" tabindex="-1"></a>    mlces_df[ , <span class="st">&quot;claimant_relationship_to_policyholder&quot;</span> ] ,</span>
+<span id="cb99-6"><a href="medical-large-claims-experience-study-mlces.html#cb99-6" aria-hidden="true" tabindex="-1"></a>    var </span>
+<span id="cb99-7"><a href="medical-large-claims-experience-study-mlces.html#cb99-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="regression-models-and-tests-of-association-3" class="section level3 unnumbered hasAnchor">
+<h3>Regression Models and Tests of Association<a href="medical-large-claims-experience-study-mlces.html#regression-models-and-tests-of-association-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Perform a t-test:</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="medical-large-claims-experience-study-mlces.html#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>( totpdchg <span class="sc">~</span> ppo_plan , mlces_df )</span></code></pre></div>
+<p>Perform a chi-squared test of association:</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="medical-large-claims-experience-study-mlces.html#cb101-1" aria-hidden="true" tabindex="-1"></a>this_table <span class="ot">&lt;-</span> <span class="fu">table</span>( mlces_df[ , <span class="fu">c</span>( <span class="st">&quot;ppo_plan&quot;</span> , <span class="st">&quot;patsex&quot;</span> ) ] )</span>
+<span id="cb101-2"><a href="medical-large-claims-experience-study-mlces.html#cb101-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-3"><a href="medical-large-claims-experience-study-mlces.html#cb101-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>( this_table )</span></code></pre></div>
+<p>Perform a generalized linear model:</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="medical-large-claims-experience-study-mlces.html#cb102-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb102-2"><a href="medical-large-claims-experience-study-mlces.html#cb102-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glm</span>( </span>
+<span id="cb102-3"><a href="medical-large-claims-experience-study-mlces.html#cb102-3" aria-hidden="true" tabindex="-1"></a>        totpdchg <span class="sc">~</span> ppo_plan <span class="sc">+</span> patsex , </span>
+<span id="cb102-4"><a href="medical-large-claims-experience-study-mlces.html#cb102-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> mlces_df</span>
+<span id="cb102-5"><a href="medical-large-claims-experience-study-mlces.html#cb102-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb102-6"><a href="medical-large-claims-experience-study-mlces.html#cb102-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-7"><a href="medical-large-claims-experience-study-mlces.html#cb102-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="intermish-3" class="section level2 unnumbered hasAnchor">
+<h2>Intermish<a href="medical-large-claims-experience-study-mlces.html#intermish-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<hr />
+</div>
+<div id="analysis-examples-with-dplyr" class="section level2 unnumbered hasAnchor">
+<h2>Analysis Examples with <code>dplyr</code>  <a href="medical-large-claims-experience-study-mlces.html#analysis-examples-with-dplyr" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The R <code>dplyr</code> library offers an alternative grammar of data manipulation to base R and SQL syntax. <a href="https://github.com/tidyverse/dplyr/">dplyr</a> offers many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, and the <code>tidyverse</code> style of non-standard evaluation. <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html">This vignette</a> details the available features. As a starting point for MLCES users, this code replicates previously-presented examples:</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="medical-large-claims-experience-study-mlces.html#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb103-2"><a href="medical-large-claims-experience-study-mlces.html#cb103-2" aria-hidden="true" tabindex="-1"></a>mlces_tbl <span class="ot">&lt;-</span> <span class="fu">tbl_df</span>( mlces_df )</span></code></pre></div>
+<p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="medical-large-claims-experience-study-mlces.html#cb104-1" aria-hidden="true" tabindex="-1"></a>mlces_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb104-2"><a href="medical-large-claims-experience-study-mlces.html#cb104-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( totpdchg ) )</span>
+<span id="cb104-3"><a href="medical-large-claims-experience-study-mlces.html#cb104-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb104-4"><a href="medical-large-claims-experience-study-mlces.html#cb104-4" aria-hidden="true" tabindex="-1"></a>mlces_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb104-5"><a href="medical-large-claims-experience-study-mlces.html#cb104-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( claimant_relationship_to_policyholder ) <span class="sc">%&gt;%</span></span>
+<span id="cb104-6"><a href="medical-large-claims-experience-study-mlces.html#cb104-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( totpdchg ) )</span></code></pre></div>
+
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-
+<a href="medicare-current-beneficiary-survey-mcbs.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="trend-analysis-of-complex-survey-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -282,7 +418,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ajdamico/asdfree/edit/master/%s",
+"link": "https://github.com/ajdamico/asdfree/edit/master/metadata/mlces.txt",
 "text": "Edit"
 },
 "history": {
