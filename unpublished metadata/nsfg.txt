@@ -16,6 +16,41 @@ administrative_organization: * Administered by the [Centers for Disease Control 
 
 
 
+~~~{download_and_import_block}
+library(SAScii)
+library(readr)
+
+sas_url <-
+	"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/sas/2017_2019_FemRespSetup.sas"
+
+dat_url <-
+	"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/2017_2019_FemRespData.dat"
+	
+sas_positions <-
+	parse.SAScii( sas_url )
+
+sas_positions[ , 'varname' ] <-
+	tolower( sas_positions[ , 'varname' ] )
+
+sas_positions[ , 'column_types' ] <-
+		ifelse( sas_positions[ , 'char' ] , "c" , "d" )
+
+chapter_tag_tbl <-
+	read_fwf(
+		dat_url ,
+		fwf_widths( 
+			abs( sas_positions[ , 'width' ] ) , 
+			col_names = sas_positions[ , 'varname' ] 
+		) ,
+		col_types = paste0( sas_positions[ , 'column_types' ] , collapse = "" ) ,
+		na = c( "" , "." )
+	)
+	
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+~~~
+
+
+
 
 
 ~~~{analysis_examples_survey_design}
@@ -23,14 +58,12 @@ options( survey.lonely.psu = "adjust" )
 
 library(survey)
 
-chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2013_2015_FemRespData.rds" ) )
-
 chapter_tag_design <- 
 	svydesign( 
 		id = ~ secu , 
 		strata = ~ sest , 
 		data = chapter_tag_df , 
-		weights = ~ wgt2013_2015 , 
+		weights = ~ wgt2017_2019 , 
 		nest = TRUE 
 	)
 ~~~
@@ -46,7 +79,7 @@ chapter_tag_design <-
 		
 		age_categories = 
 			factor( findInterval( ager , c( 15 , 20 , 25 , 30 , 35 , 40 ) ) ,
-				labels = c( '15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' ) ) ,
+				labels = c( '15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-49' ) ) ,
 		
 		marstat =
 			factor( marstat , levels = c( 1:6 , 8:9 ) ,
@@ -62,6 +95,8 @@ chapter_tag_design <-
 			)
 	)
 ~~~
+
+
 
 group_by_variable: age_categories
 
@@ -86,23 +121,25 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-The example below matches statistics and standard errors from this table pulled from the [CDC](https://www.cdc.gov/nchs/data/nsfg/NSFG_2013_2015_VarEst_Ex1.pdf) variance estimation examples:
-
-`r knitr::include_graphics("images/nsfg_2013_2015_varest_ex1.png")`
+The example below matches statistics and standard errors from this table pulled from the [CDC](https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf) variance estimation examples:
 
 Match the sum of the weights:
 
 ```{r eval = FALSE , results = "hide" }
-stopifnot( round( coef( svytotal( ~ one , nsfg_design ) ) , 0 ) == 61491766 )
+result <- svytotal( ~ one , chapter_tag_design )
+
+stopifnot( round( coef( result ) , 0 ) == 72671926 )
+
+stopifnot( round( SE( result ) , 0 ) == 3521465 )
 ```
 	
 	
 Compute the statistics and standard errors for percentage of women currently using the pill by age:
 
 ```{r eval = FALSE , results = "hide" }
-row_percents <- c( 16.1723 , 27.8173 , 18.7197 , 13.4367 , 9.0851 , 7.7224 )
+row_percents <- c( 19.5112 , 23.7833 , 19.6916 , 15.2800 , 6.4965 , 6.5215 )
 
-std_err_row_percents <- c( 1.5414 , 2.4162 , 1.9890 , 1.5074 , 1.5222 , 1.6053 )
+std_err_row_percents <- c( 1.8670 , 2.1713 , 2.2773 , 1.7551 , 0.9895 , 1.0029 )
 
 results <- svyby( ~ birth_control_pill , ~ age_categories , nsfg_design , svymean )
 
