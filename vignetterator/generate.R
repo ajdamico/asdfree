@@ -1,4 +1,4 @@
-commit_memo <- "'nsfg draft'"
+commit_memo <- "'recs unpublished'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
