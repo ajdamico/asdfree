@@ -270,19 +270,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="national-survey-of-family-growth-nsfg" class="section level1 unnumbered hasAnchor">
 <h1>National Survey of Family Growth (NSFG)<a href="national-survey-of-family-growth-nsfg.html#national-survey-of-family-growth-nsfg" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/nsfg/actions"><img src="https://github.com/asdfree/nsfg/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>The National Survey of Family Growth (NSFG) is the principal survey to measure reproductive behavior in the United States population.</p>
+<p>The principal survey to measure reproductive behavior in the United States population.</p>
 <ul>
 <li><p>Multiple tables with one row per respondent for the female and male tables, then a separate table with one row per pregnancy.</p></li>
-<li><p>A complex sample survey designed to generalize to the 15-44 year old population of the United States, by gender.</p></li>
+<li><p>A complex sample survey designed to generalize to the 15-49 year old population of the United States, by gender.</p></li>
 <li><p>Released every couple of years since 1973.</p></li>
 <li><p>Administered by the <a href="http://www.cdc.gov/">Centers for Disease Control and Prevention</a>.</p></li>
 </ul>
 <hr />
 <p>Please skim before you begin:</p>
 <ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li>This poem</li>
+<li><p><a href="https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-Sample-Design-Documentation-508.pdf">Sample Design Documentation</a></p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/National_Survey_of_Family_Growth">Wikipedia Entry</a></p></li>
+<li><p>This poem</p></li>
 </ol>
 <div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="national-survey-of-family-growth-nsfg.html#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="co"># family structure</span></span>
 <span id="cb108-2"><a href="national-survey-of-family-growth-nsfg.html#cb108-2" aria-hidden="true" tabindex="-1"></a><span class="co"># questions cuz radar fails at</span></span>
@@ -297,33 +297,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb109-5"><a href="national-survey-of-family-growth-nsfg.html#cb109-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/2017_2019_FemRespData.dat&quot;</span></span>
 <span id="cb109-6"><a href="national-survey-of-family-growth-nsfg.html#cb109-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb109-7"><a href="national-survey-of-family-growth-nsfg.html#cb109-7" aria-hidden="true" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
-<span id="cb109-8"><a href="national-survey-of-family-growth-nsfg.html#cb109-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>(</span>
-<span id="cb109-9"><a href="national-survey-of-family-growth-nsfg.html#cb109-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">dirname</span>( dat_url ) , </span>
-<span id="cb109-10"><a href="national-survey-of-family-growth-nsfg.html#cb109-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;sas&quot;</span> , </span>
-<span id="cb109-11"><a href="national-survey-of-family-growth-nsfg.html#cb109-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gsub</span>( <span class="st">&quot;Data&quot;</span> , <span class="st">&quot;Setup&quot;</span> , <span class="fu">basename</span>( dat_url ) )</span>
-<span id="cb109-12"><a href="national-survey-of-family-growth-nsfg.html#cb109-12" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb109-13"><a href="national-survey-of-family-growth-nsfg.html#cb109-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb109-14"><a href="national-survey-of-family-growth-nsfg.html#cb109-14" aria-hidden="true" tabindex="-1"></a>sas_positions <span class="ot">&lt;-</span></span>
-<span id="cb109-15"><a href="national-survey-of-family-growth-nsfg.html#cb109-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parse.SAScii</span>( sas_url )</span>
-<span id="cb109-16"><a href="national-survey-of-family-growth-nsfg.html#cb109-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb109-17"><a href="national-survey-of-family-growth-nsfg.html#cb109-17" aria-hidden="true" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb109-18"><a href="national-survey-of-family-growth-nsfg.html#cb109-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tolower</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] )</span>
-<span id="cb109-19"><a href="national-survey-of-family-growth-nsfg.html#cb109-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb109-20"><a href="national-survey-of-family-growth-nsfg.html#cb109-20" aria-hidden="true" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb109-21"><a href="national-survey-of-family-growth-nsfg.html#cb109-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ifelse</span>( sas_positions[ , <span class="st">&#39;char&#39;</span> ] , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> )</span>
-<span id="cb109-22"><a href="national-survey-of-family-growth-nsfg.html#cb109-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb109-23"><a href="national-survey-of-family-growth-nsfg.html#cb109-23" aria-hidden="true" tabindex="-1"></a>nsfg_tbl <span class="ot">&lt;-</span></span>
-<span id="cb109-24"><a href="national-survey-of-family-growth-nsfg.html#cb109-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_fwf</span>(</span>
-<span id="cb109-25"><a href="national-survey-of-family-growth-nsfg.html#cb109-25" aria-hidden="true" tabindex="-1"></a>        dat_url ,</span>
-<span id="cb109-26"><a href="national-survey-of-family-growth-nsfg.html#cb109-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">fwf_widths</span>( </span>
-<span id="cb109-27"><a href="national-survey-of-family-growth-nsfg.html#cb109-27" aria-hidden="true" tabindex="-1"></a>            <span class="fu">abs</span>( sas_positions[ , <span class="st">&#39;width&#39;</span> ] ) , </span>
-<span id="cb109-28"><a href="national-survey-of-family-growth-nsfg.html#cb109-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">col_names =</span> sas_positions[ , <span class="st">&#39;varname&#39;</span> ] </span>
-<span id="cb109-29"><a href="national-survey-of-family-growth-nsfg.html#cb109-29" aria-hidden="true" tabindex="-1"></a>        ) ,</span>
-<span id="cb109-30"><a href="national-survey-of-family-growth-nsfg.html#cb109-30" aria-hidden="true" tabindex="-1"></a>        <span class="at">col_types =</span> <span class="fu">paste0</span>( sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] , <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> ) ,</span>
-<span id="cb109-31"><a href="national-survey-of-family-growth-nsfg.html#cb109-31" aria-hidden="true" tabindex="-1"></a>        <span class="at">na =</span> <span class="fu">c</span>( <span class="st">&quot;&quot;</span> , <span class="st">&quot;.&quot;</span> )</span>
-<span id="cb109-32"><a href="national-survey-of-family-growth-nsfg.html#cb109-32" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb109-33"><a href="national-survey-of-family-growth-nsfg.html#cb109-33" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb109-34"><a href="national-survey-of-family-growth-nsfg.html#cb109-34" aria-hidden="true" tabindex="-1"></a>nsfg_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( nsfg_tbl )</span></code></pre></div>
+<span id="cb109-8"><a href="national-survey-of-family-growth-nsfg.html#cb109-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>( <span class="fu">dirname</span>( dat_url ) , <span class="st">&quot;sas/2017_2019_FemRespSetup.sas&quot;</span> )</span>
+<span id="cb109-9"><a href="national-survey-of-family-growth-nsfg.html#cb109-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb109-10"><a href="national-survey-of-family-growth-nsfg.html#cb109-10" aria-hidden="true" tabindex="-1"></a>sas_positions <span class="ot">&lt;-</span></span>
+<span id="cb109-11"><a href="national-survey-of-family-growth-nsfg.html#cb109-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parse.SAScii</span>( sas_url )</span>
+<span id="cb109-12"><a href="national-survey-of-family-growth-nsfg.html#cb109-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-13"><a href="national-survey-of-family-growth-nsfg.html#cb109-13" aria-hidden="true" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb109-14"><a href="national-survey-of-family-growth-nsfg.html#cb109-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tolower</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] )</span>
+<span id="cb109-15"><a href="national-survey-of-family-growth-nsfg.html#cb109-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-16"><a href="national-survey-of-family-growth-nsfg.html#cb109-16" aria-hidden="true" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb109-17"><a href="national-survey-of-family-growth-nsfg.html#cb109-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ifelse</span>( sas_positions[ , <span class="st">&#39;char&#39;</span> ] , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> )</span>
+<span id="cb109-18"><a href="national-survey-of-family-growth-nsfg.html#cb109-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-19"><a href="national-survey-of-family-growth-nsfg.html#cb109-19" aria-hidden="true" tabindex="-1"></a>nsfg_tbl <span class="ot">&lt;-</span></span>
+<span id="cb109-20"><a href="national-survey-of-family-growth-nsfg.html#cb109-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_fwf</span>(</span>
+<span id="cb109-21"><a href="national-survey-of-family-growth-nsfg.html#cb109-21" aria-hidden="true" tabindex="-1"></a>        dat_url ,</span>
+<span id="cb109-22"><a href="national-survey-of-family-growth-nsfg.html#cb109-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">fwf_widths</span>( </span>
+<span id="cb109-23"><a href="national-survey-of-family-growth-nsfg.html#cb109-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">abs</span>( sas_positions[ , <span class="st">&#39;width&#39;</span> ] ) , </span>
+<span id="cb109-24"><a href="national-survey-of-family-growth-nsfg.html#cb109-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">col_names =</span> sas_positions[ , <span class="st">&#39;varname&#39;</span> ] </span>
+<span id="cb109-25"><a href="national-survey-of-family-growth-nsfg.html#cb109-25" aria-hidden="true" tabindex="-1"></a>        ) ,</span>
+<span id="cb109-26"><a href="national-survey-of-family-growth-nsfg.html#cb109-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">col_types =</span> <span class="fu">paste0</span>( sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] , <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> ) ,</span>
+<span id="cb109-27"><a href="national-survey-of-family-growth-nsfg.html#cb109-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">na =</span> <span class="fu">c</span>( <span class="st">&quot;&quot;</span> , <span class="st">&quot;.&quot;</span> )</span>
+<span id="cb109-28"><a href="national-survey-of-family-growth-nsfg.html#cb109-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb109-29"><a href="national-survey-of-family-growth-nsfg.html#cb109-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb109-30"><a href="national-survey-of-family-growth-nsfg.html#cb109-30" aria-hidden="true" tabindex="-1"></a>nsfg_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( nsfg_tbl )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-the-survey-library-3" class="section level2 unnumbered hasAnchor">
@@ -487,6 +483,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="intermish-4" class="section level2 unnumbered hasAnchor">
 <h2>Intermish<a href="national-survey-of-family-growth-nsfg.html#intermish-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<center>
+<a href="https://en.wikipedia.org/wiki/Lorem_ipsum" class="uri">https://en.wikipedia.org/wiki/Lorem_ipsum</a>
+</center>
 <hr />
 </div>
 <div id="analysis-examples-with-srvyr-3" class="section level2 unnumbered hasAnchor">
@@ -505,14 +504,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-4" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="national-survey-of-family-growth-nsfg.html#replication-example-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The example below matches statistics and standard errors from this table pulled from the <a href="https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf">CDC</a> variance estimation examples:</p>
+<p>This example matches the <a href="https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf">Variance Estimates for Percentages</a>:</p>
 <p>Match the sum of the weights:</p>
 <div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="national-survey-of-family-growth-nsfg.html#cb132-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">svytotal</span>( <span class="sc">~</span> one , nsfg_design )</span>
 <span id="cb132-2"><a href="national-survey-of-family-growth-nsfg.html#cb132-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb132-3"><a href="national-survey-of-family-growth-nsfg.html#cb132-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">72671926</span> )</span>
 <span id="cb132-4"><a href="national-survey-of-family-growth-nsfg.html#cb132-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb132-5"><a href="national-survey-of-family-growth-nsfg.html#cb132-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">3521465</span> )</span></code></pre></div>
-<p>Compute the statistics and standard errors for percentage of women currently using the pill by age:</p>
+<p>Match row percentages of women currently using the pill by age:</p>
 <div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="national-survey-of-family-growth-nsfg.html#cb133-1" aria-hidden="true" tabindex="-1"></a>row_percents <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">19.5112</span> , <span class="fl">23.7833</span> , <span class="fl">19.6916</span> , <span class="fl">15.2800</span> , <span class="fl">6.4965</span> , <span class="fl">6.5215</span> )</span>
 <span id="cb133-2"><a href="national-survey-of-family-growth-nsfg.html#cb133-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb133-3"><a href="national-survey-of-family-growth-nsfg.html#cb133-3" aria-hidden="true" tabindex="-1"></a>std_err_row_percents <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">1.8670</span> , <span class="fl">2.1713</span> , <span class="fl">2.2773</span> , <span class="fl">1.7551</span> , <span class="fl">0.9895</span> , <span class="fl">1.0029</span> )</span>
