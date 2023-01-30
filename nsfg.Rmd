@@ -1,0 +1,323 @@
+# National Survey of Family Growth (NSFG) {-}
+
+<a href="https://github.com/asdfree/nsfg/actions"><img src="https://github.com/asdfree/nsfg/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The National Survey of Family Growth (NSFG) is the principal survey to measure reproductive behavior in the United States population.
+
+* Multiple tables with one row per respondent for the female and male tables, then a separate table with one row per pregnancy.
+
+* A complex sample survey designed to generalize to the 15-44 year old population of the United States, by gender.
+
+* Released every couple of years since 1973.
+
+* Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
+
+---
+
+---
+
+## Download, Import, Preparation {-}
+
+```{r eval = FALSE }
+library(SAScii)
+library(readr)
+
+sas_url <-
+	"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/sas/2017_2019_FemRespSetup.sas"
+
+dat_url <-
+	"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/2017_2019_FemRespData.dat"
+	
+sas_positions <-
+	parse.SAScii( sas_url )
+
+sas_positions[ , 'varname' ] <-
+	tolower( sas_positions[ , 'varname' ] )
+
+sas_positions[ , 'column_types' ] <-
+		ifelse( sas_positions[ , 'char' ] , "c" , "d" )
+
+nsfg_tbl <-
+	read_fwf(
+		dat_url ,
+		fwf_widths( 
+			abs( sas_positions[ , 'width' ] ) , 
+			col_names = sas_positions[ , 'varname' ] 
+		) ,
+		col_types = paste0( sas_positions[ , 'column_types' ] , collapse = "" ) ,
+		na = c( "" , "." )
+	)
+	
+nsfg_df <- data.frame( nsfg_tbl )
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+Construct a complex sample survey design:
+
+```{r messages = FALSE , eval = FALSE }
+
+```
+
+```{r messages = FALSE , eval = FALSE }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+nsfg_design <- 
+	svydesign( 
+		id = ~ secu , 
+		strata = ~ sest , 
+		data = nsfg_df , 
+		weights = ~ wgt2017_2019 , 
+		nest = TRUE 
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+nsfg_design <- 
+	update( 
+		nsfg_design , 
+
+		one = 1 ,
+		
+		birth_control_pill = as.numeric( constat1 == 6 ) ,
+		
+		age_categories = 
+			factor( findInterval( ager , c( 15 , 20 , 25 , 30 , 35 , 40 ) ) ,
+				labels = c( '15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-49' ) ) ,
+		
+		marstat =
+			factor( marstat , levels = c( 1:6 , 8:9 ) ,
+				labels = c(
+					"Married to a person of the opposite sex" ,
+					"Not married but living together with a partner of the opposite sex" ,
+					"Widowed" ,
+					"Divorced or annulled" ,
+					"Separated, because you and your spouse are not getting along" ,
+					"Never been married" ,
+					"Refused" ,
+					"Don't know" )
+			)
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( nsfg_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ age_categories , nsfg_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , nsfg_design )
+
+svyby( ~ one , ~ age_categories , nsfg_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ npregs_s , nsfg_design , na.rm = TRUE )
+
+svyby( ~ npregs_s , ~ age_categories , nsfg_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ marstat , nsfg_design )
+
+svyby( ~ marstat , ~ age_categories , nsfg_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ npregs_s , nsfg_design , na.rm = TRUE )
+
+svyby( ~ npregs_s , ~ age_categories , nsfg_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ marstat , nsfg_design )
+
+svyby( ~ marstat , ~ age_categories , nsfg_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ npregs_s , nsfg_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ npregs_s , 
+	~ age_categories , 
+	nsfg_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ npregs_s , 
+	denominator = ~ nbabes_s , 
+	nsfg_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to ever cohabited:
+```{r eval = FALSE , results = "hide" }
+sub_nsfg_design <- subset( nsfg_design , timescoh > 0 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ npregs_s , sub_nsfg_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ npregs_s , nsfg_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ npregs_s , 
+		~ age_categories , 
+		nsfg_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( nsfg_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ npregs_s , nsfg_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ npregs_s , nsfg_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ npregs_s , nsfg_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ birth_control_pill , nsfg_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( npregs_s ~ birth_control_pill , nsfg_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ birth_control_pill + marstat , 
+	nsfg_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		npregs_s ~ birth_control_pill + marstat , 
+		nsfg_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NSFG users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+library(srvyr)
+nsfg_srvyr_design <- as_survey( nsfg_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+nsfg_srvyr_design %>%
+	summarize( mean = survey_mean( npregs_s , na.rm = TRUE ) )
+
+nsfg_srvyr_design %>%
+	group_by( age_categories ) %>%
+	summarize( mean = survey_mean( npregs_s , na.rm = TRUE ) )
+```
+
+---
+
+## Replication Example {-}
+
+The example below matches statistics and standard errors from this table pulled from the [CDC](https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf) variance estimation examples:
+
+Match the sum of the weights:
+
+```{r eval = FALSE , results = "hide" }
+result <- svytotal( ~ one , nsfg_design )
+
+stopifnot( round( coef( result ) , 0 ) == 72671926 )
+
+stopifnot( round( SE( result ) , 0 ) == 3521465 )
+```
+	
+Compute the statistics and standard errors for percentage of women currently using the pill by age:
+
+```{r eval = FALSE , results = "hide" }
+row_percents <- c( 19.5112 , 23.7833 , 19.6916 , 15.2800 , 6.4965 , 6.5215 )
+
+std_err_row_percents <- c( 1.8670 , 2.1713 , 2.2773 , 1.7551 , 0.9895 , 1.0029 )
+
+results <- svyby( ~ birth_control_pill , ~ age_categories , nsfg_design , svymean )
+
+stopifnot( all( round( coef( results ) * 100 , 4 ) == row_percents ) )
+
+stopifnot( all( round( SE( results ) * 100 , 4 ) == std_err_row_percents ) )
+```
+
+

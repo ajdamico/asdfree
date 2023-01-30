@@ -1,4 +1,4 @@
-commit_memo <- "'as_tibble not tbl_df'"
+commit_memo <- "'nsfg draft'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
