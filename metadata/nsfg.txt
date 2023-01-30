@@ -1,12 +1,15 @@
 chapter_title: National Survey of Family Growth
 
+
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
-The National Survey of Family Growth (NSFG) is the principal survey to measure reproductive behavior in the United States population.
+The principal survey to measure reproductive behavior in the United States population.
 ~~~
 
 table_structure: * Multiple tables with one row per respondent for the female and male tables, then a separate table with one row per pregnancy.
 
-generalizable_population: * A complex sample survey designed to generalize to the 15-44 year old population of the United States, by gender.
+generalizable_population: * A complex sample survey designed to generalize to the 15-49 year old population of the United States, by gender.
 
 publication_period: * Released every couple of years since 1973.
 
@@ -15,9 +18,9 @@ administrative_organization: * Administered by the [Centers for Disease Control 
 ~~~{reading_block}
 Please skim before you begin:
 
-1.
+1. [Sample Design Documentation](https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-Sample-Design-Documentation-508.pdf)
 
-2.
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/National_Survey_of_Family_Growth)
 
 3. This poem
 
@@ -40,11 +43,7 @@ dat_url <-
 	"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/2017_2019_FemRespData.dat"
 
 sas_url <-
-	file.path(
-		dirname( dat_url ) , 
-		"sas" , 
-		gsub( "Data" , "Setup" , basename( dat_url ) )
-	)
+	file.path( dirname( dat_url ) , "sas/2017_2019_FemRespSetup.sas" )
 	
 sas_positions <-
 	parse.SAScii( sas_url )
@@ -137,12 +136,16 @@ subset_definition_description: ever cohabited
 binary_variable: birth_control_pill
 binary_narm: , na.rm = TRUE
 
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
 needs_srvyr_block: yes
 
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-The example below matches statistics and standard errors from this table pulled from the [CDC](https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf) variance estimation examples:
+This example matches the [Variance Estimates for Percentages](https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf):
 
 Match the sum of the weights:
 
@@ -154,8 +157,7 @@ stopifnot( round( coef( result ) , 0 ) == 72671926 )
 stopifnot( round( SE( result ) , 0 ) == 3521465 )
 ```
 	
-	
-Compute the statistics and standard errors for percentage of women currently using the pill by age:
+Match row percentages of women currently using the pill by age:
 
 ```{r eval = FALSE , results = "hide" }
 row_percents <- c( 19.5112 , 23.7833 , 19.6916 , 15.2800 , 6.4965 , 6.5215 )
@@ -172,6 +174,3 @@ stopifnot( all( round( SE( results ) * 100 , 4 ) == std_err_row_percents ) )
 
 ~~~
 
-
-
-needs_actions_build_status_line: yes
