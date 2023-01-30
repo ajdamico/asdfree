@@ -128,9 +128,9 @@ svyby( ~ one , ~ age_categories , nsfg_design , svytotal )
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ npregs_s , nsfg_design , na.rm = TRUE )
+svymean( ~ pregnum , nsfg_design , na.rm = TRUE )
 
-svyby( ~ npregs_s , ~ age_categories , nsfg_design , svymean , na.rm = TRUE )
+svyby( ~ pregnum , ~ age_categories , nsfg_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
@@ -142,9 +142,9 @@ svyby( ~ marstat , ~ age_categories , nsfg_design , svymean )
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ npregs_s , nsfg_design , na.rm = TRUE )
+svytotal( ~ pregnum , nsfg_design , na.rm = TRUE )
 
-svyby( ~ npregs_s , ~ age_categories , nsfg_design , svytotal , na.rm = TRUE )
+svyby( ~ pregnum , ~ age_categories , nsfg_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
@@ -156,10 +156,10 @@ svyby( ~ marstat , ~ age_categories , nsfg_design , svytotal )
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ npregs_s , nsfg_design , 0.5 , na.rm = TRUE )
+svyquantile( ~ pregnum , nsfg_design , 0.5 , na.rm = TRUE )
 
 svyby( 
-	~ npregs_s , 
+	~ pregnum , 
 	~ age_categories , 
 	nsfg_design , 
 	svyquantile , 
@@ -171,8 +171,8 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ npregs_s , 
-	denominator = ~ nbabes_s , 
+	numerator = ~ pregnum , 
+	denominator = ~ lbpregs , 
 	nsfg_design ,
 	na.rm = TRUE
 )
@@ -186,14 +186,14 @@ sub_nsfg_design <- subset( nsfg_design , timescoh > 0 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ npregs_s , sub_nsfg_design , na.rm = TRUE )
+svymean( ~ pregnum , sub_nsfg_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ npregs_s , nsfg_design , na.rm = TRUE )
+this_result <- svymean( ~ pregnum , nsfg_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -202,7 +202,7 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ npregs_s , 
+		~ pregnum , 
 		~ age_categories , 
 		nsfg_design , 
 		svymean ,
@@ -222,16 +222,16 @@ degf( nsfg_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ npregs_s , nsfg_design , na.rm = TRUE )
+svyvar( ~ pregnum , nsfg_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ npregs_s , nsfg_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ pregnum , nsfg_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ npregs_s , nsfg_design , na.rm = TRUE , deff = "replace" )
+svymean( ~ pregnum , nsfg_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -244,7 +244,7 @@ svyciprop( ~ birth_control_pill , nsfg_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( npregs_s ~ birth_control_pill , nsfg_design )
+svyttest( pregnum ~ birth_control_pill , nsfg_design )
 ```
 
 Perform a chi-squared test of association for survey data:
@@ -259,7 +259,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		npregs_s ~ birth_control_pill + marstat , 
+		pregnum ~ birth_control_pill + marstat , 
 		nsfg_design 
 	)
 
@@ -283,11 +283,11 @@ nsfg_srvyr_design <- as_survey( nsfg_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" , messages = FALSE }
 nsfg_srvyr_design %>%
-	summarize( mean = survey_mean( npregs_s , na.rm = TRUE ) )
+	summarize( mean = survey_mean( pregnum , na.rm = TRUE ) )
 
 nsfg_srvyr_design %>%
 	group_by( age_categories ) %>%
-	summarize( mean = survey_mean( npregs_s , na.rm = TRUE ) )
+	summarize( mean = survey_mean( pregnum , na.rm = TRUE ) )
 ```
 
 ---
