@@ -32,6 +32,22 @@ Please skim before you begin:
 
 ## Download, Import, Preparation {-}
 
+```{r eval = FALSE }
+tf <- tempfile()
+
+this_url <- "https://webfs.oecd.org/piaac/puf-data/CSV/Prgusap1_2017.csv"
+
+download.file( this_url , tf , mode = 'wb' )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+
+piaac_csv <- grep( '\\.csv$' , unzipped_files , value = TRUE )
+
+piaac_df <- read.csv( piaac_csv )
+
+names( piaac_df ) <- tolower( names( piaac_df ) )
+```
+
 ---
 
 ## Analysis Examples with the `survey` library \ {-}
@@ -46,7 +62,43 @@ Construct a multiply-imputed, complex sample survey design:
 library(survey)
 library(mitools)
 
-piaac_design <- readRDS( file.path( path.expand( "~" ) , "PIAAC" , "prgusap1 design.rds" ) )
+pvals <- c( "pvlit" , "pvnum" , "pvpsl" )
+pvars <- outer( pvals , 1:10 , paste0 )
+non.pvals <- names(x)[ !( names(x) %in% pvars ) ]
+
+for(k in 1:10){
+	
+	y <- x[ , c( non.pvals , paste0( pvals , k ) ) ]
+	
+	for( j in pvals ){
+		
+		y[ , j ] <- y[ , paste0( j , k ) ]
+		
+		y[ , paste0( j , k ) ] <- NULL
+
+	}
+	
+	if( k == 1 ) w <- list( y ) else w <- c( w , list( y ) )
+}
+
+jk.method <- unique(x$vemethod)
+
+stopifnot(length(jk.method) == 1)
+
+stopifnot(jk.method %in% c("JK1", "JK2"))
+
+if (jk.method == "JK2") jk.method <- "JKn"
+
+piaac_design <-
+	svrepdesign(
+		weights = ~spfwt0 ,
+		repweights = "spfwt[1-9]" ,
+		rscales = rep( 1 , 80 ) ,
+		scale = ifelse( jk.method == "JKn" , 1 , 79/80 ) ,
+		type = jk.method ,
+		data = imputationList( w ) ,
+		mse = TRUE
+	)
 ```
 
 ### Variable Recoding {-}

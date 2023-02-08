@@ -30,11 +30,70 @@ Please skim before you begin:
 ~~~
 
 
+
+~~~{download_and_import_block}
+
+```{r eval = FALSE }
+tf <- tempfile()
+
+this_url <- "https://webfs.oecd.org/piaac/puf-data/CSV/Prgusap1_2017.csv"
+
+download.file( this_url , tf , mode = 'wb' )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+
+chapter_tag_csv <- grep( '\\\\.csv$' , unzipped_files , value = TRUE )
+
+chapter_tag_df <- read.csv( chapter_tag_csv )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+~~~
+
+
+
+
 ~~~{analysis_examples_survey_design}
 library(survey)
 library(mitools)
 
-chapter_tag_design <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "prgusap1 design.rds" ) )
+pvals <- c( "pvlit" , "pvnum" , "pvpsl" )
+pvars <- outer( pvals , 1:10 , paste0 )
+non.pvals <- names(x)[ !( names(x) %in% pvars ) ]
+
+for(k in 1:10){
+	
+	y <- x[ , c( non.pvals , paste0( pvals , k ) ) ]
+	
+	for( j in pvals ){
+		
+		y[ , j ] <- y[ , paste0( j , k ) ]
+		
+		y[ , paste0( j , k ) ] <- NULL
+
+	}
+	
+	if( k == 1 ) w <- list( y ) else w <- c( w , list( y ) )
+}
+
+jk.method <- unique(x$vemethod)
+
+stopifnot(length(jk.method) == 1)
+
+stopifnot(jk.method %in% c("JK1", "JK2"))
+
+if (jk.method == "JK2") jk.method <- "JKn"
+
+chapter_tag_design <-
+	svrepdesign(
+		weights = ~spfwt0 ,
+		repweights = "spfwt[1-9]" ,
+		rscales = rep( 1 , 80 ) ,
+		scale = ifelse( jk.method == "JKn" , 1 , 79/80 ) ,
+		type = jk.method ,
+		data = imputationList( w ) ,
+		mse = TRUE
+	)
 ~~~
 
 ~~~{variable_recoding_block}
