@@ -4,5 +4,6 @@ european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20o
 medical-large-claims-experience-study-mlces: <p><a href="https://github.com/asdfree/mlces/actions"><img src="https://github.com/asdfree/mlces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 medicare-current-beneficiary-survey-mcbs: <p><a href="https://github.com/asdfree/mcbs/actions"><img src="https://github.com/asdfree/mcbs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-survey-of-family-growth-nsfg: <p><a href="https://github.com/asdfree/nsfg/actions"><img src="https://github.com/asdfree/nsfg/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+programme-for-the-international-assessment-of-adult-competencies-piaac: <p><a href="https://github.com/asdfree/piaac/actions"><img src="https://github.com/asdfree/piaac/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 trend-analysis-of-complex-survey-data: <p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 youth-risk-behavior-surveillance-system-yrbss: <p><a href="https://github.com/asdfree/yrbss/actions"><img src="https://github.com/asdfree/yrbss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
