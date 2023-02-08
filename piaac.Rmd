@@ -62,24 +62,24 @@ library(mitools)
 
 pvals <- c( "pvlit" , "pvnum" , "pvpsl" )
 pvars <- outer( pvals , 1:10 , paste0 )
-non.pvals <- names(x)[ !( names(x) %in% pvars ) ]
+non.pvals <- names(piaac_df)[ !( names(piaac_df) %in% pvars ) ]
 
 for(k in 1:10){
 	
-	y <- x[ , c( non.pvals , paste0( pvals , k ) ) ]
+	piaac_imp <- piaac_df[ , c( non.pvals , paste0( pvals , k ) ) ]
 	
 	for( j in pvals ){
 		
-		y[ , j ] <- y[ , paste0( j , k ) ]
+		piaac_imp[ , j ] <- piaac_imp[ , paste0( j , k ) ]
 		
-		y[ , paste0( j , k ) ] <- NULL
+		piaac_imp[ , paste0( j , k ) ] <- NULL
 
 	}
 	
-	if( k == 1 ) w <- list( y ) else w <- c( w , list( y ) )
+	if( k == 1 ) piaac_mi <- list( piaac_imp ) else piaac_mi <- c( piaac_mi , list( piaac_imp ) )
 }
 
-jk.method <- unique(x$vemethod)
+jk.method <- unique( piaac_df[ , 'vemethod' ] )
 
 stopifnot(length(jk.method) == 1)
 
@@ -94,7 +94,7 @@ piaac_design <-
 		rscales = rep( 1 , 80 ) ,
 		scale = ifelse( jk.method == "JKn" , 1 , 79/80 ) ,
 		type = jk.method ,
-		data = imputationList( w ) ,
+		data = imputationList( piaac_mi ) ,
 		mse = TRUE
 	)
 ```
@@ -301,25 +301,21 @@ summary( glm_result )
 The [OECD's Technical Report Table 18.9 on PDF page 455](https://www.oecd.org/skills/piaac/_Technical Report_17OCT13.pdf#page=455) includes statistics and standard errors for the three PIAAC domains. This code precisely replicates the Austria row shown in that official table.
 
 ```{r eval = FALSE , results = "hide" }
-
-austria_design <-
-	readRDS( file.path( path.expand( "~" ) , "PIAAC" , "prgautp1 design.rds" ) )
-
-austria_pvlit <-
-	MIcombine( with( austria_design , svymean( ~ pvlit , na.rm = TRUE ) ) )
+usa_pvlit <-
+	MIcombine( with( piaac_design , svymean( ~ pvlit , na.rm = TRUE ) ) )
 	
-austria_pvnum <-
-	MIcombine( with( austria_design , svymean( ~ pvnum , na.rm = TRUE ) ) )
+usa_pvnum <-
+	MIcombine( with( piaac_design , svymean( ~ pvnum , na.rm = TRUE ) ) )
 
-austria_pvpsl <-
-	MIcombine( with( austria_design , svymean( ~ pvpsl , na.rm = TRUE ) ) )
+usa_pvpsl <-
+	MIcombine( with( piaac_design , svymean( ~ pvpsl , na.rm = TRUE ) ) )
 	
 # confirm each estimate and standard error matches the published statistics
-stopifnot( round( coef( austria_pvlit ) ) == 269 )
-stopifnot( round( SE( austria_pvlit ) , 1 ) == 0.7 )
-stopifnot( round( coef( austria_pvnum ) ) == 275 )
-stopifnot( round( SE( austria_pvnum ) , 1 ) == 0.9 )
-stopifnot( round( coef( austria_pvpsl ) ) == 284 )
-stopifnot( round( SE( austria_pvpsl ) , 1 ) == 0.7 )
+stopifnot( round( coef( usa_pvlit ) ) == 270 )
+stopifnot( round( SE( usa_pvlit ) , 1 ) == 1.0 )
+stopifnot( round( coef( usa_pvnum ) ) == 253 )
+stopifnot( round( SE( usa_pvnum ) , 1 ) == 1.2 )
+stopifnot( round( coef( usa_pvpsl ) ) == 277 )
+stopifnot( round( SE( usa_pvpsl ) , 1 ) == 1.1 )
 
 ```
