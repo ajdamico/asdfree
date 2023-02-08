@@ -4,12 +4,12 @@
 mi_tests_of_association_block <-
 'Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-MIsvyttest( linear_variable ~ binary_variable , chapter_tag_design )
+# MIsvyttest( linear_variable ~ binary_variable , chapter_tag_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
-MIsvychisq( ~ binary_variable + categorical_variable , chapter_tag_design )
+# MIsvychisq( ~ binary_variable + categorical_variable , chapter_tag_design )
 ```
 
 Perform a survey-weighted generalized linear model:

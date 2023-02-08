@@ -1,6 +1,6 @@
 # You can find the book at http://asdfree.com/
 american-community-survey-acs: <p><a href="https://github.com/asdfree/acs/actions"><img src="https://github.com/asdfree/acs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-2023 01 26-brightgreen' alt='Local Testing Badge'></p>
+european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-2023 02 08-brightgreen' alt='Local Testing Badge'></p>
 medical-large-claims-experience-study-mlces: <p><a href="https://github.com/asdfree/mlces/actions"><img src="https://github.com/asdfree/mlces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 medicare-current-beneficiary-survey-mcbs: <p><a href="https://github.com/asdfree/mcbs/actions"><img src="https://github.com/asdfree/mcbs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-survey-of-family-growth-nsfg: <p><a href="https://github.com/asdfree/nsfg/actions"><img src="https://github.com/asdfree/nsfg/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
