@@ -1,4 +1,4 @@
-commit_memo <- "'piaac formatting'"
+commit_memo <- "'nppes download test'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
