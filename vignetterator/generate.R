@@ -1,4 +1,4 @@
-commit_memo <- "'piaac revert'"
+commit_memo <- "'skip some tests'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -124,7 +124,6 @@ for ( i in seq_along( chapter_tag ) ){
 	is_survey <- any( grepl( "library(survey)" , full_text[[i]] , fixed = TRUE ) )
 	is_mi <- any( grepl( "library(mitools)" , full_text[[i]] , fixed = TRUE ) )
 	is_db <- any( grepl( "library(DBI)" , full_text[[i]] , fixed = TRUE ) ) 
-
 	
 	needs_srvyr_block <- paste0( '---\n\n## Analysis Examples with `srvyr` \\\\ {-}\n\nThe R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package.  [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = "hide" , messages = FALSE }\n' , if( is_db ) 'library(dbplyr)\n' , 'library(srvyr)\nchapter_tag_srvyr_design <- as_survey( chapter_tag_design )\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = "hide" , messages = FALSE }\nchapter_tag_srvyr_design %>%\n\tsummarize( mean = survey_mean( linear_variable linear_narm ) )\n\nchapter_tag_srvyr_design %>%\n\tgroup_by( group_by_variable ) %>%\n\tsummarize( mean = survey_mean( linear_variable linear_narm ) )\n```' )
 
@@ -374,9 +373,22 @@ for( this_ci_file in ci_rmd_files ){
 	lapply( this_repo_dirs , dir.create , showWarnings = FALSE , recursive = TRUE )
 	
 	file.copy( repo_files , copied_files , overwrite = TRUE )
-		
+	
+	
+	
 	# do this for dataset pages
 	if( file.exists( this_metadata_file ) ){
+		
+		# skip tests?  (currently only implemented for datasets)
+		this_metadata_text <- readLines( this_metadata_file )
+		skip_linux <- any( grepl( '^needs_actions_build_status_line: yes(.*)\\-linux' , this_metadata_text ) )
+		skip_windows <- any( grepl( '^needs_actions_build_status_line: yes(.*)\\-windows' , this_metadata_text ) )
+		skip_mac <- any( grepl( '^needs_actions_build_status_line: yes(.*)\\-mac' , this_metadata_text ) )
+		r_yml <- grep( 'r\\.yml' , copied_files , value = TRUE )
+		if( skip_linux ) writeLines( gsub( "          - {os: ubuntu-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
+		if( skip_windows ) writeLines( gsub( "          - {os: windows-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
+		if( skip_mac ) writeLines( gsub( "          - {os: macOS-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
+		
 		
 		for( this_file in copied_files ){
 		
