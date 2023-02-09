@@ -321,65 +321,62 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-4" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="national-plan-and-provider-enumeration-system-nppes.html#download-import-preparation-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-1" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb109-2"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-2" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://download.cms.gov/nppes/NPPES_Data_Dissemination_January_2023.zip&quot;</span></span>
-<span id="cb109-3"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-3" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb109-4"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-4" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb109-5"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>( z )</span></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb109-2"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-3"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-3" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb109-4"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-4" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://download.cms.gov/nppes/NPPES_Data_Dissemination_January_2023.zip&quot;</span></span>
+<span id="cb109-5"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb109-6"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-6" aria-hidden="true" tabindex="-1"></a>npi_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb109-7"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-7" aria-hidden="true" tabindex="-1"></a>npi_filepath <span class="ot">&lt;-</span></span>
+<span id="cb109-8"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span>(</span>
+<span id="cb109-9"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;npidata_pfile_20050523-([0-9]+)</span><span class="sc">\\</span><span class="st">.csv&quot;</span> ,</span>
+<span id="cb109-10"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-10" aria-hidden="true" tabindex="-1"></a>        npi_files ,</span>
+<span id="cb109-11"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">value =</span> <span class="cn">TRUE</span></span>
+<span id="cb109-12"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-12" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-base-r-1" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with base R  <a href="national-plan-and-provider-enumeration-system-nppes.html#analysis-examples-with-base-r-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Load a data frame:</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-1" aria-hidden="true" tabindex="-1"></a>npi_filepath <span class="ot">&lt;-</span></span>
-<span id="cb110-2"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span>(</span>
-<span id="cb110-3"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;npidata_pfile_20050523-([0-9]+)</span><span class="sc">\\</span><span class="st">.csv&quot;</span> ,</span>
-<span id="cb110-4"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">list.files</span>(</span>
-<span id="cb110-5"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">file.path</span>( <span class="fu">path.expand</span>( <span class="st">&quot;~&quot;</span> ) , <span class="st">&quot;NPPES&quot;</span> ) ,</span>
-<span id="cb110-6"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">full.names =</span> <span class="cn">TRUE</span></span>
-<span id="cb110-7"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-7" aria-hidden="true" tabindex="-1"></a>        ) ,</span>
-<span id="cb110-8"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">value =</span> <span class="cn">TRUE</span></span>
-<span id="cb110-9"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb110-10"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb110-11"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-11" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span></span>
-<span id="cb110-12"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>( </span>
-<span id="cb110-13"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">read.csv</span>( </span>
-<span id="cb110-14"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-14" aria-hidden="true" tabindex="-1"></a>            npi_filepath , </span>
-<span id="cb110-15"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">nrow =</span> <span class="dv">1</span> )[ <span class="cn">FALSE</span> , , ] </span>
-<span id="cb110-16"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb110-17"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-18"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-18" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span> , <span class="st">&quot;_&quot;</span> , <span class="fu">tolower</span>( column_names ) )</span>
-<span id="cb110-19"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-20"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-20" aria-hidden="true" tabindex="-1"></a>column_types <span class="ot">&lt;-</span></span>
-<span id="cb110-21"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>( </span>
-<span id="cb110-22"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">grepl</span>( <span class="st">&quot;code&quot;</span> , column_names ) <span class="sc">&amp;</span> </span>
-<span id="cb110-23"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-23" aria-hidden="true" tabindex="-1"></a>        <span class="sc">!</span><span class="fu">grepl</span>( <span class="st">&quot;country|state|gender|taxonomy|postal&quot;</span> , column_names ) , </span>
-<span id="cb110-24"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;n&#39;</span> , <span class="st">&#39;c&#39;</span> </span>
-<span id="cb110-25"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-1" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span></span>
+<span id="cb110-2"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>( </span>
+<span id="cb110-3"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">read.csv</span>( </span>
+<span id="cb110-4"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-4" aria-hidden="true" tabindex="-1"></a>            npi_filepath , </span>
+<span id="cb110-5"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">nrow =</span> <span class="dv">1</span> )[ <span class="cn">FALSE</span> , , ] </span>
+<span id="cb110-6"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb110-7"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-8"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-8" aria-hidden="true" tabindex="-1"></a>column_names <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span> , <span class="st">&quot;_&quot;</span> , <span class="fu">tolower</span>( column_names ) )</span>
+<span id="cb110-9"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-10"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-10" aria-hidden="true" tabindex="-1"></a>column_types <span class="ot">&lt;-</span></span>
+<span id="cb110-11"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>( </span>
+<span id="cb110-12"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">grepl</span>( <span class="st">&quot;code&quot;</span> , column_names ) <span class="sc">&amp;</span> </span>
+<span id="cb110-13"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-13" aria-hidden="true" tabindex="-1"></a>        <span class="sc">!</span><span class="fu">grepl</span>( <span class="st">&quot;country|state|gender|taxonomy|postal&quot;</span> , column_names ) , </span>
+<span id="cb110-14"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;n&#39;</span> , <span class="st">&#39;c&#39;</span> </span>
+<span id="cb110-15"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb110-16"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-17"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-17" aria-hidden="true" tabindex="-1"></a>columns_to_import <span class="ot">&lt;-</span></span>
+<span id="cb110-18"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&quot;entity_type_code&quot;</span> , <span class="st">&quot;provider_gender_code&quot;</span> , <span class="st">&quot;provider_enumeration_date&quot;</span> ,</span>
+<span id="cb110-19"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;is_sole_proprietor&quot;</span> , <span class="st">&quot;provider_business_practice_location_address_state_name&quot;</span> )</span>
+<span id="cb110-20"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-21"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-21" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( columns_to_import <span class="sc">%in%</span> column_names ) )</span>
+<span id="cb110-22"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-23"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-23" aria-hidden="true" tabindex="-1"></a><span class="co"># readr::read_csv() columns must match their order in the csv file</span></span>
+<span id="cb110-24"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-24" aria-hidden="true" tabindex="-1"></a>columns_to_import <span class="ot">&lt;-</span></span>
+<span id="cb110-25"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-25" aria-hidden="true" tabindex="-1"></a>    columns_to_import[ <span class="fu">order</span>( <span class="fu">match</span>( columns_to_import , column_names ) ) ]</span>
 <span id="cb110-26"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-27"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-27" aria-hidden="true" tabindex="-1"></a>columns_to_import <span class="ot">&lt;-</span></span>
-<span id="cb110-28"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&quot;entity_type_code&quot;</span> , <span class="st">&quot;provider_gender_code&quot;</span> , <span class="st">&quot;provider_enumeration_date&quot;</span> ,</span>
-<span id="cb110-29"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;is_sole_proprietor&quot;</span> , <span class="st">&quot;provider_business_practice_location_address_state_name&quot;</span> )</span>
-<span id="cb110-30"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-31"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-31" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( columns_to_import <span class="sc">%in%</span> column_names ) )</span>
-<span id="cb110-32"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-33"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-33" aria-hidden="true" tabindex="-1"></a><span class="co"># readr::read_csv() columns must match their order in the csv file</span></span>
-<span id="cb110-34"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-34" aria-hidden="true" tabindex="-1"></a>columns_to_import <span class="ot">&lt;-</span></span>
-<span id="cb110-35"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-35" aria-hidden="true" tabindex="-1"></a>    columns_to_import[ <span class="fu">order</span>( <span class="fu">match</span>( columns_to_import , column_names ) ) ]</span>
-<span id="cb110-36"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-37"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-37" aria-hidden="true" tabindex="-1"></a>nppes_df <span class="ot">&lt;-</span> </span>
-<span id="cb110-38"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>( </span>
-<span id="cb110-39"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-39" aria-hidden="true" tabindex="-1"></a>        readr<span class="sc">::</span><span class="fu">read_csv</span>( </span>
-<span id="cb110-40"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-40" aria-hidden="true" tabindex="-1"></a>            npi_filepath , </span>
-<span id="cb110-41"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-41" aria-hidden="true" tabindex="-1"></a>            <span class="at">col_names =</span> columns_to_import , </span>
-<span id="cb110-42"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-42" aria-hidden="true" tabindex="-1"></a>            <span class="at">col_types =</span> </span>
-<span id="cb110-43"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-43" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste0</span>( </span>
-<span id="cb110-44"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-44" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">ifelse</span>( column_names <span class="sc">%in%</span> columns_to_import , column_types , <span class="st">&#39;_&#39;</span> ) , </span>
-<span id="cb110-45"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-45" aria-hidden="true" tabindex="-1"></a>                    <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> </span>
-<span id="cb110-46"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-46" aria-hidden="true" tabindex="-1"></a>                ) ,</span>
-<span id="cb110-47"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-47" aria-hidden="true" tabindex="-1"></a>            <span class="at">skip =</span> <span class="dv">1</span></span>
-<span id="cb110-48"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-48" aria-hidden="true" tabindex="-1"></a>        ) </span>
-<span id="cb110-49"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-49" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<span id="cb110-27"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-27" aria-hidden="true" tabindex="-1"></a>nppes_df <span class="ot">&lt;-</span> </span>
+<span id="cb110-28"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>( </span>
+<span id="cb110-29"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-29" aria-hidden="true" tabindex="-1"></a>        readr<span class="sc">::</span><span class="fu">read_csv</span>( </span>
+<span id="cb110-30"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-30" aria-hidden="true" tabindex="-1"></a>            npi_filepath , </span>
+<span id="cb110-31"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-31" aria-hidden="true" tabindex="-1"></a>            <span class="at">col_names =</span> columns_to_import , </span>
+<span id="cb110-32"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-32" aria-hidden="true" tabindex="-1"></a>            <span class="at">col_types =</span> </span>
+<span id="cb110-33"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-33" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste0</span>( </span>
+<span id="cb110-34"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-34" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">ifelse</span>( column_names <span class="sc">%in%</span> columns_to_import , column_types , <span class="st">&#39;_&#39;</span> ) , </span>
+<span id="cb110-35"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-35" aria-hidden="true" tabindex="-1"></a>                    <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> </span>
+<span id="cb110-36"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-36" aria-hidden="true" tabindex="-1"></a>                ) ,</span>
+<span id="cb110-37"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-37" aria-hidden="true" tabindex="-1"></a>            <span class="at">skip =</span> <span class="dv">1</span></span>
+<span id="cb110-38"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-38" aria-hidden="true" tabindex="-1"></a>        ) </span>
+<span id="cb110-39"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb110-39" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <div id="variable-recoding-4" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="national-plan-and-provider-enumeration-system-nppes.html#variable-recoding-4" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
