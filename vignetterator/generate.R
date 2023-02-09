@@ -1,4 +1,4 @@
-commit_memo <- "'piaac httr'"
+commit_memo <- "'piaac getBinaryURL'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
