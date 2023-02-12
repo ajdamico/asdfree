@@ -324,15 +324,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
 <span id="cb109-2"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb109-3"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-3" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb109-4"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-4" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://download.cms.gov/nppes/NPPES_Data_Dissemination_January_2023.zip&quot;</span></span>
-<span id="cb109-5"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb109-6"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-6" aria-hidden="true" tabindex="-1"></a>npi_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb109-7"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-7" aria-hidden="true" tabindex="-1"></a>npi_filepath <span class="ot">&lt;-</span></span>
-<span id="cb109-8"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span>(</span>
-<span id="cb109-9"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;npidata_pfile_20050523-([0-9]+)</span><span class="sc">\\</span><span class="st">.csv&quot;</span> ,</span>
-<span id="cb109-10"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-10" aria-hidden="true" tabindex="-1"></a>        npi_files ,</span>
-<span id="cb109-11"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">value =</span> <span class="cn">TRUE</span></span>
-<span id="cb109-12"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-12" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<span id="cb109-4"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-5"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-5" aria-hidden="true" tabindex="-1"></a>npi_datapage <span class="ot">&lt;-</span></span>
+<span id="cb109-6"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">readLines</span>( <span class="st">&quot;http://download.cms.gov/nppes/NPI_Files.html&quot;</span> )</span>
+<span id="cb109-7"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-8"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-8" aria-hidden="true" tabindex="-1"></a>latest_files <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;NPPES_Data_Dissemination_&#39;</span> , npi_datapage , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb109-9"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-10"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-10" aria-hidden="true" tabindex="-1"></a>latest_files <span class="ot">&lt;-</span> latest_files[ <span class="sc">!</span><span class="fu">grepl</span>( <span class="st">&#39;Weekly Update&#39;</span> , latest_files ) ]</span>
+<span id="cb109-11"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-12"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-12" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span></span>
+<span id="cb109-13"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(</span>
+<span id="cb109-14"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;http://download.cms.gov/nppes/&quot;</span>,</span>
+<span id="cb109-15"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gsub</span>( <span class="st">&quot;(.*)(NPPES_Data_Dissemination_.*\.zip)(.*)$&quot;</span>, <span class="st">&quot;\2&quot;</span>, latest_files )</span>
+<span id="cb109-16"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb109-17"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-18"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-18" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb109-19"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-20"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-20" aria-hidden="true" tabindex="-1"></a>npi_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb109-21"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-22"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-22" aria-hidden="true" tabindex="-1"></a>npi_filepath <span class="ot">&lt;-</span></span>
+<span id="cb109-23"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span>(</span>
+<span id="cb109-24"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;npidata_pfile_20050523-([0-9]+)</span><span class="sc">\\</span><span class="st">.csv&quot;</span> ,</span>
+<span id="cb109-25"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-25" aria-hidden="true" tabindex="-1"></a>        npi_files ,</span>
+<span id="cb109-26"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">value =</span> <span class="cn">TRUE</span></span>
+<span id="cb109-27"><a href="national-plan-and-provider-enumeration-system-nppes.html#cb109-27" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-base-r-1" class="section level2 unnumbered hasAnchor">

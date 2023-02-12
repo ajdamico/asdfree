@@ -36,9 +36,24 @@ Please skim before you begin:
 library(readr)
 
 tf <- tempfile()
-this_url <- "https://download.cms.gov/nppes/NPPES_Data_Dissemination_January_2023.zip"
+
+npi_datapage <-
+	readLines( "http://download.cms.gov/nppes/NPI_Files.html" )
+
+latest_files <- grep( 'NPPES_Data_Dissemination_' , npi_datapage , value = TRUE )
+
+latest_files <- latest_files[ !grepl( 'Weekly Update' , latest_files ) ]
+
+this_url <-
+	paste0(
+		"http://download.cms.gov/nppes/",
+		gsub( "(.*)(NPPES_Data_Dissemination_.*\.zip)(.*)$", "\2", latest_files )
+	)
+
 download.file( this_url , tf , mode = 'wb' )
+
 npi_files <- unzip( tf , exdir = tempdir() )
+
 npi_filepath <-
 	grep(
 		"npidata_pfile_20050523-([0-9]+)\\.csv" ,
