@@ -95,19 +95,20 @@ stopifnot( all( columns_to_import %in% column_names ) )
 columns_to_import <-
 	columns_to_import[ order( match( columns_to_import , column_names ) ) ]
 
+nppes_tbl <-
+	readr::read_csv( 
+		npi_filepath , 
+		col_names = columns_to_import , 
+		col_types = 
+			paste0( 
+				ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
+				collapse = "" 
+			) ,
+		skip = 1
+	) 
+
 nppes_df <- 
-	data.frame( 
-		readr::read_csv( 
-			npi_filepath , 
-			col_names = columns_to_import , 
-			col_types = 
-				paste0( 
-					ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
-					collapse = "" 
-				) ,
-			skip = 1
-		) 
-	)
+	data.frame( nppes_tbl )
 ```
 
 ```{r messages = FALSE , eval = FALSE }

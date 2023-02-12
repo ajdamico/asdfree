@@ -90,19 +90,20 @@ stopifnot( all( columns_to_import %in% column_names ) )
 columns_to_import <-
 	columns_to_import[ order( match( columns_to_import , column_names ) ) ]
 
+chapter_tag_tbl <-
+	readr::read_csv( 
+		npi_filepath , 
+		col_names = columns_to_import , 
+		col_types = 
+			paste0( 
+				ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
+				collapse = "" 
+			) ,
+		skip = 1
+	) 
+
 chapter_tag_df <- 
-	data.frame( 
-		readr::read_csv( 
-			npi_filepath , 
-			col_names = columns_to_import , 
-			col_types = 
-				paste0( 
-					ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
-					collapse = "" 
-				) ,
-			skip = 1
-		) 
-	)
+	data.frame( chapter_tag_tbl )
 ~~~
 
 
