@@ -6,7 +6,7 @@ The registry of every medical practitioner actively operating in the United Stat
 
 * A single large table with one row per enumerated health care provider.
 
-* A census of individuals and organizations who bill for medical services in the United States.
+* A census of individuals and organizations that bill for medical services in the United States.
 
 * Updated weekly with new providers.
 
@@ -32,6 +32,7 @@ Please skim before you begin:
 
 ## Download, Import, Preparation {-}
 
+Download and import the national file:
 ```{r eval = FALSE }
 library(readr)
 
@@ -125,7 +126,9 @@ nppes_df <-
 		
 		individual = as.numeric( entity_type_code ) ,
 		
-		provider_enumeration_year = as.numeric( substr( provider_enumeration_date , 7 , 10 ) )
+		provider_enumeration_year = as.numeric( substr( provider_enumeration_date , 7 , 10 ) ) ,
+		
+		state_name = provider_business_practice_location_address_state_name
 		
 	)
 ```
@@ -192,7 +195,7 @@ tapply(
 
 Limit your `data.frame` to California:
 ```{r eval = FALSE , results = "hide" }
-sub_nppes_df <- subset( nppes_df , provider_business_practice_location_address_state_name = 'CA' )
+sub_nppes_df <- subset( nppes_df , state_name = 'CA' )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }

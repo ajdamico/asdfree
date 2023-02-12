@@ -386,7 +386,7 @@ for( this_ci_file in ci_rmd_files ){
 		skip_mac <- any( grepl( '^needs_actions_build_status_line: yes(.*)\\-mac' , this_metadata_text ) )
 		r_yml <- grep( 'r\\.yml' , copied_files , value = TRUE )
 		if( skip_linux ) writeLines( gsub( "          - {os: ubuntu-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
-		if( skip_windows ) writeLines( gsub( "          - {os: windows-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
+		if( skip_windows ) writeLines( gsub( "          - {os: windows-latest, r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
 		if( skip_mac ) writeLines( gsub( "          - {os: macOS-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
 		
 		
