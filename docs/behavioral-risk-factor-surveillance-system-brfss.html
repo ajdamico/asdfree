@@ -369,30 +369,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb32-7"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;x_state&#39;</span> , <span class="st">&#39;x_age80&#39;</span> , <span class="st">&#39;nummen&#39;</span> , <span class="st">&#39;numadult&#39;</span> , <span class="st">&#39;x_hlthpln&#39;</span> )</span>
 <span id="cb32-8"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-8" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb32-9"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-9" aria-hidden="true" tabindex="-1"></a>brfss_df <span class="ot">&lt;-</span> brfss_df[ variables_to_keep ]</span>
-<span id="cb32-10"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-11"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="co"># this linearized design matches cdc specifications</span></span>
-<span id="cb32-12"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-12" aria-hidden="true" tabindex="-1"></a>brfss_tsl_design <span class="ot">&lt;-</span></span>
-<span id="cb32-13"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
-<span id="cb32-14"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> x_psu ,</span>
-<span id="cb32-15"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> x_ststr ,</span>
-<span id="cb32-16"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> brfss_df ,</span>
-<span id="cb32-17"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> x_llcpwt ,</span>
-<span id="cb32-18"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span></span>
-<span id="cb32-19"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-19" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb32-20"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-21"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-21" aria-hidden="true" tabindex="-1"></a><span class="co"># since large linearized survey designs execute slowly,</span></span>
-<span id="cb32-22"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-22" aria-hidden="true" tabindex="-1"></a><span class="co"># consider performing exploratory analysis as a replication design:</span></span>
-<span id="cb32-23"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-23" aria-hidden="true" tabindex="-1"></a>brfss_design <span class="ot">&lt;-</span></span>
-<span id="cb32-24"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.svrepdesign</span>( </span>
-<span id="cb32-25"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-25" aria-hidden="true" tabindex="-1"></a>        brfss_tsl_design </span>
-<span id="cb32-26"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;bootstrap&#39;</span> ,</span>
-<span id="cb32-27"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">replicates =</span> <span class="dv">100</span></span>
-<span id="cb32-28"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-28" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb32-29"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-30"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-30" aria-hidden="true" tabindex="-1"></a><span class="co"># coefficients (such as means and medians) do not change,</span></span>
-<span id="cb32-31"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-31" aria-hidden="true" tabindex="-1"></a><span class="co"># while standard errors and confidence intervals differ slightly.</span></span>
-<span id="cb32-32"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-32" aria-hidden="true" tabindex="-1"></a><span class="co"># attempt the commands below with `brfss_tsl_design`</span></span>
-<span id="cb32-33"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-33" aria-hidden="true" tabindex="-1"></a><span class="co"># to see these minor differences</span></span></code></pre></div>
+<span id="cb32-10"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-11"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-11" aria-hidden="true" tabindex="-1"></a>brfss_design <span class="ot">&lt;-</span></span>
+<span id="cb32-12"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
+<span id="cb32-13"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> x_psu ,</span>
+<span id="cb32-14"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> x_ststr ,</span>
+<span id="cb32-15"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> brfss_df ,</span>
+<span id="cb32-16"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> x_llcpwt ,</span>
+<span id="cb32-17"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span></span>
+<span id="cb32-18"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-19"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-20"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-20" aria-hidden="true" tabindex="-1"></a><span class="co"># note: since large linearized survey designs execute slowly,</span></span>
+<span id="cb32-21"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-21" aria-hidden="true" tabindex="-1"></a><span class="co"># consider performing exploratory analysis as a replication design:</span></span>
+<span id="cb32-22"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-22" aria-hidden="true" tabindex="-1"></a><span class="co"># coefficients (such as means and medians) do not change</span></span>
+<span id="cb32-23"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-23" aria-hidden="true" tabindex="-1"></a><span class="co"># standard errors and confidence intervals differ slightly</span></span>
+<span id="cb32-24"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-24" aria-hidden="true" tabindex="-1"></a><span class="co"># brfss_replication_design &lt;-</span></span>
+<span id="cb32-25"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb32-25" aria-hidden="true" tabindex="-1"></a><span class="co">#   as.svrepdesign( brfss_design )</span></span></code></pre></div>
 <div id="variable-recoding-1" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="behavioral-risk-factor-surveillance-system-brfss.html#variable-recoding-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
@@ -575,12 +567,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-1" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="behavioral-risk-factor-surveillance-system-brfss.html#replication-example-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>This matches Alaska’s confidence intervals from the <a href="https://nccd.cdc.gov/BRFSSPrevalence/rdPage.aspx?rdReport=DPH_BRFSS.ExploreByTopic&amp;irbLocationType=StatesAndMMSA&amp;islClass=CLASS07&amp;islTopic=TOPIC28&amp;islYear=2021&amp;rdRnd=24558">BRFSS Prevalence &amp; Trends Data</a>:</p>
+<p>The example below matches Alaska’s confidence intervals from the <a href="https://nccd.cdc.gov/BRFSSPrevalence/rdPage.aspx?rdReport=DPH_BRFSS.ExploreByTopic&amp;irbLocationType=StatesAndMMSA&amp;islClass=CLASS07&amp;islTopic=TOPIC28&amp;islYear=2021&amp;rdRnd=24558">BRFSS Prevalence &amp; Trends Data</a>:</p>
 <div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span></span>
 <span id="cb54-2"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>(</span>
 <span id="cb54-3"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> no_doc_visit_due_to_cost ,</span>
 <span id="cb54-4"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">subset</span>(</span>
-<span id="cb54-5"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-5" aria-hidden="true" tabindex="-1"></a>            brfss_tsl_design ,</span>
+<span id="cb54-5"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-5" aria-hidden="true" tabindex="-1"></a>            brfss_design ,</span>
 <span id="cb54-6"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-6" aria-hidden="true" tabindex="-1"></a>            state_name <span class="sc">%in%</span> <span class="st">&#39;ALASKA&#39;</span> <span class="sc">&amp;</span></span>
 <span id="cb54-7"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-7" aria-hidden="true" tabindex="-1"></a>            no_doc_visit_due_to_cost <span class="sc">%in%</span></span>
 <span id="cb54-8"><a href="behavioral-risk-factor-surveillance-system-brfss.html#cb54-8" aria-hidden="true" tabindex="-1"></a>                <span class="fu">c</span>( <span class="st">&#39;yes&#39;</span> , <span class="st">&#39;no&#39;</span> )</span>
