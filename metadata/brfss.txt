@@ -46,7 +46,7 @@ zip_tf <- tempfile()
 zip_url <-
 	"https://www.cdc.gov/brfss/annual_data/2021/files/LLCP2021XPT.zip"
 	
-download.file( zip_url , zip_tf , mode = 'wb' )
+download.file( zip_url , zip_tf , mode = 'wb' , method = 'curl' )
 
 chapter_tag_tbl <- read_xpt( zip_tf )
 
@@ -89,7 +89,7 @@ chapter_tag_design <-
 		
 		fair_or_poor_health = ifelse( genhlth %in% 1:5 , as.numeric( genhlth > 3 ) , NA ) ,
 		
-		couldnt_see_doc_due_to_cost = 
+		no_doc_visit_due_to_cost = 
 			factor( 
 				medcost1 , 
 				levels = c( 1 , 2 , 7 , 9 ) , 
@@ -129,7 +129,7 @@ chapter_tag_design <-
 
 group_by_variable: state_name
 linear_variable: x_age80
-categorical_variable: couldnt_see_doc_due_to_cost
+categorical_variable: no_doc_visit_due_to_cost
 categorical_narm: , na.rm = TRUE
 ratio_estimation_numerator: nummen
 ratio_estimation_denominator: numadult
@@ -156,11 +156,11 @@ The example below matches Alaska's confidence intervals from the [BRFSS Prevalen
 
 result <-
 	svymean(
-		~ couldnt_see_doc_due_to_cost ,
+		~ no_doc_visit_due_to_cost ,
 		subset(
 			chapter_tag_design ,
 			state_name %in% 'ALASKA' &
-			couldnt_see_doc_due_to_cost %in%
+			no_doc_visit_due_to_cost %in%
 				c( 'yes' , 'no' )
 		) ,
 		na.rm = TRUE
