@@ -72,8 +72,9 @@ variables_to_keep <-
 	'x_state' , 'x_age80' , 'nummen' , 'numadult' , 'x_hlthpln' )
 	
 brfss_df <- brfss_df[ variables_to_keep ]
-	
-brfss_design <-
+
+# this linearized design matches cdc specifications
+brfss_tsl_design <-
 	svydesign(
 		id = ~ x_psu ,
 		strata = ~ x_ststr ,
@@ -81,13 +82,20 @@ brfss_design <-
 		weight = ~ x_llcpwt ,
 		nest = TRUE
 	)
-	
-# note: since large linearized survey designs execute slowly,
+
+# since large linearized survey designs execute slowly,
 # consider performing exploratory analysis as a replication design:
-# coefficients (such as means and medians) do not change
-# standard errors and confidence intervals differ slightly
-# brfss_replication_design <-
-# 	as.svrepdesign( brfss_design )
+brfss_design <-
+	as.svrepdesign( 
+		brfss_tsl_design 
+		type = 'bootstrap' ,
+		replicates = 100
+	)
+
+# coefficients (such as means and medians) do not change,
+# while standard errors and confidence intervals differ slightly.
+# attempt the commands below with `brfss_tsl_design`
+# to see these minor differences
 ```
 
 ### Variable Recoding {-}
@@ -325,7 +333,7 @@ brfss_srvyr_design %>%
 
 ## Replication Example {-}
 
-The example below matches Alaska's confidence intervals from the [BRFSS Prevalence & Trends Data](https://nccd.cdc.gov/BRFSSPrevalence/rdPage.aspx?rdReport=DPH_BRFSS.ExploreByTopic&irbLocationType=StatesAndMMSA&islClass=CLASS07&islTopic=TOPIC28&islYear=2021&rdRnd=24558):
+This matches Alaska's confidence intervals from the [BRFSS Prevalence & Trends Data](https://nccd.cdc.gov/BRFSSPrevalence/rdPage.aspx?rdReport=DPH_BRFSS.ExploreByTopic&irbLocationType=StatesAndMMSA&islClass=CLASS07&islTopic=TOPIC28&islYear=2021&rdRnd=24558):
 
 ```{r eval = FALSE , results = "hide" }
 
@@ -333,7 +341,7 @@ result <-
 	svymean(
 		~ no_doc_visit_due_to_cost ,
 		subset(
-			brfss_design ,
+			brfss_tsl_design ,
 			state_name %in% 'ALASKA' &
 			no_doc_visit_due_to_cost %in%
 				c( 'yes' , 'no' )

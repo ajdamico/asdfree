@@ -71,8 +71,9 @@ variables_to_keep <-
 	'x_state' , 'x_age80' , 'nummen' , 'numadult' , 'x_hlthpln' )
 	
 chapter_tag_df <- chapter_tag_df[ variables_to_keep ]
-	
-chapter_tag_design <-
+
+# this linearized design matches cdc specifications
+chapter_tag_tsl_design <-
 	svydesign(
 		id = ~ x_psu ,
 		strata = ~ x_ststr ,
@@ -80,13 +81,20 @@ chapter_tag_design <-
 		weight = ~ x_llcpwt ,
 		nest = TRUE
 	)
-	
-# note: since large linearized survey designs execute slowly,
+
+# since large linearized survey designs execute slowly,
 # consider performing exploratory analysis as a replication design:
-# coefficients (such as means and medians) do not change
-# standard errors and confidence intervals differ slightly
-# chapter_tag_replication_design <-
-# 	as.svrepdesign( chapter_tag_design )
+chapter_tag_design <-
+	as.svrepdesign( 
+		chapter_tag_tsl_design 
+		type = 'bootstrap' ,
+		replicates = 100
+	)
+
+# coefficients (such as means and medians) do not change,
+# while standard errors and confidence intervals differ slightly.
+# attempt the commands below with `chapter_tag_tsl_design`
+# to see these minor differences
 ~~~
 
 
@@ -157,8 +165,7 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-The example below matches Alaska's confidence intervals from the [BRFSS Prevalence & Trends Data](https://nccd.cdc.gov/BRFSSPrevalence/rdPage.aspx?rdReport=DPH_BRFSS.ExploreByTopic&irbLocationType=StatesAndMMSA&islClass=CLASS07&islTopic=TOPIC28&islYear=2021&rdRnd=24558):
-
+This matches Alaska's confidence intervals from the [BRFSS Prevalence & Trends Data](https://nccd.cdc.gov/BRFSSPrevalence/rdPage.aspx?rdReport=DPH_BRFSS.ExploreByTopic&irbLocationType=StatesAndMMSA&islClass=CLASS07&islTopic=TOPIC28&islYear=2021&rdRnd=24558):
 
 ```{r eval = FALSE , results = "hide" }
 
@@ -166,7 +173,7 @@ result <-
 	svymean(
 		~ no_doc_visit_due_to_cost ,
 		subset(
-			chapter_tag_design ,
+			chapter_tag_tsl_design ,
 			state_name %in% 'ALASKA' &
 			no_doc_visit_due_to_cost %in%
 				c( 'yes' , 'no' )
