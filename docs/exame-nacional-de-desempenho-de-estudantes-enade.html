@@ -356,22 +356,55 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Download, Import, Preparation<a href="exame-nacional-de-desempenho-de-estudantes-enade.html#download-import-preparation-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download and import the 1999 medical claims file:</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
-<span id="cb57-2"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-3"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-3" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb57-4"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-5"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-5" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://download.inep.gov.br/microdados/microdados_enade_2021.zip&quot;</span></span>
-<span id="cb57-6"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-7"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="fu">GET</span>( this_url , <span class="fu">write_disk</span>( tf ) )</span>
-<span id="cb57-8"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-9"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-9" aria-hidden="true" tabindex="-1"></a>unzipped_file <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span></code></pre></div>
+<span id="cb57-2"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(archive)</span>
+<span id="cb57-3"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-4"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-4" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb57-5"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-6"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-6" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://download.inep.gov.br/microdados/microdados_enade_2021.zip&quot;</span></span>
+<span id="cb57-7"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-8"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="fu">GET</span>( this_url , <span class="fu">write_disk</span>( tf ) )</span>
+<span id="cb57-9"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-10"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb57-10" aria-hidden="true" tabindex="-1"></a><span class="fu">archive_extract</span>( tf , <span class="at">dir =</span> <span class="fu">tempdir</span>() )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-base-r" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with base R  <a href="exame-nacional-de-desempenho-de-estudantes-enade.html#analysis-examples-with-base-r" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Load a data frame:</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-1" aria-hidden="true" tabindex="-1"></a>enade_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( unzipped_file )</span>
-<span id="cb58-2"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-3"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( enade_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( enade_df ) )</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-1" aria-hidden="true" tabindex="-1"></a>read_enade_archive <span class="ot">&lt;-</span></span>
+<span id="cb58-2"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( this_regular_expression , this_directory ){</span>
+<span id="cb58-3"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-3" aria-hidden="true" tabindex="-1"></a>        this_filename <span class="ot">&lt;-</span> </span>
+<span id="cb58-4"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">grep</span>( </span>
+<span id="cb58-5"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-5" aria-hidden="true" tabindex="-1"></a>                this_regular_expression , </span>
+<span id="cb58-6"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">list.files</span>( </span>
+<span id="cb58-7"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-7" aria-hidden="true" tabindex="-1"></a>                    this_directory ,</span>
+<span id="cb58-8"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">recursive =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb58-9"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-9" aria-hidden="true" tabindex="-1"></a>                    <span class="at">full.names =</span> <span class="cn">TRUE</span> </span>
+<span id="cb58-10"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-10" aria-hidden="true" tabindex="-1"></a>                ) , </span>
+<span id="cb58-11"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">value =</span> <span class="cn">TRUE</span> </span>
+<span id="cb58-12"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-12" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb58-13"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-14"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-14" aria-hidden="true" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span></span>
+<span id="cb58-15"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">read.table</span>(</span>
+<span id="cb58-16"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-16" aria-hidden="true" tabindex="-1"></a>                this_filename ,</span>
+<span id="cb58-17"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-17" aria-hidden="true" tabindex="-1"></a>                <span class="at">header =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb58-18"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-18" aria-hidden="true" tabindex="-1"></a>                <span class="at">sep =</span> <span class="st">&quot;;&quot;</span> ,</span>
+<span id="cb58-19"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">na.strings =</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb58-20"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-20" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb58-21"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-21" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb58-22"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
+<span id="cb58-23"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-23" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb58-24"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-24" aria-hidden="true" tabindex="-1"></a>        this_df</span>
+<span id="cb58-25"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-25" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb58-26"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-27"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-27" aria-hidden="true" tabindex="-1"></a>arq1_df <span class="ot">&lt;-</span> <span class="fu">read_enade_archive</span>( <span class="st">&#39;arq1\.txt$&#39;</span> , <span class="fu">tempdir</span>() )</span>
+<span id="cb58-28"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-29"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-29" aria-hidden="true" tabindex="-1"></a>arq1_df <span class="ot">&lt;-</span> <span class="fu">unique</span>( arq1_df[ <span class="fu">c</span>( <span class="st">&#39;co_curso&#39;</span> , <span class="st">&#39;co_uf_curso&#39;</span> ) ] )</span>
+<span id="cb58-30"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-31"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-31" aria-hidden="true" tabindex="-1"></a>arq3_df <span class="ot">&lt;-</span> <span class="fu">read_enade_archive</span>( <span class="st">&#39;arq3\.txt$&#39;</span> , <span class="fu">tempdir</span>() )</span>
+<span id="cb58-32"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-33"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-33" aria-hidden="true" tabindex="-1"></a>enade_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( arq3_df , arq1_df )</span>
+<span id="cb58-34"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-35"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb58-35" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( enade_df ) <span class="sc">==</span> <span class="fu">nrow</span>( arq3_df ) )</span></code></pre></div>
 <div id="variable-recoding-2" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="exame-nacional-de-desempenho-de-estudantes-enade.html#variable-recoding-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
@@ -380,7 +413,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb59-3"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb59-3" aria-hidden="true" tabindex="-1"></a>        enade_df , </span>
 <span id="cb59-4"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb59-4" aria-hidden="true" tabindex="-1"></a>        </span>
 <span id="cb59-5"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb59-5" aria-hidden="true" tabindex="-1"></a>        <span class="co"># qual foi o tempo gasto por voce para concluir a prova?</span></span>
-<span id="cb59-6"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb59-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">less_than_two_hours =</span> <span class="fu">as.numeric</span>( qp_i9 <span class="sc">%in%</span> <span class="fu">c</span>( <span class="st">&#39;A&#39;</span> , <span class="st">&#39;B&#39;</span> ) ) ,</span>
+<span id="cb59-6"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb59-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">less_than_two_hours =</span> <span class="fu">as.numeric</span>( co_rs_i9 <span class="sc">%in%</span> <span class="fu">c</span>( <span class="st">&#39;A&#39;</span> , <span class="st">&#39;B&#39;</span> ) ) ,</span>
 <span id="cb59-7"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb59-7" aria-hidden="true" tabindex="-1"></a>        </span>
 <span id="cb59-8"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb59-9"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb59-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">state_name =</span> </span>

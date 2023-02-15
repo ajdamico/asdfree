@@ -38,6 +38,7 @@ Download and import the 1999 medical claims file:
 
 ```{r eval = FALSE }
 library(httr)
+library(archive)
 
 tf <- tempfile()
 
@@ -45,16 +46,50 @@ this_url <-	"https://download.inep.gov.br/microdados/microdados_enade_2021.zip"
 
 GET( this_url , write_disk( tf ) )
 
-unzipped_file <- unzip( tf , exdir = tempdir() )
+archive_extract( tf , dir = tempdir() )
 ```
 ~~~
 
 
 ~~~{analysis_examples_loading_block}
 ```{r messages = FALSE , eval = FALSE }
-chapter_tag_df <- read.csv( unzipped_file )
 
-names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+read_enade_archive <-
+	function( this_regular_expression , this_directory ){
+		this_filename <- 
+			grep( 
+				this_regular_expression , 
+				list.files( 
+					this_directory ,
+					recursive = TRUE ,
+					full.names = TRUE 
+				) , 
+				value = TRUE 
+			)
+
+		this_df <-
+			read.table(
+				this_filename ,
+				header = TRUE ,
+				sep = ";" ,
+				na.strings = ""
+			)
+			
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+arq1_df <- read_enade_archive( 'arq1\\.txt$' , tempdir() )
+
+arq1_df <- unique( arq1_df[ c( 'co_curso' , 'co_uf_curso' ) ] )
+
+arq3_df <- read_enade_archive( 'arq3\\.txt$' , tempdir() )
+
+chapter_tag_df <- merge( arq3_df , arq1_df )
+
+stopifnot( nrow( chapter_tag_df ) == nrow( arq3_df ) )
+
 ```
 ~~~
 
@@ -65,7 +100,7 @@ chapter_tag_df <-
 		chapter_tag_df , 
 		
 		# qual foi o tempo gasto por voce para concluir a prova?
-		less_than_two_hours = as.numeric( qp_i9 %in% c( 'A' , 'B' ) ) ,
+		less_than_two_hours = as.numeric( co_rs_i9 %in% c( 'A' , 'B' ) ) ,
 		
 
 		state_name = 
