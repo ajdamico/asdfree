@@ -80,11 +80,11 @@ read_enade_archive <-
 		this_df
 	}
 
-arq1_df <- read_enade_archive( 'arq1\\.txt$' , tempdir() )
+arq1_df <- read_enade_archive( 'arq1\\\\.txt$' , tempdir() )
 
-arq1_df <- unique( arq1_df[ c( 'co_curso' , 'co_uf_curso' ) ] )
+arq1_df <- unique( arq1_df[ c( 'co_curso' , 'co_uf_curso' , 'co_categad' , 'co_grupo' ) ] )
 
-arq3_df <- read_enade_archive( 'arq3\\.txt$' , tempdir() )
+arq3_df <- read_enade_archive( 'arq3\\\\.txt$' , tempdir() )
 
 chapter_tag_df <- merge( arq3_df , arq1_df )
 
@@ -102,6 +102,14 @@ chapter_tag_df <-
 		# qual foi o tempo gasto por voce para concluir a prova?
 		less_than_two_hours = as.numeric( co_rs_i9 %in% c( 'A' , 'B' ) ) ,
 		
+		administrative_category =
+			factor(
+				co_categad ,
+				levels = c( 1:5 , 7 ) ,
+				labels = c( '1. Pública Federal' , '2. Pública Estadual' , 
+				'3. Pública Municipal' , '4. Privada com fins lucrativos' , 
+				'5. Privada sem fins lucrativos' , '7. Especial' )
+			) ,
 
 		state_name = 
 			factor( 
@@ -122,11 +130,11 @@ chapter_tag_df <-
 	
 ~~~
 
-group_by_variable: tp_sexo
+group_by_variable: administrative_category
 linear_variable: nt_obj_fg
 linear_narm: , na.rm = TRUE
 categorical_variable: state_name
-subset_definition: qp_i1 %in% c( "A" , "B" )
+subset_definition: co_rs_i1 %in% c( "A" , "B" )
 subset_definition_description: Students reporting that the general training section of the test was easy or very easy
 binary_variable: less_than_two_hours
 
@@ -142,10 +150,20 @@ needs_dplyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-The example below matches
+The example below matches https://download.inep.gov.br/enade/resultados/2021/apresentacao_resultados_finais.pdf#page=48
 
+TECNOLOGIA EM GESTÃO DA TECNOLOGIA DA INFORMAÇÃO
 
 ```{r eval = FALSE , results = "hide" }
+
+it_students <- subset( chapter_tag_df , co_grupo %in% 6409 )
+
+results <- sapply( it_students[ c( 'nt_fg' , 'nt_ce' , 'nt_ger' ) ] , mean , na.rm = TRUE )
+
+stopifnot( round( results[ 'nt_fg' ] , 1 ) == 30.4 )
+stopifnot( round( results[ 'nt_ce' ] , 1 ) == 38.2 )
+stopifnot( round( results[ 'nt_ger' ] , 1 ) == 36.3 )
+
 ```
 ~~~
 
