@@ -153,8 +153,8 @@ for ( i in seq_along( chapter_tag ) ){
 			if( is_db ) "database" ,
 			if( is_survey & is_db ) "-backed " ,
 			if( is_survey ) "complex sample survey design" ,
-			if( !is_survey & !is_db ) "Load a data frame" ,
-			":"
+			if( !is_survey & !is_db ) "" ,
+			if( is_survey | is_db ) ":"
 		)				
 	
 	rmd_lines <- gsub( "^construct_a_what_line" , construct_a_this_line , rmd_lines )
