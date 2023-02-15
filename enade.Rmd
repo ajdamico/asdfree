@@ -1,0 +1,233 @@
+# Exame Nacional de Desempenho de Estudantes (ENADE) {-}
+
+<a href="https://github.com/asdfree/enade/actions"><img src="https://github.com/asdfree/enade/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+An evaluation of the performance of undergraduate students in relation to the program content, skills and competences acquired in their training. The exam is mandatory and the student's regularity in the exam must be included in his or her school record.
+
+* One table with one row per individual undergraduate student in Brazil.
+
+* An enumeration of undergraduate students in Brazil.
+
+* Released annually since 2004.
+
+* Compiled by the Brazilian [Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)](http://www.inep.gov.br/).
+
+---
+
+Please skim before you begin:
+
+1.
+
+2.
+
+3. This poem
+
+```{r}
+#
+#
+#
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the 1999 medical claims file:
+
+```{r eval = FALSE }
+library(httr)
+
+tf <- tempfile()
+
+this_url <-	"https://download.inep.gov.br/microdados/microdados_enade_2021.zip"
+
+GET( this_url , write_disk( tf ) )
+
+unzipped_file <- unzip( tf , exdir = tempdir() )
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+Load a data frame:
+
+```{r messages = FALSE , eval = FALSE }
+enade_df <- read.csv( unzipped_file )
+
+names( enade_df ) <- tolower( names( enade_df ) )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+enade_df <- 
+	transform( 
+		enade_df , 
+		
+		# qual foi o tempo gasto por voce para concluir a prova?
+		less_than_two_hours = as.numeric( qp_i9 %in% c( 'A' , 'B' ) ) ,
+		
+
+		state_name = 
+			factor( 
+				co_uf_curso , 
+				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
+				"Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+				"Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+				"Bahia" , "Minas Gerais" , "Espirito Santo" , 
+				"Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+				"Santa Catarina" , "Rio Grande do Sul" , 
+				"Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+				"Distrito Federal" )
+			)
+
+	)
+	
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( enade_df )
+
+table( enade_df[ , "tp_sexo" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( enade_df[ , "nt_obj_fg" ] , na.rm = TRUE )
+
+tapply(
+	enade_df[ , "nt_obj_fg" ] ,
+	enade_df[ , "tp_sexo" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( enade_df[ , "state_name" ] ) )
+
+prop.table(
+	table( enade_df[ , c( "state_name" , "tp_sexo" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( enade_df[ , "nt_obj_fg" ] , na.rm = TRUE )
+
+tapply(
+	enade_df[ , "nt_obj_fg" ] ,
+	enade_df[ , "tp_sexo" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( enade_df[ , "nt_obj_fg" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	enade_df[ , "nt_obj_fg" ] ,
+	enade_df[ , "tp_sexo" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to Students reporting that the general training section of the test was easy or very easy:
+```{r eval = FALSE , results = "hide" }
+sub_enade_df <- subset( enade_df , qp_i1 %in% c( "A" , "B" ) )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_enade_df[ , "nt_obj_fg" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( enade_df[ , "nt_obj_fg" ] , na.rm = TRUE )
+
+tapply(
+	enade_df[ , "nt_obj_fg" ] ,
+	enade_df[ , "tp_sexo" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( nt_obj_fg ~ less_than_two_hours , enade_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( enade_df[ , c( "less_than_two_hours" , "state_name" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		nt_obj_fg ~ less_than_two_hours + state_name , 
+		data = enade_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for ENADE users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+enade_tbl <- as_tibble( enade_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+enade_tbl %>%
+	summarize( mean = mean( nt_obj_fg , na.rm = TRUE ) )
+
+enade_tbl %>%
+	group_by( tp_sexo ) %>%
+	summarize( mean = mean( nt_obj_fg , na.rm = TRUE ) )
+```
+
+---
+
+## Replication Example {-}
+
+The example below matches
+
+```{r eval = FALSE , results = "hide" }
+```
