@@ -6,7 +6,7 @@ A health behavior telephone interview survey with enough sample size to examine 
 
 * One table with one row per telephone respondent.
 
-* A complex sample survey designed to generalize to the civilian non-institutional adult population of the United States.
+* A complex survey designed to generalize to the civilian non-institutional adult population of the U.S.
 
 * Released annually since 1984 but all states did not participate until 1994.
 
@@ -16,16 +16,16 @@ A health behavior telephone interview survey with enough sample size to examine 
 
 Please skim before you begin:
 
-1. 
+1. [BRFSS Data User Guide](https://www.cdc.gov/brfss/data_documentation/pdf/UserguideJune2013.pdf)
 
 2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Behavioral_Risk_Factor_Surveillance_System)
 
 3. This poem
 
 ```{r}
-#
-#
-#
+# a cellphone vibrates
+# it's the cdc! asking
+# if you ate veggies
 ```
 
 ---
@@ -38,8 +38,7 @@ library(haven)
 
 zip_tf <- tempfile()
 
-zip_url <-
-	"https://www.cdc.gov/brfss/annual_data/2021/files/LLCP2021XPT.zip"
+zip_url <- "https://www.cdc.gov/brfss/annual_data/2021/files/LLCP2021XPT.zip"
 	
 download.file( zip_url , zip_tf , mode = 'wb' )
 
@@ -57,10 +56,6 @@ brfss_df[ , 'one' ] <- 1
 ## Analysis Examples with the `survey` library \ {-}
 
 Construct a complex sample survey design:
-
-```{r messages = FALSE , eval = FALSE }
-
-```
 
 ```{r messages = FALSE , eval = FALSE }
 options( survey.lonely.psu = "adjust" )
@@ -81,17 +76,20 @@ brfss_design <-
 		weight = ~ x_llcpwt ,
 		nest = TRUE
 	)
-	
-# note: since large linearized survey designs execute slowly,
-# consider performing exploratory analysis as a replication design:
-# coefficients (such as means and medians) do not change
-# standard errors and confidence intervals differ slightly
-# brfss_replication_design <-
-# 	as.svrepdesign( 
-#	brfss_design ,
-# 	type = 'bootstrap' ,
-#	replicates = 100
-# )
+```
+
+Since large linearized survey designs execute slowly, a replication design might be preferrable for exploratory analysis. Coefficients (such as means and medians) do not change, standard errors and confidence intervals differ slightly.
+
+```{r messages = FALSE , eval = FALSE }
+brfss_replication_design <-
+ 	as.svrepdesign( 
+		brfss_design ,
+		type = 'bootstrap'
+	)
+
+system.time( print( svymean( ~ x_age80 , brfss_design ) ) )
+
+system.time( print( svymean( ~ x_age80 , brfss_replication_design ) ) )
 ```
 
 ### Variable Recoding {-}
