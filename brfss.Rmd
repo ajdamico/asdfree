@@ -51,6 +51,21 @@ names( brfss_df ) <- tolower( names( brfss_df ) )
 brfss_df[ , 'one' ] <- 1
 ```
 
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+# brfss_fn <- file.path( path.expand( "~" ) , "BRFSS" , "this_file.rds" )
+# saveRDS( brfss_df , file = brfss_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+# brfss_df <- readRDS( brfss_fn )
+```
+
 ---
 
 ## Analysis Examples with the `survey` library \ {-}
@@ -78,18 +93,18 @@ brfss_design <-
 	)
 ```
 
-Since large linearized survey designs execute slowly, a replication design might be preferrable for exploratory analysis. Coefficients (such as means and medians) do not change, standard errors and confidence intervals differ slightly.
+Since large linearized survey designs execute slowly, a replication design might be preferrable for exploratory analysis. Coefficients (such as means and medians) do not change, standard errors and confidence intervals differ slightly. The initial conversion with `as.svrepdesign` might require an extended period of processing time, but subsequent analyses will finish much faster:
 
 ```{r messages = FALSE , eval = FALSE }
-brfss_replication_design <-
- 	as.svrepdesign( 
-		brfss_design ,
-		type = 'bootstrap'
-	)
+# brfss_replication_design <-
+# 	as.svrepdesign( 
+# 		brfss_design ,
+# 		type = 'bootstrap'
+# 	)
 
-system.time( print( svymean( ~ x_age80 , brfss_design ) ) )
+# system.time( print( svymean( ~ x_age80 , brfss_design ) ) )
 
-system.time( print( svymean( ~ x_age80 , brfss_replication_design ) ) )
+# system.time( print( svymean( ~ x_age80 , brfss_replication_design ) ) )
 ```
 
 ### Variable Recoding {-}

@@ -1,4 +1,4 @@
-commit_memo <- "'enade'"
+commit_memo <- "'save line'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -137,6 +137,14 @@ for ( i in seq_along( chapter_tag ) ){
 	if( !is_survey ) rmd_lines <- gsub( "tbl_initiation_line" , if( is_db ) "library(dbplyr)\ndplyr_db <- dplyr::src_sqlite( dbdir )\nchapter_tag_tbl <- tbl( dplyr_db , 'sql_tablename' )" else "chapter_tag_tbl <- as_tibble( chapter_tag_df )" , rmd_lines )
 	
 	
+	# standalone dataset, survey design, multiply-imputed survey design, database-backed survey design, or multiply-imputed database-backed survey design
+	
+	if( is_db ){
+		stop( "revisit this" )
+	} else {
+		rmd_lines <- gsub( "^save_a_what_line" , '\n\n### Save locally \\\\ {-}\n\nSave the object at any point:\n\n```{r eval = FALSE , results = "hide" , messages = FALSE }\n# chapter_tag_fn <- file.path( path.expand( "~" ) , "CHAPTER_TAG" , "this_file.rds" )\n# saveRDS( chapter_tag_df , file = chapter_tag_fn , compress = FALSE )\n```\n\nLoad the same object:\n\n```{r eval = FALSE , results = "hide" , messages = FALSE }\n# chapter_tag_df <- readRDS( chapter_tag_fn )\n```' , rmd_lines )
+	}
+		
 	# standalone dataset, survey design, multiply-imputed survey design, database-backed survey design, or multiply-imputed database-backed survey design
 	construct_a_this_line <- 
 		paste0( 
