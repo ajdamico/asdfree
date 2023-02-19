@@ -106,6 +106,9 @@ nis_design <-
 		
 		nis_design , 
 		
+		first_fed_formula =
+			ifelse( bf_formr20 %in% 888 , NA , bf_formr20 ) ,
+		
 		dtap_3p =
 
 			as.numeric(
@@ -154,9 +157,9 @@ svyby( ~ one , ~ state , nis_design , svytotal )
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ p_nuhepx , nis_design , na.rm = TRUE )
+svymean( ~ first_fed_formula , nis_design , na.rm = TRUE )
 
-svyby( ~ p_nuhepx , ~ state , nis_design , svymean , na.rm = TRUE )
+svyby( ~ first_fed_formula , ~ state , nis_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
@@ -168,9 +171,9 @@ svyby( ~ sex , ~ state , nis_design , svymean , na.rm = TRUE )
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ p_nuhepx , nis_design , na.rm = TRUE )
+svytotal( ~ first_fed_formula , nis_design , na.rm = TRUE )
 
-svyby( ~ p_nuhepx , ~ state , nis_design , svytotal , na.rm = TRUE )
+svyby( ~ first_fed_formula , ~ state , nis_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
@@ -182,10 +185,10 @@ svyby( ~ sex , ~ state , nis_design , svytotal , na.rm = TRUE )
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ p_nuhepx , nis_design , 0.5 , na.rm = TRUE )
+svyquantile( ~ first_fed_formula , nis_design , 0.5 , na.rm = TRUE )
 
 svyby( 
-	~ p_nuhepx , 
+	~ first_fed_formula , 
 	~ state , 
 	nis_design , 
 	svyquantile , 
@@ -212,14 +215,14 @@ sub_nis_design <- subset( nis_design , p_utdpol == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ p_nuhepx , sub_nis_design , na.rm = TRUE )
+svymean( ~ first_fed_formula , sub_nis_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ p_nuhepx , nis_design , na.rm = TRUE )
+this_result <- svymean( ~ first_fed_formula , nis_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -228,7 +231,7 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ p_nuhepx , 
+		~ first_fed_formula , 
 		~ state , 
 		nis_design , 
 		svymean ,
@@ -248,16 +251,16 @@ degf( nis_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ p_nuhepx , nis_design , na.rm = TRUE )
+svyvar( ~ first_fed_formula , nis_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ p_nuhepx , nis_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ first_fed_formula , nis_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ p_nuhepx , nis_design , na.rm = TRUE , deff = "replace" )
+svymean( ~ first_fed_formula , nis_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -270,7 +273,7 @@ svyciprop( ~ dtap_3p , nis_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( p_nuhepx ~ dtap_3p , nis_design )
+svyttest( first_fed_formula ~ dtap_3p , nis_design )
 ```
 
 Perform a chi-squared test of association for survey data:
@@ -285,7 +288,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		p_nuhepx ~ dtap_3p + sex , 
+		first_fed_formula ~ dtap_3p + sex , 
 		nis_design 
 	)
 
@@ -311,11 +314,11 @@ nis_srvyr_design <- as_survey( nis_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" , messages = FALSE }
 nis_srvyr_design %>%
-	summarize( mean = survey_mean( p_nuhepx , na.rm = TRUE ) )
+	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
 
 nis_srvyr_design %>%
 	group_by( state ) %>%
-	summarize( mean = survey_mean( p_nuhepx , na.rm = TRUE ) )
+	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
 ```
 
 ---
@@ -334,11 +337,15 @@ results <-
 		svymean
 	)
 
-stopifnot( round( results[ "HISPANIC" , "p_utd431h314_rout_sUTD" , ] , 3 ) == .711 )
-stopifnot( round( results[ "NON-HISPANIC WHITE ONLY" , "p_utd431h314_rout_sUTD" , ] , 3 ) == .742 )
-stopifnot( round( results[ "NON-HISPANIC BLACK ONLY" , "p_utd431h314_rout_sUTD" , ] , 3 ) == .647 )
-stopifnot( round( results[ "HISPANIC" , "se.p_utd431h314_rout_sUTD" , ] , 3 ) == .015 )
-stopifnot( round( results[ "NON-HISPANIC WHITE ONLY" , "se.p_utd431h314_rout_sUTD" , ] , 3 ) == .009 )
-stopifnot( round( results[ "NON-HISPANIC BLACK ONLY" , "se.p_utd431h314_rout_sUTD" , ] , 3 ) == .022 )
+coefficients <- results[ , "p_utd431h314_rout_sUTD" , drop = FALSE ]
+
+standard_errors <- results[ , "se.p_utd431h314_rout_sUTD" , drop = FALSE ]
+
+stopifnot( round( coefficients[ "HISPANIC" , ] , 3 ) == .711 )
+stopifnot( round( coefficients[ "NON-HISPANIC WHITE ONLY" , ] , 3 ) == .742 )
+stopifnot( round( coefficients[ "NON-HISPANIC BLACK ONLY" , ] , 3 ) == .647 )
+stopifnot( round( standard_errors[ "HISPANIC" , ] , 3 ) == .015 )
+stopifnot( round( standard_errors[ "NON-HISPANIC WHITE ONLY" , ] , 3 ) == .009 )
+stopifnot( round( standard_errors[ "NON-HISPANIC BLACK ONLY" , ] , 3 ) == .022 )
 ```
 
