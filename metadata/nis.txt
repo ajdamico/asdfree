@@ -3,14 +3,14 @@ chapter_title: National Immunization Survey
 needs_actions_build_status_line: yes
 
 ~~~{dataset_introduction}
-The National Immunization Survey tracks childhood vaccination rates at the state-level.
+The vaccination coverage rate tracker for national, state, and selected local areas.
 ~~~
 
 table_structure: * One table with one row per sampled toddler.
 
 generalizable_population: * A complex sample survey designed to generalize to children aged 19-35 months in the United States.
 
-publication_period: * Released annually since 1995.
+publication_period: * Released annually since 1995, plus an adolescent (13-17 years) sample since 2008.
 
 administrative_organization: * Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
 
@@ -21,9 +21,9 @@ administrative_organization: * Administered by the [Centers for Disease Control 
 ~~~{reading_block}
 Please skim before you begin:
 
-1.
+1. [About NIS](https://www.cdc.gov/vaccines/imz-managers/nis/about.html)
 
-2.
+2. [National Immunizatoin Survey-Child: A User's Guide for the 2021 Public-Use Data File](https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf)
 
 3. This poem
 
@@ -37,29 +37,38 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-Run the import code provided by the CDC:
+Download the fixed-width file:
 ```{r eval = FALSE }
-library(Hmisc)
-
-tf <- tempfile()
+dat_tf <- tempfile()
 
 dat_url <- "https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.DAT"
 
-download.file( dat_url , tf , mode = 'wb' )
+download.file( dat_url , dat_tf , mode = 'wb' )
+```
 
+Edit then execute the import script provided by the CDC:
+```{r eval = FALSE }
+library(Hmisc)
 
-r_input_url <- "https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.R"
+r_tf <- tempfile()
 
-r_input_lines <- readLines( r_input_url )
+r_script_url <- "https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.R"
+
+r_input_lines <- readLines( r_script_url )
 
 # do not let the script do the save()
 r_input_lines <- gsub( "^save\\\\(" , "# save(" , r_input_lines )
 
-# redirect flat file to tf
-r_input_lines <- gsub( '\\\\"path\\\\-to\\\\-file\\\\/(.*)\\\\.DAT\\\\"' , "tf" , r_input_lines )
+# redirect the path to the flat file to the local save location of `dat_tf`
+r_input_lines <- gsub( '\\\\"path\\\\-to\\\\-file\\\\/(.*)\\\\.DAT\\\\"' , "dat_tf" , r_input_lines )
 
-eval( parse( text = r_input_lines ) )
+# save the edited script locally
+writeLines( r_input_lines , r_tf )
 
+# run the edited script
+source( r_tf , echo = TRUE )
+
+# rename the resultant data.frame object
 chapter_tag_df <- NISPUF21
 
 names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
@@ -155,7 +164,8 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf#page=35
+
+This example matches the statistics and standard errors from [Data User's Guide Table 4](https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf#page=35).
 
 ```{r eval = FALSE , results = "hide" }
 

@@ -384,19 +384,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="national-immunization-survey-nis" class="section level1 unnumbered hasAnchor">
 <h1>National Immunization Survey (NIS)<a href="national-immunization-survey-nis.html#national-immunization-survey-nis" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/nis/actions"><img src="https://github.com/asdfree/nis/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>The National Immunization Survey tracks childhood vaccination rates at the state-level.</p>
+<p>The vaccination coverage rate tracker for national, state, and selected local areas.</p>
 <ul>
 <li><p>One table with one row per sampled toddler.</p></li>
 <li><p>A complex sample survey designed to generalize to children aged 19-35 months in the United States.</p></li>
-<li><p>Released annually since 1995.</p></li>
+<li><p>Released annually since 1995, plus an adolescent (13-17 years) sample since 2008.</p></li>
 <li><p>Administered by the <a href="http://www.cdc.gov/">Centers for Disease Control and Prevention</a>.</p></li>
 </ul>
 <hr />
 <p>Please skim before you begin:</p>
 <ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li>This poem</li>
+<li><p><a href="https://www.cdc.gov/vaccines/imz-managers/nis/about.html">About NIS</a></p></li>
+<li><p><a href="https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf">National Immunizatoin Survey-Child: A User’s Guide for the 2021 Public-Use Data File</a></p></li>
+<li><p>This poem</p></li>
 </ol>
 <div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="national-immunization-survey-nis.html#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
 <span id="cb154-2"><a href="national-immunization-survey-nis.html#cb154-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
@@ -404,206 +404,213 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-6" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="national-immunization-survey-nis.html#download-import-preparation-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Run the import code provided by the CDC:</p>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="national-immunization-survey-nis.html#cb155-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Hmisc)</span>
+<p>Download the fixed-width file:</p>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="national-immunization-survey-nis.html#cb155-1" aria-hidden="true" tabindex="-1"></a>dat_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb155-2"><a href="national-immunization-survey-nis.html#cb155-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-3"><a href="national-immunization-survey-nis.html#cb155-3" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb155-3"><a href="national-immunization-survey-nis.html#cb155-3" aria-hidden="true" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span> <span class="st">&quot;https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.DAT&quot;</span></span>
 <span id="cb155-4"><a href="national-immunization-survey-nis.html#cb155-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-5"><a href="national-immunization-survey-nis.html#cb155-5" aria-hidden="true" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span> <span class="st">&quot;https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.DAT&quot;</span></span>
-<span id="cb155-6"><a href="national-immunization-survey-nis.html#cb155-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-7"><a href="national-immunization-survey-nis.html#cb155-7" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( dat_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb155-8"><a href="national-immunization-survey-nis.html#cb155-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-9"><a href="national-immunization-survey-nis.html#cb155-9" aria-hidden="true" tabindex="-1"></a>r_input_url <span class="ot">&lt;-</span> <span class="st">&quot;https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.R&quot;</span></span>
-<span id="cb155-10"><a href="national-immunization-survey-nis.html#cb155-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-11"><a href="national-immunization-survey-nis.html#cb155-11" aria-hidden="true" tabindex="-1"></a>r_input_lines <span class="ot">&lt;-</span> <span class="fu">readLines</span>( r_input_url )</span>
-<span id="cb155-12"><a href="national-immunization-survey-nis.html#cb155-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-13"><a href="national-immunization-survey-nis.html#cb155-13" aria-hidden="true" tabindex="-1"></a><span class="co"># do not let the script do the save()</span></span>
-<span id="cb155-14"><a href="national-immunization-survey-nis.html#cb155-14" aria-hidden="true" tabindex="-1"></a>r_input_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;^save</span><span class="sc">\\</span><span class="st">(&quot;</span> , <span class="st">&quot;# save(&quot;</span> , r_input_lines )</span>
-<span id="cb155-15"><a href="national-immunization-survey-nis.html#cb155-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-16"><a href="national-immunization-survey-nis.html#cb155-16" aria-hidden="true" tabindex="-1"></a><span class="co"># redirect flat file to tf</span></span>
-<span id="cb155-17"><a href="national-immunization-survey-nis.html#cb155-17" aria-hidden="true" tabindex="-1"></a>r_input_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">&quot;path</span><span class="sc">\\</span><span class="st">-to</span><span class="sc">\\</span><span class="st">-file</span><span class="sc">\\</span><span class="st">/(.*)</span><span class="sc">\\</span><span class="st">.DAT</span><span class="sc">\\</span><span class="st">&quot;&#39;</span> , <span class="st">&quot;tf&quot;</span> , r_input_lines )</span>
-<span id="cb155-18"><a href="national-immunization-survey-nis.html#cb155-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-19"><a href="national-immunization-survey-nis.html#cb155-19" aria-hidden="true" tabindex="-1"></a><span class="fu">eval</span>( <span class="fu">parse</span>( <span class="at">text =</span> r_input_lines ) )</span>
-<span id="cb155-20"><a href="national-immunization-survey-nis.html#cb155-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-21"><a href="national-immunization-survey-nis.html#cb155-21" aria-hidden="true" tabindex="-1"></a>nis_df <span class="ot">&lt;-</span> NISPUF21</span>
-<span id="cb155-22"><a href="national-immunization-survey-nis.html#cb155-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-23"><a href="national-immunization-survey-nis.html#cb155-23" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( nis_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( nis_df ) )</span>
-<span id="cb155-24"><a href="national-immunization-survey-nis.html#cb155-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb155-25"><a href="national-immunization-survey-nis.html#cb155-25" aria-hidden="true" tabindex="-1"></a>nis_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
+<span id="cb155-5"><a href="national-immunization-survey-nis.html#cb155-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( dat_url , dat_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span></code></pre></div>
+<p>Edit then execute the import script provided by the CDC:</p>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="national-immunization-survey-nis.html#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Hmisc)</span>
+<span id="cb156-2"><a href="national-immunization-survey-nis.html#cb156-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-3"><a href="national-immunization-survey-nis.html#cb156-3" aria-hidden="true" tabindex="-1"></a>r_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb156-4"><a href="national-immunization-survey-nis.html#cb156-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-5"><a href="national-immunization-survey-nis.html#cb156-5" aria-hidden="true" tabindex="-1"></a>r_script_url <span class="ot">&lt;-</span> <span class="st">&quot;https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.R&quot;</span></span>
+<span id="cb156-6"><a href="national-immunization-survey-nis.html#cb156-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-7"><a href="national-immunization-survey-nis.html#cb156-7" aria-hidden="true" tabindex="-1"></a>r_input_lines <span class="ot">&lt;-</span> <span class="fu">readLines</span>( r_script_url )</span>
+<span id="cb156-8"><a href="national-immunization-survey-nis.html#cb156-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-9"><a href="national-immunization-survey-nis.html#cb156-9" aria-hidden="true" tabindex="-1"></a><span class="co"># do not let the script do the save()</span></span>
+<span id="cb156-10"><a href="national-immunization-survey-nis.html#cb156-10" aria-hidden="true" tabindex="-1"></a>r_input_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;^save</span><span class="sc">\\</span><span class="st">(&quot;</span> , <span class="st">&quot;# save(&quot;</span> , r_input_lines )</span>
+<span id="cb156-11"><a href="national-immunization-survey-nis.html#cb156-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-12"><a href="national-immunization-survey-nis.html#cb156-12" aria-hidden="true" tabindex="-1"></a><span class="co"># redirect the path to the flat file to the local save location of `dat_tf`</span></span>
+<span id="cb156-13"><a href="national-immunization-survey-nis.html#cb156-13" aria-hidden="true" tabindex="-1"></a>r_input_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">&quot;path</span><span class="sc">\\</span><span class="st">-to</span><span class="sc">\\</span><span class="st">-file</span><span class="sc">\\</span><span class="st">/(.*)</span><span class="sc">\\</span><span class="st">.DAT</span><span class="sc">\\</span><span class="st">&quot;&#39;</span> , <span class="st">&quot;dat_tf&quot;</span> , r_input_lines )</span>
+<span id="cb156-14"><a href="national-immunization-survey-nis.html#cb156-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-15"><a href="national-immunization-survey-nis.html#cb156-15" aria-hidden="true" tabindex="-1"></a><span class="co"># save the edited script locally</span></span>
+<span id="cb156-16"><a href="national-immunization-survey-nis.html#cb156-16" aria-hidden="true" tabindex="-1"></a><span class="fu">writeLines</span>( r_input_lines , r_tf )</span>
+<span id="cb156-17"><a href="national-immunization-survey-nis.html#cb156-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-18"><a href="national-immunization-survey-nis.html#cb156-18" aria-hidden="true" tabindex="-1"></a><span class="co"># run the edited script</span></span>
+<span id="cb156-19"><a href="national-immunization-survey-nis.html#cb156-19" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>( r_tf , <span class="at">echo =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb156-20"><a href="national-immunization-survey-nis.html#cb156-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-21"><a href="national-immunization-survey-nis.html#cb156-21" aria-hidden="true" tabindex="-1"></a><span class="co"># rename the resultant data.frame object</span></span>
+<span id="cb156-22"><a href="national-immunization-survey-nis.html#cb156-22" aria-hidden="true" tabindex="-1"></a>nis_df <span class="ot">&lt;-</span> NISPUF21</span>
+<span id="cb156-23"><a href="national-immunization-survey-nis.html#cb156-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-24"><a href="national-immunization-survey-nis.html#cb156-24" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( nis_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( nis_df ) )</span>
+<span id="cb156-25"><a href="national-immunization-survey-nis.html#cb156-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-26"><a href="national-immunization-survey-nis.html#cb156-26" aria-hidden="true" tabindex="-1"></a>nis_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
 <div id="save-locally-6" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="national-immunization-survey-nis.html#save-locally-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="national-immunization-survey-nis.html#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nis_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NIS&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb156-2"><a href="national-immunization-survey-nis.html#cb156-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( nis_df , file = nis_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="national-immunization-survey-nis.html#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nis_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NIS&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb157-2"><a href="national-immunization-survey-nis.html#cb157-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( nis_df , file = nis_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="national-immunization-survey-nis.html#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nis_df &lt;- readRDS( nis_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="national-immunization-survey-nis.html#cb158-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nis_df &lt;- readRDS( nis_fn )</span></span></code></pre></div>
 <hr />
 </div>
 </div>
 <div id="analysis-examples-with-the-survey-library-4" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with the <code>survey</code> library  <a href="national-immunization-survey-nis.html#analysis-examples-with-the-survey-library-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Construct a complex sample survey design:</p>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="national-immunization-survey-nis.html#cb158-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>( <span class="at">survey.lonely.psu =</span> <span class="st">&quot;adjust&quot;</span> )</span>
-<span id="cb158-2"><a href="national-immunization-survey-nis.html#cb158-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb158-3"><a href="national-immunization-survey-nis.html#cb158-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb158-4"><a href="national-immunization-survey-nis.html#cb158-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb158-5"><a href="national-immunization-survey-nis.html#cb158-5" aria-hidden="true" tabindex="-1"></a>nis_design <span class="ot">&lt;-</span> </span>
-<span id="cb158-6"><a href="national-immunization-survey-nis.html#cb158-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
-<span id="cb158-7"><a href="national-immunization-survey-nis.html#cb158-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> seqnumhh , </span>
-<span id="cb158-8"><a href="national-immunization-survey-nis.html#cb158-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> stratum , </span>
-<span id="cb158-9"><a href="national-immunization-survey-nis.html#cb158-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> provwt_c , </span>
-<span id="cb158-10"><a href="national-immunization-survey-nis.html#cb158-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">subset</span>( nis_df , provwt_c <span class="sc">&gt;</span> <span class="dv">0</span> ) </span>
-<span id="cb158-11"><a href="national-immunization-survey-nis.html#cb158-11" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="national-immunization-survey-nis.html#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>( <span class="at">survey.lonely.psu =</span> <span class="st">&quot;adjust&quot;</span> )</span>
+<span id="cb159-2"><a href="national-immunization-survey-nis.html#cb159-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb159-3"><a href="national-immunization-survey-nis.html#cb159-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb159-4"><a href="national-immunization-survey-nis.html#cb159-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb159-5"><a href="national-immunization-survey-nis.html#cb159-5" aria-hidden="true" tabindex="-1"></a>nis_design <span class="ot">&lt;-</span> </span>
+<span id="cb159-6"><a href="national-immunization-survey-nis.html#cb159-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
+<span id="cb159-7"><a href="national-immunization-survey-nis.html#cb159-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> seqnumhh , </span>
+<span id="cb159-8"><a href="national-immunization-survey-nis.html#cb159-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> stratum , </span>
+<span id="cb159-9"><a href="national-immunization-survey-nis.html#cb159-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> provwt_c , </span>
+<span id="cb159-10"><a href="national-immunization-survey-nis.html#cb159-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">subset</span>( nis_df , provwt_c <span class="sc">&gt;</span> <span class="dv">0</span> ) </span>
+<span id="cb159-11"><a href="national-immunization-survey-nis.html#cb159-11" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <div id="variable-recoding-6" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="national-immunization-survey-nis.html#variable-recoding-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="national-immunization-survey-nis.html#cb159-1" aria-hidden="true" tabindex="-1"></a>nis_design <span class="ot">&lt;-</span> </span>
-<span id="cb159-2"><a href="national-immunization-survey-nis.html#cb159-2" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb159-3"><a href="national-immunization-survey-nis.html#cb159-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb159-4"><a href="national-immunization-survey-nis.html#cb159-4" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb159-5"><a href="national-immunization-survey-nis.html#cb159-5" aria-hidden="true" tabindex="-1"></a>        nis_design , </span>
-<span id="cb159-6"><a href="national-immunization-survey-nis.html#cb159-6" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb159-7"><a href="national-immunization-survey-nis.html#cb159-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">first_fed_formula =</span></span>
-<span id="cb159-8"><a href="national-immunization-survey-nis.html#cb159-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">ifelse</span>( bf_formr20 <span class="sc">%in%</span> <span class="dv">888</span> , <span class="cn">NA</span> , bf_formr20 ) ,</span>
-<span id="cb159-9"><a href="national-immunization-survey-nis.html#cb159-9" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb159-10"><a href="national-immunization-survey-nis.html#cb159-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">dtap_3p =</span></span>
-<span id="cb159-11"><a href="national-immunization-survey-nis.html#cb159-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-12"><a href="national-immunization-survey-nis.html#cb159-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">as.numeric</span>(</span>
-<span id="cb159-13"><a href="national-immunization-survey-nis.html#cb159-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-14"><a href="national-immunization-survey-nis.html#cb159-14" aria-hidden="true" tabindex="-1"></a>                ( p_numdah <span class="sc">&gt;=</span> <span class="dv">3</span> ) <span class="sc">|</span></span>
-<span id="cb159-15"><a href="national-immunization-survey-nis.html#cb159-15" aria-hidden="true" tabindex="-1"></a>                ( p_numdhi <span class="sc">&gt;=</span> <span class="dv">3</span> ) <span class="sc">|</span></span>
-<span id="cb159-16"><a href="national-immunization-survey-nis.html#cb159-16" aria-hidden="true" tabindex="-1"></a>                ( p_numdih <span class="sc">&gt;=</span> <span class="dv">3</span> ) <span class="sc">|</span></span>
-<span id="cb159-17"><a href="national-immunization-survey-nis.html#cb159-17" aria-hidden="true" tabindex="-1"></a>                ( p_numdta <span class="sc">&gt;=</span> <span class="dv">3</span> ) <span class="sc">|</span></span>
-<span id="cb159-18"><a href="national-immunization-survey-nis.html#cb159-18" aria-hidden="true" tabindex="-1"></a>                ( p_numdtp <span class="sc">&gt;=</span> <span class="dv">3</span> )</span>
-<span id="cb159-19"><a href="national-immunization-survey-nis.html#cb159-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-20"><a href="national-immunization-survey-nis.html#cb159-20" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
-<span id="cb159-21"><a href="national-immunization-survey-nis.html#cb159-21" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb159-22"><a href="national-immunization-survey-nis.html#cb159-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">dtap_4p =</span></span>
-<span id="cb159-23"><a href="national-immunization-survey-nis.html#cb159-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-24"><a href="national-immunization-survey-nis.html#cb159-24" aria-hidden="true" tabindex="-1"></a>            <span class="fu">as.numeric</span>(</span>
-<span id="cb159-25"><a href="national-immunization-survey-nis.html#cb159-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-26"><a href="national-immunization-survey-nis.html#cb159-26" aria-hidden="true" tabindex="-1"></a>                ( p_numdah <span class="sc">&gt;=</span> <span class="dv">4</span> ) <span class="sc">|</span></span>
-<span id="cb159-27"><a href="national-immunization-survey-nis.html#cb159-27" aria-hidden="true" tabindex="-1"></a>                ( p_numdhi <span class="sc">&gt;=</span> <span class="dv">4</span> ) <span class="sc">|</span></span>
-<span id="cb159-28"><a href="national-immunization-survey-nis.html#cb159-28" aria-hidden="true" tabindex="-1"></a>                ( p_numdih <span class="sc">&gt;=</span> <span class="dv">4</span> ) <span class="sc">|</span></span>
-<span id="cb159-29"><a href="national-immunization-survey-nis.html#cb159-29" aria-hidden="true" tabindex="-1"></a>                ( p_numdta <span class="sc">&gt;=</span> <span class="dv">4</span> ) <span class="sc">|</span></span>
-<span id="cb159-30"><a href="national-immunization-survey-nis.html#cb159-30" aria-hidden="true" tabindex="-1"></a>                ( p_numdtp <span class="sc">&gt;=</span> <span class="dv">4</span> )</span>
-<span id="cb159-31"><a href="national-immunization-survey-nis.html#cb159-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb159-32"><a href="national-immunization-survey-nis.html#cb159-32" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb159-33"><a href="national-immunization-survey-nis.html#cb159-33" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb159-34"><a href="national-immunization-survey-nis.html#cb159-34" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="national-immunization-survey-nis.html#cb160-1" aria-hidden="true" tabindex="-1"></a>nis_design <span class="ot">&lt;-</span> </span>
+<span id="cb160-2"><a href="national-immunization-survey-nis.html#cb160-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb160-3"><a href="national-immunization-survey-nis.html#cb160-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb160-4"><a href="national-immunization-survey-nis.html#cb160-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb160-5"><a href="national-immunization-survey-nis.html#cb160-5" aria-hidden="true" tabindex="-1"></a>        nis_design , </span>
+<span id="cb160-6"><a href="national-immunization-survey-nis.html#cb160-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb160-7"><a href="national-immunization-survey-nis.html#cb160-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">first_fed_formula =</span></span>
+<span id="cb160-8"><a href="national-immunization-survey-nis.html#cb160-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">ifelse</span>( bf_formr20 <span class="sc">%in%</span> <span class="dv">888</span> , <span class="cn">NA</span> , bf_formr20 ) ,</span>
+<span id="cb160-9"><a href="national-immunization-survey-nis.html#cb160-9" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb160-10"><a href="national-immunization-survey-nis.html#cb160-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">dtap_3p =</span></span>
+<span id="cb160-11"><a href="national-immunization-survey-nis.html#cb160-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb160-12"><a href="national-immunization-survey-nis.html#cb160-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">as.numeric</span>(</span>
+<span id="cb160-13"><a href="national-immunization-survey-nis.html#cb160-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb160-14"><a href="national-immunization-survey-nis.html#cb160-14" aria-hidden="true" tabindex="-1"></a>                ( p_numdah <span class="sc">&gt;=</span> <span class="dv">3</span> ) <span class="sc">|</span></span>
+<span id="cb160-15"><a href="national-immunization-survey-nis.html#cb160-15" aria-hidden="true" tabindex="-1"></a>                ( p_numdhi <span class="sc">&gt;=</span> <span class="dv">3</span> ) <span class="sc">|</span></span>
+<span id="cb160-16"><a href="national-immunization-survey-nis.html#cb160-16" aria-hidden="true" tabindex="-1"></a>                ( p_numdih <span class="sc">&gt;=</span> <span class="dv">3</span> ) <span class="sc">|</span></span>
+<span id="cb160-17"><a href="national-immunization-survey-nis.html#cb160-17" aria-hidden="true" tabindex="-1"></a>                ( p_numdta <span class="sc">&gt;=</span> <span class="dv">3</span> ) <span class="sc">|</span></span>
+<span id="cb160-18"><a href="national-immunization-survey-nis.html#cb160-18" aria-hidden="true" tabindex="-1"></a>                ( p_numdtp <span class="sc">&gt;=</span> <span class="dv">3</span> )</span>
+<span id="cb160-19"><a href="national-immunization-survey-nis.html#cb160-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb160-20"><a href="national-immunization-survey-nis.html#cb160-20" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
+<span id="cb160-21"><a href="national-immunization-survey-nis.html#cb160-21" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb160-22"><a href="national-immunization-survey-nis.html#cb160-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">dtap_4p =</span></span>
+<span id="cb160-23"><a href="national-immunization-survey-nis.html#cb160-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb160-24"><a href="national-immunization-survey-nis.html#cb160-24" aria-hidden="true" tabindex="-1"></a>            <span class="fu">as.numeric</span>(</span>
+<span id="cb160-25"><a href="national-immunization-survey-nis.html#cb160-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb160-26"><a href="national-immunization-survey-nis.html#cb160-26" aria-hidden="true" tabindex="-1"></a>                ( p_numdah <span class="sc">&gt;=</span> <span class="dv">4</span> ) <span class="sc">|</span></span>
+<span id="cb160-27"><a href="national-immunization-survey-nis.html#cb160-27" aria-hidden="true" tabindex="-1"></a>                ( p_numdhi <span class="sc">&gt;=</span> <span class="dv">4</span> ) <span class="sc">|</span></span>
+<span id="cb160-28"><a href="national-immunization-survey-nis.html#cb160-28" aria-hidden="true" tabindex="-1"></a>                ( p_numdih <span class="sc">&gt;=</span> <span class="dv">4</span> ) <span class="sc">|</span></span>
+<span id="cb160-29"><a href="national-immunization-survey-nis.html#cb160-29" aria-hidden="true" tabindex="-1"></a>                ( p_numdta <span class="sc">&gt;=</span> <span class="dv">4</span> ) <span class="sc">|</span></span>
+<span id="cb160-30"><a href="national-immunization-survey-nis.html#cb160-30" aria-hidden="true" tabindex="-1"></a>                ( p_numdtp <span class="sc">&gt;=</span> <span class="dv">4</span> )</span>
+<span id="cb160-31"><a href="national-immunization-survey-nis.html#cb160-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb160-32"><a href="national-immunization-survey-nis.html#cb160-32" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb160-33"><a href="national-immunization-survey-nis.html#cb160-33" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb160-34"><a href="national-immunization-survey-nis.html#cb160-34" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="unweighted-counts-6" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="national-immunization-survey-nis.html#unweighted-counts-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="national-immunization-survey-nis.html#cb160-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( nis_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
-<span id="cb160-2"><a href="national-immunization-survey-nis.html#cb160-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb160-3"><a href="national-immunization-survey-nis.html#cb160-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> state , nis_design , unwtd.count )</span></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="national-immunization-survey-nis.html#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( nis_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
+<span id="cb161-2"><a href="national-immunization-survey-nis.html#cb161-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb161-3"><a href="national-immunization-survey-nis.html#cb161-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> state , nis_design , unwtd.count )</span></code></pre></div>
 </div>
 <div id="weighted-counts-4" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="national-immunization-survey-nis.html#weighted-counts-4" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="national-immunization-survey-nis.html#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , nis_design )</span>
-<span id="cb161-2"><a href="national-immunization-survey-nis.html#cb161-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb161-3"><a href="national-immunization-survey-nis.html#cb161-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> state , nis_design , svytotal )</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="national-immunization-survey-nis.html#cb162-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , nis_design )</span>
+<span id="cb162-2"><a href="national-immunization-survey-nis.html#cb162-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb162-3"><a href="national-immunization-survey-nis.html#cb162-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> state , nis_design , svytotal )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-6" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="national-immunization-survey-nis.html#descriptive-statistics-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="national-immunization-survey-nis.html#cb162-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb162-2"><a href="national-immunization-survey-nis.html#cb162-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb162-3"><a href="national-immunization-survey-nis.html#cb162-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> first_fed_formula , <span class="sc">~</span> state , nis_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="national-immunization-survey-nis.html#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> sex , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="national-immunization-survey-nis.html#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb163-2"><a href="national-immunization-survey-nis.html#cb163-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb163-3"><a href="national-immunization-survey-nis.html#cb163-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> state , nis_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="national-immunization-survey-nis.html#cb164-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb163-3"><a href="national-immunization-survey-nis.html#cb163-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> first_fed_formula , <span class="sc">~</span> state , nis_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="national-immunization-survey-nis.html#cb164-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> sex , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb164-2"><a href="national-immunization-survey-nis.html#cb164-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb164-3"><a href="national-immunization-survey-nis.html#cb164-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> first_fed_formula , <span class="sc">~</span> state , nis_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="national-immunization-survey-nis.html#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> sex , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb164-3"><a href="national-immunization-survey-nis.html#cb164-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> state , nis_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="national-immunization-survey-nis.html#cb165-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb165-2"><a href="national-immunization-survey-nis.html#cb165-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb165-3"><a href="national-immunization-survey-nis.html#cb165-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> state , nis_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="national-immunization-survey-nis.html#cb166-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb165-3"><a href="national-immunization-survey-nis.html#cb165-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> first_fed_formula , <span class="sc">~</span> state , nis_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="national-immunization-survey-nis.html#cb166-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> sex , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb166-2"><a href="national-immunization-survey-nis.html#cb166-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-3"><a href="national-immunization-survey-nis.html#cb166-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
-<span id="cb166-4"><a href="national-immunization-survey-nis.html#cb166-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> first_fed_formula , </span>
-<span id="cb166-5"><a href="national-immunization-survey-nis.html#cb166-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> state , </span>
-<span id="cb166-6"><a href="national-immunization-survey-nis.html#cb166-6" aria-hidden="true" tabindex="-1"></a>    nis_design , </span>
-<span id="cb166-7"><a href="national-immunization-survey-nis.html#cb166-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
-<span id="cb166-8"><a href="national-immunization-survey-nis.html#cb166-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb166-9"><a href="national-immunization-survey-nis.html#cb166-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb166-10"><a href="national-immunization-survey-nis.html#cb166-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb166-3"><a href="national-immunization-survey-nis.html#cb166-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> sex , <span class="sc">~</span> state , nis_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="national-immunization-survey-nis.html#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb167-2"><a href="national-immunization-survey-nis.html#cb167-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-3"><a href="national-immunization-survey-nis.html#cb167-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
+<span id="cb167-4"><a href="national-immunization-survey-nis.html#cb167-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> first_fed_formula , </span>
+<span id="cb167-5"><a href="national-immunization-survey-nis.html#cb167-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> state , </span>
+<span id="cb167-6"><a href="national-immunization-survey-nis.html#cb167-6" aria-hidden="true" tabindex="-1"></a>    nis_design , </span>
+<span id="cb167-7"><a href="national-immunization-survey-nis.html#cb167-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
+<span id="cb167-8"><a href="national-immunization-survey-nis.html#cb167-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
+<span id="cb167-9"><a href="national-immunization-survey-nis.html#cb167-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
+<span id="cb167-10"><a href="national-immunization-survey-nis.html#cb167-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="national-immunization-survey-nis.html#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
-<span id="cb167-2"><a href="national-immunization-survey-nis.html#cb167-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> bf_exclr06 , </span>
-<span id="cb167-3"><a href="national-immunization-survey-nis.html#cb167-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> bf_endr06 , </span>
-<span id="cb167-4"><a href="national-immunization-survey-nis.html#cb167-4" aria-hidden="true" tabindex="-1"></a>    nis_design ,</span>
-<span id="cb167-5"><a href="national-immunization-survey-nis.html#cb167-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb167-6"><a href="national-immunization-survey-nis.html#cb167-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="national-immunization-survey-nis.html#cb168-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
+<span id="cb168-2"><a href="national-immunization-survey-nis.html#cb168-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> bf_exclr06 , </span>
+<span id="cb168-3"><a href="national-immunization-survey-nis.html#cb168-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> bf_endr06 , </span>
+<span id="cb168-4"><a href="national-immunization-survey-nis.html#cb168-4" aria-hidden="true" tabindex="-1"></a>    nis_design ,</span>
+<span id="cb168-5"><a href="national-immunization-survey-nis.html#cb168-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
+<span id="cb168-6"><a href="national-immunization-survey-nis.html#cb168-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting-6" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="national-immunization-survey-nis.html#subsetting-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to toddlers up to date on polio shots:</p>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="national-immunization-survey-nis.html#cb168-1" aria-hidden="true" tabindex="-1"></a>sub_nis_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nis_design , p_utdpol <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="national-immunization-survey-nis.html#cb169-1" aria-hidden="true" tabindex="-1"></a>sub_nis_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nis_design , p_utdpol <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="national-immunization-survey-nis.html#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , sub_nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="national-immunization-survey-nis.html#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , sub_nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-6" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="national-immunization-survey-nis.html#measures-of-uncertainty-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="national-immunization-survey-nis.html#cb170-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb170-2"><a href="national-immunization-survey-nis.html#cb170-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb170-3"><a href="national-immunization-survey-nis.html#cb170-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb170-4"><a href="national-immunization-survey-nis.html#cb170-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb170-5"><a href="national-immunization-survey-nis.html#cb170-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb170-6"><a href="national-immunization-survey-nis.html#cb170-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb170-7"><a href="national-immunization-survey-nis.html#cb170-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb170-8"><a href="national-immunization-survey-nis.html#cb170-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb170-9"><a href="national-immunization-survey-nis.html#cb170-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb170-10"><a href="national-immunization-survey-nis.html#cb170-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> first_fed_formula , </span>
-<span id="cb170-11"><a href="national-immunization-survey-nis.html#cb170-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> state , </span>
-<span id="cb170-12"><a href="national-immunization-survey-nis.html#cb170-12" aria-hidden="true" tabindex="-1"></a>        nis_design , </span>
-<span id="cb170-13"><a href="national-immunization-survey-nis.html#cb170-13" aria-hidden="true" tabindex="-1"></a>        svymean ,</span>
-<span id="cb170-14"><a href="national-immunization-survey-nis.html#cb170-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb170-15"><a href="national-immunization-survey-nis.html#cb170-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb170-16"><a href="national-immunization-survey-nis.html#cb170-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb170-17"><a href="national-immunization-survey-nis.html#cb170-17" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb170-18"><a href="national-immunization-survey-nis.html#cb170-18" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb170-19"><a href="national-immunization-survey-nis.html#cb170-19" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb170-20"><a href="national-immunization-survey-nis.html#cb170-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="national-immunization-survey-nis.html#cb171-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb171-2"><a href="national-immunization-survey-nis.html#cb171-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-3"><a href="national-immunization-survey-nis.html#cb171-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb171-4"><a href="national-immunization-survey-nis.html#cb171-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb171-5"><a href="national-immunization-survey-nis.html#cb171-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb171-6"><a href="national-immunization-survey-nis.html#cb171-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb171-7"><a href="national-immunization-survey-nis.html#cb171-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-8"><a href="national-immunization-survey-nis.html#cb171-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb171-9"><a href="national-immunization-survey-nis.html#cb171-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb171-10"><a href="national-immunization-survey-nis.html#cb171-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> first_fed_formula , </span>
+<span id="cb171-11"><a href="national-immunization-survey-nis.html#cb171-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> state , </span>
+<span id="cb171-12"><a href="national-immunization-survey-nis.html#cb171-12" aria-hidden="true" tabindex="-1"></a>        nis_design , </span>
+<span id="cb171-13"><a href="national-immunization-survey-nis.html#cb171-13" aria-hidden="true" tabindex="-1"></a>        svymean ,</span>
+<span id="cb171-14"><a href="national-immunization-survey-nis.html#cb171-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb171-15"><a href="national-immunization-survey-nis.html#cb171-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb171-16"><a href="national-immunization-survey-nis.html#cb171-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb171-17"><a href="national-immunization-survey-nis.html#cb171-17" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb171-18"><a href="national-immunization-survey-nis.html#cb171-18" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb171-19"><a href="national-immunization-survey-nis.html#cb171-19" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb171-20"><a href="national-immunization-survey-nis.html#cb171-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="national-immunization-survey-nis.html#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( nis_design )</span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="national-immunization-survey-nis.html#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( nis_design )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="national-immunization-survey-nis.html#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="national-immunization-survey-nis.html#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="national-immunization-survey-nis.html#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb173-2"><a href="national-immunization-survey-nis.html#cb173-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb173-3"><a href="national-immunization-survey-nis.html#cb173-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb173-4"><a href="national-immunization-survey-nis.html#cb173-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb173-5"><a href="national-immunization-survey-nis.html#cb173-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="national-immunization-survey-nis.html#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb174-2"><a href="national-immunization-survey-nis.html#cb174-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb174-3"><a href="national-immunization-survey-nis.html#cb174-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb174-4"><a href="national-immunization-survey-nis.html#cb174-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb174-5"><a href="national-immunization-survey-nis.html#cb174-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> first_fed_formula , nis_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="national-immunization-survey-nis.html#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> dtap_3p , nis_design ,</span>
-<span id="cb174-2"><a href="national-immunization-survey-nis.html#cb174-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="national-immunization-survey-nis.html#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> dtap_3p , nis_design ,</span>
+<span id="cb175-2"><a href="national-immunization-survey-nis.html#cb175-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> )</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-6" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="national-immunization-survey-nis.html#regression-models-and-tests-of-association-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="national-immunization-survey-nis.html#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( first_fed_formula <span class="sc">~</span> dtap_3p , nis_design )</span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="national-immunization-survey-nis.html#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( first_fed_formula <span class="sc">~</span> dtap_3p , nis_design )</span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="national-immunization-survey-nis.html#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
-<span id="cb176-2"><a href="national-immunization-survey-nis.html#cb176-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> dtap_3p <span class="sc">+</span> sex , </span>
-<span id="cb176-3"><a href="national-immunization-survey-nis.html#cb176-3" aria-hidden="true" tabindex="-1"></a>    nis_design </span>
-<span id="cb176-4"><a href="national-immunization-survey-nis.html#cb176-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="national-immunization-survey-nis.html#cb177-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
+<span id="cb177-2"><a href="national-immunization-survey-nis.html#cb177-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> dtap_3p <span class="sc">+</span> sex , </span>
+<span id="cb177-3"><a href="national-immunization-survey-nis.html#cb177-3" aria-hidden="true" tabindex="-1"></a>    nis_design </span>
+<span id="cb177-4"><a href="national-immunization-survey-nis.html#cb177-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="national-immunization-survey-nis.html#cb177-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb177-2"><a href="national-immunization-survey-nis.html#cb177-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
-<span id="cb177-3"><a href="national-immunization-survey-nis.html#cb177-3" aria-hidden="true" tabindex="-1"></a>        first_fed_formula <span class="sc">~</span> dtap_3p <span class="sc">+</span> sex , </span>
-<span id="cb177-4"><a href="national-immunization-survey-nis.html#cb177-4" aria-hidden="true" tabindex="-1"></a>        nis_design </span>
-<span id="cb177-5"><a href="national-immunization-survey-nis.html#cb177-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb177-6"><a href="national-immunization-survey-nis.html#cb177-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb177-7"><a href="national-immunization-survey-nis.html#cb177-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="national-immunization-survey-nis.html#cb178-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb178-2"><a href="national-immunization-survey-nis.html#cb178-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
+<span id="cb178-3"><a href="national-immunization-survey-nis.html#cb178-3" aria-hidden="true" tabindex="-1"></a>        first_fed_formula <span class="sc">~</span> dtap_3p <span class="sc">+</span> sex , </span>
+<span id="cb178-4"><a href="national-immunization-survey-nis.html#cb178-4" aria-hidden="true" tabindex="-1"></a>        nis_design </span>
+<span id="cb178-5"><a href="national-immunization-survey-nis.html#cb178-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb178-6"><a href="national-immunization-survey-nis.html#cb178-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb178-7"><a href="national-immunization-survey-nis.html#cb178-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -617,38 +624,38 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="analysis-examples-with-srvyr-4" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>srvyr</code>  <a href="national-immunization-survey-nis.html#analysis-examples-with-srvyr-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>srvyr</code> library calculates summary statistics from survey data, such as the mean, total or quantile using <a href="https://github.com/tidyverse/dplyr/">dplyr</a>-like syntax. <a href="https://github.com/gergness/srvyr">srvyr</a> allows for the use of many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, the <code>tidyverse</code> style of non-standard evaluation and more consistent return types than the <code>survey</code> package. <a href="https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html">This vignette</a> details the available features. As a starting point for NIS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="national-immunization-survey-nis.html#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
-<span id="cb178-2"><a href="national-immunization-survey-nis.html#cb178-2" aria-hidden="true" tabindex="-1"></a>nis_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nis_design )</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="national-immunization-survey-nis.html#cb179-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
+<span id="cb179-2"><a href="national-immunization-survey-nis.html#cb179-2" aria-hidden="true" tabindex="-1"></a>nis_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nis_design )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="national-immunization-survey-nis.html#cb179-1" aria-hidden="true" tabindex="-1"></a>nis_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb179-2"><a href="national-immunization-survey-nis.html#cb179-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( first_fed_formula , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
-<span id="cb179-3"><a href="national-immunization-survey-nis.html#cb179-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb179-4"><a href="national-immunization-survey-nis.html#cb179-4" aria-hidden="true" tabindex="-1"></a>nis_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb179-5"><a href="national-immunization-survey-nis.html#cb179-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( state ) <span class="sc">%&gt;%</span></span>
-<span id="cb179-6"><a href="national-immunization-survey-nis.html#cb179-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( first_fed_formula , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="national-immunization-survey-nis.html#cb180-1" aria-hidden="true" tabindex="-1"></a>nis_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb180-2"><a href="national-immunization-survey-nis.html#cb180-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( first_fed_formula , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb180-3"><a href="national-immunization-survey-nis.html#cb180-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb180-4"><a href="national-immunization-survey-nis.html#cb180-4" aria-hidden="true" tabindex="-1"></a>nis_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb180-5"><a href="national-immunization-survey-nis.html#cb180-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( state ) <span class="sc">%&gt;%</span></span>
+<span id="cb180-6"><a href="national-immunization-survey-nis.html#cb180-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( first_fed_formula , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="replication-example-6" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="national-immunization-survey-nis.html#replication-example-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><a href="https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf#page=35" class="uri">https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf#page=35</a></p>
-<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="national-immunization-survey-nis.html#cb180-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
-<span id="cb180-2"><a href="national-immunization-survey-nis.html#cb180-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb180-3"><a href="national-immunization-survey-nis.html#cb180-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> p_utd431h314_rout_s , </span>
-<span id="cb180-4"><a href="national-immunization-survey-nis.html#cb180-4" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> raceethk , </span>
-<span id="cb180-5"><a href="national-immunization-survey-nis.html#cb180-5" aria-hidden="true" tabindex="-1"></a>        nis_design , </span>
-<span id="cb180-6"><a href="national-immunization-survey-nis.html#cb180-6" aria-hidden="true" tabindex="-1"></a>        svymean</span>
-<span id="cb180-7"><a href="national-immunization-survey-nis.html#cb180-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb180-8"><a href="national-immunization-survey-nis.html#cb180-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb180-9"><a href="national-immunization-survey-nis.html#cb180-9" aria-hidden="true" tabindex="-1"></a>coefficients <span class="ot">&lt;-</span> results[ , <span class="st">&quot;p_utd431h314_rout_sUTD&quot;</span> , drop <span class="ot">=</span> <span class="cn">FALSE</span> ]</span>
-<span id="cb180-10"><a href="national-immunization-survey-nis.html#cb180-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb180-11"><a href="national-immunization-survey-nis.html#cb180-11" aria-hidden="true" tabindex="-1"></a>standard_errors <span class="ot">&lt;-</span> results[ , <span class="st">&quot;se.p_utd431h314_rout_sUTD&quot;</span> , drop <span class="ot">=</span> <span class="cn">FALSE</span> ]</span>
-<span id="cb180-12"><a href="national-immunization-survey-nis.html#cb180-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb180-13"><a href="national-immunization-survey-nis.html#cb180-13" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( coefficients[ <span class="st">&quot;HISPANIC&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">711</span> )</span>
-<span id="cb180-14"><a href="national-immunization-survey-nis.html#cb180-14" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( coefficients[ <span class="st">&quot;NON-HISPANIC WHITE ONLY&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">742</span> )</span>
-<span id="cb180-15"><a href="national-immunization-survey-nis.html#cb180-15" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( coefficients[ <span class="st">&quot;NON-HISPANIC BLACK ONLY&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">647</span> )</span>
-<span id="cb180-16"><a href="national-immunization-survey-nis.html#cb180-16" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( standard_errors[ <span class="st">&quot;HISPANIC&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">015</span> )</span>
-<span id="cb180-17"><a href="national-immunization-survey-nis.html#cb180-17" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( standard_errors[ <span class="st">&quot;NON-HISPANIC WHITE ONLY&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">009</span> )</span>
-<span id="cb180-18"><a href="national-immunization-survey-nis.html#cb180-18" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( standard_errors[ <span class="st">&quot;NON-HISPANIC BLACK ONLY&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">022</span> )</span></code></pre></div>
+<p>This example matches the statistics and standard errors from <a href="https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf#page=35">Data User’s Guide Table 4</a>.</p>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="national-immunization-survey-nis.html#cb181-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
+<span id="cb181-2"><a href="national-immunization-survey-nis.html#cb181-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb181-3"><a href="national-immunization-survey-nis.html#cb181-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> p_utd431h314_rout_s , </span>
+<span id="cb181-4"><a href="national-immunization-survey-nis.html#cb181-4" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> raceethk , </span>
+<span id="cb181-5"><a href="national-immunization-survey-nis.html#cb181-5" aria-hidden="true" tabindex="-1"></a>        nis_design , </span>
+<span id="cb181-6"><a href="national-immunization-survey-nis.html#cb181-6" aria-hidden="true" tabindex="-1"></a>        svymean</span>
+<span id="cb181-7"><a href="national-immunization-survey-nis.html#cb181-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb181-8"><a href="national-immunization-survey-nis.html#cb181-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb181-9"><a href="national-immunization-survey-nis.html#cb181-9" aria-hidden="true" tabindex="-1"></a>coefficients <span class="ot">&lt;-</span> results[ , <span class="st">&quot;p_utd431h314_rout_sUTD&quot;</span> , drop <span class="ot">=</span> <span class="cn">FALSE</span> ]</span>
+<span id="cb181-10"><a href="national-immunization-survey-nis.html#cb181-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb181-11"><a href="national-immunization-survey-nis.html#cb181-11" aria-hidden="true" tabindex="-1"></a>standard_errors <span class="ot">&lt;-</span> results[ , <span class="st">&quot;se.p_utd431h314_rout_sUTD&quot;</span> , drop <span class="ot">=</span> <span class="cn">FALSE</span> ]</span>
+<span id="cb181-12"><a href="national-immunization-survey-nis.html#cb181-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb181-13"><a href="national-immunization-survey-nis.html#cb181-13" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( coefficients[ <span class="st">&quot;HISPANIC&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">711</span> )</span>
+<span id="cb181-14"><a href="national-immunization-survey-nis.html#cb181-14" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( coefficients[ <span class="st">&quot;NON-HISPANIC WHITE ONLY&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">742</span> )</span>
+<span id="cb181-15"><a href="national-immunization-survey-nis.html#cb181-15" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( coefficients[ <span class="st">&quot;NON-HISPANIC BLACK ONLY&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">647</span> )</span>
+<span id="cb181-16"><a href="national-immunization-survey-nis.html#cb181-16" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( standard_errors[ <span class="st">&quot;HISPANIC&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">015</span> )</span>
+<span id="cb181-17"><a href="national-immunization-survey-nis.html#cb181-17" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( standard_errors[ <span class="st">&quot;NON-HISPANIC WHITE ONLY&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">009</span> )</span>
+<span id="cb181-18"><a href="national-immunization-survey-nis.html#cb181-18" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( standard_errors[ <span class="st">&quot;NON-HISPANIC BLACK ONLY&quot;</span> , ] , <span class="dv">3</span> ) <span class="sc">==</span> .<span class="dv">022</span> )</span></code></pre></div>
 
 </div>
 </div>
