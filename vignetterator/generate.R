@@ -489,7 +489,7 @@ readme_md_text <-
 writeLines( readme_md_text , file.path( path.expand( "~" ) , "Github/asdfree/README.md" ) )
 
 
-
+system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' pull" ) )
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add -u" ) )
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' add ." ) )
 system( paste0( "powershell git -C 'C:/Users/AnthonyD/Documents/Github/asdfree' commit -m " , commit_memo ) )
