@@ -1,0 +1,390 @@
+# Consumer Expenditure Survey (CES) {-}
+
+<a href="https://github.com/asdfree/ces/actions"><img src="https://github.com/asdfree/ces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The Consumer Expenditure Survey (CES) is the authoritative data source to understand how Americans spend money. Participating households keep a running diary about every purchase over fifteen months. Those diaries are then summed up into precise expenditure categories.
+
+* One table of survey responses per quarter with one row per sampled household (consumer unit). Additional tables containing one record per expenditure
+
+* A complex sample survey designed to generalize to the civilian non-institutional population of the United States.
+
+* Released annually since 1996.
+
+* Administered by the [Bureau of Labor Statistics](http://www.bls.gov/).
+
+---
+
+Please skim before you begin:
+
+1. https://www.bls.gov/cex/pumd-getting-started-guide.htm
+
+2.
+
+3. This poem
+
+```{r}
+# 
+# 
+# 
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download both the prior and current year of interview microdata:
+```{r eval = FALSE }
+library(haven)
+
+tf_prior_year <- tempfile()
+
+this_url_prior_year <- "https://www.bls.gov/cex/pumd/data/stata/intrvw20.zip"
+
+download.file( this_url_prior_year , tf_prior_year , mode = 'wb' )
+
+unzipped_files_prior_year <- unzip( tf_prior_year , exdir = tempdir() )
+
+tf_current_year <- tempfile()
+
+this_url_current_year <- "https://www.bls.gov/cex/pumd/data/stata/intrvw21.zip"
+
+download.file( this_url_current_year , tf_current_year , mode = 'wb' )
+
+unzipped_files_current_year <- unzip( tf_current_year , exdir = tempdir() )
+
+unzipped_files <- c( unzipped_files_current_year , unzipped_files_prior_year )
+```
+
+Import and stack all 2021 quarterly files plus 2022's first quarter:
+```{r eval = FALSE }
+fmli_files <- grep( "fmli2[1-2]" , unzipped_files , value = TRUE )
+
+fmli_tbls <- lapply( fmli_files , read_dta )
+
+fmli_dfs <- lapply( fmli_tbls , data.frame )
+
+fmli_dfs <- 
+	lapply( 
+		fmli_dfs , 
+		function( w ){ names( w ) <- tolower( names( w ) ) ; w }
+	)
+
+fmli_cols <- lapply( fmli_dfs , names )
+
+intersecting_cols <- Reduce( intersect , fmli_cols )
+
+fmli_dfs <- lapply( fmli_dfs , function( w ) w[ intersecting_cols ] )
+
+ces_df <- do.call( rbind , fmli_dfs )
+```
+
+Scale the weight columns based on the number of months in 2021:
+```{r eval = FALSE }
+ces_df[ , c( 'qintrvyr' , 'qintrvmo' ) ] <-
+	sapply( ces_df[ , c( 'qintrvyr' , 'qintrvmo' ) ] , as.numeric )
+
+weight_columns <- grep( 'wt' , names( ces_df ) , value = TRUE )
+
+ces_df <-
+	transform(
+		ces_df ,
+		mo_scope =
+			ifelse( qintrvyr %in% 2021 & qintrvmo %in% 1:3 , qintrvmo - 1 ,
+			ifelse( qintrvyr %in% 2022 , 4 - qintrvmo , 3 ) )
+	)
+
+for ( this_column in weight_columns ){
+	ces_df[ is.na( ces_df[ , this_column ] ) , this_column ] <- 0
+	ces_df[ , this_column ] <- ( ces_df[ , this_column ] * ces_df[ , 'mo_scope' ] / 12 )
+}
+```
+
+Combine previous quarter and current quarter variables into a single variable:
+```{r eval = FALSE }
+
+expenditure_variables <- 
+	gsub( "pq$" , "" , grep( "pq$" , names( ces_df ) , value = TRUE ) )
+
+# confirm that for every variable ending in pq,
+# there's the same variable ending in cq
+stopifnot( all( paste0( expenditure_variables , 'cq' ) %in% names( ces_df ) ) )
+
+# confirm none of the variables without the pq or cq suffix exist
+if( any( expenditure_variables %in% names( ces_df ) ) ) stop( "variable conflict" )
+
+for( this_column in expenditure_variables ){
+
+	ces_df[ , this_column ] <- rowSums( ces_df[ , paste0( this_column , c( 'pq' , 'cq' ) ) ] , na.rm = TRUE )
+	
+	# annualize the quarterly spending
+	ces_df[ , this_column ] <- 4 * ces_df[ , this_column ]
+	
+	ces_df[ is.na( ces_df[ , this_column ] ) , this_column ] <- 0
+
+}
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+# ces_fn <- file.path( path.expand( "~" ) , "CES" , "this_file.rds" )
+# saveRDS( ces_df , file = ces_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+# ces_df <- readRDS( ces_fn )
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+Construct a multiply-imputed, complex sample survey design:
+
+Separate the `ces_df` data.frame into five implicates, each differing from the others only in the multiply-imputed variables:
+```{r messages = FALSE , eval = FALSE }
+library(survey)
+library(mitools)
+
+# create a vector containing all of the multiply-imputed variables
+# (leaving the numbers off the end)
+mi_vars <- gsub( "5$" , "" , grep( "[a-z]5$" , names( ces_df ) , value = TRUE ) )
+
+# loop through each of the five variables..
+for ( i in 1:5 ){
+
+	# copy the 'ces_df' table over to a new temporary data frame 'x'
+	x <- ces_df
+
+	# loop through each of the multiply-imputed variables..
+	for ( j in mi_vars ){
+	
+		# copy the contents of the current column (for example 'welfare1')
+		# over to a new column ending in 'mi' (for example 'welfaremi')
+		x[ , paste0( j , 'mi' ) ] <- x[ , paste0( j , i ) ]
+		
+		# delete the all five of the imputed variable columns
+		x <- x[ , !( names( x ) %in% paste0( j , 1:5 ) ) ]
+
+	}
+	
+	assign( paste0( 'imp' , i ) , x )
+
+}
+
+ces_design <- 
+	svrepdesign( 
+		weights = ~finlwt21 , 
+		repweights = "wtrep[0-9]+" , 
+		data = imputationList( list( imp1 , imp2 , imp3 , imp4 , imp5 ) ) , 
+		type = "BRR" ,
+		combined.weights = TRUE ,
+		mse = TRUE
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+ces_design <- 
+	update( 
+		ces_design , 
+		
+		one = 1 ,
+		
+		any_food_stamp = as.numeric( jfs_amtmi > 0 ) ,
+		
+		bls_urbn = factor( bls_urbn , levels = 1:2 , labels = c( 'urban' , 'rural' ) ) ,
+		
+		sex_ref = factor( sex_ref , levels = 1:2 , labels = c( 'male' , 'female' ) )
+		
+	)
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design , svyby( ~ one , ~ one , unwtd.count ) ) )
+
+MIcombine( with( ces_design , svyby( ~ one , ~ bls_urbn , unwtd.count ) ) )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design , svytotal( ~ one ) ) )
+
+MIcombine( with( ces_design ,
+	svyby( ~ one , ~ bls_urbn , svytotal )
+) )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design , svymean( ~ totexp ) ) )
+
+MIcombine( with( ces_design ,
+	svyby( ~ totexp , ~ bls_urbn , svymean )
+) )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design , svymean( ~ sex_ref ) ) )
+
+MIcombine( with( ces_design ,
+	svyby( ~ sex_ref , ~ bls_urbn , svymean )
+) )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design , svytotal( ~ totexp ) ) )
+
+MIcombine( with( ces_design ,
+	svyby( ~ totexp , ~ bls_urbn , svytotal )
+) )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design , svytotal( ~ sex_ref ) ) )
+
+MIcombine( with( ces_design ,
+	svyby( ~ sex_ref , ~ bls_urbn , svytotal )
+) )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design ,
+	svyquantile(
+		~ totexp ,
+		0.5 , se = TRUE 
+) ) )
+
+MIcombine( with( ces_design ,
+	svyby(
+		~ totexp , ~ bls_urbn , svyquantile ,
+		0.5 , se = TRUE ,
+		ci = TRUE 
+) ) )
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design ,
+	svyratio( numerator = ~ totexp , denominator = ~ fincbtxmi )
+) )
+```
+
+### Subsetting {-}
+
+Restrict the survey design to california residents:
+```{r eval = FALSE , results = "hide" }
+sub_ces_design <- subset( ces_design , state == '06' )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( sub_ces_design , svymean( ~ totexp ) ) )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <-
+	MIcombine( with( ces_design ,
+		svymean( ~ totexp )
+	) )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	MIcombine( with( ces_design ,
+		svyby( ~ totexp , ~ bls_urbn , svymean )
+	) )
+
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( ces_design$designs[[1]] )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( ces_design , svyvar( ~ totexp ) ) )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+MIcombine( with( ces_design ,
+	svymean( ~ totexp , deff = TRUE )
+) )
+
+# SRS with replacement
+MIcombine( with( ces_design ,
+	svymean( ~ totexp , deff = "replace" )
+) )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+# MIsvyciprop( ~ any_food_stamp , ces_design ,
+# 	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+# MIsvyttest( totexp ~ any_food_stamp , ces_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+# MIsvychisq( ~ any_food_stamp + sex_ref , ces_design )
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	MIcombine( with( ces_design ,
+		svyglm( totexp ~ any_food_stamp + sex_ref )
+	) )
+	
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+
+---
+
+## Replication Example {-}
+https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2021.pdf
+```{r eval = FALSE , results = "hide" }
+result <- MIcombine( with( ces_design , svytotal( ~ one ) ) )
+stopifnot( round( coef( result ) , -3 ) == 133595000 )
+
+```
