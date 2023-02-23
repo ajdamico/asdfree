@@ -8,7 +8,7 @@ The Consumer Expenditure Survey (CES) is the authoritative data source to unders
 
 table_structure: * One table of survey responses per quarter with one row per sampled household (consumer unit).  Additional tables containing one record per expenditure
 
-generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional population of the United States.
+generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional U.S. population.
 
 publication_period: * Released annually since 1996.
 
@@ -26,9 +26,9 @@ Please skim before you begin:
 3. This poem
 
 ```{r}
-# 
-# 
-# 
+# price indices and
+# you spent how much on beans, jack?
+# pocketbook issues
 ```
 ~~~
 
@@ -102,9 +102,13 @@ chapter_tag_df <-
 			ifelse( qintrvyr %in% 2022 , 4 - qintrvmo , 3 ) )
 	)
 
+
 for ( this_column in weight_columns ){
 	chapter_tag_df[ is.na( chapter_tag_df[ , this_column ] ) , this_column ] <- 0
-	chapter_tag_df[ , this_column ] <- ( chapter_tag_df[ , this_column ] * chapter_tag_df[ , 'mo_scope' ] / 12 )
+	
+	chapter_tag_df[ , paste0( 'popwt_' , this_column ) ] <-
+		( chapter_tag_df[ , this_column ] * chapter_tag_df[ , 'mo_scope' ] / 12 )	
+	
 }
 ```
 
@@ -134,7 +138,50 @@ for( this_column in expenditure_variables ){
 
 }
 ```
+
+
+Append any interview survey UCC found at https://www.bls.gov/cex/ce_source_integrate.xlsx:
+
+```{r eval = FALSE }
+ucc_exp <- c( "450110" , "450210" )
+
+mtbi_files <- grep( "mtbi2[1-2]" , unzipped_files , value = TRUE )
+
+mtbi_tbls <- lapply( mtbi_files , read_dta )
+
+mtbi_dfs <- lapply( mtbi_tbls , data.frame )
+
+mtbi_dfs <- 
+	lapply( 
+		mtbi_dfs , 
+		function( w ){ names( w ) <- tolower( names( w ) ) ; w }
+	)
+
+mtbi_dfs <- lapply( mtbi_dfs , function( w ) w[ c( 'newid' , 'cost' , 'ucc' , 'ref_yr' ) ] )
+
+mtbi_df <- do.call( rbind , mtbi_dfs )
+
+mtbi_df <- subset( mtbi_df , ( ref_yr %in% 2021 ) & ( ucc %in% ucc_exp ) )
+
+mtbi_agg <- aggregate( cost ~ newid , data = mtbi_df , sum )
+
+names( mtbi_agg ) <- c( 'newid' , 'new_car_truck_exp' )
+
+before_nrow <- nrow( chapter_tag_df )
+
+chapter_tag_df <-
+	merge(
+		chapter_tag_df ,
+		mtbi_agg ,
+		all.x = TRUE
+	)
+
+stopifnot( nrow( chapter_tag_df ) == before_nrow )
+
+chapter_tag_df[ is.na( chapter_tag_df[ , 'new_car_truck_exp' ] ) , 'new_car_truck_exp' ] <- 0
+```
 ~~~
+
 
 
 ~~~{analysis_examples_survey_design}
@@ -172,8 +219,8 @@ for ( i in 1:5 ){
 
 chapter_tag_design <- 
 	svrepdesign( 
-		weights = ~finlwt21 , 
-		repweights = "wtrep[0-9]+" , 
+		weights = ~ finlwt21 , 
+		repweights = "^wtrep[0-9][0-9]$" , 
 		data = imputationList( list( imp1 , imp2 , imp3 , imp4 , imp5 ) ) , 
 		type = "BRR" ,
 		combined.weights = TRUE ,
@@ -211,17 +258,36 @@ binary_variable: any_food_stamp
 
 
 ~~~{intermission_block}
-<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+<center><i><b>penny for your thoughts</b></i></center>
 ~~~
 
 
 ~~~{replication_example_block}
 ## Replication Example {-}
-https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2021.pdf
+This example matches the _number of consumer units_ and the _Cars and trucks, new_ rows of [Table R-1](https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2021.pdf):
 ```{r eval = FALSE , results = "hide" }
-result <- MIcombine( with( chapter_tag_design , svytotal( ~ one ) ) )
+result <-
+	MIcombine( with( chapter_tag_design , svytotal( ~ as.numeric( popwt_finlwt21 / finlwt21 ) ) ) )
+
 stopifnot( round( coef( result ) , -3 ) == 133595000 )
 
+results <- 
+	sapply( 
+		weight_columns , 
+		function( this_column ){
+			sum( chapter_tag_df[ , 'new_car_truck_exp' ] * chapter_tag_df[ , this_column ] ) / 
+			sum( chapter_tag_df[ , paste0( 'popwt_' , this_column ) ] )
+		}
+	)
+
+stopifnot( round( results[1] , 2 ) == 2210.45 )
+
+standard_error <- sqrt( ( 1 / 44 ) * sum( ( results[-1] - results[1] )^2 ) )
+
+stopifnot( round( standard_error , 2 ) == 184.47 )
+
+# note the minor differences
+MIcombine( with( chapter_tag_design , svymean( ~ cartkn ) ) )
 ```
 ~~~
 

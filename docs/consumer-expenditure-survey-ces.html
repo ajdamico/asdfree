@@ -417,9 +417,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><a href="https://en.wikipedia.org/wiki/Consumer_Expenditure_Survey">Wikipedia Entry</a></p></li>
 <li><p>This poem</p></li>
 </ol>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="consumer-expenditure-survey-ces.html#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb61-2"><a href="consumer-expenditure-survey-ces.html#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb61-3"><a href="consumer-expenditure-survey-ces.html#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="consumer-expenditure-survey-ces.html#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># price indices and</span></span>
+<span id="cb61-2"><a href="consumer-expenditure-survey-ces.html#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="co"># you spent how much on beans, jack?</span></span>
+<span id="cb61-3"><a href="consumer-expenditure-survey-ces.html#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="co"># pocketbook issues</span></span></code></pre></div>
 <hr />
 <div id="download-import-preparation-2" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="consumer-expenditure-survey-ces.html#download-import-preparation-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -479,8 +479,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb64-13"><a href="consumer-expenditure-survey-ces.html#cb64-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb64-14"><a href="consumer-expenditure-survey-ces.html#cb64-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ( this_column <span class="cf">in</span> weight_columns ){</span>
 <span id="cb64-15"><a href="consumer-expenditure-survey-ces.html#cb64-15" aria-hidden="true" tabindex="-1"></a>    ces_df[ <span class="fu">is.na</span>( ces_df[ , this_column ] ) , this_column ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb64-16"><a href="consumer-expenditure-survey-ces.html#cb64-16" aria-hidden="true" tabindex="-1"></a>    ces_df[ , this_column ] <span class="ot">&lt;-</span> ( ces_df[ , this_column ] <span class="sc">*</span> ces_df[ , <span class="st">&#39;mo_scope&#39;</span> ] <span class="sc">/</span> <span class="dv">12</span> )</span>
-<span id="cb64-17"><a href="consumer-expenditure-survey-ces.html#cb64-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb64-16"><a href="consumer-expenditure-survey-ces.html#cb64-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb64-17"><a href="consumer-expenditure-survey-ces.html#cb64-17" aria-hidden="true" tabindex="-1"></a>    ces_df[ , <span class="fu">paste0</span>( <span class="st">&#39;popwt_&#39;</span> , this_column ) ] <span class="ot">&lt;-</span></span>
+<span id="cb64-18"><a href="consumer-expenditure-survey-ces.html#cb64-18" aria-hidden="true" tabindex="-1"></a>        ( ces_df[ , this_column ] <span class="sc">*</span> ces_df[ , <span class="st">&#39;mo_scope&#39;</span> ] <span class="sc">/</span> <span class="dv">12</span> )   </span>
+<span id="cb64-19"><a href="consumer-expenditure-survey-ces.html#cb64-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb64-20"><a href="consumer-expenditure-survey-ces.html#cb64-20" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Combine previous quarter and current quarter variables into a single variable:</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="consumer-expenditure-survey-ces.html#cb65-1" aria-hidden="true" tabindex="-1"></a>expenditure_variables <span class="ot">&lt;-</span> </span>
 <span id="cb65-2"><a href="consumer-expenditure-survey-ces.html#cb65-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gsub</span>( <span class="st">&quot;pq$&quot;</span> , <span class="st">&quot;&quot;</span> , <span class="fu">grep</span>( <span class="st">&quot;pq$&quot;</span> , <span class="fu">names</span>( ces_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) )</span>
@@ -503,13 +506,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb65-19"><a href="consumer-expenditure-survey-ces.html#cb65-19" aria-hidden="true" tabindex="-1"></a>    ces_df[ <span class="fu">is.na</span>( ces_df[ , this_column ] ) , this_column ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb65-20"><a href="consumer-expenditure-survey-ces.html#cb65-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb65-21"><a href="consumer-expenditure-survey-ces.html#cb65-21" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Append any interview survey UCC found at <a href="https://www.bls.gov/cex/ce_source_integrate.xlsx" class="uri">https://www.bls.gov/cex/ce_source_integrate.xlsx</a>:</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="consumer-expenditure-survey-ces.html#cb66-1" aria-hidden="true" tabindex="-1"></a>ucc_exp <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&quot;450110&quot;</span> , <span class="st">&quot;450210&quot;</span> )</span>
+<span id="cb66-2"><a href="consumer-expenditure-survey-ces.html#cb66-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-3"><a href="consumer-expenditure-survey-ces.html#cb66-3" aria-hidden="true" tabindex="-1"></a>mtbi_files <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&quot;mtbi2[1-2]&quot;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb66-4"><a href="consumer-expenditure-survey-ces.html#cb66-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-5"><a href="consumer-expenditure-survey-ces.html#cb66-5" aria-hidden="true" tabindex="-1"></a>mtbi_tbls <span class="ot">&lt;-</span> <span class="fu">lapply</span>( mtbi_files , read_dta )</span>
+<span id="cb66-6"><a href="consumer-expenditure-survey-ces.html#cb66-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-7"><a href="consumer-expenditure-survey-ces.html#cb66-7" aria-hidden="true" tabindex="-1"></a>mtbi_dfs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( mtbi_tbls , data.frame )</span>
+<span id="cb66-8"><a href="consumer-expenditure-survey-ces.html#cb66-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-9"><a href="consumer-expenditure-survey-ces.html#cb66-9" aria-hidden="true" tabindex="-1"></a>mtbi_dfs <span class="ot">&lt;-</span> </span>
+<span id="cb66-10"><a href="consumer-expenditure-survey-ces.html#cb66-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>( </span>
+<span id="cb66-11"><a href="consumer-expenditure-survey-ces.html#cb66-11" aria-hidden="true" tabindex="-1"></a>        mtbi_dfs , </span>
+<span id="cb66-12"><a href="consumer-expenditure-survey-ces.html#cb66-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>( w ){ <span class="fu">names</span>( w ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( w ) ) ; w }</span>
+<span id="cb66-13"><a href="consumer-expenditure-survey-ces.html#cb66-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb66-14"><a href="consumer-expenditure-survey-ces.html#cb66-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-15"><a href="consumer-expenditure-survey-ces.html#cb66-15" aria-hidden="true" tabindex="-1"></a>mtbi_dfs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( mtbi_dfs , <span class="cf">function</span>( w ) w[ <span class="fu">c</span>( <span class="st">&#39;newid&#39;</span> , <span class="st">&#39;cost&#39;</span> , <span class="st">&#39;ucc&#39;</span> , <span class="st">&#39;ref_yr&#39;</span> ) ] )</span>
+<span id="cb66-16"><a href="consumer-expenditure-survey-ces.html#cb66-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-17"><a href="consumer-expenditure-survey-ces.html#cb66-17" aria-hidden="true" tabindex="-1"></a>mtbi_df <span class="ot">&lt;-</span> <span class="fu">do.call</span>( rbind , mtbi_dfs )</span>
+<span id="cb66-18"><a href="consumer-expenditure-survey-ces.html#cb66-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-19"><a href="consumer-expenditure-survey-ces.html#cb66-19" aria-hidden="true" tabindex="-1"></a>mtbi_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( mtbi_df , ( ref_yr <span class="sc">%in%</span> <span class="dv">2021</span> ) <span class="sc">&amp;</span> ( ucc <span class="sc">%in%</span> ucc_exp ) )</span>
+<span id="cb66-20"><a href="consumer-expenditure-survey-ces.html#cb66-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-21"><a href="consumer-expenditure-survey-ces.html#cb66-21" aria-hidden="true" tabindex="-1"></a>mtbi_agg <span class="ot">&lt;-</span> <span class="fu">aggregate</span>( cost <span class="sc">~</span> newid , <span class="at">data =</span> mtbi_df , sum )</span>
+<span id="cb66-22"><a href="consumer-expenditure-survey-ces.html#cb66-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-23"><a href="consumer-expenditure-survey-ces.html#cb66-23" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( mtbi_agg ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;newid&#39;</span> , <span class="st">&#39;new_car_truck_exp&#39;</span> )</span>
+<span id="cb66-24"><a href="consumer-expenditure-survey-ces.html#cb66-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-25"><a href="consumer-expenditure-survey-ces.html#cb66-25" aria-hidden="true" tabindex="-1"></a>before_nrow <span class="ot">&lt;-</span> <span class="fu">nrow</span>( ces_df )</span>
+<span id="cb66-26"><a href="consumer-expenditure-survey-ces.html#cb66-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-27"><a href="consumer-expenditure-survey-ces.html#cb66-27" aria-hidden="true" tabindex="-1"></a>ces_df <span class="ot">&lt;-</span></span>
+<span id="cb66-28"><a href="consumer-expenditure-survey-ces.html#cb66-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">merge</span>(</span>
+<span id="cb66-29"><a href="consumer-expenditure-survey-ces.html#cb66-29" aria-hidden="true" tabindex="-1"></a>        ces_df ,</span>
+<span id="cb66-30"><a href="consumer-expenditure-survey-ces.html#cb66-30" aria-hidden="true" tabindex="-1"></a>        mtbi_agg ,</span>
+<span id="cb66-31"><a href="consumer-expenditure-survey-ces.html#cb66-31" aria-hidden="true" tabindex="-1"></a>        <span class="at">all.x =</span> <span class="cn">TRUE</span></span>
+<span id="cb66-32"><a href="consumer-expenditure-survey-ces.html#cb66-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb66-33"><a href="consumer-expenditure-survey-ces.html#cb66-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-34"><a href="consumer-expenditure-survey-ces.html#cb66-34" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( ces_df ) <span class="sc">==</span> before_nrow )</span>
+<span id="cb66-35"><a href="consumer-expenditure-survey-ces.html#cb66-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-36"><a href="consumer-expenditure-survey-ces.html#cb66-36" aria-hidden="true" tabindex="-1"></a>ces_df[ <span class="fu">is.na</span>( ces_df[ , <span class="st">&#39;new_car_truck_exp&#39;</span> ] ) , <span class="st">&#39;new_car_truck_exp&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
 <div id="save-locally-2" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="consumer-expenditure-survey-ces.html#save-locally-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="consumer-expenditure-survey-ces.html#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ces_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;CES&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb66-2"><a href="consumer-expenditure-survey-ces.html#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( ces_df , file = ces_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="consumer-expenditure-survey-ces.html#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ces_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;CES&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb67-2"><a href="consumer-expenditure-survey-ces.html#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( ces_df , file = ces_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="consumer-expenditure-survey-ces.html#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ces_df &lt;- readRDS( ces_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="consumer-expenditure-survey-ces.html#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ces_df &lt;- readRDS( ces_fn )</span></span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -517,196 +557,216 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Analysis Examples with the <code>survey</code> library  <a href="consumer-expenditure-survey-ces.html#analysis-examples-with-the-survey-library-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Construct a multiply-imputed, complex sample survey design:</p>
 <p>Separate the <code>ces_df</code> data.frame into five implicates, each differing from the others only in the multiply-imputed variables:</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="consumer-expenditure-survey-ces.html#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb68-2"><a href="consumer-expenditure-survey-ces.html#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
-<span id="cb68-3"><a href="consumer-expenditure-survey-ces.html#cb68-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-4"><a href="consumer-expenditure-survey-ces.html#cb68-4" aria-hidden="true" tabindex="-1"></a><span class="co"># create a vector containing all of the multiply-imputed variables</span></span>
-<span id="cb68-5"><a href="consumer-expenditure-survey-ces.html#cb68-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (leaving the numbers off the end)</span></span>
-<span id="cb68-6"><a href="consumer-expenditure-survey-ces.html#cb68-6" aria-hidden="true" tabindex="-1"></a>mi_vars <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;5$&quot;</span> , <span class="st">&quot;&quot;</span> , <span class="fu">grep</span>( <span class="st">&quot;[a-z]5$&quot;</span> , <span class="fu">names</span>( ces_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) )</span>
-<span id="cb68-7"><a href="consumer-expenditure-survey-ces.html#cb68-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-8"><a href="consumer-expenditure-survey-ces.html#cb68-8" aria-hidden="true" tabindex="-1"></a><span class="co"># loop through each of the five variables..</span></span>
-<span id="cb68-9"><a href="consumer-expenditure-survey-ces.html#cb68-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> ){</span>
-<span id="cb68-10"><a href="consumer-expenditure-survey-ces.html#cb68-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-11"><a href="consumer-expenditure-survey-ces.html#cb68-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># copy the &#39;ces_df&#39; table over to a new temporary data frame &#39;x&#39;</span></span>
-<span id="cb68-12"><a href="consumer-expenditure-survey-ces.html#cb68-12" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> ces_df</span>
-<span id="cb68-13"><a href="consumer-expenditure-survey-ces.html#cb68-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-14"><a href="consumer-expenditure-survey-ces.html#cb68-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># loop through each of the multiply-imputed variables..</span></span>
-<span id="cb68-15"><a href="consumer-expenditure-survey-ces.html#cb68-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ( j <span class="cf">in</span> mi_vars ){</span>
-<span id="cb68-16"><a href="consumer-expenditure-survey-ces.html#cb68-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb68-17"><a href="consumer-expenditure-survey-ces.html#cb68-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># copy the contents of the current column (for example &#39;welfare1&#39;)</span></span>
-<span id="cb68-18"><a href="consumer-expenditure-survey-ces.html#cb68-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># over to a new column ending in &#39;mi&#39; (for example &#39;welfaremi&#39;)</span></span>
-<span id="cb68-19"><a href="consumer-expenditure-survey-ces.html#cb68-19" aria-hidden="true" tabindex="-1"></a>        x[ , <span class="fu">paste0</span>( j , <span class="st">&#39;mi&#39;</span> ) ] <span class="ot">&lt;-</span> x[ , <span class="fu">paste0</span>( j , i ) ]</span>
-<span id="cb68-20"><a href="consumer-expenditure-survey-ces.html#cb68-20" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb68-21"><a href="consumer-expenditure-survey-ces.html#cb68-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># delete the all five of the imputed variable columns</span></span>
-<span id="cb68-22"><a href="consumer-expenditure-survey-ces.html#cb68-22" aria-hidden="true" tabindex="-1"></a>        x <span class="ot">&lt;-</span> x[ , <span class="sc">!</span>( <span class="fu">names</span>( x ) <span class="sc">%in%</span> <span class="fu">paste0</span>( j , <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> ) ) ]</span>
-<span id="cb68-23"><a href="consumer-expenditure-survey-ces.html#cb68-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-24"><a href="consumer-expenditure-survey-ces.html#cb68-24" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb68-25"><a href="consumer-expenditure-survey-ces.html#cb68-25" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb68-26"><a href="consumer-expenditure-survey-ces.html#cb68-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">assign</span>( <span class="fu">paste0</span>( <span class="st">&#39;imp&#39;</span> , i ) , x )</span>
-<span id="cb68-27"><a href="consumer-expenditure-survey-ces.html#cb68-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-28"><a href="consumer-expenditure-survey-ces.html#cb68-28" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb68-29"><a href="consumer-expenditure-survey-ces.html#cb68-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-30"><a href="consumer-expenditure-survey-ces.html#cb68-30" aria-hidden="true" tabindex="-1"></a>ces_design <span class="ot">&lt;-</span> </span>
-<span id="cb68-31"><a href="consumer-expenditure-survey-ces.html#cb68-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>( </span>
-<span id="cb68-32"><a href="consumer-expenditure-survey-ces.html#cb68-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span>finlwt21 , </span>
-<span id="cb68-33"><a href="consumer-expenditure-survey-ces.html#cb68-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span> <span class="st">&quot;wtrep[0-9]+&quot;</span> , </span>
-<span id="cb68-34"><a href="consumer-expenditure-survey-ces.html#cb68-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( <span class="fu">list</span>( imp1 , imp2 , imp3 , imp4 , imp5 ) ) , </span>
-<span id="cb68-35"><a href="consumer-expenditure-survey-ces.html#cb68-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;BRR&quot;</span> ,</span>
-<span id="cb68-36"><a href="consumer-expenditure-survey-ces.html#cb68-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">combined.weights =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb68-37"><a href="consumer-expenditure-survey-ces.html#cb68-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span></span>
-<span id="cb68-38"><a href="consumer-expenditure-survey-ces.html#cb68-38" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="consumer-expenditure-survey-ces.html#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb69-2"><a href="consumer-expenditure-survey-ces.html#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
+<span id="cb69-3"><a href="consumer-expenditure-survey-ces.html#cb69-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-4"><a href="consumer-expenditure-survey-ces.html#cb69-4" aria-hidden="true" tabindex="-1"></a><span class="co"># create a vector containing all of the multiply-imputed variables</span></span>
+<span id="cb69-5"><a href="consumer-expenditure-survey-ces.html#cb69-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (leaving the numbers off the end)</span></span>
+<span id="cb69-6"><a href="consumer-expenditure-survey-ces.html#cb69-6" aria-hidden="true" tabindex="-1"></a>mi_vars <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;5$&quot;</span> , <span class="st">&quot;&quot;</span> , <span class="fu">grep</span>( <span class="st">&quot;[a-z]5$&quot;</span> , <span class="fu">names</span>( ces_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb69-7"><a href="consumer-expenditure-survey-ces.html#cb69-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-8"><a href="consumer-expenditure-survey-ces.html#cb69-8" aria-hidden="true" tabindex="-1"></a><span class="co"># loop through each of the five variables..</span></span>
+<span id="cb69-9"><a href="consumer-expenditure-survey-ces.html#cb69-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> ){</span>
+<span id="cb69-10"><a href="consumer-expenditure-survey-ces.html#cb69-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-11"><a href="consumer-expenditure-survey-ces.html#cb69-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># copy the &#39;ces_df&#39; table over to a new temporary data frame &#39;x&#39;</span></span>
+<span id="cb69-12"><a href="consumer-expenditure-survey-ces.html#cb69-12" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> ces_df</span>
+<span id="cb69-13"><a href="consumer-expenditure-survey-ces.html#cb69-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-14"><a href="consumer-expenditure-survey-ces.html#cb69-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># loop through each of the multiply-imputed variables..</span></span>
+<span id="cb69-15"><a href="consumer-expenditure-survey-ces.html#cb69-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ( j <span class="cf">in</span> mi_vars ){</span>
+<span id="cb69-16"><a href="consumer-expenditure-survey-ces.html#cb69-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb69-17"><a href="consumer-expenditure-survey-ces.html#cb69-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># copy the contents of the current column (for example &#39;welfare1&#39;)</span></span>
+<span id="cb69-18"><a href="consumer-expenditure-survey-ces.html#cb69-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># over to a new column ending in &#39;mi&#39; (for example &#39;welfaremi&#39;)</span></span>
+<span id="cb69-19"><a href="consumer-expenditure-survey-ces.html#cb69-19" aria-hidden="true" tabindex="-1"></a>        x[ , <span class="fu">paste0</span>( j , <span class="st">&#39;mi&#39;</span> ) ] <span class="ot">&lt;-</span> x[ , <span class="fu">paste0</span>( j , i ) ]</span>
+<span id="cb69-20"><a href="consumer-expenditure-survey-ces.html#cb69-20" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb69-21"><a href="consumer-expenditure-survey-ces.html#cb69-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># delete the all five of the imputed variable columns</span></span>
+<span id="cb69-22"><a href="consumer-expenditure-survey-ces.html#cb69-22" aria-hidden="true" tabindex="-1"></a>        x <span class="ot">&lt;-</span> x[ , <span class="sc">!</span>( <span class="fu">names</span>( x ) <span class="sc">%in%</span> <span class="fu">paste0</span>( j , <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> ) ) ]</span>
+<span id="cb69-23"><a href="consumer-expenditure-survey-ces.html#cb69-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-24"><a href="consumer-expenditure-survey-ces.html#cb69-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb69-25"><a href="consumer-expenditure-survey-ces.html#cb69-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb69-26"><a href="consumer-expenditure-survey-ces.html#cb69-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">assign</span>( <span class="fu">paste0</span>( <span class="st">&#39;imp&#39;</span> , i ) , x )</span>
+<span id="cb69-27"><a href="consumer-expenditure-survey-ces.html#cb69-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-28"><a href="consumer-expenditure-survey-ces.html#cb69-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb69-29"><a href="consumer-expenditure-survey-ces.html#cb69-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-30"><a href="consumer-expenditure-survey-ces.html#cb69-30" aria-hidden="true" tabindex="-1"></a>ces_design <span class="ot">&lt;-</span> </span>
+<span id="cb69-31"><a href="consumer-expenditure-survey-ces.html#cb69-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>( </span>
+<span id="cb69-32"><a href="consumer-expenditure-survey-ces.html#cb69-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> finlwt21 , </span>
+<span id="cb69-33"><a href="consumer-expenditure-survey-ces.html#cb69-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span> <span class="st">&quot;^wtrep[0-9][0-9]$&quot;</span> , </span>
+<span id="cb69-34"><a href="consumer-expenditure-survey-ces.html#cb69-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( <span class="fu">list</span>( imp1 , imp2 , imp3 , imp4 , imp5 ) ) , </span>
+<span id="cb69-35"><a href="consumer-expenditure-survey-ces.html#cb69-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;BRR&quot;</span> ,</span>
+<span id="cb69-36"><a href="consumer-expenditure-survey-ces.html#cb69-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">combined.weights =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb69-37"><a href="consumer-expenditure-survey-ces.html#cb69-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span></span>
+<span id="cb69-38"><a href="consumer-expenditure-survey-ces.html#cb69-38" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <div id="variable-recoding-2" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="consumer-expenditure-survey-ces.html#variable-recoding-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="consumer-expenditure-survey-ces.html#cb69-1" aria-hidden="true" tabindex="-1"></a>ces_design <span class="ot">&lt;-</span> </span>
-<span id="cb69-2"><a href="consumer-expenditure-survey-ces.html#cb69-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb69-3"><a href="consumer-expenditure-survey-ces.html#cb69-3" aria-hidden="true" tabindex="-1"></a>        ces_design , </span>
-<span id="cb69-4"><a href="consumer-expenditure-survey-ces.html#cb69-4" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb69-5"><a href="consumer-expenditure-survey-ces.html#cb69-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
-<span id="cb69-6"><a href="consumer-expenditure-survey-ces.html#cb69-6" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb69-7"><a href="consumer-expenditure-survey-ces.html#cb69-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">any_food_stamp =</span> <span class="fu">as.numeric</span>( jfs_amtmi <span class="sc">&gt;</span> <span class="dv">0</span> ) ,</span>
-<span id="cb69-8"><a href="consumer-expenditure-survey-ces.html#cb69-8" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb69-9"><a href="consumer-expenditure-survey-ces.html#cb69-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">bls_urbn =</span> <span class="fu">factor</span>( bls_urbn , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;urban&#39;</span> , <span class="st">&#39;rural&#39;</span> ) ) ,</span>
-<span id="cb69-10"><a href="consumer-expenditure-survey-ces.html#cb69-10" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb69-11"><a href="consumer-expenditure-survey-ces.html#cb69-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">sex_ref =</span> <span class="fu">factor</span>( sex_ref , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) )</span>
-<span id="cb69-12"><a href="consumer-expenditure-survey-ces.html#cb69-12" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb69-13"><a href="consumer-expenditure-survey-ces.html#cb69-13" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="consumer-expenditure-survey-ces.html#cb70-1" aria-hidden="true" tabindex="-1"></a>ces_design <span class="ot">&lt;-</span> </span>
+<span id="cb70-2"><a href="consumer-expenditure-survey-ces.html#cb70-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb70-3"><a href="consumer-expenditure-survey-ces.html#cb70-3" aria-hidden="true" tabindex="-1"></a>        ces_design , </span>
+<span id="cb70-4"><a href="consumer-expenditure-survey-ces.html#cb70-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb70-5"><a href="consumer-expenditure-survey-ces.html#cb70-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
+<span id="cb70-6"><a href="consumer-expenditure-survey-ces.html#cb70-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb70-7"><a href="consumer-expenditure-survey-ces.html#cb70-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">any_food_stamp =</span> <span class="fu">as.numeric</span>( jfs_amtmi <span class="sc">&gt;</span> <span class="dv">0</span> ) ,</span>
+<span id="cb70-8"><a href="consumer-expenditure-survey-ces.html#cb70-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb70-9"><a href="consumer-expenditure-survey-ces.html#cb70-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">bls_urbn =</span> <span class="fu">factor</span>( bls_urbn , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;urban&#39;</span> , <span class="st">&#39;rural&#39;</span> ) ) ,</span>
+<span id="cb70-10"><a href="consumer-expenditure-survey-ces.html#cb70-10" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb70-11"><a href="consumer-expenditure-survey-ces.html#cb70-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">sex_ref =</span> <span class="fu">factor</span>( sex_ref , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) )</span>
+<span id="cb70-12"><a href="consumer-expenditure-survey-ces.html#cb70-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb70-13"><a href="consumer-expenditure-survey-ces.html#cb70-13" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="unweighted-counts-2" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="consumer-expenditure-survey-ces.html#unweighted-counts-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="consumer-expenditure-survey-ces.html#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
-<span id="cb70-2"><a href="consumer-expenditure-survey-ces.html#cb70-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-3"><a href="consumer-expenditure-survey-ces.html#cb70-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> bls_urbn , unwtd.count ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="consumer-expenditure-survey-ces.html#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
+<span id="cb71-2"><a href="consumer-expenditure-survey-ces.html#cb71-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-3"><a href="consumer-expenditure-survey-ces.html#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> bls_urbn , unwtd.count ) ) )</span></code></pre></div>
 </div>
 <div id="weighted-counts-2" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="consumer-expenditure-survey-ces.html#weighted-counts-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="consumer-expenditure-survey-ces.html#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
-<span id="cb71-2"><a href="consumer-expenditure-survey-ces.html#cb71-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-3"><a href="consumer-expenditure-survey-ces.html#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb71-4"><a href="consumer-expenditure-survey-ces.html#cb71-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> bls_urbn , svytotal )</span>
-<span id="cb71-5"><a href="consumer-expenditure-survey-ces.html#cb71-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="consumer-expenditure-survey-ces.html#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
+<span id="cb72-2"><a href="consumer-expenditure-survey-ces.html#cb72-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-3"><a href="consumer-expenditure-survey-ces.html#cb72-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb72-4"><a href="consumer-expenditure-survey-ces.html#cb72-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> bls_urbn , svytotal )</span>
+<span id="cb72-5"><a href="consumer-expenditure-survey-ces.html#cb72-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-2" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="consumer-expenditure-survey-ces.html#descriptive-statistics-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="consumer-expenditure-survey-ces.html#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svymean</span>( <span class="sc">~</span> totexp ) ) )</span>
-<span id="cb72-2"><a href="consumer-expenditure-survey-ces.html#cb72-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb72-3"><a href="consumer-expenditure-survey-ces.html#cb72-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb72-4"><a href="consumer-expenditure-survey-ces.html#cb72-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> totexp , <span class="sc">~</span> bls_urbn , svymean )</span>
-<span id="cb72-5"><a href="consumer-expenditure-survey-ces.html#cb72-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
-<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="consumer-expenditure-survey-ces.html#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svymean</span>( <span class="sc">~</span> sex_ref ) ) )</span>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="consumer-expenditure-survey-ces.html#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svymean</span>( <span class="sc">~</span> totexp ) ) )</span>
 <span id="cb73-2"><a href="consumer-expenditure-survey-ces.html#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb73-3"><a href="consumer-expenditure-survey-ces.html#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb73-4"><a href="consumer-expenditure-survey-ces.html#cb73-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sex_ref , <span class="sc">~</span> bls_urbn , svymean )</span>
+<span id="cb73-4"><a href="consumer-expenditure-survey-ces.html#cb73-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> totexp , <span class="sc">~</span> bls_urbn , svymean )</span>
 <span id="cb73-5"><a href="consumer-expenditure-survey-ces.html#cb73-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
-<p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="consumer-expenditure-survey-ces.html#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svytotal</span>( <span class="sc">~</span> totexp ) ) )</span>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="consumer-expenditure-survey-ces.html#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svymean</span>( <span class="sc">~</span> sex_ref ) ) )</span>
 <span id="cb74-2"><a href="consumer-expenditure-survey-ces.html#cb74-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb74-3"><a href="consumer-expenditure-survey-ces.html#cb74-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb74-4"><a href="consumer-expenditure-survey-ces.html#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> totexp , <span class="sc">~</span> bls_urbn , svytotal )</span>
+<span id="cb74-4"><a href="consumer-expenditure-survey-ces.html#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sex_ref , <span class="sc">~</span> bls_urbn , svymean )</span>
 <span id="cb74-5"><a href="consumer-expenditure-survey-ces.html#cb74-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
-<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="consumer-expenditure-survey-ces.html#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svytotal</span>( <span class="sc">~</span> sex_ref ) ) )</span>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="consumer-expenditure-survey-ces.html#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svytotal</span>( <span class="sc">~</span> totexp ) ) )</span>
 <span id="cb75-2"><a href="consumer-expenditure-survey-ces.html#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb75-3"><a href="consumer-expenditure-survey-ces.html#cb75-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb75-4"><a href="consumer-expenditure-survey-ces.html#cb75-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sex_ref , <span class="sc">~</span> bls_urbn , svytotal )</span>
+<span id="cb75-4"><a href="consumer-expenditure-survey-ces.html#cb75-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> totexp , <span class="sc">~</span> bls_urbn , svytotal )</span>
 <span id="cb75-5"><a href="consumer-expenditure-survey-ces.html#cb75-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="consumer-expenditure-survey-ces.html#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svytotal</span>( <span class="sc">~</span> sex_ref ) ) )</span>
+<span id="cb76-2"><a href="consumer-expenditure-survey-ces.html#cb76-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-3"><a href="consumer-expenditure-survey-ces.html#cb76-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb76-4"><a href="consumer-expenditure-survey-ces.html#cb76-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sex_ref , <span class="sc">~</span> bls_urbn , svytotal )</span>
+<span id="cb76-5"><a href="consumer-expenditure-survey-ces.html#cb76-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="consumer-expenditure-survey-ces.html#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb76-2"><a href="consumer-expenditure-survey-ces.html#cb76-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
-<span id="cb76-3"><a href="consumer-expenditure-survey-ces.html#cb76-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> totexp ,</span>
-<span id="cb76-4"><a href="consumer-expenditure-survey-ces.html#cb76-4" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> </span>
-<span id="cb76-5"><a href="consumer-expenditure-survey-ces.html#cb76-5" aria-hidden="true" tabindex="-1"></a>) ) )</span>
-<span id="cb76-6"><a href="consumer-expenditure-survey-ces.html#cb76-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb76-7"><a href="consumer-expenditure-survey-ces.html#cb76-7" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb76-8"><a href="consumer-expenditure-survey-ces.html#cb76-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
-<span id="cb76-9"><a href="consumer-expenditure-survey-ces.html#cb76-9" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> totexp , <span class="sc">~</span> bls_urbn , svyquantile ,</span>
-<span id="cb76-10"><a href="consumer-expenditure-survey-ces.html#cb76-10" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb76-11"><a href="consumer-expenditure-survey-ces.html#cb76-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
-<span id="cb76-12"><a href="consumer-expenditure-survey-ces.html#cb76-12" aria-hidden="true" tabindex="-1"></a>) ) )</span></code></pre></div>
-<p>Estimate a ratio:</p>
 <div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="consumer-expenditure-survey-ces.html#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb77-2"><a href="consumer-expenditure-survey-ces.html#cb77-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> totexp , <span class="at">denominator =</span> <span class="sc">~</span> fincbtxmi )</span>
-<span id="cb77-3"><a href="consumer-expenditure-survey-ces.html#cb77-3" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<span id="cb77-2"><a href="consumer-expenditure-survey-ces.html#cb77-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
+<span id="cb77-3"><a href="consumer-expenditure-survey-ces.html#cb77-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> totexp ,</span>
+<span id="cb77-4"><a href="consumer-expenditure-survey-ces.html#cb77-4" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> </span>
+<span id="cb77-5"><a href="consumer-expenditure-survey-ces.html#cb77-5" aria-hidden="true" tabindex="-1"></a>) ) )</span>
+<span id="cb77-6"><a href="consumer-expenditure-survey-ces.html#cb77-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-7"><a href="consumer-expenditure-survey-ces.html#cb77-7" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb77-8"><a href="consumer-expenditure-survey-ces.html#cb77-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
+<span id="cb77-9"><a href="consumer-expenditure-survey-ces.html#cb77-9" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> totexp , <span class="sc">~</span> bls_urbn , svyquantile ,</span>
+<span id="cb77-10"><a href="consumer-expenditure-survey-ces.html#cb77-10" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb77-11"><a href="consumer-expenditure-survey-ces.html#cb77-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
+<span id="cb77-12"><a href="consumer-expenditure-survey-ces.html#cb77-12" aria-hidden="true" tabindex="-1"></a>) ) )</span></code></pre></div>
+<p>Estimate a ratio:</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="consumer-expenditure-survey-ces.html#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb78-2"><a href="consumer-expenditure-survey-ces.html#cb78-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> totexp , <span class="at">denominator =</span> <span class="sc">~</span> fincbtxmi )</span>
+<span id="cb78-3"><a href="consumer-expenditure-survey-ces.html#cb78-3" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="subsetting-2" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="consumer-expenditure-survey-ces.html#subsetting-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to california residents:</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="consumer-expenditure-survey-ces.html#cb78-1" aria-hidden="true" tabindex="-1"></a>sub_ces_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( ces_design , state <span class="sc">==</span> <span class="st">&#39;06&#39;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="consumer-expenditure-survey-ces.html#cb79-1" aria-hidden="true" tabindex="-1"></a>sub_ces_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( ces_design , state <span class="sc">==</span> <span class="st">&#39;06&#39;</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="consumer-expenditure-survey-ces.html#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( sub_ces_design , <span class="fu">svymean</span>( <span class="sc">~</span> totexp ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="consumer-expenditure-survey-ces.html#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( sub_ces_design , <span class="fu">svymean</span>( <span class="sc">~</span> totexp ) ) )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-2" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="consumer-expenditure-survey-ces.html#measures-of-uncertainty-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="consumer-expenditure-survey-ces.html#cb80-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
-<span id="cb80-2"><a href="consumer-expenditure-survey-ces.html#cb80-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb80-3"><a href="consumer-expenditure-survey-ces.html#cb80-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> totexp )</span>
-<span id="cb80-4"><a href="consumer-expenditure-survey-ces.html#cb80-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb80-5"><a href="consumer-expenditure-survey-ces.html#cb80-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb80-6"><a href="consumer-expenditure-survey-ces.html#cb80-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb80-7"><a href="consumer-expenditure-survey-ces.html#cb80-7" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb80-8"><a href="consumer-expenditure-survey-ces.html#cb80-8" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb80-9"><a href="consumer-expenditure-survey-ces.html#cb80-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb80-10"><a href="consumer-expenditure-survey-ces.html#cb80-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb80-11"><a href="consumer-expenditure-survey-ces.html#cb80-11" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb80-12"><a href="consumer-expenditure-survey-ces.html#cb80-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb80-13"><a href="consumer-expenditure-survey-ces.html#cb80-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> totexp , <span class="sc">~</span> bls_urbn , svymean )</span>
-<span id="cb80-14"><a href="consumer-expenditure-survey-ces.html#cb80-14" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb80-15"><a href="consumer-expenditure-survey-ces.html#cb80-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb80-16"><a href="consumer-expenditure-survey-ces.html#cb80-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb80-17"><a href="consumer-expenditure-survey-ces.html#cb80-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb80-18"><a href="consumer-expenditure-survey-ces.html#cb80-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb80-19"><a href="consumer-expenditure-survey-ces.html#cb80-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="consumer-expenditure-survey-ces.html#cb81-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
+<span id="cb81-2"><a href="consumer-expenditure-survey-ces.html#cb81-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb81-3"><a href="consumer-expenditure-survey-ces.html#cb81-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> totexp )</span>
+<span id="cb81-4"><a href="consumer-expenditure-survey-ces.html#cb81-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb81-5"><a href="consumer-expenditure-survey-ces.html#cb81-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-6"><a href="consumer-expenditure-survey-ces.html#cb81-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb81-7"><a href="consumer-expenditure-survey-ces.html#cb81-7" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb81-8"><a href="consumer-expenditure-survey-ces.html#cb81-8" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb81-9"><a href="consumer-expenditure-survey-ces.html#cb81-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb81-10"><a href="consumer-expenditure-survey-ces.html#cb81-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-11"><a href="consumer-expenditure-survey-ces.html#cb81-11" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb81-12"><a href="consumer-expenditure-survey-ces.html#cb81-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb81-13"><a href="consumer-expenditure-survey-ces.html#cb81-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> totexp , <span class="sc">~</span> bls_urbn , svymean )</span>
+<span id="cb81-14"><a href="consumer-expenditure-survey-ces.html#cb81-14" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb81-15"><a href="consumer-expenditure-survey-ces.html#cb81-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-16"><a href="consumer-expenditure-survey-ces.html#cb81-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb81-17"><a href="consumer-expenditure-survey-ces.html#cb81-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb81-18"><a href="consumer-expenditure-survey-ces.html#cb81-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb81-19"><a href="consumer-expenditure-survey-ces.html#cb81-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="consumer-expenditure-survey-ces.html#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( ces_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] )</span></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="consumer-expenditure-survey-ces.html#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( ces_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="consumer-expenditure-survey-ces.html#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svyvar</span>( <span class="sc">~</span> totexp ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="consumer-expenditure-survey-ces.html#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svyvar</span>( <span class="sc">~</span> totexp ) ) )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="consumer-expenditure-survey-ces.html#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb83-2"><a href="consumer-expenditure-survey-ces.html#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb83-3"><a href="consumer-expenditure-survey-ces.html#cb83-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> totexp , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb83-4"><a href="consumer-expenditure-survey-ces.html#cb83-4" aria-hidden="true" tabindex="-1"></a>) )</span>
-<span id="cb83-5"><a href="consumer-expenditure-survey-ces.html#cb83-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb83-6"><a href="consumer-expenditure-survey-ces.html#cb83-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb83-7"><a href="consumer-expenditure-survey-ces.html#cb83-7" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb83-8"><a href="consumer-expenditure-survey-ces.html#cb83-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> totexp , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
-<span id="cb83-9"><a href="consumer-expenditure-survey-ces.html#cb83-9" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="consumer-expenditure-survey-ces.html#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb84-2"><a href="consumer-expenditure-survey-ces.html#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb84-3"><a href="consumer-expenditure-survey-ces.html#cb84-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> totexp , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb84-4"><a href="consumer-expenditure-survey-ces.html#cb84-4" aria-hidden="true" tabindex="-1"></a>) )</span>
+<span id="cb84-5"><a href="consumer-expenditure-survey-ces.html#cb84-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-6"><a href="consumer-expenditure-survey-ces.html#cb84-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb84-7"><a href="consumer-expenditure-survey-ces.html#cb84-7" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb84-8"><a href="consumer-expenditure-survey-ces.html#cb84-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> totexp , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
+<span id="cb84-9"><a href="consumer-expenditure-survey-ces.html#cb84-9" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="consumer-expenditure-survey-ces.html#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyciprop( ~ any_food_stamp , ces_design ,</span></span>
-<span id="cb84-2"><a href="consumer-expenditure-survey-ces.html#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; )</span></span></code></pre></div>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="consumer-expenditure-survey-ces.html#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyciprop( ~ any_food_stamp , ces_design ,</span></span>
+<span id="cb85-2"><a href="consumer-expenditure-survey-ces.html#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; )</span></span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-2" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="consumer-expenditure-survey-ces.html#regression-models-and-tests-of-association-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="consumer-expenditure-survey-ces.html#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyttest( totexp ~ any_food_stamp , ces_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="consumer-expenditure-survey-ces.html#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyttest( totexp ~ any_food_stamp , ces_design )</span></span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="consumer-expenditure-survey-ces.html#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvychisq( ~ any_food_stamp + sex_ref , ces_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="consumer-expenditure-survey-ces.html#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvychisq( ~ any_food_stamp + sex_ref , ces_design )</span></span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="consumer-expenditure-survey-ces.html#cb87-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb87-2"><a href="consumer-expenditure-survey-ces.html#cb87-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
-<span id="cb87-3"><a href="consumer-expenditure-survey-ces.html#cb87-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyglm</span>( totexp <span class="sc">~</span> any_food_stamp <span class="sc">+</span> sex_ref )</span>
-<span id="cb87-4"><a href="consumer-expenditure-survey-ces.html#cb87-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb87-5"><a href="consumer-expenditure-survey-ces.html#cb87-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb87-6"><a href="consumer-expenditure-survey-ces.html#cb87-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="consumer-expenditure-survey-ces.html#cb88-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb88-2"><a href="consumer-expenditure-survey-ces.html#cb88-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design ,</span>
+<span id="cb88-3"><a href="consumer-expenditure-survey-ces.html#cb88-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyglm</span>( totexp <span class="sc">~</span> any_food_stamp <span class="sc">+</span> sex_ref )</span>
+<span id="cb88-4"><a href="consumer-expenditure-survey-ces.html#cb88-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb88-5"><a href="consumer-expenditure-survey-ces.html#cb88-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb88-6"><a href="consumer-expenditure-survey-ces.html#cb88-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
 <div id="intermish-2" class="section level2 unnumbered hasAnchor">
 <h2>Intermish<a href="consumer-expenditure-survey-ces.html#intermish-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <center>
-<a href="https://en.wikipedia.org/wiki/Lorem_ipsum" class="uri">https://en.wikipedia.org/wiki/Lorem_ipsum</a>
+<i><b>penny for your thoughts</b></i>
 </center>
 <hr />
 </div>
 <div id="replication-example-2" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="consumer-expenditure-survey-ces.html#replication-example-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><a href="https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2021.pdf" class="uri">https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2021.pdf</a></p>
-<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="consumer-expenditure-survey-ces.html#cb88-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
-<span id="cb88-2"><a href="consumer-expenditure-survey-ces.html#cb88-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( result ) , <span class="sc">-</span><span class="dv">3</span> ) <span class="sc">==</span> <span class="dv">133595000</span> )</span></code></pre></div>
+<p>This example matches the <em>number of consumer units</em> and the <em>Cars and trucks, new</em> rows of <a href="https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2021.pdf">Table R-1</a>:</p>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="consumer-expenditure-survey-ces.html#cb89-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span></span>
+<span id="cb89-2"><a href="consumer-expenditure-survey-ces.html#cb89-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svytotal</span>( <span class="sc">~</span> <span class="fu">as.numeric</span>( popwt_finlwt21 <span class="sc">/</span> finlwt21 ) ) ) )</span>
+<span id="cb89-3"><a href="consumer-expenditure-survey-ces.html#cb89-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-4"><a href="consumer-expenditure-survey-ces.html#cb89-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( result ) , <span class="sc">-</span><span class="dv">3</span> ) <span class="sc">==</span> <span class="dv">133595000</span> )</span>
+<span id="cb89-5"><a href="consumer-expenditure-survey-ces.html#cb89-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-6"><a href="consumer-expenditure-survey-ces.html#cb89-6" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> </span>
+<span id="cb89-7"><a href="consumer-expenditure-survey-ces.html#cb89-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sapply</span>( </span>
+<span id="cb89-8"><a href="consumer-expenditure-survey-ces.html#cb89-8" aria-hidden="true" tabindex="-1"></a>        weight_columns , </span>
+<span id="cb89-9"><a href="consumer-expenditure-survey-ces.html#cb89-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>( this_column ){</span>
+<span id="cb89-10"><a href="consumer-expenditure-survey-ces.html#cb89-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sum</span>( ces_df[ , <span class="st">&#39;new_car_truck_exp&#39;</span> ] <span class="sc">*</span> ces_df[ , this_column ] ) <span class="sc">/</span> </span>
+<span id="cb89-11"><a href="consumer-expenditure-survey-ces.html#cb89-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sum</span>( ces_df[ , <span class="fu">paste0</span>( <span class="st">&#39;popwt_&#39;</span> , this_column ) ] )</span>
+<span id="cb89-12"><a href="consumer-expenditure-survey-ces.html#cb89-12" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb89-13"><a href="consumer-expenditure-survey-ces.html#cb89-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb89-14"><a href="consumer-expenditure-survey-ces.html#cb89-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-15"><a href="consumer-expenditure-survey-ces.html#cb89-15" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( results[<span class="dv">1</span>] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">2210.45</span> )</span>
+<span id="cb89-16"><a href="consumer-expenditure-survey-ces.html#cb89-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-17"><a href="consumer-expenditure-survey-ces.html#cb89-17" aria-hidden="true" tabindex="-1"></a>standard_error <span class="ot">&lt;-</span> <span class="fu">sqrt</span>( ( <span class="dv">1</span> <span class="sc">/</span> <span class="dv">44</span> ) <span class="sc">*</span> <span class="fu">sum</span>( ( results[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">-</span> results[<span class="dv">1</span>] )<span class="sc">^</span><span class="dv">2</span> ) )</span>
+<span id="cb89-18"><a href="consumer-expenditure-survey-ces.html#cb89-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-19"><a href="consumer-expenditure-survey-ces.html#cb89-19" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( standard_error , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">184.47</span> )</span>
+<span id="cb89-20"><a href="consumer-expenditure-survey-ces.html#cb89-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-21"><a href="consumer-expenditure-survey-ces.html#cb89-21" aria-hidden="true" tabindex="-1"></a><span class="co"># note the minor differences</span></span>
+<span id="cb89-22"><a href="consumer-expenditure-survey-ces.html#cb89-22" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( ces_design , <span class="fu">svymean</span>( <span class="sc">~</span> cartkn ) ) )</span></code></pre></div>
 
 </div>
 </div>
