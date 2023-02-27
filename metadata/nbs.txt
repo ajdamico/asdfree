@@ -116,12 +116,15 @@ group_by_variable_description: age categories
 
 categorical_variable: r7_c_hhsize_pub
 categorical_variable_description: household size
+categorical_narm: , na.rm = TRUE
 
 linear_variable: r7_n_totssbenlastmnth_pub
 linear_variable_description: total benefits for the month before the interview date
+linear_narm: , na.rm = TRUE
 
 ratio_estimation_numerator: r7_n_ssilastmnth_pub
 ratio_estimation_denominator: r7_n_totssbenlastmnth_pub
+ratio_narm: , na.rm = TRUE
 
 subset_definition: r7_c_curmedicare == 1
 subset_definition_description: currently covered by Medicare
@@ -200,7 +203,7 @@ r3_design <-
 			factor(
 				r3_orgsampinfo_bstatus ,
 				levels = c( 2 , 3 , 1 ) ,
-				labels = c( 'ssdi' , 'concurrent' , 'ssi' )
+				labels = c( 'di_only' , 'concurrent' , 'ssi' )
 			)
 
 	)
@@ -221,15 +224,15 @@ for( i in seq( nrow( ex_4 ) ) ){
 	stopifnot(
 		all.equal( 
 			100 * as.numeric( round( coef( benefit_percent ) , 2 ) ) , 
-			as.numeric( ex_4[ i , c( 'di_only' , 'concurrent' , 'ssdi' ) ] )
+			as.numeric( ex_4[ i , c( 'di_only' , 'concurrent' , 'ssi' ) ] )
 		)
 	)
 	
 	ttest_formula <- as.formula( paste( ex_4[ i , 'variable_name' ] , "~ benefit_type" ) )
 	
-	ssdi_con_design <- subset( r3_design , benefit_type %in% c( 'ssdi' , 'concurrent' ) )
+	di_only_con_design <- subset( r3_design , benefit_type %in% c( 'di_only' , 'concurrent' ) )
 	
-	con_ttest <- svyttest( ttest_formula , ssdi_con_design )
+	con_ttest <- svyttest( ttest_formula , di_only_con_design )
 
 	stopifnot(
 		all.equal( 
@@ -238,9 +241,9 @@ for( i in seq( nrow( ex_4 ) ) ){
 		)
 	)
 	
-	ssdi_ssi_design <- subset( r3_design , benefit_type %in% c( 'ssdi' , 'ssi' ) )
+	di_only_ssi_design <- subset( r3_design , benefit_type %in% c( 'di_only' , 'ssi' ) )
 	
-	ssi_ttest <- svyttest( ttest_formula , ssdi_ssi_design )
+	ssi_ttest <- svyttest( ttest_formula , di_only_ssi_design )
 
 	stopifnot(
 		all.equal(

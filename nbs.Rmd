@@ -147,35 +147,35 @@ svyby( ~ one , ~ age_categories , nbs_design , svytotal )
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ r7_n_totssbenlastmnth_pub , nbs_design )
+svymean( ~ r7_n_totssbenlastmnth_pub , nbs_design , na.rm = TRUE )
 
-svyby( ~ r7_n_totssbenlastmnth_pub , ~ age_categories , nbs_design , svymean )
+svyby( ~ r7_n_totssbenlastmnth_pub , ~ age_categories , nbs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ r7_c_hhsize_pub , nbs_design )
+svymean( ~ r7_c_hhsize_pub , nbs_design , na.rm = TRUE )
 
-svyby( ~ r7_c_hhsize_pub , ~ age_categories , nbs_design , svymean )
+svyby( ~ r7_c_hhsize_pub , ~ age_categories , nbs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ r7_n_totssbenlastmnth_pub , nbs_design )
+svytotal( ~ r7_n_totssbenlastmnth_pub , nbs_design , na.rm = TRUE )
 
-svyby( ~ r7_n_totssbenlastmnth_pub , ~ age_categories , nbs_design , svytotal )
+svyby( ~ r7_n_totssbenlastmnth_pub , ~ age_categories , nbs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ r7_c_hhsize_pub , nbs_design )
+svytotal( ~ r7_c_hhsize_pub , nbs_design , na.rm = TRUE )
 
-svyby( ~ r7_c_hhsize_pub , ~ age_categories , nbs_design , svytotal )
+svyby( ~ r7_c_hhsize_pub , ~ age_categories , nbs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ r7_n_totssbenlastmnth_pub , nbs_design , 0.5 )
+svyquantile( ~ r7_n_totssbenlastmnth_pub , nbs_design , 0.5 , na.rm = TRUE )
 
 svyby( 
 	~ r7_n_totssbenlastmnth_pub , 
@@ -183,7 +183,7 @@ svyby(
 	nbs_design , 
 	svyquantile , 
 	0.5 ,
-	ci = TRUE 
+	ci = TRUE , na.rm = TRUE
 )
 ```
 
@@ -192,7 +192,8 @@ Estimate a ratio:
 svyratio( 
 	numerator = ~ r7_n_ssilastmnth_pub , 
 	denominator = ~ r7_n_totssbenlastmnth_pub , 
-	nbs_design 
+	nbs_design ,
+	na.rm = TRUE
 )
 ```
 
@@ -204,14 +205,14 @@ sub_nbs_design <- subset( nbs_design , r7_c_curmedicare == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ r7_n_totssbenlastmnth_pub , sub_nbs_design )
+svymean( ~ r7_n_totssbenlastmnth_pub , sub_nbs_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ r7_n_totssbenlastmnth_pub , nbs_design )
+this_result <- svymean( ~ r7_n_totssbenlastmnth_pub , nbs_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -223,7 +224,8 @@ grouped_result <-
 		~ r7_n_totssbenlastmnth_pub , 
 		~ age_categories , 
 		nbs_design , 
-		svymean 
+		svymean ,
+		na.rm = TRUE 
 	)
 	
 coef( grouped_result )
@@ -239,16 +241,16 @@ degf( nbs_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ r7_n_totssbenlastmnth_pub , nbs_design )
+svyvar( ~ r7_n_totssbenlastmnth_pub , nbs_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ r7_n_totssbenlastmnth_pub , nbs_design , deff = TRUE )
+svymean( ~ r7_n_totssbenlastmnth_pub , nbs_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ r7_n_totssbenlastmnth_pub , nbs_design , deff = "replace" )
+svymean( ~ r7_n_totssbenlastmnth_pub , nbs_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -302,11 +304,11 @@ nbs_srvyr_design <- as_survey( nbs_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" , messages = FALSE }
 nbs_srvyr_design %>%
-	summarize( mean = survey_mean( r7_n_totssbenlastmnth_pub ) )
+	summarize( mean = survey_mean( r7_n_totssbenlastmnth_pub , na.rm = TRUE ) )
 
 nbs_srvyr_design %>%
 	group_by( age_categories ) %>%
-	summarize( mean = survey_mean( r7_n_totssbenlastmnth_pub ) )
+	summarize( mean = survey_mean( r7_n_totssbenlastmnth_pub , na.rm = TRUE ) )
 ```
 
 ---
@@ -374,7 +376,7 @@ r3_design <-
 			factor(
 				r3_orgsampinfo_bstatus ,
 				levels = c( 2 , 3 , 1 ) ,
-				labels = c( 'ssdi' , 'concurrent' , 'ssi' )
+				labels = c( 'di_only' , 'concurrent' , 'ssi' )
 			)
 
 	)
@@ -395,15 +397,15 @@ for( i in seq( nrow( ex_4 ) ) ){
 	stopifnot(
 		all.equal( 
 			100 * as.numeric( round( coef( benefit_percent ) , 2 ) ) , 
-			as.numeric( ex_4[ i , c( 'di_only' , 'concurrent' , 'ssdi' ) ] )
+			as.numeric( ex_4[ i , c( 'di_only' , 'concurrent' , 'ssi' ) ] )
 		)
 	)
 	
 	ttest_formula <- as.formula( paste( ex_4[ i , 'variable_name' ] , "~ benefit_type" ) )
 	
-	ssdi_con_design <- subset( r3_design , benefit_type %in% c( 'ssdi' , 'concurrent' ) )
+	di_only_con_design <- subset( r3_design , benefit_type %in% c( 'di_only' , 'concurrent' ) )
 	
-	con_ttest <- svyttest( ttest_formula , ssdi_con_design )
+	con_ttest <- svyttest( ttest_formula , di_only_con_design )
 
 	stopifnot(
 		all.equal( 
@@ -412,9 +414,9 @@ for( i in seq( nrow( ex_4 ) ) ){
 		)
 	)
 	
-	ssdi_ssi_design <- subset( r3_design , benefit_type %in% c( 'ssdi' , 'ssi' ) )
+	di_only_ssi_design <- subset( r3_design , benefit_type %in% c( 'di_only' , 'ssi' ) )
 	
-	ssi_ttest <- svyttest( ttest_formula , ssdi_ssi_design )
+	ssi_ttest <- svyttest( ttest_formula , di_only_ssi_design )
 
 	stopifnot(
 		all.equal(
