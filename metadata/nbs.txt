@@ -22,7 +22,7 @@ Please skim before you begin:
 
 1. [National Beneficiary Survey: Disability Statistics, 2015](https://www.ssa.gov/policy/docs/statcomps/nbs/2015/nbs-statistics-2015.pdf)
 
-2. [National Beneficiary Survey - General Waves Round 7: Public Use File Codebook](https://www.ssa.gov/disabilityresearch/documents/NBSR7_PUFCodebook_Final_508C.pdf)
+2. [National Beneficiary Survey - General Waves Round 7: User's Guide](https://www.ssa.gov/disabilityresearch/documents/NBS_R7_Users%20Guide%20Report.pdf)
 
 3. This poem
 
@@ -35,7 +35,7 @@ Please skim before you begin:
 
 
 ~~~{download_and_import_block}
-Download and import the national file:
+Download and import the round 7 file:
 ```{r eval = FALSE }
 library(haven)
 
@@ -137,9 +137,41 @@ needs_srvyr_block: yes
 
 ~~~{replication_example_block}
 ## Replication Example {-}
-exhibit 4 final ten rows of difficulty with specific activities (including statistical testing) https://www.ssa.gov/disabilityresearch/documents/TTW5_2_BeneChar.pdf#page=20
-```{r eval = FALSE , results = "hide" }
 
+The example below matches the percentages and t-tests from the final ten rows of [Exhibit 4](https://www.ssa.gov/disabilityresearch/documents/TTW5_2_BeneChar.pdf#page=20).
+
+```{r eval = FALSE , results = "hide" }
+ex_4 <-
+	data.frame(
+		variable_label =
+			c( 'coping with stress' , 'concentrating' , 
+			'getting around outside of the home' , 
+			'shopping for personal items' , 'preparing meals' , 
+			'getting into or out of bed' , 'bathing or dressing' , 
+			'getting along with others' , 
+			'getting around inside the house' , 'eating' ) ,
+		variable_name =
+			c( "r3_i60_i" , "r3_i59_i" , "r3_i47_i" , "r3_i53_i" , 
+			"r3_i55_i" , "r3_i49_i" , "r3_i51_i" , "r3_i61_i" , 
+			"r3_i45_i" , "r3_i57_i" ) ,
+		overall =
+			c( 61 , 58 , 47 , 39 , 37 , 34 , 30 , 27 , 23 , 14 ) ,
+		di_only =
+			c( 60 , 54 , 47 , 36 , 35 , 36 , 30 , 23 , 24 , 13 ) ,
+		concurrent =
+			c( 63 , 63 , 47 , 43 , 41 , 34 , 33 , 31 , 23 , 15 ) ,
+		concurrent_vs_di =
+			c( F , T , F , F , F , F , F , T , F , F ) ,
+		ssi =
+			c( 61 , 62 , 47 , 40 , 39 , 33 , 29 , 31 , 22 , 15 ) ,
+		ssi_vs_di =
+			c( F , T , F , F , F , F , F , T , F , F )
+	)
+```		
+
+
+Download, import, and recode the round 3 file:
+```{r eval = FALSE , results = "hide" }
 r3_tf <- tempfile()
 
 r3_url <- "https://www.ssa.gov/disabilityresearch/documents/nbsr3pufstata.zip"
@@ -172,35 +204,10 @@ r3_design <-
 			)
 
 	)
+```
 
-ex_4 <-
-	data.frame(
-		variable_label =
-			c( 'coping with stress' , 'concentrating' , 
-			'getting around outside of the home' , 
-			'shopping for personal items' , 'preparing meals' , 
-			'getting into or out of bed' , 'bathing or dressing' , 
-			'getting along with others' , 
-			'getting around inside the house' , 'eating' ) ,
-		variable_name =
-			c( "r3_i60_i" , "r3_i59_i" , "r3_i47_i" , "r3_i53_i" , 
-			"r3_i55_i" , "r3_i49_i" , "r3_i51_i" , "r3_i61_i" , 
-			"r3_i45_i" , "r3_i57_i" ) ,
-		overall_percentage =
-			c( 61 , 58 , 47 , 39 , 37 , 34 , 30 , 27 , 23 , 14 ) ,
-		di_only_percentage =
-			c( 60 , 54 , 47 , 36 , 35 , 36 , 30 , 23 , 24 , 13 ) ,
-		concurrent_percentage =
-			c( 63 , 63 , 47 , 43 , 41 , 34 , 33 , 31 , 23 , 15 ) ,
-		concurrent_vs_di =
-			c( F , T , F , F , F , F , F , T , F , F ) ,
-		ssi_percentage =
-			c( 61 , 62 , 47 , 40 , 39 , 33 , 29 , 31 , 22 , 15 ) ,
-		ssi_vs_di =
-			c( F , T , F , F , F , F , F , T , F , F )
-	)
-		
-
+Calculate the final ten rows of exhibit 4 and confirm each statistics and t-test matches:
+```{r eval = FALSE , results = "hide" }
 for( i in seq( nrow( ex_4 ) ) ){
 
 	this_formula <- as.formula( paste( "~" , ex_4[ i , 'variable_name' ] ) )
@@ -214,7 +221,7 @@ for( i in seq( nrow( ex_4 ) ) ){
 	stopifnot(
 		all.equal( 
 			100 * as.numeric( round( coef( benefit_percent ) , 2 ) ) , 
-			as.numeric( ex_4[ i , grep( 'percentage' , names( ex_4 ) ) ] )
+			as.numeric( ex_4[ i , c( 'di_only' , 'concurrent' , 'ssdi' ) ] )
 		)
 	)
 	
