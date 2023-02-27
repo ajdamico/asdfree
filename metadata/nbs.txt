@@ -1,0 +1,254 @@
+chapter_title: National Beneficiary Survey
+
+needs_actions_build_status_line: yes
+
+~~~{dataset_introduction}
+The principal microdata for U.S. disability researchers interested in Social Security program performance.
+~~~
+
+table_structure: * One table with one row per respondent.
+
+generalizable_population: * A complex sample designed to generalize to Americans between age 18 and full retirement age, covered by either Social Security Disability Insurance (SSDI) or Supplemental Security Income (SSI).
+
+publication_period: * Released at irregular intervals, with 2004, 2005, 2006, 2010, 2015, 2017, and 2019 available.
+
+administrative_organization: * Administered by the [Social Security Administration](http://www.ssa.gov/).
+
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [National Beneficiary Survey: Disability Statistics, 2015](https://www.ssa.gov/policy/docs/statcomps/nbs/2015/nbs-statistics-2015.pdf)
+
+2. [National Beneficiary Survey - General Waves Round 7: Public Use File Codebook](https://www.ssa.gov/disabilityresearch/documents/NBSR7_PUFCodebook_Final_508C.pdf)
+
+3. This poem
+
+```{r}
+# social safety net
+# poverty acrobatics
+# trap or trampoline
+```
+~~~
+
+
+~~~{download_and_import_block}
+Download and import the national file:
+```{r eval = FALSE }
+library(haven)
+
+zip_tf <- tempfile()
+
+zip_url <- "https://www.ssa.gov/disabilityresearch/documents/R7NBSPUF_STATA.zip"
+	
+download.file( zip_url , zip_tf , mode = 'wb' )
+
+chapter_tag_tbl <- read_stata( zip_tf )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
+
+
+~~~{analysis_examples_survey_design}
+```{r messages = FALSE , eval = FALSE }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+# representative beneficiary sample
+chapter_tag_design <-
+	svydesign(
+		id = ~ r7_a_psu_pub , 
+		strata = ~ r7_a_strata , 
+		weights = ~ r7_wtr7_ben , 
+		data = subset( chapter_tag_df , r7_wtr7_ben > 0 ) 
+	)
+	
+# cross-sectional successful worker sample
+chapter_tag_design <- 
+	svydesign(
+		id = ~ r7_a_psu_pub , 
+		strata = ~ r7_a_strata , 
+		weights = ~ r7_wtr7_cssws , 
+		data = subset( chapter_tag_df , r7_wtr7_cssws > 0 ) 
+	)
+	
+# longitudinal successful worker sample
+lngsws_design <-
+	svydesign(
+		id = ~ r7_a_psu_pub , 
+		strata = ~ r7_a_strata , 
+		weights = ~ r7_wtr7_lngsws , 
+		data = subset( chapter_tag_df , r7_wtr7_lngsws > 0 ) 
+	)
+	
+	
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		male = as.numeric( orgsampinfo_sex == 1 ) ,
+		
+		age_categories = 
+			factor( 
+				c_intage_pub ,
+				labels = 
+					c( "18-25" , "26-40" , "41-55" , "56 and older" )
+			)
+		
+	)
+~~~
+
+group_by_variable: age_categories
+group_by_variable_description: age categories
+
+categorical_variable: r7_c_hhsize_pub
+categorical_variable_description: household size
+
+linear_variable: r7_n_totssbenlastmnth_pub
+linear_variable_description: total benefits for the month before the interview date
+
+ratio_estimation_numerator: r7_n_ssilastmnth_pub
+ratio_estimation_denominator: r7_n_totssbenlastmnth_pub
+
+subset_definition: r7_c_curmedicare == 1
+subset_definition_description: currently covered by Medicare
+
+binary_variable: male
+binary_variable_description: male
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+exhibit 4 final ten rows of difficulty with specific activities (including statistical testing) https://www.ssa.gov/disabilityresearch/documents/TTW5_2_BeneChar.pdf#page=20
+```{r eval = FALSE , results = "hide" }
+
+r3_tf <- tempfile()
+
+r3_url <- "https://www.ssa.gov/disabilityresearch/documents/nbsr3pufstata.zip"
+	
+download.file( r3_url , r3_tf , mode = 'wb' )
+
+r3_tbl <- read_stata( r3_tf )
+
+r3_df <- data.frame( r3_tbl )
+
+names( r3_df ) <- tolower( names( r3_df ) )
+
+r3_design <- 
+	svydesign(
+		id = ~ r3_a_psu_pub , 
+		strata = ~ r3_a_strata , 
+		weights = ~ r3_wtr3_ben , 
+		data = subset( r3_df , r3_wtr3_ben > 0 ) 
+	)
+	
+r3_design <-
+	update(
+		r3_design ,
+		
+		benefit_type =
+			factor(
+				r3_orgsampinfo_bstatus ,
+				levels = c( 2 , 3 , 1 ) ,
+				labels = c( 'ssdi' , 'concurrent' , 'ssi' )
+			)
+
+	)
+
+ex_4 <-
+	data.frame(
+		variable_label =
+			c( 'coping with stress' , 'concentrating' , 
+			'getting around outside of the home' , 
+			'shopping for personal items' , 'preparing meals' , 
+			'getting into or out of bed' , 'bathing or dressing' , 
+			'getting along with others' , 
+			'getting around inside the house' , 'eating' ) ,
+		variable_name =
+			c( "r3_i60_i" , "r3_i59_i" , "r3_i47_i" , "r3_i53_i" , 
+			"r3_i55_i" , "r3_i49_i" , "r3_i51_i" , "r3_i61_i" , 
+			"r3_i45_i" , "r3_i57_i" ) ,
+		overall_percentage =
+			c( 61 , 58 , 47 , 39 , 37 , 34 , 30 , 27 , 23 , 14 ) ,
+		di_only_percentage =
+			c( 60 , 54 , 47 , 36 , 35 , 36 , 30 , 23 , 24 , 13 ) ,
+		concurrent_percentage =
+			c( 63 , 63 , 47 , 43 , 41 , 34 , 33 , 31 , 23 , 15 ) ,
+		concurrent_vs_di =
+			c( F , T , F , F , F , F , F , T , F , F ) ,
+		ssi_percentage =
+			c( 61 , 62 , 47 , 40 , 39 , 33 , 29 , 31 , 22 , 15 ) ,
+		ssi_vs_di =
+			c( F , T , F , F , F , F , F , T , F , F )
+	)
+		
+
+for( i in seq( nrow( ex_4 ) ) ){
+
+	this_formula <- as.formula( paste( "~" , ex_4[ i , 'variable_name' ] ) )
+
+	overall_percent <- svymean( this_formula , r3_design )
+	
+	stopifnot( 100 * round( coef( overall_percent ) , 2 ) == ex_4[ i , 'overall_percent' ] )
+	
+	benefit_percent <- svyby( this_formula , ~ benefit_type , r3_design , svymean )
+	
+	stopifnot(
+		all.equal( 
+			100 * as.numeric( round( coef( benefit_percent ) , 2 ) ) , 
+			as.numeric( ex_4[ i , grep( 'percentage' , names( ex_4 ) ) ] )
+		)
+	)
+	
+	ttest_formula <- as.formula( paste( ex_4[ i , 'variable_name' ] , "~ benefit_type" ) )
+	
+	ssdi_con_design <- subset( r3_design , benefit_type %in% c( 'ssdi' , 'concurrent' ) )
+	
+	con_ttest <- svyttest( ttest_formula , ssdi_con_design )
+
+	stopifnot(
+		all.equal( 
+			as.logical( con_ttest$p.value < 0.05 ) , 
+			as.logical( ex_4[ i , 'concurrent_vs_di' ] )
+		)
+	)
+	
+	ssdi_ssi_design <- subset( r3_design , benefit_type %in% c( 'ssdi' , 'ssi' ) )
+	
+	ssi_ttest <- svyttest( ttest_formula , ssdi_ssi_design )
+
+	stopifnot(
+		all.equal(
+			as.logical( ssi_ttest$p.value < 0.05 ) , 
+			as.logical( ex_4[ i , 'ssi_vs_di' ] ) 
+		)
+	)
+
+}
+
+
+
+```
+
+~~~
+
+
+
