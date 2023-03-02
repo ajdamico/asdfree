@@ -2,11 +2,11 @@
 
 <a href="https://github.com/asdfree/nsduh/actions"><img src="https://github.com/asdfree/nsduh/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-The National Survey on Drug Use and Health measures the prevalence and correlates of drug use in the United States.
+The primary survey to measure of prevalence of substance use and its correlates in the United States.
 
 * One table with one row per sampled respondent.
 
-* A complex sample survey designed to generalize to the civilian, noninstitutionalized population of the United States aged 12 and older.
+* A complex survey designed to generalize to civilian, non-institutional americans aged 12 and older.
 
 * Released periodically since 1979 and annually since 1990.
 
@@ -16,9 +16,9 @@ The National Survey on Drug Use and Health measures the prevalence and correlate
 
 Please skim before you begin:
 
-1.
+1. [2021 National Survey on Drug Use and Health (NSDUH): Public Use File Codebook](https://www.datafiles.samhsa.gov/sites/default/files/field-uploads-protected/studies/NSDUH-2021/NSDUH-2021-datasets/NSDUH-2021-DS0001/NSDUH-2021-DS0001-info/NSDUH-2021-DS0001-info-codebook.pdf)
 
-2.
+2. [2021 National Survey on Drug Use and Health (NSDUH): Methodological Summary and Definitions](https://www.samhsa.gov/data/sites/default/files/reports/rpt39442/2021NSDUHMethodSummDefs100422.pdf)
 
 3. This poem
 
@@ -110,7 +110,7 @@ nsduh_design <-
 					"fair" , "poor" )
 			) ,
 			
-		age_tried_first_cigarette = ifelse( cigtry > 99 , NA , cigtry ) ,
+		age_first_cigarette = ifelse( cigtry > 99 , NA , cigtry ) ,
 		
 		age_tried_cocaine = ifelse( cocage > 99 , NA , cocage ) ,
 
@@ -147,9 +147,9 @@ svyby( ~ one , ~ county_type , nsduh_design , svytotal )
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ age_tried_first_cigarette , nsduh_design , na.rm = TRUE )
+svymean( ~ age_first_cigarette , nsduh_design , na.rm = TRUE )
 
-svyby( ~ age_tried_first_cigarette , ~ county_type , nsduh_design , svymean , na.rm = TRUE )
+svyby( ~ age_first_cigarette , ~ county_type , nsduh_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
@@ -161,9 +161,9 @@ svyby( ~ health , ~ county_type , nsduh_design , svymean , na.rm = TRUE )
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ age_tried_first_cigarette , nsduh_design , na.rm = TRUE )
+svytotal( ~ age_first_cigarette , nsduh_design , na.rm = TRUE )
 
-svyby( ~ age_tried_first_cigarette , ~ county_type , nsduh_design , svytotal , na.rm = TRUE )
+svyby( ~ age_first_cigarette , ~ county_type , nsduh_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
@@ -175,10 +175,10 @@ svyby( ~ health , ~ county_type , nsduh_design , svytotal , na.rm = TRUE )
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ age_tried_first_cigarette , nsduh_design , 0.5 , na.rm = TRUE )
+svyquantile( ~ age_first_cigarette , nsduh_design , 0.5 , na.rm = TRUE )
 
 svyby( 
-	~ age_tried_first_cigarette , 
+	~ age_first_cigarette , 
 	~ county_type , 
 	nsduh_design , 
 	svyquantile , 
@@ -190,7 +190,7 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ age_tried_first_cigarette , 
+	numerator = ~ age_first_cigarette , 
 	denominator = ~ age_tried_cocaine , 
 	nsduh_design ,
 	na.rm = TRUE
@@ -205,14 +205,14 @@ sub_nsduh_design <- subset( nsduh_design , preg == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ age_tried_first_cigarette , sub_nsduh_design , na.rm = TRUE )
+svymean( ~ age_first_cigarette , sub_nsduh_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ age_tried_first_cigarette , nsduh_design , na.rm = TRUE )
+this_result <- svymean( ~ age_first_cigarette , nsduh_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -221,7 +221,7 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ age_tried_first_cigarette , 
+		~ age_first_cigarette , 
 		~ county_type , 
 		nsduh_design , 
 		svymean ,
@@ -241,16 +241,16 @@ degf( nsduh_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ age_tried_first_cigarette , nsduh_design , na.rm = TRUE )
+svyvar( ~ age_first_cigarette , nsduh_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ age_tried_first_cigarette , nsduh_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ age_first_cigarette , nsduh_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ age_tried_first_cigarette , nsduh_design , na.rm = TRUE , deff = "replace" )
+svymean( ~ age_first_cigarette , nsduh_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
@@ -263,7 +263,7 @@ svyciprop( ~ ever_used_marijuana , nsduh_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( age_tried_first_cigarette ~ ever_used_marijuana , nsduh_design )
+svyttest( age_first_cigarette ~ ever_used_marijuana , nsduh_design )
 ```
 
 Perform a chi-squared test of association for survey data:
@@ -278,7 +278,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		age_tried_first_cigarette ~ ever_used_marijuana + health , 
+		age_first_cigarette ~ ever_used_marijuana + health , 
 		nsduh_design 
 	)
 
@@ -304,18 +304,18 @@ nsduh_srvyr_design <- as_survey( nsduh_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" , messages = FALSE }
 nsduh_srvyr_design %>%
-	summarize( mean = survey_mean( age_tried_first_cigarette , na.rm = TRUE ) )
+	summarize( mean = survey_mean( age_first_cigarette , na.rm = TRUE ) )
 
 nsduh_srvyr_design %>%
 	group_by( county_type ) %>%
-	summarize( mean = survey_mean( age_tried_first_cigarette , na.rm = TRUE ) )
+	summarize( mean = survey_mean( age_first_cigarette , na.rm = TRUE ) )
 ```
 
 ---
 
 ## Replication Example {-}
 
-https://www.datafiles.samhsa.gov/sites/default/files/field-uploads-protected/studies/NSDUH-2021/NSDUH-2021-datasets/NSDUH-2021-DS0001/NSDUH-2021-DS0001-info/NSDUH-2021-DS0001-info-codebook.pdf#page=818
+This matches the prevalence and SE of alcohol use in the past month from [Codebook Table G.2](https://www.datafiles.samhsa.gov/sites/default/files/field-uploads-protected/studies/NSDUH-2021/NSDUH-2021-datasets/NSDUH-2021-DS0001/NSDUH-2021-DS0001-info/NSDUH-2021-DS0001-info-codebook.pdf#page=818):
 
 ```{r eval = FALSE , results = "hide" }
 result <- svymean( ~ alcmon , nsduh_design )
