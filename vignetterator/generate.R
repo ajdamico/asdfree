@@ -1,4 +1,4 @@
-commit_memo <- "'most recent build date'"
+commit_memo <- "'nsduh'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
