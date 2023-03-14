@@ -1,0 +1,490 @@
+# American Time Use Survey (ATUS) {-}
+
+<a href="https://github.com/asdfree/atus/actions"><img src="https://github.com/asdfree/atus/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+Sampled individuals write down everything they do for a single twenty-four hour period, in ten minute intervals. Time use data allows for the study of uncompensated work like cooking, chores, childcare.
+
+* Many tables with structures [described in the user guide](https://www.bls.gov/tus/atususersguide.pdf#page=33), linkable to the Current Population Survey.
+
+* A complex survey generalizing to person-hours among civilian non-institutional americans aged 15+.
+
+* Released annually since 2003.
+
+* Administered by the [Bureau of Labor Statistics](https://www.bls.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [American Time Use Survey User's Guide](https://www.bls.gov/tus/atususersguide.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/American_Time_Use_Survey)
+
+3. This poem
+
+```{r}
+#
+#
+#
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Define a function to download, unzip, and import each comma-separated value dat file:
+
+```{r messages = FALSE , eval = FALSE }
+
+atus_csv_import <-
+	function( this_url ){
+		
+		this_tf <- tempfile()
+		
+		download.file( this_url , this_tf , mode = 'wb' )
+		
+		unzipped_files <- unzip( this_tf , exdir = tempdir() )
+		
+		this_dat <- grep( '\\.dat$' , unzipped_files , value = TRUE )
+		
+		this_df <- read.csv( this_dat )
+		
+		file.remove( c( this_tf , unzipped_files ) )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+```	
+
+Download and import the activity, respondent, roster, and weights tables:
+
+```{r messages = FALSE , eval = FALSE }
+act_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusact-2021.zip" )
+
+resp_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusresp-2021.zip" )
+
+rost_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusrost-2021.zip" )
+
+wgts_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atuswgts-2021.zip" )
+```
+
+Specify which variables to keep in each of the `data.frame` objects:
+```{r messages = FALSE , eval = FALSE }
+act_df <- act_df[ c( 'tucaseid' , 'tutier1code' , 'tutier2code' , 'tuactdur24' ) ]
+
+resp_df <- resp_df[ c( 'tucaseid' , 'tufinlwgt' , 'tulineno' ) ]
+
+rost_df <- rost_df[ , c( 'tucaseid' , 'tulineno' , 'teage' , 'tesex' ) ]
+```
+
+Distribute travel-related activities (`tutier1code == 18` from the [lexicon](https://www.bls.gov/tus/lexicons/lexiconnoex2021.pdf)) based on their second tier code:
+
+```{r messages = FALSE , eval = FALSE }
+act_df[ act_df[ , 'tutier1code' ] == 18 & act_df[ , 'tutier2code' ] == 99 , 'tutier1code' ] <- 50
+
+act_df[ act_df[ , 'tutier1code' ] == 18 , 'tutier1code' ] <-
+	act_df[ act_df[ , 'tutier1code' ] == 18 , 'tutier2code' ]
+```
+
+Sum up all durations at the (respondent x major activity category)-level:
+
+```{r messages = FALSE , eval = FALSE }
+act_long_df <- aggregate( tuactdur24 ~ tucaseid + tutier1code , data = act_df , sum )
+
+act_wide_df <-
+	reshape( act_long_df , idvar = 'tucaseid' , timevar = 'tutier1code' , direction = 'wide' )
+
+# for individuals not engaging in an activity category, replace missings with zero minutes
+act_wide_df[ is.na( act_wide_df ) ] <- 0
+
+# for all columns except the respondent identifier, convert minutes to hours
+act_wide_df[ , -1 ] <- act_wide_df[ , -1 ] / 60
+```
+
+Merge the respondent and summed activity tables, then the roster table, and finally the replicate weights:
+
+```{r messages = FALSE , eval = FALSE }
+resp_act_df <- merge( resp_df , act_wide_df )
+
+stopifnot( nrow( resp_act_df ) == nrow( resp_df ) )
+
+resp_act_rost_df <- merge( resp_act_df , rost_df )
+
+stopifnot( nrow( resp_act_rost_df ) == nrow( resp_df ) )
+
+atus_df <- merge( resp_act_rost_df , wgts_df )
+
+stopifnot( nrow( atus_df ) == nrow( resp_df ) )
+
+# remove dots from column names
+names( atus_df ) <- gsub( "\\." , "_" , names( atus_df ) )
+
+atus_df[ , 'one' ] <- 1
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+# atus_fn <- file.path( path.expand( "~" ) , "ATUS" , "this_file.rds" )
+# saveRDS( atus_df , file = atus_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+# atus_df <- readRDS( atus_fn )
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+Construct a complex sample survey design:
+
+```{r messages = FALSE , eval = FALSE }
+library(survey)
+
+atus_design <- 
+	svrepdesign(
+		weights = ~ tufinlwgt ,
+		repweights = "finlwgt[0-9]" , 
+		type = "Fay" , 
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		mse = TRUE ,
+		data = atus_df
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+
+# caring for and helping household members is top level 03 from the lexicon
+# https://www.bls.gov/tus/lexicons/lexiconnoex2021.pdf
+
+atus_design <-
+	update(
+		atus_design ,
+		
+		any_care = as.numeric( tuactdur24_3 > 0 ) ,
+		
+		tesex = factor( tesex , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+		
+		age_category = 
+			factor( 
+				1 + findInterval( teage , c( 18 , 35 , 65 ) ) , 
+				labels = c( "under 18" , "18 - 34" , "35 - 64" , "65 or older" ) 
+			)
+	)
+
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( atus_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ age_category , atus_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , atus_design )
+
+svyby( ~ one , ~ age_category , atus_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ tuactdur24_1 , atus_design )
+
+svyby( ~ tuactdur24_1 , ~ age_category , atus_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ tesex , atus_design )
+
+svyby( ~ tesex , ~ age_category , atus_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ tuactdur24_1 , atus_design )
+
+svyby( ~ tuactdur24_1 , ~ age_category , atus_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ tesex , atus_design )
+
+svyby( ~ tesex , ~ age_category , atus_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ tuactdur24_1 , atus_design , 0.5 )
+
+svyby( 
+	~ tuactdur24_1 , 
+	~ age_category , 
+	atus_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ tuactdur24_5 , 
+	denominator = ~ tuactdur24_12 , 
+	atus_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to any time volunteering:
+```{r eval = FALSE , results = "hide" }
+sub_atus_design <- subset( atus_design , tuactdur24_15 > 0 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ tuactdur24_1 , sub_atus_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ tuactdur24_1 , atus_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ tuactdur24_1 , 
+		~ age_category , 
+		atus_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( atus_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ tuactdur24_1 , atus_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ tuactdur24_1 , atus_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ tuactdur24_1 , atus_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ any_care , atus_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( tuactdur24_1 ~ any_care , atus_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ any_care + tesex , 
+	atus_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		tuactdur24_1 ~ any_care + tesex , 
+		atus_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ATUS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+library(srvyr)
+atus_srvyr_design <- as_survey( atus_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+atus_srvyr_design %>%
+	summarize( mean = survey_mean( tuactdur24_1 ) )
+
+atus_srvyr_design %>%
+	group_by( age_category ) %>%
+	summarize( mean = survey_mean( tuactdur24_1 ) )
+```
+
+---
+
+## Replication Example {-}
+
+The example below matches the "Caring for and helping household members" row of [Table A-1](https://www.bls.gov/tus/tables/a1_2021.pdf):
+
+```{r messages = FALSE , eval = FALSE }
+hours_per_day_civilian_population <- svymean( ~ tuactdur24_3 , atus_design )
+
+stopifnot( round( coef( hours_per_day_civilian_population ) , 2 ) == 0.47 )
+
+percent_engaged_per_day <- svymean( ~ any_care , atus_design )
+
+stopifnot( round( coef( percent_engaged_per_day ) , 3 ) == 0.217 )
+
+hours_per_day_among_engaged <- svymean( ~ tuactdur24_3 , subset( atus_design , any_care ) )
+
+stopifnot( round( coef( hours_per_day_among_engaged ) , 2 ) == 2.17 )
+```
+
+The example below matches the average hours and SE from Section 7.5 of the [User's Guide](https://www.bls.gov/tus/atususersguide.pdf#page=42):
+
+Download and import the activity, activity summary, respondent, and weights tables:
+
+```{r messages = FALSE , eval = FALSE }
+actsum07_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atussum_2007.zip" )
+resp07_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusresp_2007.zip" )
+act07_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusact_2007.zip" )
+wgts07_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atuswgts_2007.zip" )
+```
+
+Option 1. Sum the two television fields from the activity summary file, removing zeroes:
+
+```{r messages = FALSE , eval = FALSE }
+television_per_person <-
+	data.frame(
+		tucaseid = actsum07_df[ , 'tucaseid' ] ,
+
+		tuactdur24 = rowSums( actsum07_df[ , c( 't120303' , 't120304' ) ] )
+	)
+
+television_per_person <- 
+	television_per_person[ television_per_person[ , 'tuactdur24' ] > 0 , ]
+```
+
+Option 2. Limit the activity file to television watching records according to the [2007 Lexicon](https://www.bls.gov/tus/lexicons/lexiconwex2007.pdf):
+
+```{r messages = FALSE , eval = FALSE }
+television_activity <- 
+	subset( 
+		act07_df , 
+		tutier1code == 12 &
+		tutier2code == 3 &
+		tutier3code %in% 3:4
+	)
+
+television_activity_summed <-
+		aggregate(
+			tuactdur24 ~ tucaseid ,
+			data = television_activity ,
+			sum
+		)
+```
+
+Confirm both aggregation options yield the same results:
+
+```{r messages = FALSE , eval = FALSE }
+stopifnot(
+	all( television_per_person[ , 'tucaseid' ] == television_activity_summed[ , 'tucaseid' ] )
+)
+
+stopifnot(
+	all( television_per_person[ , 'tuactdur24' ] == television_activity_summed[ , 'tuactdur24' ] )
+)
+```
+
+Merge the respondent and summed activity tables, then the replicate weights:
+
+```{r messages = FALSE , eval = FALSE }
+resp07_tpp_df <- 
+	merge( 
+		resp07_df[ , c( 'tucaseid' , 'tufinlwgt' ) ] , 
+		television_per_person , 
+		all.x = TRUE
+	)
+
+stopifnot( nrow( resp07_tpp_df ) == nrow( resp07_df ) )
+
+# for individuals without television time, replace missings with zero minutes
+resp07_tpp_df[ is.na( resp07_tpp_df[ , 'tuactdur24' ] ) , 'tuactdur24' ] <- 0
+
+# convert minutes to hours
+resp07_tpp_df[ , 'tuactdur24_hour' ] <- resp07_tpp_df[ , 'tuactdur24' ] / 60
+
+atus07_df <- merge( resp07_tpp_df , wgts07_df )
+
+stopifnot( nrow( atus07_df ) == nrow( resp07_df ) )
+```
+
+Construct a complex sample survey design:
+
+```{r messages = FALSE , eval = FALSE }
+atus07_design <- 
+	svrepdesign(
+		weights = ~ tufinlwgt ,
+		repweights = "finlwgt[0-9]" ,
+		type = "Fay" ,
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		data = atus07_df
+	)
+```
+
+Match the statistic and SE of the number of hours daily that americans older than 14 watch tv:
+
+```{r messages = FALSE , eval = FALSE }
+result <- svymean( ~ tuactdur24_hour , atus07_design )
+
+stopifnot( round( coef( result ) , 2 ) == 2.62 )
+stopifnot( round( SE( result ) , 4 ) == 0.0293 )
+```
+

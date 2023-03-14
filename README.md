@@ -1,5 +1,6 @@
 # You can find the book at http://asdfree.com/
 american-community-survey-acs: <p><a href="https://github.com/asdfree/acs/actions"><img src="https://github.com/asdfree/acs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+american-time-use-survey-atus: <p><a href="https://github.com/asdfree/atus/actions"><img src="https://github.com/asdfree/atus/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 behavioral-risk-factor-surveillance-system-brfss: <p><a href="https://github.com/asdfree/brfss/actions"><img src="https://github.com/asdfree/brfss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 consumer-expenditure-survey-ces: <p><a href="https://github.com/asdfree/ces/actions"><img src="https://github.com/asdfree/ces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-2023 03 13-brightgreen' alt='Local Testing Badge'></p>
