@@ -523,22 +523,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Download, Import, Preparation<a href="social-security-administration-public-use-microdata-ssa.html#download-import-preparation-15" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download and import the national file:</p>
 <div class="sourceCode" id="cb422"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb422-1"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
-<span id="cb422-2"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb422-3"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-3" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb422-4"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb422-5"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-5" aria-hidden="true" tabindex="-1"></a>ssa_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip&quot;</span></span>
-<span id="cb422-6"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb422-7"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-7" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( ssa_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb422-8"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb422-9"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-9" aria-hidden="true" tabindex="-1"></a>ssa_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb422-10"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb422-11"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-11" aria-hidden="true" tabindex="-1"></a>demographic_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;demographic&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb422-12"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb422-13"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-13" aria-hidden="true" tabindex="-1"></a>annual_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;annual&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb422-14"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb422-15"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-15" aria-hidden="true" tabindex="-1"></a>demographic_df <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( demographic_fn )</span>
-<span id="cb422-16"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb422-17"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-17" aria-hidden="true" tabindex="-1"></a>annual_df <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( annual_fn )</span></code></pre></div>
+<span id="cb422-2"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb422-3"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-4"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-4" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb422-5"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-6"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-6" aria-hidden="true" tabindex="-1"></a>ssa_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip&quot;</span></span>
+<span id="cb422-7"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-8"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-8" aria-hidden="true" tabindex="-1"></a><span class="fu">GET</span>( ssa_url , <span class="fu">write_disk</span>( tf ) )</span>
+<span id="cb422-9"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-10"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-10" aria-hidden="true" tabindex="-1"></a>ssa_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb422-11"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-12"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-12" aria-hidden="true" tabindex="-1"></a>demographic_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;demographic&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb422-13"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-14"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-14" aria-hidden="true" tabindex="-1"></a>annual_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;annual&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb422-15"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-16"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-16" aria-hidden="true" tabindex="-1"></a>demographic_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( demographic_fn )</span>
+<span id="cb422-17"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-18"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-18" aria-hidden="true" tabindex="-1"></a>annual_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( annual_fn )</span>
+<span id="cb422-19"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-20"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-20" aria-hidden="true" tabindex="-1"></a>demographic_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( demographic_tbl )</span>
+<span id="cb422-21"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-22"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-22" aria-hidden="true" tabindex="-1"></a>annual_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( annual_tbl )</span>
+<span id="cb422-23"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-24"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-24" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( demographic_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( demographic_df ) )</span>
+<span id="cb422-25"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb422-26"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-26" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( annual_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( annual_df ) )</span></code></pre></div>
 <div id="save-locally-15" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="social-security-administration-public-use-microdata-ssa.html#save-locally-15" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
