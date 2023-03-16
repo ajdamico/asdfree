@@ -1,0 +1,234 @@
+# Social Security Administration Public Use Microdata (SSA) {-}
+
+<a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+Research extracts provided by the Social Security Administration.
+
+* Tables contain either one record per person or one record per person per year.
+
+* The entire population of either social security number holders (most of the country) or social security recipients (just beneficiaries). One-percent samples should be multiplied by 100 to get accurate nationwide count statistics, five-percent samples by 20.
+
+* No expected release timeline.
+
+* Released by the United States [Social Security Administration (SSA)](http://www.ssa.gov/).
+
+---
+
+Please skim before you begin:
+
+1.
+
+2.
+
+3. This poem
+
+```{r}
+# 
+# 
+# 
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the national file:
+```{r eval = FALSE }
+library(haven)
+
+tf <- tempfile()
+
+ssa_url <- "https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip"
+
+download.file( ssa_url , tf , mode = 'wb' )
+
+ssa_files <- unzip( tf , exdir = tempdir() )
+
+demographic_fn <- grep( 'demographic' , ssa_files , value = TRUE )
+
+annual_fn <- grep( 'annual' , ssa_files , value = TRUE )
+
+demographic_df <- read_sas( demographic_fn )
+
+annual_df <- read_sas( annual_fn )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+# ssa_fn <- file.path( path.expand( "~" ) , "SSA" , "this_file.rds" )
+# saveRDS( ssa_df , file = ssa_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" , messages = FALSE }
+# ssa_df <- readRDS( ssa_fn )
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE }
+ssa_df <- 
+	transform( 
+		ssa_df , 
+		
+		mental_disorder = as.numeric( diag %in% 1:2 ) ,
+		
+		program_eligibility =
+			factor( 
+				prel , 
+				
+				levels = 0:5 , 
+				
+				labels =
+					c( "Unspecified" ,
+					"Aged individual" ,
+					"Aged spouse" ,
+					"Disabled or blind individual" ,
+					"Disabled or blind spouse" ,
+					"Disabled or blind child" )
+			)
+			
+	)
+	
+```
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( ssa_df )
+
+table( ssa_df[ , "stat" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( ssa_df[ , "fpmt" ] )
+
+tapply(
+	ssa_df[ , "fpmt" ] ,
+	ssa_df[ , "stat" ] ,
+	mean 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( ssa_df[ , "program_eligibility" ] ) )
+
+prop.table(
+	table( ssa_df[ , c( "program_eligibility" , "stat" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( ssa_df[ , "fpmt" ] )
+
+tapply(
+	ssa_df[ , "fpmt" ] ,
+	ssa_df[ , "stat" ] ,
+	sum 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( ssa_df[ , "fpmt" ] , 0.5 )
+
+tapply(
+	ssa_df[ , "fpmt" ] ,
+	ssa_df[ , "stat" ] ,
+	quantile ,
+	0.5 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to females:
+```{r eval = FALSE , results = "hide" }
+sub_ssa_df <- subset( ssa_df , sex == "F" )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_ssa_df[ , "fpmt" ] )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( ssa_df[ , "fpmt" ] )
+
+tapply(
+	ssa_df[ , "fpmt" ] ,
+	ssa_df[ , "stat" ] ,
+	var 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( fpmt ~ mental_disorder , ssa_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( ssa_df[ , c( "mental_disorder" , "program_eligibility" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		fpmt ~ mental_disorder + program_eligibility , 
+		data = ssa_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for SSA users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+ssa_tbl <- as_tibble( ssa_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+ssa_tbl %>%
+	summarize( mean = mean( fpmt ) )
+
+ssa_tbl %>%
+	group_by( stat ) %>%
+	summarize( mean = mean( fpmt ) )
+```
+
+
