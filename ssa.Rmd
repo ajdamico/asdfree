@@ -32,7 +32,7 @@ Please skim before you begin:
 
 ## Download, Import, Preparation {-}
 
-Download and import the 1951-2006 topcoded earnings one percent file:
+Download and import the 1951-2006 one percent files with one record per person and per person-year:
 ```{r eval = FALSE }
 library(haven)
 library(httr)
@@ -66,7 +66,7 @@ names( ssa_df ) <- tolower( names( ssa_df ) )
 names( annual_df ) <- tolower( names( annual_df ) )
 ```
 
-Sum up 1951-1952 earnings, 1953-2006 earnings, and 1953-2006 credits:
+Sum up 1951-1952 and 1953-2006 earnings, and also 1953-2006 credits, copying the naming convention:
 ```{r eval = FALSE }
 summed_earnings_5152 <-
 	with( 
@@ -100,7 +100,7 @@ earnings_2006 <- annual_df[ annual_df[ , 'year_earn' ] == 2006 , c( 'id' , 'annu
 names( earnings_2006 ) <- c( 'id' , 'annual_earnings_2006' )
 ```
 
-Merge each of these columns on to the demographic table:
+Merge each column on to the person-level table, adding zeroes to person-years without earnings:
 ```{r eval = FALSE }
 stopifnot( all( !is.na( ssa_df ) ) )
 

@@ -522,7 +522,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-15" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="social-security-administration-public-use-microdata-ssa.html#download-import-preparation-15" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Download and import the 1951-2006 topcoded earnings one percent file:</p>
+<p>Download and import the 1951-2006 one percent files with one record per person and per person-year:</p>
 <div class="sourceCode" id="cb422"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb422-1"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
 <span id="cb422-2"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
 <span id="cb422-3"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -553,7 +553,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb422-28"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-28" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( ssa_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( ssa_df ) )</span>
 <span id="cb422-29"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb422-30"><a href="social-security-administration-public-use-microdata-ssa.html#cb422-30" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( annual_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( annual_df ) )</span></code></pre></div>
-<p>Sum up 1951-1952 earnings, 1953-2006 earnings, and 1953-2006 credits:</p>
+<p>Sum up 1951-1952 and 1953-2006 earnings, and also 1953-2006 credits, copying the naming convention:</p>
 <div class="sourceCode" id="cb423"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb423-1"><a href="social-security-administration-public-use-microdata-ssa.html#cb423-1" aria-hidden="true" tabindex="-1"></a>summed_earnings_5152 <span class="ot">&lt;-</span></span>
 <span id="cb423-2"><a href="social-security-administration-public-use-microdata-ssa.html#cb423-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>( </span>
 <span id="cb423-3"><a href="social-security-administration-public-use-microdata-ssa.html#cb423-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">subset</span>( annual_df , year_earn <span class="sc">%in%</span> <span class="dv">1951</span><span class="sc">:</span><span class="dv">1952</span> ) , </span>
@@ -581,7 +581,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb424"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb424-1"><a href="social-security-administration-public-use-microdata-ssa.html#cb424-1" aria-hidden="true" tabindex="-1"></a>earnings_2006 <span class="ot">&lt;-</span> annual_df[ annual_df[ , <span class="st">&#39;year_earn&#39;</span> ] <span class="sc">==</span> <span class="dv">2006</span> , <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;annual_earnings&#39;</span> ) ]</span>
 <span id="cb424-2"><a href="social-security-administration-public-use-microdata-ssa.html#cb424-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb424-3"><a href="social-security-administration-public-use-microdata-ssa.html#cb424-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( earnings_2006 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;annual_earnings_2006&#39;</span> )</span></code></pre></div>
-<p>Merge each of these columns on to the demographic table:</p>
+<p>Merge each column on to the person-level table, adding zeroes to person-years without earnings:</p>
 <div class="sourceCode" id="cb425"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb425-1"><a href="social-security-administration-public-use-microdata-ssa.html#cb425-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="sc">!</span><span class="fu">is.na</span>( ssa_df ) ) )</span>
 <span id="cb425-2"><a href="social-security-administration-public-use-microdata-ssa.html#cb425-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb425-3"><a href="social-security-administration-public-use-microdata-ssa.html#cb425-3" aria-hidden="true" tabindex="-1"></a>before_nrow <span class="ot">&lt;-</span> <span class="fu">nrow</span>( ssa_df )</span>
