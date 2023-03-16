@@ -34,70 +34,119 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-Download and import the national file:
+Download and import the 1951-2006 topcoded earnings one percent file:
 ```{r eval = FALSE }
 library(haven)
 library(httr)
 
 tf <- tempfile()
 
-ssa_url <- "https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip"
+chapter_tag_url <- "https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip"
 
-GET( ssa_url , write_disk( tf ) )
+GET( chapter_tag_url , write_disk( tf ) )
 
-ssa_files <- unzip( tf , exdir = tempdir() )
+chapter_tag_files <- unzip( tf , exdir = tempdir() )
 
-demographic_fn <- grep( 'demographic' , ssa_files , value = TRUE )
+chapter_tag_fn <- grep( 'demographic' , chapter_tag_files , value = TRUE )
 
-annual_fn <- grep( 'annual' , ssa_files , value = TRUE )
+annual_fn <- grep( 'annual' , chapter_tag_files , value = TRUE )
 
-demographic_tbl <- read_sas( demographic_fn )
+chapter_tag_tbl <- read_sas( chapter_tag_fn )
 
 annual_tbl <- read_sas( annual_fn )
 
-demographic_df <- data.frame( demographic_tbl )
+chapter_tag_df <- data.frame( chapter_tag_tbl )
 
 annual_df <- data.frame( annual_tbl )
 
-names( demographic_df ) <- tolower( names( demographic_df ) )
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
 
 names( annual_df ) <- tolower( names( annual_df ) )
 ```
+
+
+Sum up 1951-1952 earnings, 1953-2006 earnings, and 1953-2006 credits:
+```{r eval = FALSE }
+summed_earnings_5152 <-
+	with( 
+		subset( annual_df , year_earn %in% 1951:1952 ) , 
+		aggregate( annual_earnings , list( id ) , sum )
+	)
+	
+names( summed_earnings_5152 ) <- c( 'id' , 'tot_cov_earn5152' )
+
+summed_earnings_5306 <-
+	with( 
+		subset( annual_df , year_earn > 1952 ) , 
+		aggregate( annual_earnings , list( id ) , sum )
+	)
+	
+names( summed_earnings_5306 ) <- c( 'id' , 'tot_cov_earn5306' )
+
+summed_quarters_5306 <-
+	with( 
+		subset( annual_df , year_earn > 1952 ) , 
+		aggregate( annual_qtrs , list( id ) , sum )
+	)
+
+names( summed_quarters_5306 ) <- c( 'id' , 'qc5306' )
+```
+
+Isolate a single year of earnings:
+```{r eval = FALSE }
+earnings_2006 <- annual_df[ annual_df[ , 'year_earn' ] == 2006 , c( 'id' , 'annual_earnings' ) ]
+
+names( earnings_2006 ) <- c( 'id' , 'annual_earnings_2006' )
+```
+
+Merge each of these columns on to the demographic table:
+```{r eval = FALSE }
+stopifnot( all( !is.na( chapter_tag_df ) ) )
+
+before_nrow <- nrow( chapter_tag_df )
+
+chapter_tag_df <- merge( chapter_tag_df , summed_earnings_5152 , all.x = TRUE )
+
+chapter_tag_df <- merge( chapter_tag_df , summed_earnings_5306 , all.x = TRUE )
+
+chapter_tag_df <- merge( chapter_tag_df , summed_quarters_5306 , all.x = TRUE )
+
+chapter_tag_df <- merge( chapter_tag_df , earnings_2006 , all.x = TRUE )
+
+chapter_tag_df[ is.na( chapter_tag_df ) ] <- 0
+
+stopifnot( nrow( chapter_tag_df ) == before_nrow )
+
+```
+
+
+
 ~~~
 
 
 ~~~{variable_recoding_block}
 chapter_tag_df <- 
 	transform( 
-		chapter_tag_df , 
+		chapter_tag_df ,
+
+		decade_of_birth = floor( yob / 10 ) * 10 ,
 		
-		mental_disorder = as.numeric( diag %in% 1:2 ) ,
+		sex = factor( sex , levels = 1:2 , labels = c( 'male' , 'female' ) )
 		
-		program_eligibility =
-			factor( 
-				prel , 
-				
-				levels = 0:5 , 
-				
-				labels =
-					c( "Unspecified" ,
-					"Aged individual" ,
-					"Aged spouse" ,
-					"Disabled or blind individual" ,
-					"Disabled or blind spouse" ,
-					"Disabled or blind child" )
-			)
-			
+		tot_cov_earn3706 = ( tot_cov_earn3750 + tot_cov_earn5152 + tot_cov_earn5306 ) ,
+		
+		qc3706 = ( qc3750 + qc5152 + qc5306 ) ,
+		
+		any_earnings_2006 = ( annual_earnings_2006 > 0 )
 	)
-	
 ~~~
 
-group_by_variable: stat
-linear_variable: fpmt
-categorical_variable: program_eligibility
-subset_definition: sex == "F"
-subset_definition_description: females
-binary_variable: mental_disorder
+group_by_variable: sex
+linear_variable: tot_cov_earn3706
+categorical_variable: decade_of_birth
+subset_definition: qc3706 >= 40
+subset_definition_description: at least forty lifetime credits
+binary_variable: any_earnings_2006
 
 
 ~~~{intermission_block}
@@ -109,6 +158,19 @@ needs_dplyr_block: yes
 
 
 
+
+
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+
+```{r eval = FALSE , results = "hide" }
+
+
+```
+~~~
 
 
 
