@@ -1,6 +1,6 @@
 chapter_title: Social Security Administration Public Use Microdata
 
-needs_actions_build_status_line: yes
+needs_actions_build_status_line: yes -linux
 
 ~~~{dataset_introduction}
 Research extracts provided by the Social Security Administration.
@@ -18,9 +18,9 @@ administrative_organization: * Released by the United States [Social Security Ad
 ~~~{reading_block}
 Please skim before you begin:
 
-1.
+1. [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html)
 
-2.
+2. [Comparing Earnings Estimates from the 2006 Earnings Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html)
 
 3. This poem
 
@@ -137,7 +137,18 @@ chapter_tag_df <-
 		
 		qc3706 = ( qc3750 + qc5152 + qc5306 ) ,
 		
-		any_earnings_2006 = ( annual_earnings_2006 > 0 )
+		any_earnings_2006 = ( annual_earnings_2006 > 0 ) ,
+		
+		earnings_periods =
+			factor(
+				ifelse( ( tot_cov_earn5152 > 0 | tot_cov_earn5306 > 0 ) & ( tot_cov_earn3750 > 0 ) , 1 ,
+				ifelse( ( tot_cov_earn5152 > 0 | tot_cov_earn5306 > 0 ) , 2 ,
+				ifelse( ( tot_cov_earn3750 > 0 ) , 3 , 4 ) ) ) ,
+				levels = 1:4 ,
+				labels =
+					c( 'Earnings in both periods' , 'Earnings during 1951-2006 only' ,
+						'Earnings during 1937-1950 only' , 'No earnings' ) )
+
 	)
 ~~~
 
@@ -165,11 +176,44 @@ needs_dplyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
+Chart 5: https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html
+```{r eval = FALSE , results = "hide" }
+chart_five_results <- prop.table( table( chapter_tag_df[ , 'earnings_periods' ] ) )
+chart_five_results <- 100 * round( chart_five_results , 2 )
+
+stopifnot( chart_five_results[ 'Earnings in both periods' ] == 16 )
+stopifnot( chart_five_results[ 'Earnings during 1951-2006 only' ] == 55 )
+stopifnot( chart_five_results[ 'Earnings during 1937-1950 only' ] == 4 )
+stopifnot( chart_five_results[ 'No earnings' ] == 25 )
+```
+
+2006 row of Table 4. Average and median Social Security taxable earnings in EPUF, by sex, 1951–2006 (in dollars)
 
 ```{r eval = FALSE , results = "hide" }
-
-
+nonzero_2006_earners <- chapter_tag_df[ chapter_tag_df[ , 'annual_earnings_2006' ] > 0 , 'annual_earnings_2006' ]
+stopifnot( round( mean( nonzero_2006_earners ) , 0 ) == 30953 )
+stopifnot( round( quantile( nonzero_2006_earners )[ 3 ] , 0 ) == 24000 )
 ```
+
+2006 row of Table A1. Number and percentage distribution of individuals with Social Security taxable earnings records in EPUF, by sex, 1951–2006 
+
+```{r eval = FALSE , results = "hide" }
+nonzero_2006_earners <- chapter_tag_df[ chapter_tag_df[ , 'annual_earnings_2006' ] > 0 ,  ]
+stopifnot( round( mean( nonzero_2006_earners[ , 'annual_earnings_2006' ] ) , 0 ) == 30953 )
+stopifnot( round( quantile( nonzero_2006_earners[ , 'annual_earnings_2006' ] )[ 3 ] , 0 ) == 24000 )
+```
+
+Table 4. Comparing Supplement and EPUF estimates: Number of all, male, and female workers with any earnings during the year, 1951–2006
+https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html
+
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( round( nrow( nonzero_2006_earners ) * 100 , -3 ) == 156280000 )
+earners_in_2006_by_sex <- table( nonzero_2006_earners[ , 'sex' ] ) * 100
+stopifnot( round( earners_in_2006_by_sex[ 'male' ] , -3 ) == 81576000 )
+stopifnot( round( earners_in_2006_by_sex[ 'female' ] , -3 ) == 74681000 )
+```
+
 ~~~
 
 
