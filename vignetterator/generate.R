@@ -1,4 +1,4 @@
-commit_memo <- "'data.table'"
+commit_memo <- "'duckdb'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -27,6 +27,8 @@ needs_dplyr_block <- '---\n\n## Analysis Examples with `dplyr` \\\\ {-}\n\nThe R
 
 needs_datatable_block <- "---\n\n## Analysis Examples with `data.table` \\\\ {-}\n\nThe R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed.  [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features.  [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = 'hide' }\nlibrary(data.table)\nchapter_tag_dt <- data.table( chapter_tag_df )\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = 'hide' }\nchapter_tag_dt[ , mean( linear_variable linear_narm ) ]\n\nchapter_tag_dt[ , mean( linear_variable linear_narm ) , by = group_by_variable ]\n```"
 
+needs_duckdb_block <- "---\n\n## Analysis Examples with `duckdb` \\\\ {-}\n\nThe R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL).  [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system.  [This vignette](https://duckdb.org/docs/api/r) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = 'hide' }\nlibrary(duckdb)\ncon <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )\ndbWriteTable( con , 'chapter_tag' , chapter_tag_df )\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = 'hide' }\ndbGetQuery( con , 'SELECT AVG( linear_variable ) FROM chapter_tag' )\n\ndbGetQuery(\n\tcon ,\n\t'SELECT\n\t\tgroup_by_variable ,\n\t\tAVG( linear_variable )\n\tFROM\n\t\tchapter_tag\n\tGROUP BY\n\t\tgroup_by_variable'\n)\n```"
+
 
 
 pull_chunk <-
@@ -50,7 +52,7 @@ pull_line <-
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "password_parameters" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
 sub_chunks <- c( "reading_block" , "download_and_import_block" , "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "intermission_block" , "convey_block" , "replacement_block" )
-needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_datatable_block" , "needs_actions_build_status_line" , "needs_local_build_status_line" )
+needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_datatable_block" , "needs_duckdb_block" , "needs_actions_build_status_line" , "needs_local_build_status_line" )
 
 
 library(bookdown)

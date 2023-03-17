@@ -314,6 +314,33 @@ ssa_dt[ , mean( tot_cov_earn3706 ) , by = sex ]
 
 ---
 
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for SSA users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'ssa' , ssa_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( tot_cov_earn3706 ) FROM ssa' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		sex ,
+		AVG( tot_cov_earn3706 )
+	FROM
+		ssa
+	GROUP BY
+		sex'
+)
+```
+
+---
+
 ## Replication Example {-}
 
 This example matches statistics in [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html):

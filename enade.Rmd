@@ -295,6 +295,33 @@ enade_dt[ , mean( nt_obj_fg , na.rm = TRUE ) , by = administrative_category ]
 
 ---
 
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for ENADE users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'enade' , enade_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( nt_obj_fg ) FROM enade' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		administrative_category ,
+		AVG( nt_obj_fg )
+	FROM
+		enade
+	GROUP BY
+		administrative_category'
+)
+```
+
+---
+
 ## Replication Example {-}
 
 This example matches the tecnologia em gestão da tecnologia da informação test scores on PDF page 48 of [the 2021 final results document](https://download.inep.gov.br/enade/resultados/2021/apresentacao_resultados_finais.pdf#page=48):

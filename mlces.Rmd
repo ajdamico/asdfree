@@ -236,6 +236,33 @@ mlces_dt[ , mean( totpdchg ) , by = claimant_relationship_to_policyholder ]
 
 ---
 
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for MLCES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'mlces' , mlces_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( totpdchg ) FROM mlces' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		claimant_relationship_to_policyholder ,
+		AVG( totpdchg )
+	FROM
+		mlces
+	GROUP BY
+		claimant_relationship_to_policyholder'
+)
+```
+
+---
+
 ## Replication Example {-}
 
 This example matches statistics in Table II-A's 1999 row numbers 52 and 53 from the [Database](https://www.soa.org/4937cc/globalassets/assets/files/research/tables.zip):

@@ -292,4 +292,31 @@ nppes_dt[ , mean( provider_enumeration_year , na.rm = TRUE ) ]
 nppes_dt[ , mean( provider_enumeration_year , na.rm = TRUE ) , by = provider_gender_code ]
 ```
 
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for NPPES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'nppes' , nppes_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( provider_enumeration_year ) FROM nppes' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		provider_gender_code ,
+		AVG( provider_enumeration_year )
+	FROM
+		nppes
+	GROUP BY
+		provider_gender_code'
+)
+```
+
 
