@@ -1,4 +1,4 @@
-commit_memo <- "'ssa'"
+commit_memo <- "'data.table'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -25,6 +25,9 @@ needs_local_build_status_line <- '```{r , echo = FALSE }\n\nmost_recent_build_da
 
 needs_dplyr_block <- '---\n\n## Analysis Examples with `dplyr` \\\\ {-}\n\nThe R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax.  [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation.  [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = "hide" }\nlibrary(dplyr)\ntbl_initiation_line\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = "hide" }\nchapter_tag_tbl %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n\nchapter_tag_tbl %>%\n\tgroup_by( group_by_variable ) %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n```'
 
+needs_datatable_block <- "---\n\n## Analysis Examples with `data.table` \\\\ {-}\n\nThe R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed.  [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features.  [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = 'hide' }\nlibrary(data.table)\nchapter_tag_dt <- data.table( chapter_tag_df )\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = 'hide' }\nchapter_tag_dt[ , mean( linear_variable linear_narm ) ]\n\nchapter_tag_dt[ , mean( linear_variable linear_narm ) , by = group_by_variable ]\n```"
+
+
 
 pull_chunk <-
 	function( text_file , code_chunk ){
@@ -47,7 +50,7 @@ pull_line <-
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "password_parameters" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
 sub_chunks <- c( "reading_block" , "download_and_import_block" , "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "intermission_block" , "convey_block" , "replacement_block" )
-needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_actions_build_status_line" , "needs_local_build_status_line" )
+needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_datatable_block" , "needs_actions_build_status_line" , "needs_local_build_status_line" )
 
 
 library(bookdown)
@@ -136,6 +139,7 @@ for ( i in seq_along( chapter_tag ) ){
 	
 	if( !is_survey ) rmd_lines <- gsub( "tbl_initiation_line" , if( is_db ) "library(dbplyr)\ndplyr_db <- dplyr::src_sqlite( dbdir )\nchapter_tag_tbl <- tbl( dplyr_db , 'sql_tablename' )" else "chapter_tag_tbl <- as_tibble( chapter_tag_df )" , rmd_lines )
 	
+
 	
 	# standalone dataset, survey design, multiply-imputed survey design, database-backed survey design, or multiply-imputed database-backed survey design
 	
