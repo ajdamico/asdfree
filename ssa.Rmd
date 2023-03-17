@@ -1,16 +1,16 @@
-# Social Security Administration Public Use Microdata (SSA) {-}
+# Social Security Public-Use Data Files (SSA) {-}
 
 <a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-Research extracts provided by the Social Security Administration.
+Microdata from administrative sources like the Master Beneficiary Record, Supplemental Security Record.
 
 * Tables contain either one record per person or one record per person per year.
 
-* The entire population of either social security number holders (most of the country) or social security recipients (just beneficiaries). One-percent samples should be multiplied by 100 to get accurate nationwide count statistics, five-percent samples by 20.
+* A systematic sample of either social security number holders (most americans) or program recipients (current beneficiaries). Multiply 1% samples by 100 to get weighted statistics, 5% samples by 20.
 
-* No expected release timeline.
+* [No expected release timeline](https://www.ssa.gov/policy/pub_schedule.html).
 
-* Released by the United States [Social Security Administration (SSA)](http://www.ssa.gov/).
+* Released by the [Office of Research, Evaluation, and Statistics](https://www.ssa.gov/policy/index.html), US [Social Security Administration](http://www.ssa.gov/).
 
 ---
 
@@ -18,14 +18,14 @@ Please skim before you begin:
 
 1. [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html)
 
-2. [Comparing Earnings Estimates from the 2006 Earnings Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html)
+2. [Comparing Earnings Estimates from the 2006 Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html)
 
 3. This poem
 
 ```{r}
-# 
-# 
-# 
+# annual earnings.
+# for pensioner payouts, see
+# the '04 extract
 ```
 
 ---
@@ -53,7 +53,7 @@ ssa_tbl <- read_sas( ssa_fn )
 
 annual_tbl <- read_sas( annual_fn )
 
-ssa_df <- data.frame( ssa_tbl ) ; 
+ssa_df <- data.frame( ssa_tbl )
 
 annual_df <- data.frame( annual_tbl )
 
@@ -96,7 +96,7 @@ earnings_2006 <- annual_df[ annual_df[ , 'year_earn' ] == 2006 , c( 'id' , 'annu
 names( earnings_2006 ) <- c( 'id' , 'tot_cov_earn06' )
 ```
 
-Merge each column on to the person-level table, adding zeroes to person-years without earnings:
+Merge each new column on to the person-level table, then add zeroes to person-years without earnings:
 ```{r eval = FALSE }
 stopifnot( all( !is.na( ssa_df ) ) )
 
@@ -222,7 +222,7 @@ tapply(
 
 ### Subsetting {-}
 
-Limit your `data.frame` to at least forty lifetime credits:
+Limit your `data.frame` to individuals with at least forty lifetime credits:
 ```{r eval = FALSE , results = "hide" }
 sub_ssa_df <- subset( ssa_df , qc3706 >= 40 )
 ```
@@ -299,7 +299,9 @@ ssa_tbl %>%
 
 ## Replication Example {-}
 
-Chart 5: https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html
+This example matches statistics in [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html):
+
+Chart 5. Percentage distribution of individuals in EPUF, by capped Social Security taxable earnings status: 
 ```{r eval = FALSE , results = "hide" }
 chart_five_results <- prop.table( table( ssa_df[ , 'earnings_periods' ] ) )
 chart_five_results <- round( 100 * chart_five_results )
@@ -310,24 +312,23 @@ stopifnot( chart_five_results[ 'Earnings during 1937-1950 only' ] == 4 )
 stopifnot( chart_five_results[ 'No earnings' ] == 25 )
 ```
 
-2006 row of Table 4. Average and median Social Security taxable earnings in EPUF, by sex, 1951–2006 (in dollars)
-
+Table 4. Average and median Social Security taxable earnings in EPUF, by sex, 1951–2006 (in dollars):
 ```{r eval = FALSE , results = "hide" }
 nonzero_2006_earners <- ssa_df[ ssa_df[ , 'tot_cov_earn06' ] > 0 , 'tot_cov_earn06' ]
 stopifnot( round( mean( nonzero_2006_earners ) , 0 ) == 30953 )
 stopifnot( round( quantile( nonzero_2006_earners )[ 3 ] , 0 ) == 24000 )
 ```
 
-2006 row of Table A1. Number and percentage distribution of individuals with Social Security taxable earnings records in EPUF, by sex, 1951–2006 
-
+Table A1. Number and percentage distribution of individuals with Social Security taxable earnings records in EPUF, by sex, 1951–2006:
 ```{r eval = FALSE , results = "hide" }
 nonzero_2006_earners <- ssa_df[ ssa_df[ , 'tot_cov_earn06' ] > 0 , ]
 stopifnot( round( mean( nonzero_2006_earners[ , 'tot_cov_earn06' ] ) , 0 ) == 30953 )
 stopifnot( round( quantile( nonzero_2006_earners[ , 'tot_cov_earn06' ] )[ 3 ] , 0 ) == 24000 )
 ```
 
-Table 4. Comparing Supplement and EPUF estimates: Number of all, male, and female workers with any earnings during the year, 1951–2006
-https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html
+This example matches statistics in [Comparing Earnings Estimates from the 2006 Earnings Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html):
+
+Table 4. Comparing Supplement and EPUF estimates: Number of all, male, and female workers with any earnings during the year, 1951–2006:
 
 ```{r eval = FALSE , results = "hide" }
 stopifnot( round( nrow( nonzero_2006_earners ) * 100 , -3 ) == 156280000 )
