@@ -33,7 +33,7 @@ Please skim before you begin:
 ## Download, Import, Preparation {-}
 
 Download both the prior and current year of interview microdata:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 tf_prior_year <- tempfile()
@@ -56,7 +56,7 @@ unzipped_files <- c( unzipped_files_current_year , unzipped_files_prior_year )
 ```
 
 Import and stack all 2021 quarterly files plus 2022's first quarter:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 fmli_files <- grep( "fmli2[1-2]" , unzipped_files , value = TRUE )
 
 fmli_tbls <- lapply( fmli_files , read_dta )
@@ -79,7 +79,7 @@ ces_df <- do.call( rbind , fmli_dfs )
 ```
 
 Scale the weight columns based on the number of months in 2021:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 ces_df[ , c( 'qintrvyr' , 'qintrvmo' ) ] <-
 	sapply( ces_df[ , c( 'qintrvyr' , 'qintrvmo' ) ] , as.numeric )
 
@@ -103,7 +103,7 @@ for ( this_column in weight_columns ){
 ```
 
 Combine previous quarter and current quarter variables into a single variable:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 
 expenditure_variables <- 
 	gsub( "pq$" , "" , grep( "pq$" , names( ces_df ) , value = TRUE ) )
@@ -130,7 +130,7 @@ for( this_column in expenditure_variables ){
 
 Append any interview survey UCC found at https://www.bls.gov/cex/ce_source_integrate.xlsx:
 
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 ucc_exp <- c( "450110" , "450210" )
 
 mtbi_files <- grep( "mtbi2[1-2]" , unzipped_files , value = TRUE )
@@ -173,14 +173,14 @@ ces_df[ is.na( ces_df[ , 'new_car_truck_exp' ] ) , 'new_car_truck_exp' ] <- 0
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # ces_fn <- file.path( path.expand( "~" ) , "CES" , "this_file.rds" )
 # saveRDS( ces_df , file = ces_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # ces_df <- readRDS( ces_fn )
 ```
 
@@ -235,7 +235,7 @@ ces_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 ces_design <- 
 	update( 
 		ces_design , 
@@ -452,3 +452,5 @@ stopifnot( round( standard_error , 2 ) == 184.47 )
 # note the minor differences
 MIcombine( with( ces_design , svymean( ~ cartkn ) ) )
 ```
+
+

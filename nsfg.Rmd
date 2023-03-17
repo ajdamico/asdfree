@@ -32,7 +32,7 @@ Please skim before you begin:
 
 ## Download, Import, Preparation {-}
 
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(SAScii)
 library(readr)
 
@@ -69,14 +69,14 @@ nsfg_df <- data.frame( nsfg_tbl )
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # nsfg_fn <- file.path( path.expand( "~" ) , "NSFG" , "this_file.rds" )
 # saveRDS( nsfg_df , file = nsfg_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # nsfg_df <- readRDS( nsfg_fn )
 ```
 
@@ -104,7 +104,7 @@ nsfg_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 nsfg_design <- 
 	update( 
 		nsfg_design , 
@@ -299,26 +299,6 @@ summary( glm_result )
 
 ---
 
-## Analysis Examples with `srvyr` \ {-}
-
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NSFG users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-library(srvyr)
-nsfg_srvyr_design <- as_survey( nsfg_design )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-nsfg_srvyr_design %>%
-	summarize( mean = survey_mean( pregnum , na.rm = TRUE ) )
-
-nsfg_srvyr_design %>%
-	group_by( age_categories ) %>%
-	summarize( mean = survey_mean( pregnum , na.rm = TRUE ) )
-```
-
----
-
 ## Replication Example {-}
 
 This example matches the [Variance Estimates for Percentages using SAS (9.4) and STATA (14)](https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf):
@@ -345,6 +325,26 @@ results <- svyby( ~ birth_control_pill , ~ age_categories , nsfg_design , svymea
 stopifnot( all( round( coef( results ) * 100 , 4 ) == row_percents ) )
 
 stopifnot( all( round( SE( results ) * 100 , 4 ) == std_err_row_percents ) )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NSFG users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nsfg_srvyr_design <- as_survey( nsfg_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nsfg_srvyr_design %>%
+	summarize( mean = survey_mean( pregnum , na.rm = TRUE ) )
+
+nsfg_srvyr_design %>%
+	group_by( age_categories ) %>%
+	summarize( mean = survey_mean( pregnum , na.rm = TRUE ) )
 ```
 
 

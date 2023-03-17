@@ -33,7 +33,7 @@ Please skim before you begin:
 ## Download, Import, Preparation {-}
 
 Download and import the demographics (demo) and total cholesterol laboratory (tchol) data:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 nhanes_2015_2016_demo_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DEMO_I.XPT"
@@ -57,7 +57,7 @@ nhanes_2017_2018_tchol_df <- data.frame( nhanes_2017_2018_tchol_tbl )
 ```
 
 Specify which variables to keep from both the demo and tchol data files, then stack the four years:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 demo_vars <-
 	c( 
 		 # unique person identifier (merge variable)
@@ -118,7 +118,7 @@ nhanes_2015_2018_tchol_df <-
 ```
 
 Merge the two pooled datasets, limit the data.frame to mobile examination component respondents:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 nhanes_full_df <-
 	merge(
 		nhanes_2015_2018_demo_df ,
@@ -132,7 +132,7 @@ nhanes_df <- subset( nhanes_full_df , ridstatr %in% 2 )
 ```
 
 Scale the mobile examination component two-year weight to generalize to the pooled, four year period:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 nhanes_df[ , 'wtmec4yr' ] <- nhanes_df[ , 'wtmec2yr' ] / 2
 ```
 
@@ -140,14 +140,14 @@ nhanes_df[ , 'wtmec4yr' ] <- nhanes_df[ , 'wtmec2yr' ] / 2
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # nhanes_fn <- file.path( path.expand( "~" ) , "NHANES" , "this_file.rds" )
 # saveRDS( nhanes_df , file = nhanes_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # nhanes_df <- readRDS( nhanes_fn )
 ```
 
@@ -174,7 +174,7 @@ nhanes_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 nhanes_design <-
 
 	update(
@@ -380,26 +380,6 @@ summary( glm_result )
 
 ---
 
-## Analysis Examples with `srvyr` \ {-}
-
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NHANES users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-library(srvyr)
-nhanes_srvyr_design <- as_survey( nhanes_design )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-nhanes_srvyr_design %>%
-	summarize( mean = survey_mean( lbxtc , na.rm = TRUE ) )
-
-nhanes_srvyr_design %>%
-	group_by( race_ethnicity ) %>%
-	summarize( mean = survey_mean( lbxtc , na.rm = TRUE ) )
-```
-
----
-
 ## Direct Method of Age-Adjustment Replication Example {-}
 
 This example matches the total cholesterol statistics and standard errors in [Table 1](https://www.cdc.gov/nchs/data/databriefs/db363-tables-508.pdf#page=1) from [Data Brief 363](https://www.cdc.gov/nchs/products/databriefs/db363.htm):
@@ -527,4 +507,25 @@ stopifnot( round( SE( results_by_race_ethnicity )[ 2 ] , 3 ) == 0.009 )
 stopifnot( round( SE( results_by_race_ethnicity )[ 3 ] , 3 ) == 0.011 )	
 stopifnot( round( SE( results_by_race_ethnicity )[ 4 ] , 3 ) == 0.009 )	
 ```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NHANES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nhanes_srvyr_design <- as_survey( nhanes_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nhanes_srvyr_design %>%
+	summarize( mean = survey_mean( lbxtc , na.rm = TRUE ) )
+
+nhanes_srvyr_design %>%
+	group_by( race_ethnicity ) %>%
+	summarize( mean = survey_mean( lbxtc , na.rm = TRUE ) )
+```
+
 

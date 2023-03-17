@@ -33,7 +33,7 @@ Please skim before you begin:
 ## Download, Import, Preparation {-}
 
 Download and import the round 7 file:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 zip_tf <- tempfile()
@@ -55,14 +55,14 @@ nbs_df[ , 'one' ] <- 1
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # nbs_fn <- file.path( path.expand( "~" ) , "NBS" , "this_file.rds" )
 # saveRDS( nbs_df , file = nbs_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # nbs_df <- readRDS( nbs_fn )
 ```
 
@@ -109,7 +109,7 @@ lngsws_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 nbs_design <- 
 	update( 
 		nbs_design , 
@@ -293,26 +293,6 @@ summary( glm_result )
 
 ---
 
-## Analysis Examples with `srvyr` \ {-}
-
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NBS users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-library(srvyr)
-nbs_srvyr_design <- as_survey( nbs_design )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-nbs_srvyr_design %>%
-	summarize( mean = survey_mean( r7_n_totssbenlastmnth_pub , na.rm = TRUE ) )
-
-nbs_srvyr_design %>%
-	group_by( age_categories ) %>%
-	summarize( mean = survey_mean( r7_n_totssbenlastmnth_pub , na.rm = TRUE ) )
-```
-
----
-
 ## Replication Example {-}
 
 This example matches the percentages and t-tests from the final ten rows of [Exhibit 4](https://www.ssa.gov/disabilityresearch/documents/TTW5_2_BeneChar.pdf#page=20).
@@ -430,4 +410,25 @@ for( i in seq( nrow( ex_4 ) ) ){
 }
 
 ```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NBS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nbs_srvyr_design <- as_survey( nbs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nbs_srvyr_design %>%
+	summarize( mean = survey_mean( r7_n_totssbenlastmnth_pub , na.rm = TRUE ) )
+
+nbs_srvyr_design %>%
+	group_by( age_categories ) %>%
+	summarize( mean = survey_mean( r7_n_totssbenlastmnth_pub , na.rm = TRUE ) )
+```
+
 

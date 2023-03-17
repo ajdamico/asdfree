@@ -33,7 +33,7 @@ Please skim before you begin:
 ## Download, Import, Preparation {-}
 
 Download and import the 1951-2006 one percent files with one record per person and per person-year:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 library(httr)
 
@@ -63,7 +63,7 @@ names( annual_df ) <- tolower( names( annual_df ) )
 ```
 
 Sum up 1951-1952 and 1953-2006 earnings, and also 1953-2006 credits, copying the naming convention:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 summed_earnings_5152 <-
 	with( 
 		subset( annual_df , year_earn %in% 1951:1952 ) , 
@@ -90,14 +90,14 @@ names( summed_quarters_5306 ) <- c( 'id' , 'qc5306' )
 ```
 
 Isolate a single year of earnings:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 earnings_2006 <- annual_df[ annual_df[ , 'year_earn' ] == 2006 , c( 'id' , 'annual_earnings' ) ]
 
 names( earnings_2006 ) <- c( 'id' , 'tot_cov_earn06' )
 ```
 
 Merge each new column on to the person-level table, then add zeroes to person-years without earnings:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 stopifnot( all( !is.na( ssa_df ) ) )
 
 before_nrow <- nrow( ssa_df )
@@ -120,14 +120,14 @@ stopifnot( nrow( ssa_df ) == before_nrow )
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # ssa_fn <- file.path( path.expand( "~" ) , "SSA" , "this_file.rds" )
 # saveRDS( ssa_df , file = ssa_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # ssa_df <- readRDS( ssa_fn )
 ```
 
@@ -138,7 +138,7 @@ Load the same object:
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 ssa_df <- 
 	transform( 
 		ssa_df ,
@@ -277,6 +277,48 @@ summary( glm_result )
 
 ---
 
+## Replication Example {-}
+
+This example matches statistics in [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html):
+
+Chart 5. Percentage distribution of individuals in EPUF, by capped Social Security taxable earnings status: 
+```{r eval = FALSE , results = "hide" }
+chart_five_results <- prop.table( table( ssa_df[ , 'earnings_periods' ] ) )
+chart_five_results <- round( 100 * chart_five_results )
+
+stopifnot( chart_five_results[ 'Earnings in both periods' ] == 16 )
+stopifnot( chart_five_results[ 'Earnings during 1951-2006 only' ] == 55 )
+stopifnot( chart_five_results[ 'Earnings during 1937-1950 only' ] == 4 )
+stopifnot( chart_five_results[ 'No earnings' ] == 25 )
+```
+
+Table 4. Average and median Social Security taxable earnings in EPUF, by sex, 1951–2006 (in dollars):
+```{r eval = FALSE , results = "hide" }
+nonzero_2006_earners <- ssa_df[ ssa_df[ , 'tot_cov_earn06' ] > 0 , 'tot_cov_earn06' ]
+stopifnot( round( mean( nonzero_2006_earners ) , 0 ) == 30953 )
+stopifnot( round( quantile( nonzero_2006_earners )[ 3 ] , 0 ) == 24000 )
+```
+
+Table A1. Number and percentage distribution of individuals with Social Security taxable earnings records in EPUF, by sex, 1951–2006:
+```{r eval = FALSE , results = "hide" }
+nonzero_2006_earners <- ssa_df[ ssa_df[ , 'tot_cov_earn06' ] > 0 , ]
+stopifnot( round( mean( nonzero_2006_earners[ , 'tot_cov_earn06' ] ) , 0 ) == 30953 )
+stopifnot( round( quantile( nonzero_2006_earners[ , 'tot_cov_earn06' ] )[ 3 ] , 0 ) == 24000 )
+```
+
+This example matches statistics in [Comparing Earnings Estimates from the 2006 Earnings Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html):
+
+Table 4. Comparing Supplement and EPUF estimates: Number of all, male, and female workers with any earnings during the year, 1951–2006:
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( round( nrow( nonzero_2006_earners ) * 100 , -3 ) == 156280000 )
+earners_in_2006_by_sex <- table( nonzero_2006_earners[ , 'sex' ] ) * 100
+stopifnot( round( earners_in_2006_by_sex[ 'male' ] , -3 ) == 81576000 )
+stopifnot( round( earners_in_2006_by_sex[ 'female' ] , -3 ) == 74681000 )
+```
+
+---
+
 ## Analysis Examples with `dplyr` \ {-}
 
 The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for SSA users, this code replicates previously-presented examples:
@@ -338,46 +380,3 @@ dbGetQuery(
 		sex'
 )
 ```
-
----
-
-## Replication Example {-}
-
-This example matches statistics in [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html):
-
-Chart 5. Percentage distribution of individuals in EPUF, by capped Social Security taxable earnings status: 
-```{r eval = FALSE , results = "hide" }
-chart_five_results <- prop.table( table( ssa_df[ , 'earnings_periods' ] ) )
-chart_five_results <- round( 100 * chart_five_results )
-
-stopifnot( chart_five_results[ 'Earnings in both periods' ] == 16 )
-stopifnot( chart_five_results[ 'Earnings during 1951-2006 only' ] == 55 )
-stopifnot( chart_five_results[ 'Earnings during 1937-1950 only' ] == 4 )
-stopifnot( chart_five_results[ 'No earnings' ] == 25 )
-```
-
-Table 4. Average and median Social Security taxable earnings in EPUF, by sex, 1951–2006 (in dollars):
-```{r eval = FALSE , results = "hide" }
-nonzero_2006_earners <- ssa_df[ ssa_df[ , 'tot_cov_earn06' ] > 0 , 'tot_cov_earn06' ]
-stopifnot( round( mean( nonzero_2006_earners ) , 0 ) == 30953 )
-stopifnot( round( quantile( nonzero_2006_earners )[ 3 ] , 0 ) == 24000 )
-```
-
-Table A1. Number and percentage distribution of individuals with Social Security taxable earnings records in EPUF, by sex, 1951–2006:
-```{r eval = FALSE , results = "hide" }
-nonzero_2006_earners <- ssa_df[ ssa_df[ , 'tot_cov_earn06' ] > 0 , ]
-stopifnot( round( mean( nonzero_2006_earners[ , 'tot_cov_earn06' ] ) , 0 ) == 30953 )
-stopifnot( round( quantile( nonzero_2006_earners[ , 'tot_cov_earn06' ] )[ 3 ] , 0 ) == 24000 )
-```
-
-This example matches statistics in [Comparing Earnings Estimates from the 2006 Earnings Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html):
-
-Table 4. Comparing Supplement and EPUF estimates: Number of all, male, and female workers with any earnings during the year, 1951–2006:
-
-```{r eval = FALSE , results = "hide" }
-stopifnot( round( nrow( nonzero_2006_earners ) * 100 , -3 ) == 156280000 )
-earners_in_2006_by_sex <- table( nonzero_2006_earners[ , 'sex' ] ) * 100
-stopifnot( round( earners_in_2006_by_sex[ 'male' ] , -3 ) == 81576000 )
-stopifnot( round( earners_in_2006_by_sex[ 'female' ] , -3 ) == 74681000 )
-```
-

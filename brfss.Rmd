@@ -33,7 +33,7 @@ Please skim before you begin:
 ## Download, Import, Preparation {-}
 
 Download and import the national file:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 zip_tf <- tempfile()
@@ -55,14 +55,14 @@ brfss_df[ , 'one' ] <- 1
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # brfss_fn <- file.path( path.expand( "~" ) , "BRFSS" , "this_file.rds" )
 # saveRDS( brfss_df , file = brfss_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # brfss_df <- readRDS( brfss_fn )
 ```
 
@@ -120,7 +120,7 @@ brfss_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 brfss_design <- 
 	update( 
 		brfss_design ,
@@ -330,26 +330,6 @@ summary( glm_result )
 
 ---
 
-## Analysis Examples with `srvyr` \ {-}
-
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for BRFSS users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-library(srvyr)
-brfss_srvyr_design <- as_survey( brfss_design )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-brfss_srvyr_design %>%
-	summarize( mean = survey_mean( x_age80 ) )
-
-brfss_srvyr_design %>%
-	group_by( state_name ) %>%
-	summarize( mean = survey_mean( x_age80 ) )
-```
-
----
-
 ## Replication Example {-}
 
 This example matches Alaska's confidence intervals from the [BRFSS Prevalence & Trends Data](https://nccd.cdc.gov/BRFSSPrevalence/rdPage.aspx?rdReport=DPH_BRFSS.ExploreByTopic&irbLocationType=StatesAndMMSA&islClass=CLASS07&islTopic=TOPIC28&islYear=2021&rdRnd=24558):
@@ -373,4 +353,25 @@ stopifnot( round( confint( result )[ 2 , 1 ] , 3 ) == 0.878 )
 stopifnot( round( confint( result )[ 2 , 2 ] , 3 ) == 0.906 )
 
 ```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for BRFSS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+brfss_srvyr_design <- as_survey( brfss_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+brfss_srvyr_design %>%
+	summarize( mean = survey_mean( x_age80 ) )
+
+brfss_srvyr_design %>%
+	group_by( state_name ) %>%
+	summarize( mean = survey_mean( x_age80 ) )
+```
+
 

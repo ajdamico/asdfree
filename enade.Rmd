@@ -34,7 +34,7 @@ Please skim before you begin:
 
 Download, import, and merge two of the 2021 files:
 
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(httr)
 library(archive)
 
@@ -88,14 +88,14 @@ stopifnot( nrow( enade_df ) == nrow( arq3_df ) )
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # enade_fn <- file.path( path.expand( "~" ) , "ENADE" , "this_file.rds" )
 # saveRDS( enade_df , file = enade_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # enade_df <- readRDS( enade_fn )
 ```
 
@@ -106,7 +106,7 @@ Load the same object:
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 enade_df <- 
 	transform( 
 		enade_df , 
@@ -258,6 +258,24 @@ summary( glm_result )
 
 ---
 
+## Replication Example {-}
+
+This example matches the tecnologia em gestão da tecnologia da informação test scores on PDF page 48 of [the 2021 final results document](https://download.inep.gov.br/enade/resultados/2021/apresentacao_resultados_finais.pdf#page=48):
+
+```{r eval = FALSE , results = "hide" }
+
+it_students <- subset( enade_df , co_grupo %in% 6409 )
+
+results <- sapply( it_students[ c( 'nt_fg' , 'nt_ce' , 'nt_ger' ) ] , mean , na.rm = TRUE )
+
+stopifnot( round( results[ 'nt_fg' ] , 1 ) == 30.4 )
+stopifnot( round( results[ 'nt_ce' ] , 1 ) == 38.2 )
+stopifnot( round( results[ 'nt_ger' ] , 1 ) == 36.3 )
+
+```
+
+---
+
 ## Analysis Examples with `dplyr` \ {-}
 
 The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for ENADE users, this code replicates previously-presented examples:
@@ -318,22 +336,4 @@ dbGetQuery(
 	GROUP BY
 		administrative_category'
 )
-```
-
----
-
-## Replication Example {-}
-
-This example matches the tecnologia em gestão da tecnologia da informação test scores on PDF page 48 of [the 2021 final results document](https://download.inep.gov.br/enade/resultados/2021/apresentacao_resultados_finais.pdf#page=48):
-
-```{r eval = FALSE , results = "hide" }
-
-it_students <- subset( enade_df , co_grupo %in% 6409 )
-
-results <- sapply( it_students[ c( 'nt_fg' , 'nt_ce' , 'nt_ger' ) ] , mean , na.rm = TRUE )
-
-stopifnot( round( results[ 'nt_fg' ] , 1 ) == 30.4 )
-stopifnot( round( results[ 'nt_ce' ] , 1 ) == 38.2 )
-stopifnot( round( results[ 'nt_ger' ] , 1 ) == 36.3 )
-
 ```

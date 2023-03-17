@@ -128,14 +128,14 @@ atus_df[ , 'one' ] <- 1
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # atus_fn <- file.path( path.expand( "~" ) , "ATUS" , "this_file.rds" )
 # saveRDS( atus_df , file = atus_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # atus_df <- readRDS( atus_fn )
 ```
 
@@ -162,7 +162,7 @@ atus_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 
 # caring for and helping household members is top level 03 from the lexicon
 # https://www.bls.gov/tus/lexicons/lexiconnoex2021.pdf
@@ -349,26 +349,6 @@ summary( glm_result )
 
 ---
 
-## Analysis Examples with `srvyr` \ {-}
-
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ATUS users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-library(srvyr)
-atus_srvyr_design <- as_survey( atus_design )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-atus_srvyr_design %>%
-	summarize( mean = survey_mean( tuactdur24_1 ) )
-
-atus_srvyr_design %>%
-	group_by( age_category ) %>%
-	summarize( mean = survey_mean( tuactdur24_1 ) )
-```
-
----
-
 ## Replication Example {-}
 
 This example matches the "Caring for and helping household members" row of [Table A-1](https://www.bls.gov/tus/tables/a1_2021.pdf):
@@ -487,4 +467,25 @@ result <- svymean( ~ tuactdur24_hour , atus07_design )
 stopifnot( round( coef( result ) , 2 ) == 2.62 )
 stopifnot( round( SE( result ) , 4 ) == 0.0293 )
 ```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ATUS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+atus_srvyr_design <- as_survey( atus_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+atus_srvyr_design %>%
+	summarize( mean = survey_mean( tuactdur24_1 ) )
+
+atus_srvyr_design %>%
+	group_by( age_category ) %>%
+	summarize( mean = survey_mean( tuactdur24_1 ) )
+```
+
 

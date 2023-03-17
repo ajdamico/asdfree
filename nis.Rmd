@@ -33,7 +33,7 @@ Please skim before you begin:
 ## Download, Import, Preparation {-}
 
 Download the fixed-width file:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 dat_tf <- tempfile()
 
 dat_url <- "https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.DAT"
@@ -42,7 +42,7 @@ download.file( dat_url , dat_tf , mode = 'wb' )
 ```
 
 Edit then execute the import script provided by the CDC:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(Hmisc)
 
 r_tf <- tempfile()
@@ -75,14 +75,14 @@ nis_df[ , 'one' ] <- 1
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # nis_fn <- file.path( path.expand( "~" ) , "NIS" , "this_file.rds" )
 # saveRDS( nis_df , file = nis_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # nis_df <- readRDS( nis_fn )
 ```
 
@@ -109,7 +109,7 @@ nis_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 nis_design <- 
 	
 	update( 
@@ -313,26 +313,6 @@ summary( glm_result )
 
 ---
 
-## Analysis Examples with `srvyr` \ {-}
-
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NIS users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-library(srvyr)
-nis_srvyr_design <- as_survey( nis_design )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-nis_srvyr_design %>%
-	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
-
-nis_srvyr_design %>%
-	group_by( state ) %>%
-	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
-```
-
----
-
 ## Replication Example {-}
 
 This example matches the statistics and standard errors from [Data User's Guide Table 4](https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf#page=35):
@@ -358,4 +338,25 @@ stopifnot( round( standard_errors[ "HISPANIC" , ] , 3 ) == .015 )
 stopifnot( round( standard_errors[ "NON-HISPANIC WHITE ONLY" , ] , 3 ) == .009 )
 stopifnot( round( standard_errors[ "NON-HISPANIC BLACK ONLY" , ] , 3 ) == .022 )
 ```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NIS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nis_srvyr_design <- as_survey( nis_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nis_srvyr_design %>%
+	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
+
+nis_srvyr_design %>%
+	group_by( state ) %>%
+	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
+```
+
 

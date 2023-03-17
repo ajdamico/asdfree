@@ -32,7 +32,7 @@ Please skim before you begin:
 
 ## Download, Import, Preparation {-}
 
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 tf <- tempfile()
 
 this_url <- "https://www.cms.gov/files/zip/cspuf2019.zip"
@@ -52,14 +52,14 @@ names( mcbs_df ) <- tolower( names( mcbs_df ) )
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # mcbs_fn <- file.path( path.expand( "~" ) , "MCBS" , "this_file.rds" )
 # saveRDS( mcbs_df , file = mcbs_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # mcbs_df <- readRDS( mcbs_fn )
 ```
 
@@ -86,7 +86,7 @@ mcbs_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 mcbs_design <-
 	update(
 		
@@ -277,16 +277,26 @@ summary( glm_result )
 
 ---
 
+## Replication Example {-}
+
+This example matches the weighted total from the [2019 Data User's Guide: Cost Supplement File Public Use File](https://data.cms.gov/sites/default/files/2023-01/2019MCBSDataUsersGuideCSFIlePUF.pdf):
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( round( coef( svytotal( ~ one , mcbs_design ) ) , 0 ) == 56307461 )
+```
+
+---
+
 ## Analysis Examples with `srvyr` \ {-}
 
 The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for MCBS users, this code replicates previously-presented examples:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(srvyr)
 mcbs_srvyr_design <- as_survey( mcbs_design )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 mcbs_srvyr_design %>%
 	summarize( mean = survey_mean( pamtoop ) )
 
@@ -295,12 +305,4 @@ mcbs_srvyr_design %>%
 	summarize( mean = survey_mean( pamtoop ) )
 ```
 
----
 
-## Replication Example {-}
-
-This example matches the weighted total from the [2019 Data User's Guide: Cost Supplement File Public Use File](https://data.cms.gov/sites/default/files/2023-01/2019MCBSDataUsersGuideCSFIlePUF.pdf):
-
-```{r eval = FALSE , results = "hide" }
-stopifnot( round( coef( svytotal( ~ one , mcbs_design ) ) , 0 ) == 56307461 )
-```

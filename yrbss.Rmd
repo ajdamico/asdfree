@@ -33,7 +33,7 @@ Please skim before you begin:
 ## Download, Import, Preparation {-}
 
 Load the `SAScii` library to interpret a SAS input program, and also re-arrange the SAS input program:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(SAScii)
 
 sas_url <-
@@ -74,7 +74,7 @@ writeLines( sas_text , sas_tf )
 ```
 
 Download and import the national file:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 dat_tf <- tempfile()
 
 dat_url <-
@@ -93,14 +93,14 @@ yrbss_df[ , 'one' ] <- 1
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # yrbss_fn <- file.path( path.expand( "~" ) , "YRBSS" , "this_file.rds" )
 # saveRDS( yrbss_df , file = yrbss_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # yrbss_df <- readRDS( yrbss_fn )
 ```
 
@@ -126,7 +126,7 @@ yrbss_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 yrbss_design <- 
 	update( 
 		yrbss_design , 
@@ -305,26 +305,6 @@ summary( glm_result )
 
 ---
 
-## Analysis Examples with `srvyr` \ {-}
-
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for YRBSS users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-library(srvyr)
-yrbss_srvyr_design <- as_survey( yrbss_design )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-yrbss_srvyr_design %>%
-	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
-
-yrbss_srvyr_design %>%
-	group_by( ever_used_marijuana ) %>%
-	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
-```
-
----
-
 ## Replication Example {-}
 
 This example matches statistics, standard errors, and confidence intervals from the "never/rarely wore seat belt" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2019/2019_yrbs_analysis_software.pdf#page=29).
@@ -370,3 +350,25 @@ stopifnot( round( confint( ci_result )[1] , 4 ) == 0.0529 )
 
 stopifnot( round( confint( ci_result )[2] , 2 ) == 0.08 )
 ```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for YRBSS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+yrbss_srvyr_design <- as_survey( yrbss_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+yrbss_srvyr_design %>%
+	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
+
+yrbss_srvyr_design %>%
+	group_by( ever_used_marijuana ) %>%
+	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
+```
+
+

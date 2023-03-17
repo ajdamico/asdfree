@@ -1,4 +1,4 @@
-commit_memo <- "'duckdb'"
+commit_memo <- "'warnings'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -130,7 +130,7 @@ for ( i in seq_along( chapter_tag ) ){
 	is_mi <- any( grepl( "library(mitools)" , full_text[[i]] , fixed = TRUE ) )
 	is_db <- any( grepl( "library(DBI)" , full_text[[i]] , fixed = TRUE ) ) 
 	
-	needs_srvyr_block <- paste0( '---\n\n## Analysis Examples with `srvyr` \\\\ {-}\n\nThe R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package.  [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = "hide" , messages = FALSE }\n' , if( is_db ) 'library(dbplyr)\n' , 'library(srvyr)\nchapter_tag_srvyr_design <- as_survey( chapter_tag_design )\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = "hide" , messages = FALSE }\nchapter_tag_srvyr_design %>%\n\tsummarize( mean = survey_mean( linear_variable linear_narm ) )\n\nchapter_tag_srvyr_design %>%\n\tgroup_by( group_by_variable ) %>%\n\tsummarize( mean = survey_mean( linear_variable linear_narm ) )\n```' )
+	needs_srvyr_block <- paste0( '---\n\n## Analysis Examples with `srvyr` \\\\ {-}\n\nThe R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package.  [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = "hide" }\n' , if( is_db ) 'library(dbplyr)\n' , 'library(srvyr)\nchapter_tag_srvyr_design <- as_survey( chapter_tag_design )\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = "hide" }\nchapter_tag_srvyr_design %>%\n\tsummarize( mean = survey_mean( linear_variable linear_narm ) )\n\nchapter_tag_srvyr_design %>%\n\tgroup_by( group_by_variable ) %>%\n\tsummarize( mean = survey_mean( linear_variable linear_narm ) )\n```' )
 
 
 	rmd_lines <- gsub( "kind_of_analysis_examples" , if( is_survey ) "the `survey` library" else if( is_db ) "SQL and `RSQLite`" else "base R" , rmd_lines )
@@ -148,7 +148,7 @@ for ( i in seq_along( chapter_tag ) ){
 	if( is_db ){
 		stop( "revisit this" )
 	} else {
-		rmd_lines <- gsub( "^save_a_what_line" , '\n\n### Save locally \\\\ {-}\n\nSave the object at any point:\n\n```{r eval = FALSE , results = "hide" , messages = FALSE }\n# chapter_tag_fn <- file.path( path.expand( "~" ) , "CHAPTER_TAG" , "this_file.rds" )\n# saveRDS( chapter_tag_df , file = chapter_tag_fn , compress = FALSE )\n```\n\nLoad the same object:\n\n```{r eval = FALSE , results = "hide" , messages = FALSE }\n# chapter_tag_df <- readRDS( chapter_tag_fn )\n```' , rmd_lines )
+		rmd_lines <- gsub( "^save_a_what_line" , '\n\n### Save locally \\\\ {-}\n\nSave the object at any point:\n\n```{r eval = FALSE , results = "hide" }\n# chapter_tag_fn <- file.path( path.expand( "~" ) , "CHAPTER_TAG" , "this_file.rds" )\n# saveRDS( chapter_tag_df , file = chapter_tag_fn , compress = FALSE )\n```\n\nLoad the same object:\n\n```{r eval = FALSE , results = "hide" }\n# chapter_tag_df <- readRDS( chapter_tag_fn )\n```' , rmd_lines )
 	}
 		
 	# standalone dataset, survey design, multiply-imputed survey design, database-backed survey design, or multiply-imputed database-backed survey design
@@ -280,12 +280,12 @@ for ( i in seq_along( chapter_tag ) ){
 }
 
 
+
 # overwrite non-evaluation with run + cache
 rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
 local_testing_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Local Testing Badge" , readLines( w ) ) ) )
 local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_files ] )
-for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE" , readLines( this_rmd ) ) , this_rmd )
-
+for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE , warning = FALSE" , readLines( this_rmd ) ) , this_rmd )
 
 
 setwd( book_folder )

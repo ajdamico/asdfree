@@ -35,7 +35,7 @@ Please skim before you begin:
 Download and import the Alabama household file:
 
 (switch `sas_hal` to `sas_hak` for Alaska or `sas_hus` for the entire country)
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 tf_household <- tempfile()
@@ -58,7 +58,7 @@ names( acs_df_household ) <- tolower( names( acs_df_household ) )
 Download and import the Alabama person file:
 
 (switch `sas_pal` to `sas_pak` for Alaska or `sas_pus` for the entire country)
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 tf_person <- tempfile()
 
 this_url_person <-
@@ -77,7 +77,7 @@ names( acs_df_person ) <- tolower( names( acs_df_person ) )
 ```
 
 Remove overlapping column and merge household + person files:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 
 acs_df_household[ , 'rt' ] <- NULL
 
@@ -94,14 +94,14 @@ acs_df[ , 'one' ] <- 1
 
 Save the object at any point:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # acs_fn <- file.path( path.expand( "~" ) , "ACS" , "this_file.rds" )
 # saveRDS( acs_df , file = acs_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r eval = FALSE , results = "hide" , messages = FALSE }
+```{r eval = FALSE , results = "hide" }
 # acs_df <- readRDS( acs_fn )
 ```
 
@@ -129,7 +129,7 @@ acs_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 acs_design <-
 	update(
 		
@@ -349,39 +349,6 @@ summary( glm_result )
 
 ---
 
-## Poverty and Inequality Estimation with `convey` \ {-}
-
-The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for ACS users, this code calculates the gini coefficient on complex sample survey data:
-
-```{r eval = FALSE , results = "hide" }
-library(convey)
-acs_design <- convey_prep( acs_design )
-
-svygini( ~ hincp , acs_design , na.rm = TRUE )
-```
-
----
-
-## Analysis Examples with `srvyr` \ {-}
-
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ACS users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-library(srvyr)
-acs_srvyr_design <- as_survey( acs_design )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = "hide" , messages = FALSE }
-acs_srvyr_design %>%
-	summarize( mean = survey_mean( poverty_level , na.rm = TRUE ) )
-
-acs_srvyr_design %>%
-	group_by( cit ) %>%
-	summarize( mean = survey_mean( poverty_level , na.rm = TRUE ) )
-```
-
----
-
 ## Replication Example {-}
 
 This example matches statistics, standard errors, and margin of errors from the [2021 PUMS tallies](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_21.csv):
@@ -432,4 +399,38 @@ stopifnot( all( round( SE( results ) , 0 ) == pums_standard_error ) )
 stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
 
 ```
+
+---
+
+## Poverty and Inequality Estimation with `convey` \ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for ACS users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+acs_design <- convey_prep( acs_design )
+
+svygini( ~ hincp , acs_design , na.rm = TRUE )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ACS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+acs_srvyr_design <- as_survey( acs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+acs_srvyr_design %>%
+	summarize( mean = survey_mean( poverty_level , na.rm = TRUE ) )
+
+acs_srvyr_design %>%
+	group_by( cit ) %>%
+	summarize( mean = survey_mean( poverty_level , na.rm = TRUE ) )
+```
+
 
