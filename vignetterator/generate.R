@@ -1,4 +1,4 @@
-commit_memo <- "'warnings'"
+commit_memo <- "'restructure'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -51,7 +51,7 @@ pull_line <-
 
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "password_parameters" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
-sub_chunks <- c( "reading_block" , "download_and_import_block" , "analysis_examples_loading_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "intermission_block" , "convey_block" , "replacement_block" )
+sub_chunks <- c( "reading_block" , "download_and_import_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "intermission_block" , "convey_block" , "replacement_block" )
 needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_datatable_block" , "needs_duckdb_block" , "needs_actions_build_status_line" , "needs_local_build_status_line" )
 
 
@@ -154,7 +154,7 @@ for ( i in seq_along( chapter_tag ) ){
 	# standalone dataset, survey design, multiply-imputed survey design, database-backed survey design, or multiply-imputed database-backed survey design
 	construct_a_this_line <- 
 		paste0( 
-			if( is_survey ) "Construct a " else if( is_db ) "Connect to a " ,
+			if( is_survey ) "### Survey Design Definition {-}\nConstruct a " else if( is_db ) "### Database Definition {-}\nConnect to a " ,
 			if( is_mi ) "multiply-imputed, " ,
 			if( is_db ) "database" ,
 			if( is_survey & is_db ) "-backed " ,
@@ -164,8 +164,6 @@ for ( i in seq_along( chapter_tag ) ){
 		)				
 	
 	rmd_lines <- gsub( "^construct_a_what_line" , construct_a_this_line , rmd_lines )
-		
-
 
 	unweighted_counts_block <-
 		if( is_survey ){
