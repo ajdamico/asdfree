@@ -1,0 +1,188 @@
+chapter_title: National Financial Capability Study
+
+needs_actions_build_status_line: yes
+
+
+~~~{dataset_introduction}
+xyz
+~~~
+
+table_structure: * 
+
+generalizable_population: * 
+
+publication_period: * 
+
+administrative_organization: * 
+
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. 
+
+2. 
+
+3. 
+~~~
+
+
+
+~~~{download_and_import_block}
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+zip_tf <- tempfile()
+
+zip_url <- 'https://finrafoundation.org/sites/finrafoundation/files/2021-SxS-Data-and-Data-Info.zip'
+
+download.file( zip_url , zip_tf , mode = 'wb' )
+
+unzipped_files <- unzip( zip_tf , exdir = tempdir() )
+
+# load the stata file
+chapter_tag_tbl <- read_dta( grep( "\\.dta$" , unzipped_files , value = TRUE ) )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
+
+
+
+~~~{analysis_examples_survey_design}
+```{r messages = FALSE , eval = FALSE }
+
+# add labels to state names
+chapter_tag_df[ , 'state_name' ] <-
+	factor(
+		chapter_tag_df[ , 'stateq' ] , 
+		levels = 1:51 , 
+		labels = sort( c( 'District of Columbia' , state.name ) ) 
+	)
+
+# add labels to rainy day fund question
+chapter_tag_df[ , 'rainy_day_fund' ] <-
+	factor(
+		chapter_tag_df[ , 'j5' ] ,
+		levels = c( 1 , 2 , 98 , 99 ) ,
+		labels = c( 'Yes' , 'No' , "Don't Know" , "Prefer not to say" )
+	)
+library(survey)
+
+chapter_tag_design <- svydesign( ~ 1 , data = chapter_tag_df , weights = ~ wgt_n2 )
+
+divison_design <- svydesign( ~ 1 , data = chapter_tag_df , weights = ~ wgt_d2 )
+
+state_design <- svydesign( ~ 1 , data = chapter_tag_df , weights = ~ wgt_s3 )
+```
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design ,
+		
+		ten_point_satisfaction_with_financial_condtion =
+			ifelse( j1 > 10 , NA , j1 ) ,
+			
+		
+		difficult_to_pay_bills =
+			factor(
+				j4 ,
+				levels = c( 1 , 2 , 3 , 98 , 99 ) ,
+				labels = c( 'Very difficult' , 'Somewhat difficult' , 'Not at all difficult' , "Don't know" , 'Prefer not to say' )
+			) ,
+				
+		spending_vs_income =
+			factor(
+				j3 ,
+				levels = c( 1 , 2 , 3 , 98 , 99 ) ,
+				labels = c( 'Spending less than income' , 'Spending more than income' , 'Spending about equal to income' , "Don't know" , 'Prefer not to say' )
+			) ,
+		
+		unpaid_medical_bills =
+			ifelse( g20 > 2 , NA , as.numeric( g20 == 1 ) )
+	)
+~~~
+
+
+group_by_variable: spending_vs_income
+linear_variable: ten_point_satisfaction_with_financial_condtion
+linear_narm: , na.rm = TRUE
+categorical_variable: difficult_to_pay_bills
+ratio_estimation_numerator: nummen
+ratio_estimation_denominator: numadult
+ratio_narm: , na.rm = TRUE
+subset_definition: j50 == 1
+subset_definition_description: persons receiving pandemic-related stimulus payment
+binary_variable: unpaid_medical_bills
+binary_narm: , na.rm = TRUE
+
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+
+
+```{r eval = FALSE , results = "hide" }
+
+# match https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=4
+# The fifth and latest wave of the NFCS was fielded from June to October 2021 (N=27,118), providing a view of
+# financial capability during the COVID-19 pandemic. This unusual context is important to bear in mind while
+# interpreting the study’s findings.
+
+stopifnot( nrow( chapter_tag_df ) == 27118 )
+
+
+# match 53% have three months of rainy day funds from
+# https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7
+national_rainy_day <- svymean( ~ rainy_day_fund , chapter_tag_design )
+stopifnot( round( coef( national_rainy_day )[ 'rainy_day_fundYes' ] , 2 ) == 0.53 )
+
+
+# match unweighted counts from https://cdn.finra.org/nfcs/2021/geography.html
+state_counts <-
+	svyby(
+		~ one ,
+		~ state_name ,
+		state_design ,
+		unwtd.count
+	)
+	
+stopifnot( state_counts[ 'California' , 'counts' ] == 1252 )
+stopifnot( state_counts[ 'Missouri' , 'counts' ] == 501 )
+stopifnot( state_counts[ 'Oregon' , 'counts' ] == 1261 )
+
+
+# match weighted rainy day estimates from https://cdn.finra.org/nfcs/2021/geography.html
+state_rainy_day <-
+	svyby(
+		~ rainy_day_fund ,
+		~ state_name ,
+		state_design ,
+		svymean
+	)
+	
+stopifnot( round( state_rainy_day[ 'California' , 'rainy_day_fundYes' ] , 2 ) == 0.57 )
+stopifnot( round( state_rainy_day[ 'Missouri' , 'rainy_day_fundYes' ] , 2 ) == 0.51 )
+stopifnot( round( state_rainy_day[ 'Oregon' , 'rainy_day_fundYes' ] , 2 ) == 0.52 )
+
+```
+
+~~~
+
+
+
+
