@@ -1,0 +1,385 @@
+chapter_title: Survey of Business Owners
+
+needs_actions_build_status_line: yes
+
+~~~{replacement_block}
+MIcombine
+sbo_MIcombine
+MIcombine( with(
+MIcombine( sbo_with(
+design <- subset(
+design <- sbo_subset(
+	update(
+	sbo_update(
+MIsvyttest
+# sbo_MIsvyttest
+MIsvychisq
+# sbo_MIsvychisq
+MIsvyciprop
+# sbo_MIsvyciprop
+degf( sbo_design$designs[[1]] )
+sbo_degf( sbo_design )
+summary( glm_result )
+glm_result
+~~~
+
+
+~~~{dataset_introduction}
+The Survey of Business Owners tracks nearly every tax-filing sole proprietorship, partnership, and corporation in the nation.
+~~~
+
+table_structure: * One table with one row per firm per state per industry.
+
+generalizable_population: * A complex sample survey designed to generalize to all firms in the United States, however the public use microdata only includes [classifiable (non-identifiable) firms](https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=17) which comprise nearly all businesses but only about half of workers.
+
+publication_period: * Released as part of the U.S. Census Bureau's Economic Census, every year ending in 2 or 7.
+
+administrative_organization: * Administered by the [U.S. Census Bureau](http://www.census.gov/).
+
+~~~{reading_block}
+Please skim before you begin:
+
+1.
+
+2.
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# butchers, chandlers, baked
+# sea shanty, filial pie
+# call your mom and pop
+```
+~~~
+
+
+
+~~~{definitions_block}
+## Function Definitions {-}
+Define functions specific to only this dataset:
+
+```{r eval = FALSE , results = "hide" }
+#' dual design calculations for the survey of business owners
+#'
+#' the \code{mitools::MIcombine} variant includes a 2007-specific variance adjustment.  this will change in other years.
+#' this adjustment statistic was pulled from the middle of page 8
+#' \url{https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=8}
+#'
+#' each of these sbo-specific functions contain a variant of some other \code{library(survey)} function that also maintains the census bureau's dual design calculation.
+#' these functions expect both the coefficient and the variance survey objects
+#'
+MIcombine <-
+	function( x , adjustment = 1.992065 ){
+	
+		# just pull the structure of a variance-covariance matrix
+		variance.shell <- suppressWarnings( vcov( x$var[[1]] ) )
+		
+		# initiate a function that will overwrite the diagonals.
+		diag.replacement <-	
+			function( z ){
+				diag( variance.shell ) <- coef( z )
+				variance.shell
+			}
+			
+		# overwrite all the diagonals in the variance svy.sbo object
+		coef.variances <- lapply( x$var , diag.replacement )
+	
+		# add 'em all together and divide by ten.
+		midpoint <- Reduce( '+' , coef.variances ) / 10
+	
+		# initiate another function that takes some object,
+		# subtracts the midpoint, squares it, and divides by ninety
+		midpoint.var <- function( z ){ 1/10 * ( ( midpoint - z )^2 / 9 ) }
+	
+		# sum up all the differences into a single object
+		variance <- Reduce( '+' , lapply( coef.variances , midpoint.var ) )
+		
+		# adjust every. single. number.
+		adj_var <- adjustment * variance
+
+		# construct a result that looks a lot like
+		# other MIcombine methods.
+		rval <-
+			list( 
+				coefficients = coef( x$coef ) ,
+				variance = adj_var
+			)
+		
+		# call it an MIresult class, just like all other MIcombine results.
+		class( rval ) <- 'MIresult'
+		
+		# return it at the end of the function.
+		rval
+	}
+
+
+
+sbo_with <-
+	function ( sbo.svy , expr , ... ){
+	
+		pf <- parent.frame()
+		
+		expr <- substitute( expr )
+		
+		expr$design <- as.name(".design")
+
+		# this pulls in means, medians, totals, etc.
+		# notice it uses sbo.svy$coef
+		results <- eval( expr , list( .design = sbo.svy$coef ) )
+		
+		gc()
+		
+		# this is used to calculate the variance, adjusted variance, standard error
+		# notice it uses the sbo.svy$var object
+		variances <- 
+			lapply( 
+				sbo.svy$var$designs , 
+				function( .design ){ 
+					eval( expr , list( .design = .design ) , enclos = pf ) 
+				} 
+			)
+		
+		gc()
+		
+		# combine both results..
+		rval <- list( coef = results , var = variances )
+		
+		# ..into a brand new object class
+		class( rval ) <- 'imputationResultList'
+		
+		gc()
+		
+		# and return it.
+		rval
+	}
+
+
+
+
+sbo_subset <-
+	function( x , ... ){
+		
+		# subset the survey object that's going to be used for
+		# means, medians, totals, etc.
+		coef.sub <- subset( x$coef , ... )
+		
+		gc()
+		
+		# replicate `var.sub` so it's got all the same attributes as `x$var`
+		var.sub <- x$var
+		
+		# but then overwrite the `designs` attribute with a subset
+		var.sub$designs <- lapply( x$var$designs , subset , ... )
+		
+		gc()
+		
+		# now re-create the `sbosvyimputationList` just as before
+		sub.svy <-
+			list(
+				coef = coef.sub ,
+				var = var.sub
+			)
+		
+		# ..class it..
+		sub.svy$call <- sys.call(-1)
+		
+		gc()
+		
+		# ..return it.  done.
+		sub.svy
+	}
+
+sbo_update <-
+	function( x , ... ){
+		
+		# update the survey object that's going to be used for
+		# means, medians, totals, etc.
+		coef.upd <- update( x$coef , ... )
+		
+		gc()
+		
+		# replicate `var.upd` so it's got all the same attributes as `x$var`
+		var.upd <- x$var
+		
+		# but then overwrite the `designs` attribute with an update
+		var.upd$designs <- lapply( x$var$designs , update , ... )
+		
+		gc()
+		
+		# now re-create the `sbosvyimputationList` just as before
+		upd.svy <-
+			list(
+				coef = coef.upd ,
+				var = var.upd
+			)
+			
+		gc()
+		
+		# ..return it.  done.
+		upd.svy
+	}
+
+sbo_degf <- function( x ) survey:::degf( x$coef )
+
+
+```
+---
+~~~
+
+
+
+~~~{download_and_import_block}
+
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+tf <- tempfile()
+
+this_url <- "https://www2.census.gov/programs-surveys/sbo/datasets/2007/pums_csv.zip"
+
+download.file( this_url , tf , mode = 'wb' )
+
+chapter_tag_tbl <- read_csv( tf )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+
+# and use the weights displayed in the census bureau's technical documentation
+chapter_tag_df[ , 'newwgt' ] <- 10 * chapter_tag_df[ , 'tabwgt' ] * sqrt( 1 - 1 / chapter_tag_df[ , 'tabwgt' ] )
+# https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=7
+
+```
+~~~
+
+~~~{analysis_examples_survey_design}
+
+```{r messages = FALSE , eval = FALSE }
+library(survey)
+library(mitools)
+
+
+var_list <- NULL
+
+for( i in 1:10 ) { var_list <- c( var_list , list( subset( chapter_tag_df , rg == i ) ) ) }
+
+#####################################################
+# survey design for a hybrid database-backed object #
+#####################################################
+
+# create a survey design object with the SBO design
+# to use for the coefficients: means, medians, totals, etc.
+sbo_coef <-
+	svydesign(
+		id = ~ 1 ,
+		weight = ~ tabwgt ,
+		data = chapter_tag_df
+	)
+# this one just uses the original table `x`
+
+# create a survey design object with the SBO design
+# to use for the variance and standard error
+sbo_var <-
+	svydesign(
+		id = ~ 1 ,
+		weight = ~ newwgt ,
+		data = mitools::imputationList( var_list )
+	)
+
+# rm( var_list ) ; gc()
+# this one uses the ten `x1` thru `x10` tables you just made.
+
+
+# slap 'em together into a single list object..
+chapter_tag_design <- list( coef = sbo_coef , var = sbo_var )
+class( chapter_tag_design ) <- 'sbosvyimputationList'
+
+
+
+
+# # keep only the variables you need
+# variables_to_keep <- 
+	# c( 
+		# "one" , 
+		# "newwgt" , 
+		# "tabwgt" , 
+		# "receipts_noisy" ,
+		# "employment_noisy" ,
+		# "n07_employer" ,
+		# "established" ,
+		# "healthins" ,
+		# "husbwife"
+	# )
+
+# # keep only columns used in this analysis
+# chapter_tag_design$coef$variables <-
+	# chapter_tag_design$coef$variables[ variables_to_keep ]
+	
+# chapter_tag_design$var <-
+	# lapply( 
+		# chapter_tag_design$var , 
+		# function( w ){
+			# w$variables <- w$variables[ variables_to_keep ]
+			# w
+		# }
+	# )
+	
+# gc()
+# # this step conserves RAM
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		established_before_2000 =
+			ifelse( established %in% c( '0' , 'A' ) , NA , as.numeric( established < 4 ) ) ,
+			
+		healthins =
+			factor( healthins , levels = 1:2 ,
+				labels = c( "offered health insurance" , "did not offer health insurance" )
+			)
+	)
+
+gc()
+~~~
+
+group_by_variable: healthins
+
+categorical_variable: n07_employer
+categorical_variable_description: employer or non-employer
+categorical_narm: , na.rm = TRUE
+
+linear_variable: receipts_noisy
+linear_variable_description: establishment receipts (noisy)
+
+ratio_estimation_numerator: receipts_noisy
+ratio_estimation_denominator: employment_noisy
+
+subset_definition: husbwife %in% 1:3
+subset_definition_description: jointly owned by husband and wife
+
+binary_variable: established_before_2000
+binary_narm: , na.rm = TRUE
+
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+

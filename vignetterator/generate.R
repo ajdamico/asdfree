@@ -1,4 +1,4 @@
-commit_memo <- "'sbo haiku'"
+commit_memo <- "'sbo'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -51,7 +51,7 @@ pull_line <-
 
 book_folder <- "C:/Users/anthonyd/Documents/Github/asdfree/"
 sub_lines <- c( "chapter_title" , "password_parameters" , "table_structure" , "generalizable_population" , "publication_period" , "administrative_organization" , "sql_tablename" , "income_variable_description" , "income_variable" , "ratio_estimation_numerator" , "ratio_estimation_denominator" , "group_by_variable" , "categorical_variable" , "linear_variable" , "binary_variable" , "subset_definition_description" , "subset_definition" , "linear_narm" , "categorical_narm" , "ratio_narm" , "binary_narm" )
-sub_chunks <- c( "reading_block" , "download_and_import_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "intermission_block" , "convey_block" , "replacement_block" )
+sub_chunks <- c( "reading_block" , "definitions_block" , "download_and_import_block" , "analysis_examples_survey_design" , "variable_recoding_block" , "replication_example_block" , "dataset_introduction" , "intermission_block" , "convey_block" , "replacement_block" )
 needs_this_block <- c( "needs_srvyr_block" , "needs_dplyr_block" , "needs_datatable_block" , "needs_duckdb_block" , "needs_actions_build_status_line" , "needs_local_build_status_line" )
 
 
