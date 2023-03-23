@@ -16,6 +16,5 @@ national-survey-on-drug-use-and-health-nsduh: <p><a href="https://github.com/asd
 programme-for-the-international-assessment-of-adult-competencies-piaac: <p><a href="https://github.com/asdfree/piaac/actions"><img src="https://github.com/asdfree/piaac/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 social-security-public-use-data-files-ssa: <p><a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 survey-of-business-owners-sbo: <p><a href="https://github.com/asdfree/sbo/actions"><img src="https://github.com/asdfree/sbo/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-survey-of-consumer-finances-scf: <p><a href="https://github.com/asdfree/scf/actions"><img src="https://github.com/asdfree/scf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 trend-analysis-of-complex-survey-data: <p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 youth-risk-behavior-surveillance-system-yrbss: <p><a href="https://github.com/asdfree/yrbss/actions"><img src="https://github.com/asdfree/yrbss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
