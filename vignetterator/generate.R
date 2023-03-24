@@ -1,4 +1,4 @@
-commit_memo <- "'hide messages on local builds'"
+commit_memo <- "'sbo'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
