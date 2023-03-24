@@ -544,7 +544,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="survey-of-business-owners-sbo" class="section level1 unnumbered hasAnchor">
 <h1>Survey of Business Owners (SBO)<a href="survey-of-business-owners-sbo.html#survey-of-business-owners-sbo" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/sbo/actions"><img src="https://github.com/asdfree/sbo/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>Before its replacement in 2018 by the <a href="https://www.census.gov/newsroom/press-releases/2018/annual-business-survey.html">Annual Business Survey</a>, nearly every tax-filing sole proprietorship, partnership, and corporation nationwide completed this <a href="https://www.census.gov/programs-surveys/sbo/technical-documentation/questionnaires.html">questionnaire</a>. 2007 the only microdata year.</p>
+<p>Before its replacement in 2018 by the <a href="https://www.census.gov/newsroom/press-releases/2018/annual-business-survey.html">Annual Business Survey</a>, nearly every tax-filing sole proprietorship, partnership, and corporation nationwide completed this <a href="https://www.census.gov/programs-surveys/sbo/technical-documentation/questionnaires.html">questionnaire</a>, with 2007 the only microdata year.</p>
 <ul>
 <li><p>One table with one row per firm per state per industry, except <a href="https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=9">eight collapsed geographies</a>.</p></li>
 <li><p>A complex sample survey designed to generalize to <a href="https://www.census.gov/programs-surveys/sbo/technical-documentation/methodology.2007.html">most firms in the United States</a>, public microdata includes <a href="https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=17">classifiable (non-identifiable) firms</a>, i.e. nearly all businesses but only about half of workers.</p></li>
@@ -568,7 +568,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb434"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb434-1"><a href="survey-of-business-owners-sbo.html#cb434-1" aria-hidden="true" tabindex="-1"></a>sbo_MIcombine <span class="ot">&lt;-</span></span>
 <span id="cb434-2"><a href="survey-of-business-owners-sbo.html#cb434-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( x , <span class="at">adjustment =</span> <span class="fl">1.992065</span> ){</span>
 <span id="cb434-3"><a href="survey-of-business-owners-sbo.html#cb434-3" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb434-4"><a href="survey-of-business-owners-sbo.html#cb434-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># just pull the structure of a variance-covariance matrix</span></span>
+<span id="cb434-4"><a href="survey-of-business-owners-sbo.html#cb434-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># pull the structure of a variance-covariance matrix</span></span>
 <span id="cb434-5"><a href="survey-of-business-owners-sbo.html#cb434-5" aria-hidden="true" tabindex="-1"></a>        variance.shell <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>( <span class="fu">vcov</span>( x<span class="sc">$</span>var[[<span class="dv">1</span>]] ) )</span>
 <span id="cb434-6"><a href="survey-of-business-owners-sbo.html#cb434-6" aria-hidden="true" tabindex="-1"></a>        </span>
 <span id="cb434-7"><a href="survey-of-business-owners-sbo.html#cb434-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># initiate a function that will overwrite the diagonals.</span></span>
@@ -594,123 +594,100 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb434-27"><a href="survey-of-business-owners-sbo.html#cb434-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># adjust every number with the factor in the user guide</span></span>
 <span id="cb434-28"><a href="survey-of-business-owners-sbo.html#cb434-28" aria-hidden="true" tabindex="-1"></a>        adj_var <span class="ot">&lt;-</span> adjustment <span class="sc">*</span> variance</span>
 <span id="cb434-29"><a href="survey-of-business-owners-sbo.html#cb434-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb434-30"><a href="survey-of-business-owners-sbo.html#cb434-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># construct a result that looks like</span></span>
-<span id="cb434-31"><a href="survey-of-business-owners-sbo.html#cb434-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># other sbo_MIcombine methods</span></span>
-<span id="cb434-32"><a href="survey-of-business-owners-sbo.html#cb434-32" aria-hidden="true" tabindex="-1"></a>        rval <span class="ot">&lt;-</span></span>
-<span id="cb434-33"><a href="survey-of-business-owners-sbo.html#cb434-33" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>( </span>
-<span id="cb434-34"><a href="survey-of-business-owners-sbo.html#cb434-34" aria-hidden="true" tabindex="-1"></a>                <span class="at">coefficients =</span> <span class="fu">coef</span>( x<span class="sc">$</span>coef ) ,</span>
-<span id="cb434-35"><a href="survey-of-business-owners-sbo.html#cb434-35" aria-hidden="true" tabindex="-1"></a>                <span class="at">variance =</span> adj_var</span>
-<span id="cb434-36"><a href="survey-of-business-owners-sbo.html#cb434-36" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb434-37"><a href="survey-of-business-owners-sbo.html#cb434-37" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-38"><a href="survey-of-business-owners-sbo.html#cb434-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># call it an MIresult class, like other sbo_MIcombine results</span></span>
-<span id="cb434-39"><a href="survey-of-business-owners-sbo.html#cb434-39" aria-hidden="true" tabindex="-1"></a>        <span class="fu">class</span>( rval ) <span class="ot">&lt;-</span> <span class="st">&#39;MIresult&#39;</span></span>
-<span id="cb434-40"><a href="survey-of-business-owners-sbo.html#cb434-40" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-41"><a href="survey-of-business-owners-sbo.html#cb434-41" aria-hidden="true" tabindex="-1"></a>        rval</span>
-<span id="cb434-42"><a href="survey-of-business-owners-sbo.html#cb434-42" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb434-43"><a href="survey-of-business-owners-sbo.html#cb434-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb434-44"><a href="survey-of-business-owners-sbo.html#cb434-44" aria-hidden="true" tabindex="-1"></a>sbo_with <span class="ot">&lt;-</span></span>
-<span id="cb434-45"><a href="survey-of-business-owners-sbo.html#cb434-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span> ( this_design , expr , ... ){</span>
-<span id="cb434-46"><a href="survey-of-business-owners-sbo.html#cb434-46" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb434-47"><a href="survey-of-business-owners-sbo.html#cb434-47" aria-hidden="true" tabindex="-1"></a>        pf <span class="ot">&lt;-</span> <span class="fu">parent.frame</span>()</span>
-<span id="cb434-48"><a href="survey-of-business-owners-sbo.html#cb434-48" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-49"><a href="survey-of-business-owners-sbo.html#cb434-49" aria-hidden="true" tabindex="-1"></a>        expr <span class="ot">&lt;-</span> <span class="fu">substitute</span>( expr )</span>
-<span id="cb434-50"><a href="survey-of-business-owners-sbo.html#cb434-50" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-51"><a href="survey-of-business-owners-sbo.html#cb434-51" aria-hidden="true" tabindex="-1"></a>        expr<span class="sc">$</span>design <span class="ot">&lt;-</span> <span class="fu">as.name</span>(<span class="st">&quot;.design&quot;</span>)</span>
-<span id="cb434-52"><a href="survey-of-business-owners-sbo.html#cb434-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb434-53"><a href="survey-of-business-owners-sbo.html#cb434-53" aria-hidden="true" tabindex="-1"></a>        <span class="co"># this pulls in means, medians, totals, etc.</span></span>
-<span id="cb434-54"><a href="survey-of-business-owners-sbo.html#cb434-54" aria-hidden="true" tabindex="-1"></a>        <span class="co"># notice it uses this_design$coef</span></span>
-<span id="cb434-55"><a href="survey-of-business-owners-sbo.html#cb434-55" aria-hidden="true" tabindex="-1"></a>        results <span class="ot">&lt;-</span> <span class="fu">eval</span>( expr , <span class="fu">list</span>( <span class="at">.design =</span> this_design<span class="sc">$</span>coef ) )</span>
-<span id="cb434-56"><a href="survey-of-business-owners-sbo.html#cb434-56" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-57"><a href="survey-of-business-owners-sbo.html#cb434-57" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-58"><a href="survey-of-business-owners-sbo.html#cb434-58" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-59"><a href="survey-of-business-owners-sbo.html#cb434-59" aria-hidden="true" tabindex="-1"></a>        <span class="co"># this is used to calculate the variance, adjusted variance, standard error</span></span>
-<span id="cb434-60"><a href="survey-of-business-owners-sbo.html#cb434-60" aria-hidden="true" tabindex="-1"></a>        <span class="co"># notice it uses the this_design$var object</span></span>
-<span id="cb434-61"><a href="survey-of-business-owners-sbo.html#cb434-61" aria-hidden="true" tabindex="-1"></a>        variances <span class="ot">&lt;-</span> </span>
-<span id="cb434-62"><a href="survey-of-business-owners-sbo.html#cb434-62" aria-hidden="true" tabindex="-1"></a>            <span class="fu">lapply</span>( </span>
-<span id="cb434-63"><a href="survey-of-business-owners-sbo.html#cb434-63" aria-hidden="true" tabindex="-1"></a>                this_design<span class="sc">$</span>var<span class="sc">$</span>designs , </span>
-<span id="cb434-64"><a href="survey-of-business-owners-sbo.html#cb434-64" aria-hidden="true" tabindex="-1"></a>                <span class="cf">function</span>( .design ){ </span>
-<span id="cb434-65"><a href="survey-of-business-owners-sbo.html#cb434-65" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">eval</span>( expr , <span class="fu">list</span>( <span class="at">.design =</span> .design ) , <span class="at">enclos =</span> pf ) </span>
-<span id="cb434-66"><a href="survey-of-business-owners-sbo.html#cb434-66" aria-hidden="true" tabindex="-1"></a>                } </span>
-<span id="cb434-67"><a href="survey-of-business-owners-sbo.html#cb434-67" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb434-30"><a href="survey-of-business-owners-sbo.html#cb434-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># construct a result that looks like other sbo_MIcombine methods</span></span>
+<span id="cb434-31"><a href="survey-of-business-owners-sbo.html#cb434-31" aria-hidden="true" tabindex="-1"></a>        rval <span class="ot">&lt;-</span></span>
+<span id="cb434-32"><a href="survey-of-business-owners-sbo.html#cb434-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>( </span>
+<span id="cb434-33"><a href="survey-of-business-owners-sbo.html#cb434-33" aria-hidden="true" tabindex="-1"></a>                <span class="at">coefficients =</span> <span class="fu">coef</span>( x<span class="sc">$</span>coef ) ,</span>
+<span id="cb434-34"><a href="survey-of-business-owners-sbo.html#cb434-34" aria-hidden="true" tabindex="-1"></a>                <span class="at">variance =</span> adj_var</span>
+<span id="cb434-35"><a href="survey-of-business-owners-sbo.html#cb434-35" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb434-36"><a href="survey-of-business-owners-sbo.html#cb434-36" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-37"><a href="survey-of-business-owners-sbo.html#cb434-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># call it an MIresult class, like other sbo_MIcombine results</span></span>
+<span id="cb434-38"><a href="survey-of-business-owners-sbo.html#cb434-38" aria-hidden="true" tabindex="-1"></a>        <span class="fu">class</span>( rval ) <span class="ot">&lt;-</span> <span class="st">&#39;MIresult&#39;</span></span>
+<span id="cb434-39"><a href="survey-of-business-owners-sbo.html#cb434-39" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-40"><a href="survey-of-business-owners-sbo.html#cb434-40" aria-hidden="true" tabindex="-1"></a>        rval</span>
+<span id="cb434-41"><a href="survey-of-business-owners-sbo.html#cb434-41" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb434-42"><a href="survey-of-business-owners-sbo.html#cb434-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb434-43"><a href="survey-of-business-owners-sbo.html#cb434-43" aria-hidden="true" tabindex="-1"></a>sbo_with <span class="ot">&lt;-</span></span>
+<span id="cb434-44"><a href="survey-of-business-owners-sbo.html#cb434-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span> ( this_design , expr , ... ){</span>
+<span id="cb434-45"><a href="survey-of-business-owners-sbo.html#cb434-45" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb434-46"><a href="survey-of-business-owners-sbo.html#cb434-46" aria-hidden="true" tabindex="-1"></a>        pf <span class="ot">&lt;-</span> <span class="fu">parent.frame</span>()</span>
+<span id="cb434-47"><a href="survey-of-business-owners-sbo.html#cb434-47" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-48"><a href="survey-of-business-owners-sbo.html#cb434-48" aria-hidden="true" tabindex="-1"></a>        expr <span class="ot">&lt;-</span> <span class="fu">substitute</span>( expr )</span>
+<span id="cb434-49"><a href="survey-of-business-owners-sbo.html#cb434-49" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-50"><a href="survey-of-business-owners-sbo.html#cb434-50" aria-hidden="true" tabindex="-1"></a>        expr<span class="sc">$</span>design <span class="ot">&lt;-</span> <span class="fu">as.name</span>(<span class="st">&quot;.design&quot;</span>)</span>
+<span id="cb434-51"><a href="survey-of-business-owners-sbo.html#cb434-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb434-52"><a href="survey-of-business-owners-sbo.html#cb434-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># this pulls in means, medians, totals, etc.</span></span>
+<span id="cb434-53"><a href="survey-of-business-owners-sbo.html#cb434-53" aria-hidden="true" tabindex="-1"></a>        <span class="co"># notice it uses this_design$coef</span></span>
+<span id="cb434-54"><a href="survey-of-business-owners-sbo.html#cb434-54" aria-hidden="true" tabindex="-1"></a>        results <span class="ot">&lt;-</span> <span class="fu">eval</span>( expr , <span class="fu">list</span>( <span class="at">.design =</span> this_design<span class="sc">$</span>coef ) )</span>
+<span id="cb434-55"><a href="survey-of-business-owners-sbo.html#cb434-55" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-56"><a href="survey-of-business-owners-sbo.html#cb434-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># this is used to calculate the variance, adjusted variance, standard error</span></span>
+<span id="cb434-57"><a href="survey-of-business-owners-sbo.html#cb434-57" aria-hidden="true" tabindex="-1"></a>        <span class="co"># notice it uses the this_design$var object</span></span>
+<span id="cb434-58"><a href="survey-of-business-owners-sbo.html#cb434-58" aria-hidden="true" tabindex="-1"></a>        variances <span class="ot">&lt;-</span> </span>
+<span id="cb434-59"><a href="survey-of-business-owners-sbo.html#cb434-59" aria-hidden="true" tabindex="-1"></a>            <span class="fu">lapply</span>( </span>
+<span id="cb434-60"><a href="survey-of-business-owners-sbo.html#cb434-60" aria-hidden="true" tabindex="-1"></a>                this_design<span class="sc">$</span>var<span class="sc">$</span>designs , </span>
+<span id="cb434-61"><a href="survey-of-business-owners-sbo.html#cb434-61" aria-hidden="true" tabindex="-1"></a>                <span class="cf">function</span>( .design ){ </span>
+<span id="cb434-62"><a href="survey-of-business-owners-sbo.html#cb434-62" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">eval</span>( expr , <span class="fu">list</span>( <span class="at">.design =</span> .design ) , <span class="at">enclos =</span> pf ) </span>
+<span id="cb434-63"><a href="survey-of-business-owners-sbo.html#cb434-63" aria-hidden="true" tabindex="-1"></a>                } </span>
+<span id="cb434-64"><a href="survey-of-business-owners-sbo.html#cb434-64" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb434-65"><a href="survey-of-business-owners-sbo.html#cb434-65" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-66"><a href="survey-of-business-owners-sbo.html#cb434-66" aria-hidden="true" tabindex="-1"></a>        <span class="co"># combine both results..</span></span>
+<span id="cb434-67"><a href="survey-of-business-owners-sbo.html#cb434-67" aria-hidden="true" tabindex="-1"></a>        rval <span class="ot">&lt;-</span> <span class="fu">list</span>( <span class="at">coef =</span> results , <span class="at">var =</span> variances )</span>
 <span id="cb434-68"><a href="survey-of-business-owners-sbo.html#cb434-68" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-69"><a href="survey-of-business-owners-sbo.html#cb434-69" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-70"><a href="survey-of-business-owners-sbo.html#cb434-70" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-71"><a href="survey-of-business-owners-sbo.html#cb434-71" aria-hidden="true" tabindex="-1"></a>        <span class="co"># combine both results..</span></span>
-<span id="cb434-72"><a href="survey-of-business-owners-sbo.html#cb434-72" aria-hidden="true" tabindex="-1"></a>        rval <span class="ot">&lt;-</span> <span class="fu">list</span>( <span class="at">coef =</span> results , <span class="at">var =</span> variances )</span>
-<span id="cb434-73"><a href="survey-of-business-owners-sbo.html#cb434-73" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-74"><a href="survey-of-business-owners-sbo.html#cb434-74" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ..into a brand new object class</span></span>
-<span id="cb434-75"><a href="survey-of-business-owners-sbo.html#cb434-75" aria-hidden="true" tabindex="-1"></a>        <span class="fu">class</span>( rval ) <span class="ot">&lt;-</span> <span class="st">&#39;imputationResultList&#39;</span></span>
-<span id="cb434-76"><a href="survey-of-business-owners-sbo.html#cb434-76" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-77"><a href="survey-of-business-owners-sbo.html#cb434-77" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-78"><a href="survey-of-business-owners-sbo.html#cb434-78" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-79"><a href="survey-of-business-owners-sbo.html#cb434-79" aria-hidden="true" tabindex="-1"></a>        <span class="co"># and return it.</span></span>
-<span id="cb434-80"><a href="survey-of-business-owners-sbo.html#cb434-80" aria-hidden="true" tabindex="-1"></a>        rval</span>
-<span id="cb434-81"><a href="survey-of-business-owners-sbo.html#cb434-81" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb434-82"><a href="survey-of-business-owners-sbo.html#cb434-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb434-83"><a href="survey-of-business-owners-sbo.html#cb434-83" aria-hidden="true" tabindex="-1"></a>sbo_subset <span class="ot">&lt;-</span></span>
-<span id="cb434-84"><a href="survey-of-business-owners-sbo.html#cb434-84" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( x , ... ){</span>
-<span id="cb434-85"><a href="survey-of-business-owners-sbo.html#cb434-85" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-86"><a href="survey-of-business-owners-sbo.html#cb434-86" aria-hidden="true" tabindex="-1"></a>        <span class="co"># subset the survey object that&#39;s going to be used for</span></span>
-<span id="cb434-87"><a href="survey-of-business-owners-sbo.html#cb434-87" aria-hidden="true" tabindex="-1"></a>        <span class="co"># means, medians, totals, etc.</span></span>
-<span id="cb434-88"><a href="survey-of-business-owners-sbo.html#cb434-88" aria-hidden="true" tabindex="-1"></a>        coef.sub <span class="ot">&lt;-</span> <span class="fu">subset</span>( x<span class="sc">$</span>coef , ... )</span>
-<span id="cb434-89"><a href="survey-of-business-owners-sbo.html#cb434-89" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-90"><a href="survey-of-business-owners-sbo.html#cb434-90" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-91"><a href="survey-of-business-owners-sbo.html#cb434-91" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-92"><a href="survey-of-business-owners-sbo.html#cb434-92" aria-hidden="true" tabindex="-1"></a>        <span class="co"># replicate `var.sub` so it&#39;s got all the same attributes as `x$var`</span></span>
-<span id="cb434-93"><a href="survey-of-business-owners-sbo.html#cb434-93" aria-hidden="true" tabindex="-1"></a>        var.sub <span class="ot">&lt;-</span> x<span class="sc">$</span>var</span>
-<span id="cb434-94"><a href="survey-of-business-owners-sbo.html#cb434-94" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-95"><a href="survey-of-business-owners-sbo.html#cb434-95" aria-hidden="true" tabindex="-1"></a>        <span class="co"># but then overwrite the `designs` attribute with a subset</span></span>
-<span id="cb434-96"><a href="survey-of-business-owners-sbo.html#cb434-96" aria-hidden="true" tabindex="-1"></a>        var.sub<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var<span class="sc">$</span>designs , subset , ... )</span>
-<span id="cb434-97"><a href="survey-of-business-owners-sbo.html#cb434-97" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-98"><a href="survey-of-business-owners-sbo.html#cb434-98" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-99"><a href="survey-of-business-owners-sbo.html#cb434-99" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-100"><a href="survey-of-business-owners-sbo.html#cb434-100" aria-hidden="true" tabindex="-1"></a>        <span class="co"># now re-create the `sbosvyimputationList` just as before</span></span>
-<span id="cb434-101"><a href="survey-of-business-owners-sbo.html#cb434-101" aria-hidden="true" tabindex="-1"></a>        sub.svy <span class="ot">&lt;-</span></span>
-<span id="cb434-102"><a href="survey-of-business-owners-sbo.html#cb434-102" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>(</span>
-<span id="cb434-103"><a href="survey-of-business-owners-sbo.html#cb434-103" aria-hidden="true" tabindex="-1"></a>                <span class="at">coef =</span> coef.sub ,</span>
-<span id="cb434-104"><a href="survey-of-business-owners-sbo.html#cb434-104" aria-hidden="true" tabindex="-1"></a>                <span class="at">var =</span> var.sub</span>
-<span id="cb434-105"><a href="survey-of-business-owners-sbo.html#cb434-105" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb434-69"><a href="survey-of-business-owners-sbo.html#cb434-69" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ..into a brand new object class</span></span>
+<span id="cb434-70"><a href="survey-of-business-owners-sbo.html#cb434-70" aria-hidden="true" tabindex="-1"></a>        <span class="fu">class</span>( rval ) <span class="ot">&lt;-</span> <span class="st">&#39;imputationResultList&#39;</span></span>
+<span id="cb434-71"><a href="survey-of-business-owners-sbo.html#cb434-71" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-72"><a href="survey-of-business-owners-sbo.html#cb434-72" aria-hidden="true" tabindex="-1"></a>        rval</span>
+<span id="cb434-73"><a href="survey-of-business-owners-sbo.html#cb434-73" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb434-74"><a href="survey-of-business-owners-sbo.html#cb434-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb434-75"><a href="survey-of-business-owners-sbo.html#cb434-75" aria-hidden="true" tabindex="-1"></a>sbo_subset <span class="ot">&lt;-</span></span>
+<span id="cb434-76"><a href="survey-of-business-owners-sbo.html#cb434-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( x , ... ){</span>
+<span id="cb434-77"><a href="survey-of-business-owners-sbo.html#cb434-77" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-78"><a href="survey-of-business-owners-sbo.html#cb434-78" aria-hidden="true" tabindex="-1"></a>        <span class="co"># subset the survey object</span></span>
+<span id="cb434-79"><a href="survey-of-business-owners-sbo.html#cb434-79" aria-hidden="true" tabindex="-1"></a>        coef.sub <span class="ot">&lt;-</span> <span class="fu">subset</span>( x<span class="sc">$</span>coef , ... )</span>
+<span id="cb434-80"><a href="survey-of-business-owners-sbo.html#cb434-80" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-81"><a href="survey-of-business-owners-sbo.html#cb434-81" aria-hidden="true" tabindex="-1"></a>        <span class="co"># replicate `var.sub` so it&#39;s got all the same attributes as `x$var`</span></span>
+<span id="cb434-82"><a href="survey-of-business-owners-sbo.html#cb434-82" aria-hidden="true" tabindex="-1"></a>        var.sub <span class="ot">&lt;-</span> x<span class="sc">$</span>var</span>
+<span id="cb434-83"><a href="survey-of-business-owners-sbo.html#cb434-83" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-84"><a href="survey-of-business-owners-sbo.html#cb434-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># but then overwrite the `designs` attribute with a subset</span></span>
+<span id="cb434-85"><a href="survey-of-business-owners-sbo.html#cb434-85" aria-hidden="true" tabindex="-1"></a>        var.sub<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var<span class="sc">$</span>designs , subset , ... )</span>
+<span id="cb434-86"><a href="survey-of-business-owners-sbo.html#cb434-86" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-87"><a href="survey-of-business-owners-sbo.html#cb434-87" aria-hidden="true" tabindex="-1"></a>        <span class="co"># now re-create the `sbosvyimputationList` just as before..</span></span>
+<span id="cb434-88"><a href="survey-of-business-owners-sbo.html#cb434-88" aria-hidden="true" tabindex="-1"></a>        sub.svy <span class="ot">&lt;-</span></span>
+<span id="cb434-89"><a href="survey-of-business-owners-sbo.html#cb434-89" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>(</span>
+<span id="cb434-90"><a href="survey-of-business-owners-sbo.html#cb434-90" aria-hidden="true" tabindex="-1"></a>                <span class="at">coef =</span> coef.sub ,</span>
+<span id="cb434-91"><a href="survey-of-business-owners-sbo.html#cb434-91" aria-hidden="true" tabindex="-1"></a>                <span class="at">var =</span> var.sub</span>
+<span id="cb434-92"><a href="survey-of-business-owners-sbo.html#cb434-92" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb434-93"><a href="survey-of-business-owners-sbo.html#cb434-93" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-94"><a href="survey-of-business-owners-sbo.html#cb434-94" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ..and give it the same class</span></span>
+<span id="cb434-95"><a href="survey-of-business-owners-sbo.html#cb434-95" aria-hidden="true" tabindex="-1"></a>        sub.svy<span class="sc">$</span>call <span class="ot">&lt;-</span> <span class="fu">sys.call</span>(<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb434-96"><a href="survey-of-business-owners-sbo.html#cb434-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb434-97"><a href="survey-of-business-owners-sbo.html#cb434-97" aria-hidden="true" tabindex="-1"></a>        sub.svy</span>
+<span id="cb434-98"><a href="survey-of-business-owners-sbo.html#cb434-98" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb434-99"><a href="survey-of-business-owners-sbo.html#cb434-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb434-100"><a href="survey-of-business-owners-sbo.html#cb434-100" aria-hidden="true" tabindex="-1"></a>sbo_update <span class="ot">&lt;-</span></span>
+<span id="cb434-101"><a href="survey-of-business-owners-sbo.html#cb434-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( x , ... ){</span>
+<span id="cb434-102"><a href="survey-of-business-owners-sbo.html#cb434-102" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-103"><a href="survey-of-business-owners-sbo.html#cb434-103" aria-hidden="true" tabindex="-1"></a>        <span class="co"># update the survey object that&#39;s going to be used for</span></span>
+<span id="cb434-104"><a href="survey-of-business-owners-sbo.html#cb434-104" aria-hidden="true" tabindex="-1"></a>        <span class="co"># means, medians, totals, etc.</span></span>
+<span id="cb434-105"><a href="survey-of-business-owners-sbo.html#cb434-105" aria-hidden="true" tabindex="-1"></a>        coef.upd <span class="ot">&lt;-</span> <span class="fu">update</span>( x<span class="sc">$</span>coef , ... )</span>
 <span id="cb434-106"><a href="survey-of-business-owners-sbo.html#cb434-106" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-107"><a href="survey-of-business-owners-sbo.html#cb434-107" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ..class it..</span></span>
-<span id="cb434-108"><a href="survey-of-business-owners-sbo.html#cb434-108" aria-hidden="true" tabindex="-1"></a>        sub.svy<span class="sc">$</span>call <span class="ot">&lt;-</span> <span class="fu">sys.call</span>(<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb434-107"><a href="survey-of-business-owners-sbo.html#cb434-107" aria-hidden="true" tabindex="-1"></a>        <span class="co"># replicate `var.upd` so it&#39;s got all the same attributes as `x$var`</span></span>
+<span id="cb434-108"><a href="survey-of-business-owners-sbo.html#cb434-108" aria-hidden="true" tabindex="-1"></a>        var.upd <span class="ot">&lt;-</span> x<span class="sc">$</span>var</span>
 <span id="cb434-109"><a href="survey-of-business-owners-sbo.html#cb434-109" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-110"><a href="survey-of-business-owners-sbo.html#cb434-110" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-111"><a href="survey-of-business-owners-sbo.html#cb434-111" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-112"><a href="survey-of-business-owners-sbo.html#cb434-112" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ..return it. done.</span></span>
-<span id="cb434-113"><a href="survey-of-business-owners-sbo.html#cb434-113" aria-hidden="true" tabindex="-1"></a>        sub.svy</span>
-<span id="cb434-114"><a href="survey-of-business-owners-sbo.html#cb434-114" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb434-115"><a href="survey-of-business-owners-sbo.html#cb434-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb434-116"><a href="survey-of-business-owners-sbo.html#cb434-116" aria-hidden="true" tabindex="-1"></a>sbo_update <span class="ot">&lt;-</span></span>
-<span id="cb434-117"><a href="survey-of-business-owners-sbo.html#cb434-117" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( x , ... ){</span>
-<span id="cb434-118"><a href="survey-of-business-owners-sbo.html#cb434-118" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-119"><a href="survey-of-business-owners-sbo.html#cb434-119" aria-hidden="true" tabindex="-1"></a>        <span class="co"># update the survey object that&#39;s going to be used for</span></span>
-<span id="cb434-120"><a href="survey-of-business-owners-sbo.html#cb434-120" aria-hidden="true" tabindex="-1"></a>        <span class="co"># means, medians, totals, etc.</span></span>
-<span id="cb434-121"><a href="survey-of-business-owners-sbo.html#cb434-121" aria-hidden="true" tabindex="-1"></a>        coef.upd <span class="ot">&lt;-</span> <span class="fu">update</span>( x<span class="sc">$</span>coef , ... )</span>
-<span id="cb434-122"><a href="survey-of-business-owners-sbo.html#cb434-122" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-123"><a href="survey-of-business-owners-sbo.html#cb434-123" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-124"><a href="survey-of-business-owners-sbo.html#cb434-124" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-125"><a href="survey-of-business-owners-sbo.html#cb434-125" aria-hidden="true" tabindex="-1"></a>        <span class="co"># replicate `var.upd` so it&#39;s got all the same attributes as `x$var`</span></span>
-<span id="cb434-126"><a href="survey-of-business-owners-sbo.html#cb434-126" aria-hidden="true" tabindex="-1"></a>        var.upd <span class="ot">&lt;-</span> x<span class="sc">$</span>var</span>
-<span id="cb434-127"><a href="survey-of-business-owners-sbo.html#cb434-127" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-128"><a href="survey-of-business-owners-sbo.html#cb434-128" aria-hidden="true" tabindex="-1"></a>        <span class="co"># but then overwrite the `designs` attribute with an update</span></span>
-<span id="cb434-129"><a href="survey-of-business-owners-sbo.html#cb434-129" aria-hidden="true" tabindex="-1"></a>        var.upd<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var<span class="sc">$</span>designs , update , ... )</span>
-<span id="cb434-130"><a href="survey-of-business-owners-sbo.html#cb434-130" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-131"><a href="survey-of-business-owners-sbo.html#cb434-131" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-132"><a href="survey-of-business-owners-sbo.html#cb434-132" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-133"><a href="survey-of-business-owners-sbo.html#cb434-133" aria-hidden="true" tabindex="-1"></a>        <span class="co"># now re-create the `sbosvyimputationList` just as before</span></span>
-<span id="cb434-134"><a href="survey-of-business-owners-sbo.html#cb434-134" aria-hidden="true" tabindex="-1"></a>        upd.svy <span class="ot">&lt;-</span></span>
-<span id="cb434-135"><a href="survey-of-business-owners-sbo.html#cb434-135" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>(</span>
-<span id="cb434-136"><a href="survey-of-business-owners-sbo.html#cb434-136" aria-hidden="true" tabindex="-1"></a>                <span class="at">coef =</span> coef.upd ,</span>
-<span id="cb434-137"><a href="survey-of-business-owners-sbo.html#cb434-137" aria-hidden="true" tabindex="-1"></a>                <span class="at">var =</span> var.upd</span>
-<span id="cb434-138"><a href="survey-of-business-owners-sbo.html#cb434-138" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb434-139"><a href="survey-of-business-owners-sbo.html#cb434-139" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb434-140"><a href="survey-of-business-owners-sbo.html#cb434-140" aria-hidden="true" tabindex="-1"></a>        <span class="fu">gc</span>()</span>
-<span id="cb434-141"><a href="survey-of-business-owners-sbo.html#cb434-141" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb434-142"><a href="survey-of-business-owners-sbo.html#cb434-142" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ..return it. done.</span></span>
-<span id="cb434-143"><a href="survey-of-business-owners-sbo.html#cb434-143" aria-hidden="true" tabindex="-1"></a>        upd.svy</span>
-<span id="cb434-144"><a href="survey-of-business-owners-sbo.html#cb434-144" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb434-145"><a href="survey-of-business-owners-sbo.html#cb434-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb434-146"><a href="survey-of-business-owners-sbo.html#cb434-146" aria-hidden="true" tabindex="-1"></a>sbo_degf <span class="ot">&lt;-</span> <span class="cf">function</span>( x ) <span class="fu">degf</span>( x<span class="sc">$</span>coef )</span></code></pre></div>
+<span id="cb434-110"><a href="survey-of-business-owners-sbo.html#cb434-110" aria-hidden="true" tabindex="-1"></a>        <span class="co"># but then overwrite the `designs` attribute with an update</span></span>
+<span id="cb434-111"><a href="survey-of-business-owners-sbo.html#cb434-111" aria-hidden="true" tabindex="-1"></a>        var.upd<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var<span class="sc">$</span>designs , update , ... )</span>
+<span id="cb434-112"><a href="survey-of-business-owners-sbo.html#cb434-112" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-113"><a href="survey-of-business-owners-sbo.html#cb434-113" aria-hidden="true" tabindex="-1"></a>        <span class="co"># now re-create the `sbosvyimputationList` just as before</span></span>
+<span id="cb434-114"><a href="survey-of-business-owners-sbo.html#cb434-114" aria-hidden="true" tabindex="-1"></a>        upd.svy <span class="ot">&lt;-</span></span>
+<span id="cb434-115"><a href="survey-of-business-owners-sbo.html#cb434-115" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>(</span>
+<span id="cb434-116"><a href="survey-of-business-owners-sbo.html#cb434-116" aria-hidden="true" tabindex="-1"></a>                <span class="at">coef =</span> coef.upd ,</span>
+<span id="cb434-117"><a href="survey-of-business-owners-sbo.html#cb434-117" aria-hidden="true" tabindex="-1"></a>                <span class="at">var =</span> var.upd</span>
+<span id="cb434-118"><a href="survey-of-business-owners-sbo.html#cb434-118" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb434-119"><a href="survey-of-business-owners-sbo.html#cb434-119" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb434-120"><a href="survey-of-business-owners-sbo.html#cb434-120" aria-hidden="true" tabindex="-1"></a>        upd.svy</span>
+<span id="cb434-121"><a href="survey-of-business-owners-sbo.html#cb434-121" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb434-122"><a href="survey-of-business-owners-sbo.html#cb434-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb434-123"><a href="survey-of-business-owners-sbo.html#cb434-123" aria-hidden="true" tabindex="-1"></a>sbo_degf <span class="ot">&lt;-</span> <span class="cf">function</span>( x ) <span class="fu">degf</span>( x<span class="sc">$</span>coef )</span></code></pre></div>
 <hr />
 </div>
 <div id="download-import-preparation-15" class="section level2 unnumbered hasAnchor">
