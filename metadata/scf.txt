@@ -2,7 +2,7 @@
 MIcombine
 scf_MIcombine
  se = TRUE
- se = TRUE , method = 'constant' , interval.type = 'quantile'
+ se = TRUE , interval.type = 'quantile'
 ~~~
 
 
@@ -284,20 +284,6 @@ binary_variable: married
 ~~~
 
 
-~~~{convey_block}
-## Poverty and Inequality Estimation with `convey` \\ {-}
-
-The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
-
-```{r eval = FALSE , results = "hide" }
-library(convey)
-chapter_tag_design$designs <- lapply( chapter_tag_design$designs , convey_prep )
-
-MIcombine( with( chapter_tag_design , svygini( ~ networth ) ) )
-```
-~~~
-
-
 ~~~{replication_example_block}
 ## Replication Example {-}
 
@@ -317,28 +303,29 @@ stopifnot( round( coef( mean_net_worth ) / 1000 , 2 ) == 746.82 )
 stopifnot( abs( 15.6 - round( SE( mean_net_worth ) / 1000 , 1 ) ) < 0.1 )
 
 
-# compute median net worth using the 2019 PUF
-median_net_worth <-
-	MIcombine( with( chapter_tag_design ,
-		svyquantile(
-			~ networth ,
-			0.5 , se = TRUE ,
-			ci = TRUE
-	) ) )
+# compute quantile with all five implicates stacked
+# matches the public excel tables but not the recommended technique
+fake_design <- svydesign( ~ 1 , data = p_df[ c( 'networth' , 'wgt' ) ] , weights = ~ wgt )
+median_net_worth_incorrect_errors <- svyquantile( ~ networth , fake_design , 0.5 )
 
-# for( this_qrule in c("math","school","shahvaish","hf1","hf2","hf3",
-# 		      "hf4","hf5","hf6","hf7","hf8","hf9") ){
-# 			  print( this_qrule )
-# print( MIcombine( with( chapter_tag_design , svyquantile( ~ networth , 0.5 , interval.type = 'quantile' , qrule = this_qrule ) ) ) )
-# }
-
-
-# confirm the estimate and standard error match FRB calculations within one dollar
-# stopifnot( round( coef( median_net_worth ) ) == 97306 )
-# stopifnot( round( SE( median_net_worth ) ) == 2699 )
-
-# MIcombine( with( chapter_tag_design , oldsvyquantile( ~networth , 0.5 , method = 'constant' , interval.type = 'quantile' ) ) )
+# exactly match "Table 4" tab cell V6 of
+# https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx
+stopifnot( round( coef( median_net_worth_incorrect_errors ) / 1000 , 2 ) == 121.76 )
 ```
 ~~~
 
 
+
+
+~~~{convey_block}
+## Poverty and Inequality Estimation with `convey` \\ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+chapter_tag_design$designs <- lapply( chapter_tag_design$designs , convey_prep )
+
+MIcombine( with( chapter_tag_design , svygini( ~ networth ) ) )
+```
+~~~
