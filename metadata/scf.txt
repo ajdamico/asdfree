@@ -1,0 +1,344 @@
+~~~{replacement_block}
+MIcombine
+scf_MIcombine
+ se = TRUE
+ se = TRUE , method = 'constant' , interval.type = 'quantile'
+~~~
+
+
+
+chapter_title: Survey of Consumer Finances
+
+
+
+
+
+needs_actions_build_status_line: yes
+
+
+~~~{dataset_introduction}
+The Survey of Consumer Finances (SCF) tracks the wealth of American families.  Six thousand households answer a battery of questions about income, net worth, credit card debt, pensions, mortgages, even the lease on their cars.  Plenty of surveys collect annual income, only the Survey of Consumer Finances captures such detailed asset data.
+~~~
+
+table_structure: * One set of five tables of survey responses and a separate table with replicate weights, each table containing with one row per sampled household.  The set of five tables of survey responses contain successive replicates of each sampled households, used to properly account for statistical uncertainty.
+
+generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional population of the United States.
+
+publication_period: * Released triennially since 1989.
+
+administrative_organization: * Administered by the [Board of Governors of the Federal Reserve System](https://www.federalreserve.gov/).
+
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. 
+
+2. 
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# incomes, assets, debts
+# high net worth oversample
+# pig bank laproscope
+```
+~~~
+
+
+
+~~~{definitions_block}
+## Function Definitions {-}
+
+This survey uses a dual design variance estimation technique described in the [Data Users Guide](https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=7).  Most users do not need to study these functions carefully.  Define functions specific to only this dataset:
+
+```{r eval = FALSE , results = "hide" }
+
+# variant of \code{mitools::MIcombine} that only uses the sampling variance from the first implicate instead of averaging all five
+
+scf_MIcombine <-
+	function (results, variances, call = sys.call(), df.complete = Inf, ...) {
+		m <- length(results)
+		oldcall <- attr(results, "call")
+		if (missing(variances)) {
+			variances <- suppressWarnings(lapply(results, vcov))
+			results <- lapply(results, coef)
+		}
+		vbar <- variances[[1]]
+		cbar <- results[[1]]
+		for (i in 2:m) {
+			cbar <- cbar + results[[i]]
+			# MODIFICATION:
+			# vbar <- vbar + variances[[i]]
+		}
+		cbar <- cbar/m
+		# MODIFICATION:
+		# vbar <- vbar/m
+		evar <- var(do.call("rbind", results))
+		r <- (1 + 1/m) * evar/vbar
+		df <- (m - 1) * (1 + 1/r)^2
+		if (is.matrix(df)) df <- diag(df)
+		if (is.finite(df.complete)) {
+			dfobs <- ((df.complete + 1)/(df.complete + 3)) * df.complete *
+			vbar/(vbar + evar)
+			if (is.matrix(dfobs)) dfobs <- diag(dfobs)
+			df <- 1/(1/dfobs + 1/df)
+		}
+		if (is.matrix(r)) r <- diag(r)
+		rval <- list(coefficients = cbar, variance = vbar + evar *
+		(m + 1)/m, call = c(oldcall, call), nimp = m, df = df,
+		missinfo = (r + 2/(df + 3))/(r + 1))
+		class(rval) <- "MIresult"
+		rval
+	}
+
+
+
+
+```
+---
+~~~
+
+
+~~~{download_and_import_block}
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+tf_s <- tempfile()
+
+tf_p <- tempfile()
+
+tf_rw <- tempfile()
+
+download.file( "https://www.federalreserve.gov/econres/files/scf2019s.zip" , tf_s , mode = 'wb' )
+
+download.file( "https://www.federalreserve.gov/econres/files/scfp2019s.zip" , tf_p , mode = 'wb' )
+
+download.file( "https://www.federalreserve.gov/econres/files/scf2019rw1s.zip" , tf_rw , mode = 'wb' )
+
+s_tbl <- read_dta( tf_s )
+
+p_tbl <- read_dta( tf_p )
+
+rw_tbl <- read_dta( tf_rw )
+
+s_df <- data.frame( s_tbl )
+
+p_df <- data.frame( p_tbl )
+
+chapter_tag_rw_df <- data.frame( rw_tbl )
+
+names( s_df ) <- tolower( names( s_df ) )
+
+names( p_df ) <- tolower( names( p_df ) )
+
+names( chapter_tag_rw_df ) <- tolower( names( chapter_tag_rw_df ) )
+
+stopifnot( nrow( s_df ) == nrow( chapter_tag_rw_df ) * 5 )
+stopifnot( nrow( s_df ) == nrow( p_df ) )
+```
+~~~
+
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+
+```{r messages = FALSE , eval = FALSE }
+library(survey)
+library(mitools)
+
+
+
+# confirm that the only overlapping columns
+# between the three data sets are `y1`
+# (the unique primary economic unit id - peu)
+# and `yy1` (the five records of the peu)
+stopifnot( all.equal( sort( intersect( names( s_df ) , names( p_df ) ) ) , c( 'y1' , 'yy1' ) ) )
+stopifnot( all.equal( sort( intersect( names( s_df ) , names( chapter_tag_rw_df ) ) ) , c( 'y1' , 'yy1' ) ) )
+stopifnot( all.equal( sort( intersect( names( p_df ) , names( chapter_tag_rw_df ) ) ) , c( 'y1' , 'yy1' ) ) )
+
+
+
+
+# throw out the unique identifiers ending with `1`
+# because they only match one-fifth of the records in the survey data
+chapter_tag_rw_df$y1 <- NULL
+
+# `s_df` currently contains
+# five records per household -- all five of the implicates.
+
+# add a column `one` to every record, containing just the number one
+s_df$one <- 1
+
+# add a column `five` to every record, containing just the number five
+s_df$five <- 5
+# note: this column should be used to calculate weighted totals.
+
+# break `s_df` into five different data sets
+# based on the final character of the column 'y1'
+# which separates the five implicates
+s1_df <- s_df[ substr( s_df$y1 , nchar( s_df$y1 ) , nchar( s_df$y1 ) ) == 1 , ]
+s2_df <- s_df[ substr( s_df$y1 , nchar( s_df$y1 ) , nchar( s_df$y1 ) ) == 2 , ]
+s3_df <- s_df[ substr( s_df$y1 , nchar( s_df$y1 ) , nchar( s_df$y1 ) ) == 3 , ]
+s4_df <- s_df[ substr( s_df$y1 , nchar( s_df$y1 ) , nchar( s_df$y1 ) ) == 4 , ]
+s5_df <- s_df[ substr( s_df$y1 , nchar( s_df$y1 ) , nchar( s_df$y1 ) ) == 5 , ]
+
+# count the total number of records in `s_df`
+m.rows <- nrow( s_df )
+
+# confirm that the number of records did not change
+stopifnot(
+	sum( nrow( s1_df ) , nrow( s2_df ) , nrow( s3_df ) , nrow( s4_df ) , nrow( s5_df ) ) == m.rows
+)
+
+# sort all five implicates by the unique identifier
+# s1_df <- s1_df[ order( s1_df$yy1 ) , ]
+# s2_df <- s2_df[ order( s2_df$yy1 ) , ]
+# s3_df <- s3_df[ order( s3_df$yy1 ) , ]
+# s4_df <- s4_df[ order( s4_df$yy1 ) , ]
+# s5_df <- s5_df[ order( s5_df$yy1 ) , ]
+
+chapter_tag_imp <- list( s1_df , s2_df , s3_df , s4_df , s5_df )
+
+chapter_tag_list <- lapply( chapter_tag_imp , merge , p_df )
+
+chapter_tag_list <- lapply( chapter_tag_list , function( w ) w[ order( w[ , 'yy1' ] ) , ] )
+
+# replace all missing values in the replicate weights table with zeroes..
+chapter_tag_rw_df[ is.na( chapter_tag_rw_df ) ] <- 0
+
+# ..then multiply the replicate weights by the multiplication factor
+chapter_tag_rw_df[ , paste0( 'wgt' , 1:999 ) ] <- chapter_tag_rw_df[ , paste0( 'wt1b' , 1:999 ) ] * chapter_tag_rw_df[ , paste0( 'mm' , 1:999 ) ]
+
+# only keep the unique identifier and the final (combined) replicate weights
+chapter_tag_rw_df <- chapter_tag_rw_df[ , c( 'yy1' , paste0( 'wgt' , 1:999 ) ) ]
+
+# sort the replicate weights data frame by the unique identifier as well
+chapter_tag_rw_df <- chapter_tag_rw_df[ order( chapter_tag_rw_df$yy1 ) , ]
+
+
+
+
+
+
+chapter_tag_design <- 
+	svrepdesign( 
+		weights = ~wgt , 
+		repweights = chapter_tag_rw_df[ , -1 ] , 
+		data = imputationList( chapter_tag_list ) , 
+		scale = 1 ,
+		rscales = rep( 1 / 998 , 999 ) ,
+		mse = FALSE ,
+		type = "other" ,
+		combined.weights = TRUE
+	)
+	
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		hhsex = factor( hhsex , labels = c( "male" , "female" ) ) ,
+		
+		married = as.numeric( married == 1 ) ,
+		
+		edcl = 
+			factor( 
+				edcl , 
+				labels = 
+					c( 
+						"less than high school" , 
+						"high school or GED" , 
+						"some college" , 
+						"college degree" 
+					) 
+			)
+
+	)
+~~~
+
+group_by_variable: hhsex
+linear_variable: networth
+categorical_variable: edcl
+ratio_estimation_numerator: income
+ratio_estimation_denominator: networth
+subset_definition: lf == 1
+subset_definition_description: labor force participants
+binary_variable: married
+
+
+
+~~~{intermission_block}
+
+<center><i><b>Ai Weiwei, Dropping a Han Dynasty Urn, 1995 with piggy bank</b></i></center>
+
+~~~
+
+
+~~~{convey_block}
+## Poverty and Inequality Estimation with `convey` \\ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+chapter_tag_design$designs <- lapply( chapter_tag_design$designs , convey_prep )
+
+MIcombine( with( chapter_tag_design , svygini( ~ networth ) ) )
+```
+~~~
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+The statistics computed off of the public use file come very close to the net worth estimates in [Table 2 of the bulletin](https://www.federalreserve.gov/publications/files/scf20.pdf#page=11) but do not match exactly.  A member of the SCF staff at the Federal Reserve re-ran the net worth calculations using the 2016 public use file to confirm that the calculations presented on this page follow the correct methodology.
+
+```{r eval = FALSE , results = "hide" }
+
+# compute mean net worth using the 2019 PUF
+mean_net_worth <- scf_MIcombine( with( chapter_tag_design , svymean( ~ networth ) ) )
+
+# exactly match "Table 4" tab cell W6 of
+# https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx
+stopifnot( round( coef( mean_net_worth ) / 1000 , 2 ) == 746.82 )
+
+# match mean net worth standard error within $100 from
+# https://www.federalreserve.gov/publications/files/scf20.pdf#page=11
+stopifnot( abs( 15.6 - round( SE( mean_net_worth ) / 1000 , 1 ) ) < 0.1 )
+
+
+# compute median net worth using the 2019 PUF
+median_net_worth <-
+	scf_MIcombine( with( chapter_tag_design ,
+		svyquantile(
+			~ networth ,
+			0.5 , se = TRUE ,
+			ci = TRUE
+	) ) )
+
+# for( this_qrule in c("math","school","shahvaish","hf1","hf2","hf3",
+# 		      "hf4","hf5","hf6","hf7","hf8","hf9") ){
+# 			  print( this_qrule )
+# print( scf_MIcombine( with( chapter_tag_design , svyquantile( ~ networth , 0.5 , interval.type = 'quantile' , qrule = this_qrule ) ) ) )
+# }
+
+
+# confirm the estimate and standard error match FRB calculations within one dollar
+# stopifnot( round( coef( median_net_worth ) ) == 97306 )
+# stopifnot( round( SE( median_net_worth ) ) == 2699 )
+
+scf_MIcombine( with( chapter_tag_design , oldsvyquantile( ~networth , 0.5 , method = 'constant' , interval.type = 'quantile' ) ) )
+```
+~~~
+
+
