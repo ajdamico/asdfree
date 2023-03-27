@@ -58,7 +58,7 @@ This survey uses a dual design variance estimation technique described in the [D
 
 # variant of \code{mitools::MIcombine} that only uses the sampling variance from the first implicate instead of averaging all five
 
-scf_MIcombine <-
+MIcombine <-
 	function (results, variances, call = sys.call(), df.complete = Inf, ...) {
 		m <- length(results)
 		oldcall <- attr(results, "call")
@@ -306,7 +306,7 @@ The statistics computed off of the public use file come very close to the net wo
 ```{r eval = FALSE , results = "hide" }
 
 # compute mean net worth using the 2019 PUF
-mean_net_worth <- scf_MIcombine( with( chapter_tag_design , svymean( ~ networth ) ) )
+mean_net_worth <- MIcombine( with( chapter_tag_design , svymean( ~ networth ) ) )
 
 # exactly match "Table 4" tab cell W6 of
 # https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx
@@ -319,7 +319,7 @@ stopifnot( abs( 15.6 - round( SE( mean_net_worth ) / 1000 , 1 ) ) < 0.1 )
 
 # compute median net worth using the 2019 PUF
 median_net_worth <-
-	scf_MIcombine( with( chapter_tag_design ,
+	MIcombine( with( chapter_tag_design ,
 		svyquantile(
 			~ networth ,
 			0.5 , se = TRUE ,
@@ -329,7 +329,7 @@ median_net_worth <-
 # for( this_qrule in c("math","school","shahvaish","hf1","hf2","hf3",
 # 		      "hf4","hf5","hf6","hf7","hf8","hf9") ){
 # 			  print( this_qrule )
-# print( scf_MIcombine( with( chapter_tag_design , svyquantile( ~ networth , 0.5 , interval.type = 'quantile' , qrule = this_qrule ) ) ) )
+# print( MIcombine( with( chapter_tag_design , svyquantile( ~ networth , 0.5 , interval.type = 'quantile' , qrule = this_qrule ) ) ) )
 # }
 
 
@@ -337,7 +337,7 @@ median_net_worth <-
 # stopifnot( round( coef( median_net_worth ) ) == 97306 )
 # stopifnot( round( SE( median_net_worth ) ) == 2699 )
 
-scf_MIcombine( with( chapter_tag_design , oldsvyquantile( ~networth , 0.5 , method = 'constant' , interval.type = 'quantile' ) ) )
+# MIcombine( with( chapter_tag_design , oldsvyquantile( ~networth , 0.5 , method = 'constant' , interval.type = 'quantile' ) ) )
 ```
 ~~~
 
