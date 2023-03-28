@@ -3,8 +3,8 @@ MIcombine
 scf_MIcombine
  se = TRUE
  se = TRUE , interval.type = 'quantile'
-( ~ one
-( ~ five
+~ one
+~ five
 ~~~
 
 
@@ -114,7 +114,7 @@ scf_dta_import <-
 		
 		this_df <- data.frame( this_tbl )
 		
-		file.remove( this_file )
+		file.remove( this_tf )
 		
 		names( this_df ) <- tolower( names( this_df ) )
 		
@@ -201,7 +201,7 @@ Sort both the five implicates and also the replicate weights table by the unique
 ```{r messages = FALSE , eval = FALSE }
 chapter_tag_list <- lapply( chapter_tag_list , function( w ) w[ order( w[ , 'yy1' ] ) , ] )
 
-chapter_tag_rw_df <- chapter_tag_rw_df[ order( chapter_tag_rw_df$yy1 ) , ]
+chapter_tag_rw_df <- chapter_tag_rw_df[ order( chapter_tag_rw_df[ , 'yy1' ] ) , ]
 ```
 
 
@@ -272,29 +272,27 @@ binary_variable: married
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-The statistics computed off of the public use file come very close to the net worth estimates in [Table 2 of the bulletin](https://www.federalreserve.gov/publications/files/scf20.pdf#page=11) but do not match exactly.  A member of the SCF staff at the Federal Reserve re-ran the net worth calculations using the 2016 public use file to confirm that the calculations presented on this page follow the correct methodology.
+This example matches the "Table 4" tab's cell W6 of the [Excel Based on Public Data](https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx):
 
 ```{r eval = FALSE , results = "hide" }
-
-# compute mean net worth using the 2019 PUF
 mean_net_worth <- MIcombine( with( chapter_tag_design , svymean( ~ networth ) ) )
 
-# exactly match "Table 4" tab cell W6 of
-# https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx
 stopifnot( round( coef( mean_net_worth ) / 1000 , 2 ) == 746.82 )
+```
 
-# match mean net worth standard error within $100 from
-# https://www.federalreserve.gov/publications/files/scf20.pdf#page=11
+This example comes within $100 of the standard error of mean net worth from Table 2 of the [Federal Reserve Bulletin](https://www.federalreserve.gov/publications/files/scf20.pdf#page=11), displaying the minor differences between the [Internal Data](https://www.federalreserve.gov/econres/files/scf2019_tables_internal_nominal_historical.xlsx) and [Public Data](https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx):
+```{r eval = FALSE , results = "hide" }
 stopifnot( abs( 15.6 - round( SE( mean_net_worth ) / 1000 , 1 ) ) < 0.1 )
+```
 
+This example matches the "Table 4" tab's cells V6 of the [Excel Based on Public Data](https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx):
 
-# compute quantile with all five implicates stacked
-# matches the public excel tables but not the recommended technique
+```{r eval = FALSE , results = "hide" }
+# compute quantile with all five implicates stacked (not the recommended technique)
 fake_design <- svydesign( ~ 1 , data = ext_df[ c( 'networth' , 'wgt' ) ] , weights = ~ wgt )
+
 median_net_worth_incorrect_errors <- svyquantile( ~ networth , fake_design , 0.5 )
 
-# exactly match "Table 4" tab cell V6 of
-# https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx
 stopifnot( round( coef( median_net_worth_incorrect_errors ) / 1000 , 2 ) == 121.76 )
 ```
 ~~~
