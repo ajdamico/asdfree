@@ -566,19 +566,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="survey-of-consumer-finances-scf" class="section level1 unnumbered hasAnchor">
 <h1>Survey of Consumer Finances (SCF)<a href="survey-of-consumer-finances-scf.html#survey-of-consumer-finances-scf" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/scf/actions"><img src="https://github.com/asdfree/scf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>The Survey of Consumer Finances (SCF) tracks the wealth of American families. Six thousand households answer a battery of questions about income, net worth, credit card debt, pensions, mortgages, even the lease on their cars. Plenty of surveys collect annual income, only the Survey of Consumer Finances captures such detailed asset data.</p>
+<p>A comprehensive survey of household wealth, the U.S. central bank studies net worth across the country by asking about both active and passive income, mortgages, pensions, credit card debt, even car leases.</p>
 <ul>
-<li><p>One set of five tables of survey responses and a separate table with replicate weights, each table containing with one row per sampled household. The set of five tables of survey responses contain successive replicates of each sampled households, used to properly account for statistical uncertainty.</p></li>
-<li><p>A complex sample survey designed to generalize to the civilian non-institutional population of the United States.</p></li>
+<li><p>Five implicates, each containing one row per sampled household to account for statistical uncertainty.</p></li>
+<li><p>A complex sample survey designed to generalize to the civilian non-institutional U.S. population.</p></li>
 <li><p>Released triennially since 1989.</p></li>
 <li><p>Administered by the <a href="https://www.federalreserve.gov/">Board of Governors of the Federal Reserve System</a>.</p></li>
 </ul>
 <hr />
 <p>Please skim before you begin:</p>
 <ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Survey%20of%20Consumer%20Finances">artificial intelligence-generated limericks</a></li>
+<li><p><a href="https://www.federalreserve.gov/econresdata/scf/files/brickertextspring16bpea.pdf">Measuring Income and Wealth at the Top Using Administrative and Survey Data</a></p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Survey_of_Consumer_Finances">Wikipedia Entry</a></p></li>
+<li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Survey%20of%20Consumer%20Finances">artificial intelligence-generated limericks</a></p></li>
 </ol>
 <div class="sourceCode" id="cb463"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb463-1"><a href="survey-of-consumer-finances-scf.html#cb463-1" aria-hidden="true" tabindex="-1"></a><span class="co"># incomes, assets, debts</span></span>
 <span id="cb463-2"><a href="survey-of-consumer-finances-scf.html#cb463-2" aria-hidden="true" tabindex="-1"></a><span class="co"># high net worth oversample</span></span>
@@ -586,196 +586,158 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="function-definitions-1" class="section level2 unnumbered hasAnchor">
 <h2>Function Definitions<a href="survey-of-consumer-finances-scf.html#function-definitions-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>This survey uses a dual design variance estimation technique described in the <a href="https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=7">Data Users Guide</a>. Most users do not need to study these functions carefully. Define functions specific to only this dataset:</p>
-<div class="sourceCode" id="cb464"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb464-1"><a href="survey-of-consumer-finances-scf.html#cb464-1" aria-hidden="true" tabindex="-1"></a><span class="co"># variant of code{mitools::scf_MIcombine} that only uses the sampling variance from the first implicate instead of averaging all five</span></span>
-<span id="cb464-2"><a href="survey-of-consumer-finances-scf.html#cb464-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb464-3"><a href="survey-of-consumer-finances-scf.html#cb464-3" aria-hidden="true" tabindex="-1"></a>scf_MIcombine <span class="ot">&lt;-</span></span>
-<span id="cb464-4"><a href="survey-of-consumer-finances-scf.html#cb464-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span> (results, variances, <span class="at">call =</span> <span class="fu">sys.call</span>(), <span class="at">df.complete =</span> <span class="cn">Inf</span>, ...) {</span>
-<span id="cb464-5"><a href="survey-of-consumer-finances-scf.html#cb464-5" aria-hidden="true" tabindex="-1"></a>        m <span class="ot">&lt;-</span> <span class="fu">length</span>(results)</span>
-<span id="cb464-6"><a href="survey-of-consumer-finances-scf.html#cb464-6" aria-hidden="true" tabindex="-1"></a>        oldcall <span class="ot">&lt;-</span> <span class="fu">attr</span>(results, <span class="st">&quot;call&quot;</span>)</span>
-<span id="cb464-7"><a href="survey-of-consumer-finances-scf.html#cb464-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">missing</span>(variances)) {</span>
-<span id="cb464-8"><a href="survey-of-consumer-finances-scf.html#cb464-8" aria-hidden="true" tabindex="-1"></a>            variances <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">lapply</span>(results, vcov))</span>
-<span id="cb464-9"><a href="survey-of-consumer-finances-scf.html#cb464-9" aria-hidden="true" tabindex="-1"></a>            results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(results, coef)</span>
-<span id="cb464-10"><a href="survey-of-consumer-finances-scf.html#cb464-10" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb464-11"><a href="survey-of-consumer-finances-scf.html#cb464-11" aria-hidden="true" tabindex="-1"></a>        vbar <span class="ot">&lt;-</span> variances[[<span class="dv">1</span>]]</span>
-<span id="cb464-12"><a href="survey-of-consumer-finances-scf.html#cb464-12" aria-hidden="true" tabindex="-1"></a>        cbar <span class="ot">&lt;-</span> results[[<span class="dv">1</span>]]</span>
-<span id="cb464-13"><a href="survey-of-consumer-finances-scf.html#cb464-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>m) {</span>
-<span id="cb464-14"><a href="survey-of-consumer-finances-scf.html#cb464-14" aria-hidden="true" tabindex="-1"></a>            cbar <span class="ot">&lt;-</span> cbar <span class="sc">+</span> results[[i]]</span>
-<span id="cb464-15"><a href="survey-of-consumer-finances-scf.html#cb464-15" aria-hidden="true" tabindex="-1"></a>            <span class="co"># MODIFICATION:</span></span>
-<span id="cb464-16"><a href="survey-of-consumer-finances-scf.html#cb464-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># vbar &lt;- vbar + variances[[i]]</span></span>
-<span id="cb464-17"><a href="survey-of-consumer-finances-scf.html#cb464-17" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb464-18"><a href="survey-of-consumer-finances-scf.html#cb464-18" aria-hidden="true" tabindex="-1"></a>        cbar <span class="ot">&lt;-</span> cbar<span class="sc">/</span>m</span>
-<span id="cb464-19"><a href="survey-of-consumer-finances-scf.html#cb464-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># MODIFICATION:</span></span>
-<span id="cb464-20"><a href="survey-of-consumer-finances-scf.html#cb464-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># vbar &lt;- vbar/m</span></span>
-<span id="cb464-21"><a href="survey-of-consumer-finances-scf.html#cb464-21" aria-hidden="true" tabindex="-1"></a>        evar <span class="ot">&lt;-</span> <span class="fu">var</span>(<span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, results))</span>
-<span id="cb464-22"><a href="survey-of-consumer-finances-scf.html#cb464-22" aria-hidden="true" tabindex="-1"></a>        r <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>m) <span class="sc">*</span> evar<span class="sc">/</span>vbar</span>
-<span id="cb464-23"><a href="survey-of-consumer-finances-scf.html#cb464-23" aria-hidden="true" tabindex="-1"></a>        df <span class="ot">&lt;-</span> (m <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>r)<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb464-24"><a href="survey-of-consumer-finances-scf.html#cb464-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">is.matrix</span>(df)) df <span class="ot">&lt;-</span> <span class="fu">diag</span>(df)</span>
-<span id="cb464-25"><a href="survey-of-consumer-finances-scf.html#cb464-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">is.finite</span>(df.complete)) {</span>
-<span id="cb464-26"><a href="survey-of-consumer-finances-scf.html#cb464-26" aria-hidden="true" tabindex="-1"></a>            dfobs <span class="ot">&lt;-</span> ((df.complete <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">/</span>(df.complete <span class="sc">+</span> <span class="dv">3</span>)) <span class="sc">*</span> df.complete <span class="sc">*</span></span>
-<span id="cb464-27"><a href="survey-of-consumer-finances-scf.html#cb464-27" aria-hidden="true" tabindex="-1"></a>            vbar<span class="sc">/</span>(vbar <span class="sc">+</span> evar)</span>
-<span id="cb464-28"><a href="survey-of-consumer-finances-scf.html#cb464-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">is.matrix</span>(dfobs)) dfobs <span class="ot">&lt;-</span> <span class="fu">diag</span>(dfobs)</span>
-<span id="cb464-29"><a href="survey-of-consumer-finances-scf.html#cb464-29" aria-hidden="true" tabindex="-1"></a>            df <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">/</span>dfobs <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>df)</span>
-<span id="cb464-30"><a href="survey-of-consumer-finances-scf.html#cb464-30" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb464-31"><a href="survey-of-consumer-finances-scf.html#cb464-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">is.matrix</span>(r)) r <span class="ot">&lt;-</span> <span class="fu">diag</span>(r)</span>
-<span id="cb464-32"><a href="survey-of-consumer-finances-scf.html#cb464-32" aria-hidden="true" tabindex="-1"></a>        rval <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">coefficients =</span> cbar, <span class="at">variance =</span> vbar <span class="sc">+</span> evar <span class="sc">*</span></span>
-<span id="cb464-33"><a href="survey-of-consumer-finances-scf.html#cb464-33" aria-hidden="true" tabindex="-1"></a>        (m <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">/</span>m, <span class="at">call =</span> <span class="fu">c</span>(oldcall, call), <span class="at">nimp =</span> m, <span class="at">df =</span> df,</span>
-<span id="cb464-34"><a href="survey-of-consumer-finances-scf.html#cb464-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">missinfo =</span> (r <span class="sc">+</span> <span class="dv">2</span><span class="sc">/</span>(df <span class="sc">+</span> <span class="dv">3</span>))<span class="sc">/</span>(r <span class="sc">+</span> <span class="dv">1</span>))</span>
-<span id="cb464-35"><a href="survey-of-consumer-finances-scf.html#cb464-35" aria-hidden="true" tabindex="-1"></a>        <span class="fu">class</span>(rval) <span class="ot">&lt;-</span> <span class="st">&quot;MIresult&quot;</span></span>
-<span id="cb464-36"><a href="survey-of-consumer-finances-scf.html#cb464-36" aria-hidden="true" tabindex="-1"></a>        rval</span>
-<span id="cb464-37"><a href="survey-of-consumer-finances-scf.html#cb464-37" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<p>This survey uses a multiply-imputed variance estimation technique described in the <a href="https://www.federalreserve.gov/econres/files/2004_codebk2004.txt">2004 Codebook</a>. Most users do not need to study this function carefully. Define a function specific to only this dataset:</p>
+<div class="sourceCode" id="cb464"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb464-1"><a href="survey-of-consumer-finances-scf.html#cb464-1" aria-hidden="true" tabindex="-1"></a>scf_MIcombine <span class="ot">&lt;-</span></span>
+<span id="cb464-2"><a href="survey-of-consumer-finances-scf.html#cb464-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span> (results, variances, <span class="at">call =</span> <span class="fu">sys.call</span>(), <span class="at">df.complete =</span> <span class="cn">Inf</span>, ...) {</span>
+<span id="cb464-3"><a href="survey-of-consumer-finances-scf.html#cb464-3" aria-hidden="true" tabindex="-1"></a>        m <span class="ot">&lt;-</span> <span class="fu">length</span>(results)</span>
+<span id="cb464-4"><a href="survey-of-consumer-finances-scf.html#cb464-4" aria-hidden="true" tabindex="-1"></a>        oldcall <span class="ot">&lt;-</span> <span class="fu">attr</span>(results, <span class="st">&quot;call&quot;</span>)</span>
+<span id="cb464-5"><a href="survey-of-consumer-finances-scf.html#cb464-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">missing</span>(variances)) {</span>
+<span id="cb464-6"><a href="survey-of-consumer-finances-scf.html#cb464-6" aria-hidden="true" tabindex="-1"></a>            variances <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">lapply</span>(results, vcov))</span>
+<span id="cb464-7"><a href="survey-of-consumer-finances-scf.html#cb464-7" aria-hidden="true" tabindex="-1"></a>            results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(results, coef)</span>
+<span id="cb464-8"><a href="survey-of-consumer-finances-scf.html#cb464-8" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb464-9"><a href="survey-of-consumer-finances-scf.html#cb464-9" aria-hidden="true" tabindex="-1"></a>        vbar <span class="ot">&lt;-</span> variances[[<span class="dv">1</span>]]</span>
+<span id="cb464-10"><a href="survey-of-consumer-finances-scf.html#cb464-10" aria-hidden="true" tabindex="-1"></a>        cbar <span class="ot">&lt;-</span> results[[<span class="dv">1</span>]]</span>
+<span id="cb464-11"><a href="survey-of-consumer-finances-scf.html#cb464-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>m) {</span>
+<span id="cb464-12"><a href="survey-of-consumer-finances-scf.html#cb464-12" aria-hidden="true" tabindex="-1"></a>            cbar <span class="ot">&lt;-</span> cbar <span class="sc">+</span> results[[i]]</span>
+<span id="cb464-13"><a href="survey-of-consumer-finances-scf.html#cb464-13" aria-hidden="true" tabindex="-1"></a>            <span class="co"># MODIFICATION:</span></span>
+<span id="cb464-14"><a href="survey-of-consumer-finances-scf.html#cb464-14" aria-hidden="true" tabindex="-1"></a>            <span class="co"># vbar &lt;- vbar + variances[[i]]</span></span>
+<span id="cb464-15"><a href="survey-of-consumer-finances-scf.html#cb464-15" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb464-16"><a href="survey-of-consumer-finances-scf.html#cb464-16" aria-hidden="true" tabindex="-1"></a>        cbar <span class="ot">&lt;-</span> cbar<span class="sc">/</span>m</span>
+<span id="cb464-17"><a href="survey-of-consumer-finances-scf.html#cb464-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># MODIFICATION:</span></span>
+<span id="cb464-18"><a href="survey-of-consumer-finances-scf.html#cb464-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># vbar &lt;- vbar/m</span></span>
+<span id="cb464-19"><a href="survey-of-consumer-finances-scf.html#cb464-19" aria-hidden="true" tabindex="-1"></a>        evar <span class="ot">&lt;-</span> <span class="fu">var</span>(<span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, results))</span>
+<span id="cb464-20"><a href="survey-of-consumer-finances-scf.html#cb464-20" aria-hidden="true" tabindex="-1"></a>        r <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>m) <span class="sc">*</span> evar<span class="sc">/</span>vbar</span>
+<span id="cb464-21"><a href="survey-of-consumer-finances-scf.html#cb464-21" aria-hidden="true" tabindex="-1"></a>        df <span class="ot">&lt;-</span> (m <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>r)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb464-22"><a href="survey-of-consumer-finances-scf.html#cb464-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">is.matrix</span>(df)) df <span class="ot">&lt;-</span> <span class="fu">diag</span>(df)</span>
+<span id="cb464-23"><a href="survey-of-consumer-finances-scf.html#cb464-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">is.finite</span>(df.complete)) {</span>
+<span id="cb464-24"><a href="survey-of-consumer-finances-scf.html#cb464-24" aria-hidden="true" tabindex="-1"></a>            dfobs <span class="ot">&lt;-</span> ((df.complete <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">/</span>(df.complete <span class="sc">+</span> <span class="dv">3</span>)) <span class="sc">*</span> df.complete <span class="sc">*</span></span>
+<span id="cb464-25"><a href="survey-of-consumer-finances-scf.html#cb464-25" aria-hidden="true" tabindex="-1"></a>            vbar<span class="sc">/</span>(vbar <span class="sc">+</span> evar)</span>
+<span id="cb464-26"><a href="survey-of-consumer-finances-scf.html#cb464-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">is.matrix</span>(dfobs)) dfobs <span class="ot">&lt;-</span> <span class="fu">diag</span>(dfobs)</span>
+<span id="cb464-27"><a href="survey-of-consumer-finances-scf.html#cb464-27" aria-hidden="true" tabindex="-1"></a>            df <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">/</span>dfobs <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>df)</span>
+<span id="cb464-28"><a href="survey-of-consumer-finances-scf.html#cb464-28" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb464-29"><a href="survey-of-consumer-finances-scf.html#cb464-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">is.matrix</span>(r)) r <span class="ot">&lt;-</span> <span class="fu">diag</span>(r)</span>
+<span id="cb464-30"><a href="survey-of-consumer-finances-scf.html#cb464-30" aria-hidden="true" tabindex="-1"></a>        rval <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">coefficients =</span> cbar, <span class="at">variance =</span> vbar <span class="sc">+</span> evar <span class="sc">*</span></span>
+<span id="cb464-31"><a href="survey-of-consumer-finances-scf.html#cb464-31" aria-hidden="true" tabindex="-1"></a>        (m <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">/</span>m, <span class="at">call =</span> <span class="fu">c</span>(oldcall, call), <span class="at">nimp =</span> m, <span class="at">df =</span> df,</span>
+<span id="cb464-32"><a href="survey-of-consumer-finances-scf.html#cb464-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">missinfo =</span> (r <span class="sc">+</span> <span class="dv">2</span><span class="sc">/</span>(df <span class="sc">+</span> <span class="dv">3</span>))<span class="sc">/</span>(r <span class="sc">+</span> <span class="dv">1</span>))</span>
+<span id="cb464-33"><a href="survey-of-consumer-finances-scf.html#cb464-33" aria-hidden="true" tabindex="-1"></a>        <span class="fu">class</span>(rval) <span class="ot">&lt;-</span> <span class="st">&quot;MIresult&quot;</span></span>
+<span id="cb464-34"><a href="survey-of-consumer-finances-scf.html#cb464-34" aria-hidden="true" tabindex="-1"></a>        rval</span>
+<span id="cb464-35"><a href="survey-of-consumer-finances-scf.html#cb464-35" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
 <hr />
 </div>
 <div id="download-import-preparation-16" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="survey-of-consumer-finances-scf.html#download-import-preparation-16" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Define a function to download and import each stata file:</p>
 <div class="sourceCode" id="cb465"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb465-1"><a href="survey-of-consumer-finances-scf.html#cb465-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
 <span id="cb465-2"><a href="survey-of-consumer-finances-scf.html#cb465-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-3"><a href="survey-of-consumer-finances-scf.html#cb465-3" aria-hidden="true" tabindex="-1"></a>tf_s <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb465-4"><a href="survey-of-consumer-finances-scf.html#cb465-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-5"><a href="survey-of-consumer-finances-scf.html#cb465-5" aria-hidden="true" tabindex="-1"></a>tf_p <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb465-6"><a href="survey-of-consumer-finances-scf.html#cb465-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-7"><a href="survey-of-consumer-finances-scf.html#cb465-7" aria-hidden="true" tabindex="-1"></a>tf_rw <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb465-8"><a href="survey-of-consumer-finances-scf.html#cb465-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-9"><a href="survey-of-consumer-finances-scf.html#cb465-9" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( <span class="st">&quot;https://www.federalreserve.gov/econres/files/scf2019s.zip&quot;</span> , tf_s , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb465-10"><a href="survey-of-consumer-finances-scf.html#cb465-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-11"><a href="survey-of-consumer-finances-scf.html#cb465-11" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( <span class="st">&quot;https://www.federalreserve.gov/econres/files/scfp2019s.zip&quot;</span> , tf_p , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb465-12"><a href="survey-of-consumer-finances-scf.html#cb465-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-13"><a href="survey-of-consumer-finances-scf.html#cb465-13" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( <span class="st">&quot;https://www.federalreserve.gov/econres/files/scf2019rw1s.zip&quot;</span> , tf_rw , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb465-14"><a href="survey-of-consumer-finances-scf.html#cb465-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-15"><a href="survey-of-consumer-finances-scf.html#cb465-15" aria-hidden="true" tabindex="-1"></a>s_tbl <span class="ot">&lt;-</span> <span class="fu">read_dta</span>( tf_s )</span>
-<span id="cb465-16"><a href="survey-of-consumer-finances-scf.html#cb465-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-17"><a href="survey-of-consumer-finances-scf.html#cb465-17" aria-hidden="true" tabindex="-1"></a>p_tbl <span class="ot">&lt;-</span> <span class="fu">read_dta</span>( tf_p )</span>
-<span id="cb465-18"><a href="survey-of-consumer-finances-scf.html#cb465-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-19"><a href="survey-of-consumer-finances-scf.html#cb465-19" aria-hidden="true" tabindex="-1"></a>rw_tbl <span class="ot">&lt;-</span> <span class="fu">read_dta</span>( tf_rw )</span>
-<span id="cb465-20"><a href="survey-of-consumer-finances-scf.html#cb465-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-21"><a href="survey-of-consumer-finances-scf.html#cb465-21" aria-hidden="true" tabindex="-1"></a>s_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( s_tbl )</span>
-<span id="cb465-22"><a href="survey-of-consumer-finances-scf.html#cb465-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-23"><a href="survey-of-consumer-finances-scf.html#cb465-23" aria-hidden="true" tabindex="-1"></a>p_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( p_tbl )</span>
-<span id="cb465-24"><a href="survey-of-consumer-finances-scf.html#cb465-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-25"><a href="survey-of-consumer-finances-scf.html#cb465-25" aria-hidden="true" tabindex="-1"></a>scf_rw_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( rw_tbl )</span>
-<span id="cb465-26"><a href="survey-of-consumer-finances-scf.html#cb465-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-27"><a href="survey-of-consumer-finances-scf.html#cb465-27" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( s_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( s_df ) )</span>
-<span id="cb465-28"><a href="survey-of-consumer-finances-scf.html#cb465-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-29"><a href="survey-of-consumer-finances-scf.html#cb465-29" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( p_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( p_df ) )</span>
-<span id="cb465-30"><a href="survey-of-consumer-finances-scf.html#cb465-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-31"><a href="survey-of-consumer-finances-scf.html#cb465-31" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( scf_rw_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( scf_rw_df ) )</span>
-<span id="cb465-32"><a href="survey-of-consumer-finances-scf.html#cb465-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb465-33"><a href="survey-of-consumer-finances-scf.html#cb465-33" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( s_df ) <span class="sc">==</span> <span class="fu">nrow</span>( scf_rw_df ) <span class="sc">*</span> <span class="dv">5</span> )</span>
-<span id="cb465-34"><a href="survey-of-consumer-finances-scf.html#cb465-34" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( s_df ) <span class="sc">==</span> <span class="fu">nrow</span>( p_df ) )</span></code></pre></div>
+<span id="cb465-3"><a href="survey-of-consumer-finances-scf.html#cb465-3" aria-hidden="true" tabindex="-1"></a>scf_dta_import <span class="ot">&lt;-</span></span>
+<span id="cb465-4"><a href="survey-of-consumer-finances-scf.html#cb465-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( this_url ){</span>
+<span id="cb465-5"><a href="survey-of-consumer-finances-scf.html#cb465-5" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb465-6"><a href="survey-of-consumer-finances-scf.html#cb465-6" aria-hidden="true" tabindex="-1"></a>        this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb465-7"><a href="survey-of-consumer-finances-scf.html#cb465-7" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb465-8"><a href="survey-of-consumer-finances-scf.html#cb465-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">download.file</span>( this_url , this_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb465-9"><a href="survey-of-consumer-finances-scf.html#cb465-9" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb465-10"><a href="survey-of-consumer-finances-scf.html#cb465-10" aria-hidden="true" tabindex="-1"></a>        this_tbl <span class="ot">&lt;-</span> <span class="fu">read_dta</span>( this_tf )</span>
+<span id="cb465-11"><a href="survey-of-consumer-finances-scf.html#cb465-11" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb465-12"><a href="survey-of-consumer-finances-scf.html#cb465-12" aria-hidden="true" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( this_tbl )</span>
+<span id="cb465-13"><a href="survey-of-consumer-finances-scf.html#cb465-13" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb465-14"><a href="survey-of-consumer-finances-scf.html#cb465-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">file.remove</span>( this_file )</span>
+<span id="cb465-15"><a href="survey-of-consumer-finances-scf.html#cb465-15" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb465-16"><a href="survey-of-consumer-finances-scf.html#cb465-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
+<span id="cb465-17"><a href="survey-of-consumer-finances-scf.html#cb465-17" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb465-18"><a href="survey-of-consumer-finances-scf.html#cb465-18" aria-hidden="true" tabindex="-1"></a>        this_df</span>
+<span id="cb465-19"><a href="survey-of-consumer-finances-scf.html#cb465-19" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<p>Download and import the full, summary extract, and replicate weights tables:</p>
+<div class="sourceCode" id="cb466"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb466-1"><a href="survey-of-consumer-finances-scf.html#cb466-1" aria-hidden="true" tabindex="-1"></a>scf_df <span class="ot">&lt;-</span> <span class="fu">scf_dta_import</span>( <span class="st">&quot;https://www.federalreserve.gov/econres/files/scf2019s.zip&quot;</span> )</span>
+<span id="cb466-2"><a href="survey-of-consumer-finances-scf.html#cb466-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb466-3"><a href="survey-of-consumer-finances-scf.html#cb466-3" aria-hidden="true" tabindex="-1"></a>ext_df <span class="ot">&lt;-</span> <span class="fu">scf_dta_import</span>( <span class="st">&quot;https://www.federalreserve.gov/econres/files/scfp2019s.zip&quot;</span> )</span>
+<span id="cb466-4"><a href="survey-of-consumer-finances-scf.html#cb466-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb466-5"><a href="survey-of-consumer-finances-scf.html#cb466-5" aria-hidden="true" tabindex="-1"></a>scf_rw_df <span class="ot">&lt;-</span> <span class="fu">scf_dta_import</span>( <span class="st">&quot;https://www.federalreserve.gov/econres/files/scf2019rw1s.zip&quot;</span> )</span></code></pre></div>
+<p>Confirm both the full public data and the summary extract contain five records per family:</p>
+<div class="sourceCode" id="cb467"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb467-1"><a href="survey-of-consumer-finances-scf.html#cb467-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( scf_df ) <span class="sc">==</span> <span class="fu">nrow</span>( scf_rw_df ) <span class="sc">*</span> <span class="dv">5</span> )</span>
+<span id="cb467-2"><a href="survey-of-consumer-finances-scf.html#cb467-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( scf_df ) <span class="sc">==</span> <span class="fu">nrow</span>( ext_df ) )</span></code></pre></div>
+<p>Confirm only the primary economic unit and the five implicate identifiers overlap:</p>
+<div class="sourceCode" id="cb468"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb468-1"><a href="survey-of-consumer-finances-scf.html#cb468-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">sort</span>( <span class="fu">intersect</span>( <span class="fu">names</span>( scf_df ) , <span class="fu">names</span>( ext_df ) ) ) <span class="sc">==</span> <span class="fu">c</span>( <span class="st">&#39;y1&#39;</span> , <span class="st">&#39;yy1&#39;</span> ) ) )</span>
+<span id="cb468-2"><a href="survey-of-consumer-finances-scf.html#cb468-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">sort</span>( <span class="fu">intersect</span>( <span class="fu">names</span>( scf_df ) , <span class="fu">names</span>( scf_rw_df ) ) ) <span class="sc">==</span> <span class="fu">c</span>( <span class="st">&#39;y1&#39;</span> , <span class="st">&#39;yy1&#39;</span> ) ) )</span>
+<span id="cb468-3"><a href="survey-of-consumer-finances-scf.html#cb468-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">sort</span>( <span class="fu">intersect</span>( <span class="fu">names</span>( ext_df ) , <span class="fu">names</span>( scf_rw_df ) ) ) <span class="sc">==</span> <span class="fu">c</span>( <span class="st">&#39;y1&#39;</span> , <span class="st">&#39;yy1&#39;</span> ) ) )</span></code></pre></div>
+<p>Remove the implicate identifier from the replicate weights table, add a column of fives for weighting:</p>
+<div class="sourceCode" id="cb469"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb469-1"><a href="survey-of-consumer-finances-scf.html#cb469-1" aria-hidden="true" tabindex="-1"></a>scf_rw_df[ , <span class="st">&#39;y1&#39;</span> ] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb469-2"><a href="survey-of-consumer-finances-scf.html#cb469-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb469-3"><a href="survey-of-consumer-finances-scf.html#cb469-3" aria-hidden="true" tabindex="-1"></a>scf_df[ , <span class="st">&#39;five&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">5</span></span></code></pre></div>
 <div id="save-locally-16" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="survey-of-consumer-finances-scf.html#save-locally-16" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb466"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb466-1"><a href="survey-of-consumer-finances-scf.html#cb466-1" aria-hidden="true" tabindex="-1"></a><span class="co"># scf_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;SCF&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb466-2"><a href="survey-of-consumer-finances-scf.html#cb466-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( scf_df , file = scf_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb470-1"><a href="survey-of-consumer-finances-scf.html#cb470-1" aria-hidden="true" tabindex="-1"></a><span class="co"># scf_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;SCF&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb470-2"><a href="survey-of-consumer-finances-scf.html#cb470-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( scf_df , file = scf_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb467"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb467-1"><a href="survey-of-consumer-finances-scf.html#cb467-1" aria-hidden="true" tabindex="-1"></a><span class="co"># scf_df &lt;- readRDS( scf_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="survey-of-consumer-finances-scf.html#cb471-1" aria-hidden="true" tabindex="-1"></a><span class="co"># scf_df &lt;- readRDS( scf_fn )</span></span></code></pre></div>
 </div>
 <div id="survey-design-definition-13" class="section level3 unnumbered hasAnchor">
 <h3>Survey Design Definition<a href="survey-of-consumer-finances-scf.html#survey-design-definition-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Construct a multiply-imputed, complex sample survey design:</p>
-<div class="sourceCode" id="cb468"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb468-1"><a href="survey-of-consumer-finances-scf.html#cb468-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb468-2"><a href="survey-of-consumer-finances-scf.html#cb468-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
-<span id="cb468-3"><a href="survey-of-consumer-finances-scf.html#cb468-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-4"><a href="survey-of-consumer-finances-scf.html#cb468-4" aria-hidden="true" tabindex="-1"></a><span class="co"># confirm that the only overlapping columns</span></span>
-<span id="cb468-5"><a href="survey-of-consumer-finances-scf.html#cb468-5" aria-hidden="true" tabindex="-1"></a><span class="co"># between the three data sets are `y1`</span></span>
-<span id="cb468-6"><a href="survey-of-consumer-finances-scf.html#cb468-6" aria-hidden="true" tabindex="-1"></a><span class="co"># (the unique primary economic unit id - peu)</span></span>
-<span id="cb468-7"><a href="survey-of-consumer-finances-scf.html#cb468-7" aria-hidden="true" tabindex="-1"></a><span class="co"># and `yy1` (the five records of the peu)</span></span>
-<span id="cb468-8"><a href="survey-of-consumer-finances-scf.html#cb468-8" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all.equal</span>( <span class="fu">sort</span>( <span class="fu">intersect</span>( <span class="fu">names</span>( s_df ) , <span class="fu">names</span>( p_df ) ) ) , <span class="fu">c</span>( <span class="st">&#39;y1&#39;</span> , <span class="st">&#39;yy1&#39;</span> ) ) )</span>
-<span id="cb468-9"><a href="survey-of-consumer-finances-scf.html#cb468-9" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all.equal</span>( <span class="fu">sort</span>( <span class="fu">intersect</span>( <span class="fu">names</span>( s_df ) , <span class="fu">names</span>( scf_rw_df ) ) ) , <span class="fu">c</span>( <span class="st">&#39;y1&#39;</span> , <span class="st">&#39;yy1&#39;</span> ) ) )</span>
-<span id="cb468-10"><a href="survey-of-consumer-finances-scf.html#cb468-10" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all.equal</span>( <span class="fu">sort</span>( <span class="fu">intersect</span>( <span class="fu">names</span>( p_df ) , <span class="fu">names</span>( scf_rw_df ) ) ) , <span class="fu">c</span>( <span class="st">&#39;y1&#39;</span> , <span class="st">&#39;yy1&#39;</span> ) ) )</span>
-<span id="cb468-11"><a href="survey-of-consumer-finances-scf.html#cb468-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-12"><a href="survey-of-consumer-finances-scf.html#cb468-12" aria-hidden="true" tabindex="-1"></a><span class="co"># throw out the unique identifiers ending with `1`</span></span>
-<span id="cb468-13"><a href="survey-of-consumer-finances-scf.html#cb468-13" aria-hidden="true" tabindex="-1"></a><span class="co"># because they only match one-fifth of the records in the survey data</span></span>
-<span id="cb468-14"><a href="survey-of-consumer-finances-scf.html#cb468-14" aria-hidden="true" tabindex="-1"></a>scf_rw_df<span class="sc">$</span>y1 <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb468-15"><a href="survey-of-consumer-finances-scf.html#cb468-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-16"><a href="survey-of-consumer-finances-scf.html#cb468-16" aria-hidden="true" tabindex="-1"></a><span class="co"># `s_df` currently contains</span></span>
-<span id="cb468-17"><a href="survey-of-consumer-finances-scf.html#cb468-17" aria-hidden="true" tabindex="-1"></a><span class="co"># five records per household -- all five of the implicates.</span></span>
-<span id="cb468-18"><a href="survey-of-consumer-finances-scf.html#cb468-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-19"><a href="survey-of-consumer-finances-scf.html#cb468-19" aria-hidden="true" tabindex="-1"></a><span class="co"># add a column `one` to every record, containing just the number one</span></span>
-<span id="cb468-20"><a href="survey-of-consumer-finances-scf.html#cb468-20" aria-hidden="true" tabindex="-1"></a>s_df<span class="sc">$</span>one <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb468-21"><a href="survey-of-consumer-finances-scf.html#cb468-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-22"><a href="survey-of-consumer-finances-scf.html#cb468-22" aria-hidden="true" tabindex="-1"></a><span class="co"># add a column `five` to every record, containing just the number five</span></span>
-<span id="cb468-23"><a href="survey-of-consumer-finances-scf.html#cb468-23" aria-hidden="true" tabindex="-1"></a>s_df<span class="sc">$</span>five <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb468-24"><a href="survey-of-consumer-finances-scf.html#cb468-24" aria-hidden="true" tabindex="-1"></a><span class="co"># note: this column should be used to calculate weighted totals.</span></span>
-<span id="cb468-25"><a href="survey-of-consumer-finances-scf.html#cb468-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-26"><a href="survey-of-consumer-finances-scf.html#cb468-26" aria-hidden="true" tabindex="-1"></a><span class="co"># break `s_df` into five different data sets</span></span>
-<span id="cb468-27"><a href="survey-of-consumer-finances-scf.html#cb468-27" aria-hidden="true" tabindex="-1"></a><span class="co"># based on the final character of the column &#39;y1&#39;</span></span>
-<span id="cb468-28"><a href="survey-of-consumer-finances-scf.html#cb468-28" aria-hidden="true" tabindex="-1"></a><span class="co"># which separates the five implicates</span></span>
-<span id="cb468-29"><a href="survey-of-consumer-finances-scf.html#cb468-29" aria-hidden="true" tabindex="-1"></a>s1_df <span class="ot">&lt;-</span> s_df[ <span class="fu">substr</span>( s_df<span class="sc">$</span>y1 , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) ) <span class="sc">==</span> <span class="dv">1</span> , ]</span>
-<span id="cb468-30"><a href="survey-of-consumer-finances-scf.html#cb468-30" aria-hidden="true" tabindex="-1"></a>s2_df <span class="ot">&lt;-</span> s_df[ <span class="fu">substr</span>( s_df<span class="sc">$</span>y1 , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) ) <span class="sc">==</span> <span class="dv">2</span> , ]</span>
-<span id="cb468-31"><a href="survey-of-consumer-finances-scf.html#cb468-31" aria-hidden="true" tabindex="-1"></a>s3_df <span class="ot">&lt;-</span> s_df[ <span class="fu">substr</span>( s_df<span class="sc">$</span>y1 , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) ) <span class="sc">==</span> <span class="dv">3</span> , ]</span>
-<span id="cb468-32"><a href="survey-of-consumer-finances-scf.html#cb468-32" aria-hidden="true" tabindex="-1"></a>s4_df <span class="ot">&lt;-</span> s_df[ <span class="fu">substr</span>( s_df<span class="sc">$</span>y1 , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) ) <span class="sc">==</span> <span class="dv">4</span> , ]</span>
-<span id="cb468-33"><a href="survey-of-consumer-finances-scf.html#cb468-33" aria-hidden="true" tabindex="-1"></a>s5_df <span class="ot">&lt;-</span> s_df[ <span class="fu">substr</span>( s_df<span class="sc">$</span>y1 , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) , <span class="fu">nchar</span>( s_df<span class="sc">$</span>y1 ) ) <span class="sc">==</span> <span class="dv">5</span> , ]</span>
-<span id="cb468-34"><a href="survey-of-consumer-finances-scf.html#cb468-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-35"><a href="survey-of-consumer-finances-scf.html#cb468-35" aria-hidden="true" tabindex="-1"></a><span class="co"># count the total number of records in `s_df`</span></span>
-<span id="cb468-36"><a href="survey-of-consumer-finances-scf.html#cb468-36" aria-hidden="true" tabindex="-1"></a>m.rows <span class="ot">&lt;-</span> <span class="fu">nrow</span>( s_df )</span>
-<span id="cb468-37"><a href="survey-of-consumer-finances-scf.html#cb468-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-38"><a href="survey-of-consumer-finances-scf.html#cb468-38" aria-hidden="true" tabindex="-1"></a><span class="co"># confirm that the number of records did not change</span></span>
-<span id="cb468-39"><a href="survey-of-consumer-finances-scf.html#cb468-39" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
-<span id="cb468-40"><a href="survey-of-consumer-finances-scf.html#cb468-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>( <span class="fu">nrow</span>( s1_df ) , <span class="fu">nrow</span>( s2_df ) , <span class="fu">nrow</span>( s3_df ) , <span class="fu">nrow</span>( s4_df ) , <span class="fu">nrow</span>( s5_df ) ) <span class="sc">==</span> m.rows</span>
-<span id="cb468-41"><a href="survey-of-consumer-finances-scf.html#cb468-41" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb468-42"><a href="survey-of-consumer-finances-scf.html#cb468-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-43"><a href="survey-of-consumer-finances-scf.html#cb468-43" aria-hidden="true" tabindex="-1"></a><span class="co"># sort all five implicates by the unique identifier</span></span>
-<span id="cb468-44"><a href="survey-of-consumer-finances-scf.html#cb468-44" aria-hidden="true" tabindex="-1"></a><span class="co"># s1_df &lt;- s1_df[ order( s1_df$yy1 ) , ]</span></span>
-<span id="cb468-45"><a href="survey-of-consumer-finances-scf.html#cb468-45" aria-hidden="true" tabindex="-1"></a><span class="co"># s2_df &lt;- s2_df[ order( s2_df$yy1 ) , ]</span></span>
-<span id="cb468-46"><a href="survey-of-consumer-finances-scf.html#cb468-46" aria-hidden="true" tabindex="-1"></a><span class="co"># s3_df &lt;- s3_df[ order( s3_df$yy1 ) , ]</span></span>
-<span id="cb468-47"><a href="survey-of-consumer-finances-scf.html#cb468-47" aria-hidden="true" tabindex="-1"></a><span class="co"># s4_df &lt;- s4_df[ order( s4_df$yy1 ) , ]</span></span>
-<span id="cb468-48"><a href="survey-of-consumer-finances-scf.html#cb468-48" aria-hidden="true" tabindex="-1"></a><span class="co"># s5_df &lt;- s5_df[ order( s5_df$yy1 ) , ]</span></span>
-<span id="cb468-49"><a href="survey-of-consumer-finances-scf.html#cb468-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-50"><a href="survey-of-consumer-finances-scf.html#cb468-50" aria-hidden="true" tabindex="-1"></a>scf_imp <span class="ot">&lt;-</span> <span class="fu">list</span>( s1_df , s2_df , s3_df , s4_df , s5_df )</span>
-<span id="cb468-51"><a href="survey-of-consumer-finances-scf.html#cb468-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-52"><a href="survey-of-consumer-finances-scf.html#cb468-52" aria-hidden="true" tabindex="-1"></a>scf_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>( scf_imp , merge , p_df )</span>
-<span id="cb468-53"><a href="survey-of-consumer-finances-scf.html#cb468-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-54"><a href="survey-of-consumer-finances-scf.html#cb468-54" aria-hidden="true" tabindex="-1"></a>scf_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>( scf_list , <span class="cf">function</span>( w ) w[ <span class="fu">order</span>( w[ , <span class="st">&#39;yy1&#39;</span> ] ) , ] )</span>
-<span id="cb468-55"><a href="survey-of-consumer-finances-scf.html#cb468-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-56"><a href="survey-of-consumer-finances-scf.html#cb468-56" aria-hidden="true" tabindex="-1"></a><span class="co"># replace all missing values in the replicate weights table with zeroes..</span></span>
-<span id="cb468-57"><a href="survey-of-consumer-finances-scf.html#cb468-57" aria-hidden="true" tabindex="-1"></a>scf_rw_df[ <span class="fu">is.na</span>( scf_rw_df ) ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb468-58"><a href="survey-of-consumer-finances-scf.html#cb468-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-59"><a href="survey-of-consumer-finances-scf.html#cb468-59" aria-hidden="true" tabindex="-1"></a><span class="co"># ..then multiply the replicate weights by the multiplication factor</span></span>
-<span id="cb468-60"><a href="survey-of-consumer-finances-scf.html#cb468-60" aria-hidden="true" tabindex="-1"></a>scf_rw_df[ , <span class="fu">paste0</span>( <span class="st">&#39;wgt&#39;</span> , <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span> ) ] <span class="ot">&lt;-</span> scf_rw_df[ , <span class="fu">paste0</span>( <span class="st">&#39;wt1b&#39;</span> , <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span> ) ] <span class="sc">*</span> scf_rw_df[ , <span class="fu">paste0</span>( <span class="st">&#39;mm&#39;</span> , <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span> ) ]</span>
-<span id="cb468-61"><a href="survey-of-consumer-finances-scf.html#cb468-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-62"><a href="survey-of-consumer-finances-scf.html#cb468-62" aria-hidden="true" tabindex="-1"></a><span class="co"># only keep the unique identifier and the final (combined) replicate weights</span></span>
-<span id="cb468-63"><a href="survey-of-consumer-finances-scf.html#cb468-63" aria-hidden="true" tabindex="-1"></a>scf_rw_df <span class="ot">&lt;-</span> scf_rw_df[ , <span class="fu">c</span>( <span class="st">&#39;yy1&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;wgt&#39;</span> , <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span> ) ) ]</span>
-<span id="cb468-64"><a href="survey-of-consumer-finances-scf.html#cb468-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-65"><a href="survey-of-consumer-finances-scf.html#cb468-65" aria-hidden="true" tabindex="-1"></a><span class="co"># sort the replicate weights data frame by the unique identifier as well</span></span>
-<span id="cb468-66"><a href="survey-of-consumer-finances-scf.html#cb468-66" aria-hidden="true" tabindex="-1"></a>scf_rw_df <span class="ot">&lt;-</span> scf_rw_df[ <span class="fu">order</span>( scf_rw_df<span class="sc">$</span>yy1 ) , ]</span>
-<span id="cb468-67"><a href="survey-of-consumer-finances-scf.html#cb468-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb468-68"><a href="survey-of-consumer-finances-scf.html#cb468-68" aria-hidden="true" tabindex="-1"></a>scf_design <span class="ot">&lt;-</span> </span>
-<span id="cb468-69"><a href="survey-of-consumer-finances-scf.html#cb468-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>( </span>
-<span id="cb468-70"><a href="survey-of-consumer-finances-scf.html#cb468-70" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span>wgt , </span>
-<span id="cb468-71"><a href="survey-of-consumer-finances-scf.html#cb468-71" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span> scf_rw_df[ , <span class="sc">-</span><span class="dv">1</span> ] , </span>
-<span id="cb468-72"><a href="survey-of-consumer-finances-scf.html#cb468-72" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( scf_list ) , </span>
-<span id="cb468-73"><a href="survey-of-consumer-finances-scf.html#cb468-73" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">1</span> ,</span>
-<span id="cb468-74"><a href="survey-of-consumer-finances-scf.html#cb468-74" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="fu">rep</span>( <span class="dv">1</span> <span class="sc">/</span> <span class="dv">998</span> , <span class="dv">999</span> ) ,</span>
-<span id="cb468-75"><a href="survey-of-consumer-finances-scf.html#cb468-75" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">FALSE</span> ,</span>
-<span id="cb468-76"><a href="survey-of-consumer-finances-scf.html#cb468-76" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;other&quot;</span> ,</span>
-<span id="cb468-77"><a href="survey-of-consumer-finances-scf.html#cb468-77" aria-hidden="true" tabindex="-1"></a>        <span class="at">combined.weights =</span> <span class="cn">TRUE</span></span>
-<span id="cb468-78"><a href="survey-of-consumer-finances-scf.html#cb468-78" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<p>Break the main table into five different implicates based on the final character of the column <code>y1</code>:</p>
+<div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb472-1"><a href="survey-of-consumer-finances-scf.html#cb472-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb472-2"><a href="survey-of-consumer-finances-scf.html#cb472-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb472-3"><a href="survey-of-consumer-finances-scf.html#cb472-3" aria-hidden="true" tabindex="-1"></a>s1_df <span class="ot">&lt;-</span> scf_df[ <span class="fu">str_sub</span>( scf_df[ , <span class="st">&#39;y1&#39;</span> ] , <span class="sc">-</span><span class="dv">1</span> , <span class="sc">-</span><span class="dv">1</span> ) <span class="sc">==</span> <span class="dv">1</span> , ]</span>
+<span id="cb472-4"><a href="survey-of-consumer-finances-scf.html#cb472-4" aria-hidden="true" tabindex="-1"></a>s2_df <span class="ot">&lt;-</span> scf_df[ <span class="fu">str_sub</span>( scf_df[ , <span class="st">&#39;y1&#39;</span> ] , <span class="sc">-</span><span class="dv">1</span> , <span class="sc">-</span><span class="dv">1</span> ) <span class="sc">==</span> <span class="dv">2</span> , ]</span>
+<span id="cb472-5"><a href="survey-of-consumer-finances-scf.html#cb472-5" aria-hidden="true" tabindex="-1"></a>s3_df <span class="ot">&lt;-</span> scf_df[ <span class="fu">str_sub</span>( scf_df[ , <span class="st">&#39;y1&#39;</span> ] , <span class="sc">-</span><span class="dv">1</span> , <span class="sc">-</span><span class="dv">1</span> ) <span class="sc">==</span> <span class="dv">3</span> , ]</span>
+<span id="cb472-6"><a href="survey-of-consumer-finances-scf.html#cb472-6" aria-hidden="true" tabindex="-1"></a>s4_df <span class="ot">&lt;-</span> scf_df[ <span class="fu">str_sub</span>( scf_df[ , <span class="st">&#39;y1&#39;</span> ] , <span class="sc">-</span><span class="dv">1</span> , <span class="sc">-</span><span class="dv">1</span> ) <span class="sc">==</span> <span class="dv">4</span> , ]</span>
+<span id="cb472-7"><a href="survey-of-consumer-finances-scf.html#cb472-7" aria-hidden="true" tabindex="-1"></a>s5_df <span class="ot">&lt;-</span> scf_df[ <span class="fu">str_sub</span>( scf_df[ , <span class="st">&#39;y1&#39;</span> ] , <span class="sc">-</span><span class="dv">1</span> , <span class="sc">-</span><span class="dv">1</span> ) <span class="sc">==</span> <span class="dv">5</span> , ]</span></code></pre></div>
+<p>Combine these into a single <code>list</code>, then merge each implicate with the summary extract:</p>
+<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb473-1"><a href="survey-of-consumer-finances-scf.html#cb473-1" aria-hidden="true" tabindex="-1"></a>scf_imp <span class="ot">&lt;-</span> <span class="fu">list</span>( s1_df , s2_df , s3_df , s4_df , s5_df )</span>
+<span id="cb473-2"><a href="survey-of-consumer-finances-scf.html#cb473-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb473-3"><a href="survey-of-consumer-finances-scf.html#cb473-3" aria-hidden="true" tabindex="-1"></a>scf_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>( scf_imp , merge , ext_df )</span></code></pre></div>
+<p>Replace all missing values in the replicate weights table with zeroes, multiply the replicate weights by the multiplication factor, then only keep the unique identifier and the final (combined) replicate weights:</p>
+<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb474-1"><a href="survey-of-consumer-finances-scf.html#cb474-1" aria-hidden="true" tabindex="-1"></a>scf_rw_df[ <span class="fu">is.na</span>( scf_rw_df ) ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb474-2"><a href="survey-of-consumer-finances-scf.html#cb474-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb474-3"><a href="survey-of-consumer-finances-scf.html#cb474-3" aria-hidden="true" tabindex="-1"></a>scf_rw_df[ , <span class="fu">paste0</span>( <span class="st">&#39;wgt&#39;</span> , <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span> ) ] <span class="ot">&lt;-</span></span>
+<span id="cb474-4"><a href="survey-of-consumer-finances-scf.html#cb474-4" aria-hidden="true" tabindex="-1"></a>    scf_rw_df[ , <span class="fu">paste0</span>( <span class="st">&#39;wt1b&#39;</span> , <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span> ) ] <span class="sc">*</span> scf_rw_df[ , <span class="fu">paste0</span>( <span class="st">&#39;mm&#39;</span> , <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span> ) ]</span>
+<span id="cb474-5"><a href="survey-of-consumer-finances-scf.html#cb474-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb474-6"><a href="survey-of-consumer-finances-scf.html#cb474-6" aria-hidden="true" tabindex="-1"></a>scf_rw_df <span class="ot">&lt;-</span> scf_rw_df[ , <span class="fu">c</span>( <span class="st">&#39;yy1&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;wgt&#39;</span> , <span class="dv">1</span><span class="sc">:</span><span class="dv">999</span> ) ) ]</span></code></pre></div>
+<p>Sort both the five implicates and also the replicate weights table by the unique identifier:</p>
+<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb475-1"><a href="survey-of-consumer-finances-scf.html#cb475-1" aria-hidden="true" tabindex="-1"></a>scf_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>( scf_list , <span class="cf">function</span>( w ) w[ <span class="fu">order</span>( w[ , <span class="st">&#39;yy1&#39;</span> ] ) , ] )</span>
+<span id="cb475-2"><a href="survey-of-consumer-finances-scf.html#cb475-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb475-3"><a href="survey-of-consumer-finances-scf.html#cb475-3" aria-hidden="true" tabindex="-1"></a>scf_rw_df <span class="ot">&lt;-</span> scf_rw_df[ <span class="fu">order</span>( scf_rw_df<span class="sc">$</span>yy1 ) , ]</span></code></pre></div>
+<p>Define the design:</p>
+<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb476-1"><a href="survey-of-consumer-finances-scf.html#cb476-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb476-2"><a href="survey-of-consumer-finances-scf.html#cb476-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
+<span id="cb476-3"><a href="survey-of-consumer-finances-scf.html#cb476-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb476-4"><a href="survey-of-consumer-finances-scf.html#cb476-4" aria-hidden="true" tabindex="-1"></a>scf_design <span class="ot">&lt;-</span> </span>
+<span id="cb476-5"><a href="survey-of-consumer-finances-scf.html#cb476-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>( </span>
+<span id="cb476-6"><a href="survey-of-consumer-finances-scf.html#cb476-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span>wgt , </span>
+<span id="cb476-7"><a href="survey-of-consumer-finances-scf.html#cb476-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span> scf_rw_df[ , <span class="sc">-</span><span class="dv">1</span> ] , </span>
+<span id="cb476-8"><a href="survey-of-consumer-finances-scf.html#cb476-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( scf_list ) , </span>
+<span id="cb476-9"><a href="survey-of-consumer-finances-scf.html#cb476-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">1</span> ,</span>
+<span id="cb476-10"><a href="survey-of-consumer-finances-scf.html#cb476-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="fu">rep</span>( <span class="dv">1</span> <span class="sc">/</span> <span class="dv">998</span> , <span class="dv">999</span> ) ,</span>
+<span id="cb476-11"><a href="survey-of-consumer-finances-scf.html#cb476-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">FALSE</span> ,</span>
+<span id="cb476-12"><a href="survey-of-consumer-finances-scf.html#cb476-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;other&quot;</span> ,</span>
+<span id="cb476-13"><a href="survey-of-consumer-finances-scf.html#cb476-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">combined.weights =</span> <span class="cn">TRUE</span></span>
+<span id="cb476-14"><a href="survey-of-consumer-finances-scf.html#cb476-14" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="variable-recoding-16" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="survey-of-consumer-finances-scf.html#variable-recoding-16" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb469"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb469-1"><a href="survey-of-consumer-finances-scf.html#cb469-1" aria-hidden="true" tabindex="-1"></a>scf_design <span class="ot">&lt;-</span> </span>
-<span id="cb469-2"><a href="survey-of-consumer-finances-scf.html#cb469-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb469-3"><a href="survey-of-consumer-finances-scf.html#cb469-3" aria-hidden="true" tabindex="-1"></a>        scf_design , </span>
-<span id="cb469-4"><a href="survey-of-consumer-finances-scf.html#cb469-4" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb469-5"><a href="survey-of-consumer-finances-scf.html#cb469-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">hhsex =</span> <span class="fu">factor</span>( hhsex , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) ) ,</span>
-<span id="cb469-6"><a href="survey-of-consumer-finances-scf.html#cb469-6" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb469-7"><a href="survey-of-consumer-finances-scf.html#cb469-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">married =</span> <span class="fu">as.numeric</span>( married <span class="sc">==</span> <span class="dv">1</span> ) ,</span>
-<span id="cb469-8"><a href="survey-of-consumer-finances-scf.html#cb469-8" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb469-9"><a href="survey-of-consumer-finances-scf.html#cb469-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">edcl =</span> </span>
-<span id="cb469-10"><a href="survey-of-consumer-finances-scf.html#cb469-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb469-11"><a href="survey-of-consumer-finances-scf.html#cb469-11" aria-hidden="true" tabindex="-1"></a>                edcl , </span>
-<span id="cb469-12"><a href="survey-of-consumer-finances-scf.html#cb469-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> </span>
-<span id="cb469-13"><a href="survey-of-consumer-finances-scf.html#cb469-13" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>( </span>
-<span id="cb469-14"><a href="survey-of-consumer-finances-scf.html#cb469-14" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;less than high school&quot;</span> , </span>
-<span id="cb469-15"><a href="survey-of-consumer-finances-scf.html#cb469-15" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;high school or GED&quot;</span> , </span>
-<span id="cb469-16"><a href="survey-of-consumer-finances-scf.html#cb469-16" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;some college&quot;</span> , </span>
-<span id="cb469-17"><a href="survey-of-consumer-finances-scf.html#cb469-17" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;college degree&quot;</span> </span>
-<span id="cb469-18"><a href="survey-of-consumer-finances-scf.html#cb469-18" aria-hidden="true" tabindex="-1"></a>                    ) </span>
-<span id="cb469-19"><a href="survey-of-consumer-finances-scf.html#cb469-19" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb469-20"><a href="survey-of-consumer-finances-scf.html#cb469-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb469-21"><a href="survey-of-consumer-finances-scf.html#cb469-21" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb477-1"><a href="survey-of-consumer-finances-scf.html#cb477-1" aria-hidden="true" tabindex="-1"></a>scf_design <span class="ot">&lt;-</span> </span>
+<span id="cb477-2"><a href="survey-of-consumer-finances-scf.html#cb477-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb477-3"><a href="survey-of-consumer-finances-scf.html#cb477-3" aria-hidden="true" tabindex="-1"></a>        scf_design , </span>
+<span id="cb477-4"><a href="survey-of-consumer-finances-scf.html#cb477-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb477-5"><a href="survey-of-consumer-finances-scf.html#cb477-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">hhsex =</span> <span class="fu">factor</span>( hhsex , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) ) ,</span>
+<span id="cb477-6"><a href="survey-of-consumer-finances-scf.html#cb477-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb477-7"><a href="survey-of-consumer-finances-scf.html#cb477-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">married =</span> <span class="fu">as.numeric</span>( married <span class="sc">==</span> <span class="dv">1</span> ) ,</span>
+<span id="cb477-8"><a href="survey-of-consumer-finances-scf.html#cb477-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb477-9"><a href="survey-of-consumer-finances-scf.html#cb477-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">edcl =</span> </span>
+<span id="cb477-10"><a href="survey-of-consumer-finances-scf.html#cb477-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
+<span id="cb477-11"><a href="survey-of-consumer-finances-scf.html#cb477-11" aria-hidden="true" tabindex="-1"></a>                edcl , </span>
+<span id="cb477-12"><a href="survey-of-consumer-finances-scf.html#cb477-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ,</span>
+<span id="cb477-13"><a href="survey-of-consumer-finances-scf.html#cb477-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> </span>
+<span id="cb477-14"><a href="survey-of-consumer-finances-scf.html#cb477-14" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>( </span>
+<span id="cb477-15"><a href="survey-of-consumer-finances-scf.html#cb477-15" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;less than high school&quot;</span> , </span>
+<span id="cb477-16"><a href="survey-of-consumer-finances-scf.html#cb477-16" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;high school or GED&quot;</span> , </span>
+<span id="cb477-17"><a href="survey-of-consumer-finances-scf.html#cb477-17" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;some college&quot;</span> , </span>
+<span id="cb477-18"><a href="survey-of-consumer-finances-scf.html#cb477-18" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;college degree&quot;</span> </span>
+<span id="cb477-19"><a href="survey-of-consumer-finances-scf.html#cb477-19" aria-hidden="true" tabindex="-1"></a>                    ) </span>
+<span id="cb477-20"><a href="survey-of-consumer-finances-scf.html#cb477-20" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb477-21"><a href="survey-of-consumer-finances-scf.html#cb477-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb477-22"><a href="survey-of-consumer-finances-scf.html#cb477-22" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -784,123 +746,123 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-16" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="survey-of-consumer-finances-scf.html#unweighted-counts-16" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb470-1"><a href="survey-of-consumer-finances-scf.html#cb470-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
-<span id="cb470-2"><a href="survey-of-consumer-finances-scf.html#cb470-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb470-3"><a href="survey-of-consumer-finances-scf.html#cb470-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> hhsex , unwtd.count ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb478-1"><a href="survey-of-consumer-finances-scf.html#cb478-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svyby</span>( <span class="sc">~</span> five , <span class="sc">~</span> one , unwtd.count ) ) )</span>
+<span id="cb478-2"><a href="survey-of-consumer-finances-scf.html#cb478-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb478-3"><a href="survey-of-consumer-finances-scf.html#cb478-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svyby</span>( <span class="sc">~</span> five , <span class="sc">~</span> hhsex , unwtd.count ) ) )</span></code></pre></div>
 </div>
 <div id="weighted-counts-13" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="survey-of-consumer-finances-scf.html#weighted-counts-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="survey-of-consumer-finances-scf.html#cb471-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
-<span id="cb471-2"><a href="survey-of-consumer-finances-scf.html#cb471-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb471-3"><a href="survey-of-consumer-finances-scf.html#cb471-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb471-4"><a href="survey-of-consumer-finances-scf.html#cb471-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> hhsex , svytotal )</span>
-<span id="cb471-5"><a href="survey-of-consumer-finances-scf.html#cb471-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb479"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb479-1"><a href="survey-of-consumer-finances-scf.html#cb479-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svytotal</span>( <span class="sc">~</span> five ) ) )</span>
+<span id="cb479-2"><a href="survey-of-consumer-finances-scf.html#cb479-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb479-3"><a href="survey-of-consumer-finances-scf.html#cb479-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb479-4"><a href="survey-of-consumer-finances-scf.html#cb479-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> five , <span class="sc">~</span> hhsex , svytotal )</span>
+<span id="cb479-5"><a href="survey-of-consumer-finances-scf.html#cb479-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-16" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="survey-of-consumer-finances-scf.html#descriptive-statistics-16" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb472-1"><a href="survey-of-consumer-finances-scf.html#cb472-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svymean</span>( <span class="sc">~</span> networth ) ) )</span>
-<span id="cb472-2"><a href="survey-of-consumer-finances-scf.html#cb472-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb472-3"><a href="survey-of-consumer-finances-scf.html#cb472-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb472-4"><a href="survey-of-consumer-finances-scf.html#cb472-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> networth , <span class="sc">~</span> hhsex , svymean )</span>
-<span id="cb472-5"><a href="survey-of-consumer-finances-scf.html#cb472-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb480"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb480-1"><a href="survey-of-consumer-finances-scf.html#cb480-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svymean</span>( <span class="sc">~</span> networth ) ) )</span>
+<span id="cb480-2"><a href="survey-of-consumer-finances-scf.html#cb480-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb480-3"><a href="survey-of-consumer-finances-scf.html#cb480-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb480-4"><a href="survey-of-consumer-finances-scf.html#cb480-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> networth , <span class="sc">~</span> hhsex , svymean )</span>
+<span id="cb480-5"><a href="survey-of-consumer-finances-scf.html#cb480-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb473-1"><a href="survey-of-consumer-finances-scf.html#cb473-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svymean</span>( <span class="sc">~</span> edcl ) ) )</span>
-<span id="cb473-2"><a href="survey-of-consumer-finances-scf.html#cb473-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb473-3"><a href="survey-of-consumer-finances-scf.html#cb473-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb473-4"><a href="survey-of-consumer-finances-scf.html#cb473-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> edcl , <span class="sc">~</span> hhsex , svymean )</span>
-<span id="cb473-5"><a href="survey-of-consumer-finances-scf.html#cb473-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb481"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb481-1"><a href="survey-of-consumer-finances-scf.html#cb481-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svymean</span>( <span class="sc">~</span> edcl ) ) )</span>
+<span id="cb481-2"><a href="survey-of-consumer-finances-scf.html#cb481-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb481-3"><a href="survey-of-consumer-finances-scf.html#cb481-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb481-4"><a href="survey-of-consumer-finances-scf.html#cb481-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> edcl , <span class="sc">~</span> hhsex , svymean )</span>
+<span id="cb481-5"><a href="survey-of-consumer-finances-scf.html#cb481-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb474-1"><a href="survey-of-consumer-finances-scf.html#cb474-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svytotal</span>( <span class="sc">~</span> networth ) ) )</span>
-<span id="cb474-2"><a href="survey-of-consumer-finances-scf.html#cb474-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb474-3"><a href="survey-of-consumer-finances-scf.html#cb474-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb474-4"><a href="survey-of-consumer-finances-scf.html#cb474-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> networth , <span class="sc">~</span> hhsex , svytotal )</span>
-<span id="cb474-5"><a href="survey-of-consumer-finances-scf.html#cb474-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb482-1"><a href="survey-of-consumer-finances-scf.html#cb482-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svytotal</span>( <span class="sc">~</span> networth ) ) )</span>
+<span id="cb482-2"><a href="survey-of-consumer-finances-scf.html#cb482-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb482-3"><a href="survey-of-consumer-finances-scf.html#cb482-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb482-4"><a href="survey-of-consumer-finances-scf.html#cb482-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> networth , <span class="sc">~</span> hhsex , svytotal )</span>
+<span id="cb482-5"><a href="survey-of-consumer-finances-scf.html#cb482-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb475-1"><a href="survey-of-consumer-finances-scf.html#cb475-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svytotal</span>( <span class="sc">~</span> edcl ) ) )</span>
-<span id="cb475-2"><a href="survey-of-consumer-finances-scf.html#cb475-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb475-3"><a href="survey-of-consumer-finances-scf.html#cb475-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb475-4"><a href="survey-of-consumer-finances-scf.html#cb475-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> edcl , <span class="sc">~</span> hhsex , svytotal )</span>
-<span id="cb475-5"><a href="survey-of-consumer-finances-scf.html#cb475-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb483"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb483-1"><a href="survey-of-consumer-finances-scf.html#cb483-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svytotal</span>( <span class="sc">~</span> edcl ) ) )</span>
+<span id="cb483-2"><a href="survey-of-consumer-finances-scf.html#cb483-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb483-3"><a href="survey-of-consumer-finances-scf.html#cb483-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb483-4"><a href="survey-of-consumer-finances-scf.html#cb483-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> edcl , <span class="sc">~</span> hhsex , svytotal )</span>
+<span id="cb483-5"><a href="survey-of-consumer-finances-scf.html#cb483-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb476-1"><a href="survey-of-consumer-finances-scf.html#cb476-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb476-2"><a href="survey-of-consumer-finances-scf.html#cb476-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
-<span id="cb476-3"><a href="survey-of-consumer-finances-scf.html#cb476-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> networth ,</span>
-<span id="cb476-4"><a href="survey-of-consumer-finances-scf.html#cb476-4" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> , <span class="at">interval.type =</span> <span class="st">&#39;quantile&#39;</span> </span>
-<span id="cb476-5"><a href="survey-of-consumer-finances-scf.html#cb476-5" aria-hidden="true" tabindex="-1"></a>) ) )</span>
-<span id="cb476-6"><a href="survey-of-consumer-finances-scf.html#cb476-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb476-7"><a href="survey-of-consumer-finances-scf.html#cb476-7" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb476-8"><a href="survey-of-consumer-finances-scf.html#cb476-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
-<span id="cb476-9"><a href="survey-of-consumer-finances-scf.html#cb476-9" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> networth , <span class="sc">~</span> hhsex , svyquantile ,</span>
-<span id="cb476-10"><a href="survey-of-consumer-finances-scf.html#cb476-10" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> , <span class="at">interval.type =</span> <span class="st">&#39;quantile&#39;</span> ,</span>
-<span id="cb476-11"><a href="survey-of-consumer-finances-scf.html#cb476-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
-<span id="cb476-12"><a href="survey-of-consumer-finances-scf.html#cb476-12" aria-hidden="true" tabindex="-1"></a>) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb484"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb484-1"><a href="survey-of-consumer-finances-scf.html#cb484-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb484-2"><a href="survey-of-consumer-finances-scf.html#cb484-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
+<span id="cb484-3"><a href="survey-of-consumer-finances-scf.html#cb484-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> networth ,</span>
+<span id="cb484-4"><a href="survey-of-consumer-finances-scf.html#cb484-4" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> , <span class="at">interval.type =</span> <span class="st">&#39;quantile&#39;</span> </span>
+<span id="cb484-5"><a href="survey-of-consumer-finances-scf.html#cb484-5" aria-hidden="true" tabindex="-1"></a>) ) )</span>
+<span id="cb484-6"><a href="survey-of-consumer-finances-scf.html#cb484-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb484-7"><a href="survey-of-consumer-finances-scf.html#cb484-7" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb484-8"><a href="survey-of-consumer-finances-scf.html#cb484-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
+<span id="cb484-9"><a href="survey-of-consumer-finances-scf.html#cb484-9" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> networth , <span class="sc">~</span> hhsex , svyquantile ,</span>
+<span id="cb484-10"><a href="survey-of-consumer-finances-scf.html#cb484-10" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> , <span class="at">interval.type =</span> <span class="st">&#39;quantile&#39;</span> ,</span>
+<span id="cb484-11"><a href="survey-of-consumer-finances-scf.html#cb484-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
+<span id="cb484-12"><a href="survey-of-consumer-finances-scf.html#cb484-12" aria-hidden="true" tabindex="-1"></a>) ) )</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb477-1"><a href="survey-of-consumer-finances-scf.html#cb477-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb477-2"><a href="survey-of-consumer-finances-scf.html#cb477-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> income , <span class="at">denominator =</span> <span class="sc">~</span> networth )</span>
-<span id="cb477-3"><a href="survey-of-consumer-finances-scf.html#cb477-3" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb485-1"><a href="survey-of-consumer-finances-scf.html#cb485-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb485-2"><a href="survey-of-consumer-finances-scf.html#cb485-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> income , <span class="at">denominator =</span> <span class="sc">~</span> networth )</span>
+<span id="cb485-3"><a href="survey-of-consumer-finances-scf.html#cb485-3" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="subsetting-16" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="survey-of-consumer-finances-scf.html#subsetting-16" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to labor force participants:</p>
-<div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb478-1"><a href="survey-of-consumer-finances-scf.html#cb478-1" aria-hidden="true" tabindex="-1"></a>sub_scf_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( scf_design , lf <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb486"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb486-1"><a href="survey-of-consumer-finances-scf.html#cb486-1" aria-hidden="true" tabindex="-1"></a>sub_scf_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( scf_design , lf <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb479"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb479-1"><a href="survey-of-consumer-finances-scf.html#cb479-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( sub_scf_design , <span class="fu">svymean</span>( <span class="sc">~</span> networth ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb487-1"><a href="survey-of-consumer-finances-scf.html#cb487-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( sub_scf_design , <span class="fu">svymean</span>( <span class="sc">~</span> networth ) ) )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-16" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="survey-of-consumer-finances-scf.html#measures-of-uncertainty-16" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb480"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb480-1"><a href="survey-of-consumer-finances-scf.html#cb480-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
-<span id="cb480-2"><a href="survey-of-consumer-finances-scf.html#cb480-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb480-3"><a href="survey-of-consumer-finances-scf.html#cb480-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> networth )</span>
-<span id="cb480-4"><a href="survey-of-consumer-finances-scf.html#cb480-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb480-5"><a href="survey-of-consumer-finances-scf.html#cb480-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb480-6"><a href="survey-of-consumer-finances-scf.html#cb480-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb480-7"><a href="survey-of-consumer-finances-scf.html#cb480-7" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb480-8"><a href="survey-of-consumer-finances-scf.html#cb480-8" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb480-9"><a href="survey-of-consumer-finances-scf.html#cb480-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb480-10"><a href="survey-of-consumer-finances-scf.html#cb480-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb480-11"><a href="survey-of-consumer-finances-scf.html#cb480-11" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb480-12"><a href="survey-of-consumer-finances-scf.html#cb480-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb480-13"><a href="survey-of-consumer-finances-scf.html#cb480-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> networth , <span class="sc">~</span> hhsex , svymean )</span>
-<span id="cb480-14"><a href="survey-of-consumer-finances-scf.html#cb480-14" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb480-15"><a href="survey-of-consumer-finances-scf.html#cb480-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb480-16"><a href="survey-of-consumer-finances-scf.html#cb480-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb480-17"><a href="survey-of-consumer-finances-scf.html#cb480-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb480-18"><a href="survey-of-consumer-finances-scf.html#cb480-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb480-19"><a href="survey-of-consumer-finances-scf.html#cb480-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb488"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb488-1"><a href="survey-of-consumer-finances-scf.html#cb488-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
+<span id="cb488-2"><a href="survey-of-consumer-finances-scf.html#cb488-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb488-3"><a href="survey-of-consumer-finances-scf.html#cb488-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> networth )</span>
+<span id="cb488-4"><a href="survey-of-consumer-finances-scf.html#cb488-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb488-5"><a href="survey-of-consumer-finances-scf.html#cb488-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb488-6"><a href="survey-of-consumer-finances-scf.html#cb488-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb488-7"><a href="survey-of-consumer-finances-scf.html#cb488-7" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb488-8"><a href="survey-of-consumer-finances-scf.html#cb488-8" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb488-9"><a href="survey-of-consumer-finances-scf.html#cb488-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb488-10"><a href="survey-of-consumer-finances-scf.html#cb488-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb488-11"><a href="survey-of-consumer-finances-scf.html#cb488-11" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb488-12"><a href="survey-of-consumer-finances-scf.html#cb488-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb488-13"><a href="survey-of-consumer-finances-scf.html#cb488-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> networth , <span class="sc">~</span> hhsex , svymean )</span>
+<span id="cb488-14"><a href="survey-of-consumer-finances-scf.html#cb488-14" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb488-15"><a href="survey-of-consumer-finances-scf.html#cb488-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb488-16"><a href="survey-of-consumer-finances-scf.html#cb488-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb488-17"><a href="survey-of-consumer-finances-scf.html#cb488-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb488-18"><a href="survey-of-consumer-finances-scf.html#cb488-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb488-19"><a href="survey-of-consumer-finances-scf.html#cb488-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb481"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb481-1"><a href="survey-of-consumer-finances-scf.html#cb481-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( scf_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] )</span></code></pre></div>
+<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb489-1"><a href="survey-of-consumer-finances-scf.html#cb489-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( scf_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb482-1"><a href="survey-of-consumer-finances-scf.html#cb482-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svyvar</span>( <span class="sc">~</span> networth ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb490-1"><a href="survey-of-consumer-finances-scf.html#cb490-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svyvar</span>( <span class="sc">~</span> networth ) ) )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb483"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb483-1"><a href="survey-of-consumer-finances-scf.html#cb483-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb483-2"><a href="survey-of-consumer-finances-scf.html#cb483-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb483-3"><a href="survey-of-consumer-finances-scf.html#cb483-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> networth , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb483-4"><a href="survey-of-consumer-finances-scf.html#cb483-4" aria-hidden="true" tabindex="-1"></a>) )</span>
-<span id="cb483-5"><a href="survey-of-consumer-finances-scf.html#cb483-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb483-6"><a href="survey-of-consumer-finances-scf.html#cb483-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb483-7"><a href="survey-of-consumer-finances-scf.html#cb483-7" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb483-8"><a href="survey-of-consumer-finances-scf.html#cb483-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> networth , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
-<span id="cb483-9"><a href="survey-of-consumer-finances-scf.html#cb483-9" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb491-1"><a href="survey-of-consumer-finances-scf.html#cb491-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb491-2"><a href="survey-of-consumer-finances-scf.html#cb491-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb491-3"><a href="survey-of-consumer-finances-scf.html#cb491-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> networth , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb491-4"><a href="survey-of-consumer-finances-scf.html#cb491-4" aria-hidden="true" tabindex="-1"></a>) )</span>
+<span id="cb491-5"><a href="survey-of-consumer-finances-scf.html#cb491-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb491-6"><a href="survey-of-consumer-finances-scf.html#cb491-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb491-7"><a href="survey-of-consumer-finances-scf.html#cb491-7" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb491-8"><a href="survey-of-consumer-finances-scf.html#cb491-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> networth , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
+<span id="cb491-9"><a href="survey-of-consumer-finances-scf.html#cb491-9" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb484"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb484-1"><a href="survey-of-consumer-finances-scf.html#cb484-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyciprop( ~ married , scf_design ,</span></span>
-<span id="cb484-2"><a href="survey-of-consumer-finances-scf.html#cb484-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; )</span></span></code></pre></div>
+<div class="sourceCode" id="cb492"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb492-1"><a href="survey-of-consumer-finances-scf.html#cb492-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyciprop( ~ married , scf_design ,</span></span>
+<span id="cb492-2"><a href="survey-of-consumer-finances-scf.html#cb492-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; )</span></span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-16" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="survey-of-consumer-finances-scf.html#regression-models-and-tests-of-association-16" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb485-1"><a href="survey-of-consumer-finances-scf.html#cb485-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyttest( networth ~ married , scf_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb493"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb493-1"><a href="survey-of-consumer-finances-scf.html#cb493-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyttest( networth ~ married , scf_design )</span></span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb486"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb486-1"><a href="survey-of-consumer-finances-scf.html#cb486-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvychisq( ~ married + edcl , scf_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb494"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb494-1"><a href="survey-of-consumer-finances-scf.html#cb494-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvychisq( ~ married + edcl , scf_design )</span></span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb487-1"><a href="survey-of-consumer-finances-scf.html#cb487-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb487-2"><a href="survey-of-consumer-finances-scf.html#cb487-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
-<span id="cb487-3"><a href="survey-of-consumer-finances-scf.html#cb487-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyglm</span>( networth <span class="sc">~</span> married <span class="sc">+</span> edcl )</span>
-<span id="cb487-4"><a href="survey-of-consumer-finances-scf.html#cb487-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb487-5"><a href="survey-of-consumer-finances-scf.html#cb487-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb487-6"><a href="survey-of-consumer-finances-scf.html#cb487-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb495"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb495-1"><a href="survey-of-consumer-finances-scf.html#cb495-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb495-2"><a href="survey-of-consumer-finances-scf.html#cb495-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design ,</span>
+<span id="cb495-3"><a href="survey-of-consumer-finances-scf.html#cb495-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyglm</span>( networth <span class="sc">~</span> married <span class="sc">+</span> edcl )</span>
+<span id="cb495-4"><a href="survey-of-consumer-finances-scf.html#cb495-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb495-5"><a href="survey-of-consumer-finances-scf.html#cb495-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb495-6"><a href="survey-of-consumer-finances-scf.html#cb495-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -914,34 +876,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="replication-example-14" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="survey-of-consumer-finances-scf.html#replication-example-14" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The statistics computed off of the public use file come very close to the net worth estimates in <a href="https://www.federalreserve.gov/publications/files/scf20.pdf#page=11">Table 2 of the bulletin</a> but do not match exactly. A member of the SCF staff at the Federal Reserve re-ran the net worth calculations using the 2016 public use file to confirm that the calculations presented on this page follow the correct methodology.</p>
-<div class="sourceCode" id="cb488"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb488-1"><a href="survey-of-consumer-finances-scf.html#cb488-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute mean net worth using the 2019 PUF</span></span>
-<span id="cb488-2"><a href="survey-of-consumer-finances-scf.html#cb488-2" aria-hidden="true" tabindex="-1"></a>mean_net_worth <span class="ot">&lt;-</span> <span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svymean</span>( <span class="sc">~</span> networth ) ) )</span>
-<span id="cb488-3"><a href="survey-of-consumer-finances-scf.html#cb488-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb488-4"><a href="survey-of-consumer-finances-scf.html#cb488-4" aria-hidden="true" tabindex="-1"></a><span class="co"># exactly match &quot;Table 4&quot; tab cell W6 of</span></span>
-<span id="cb488-5"><a href="survey-of-consumer-finances-scf.html#cb488-5" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx</span></span>
-<span id="cb488-6"><a href="survey-of-consumer-finances-scf.html#cb488-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( mean_net_worth ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">746.82</span> )</span>
-<span id="cb488-7"><a href="survey-of-consumer-finances-scf.html#cb488-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb488-8"><a href="survey-of-consumer-finances-scf.html#cb488-8" aria-hidden="true" tabindex="-1"></a><span class="co"># match mean net worth standard error within $100 from</span></span>
-<span id="cb488-9"><a href="survey-of-consumer-finances-scf.html#cb488-9" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.federalreserve.gov/publications/files/scf20.pdf#page=11</span></span>
-<span id="cb488-10"><a href="survey-of-consumer-finances-scf.html#cb488-10" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">abs</span>( <span class="fl">15.6</span> <span class="sc">-</span> <span class="fu">round</span>( <span class="fu">SE</span>( mean_net_worth ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">1</span> ) ) <span class="sc">&lt;</span> <span class="fl">0.1</span> )</span>
-<span id="cb488-11"><a href="survey-of-consumer-finances-scf.html#cb488-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb488-12"><a href="survey-of-consumer-finances-scf.html#cb488-12" aria-hidden="true" tabindex="-1"></a><span class="co"># compute quantile with all five implicates stacked</span></span>
-<span id="cb488-13"><a href="survey-of-consumer-finances-scf.html#cb488-13" aria-hidden="true" tabindex="-1"></a><span class="co"># matches the public excel tables but not the recommended technique</span></span>
-<span id="cb488-14"><a href="survey-of-consumer-finances-scf.html#cb488-14" aria-hidden="true" tabindex="-1"></a>fake_design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>( <span class="sc">~</span> <span class="dv">1</span> , <span class="at">data =</span> p_df[ <span class="fu">c</span>( <span class="st">&#39;networth&#39;</span> , <span class="st">&#39;wgt&#39;</span> ) ] , <span class="at">weights =</span> <span class="sc">~</span> wgt )</span>
-<span id="cb488-15"><a href="survey-of-consumer-finances-scf.html#cb488-15" aria-hidden="true" tabindex="-1"></a>median_net_worth_incorrect_errors <span class="ot">&lt;-</span> <span class="fu">svyquantile</span>( <span class="sc">~</span> networth , fake_design , <span class="fl">0.5</span> )</span>
-<span id="cb488-16"><a href="survey-of-consumer-finances-scf.html#cb488-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb488-17"><a href="survey-of-consumer-finances-scf.html#cb488-17" aria-hidden="true" tabindex="-1"></a><span class="co"># exactly match &quot;Table 4&quot; tab cell V6 of</span></span>
-<span id="cb488-18"><a href="survey-of-consumer-finances-scf.html#cb488-18" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx</span></span>
-<span id="cb488-19"><a href="survey-of-consumer-finances-scf.html#cb488-19" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( median_net_worth_incorrect_errors ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">121.76</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb496"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb496-1"><a href="survey-of-consumer-finances-scf.html#cb496-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute mean net worth using the 2019 PUF</span></span>
+<span id="cb496-2"><a href="survey-of-consumer-finances-scf.html#cb496-2" aria-hidden="true" tabindex="-1"></a>mean_net_worth <span class="ot">&lt;-</span> <span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svymean</span>( <span class="sc">~</span> networth ) ) )</span>
+<span id="cb496-3"><a href="survey-of-consumer-finances-scf.html#cb496-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb496-4"><a href="survey-of-consumer-finances-scf.html#cb496-4" aria-hidden="true" tabindex="-1"></a><span class="co"># exactly match &quot;Table 4&quot; tab cell W6 of</span></span>
+<span id="cb496-5"><a href="survey-of-consumer-finances-scf.html#cb496-5" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx</span></span>
+<span id="cb496-6"><a href="survey-of-consumer-finances-scf.html#cb496-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( mean_net_worth ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">746.82</span> )</span>
+<span id="cb496-7"><a href="survey-of-consumer-finances-scf.html#cb496-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb496-8"><a href="survey-of-consumer-finances-scf.html#cb496-8" aria-hidden="true" tabindex="-1"></a><span class="co"># match mean net worth standard error within $100 from</span></span>
+<span id="cb496-9"><a href="survey-of-consumer-finances-scf.html#cb496-9" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.federalreserve.gov/publications/files/scf20.pdf#page=11</span></span>
+<span id="cb496-10"><a href="survey-of-consumer-finances-scf.html#cb496-10" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">abs</span>( <span class="fl">15.6</span> <span class="sc">-</span> <span class="fu">round</span>( <span class="fu">SE</span>( mean_net_worth ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">1</span> ) ) <span class="sc">&lt;</span> <span class="fl">0.1</span> )</span>
+<span id="cb496-11"><a href="survey-of-consumer-finances-scf.html#cb496-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb496-12"><a href="survey-of-consumer-finances-scf.html#cb496-12" aria-hidden="true" tabindex="-1"></a><span class="co"># compute quantile with all five implicates stacked</span></span>
+<span id="cb496-13"><a href="survey-of-consumer-finances-scf.html#cb496-13" aria-hidden="true" tabindex="-1"></a><span class="co"># matches the public excel tables but not the recommended technique</span></span>
+<span id="cb496-14"><a href="survey-of-consumer-finances-scf.html#cb496-14" aria-hidden="true" tabindex="-1"></a>fake_design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>( <span class="sc">~</span> <span class="dv">1</span> , <span class="at">data =</span> ext_df[ <span class="fu">c</span>( <span class="st">&#39;networth&#39;</span> , <span class="st">&#39;wgt&#39;</span> ) ] , <span class="at">weights =</span> <span class="sc">~</span> wgt )</span>
+<span id="cb496-15"><a href="survey-of-consumer-finances-scf.html#cb496-15" aria-hidden="true" tabindex="-1"></a>median_net_worth_incorrect_errors <span class="ot">&lt;-</span> <span class="fu">svyquantile</span>( <span class="sc">~</span> networth , fake_design , <span class="fl">0.5</span> )</span>
+<span id="cb496-16"><a href="survey-of-consumer-finances-scf.html#cb496-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb496-17"><a href="survey-of-consumer-finances-scf.html#cb496-17" aria-hidden="true" tabindex="-1"></a><span class="co"># exactly match &quot;Table 4&quot; tab cell V6 of</span></span>
+<span id="cb496-18"><a href="survey-of-consumer-finances-scf.html#cb496-18" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.federalreserve.gov/econres/files/scf2019_tables_public_nominal_historical.xlsx</span></span>
+<span id="cb496-19"><a href="survey-of-consumer-finances-scf.html#cb496-19" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( median_net_worth_incorrect_errors ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">121.76</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="poverty-and-inequality-estimation-with-convey-1" class="section level2 unnumbered hasAnchor">
 <h2>Poverty and Inequality Estimation with <code>convey</code>  <a href="survey-of-consumer-finances-scf.html#poverty-and-inequality-estimation-with-convey-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>convey</code> library estimates measures of income concentration, poverty, inequality, and wellbeing. <a href="https://guilhermejacob.github.io/context/">This textbook</a> details the available features. As a starting point for SCF users, this code calculates the gini coefficient on complex sample survey data:</p>
-<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb489-1"><a href="survey-of-consumer-finances-scf.html#cb489-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(convey)</span>
-<span id="cb489-2"><a href="survey-of-consumer-finances-scf.html#cb489-2" aria-hidden="true" tabindex="-1"></a>scf_design<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( scf_design<span class="sc">$</span>designs , convey_prep )</span>
-<span id="cb489-3"><a href="survey-of-consumer-finances-scf.html#cb489-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb489-4"><a href="survey-of-consumer-finances-scf.html#cb489-4" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svygini</span>( <span class="sc">~</span> networth ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb497"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb497-1"><a href="survey-of-consumer-finances-scf.html#cb497-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(convey)</span>
+<span id="cb497-2"><a href="survey-of-consumer-finances-scf.html#cb497-2" aria-hidden="true" tabindex="-1"></a>scf_design<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( scf_design<span class="sc">$</span>designs , convey_prep )</span>
+<span id="cb497-3"><a href="survey-of-consumer-finances-scf.html#cb497-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb497-4"><a href="survey-of-consumer-finances-scf.html#cb497-4" aria-hidden="true" tabindex="-1"></a><span class="fu">scf_MIcombine</span>( <span class="fu">with</span>( scf_design , <span class="fu">svygini</span>( <span class="sc">~</span> networth ) ) )</span></code></pre></div>
 
 </div>
 </div>
