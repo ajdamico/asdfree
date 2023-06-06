@@ -2,48 +2,45 @@
 
 <a href="https://github.com/asdfree/recs/actions"><img src="https://github.com/asdfree/recs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-dataset introduction
+A periodic study conducted to provide detailed information about energy usage in U.S. homes.
 
-* table structure
+* One table with one row per sampled housing unit.
 
-* generalizable population
+* A complex sample survey designed to generalize to U.S. homes occupied as primary residences.
 
-* publication period
+* Released approximately every five years since 1979.
 
-* administrative organization
+* Prepared by the [Energy Information Administration](https://www.eia.gov/), with help from [IMG-Crown](https://www.imgcrown.com/) and [RTI International](https://www.rti.org/).
 
 ---
 
 Please skim before you begin:
 
-1. 
+1. [Annual Energy Outlook 2023](https://www.eia.gov/outlooks/aeo/narrative/)
 
-2. [2020 Residential Energy Consumption Survey: Household Characteristics Technical Documentation Summary](https://www.eia.gov/consumption/residential/data/2020/pdf/2020%20RECS_Methodology%20Report.pdf)
+2. [Household Characteristics Technical Documentation Summary](https://www.eia.gov/consumption/residential/data/2020/pdf/2020%20RECS_Methodology%20Report.pdf)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Residential Energy Consumption Survey)
 
 ```{r}
-# 
-# 
-# 
+# housing code dogma
+# even satan ceased sweat since
+# eighth sin: central air
 ```
 
 ---
 
 ## Download, Import, Preparation {-}
 
-Download the sas file:
+Download and import the most recent sas file:
 ```{r eval = FALSE , results = "hide" }
+library(haven)
+
 sas_tf <- tempfile()
 
 sas_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v2.zip"
 
 download.file( sas_url , sas_tf , mode = 'wb' )
-```
-
-Edit then execute the import script provided by the CDC:
-```{r eval = FALSE , results = "hide" }
-library(haven)
 
 recs_tbl <- read_sas( sas_tf )
 
@@ -290,7 +287,7 @@ summary( glm_result )
 
 ## Replication Example {-}
 
-This example matches the statistic, standard error, and relative standard error on PDF page 8 of [2020 Residential Energy Consumption Survey: Using the microdata file to compute estimates and relative standard errors (RSEs)](https://www.eia.gov/consumption/residential/data/2020/pdf/microdata-guide.pdf)
+This example matches the statistic, standard error, and relative standard error shown on PDF page 8 of [Using the microdata file to compute estimates and relative standard errors (RSEs)](https://www.eia.gov/consumption/residential/data/2020/pdf/microdata-guide.pdf)
 
 ```{r eval = FALSE , results = "hide" }
 sas_v1_tf <- tempfile()
@@ -306,24 +303,23 @@ recs_v1_df <- data.frame( recs_v1_tbl )
 names( recs_v1_df ) <- tolower( names( recs_v1_df ) )
 
 recs_v1_design <-
- svrepdesign(
- data = recs_v1_df ,
- weight = ~ nweight ,
- repweights = 'nweight[1-9]+' ,
- type = 'JK1' ,
- combined.weights = TRUE ,
- scale = 59 / 60 ,
- mse = TRUE
- )
-	
+	svrepdesign(
+		data = recs_v1_df ,
+		weight = ~ nweight ,
+		repweights = 'nweight[1-9]+' ,
+		type = 'JK1' ,
+		combined.weights = TRUE ,
+		scale = 59 / 60 ,
+		mse = TRUE
+	)
+
 recs_v1_design <- 
-	
 	update( 
-		
+
 		recs_v1_design , 
-		
+
 		natural_gas_mainspace_heat = as.numeric( fuelheat == 1 )
-			
+		
 	)
 	
 result <-
