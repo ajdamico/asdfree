@@ -109,6 +109,23 @@ recs_design <-
 						'Other' 
 					)
 			) ,
+
+		rooftype =
+			factor(
+				rooftype ,
+				levels = c( -2 , 1:6 , 99 ) ,
+				labels =
+					c(
+						'Not applicable' ,
+						'Ceramic or clay tiles' ,
+						'Wood shingles/shakes' ,
+						'Metal' ,
+						'Slate or synthetic slate' ,
+						'Shingles (composition or asphalt)' ,
+						'Concrete tiles' ,
+						'Other'
+					)
+			) ,
 			
 		swimpool_binary =
 			ifelse( swimpool %in% 0:1 , swimpool , NA )
@@ -148,9 +165,9 @@ svyby( ~ totsqft_en , ~ main_heating_fuel , recs_design , svymean )
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ state_name , recs_design )
+svymean( ~ rooftype , recs_design )
 
-svyby( ~ state_name , ~ main_heating_fuel , recs_design , svymean )
+svyby( ~ rooftype , ~ main_heating_fuel , recs_design , svymean )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
@@ -162,9 +179,9 @@ svyby( ~ totsqft_en , ~ main_heating_fuel , recs_design , svytotal )
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ state_name , recs_design )
+svytotal( ~ rooftype , recs_design )
 
-svyby( ~ state_name , ~ main_heating_fuel , recs_design , svytotal )
+svyby( ~ rooftype , ~ main_heating_fuel , recs_design , svytotal )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
@@ -261,7 +278,7 @@ svyttest( totsqft_en ~ swimpool_binary , recs_design )
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
 svychisq( 
-	~ swimpool_binary + state_name , 
+	~ swimpool_binary + rooftype , 
 	recs_design 
 )
 ```
@@ -270,7 +287,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		totsqft_en ~ swimpool_binary + state_name , 
+		totsqft_en ~ swimpool_binary + rooftype , 
 		recs_design 
 	)
 
