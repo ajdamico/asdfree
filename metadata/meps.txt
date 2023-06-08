@@ -1,0 +1,183 @@
+chapter_title: Medical Expenditure Panel Survey
+
+
+needs_actions_build_status_line: yes
+
+~~~{dataset_introduction}
+The Household Component captures person-level spending across service categories, coverage types.
+~~~
+
+table_structure: * The consolidated file contains one row per individual within each sampled household, other tables contain one record per event (like prescription fills, hospitalizations), per job, per insurance policy.
+
+generalizable_population: * A complex sample survey designed to generalize to the U.S. civilian non-institutionalized population.
+
+publication_period: * Released annually since 1996.
+
+administrative_organization: * Administered by the [Agency for Healthcare Research and Quality](http://www.ahrq.gov/).
+
+
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [MEPS HC-224 2020 Full Year Consolidated Data File](https://meps.ahrq.gov/data_stats/download_data/pufs/h224/h224doc.shtml)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Medical_Expenditure_Panel_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# king dumpty's horsemen
+# ahrq stitches payors, bills, claims
+# fractured health system
+```
+~~~
+
+
+
+
+~~~{download_and_import_block}
+
+Define a function to download, unzip, and import each sas file:
+
+```{r messages = FALSE , eval = FALSE }
+library(haven)
+
+meps_sas_import <-
+	function( this_url ){
+		
+		this_tf <- tempfile()
+		
+		download.file( this_url , this_tf , mode = 'wb' )
+		
+		this_tbl <- read_sas( this_tf )
+
+		this_df <- data.frame( this_tbl )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+```	
+
+Download and import the consolidated file and the replicate weights file:
+
+```{r messages = FALSE , eval = FALSE }
+chapter_tag_cons_df <-
+	meps_sas_import( "https://meps.ahrq.gov/data_files/pufs/h224/h224v9.zip" )
+
+chapter_tag_brr_df <-
+	meps_sas_import( "https://meps.ahrq.gov/mepsweb/data_files/pufs/h036brr/h36brr20v9.zip" )
+```
+
+
+Merge the consolidated file with the replicate weights:
+
+```{r messages = FALSE , eval = FALSE }
+chapter_tag_df <- merge( chapter_tag_cons_df , chapter_tag_brr_df )
+
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_cons_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+
+
+
+
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+```
+library(survey)
+
+chapter_tag_design <-
+	svrepdesign(
+		data = chapter_tag_df ,
+		weights = ~ perwt20f ,
+		type = "BRR" ,
+		combined.weights = FALSE ,
+		repweights = "brr[1-9]+" ,
+		mse = TRUE
+	)
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		insured_december_31st = ifelse( ins20x %in% 1:2 , as.numeric( ins20x == 1 ) , NA )
+		
+	)
+~~~
+
+group_by_variable: region20
+group_by_variable_description: Census Region
+
+categorical_variable: sex
+categorical_variable_description: sex (1=male, 2=female)
+
+linear_variable: totexp20
+linear_variable_description: total medical expenditure during the year
+
+ratio_estimation_numerator: totmcd20
+ratio_estimation_denominator: totexp20
+
+subset_definition: agelast >= 65
+subset_definition_description: seniors
+
+binary_variable: insured_december_31st
+binary_variable_description: insured December 31st, 2020
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+https://meps.ahrq.gov/mepsweb/survey_comp/standard_errors.jsp
+```{r eval = FALSE , results = "hide" }
+library(foreign)
+
+xport_2002_tf <- tempfile()
+
+xport_2002_url <- "https://meps.ahrq.gov/data_files/pufs/h70ssp.zip"
+
+download.file( xport_2002_url , xport_2002_tf , mode = 'wb' )
+
+unzipped_2002_xport <- unzip( xport_2002_tf , exdir = tempdir() )
+
+chapter_tag_2002_df <- read.xport( unzipped_2002_xport )
+
+names( chapter_tag_2002_df ) <- tolower( names( chapter_tag_2002_df ) )
+
+chapter_tag_2002_design <-
+	svydesign(
+		~ varpsu ,
+		strata = ~ varstr ,
+		weights = ~ perwt02f ,
+		data = chapter_tag_2002_df ,
+		nest = TRUE
+	)
+			
+result <- svymean( ~ totexp02 , chapter_tag_2002_design )
+stopifnot( round( coef( result ) , 2 ) == 2813.24 )
+stopifnot( round( SE( result ) , 2 ) == 58.99 )
+
+```
+
+~~~
+
+
+
+
+
