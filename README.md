@@ -5,6 +5,7 @@ behavioral-risk-factor-surveillance-system-brfss: <p><a href="https://github.com
 consumer-expenditure-survey-ces: <p><a href="https://github.com/asdfree/ces/actions"><img src="https://github.com/asdfree/ces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-2023 06 02-brightgreen' alt='Local Testing Badge'></p>
 exame-nacional-de-desempenho-de-estudantes-enade: <p><a href="https://github.com/asdfree/enade/actions"><img src="https://github.com/asdfree/enade/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+fda-adverse-event-reporting-system-faers: <p><a href="https://github.com/asdfree/faers/actions"><img src="https://github.com/asdfree/faers/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 medical-expenditure-panel-survey-meps: <p><a href="https://github.com/asdfree/meps/actions"><img src="https://github.com/asdfree/meps/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 medical-large-claims-experience-study-mlces: <p><a href="https://github.com/asdfree/mlces/actions"><img src="https://github.com/asdfree/mlces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 medicare-current-beneficiary-survey-mcbs: <p><a href="https://github.com/asdfree/mcbs/actions"><img src="https://github.com/asdfree/mcbs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>

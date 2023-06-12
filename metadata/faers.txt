@@ -1,0 +1,151 @@
+chapter_title: FDA Adverse Event Reporting System
+
+
+needs_actions_build_status_line: yes
+
+
+
+~~~{dataset_introduction}
+The post-marketing safety surveillance program for drug and therapeutic biological products.
+~~~
+
+table_structure: * Multiple tables linked by `primaryid` including demographics, outcomes, drug start and end dates.
+
+publication_period: * Published quarterly since 2004, revisions at 2012Q4 and 2014Q3.
+
+generalizable_population: * Voluntary reports from practitioners, consumers, mandatory reports from manufacturers.
+
+administrative_organization: * Maintained by the United States [Food and Drug Administration (FDA)](http://www.fda.gov/).
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. `ASC_NTS.DOC` included in each quarterly zipped file, especially the Entity Relationship Diagram
+
+2. [Questions and Answers on FDA's Adverse Event Reporting System (FAERS)](https://www.fda.gov/drugs/surveillance/questions-and-answers-fdas-adverse-event-reporting-system-faers)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# side effect guestbook
+# violet you're turning violet
+# vi'lent dose response
+```
+~~~
+
+
+
+~~~{download_and_import_block}
+
+Download any quarterly file:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+
+tf <- tempfile()
+
+this_url <- "https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+```
+
+Define a function to import each text file:
+
+```{r messages = FALSE , eval = FALSE }
+read_faers <-
+	function( this_fn ){
+		read.table( this_fn , sep = "$" , header = TRUE , comment.char = "" , quote = "" )
+	}
+```	
+
+Import multiple files from the current quarter:
+```{r eval = FALSE , results = "hide" }
+# one record per report
+faers_demo_df <- read_faers( grep( 'DEMO23Q1\\\\.txt$' , unzipped_files , value = TRUE ) )
+
+# one or more record per report
+faers_drug_df <- read_faers( grep( 'DRUG23Q1\\\\.txt$' , unzipped_files , value = TRUE ) )
+
+# zero or more records per report
+faers_outcome_df <- read_faers( grep( 'OUTC23Q1\\\\.txt$' , unzipped_files , value = TRUE ) )
+```
+
+Construct an analysis file limited to reported deaths:
+```{r eval = FALSE , results = "hide" }
+# limit the outcome file to deaths
+faers_deaths_df <- subset( faers_outcome_df , outc_cod == 'DE' )
+
+# merge demographics with each reported death
+faers_df <-	merge( faers_demo_df , faers_deaths_df )
+
+# confirm that the analysis file matches the number of death outcomes
+stopifnot( nrow( faers_deaths_df ) == nrow( faers_df ) )
+
+# confirm zero reports include multiple deaths
+stopifnot( nrow( faers_df ) == length( unique( faers_df[ , 'primaryid' ] ) ) )
+```
+
+
+
+
+~~~
+
+
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		physician_reported = as.numeric( occp_cod == "MD" ) ,
+		
+		reporter_country_categories = 
+			ifelse( reporter_country == 'US' , 'USA' ,
+			ifelse( reporter_country == 'COUNTRY NOT SPECIFIED' , 'missing' ,
+			ifelse( reporter_country == 'JP' , 'Japan' ,
+			ifelse( reporter_country == 'UK' , 'UK' ,
+			ifelse( reporter_country == 'CA' , 'Canada' ,
+			ifelse( reporter_country == 'FR' , 'France' ,
+				'Other' ) ) ) ) ) ) ,
+		
+		init_fda_year = as.numeric( substr( init_fda_dt , 1 , 4 ) )
+		
+	)
+	
+~~~
+
+group_by_variable: reporter_country_categories
+linear_variable: init_fda_year
+linear_narm: , na.rm = TRUE
+categorical_variable: sex
+subset_definition: age_grp == "E"
+subset_definition_description: elderly persons
+binary_variable: physician_reported
+
+
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
+
+needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
+
+
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches
+
+```{r eval = FALSE , results = "hide" }
+
+
+```
+~~~
