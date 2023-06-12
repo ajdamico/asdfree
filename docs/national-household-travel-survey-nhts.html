@@ -668,188 +668,188 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><a href="https://nhts.ornl.gov/assets/2017%20NHTS%20Weighting%20Report.pdf">2017 NHTS Weighting Report</a></p></li>
 <li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National%20Household%20Travel%20Survey">artificial intelligence-generated limericks</a></p></li>
 </ol>
-<div class="sourceCode" id="cb357"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb357-1"><a href="national-household-travel-survey-nhts.html#cb357-1" aria-hidden="true" tabindex="-1"></a><span class="co"># commuter patterns,</span></span>
-<span id="cb357-2"><a href="national-household-travel-survey-nhts.html#cb357-2" aria-hidden="true" tabindex="-1"></a><span class="co"># truckin&#39;. what a long strange trip</span></span>
-<span id="cb357-3"><a href="national-household-travel-survey-nhts.html#cb357-3" aria-hidden="true" tabindex="-1"></a><span class="co"># who went when where why</span></span></code></pre></div>
+<div class="sourceCode" id="cb358"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb358-1"><a href="national-household-travel-survey-nhts.html#cb358-1" aria-hidden="true" tabindex="-1"></a><span class="co"># commuter patterns,</span></span>
+<span id="cb358-2"><a href="national-household-travel-survey-nhts.html#cb358-2" aria-hidden="true" tabindex="-1"></a><span class="co"># truckin&#39;. what a long strange trip</span></span>
+<span id="cb358-3"><a href="national-household-travel-survey-nhts.html#cb358-3" aria-hidden="true" tabindex="-1"></a><span class="co"># who went when where why</span></span></code></pre></div>
 <hr />
 <div id="download-import-preparation-12" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="national-household-travel-survey-nhts.html#download-import-preparation-12" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download and unzip each of the main 2017 files:</p>
-<div class="sourceCode" id="cb358"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb358-1"><a href="national-household-travel-survey-nhts.html#cb358-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
-<span id="cb358-2"><a href="national-household-travel-survey-nhts.html#cb358-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb358-3"><a href="national-household-travel-survey-nhts.html#cb358-3" aria-hidden="true" tabindex="-1"></a>nhts_dl_uz <span class="ot">&lt;-</span></span>
-<span id="cb358-4"><a href="national-household-travel-survey-nhts.html#cb358-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( this_url ){</span>
-<span id="cb358-5"><a href="national-household-travel-survey-nhts.html#cb358-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb358-6"><a href="national-household-travel-survey-nhts.html#cb358-6" aria-hidden="true" tabindex="-1"></a>        tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb358-7"><a href="national-household-travel-survey-nhts.html#cb358-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb358-8"><a href="national-household-travel-survey-nhts.html#cb358-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb358-9"><a href="national-household-travel-survey-nhts.html#cb358-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb358-10"><a href="national-household-travel-survey-nhts.html#cb358-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb358-11"><a href="national-household-travel-survey-nhts.html#cb358-11" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb358-12"><a href="national-household-travel-survey-nhts.html#cb358-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb358-13"><a href="national-household-travel-survey-nhts.html#cb358-13" aria-hidden="true" tabindex="-1"></a>unzipped_survey_data <span class="ot">&lt;-</span></span>
-<span id="cb358-14"><a href="national-household-travel-survey-nhts.html#cb358-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nhts_dl_uz</span>( <span class="st">&quot;https://nhts.ornl.gov/assets/2016/download/sas.zip&quot;</span> )</span>
-<span id="cb358-15"><a href="national-household-travel-survey-nhts.html#cb358-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb358-16"><a href="national-household-travel-survey-nhts.html#cb358-16" aria-hidden="true" tabindex="-1"></a>unzipped_replicate_weights <span class="ot">&lt;-</span></span>
-<span id="cb358-17"><a href="national-household-travel-survey-nhts.html#cb358-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nhts_dl_uz</span>( <span class="st">&quot;https://nhts.ornl.gov/assets/2016/download/Replicates.zip&quot;</span> )</span>
-<span id="cb358-18"><a href="national-household-travel-survey-nhts.html#cb358-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb358-19"><a href="national-household-travel-survey-nhts.html#cb358-19" aria-hidden="true" tabindex="-1"></a>unzipped_trip_chains <span class="ot">&lt;-</span></span>
-<span id="cb358-20"><a href="national-household-travel-survey-nhts.html#cb358-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nhts_dl_uz</span>( <span class="st">&quot;https://nhts.ornl.gov/assets/2016/download/TripChain/TripChain17.zip&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb359"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb359-1"><a href="national-household-travel-survey-nhts.html#cb359-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb359-2"><a href="national-household-travel-survey-nhts.html#cb359-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-3"><a href="national-household-travel-survey-nhts.html#cb359-3" aria-hidden="true" tabindex="-1"></a>nhts_dl_uz <span class="ot">&lt;-</span></span>
+<span id="cb359-4"><a href="national-household-travel-survey-nhts.html#cb359-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( this_url ){</span>
+<span id="cb359-5"><a href="national-household-travel-survey-nhts.html#cb359-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb359-6"><a href="national-household-travel-survey-nhts.html#cb359-6" aria-hidden="true" tabindex="-1"></a>        tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb359-7"><a href="national-household-travel-survey-nhts.html#cb359-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-8"><a href="national-household-travel-survey-nhts.html#cb359-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb359-9"><a href="national-household-travel-survey-nhts.html#cb359-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-10"><a href="national-household-travel-survey-nhts.html#cb359-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb359-11"><a href="national-household-travel-survey-nhts.html#cb359-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb359-12"><a href="national-household-travel-survey-nhts.html#cb359-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb359-13"><a href="national-household-travel-survey-nhts.html#cb359-13" aria-hidden="true" tabindex="-1"></a>unzipped_survey_data <span class="ot">&lt;-</span></span>
+<span id="cb359-14"><a href="national-household-travel-survey-nhts.html#cb359-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nhts_dl_uz</span>( <span class="st">&quot;https://nhts.ornl.gov/assets/2016/download/sas.zip&quot;</span> )</span>
+<span id="cb359-15"><a href="national-household-travel-survey-nhts.html#cb359-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-16"><a href="national-household-travel-survey-nhts.html#cb359-16" aria-hidden="true" tabindex="-1"></a>unzipped_replicate_weights <span class="ot">&lt;-</span></span>
+<span id="cb359-17"><a href="national-household-travel-survey-nhts.html#cb359-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nhts_dl_uz</span>( <span class="st">&quot;https://nhts.ornl.gov/assets/2016/download/Replicates.zip&quot;</span> )</span>
+<span id="cb359-18"><a href="national-household-travel-survey-nhts.html#cb359-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-19"><a href="national-household-travel-survey-nhts.html#cb359-19" aria-hidden="true" tabindex="-1"></a>unzipped_trip_chains <span class="ot">&lt;-</span></span>
+<span id="cb359-20"><a href="national-household-travel-survey-nhts.html#cb359-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nhts_dl_uz</span>( <span class="st">&quot;https://nhts.ornl.gov/assets/2016/download/TripChain/TripChain17.zip&quot;</span> )</span></code></pre></div>
 <p>Import the tables containing one record per household, person, trip, and vehicle:</p>
-<div class="sourceCode" id="cb359"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb359-1"><a href="national-household-travel-survey-nhts.html#cb359-1" aria-hidden="true" tabindex="-1"></a>nhts_import <span class="ot">&lt;-</span></span>
-<span id="cb359-2"><a href="national-household-travel-survey-nhts.html#cb359-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( this_prefix , this_unzip ){</span>
-<span id="cb359-3"><a href="national-household-travel-survey-nhts.html#cb359-3" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb359-4"><a href="national-household-travel-survey-nhts.html#cb359-4" aria-hidden="true" tabindex="-1"></a>        this_sas7bdat <span class="ot">&lt;-</span></span>
-<span id="cb359-5"><a href="national-household-travel-survey-nhts.html#cb359-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">grep</span>( </span>
-<span id="cb359-6"><a href="national-household-travel-survey-nhts.html#cb359-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste0</span>( this_prefix , <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.sas7bdat$&quot;</span> ) , </span>
-<span id="cb359-7"><a href="national-household-travel-survey-nhts.html#cb359-7" aria-hidden="true" tabindex="-1"></a>                this_unzip , </span>
-<span id="cb359-8"><a href="national-household-travel-survey-nhts.html#cb359-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">value =</span> <span class="cn">TRUE</span> </span>
-<span id="cb359-9"><a href="national-household-travel-survey-nhts.html#cb359-9" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb359-10"><a href="national-household-travel-survey-nhts.html#cb359-10" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb359-11"><a href="national-household-travel-survey-nhts.html#cb359-11" aria-hidden="true" tabindex="-1"></a>        this_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( this_sas7bdat )</span>
-<span id="cb359-12"><a href="national-household-travel-survey-nhts.html#cb359-12" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb359-13"><a href="national-household-travel-survey-nhts.html#cb359-13" aria-hidden="true" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( this_tbl )</span>
-<span id="cb359-14"><a href="national-household-travel-survey-nhts.html#cb359-14" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb359-15"><a href="national-household-travel-survey-nhts.html#cb359-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
-<span id="cb359-16"><a href="national-household-travel-survey-nhts.html#cb359-16" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb359-17"><a href="national-household-travel-survey-nhts.html#cb359-17" aria-hidden="true" tabindex="-1"></a>        this_df</span>
-<span id="cb359-18"><a href="national-household-travel-survey-nhts.html#cb359-18" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb359-19"><a href="national-household-travel-survey-nhts.html#cb359-19" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb359-20"><a href="national-household-travel-survey-nhts.html#cb359-20" aria-hidden="true" tabindex="-1"></a>hhpub_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;hhpub&quot;</span> , unzipped_survey_data )</span>
-<span id="cb359-21"><a href="national-household-travel-survey-nhts.html#cb359-21" aria-hidden="true" tabindex="-1"></a>perpub_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;perpub&quot;</span> , unzipped_survey_data )</span>
-<span id="cb359-22"><a href="national-household-travel-survey-nhts.html#cb359-22" aria-hidden="true" tabindex="-1"></a>trippub_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;trippub&quot;</span> , unzipped_survey_data )</span>
-<span id="cb359-23"><a href="national-household-travel-survey-nhts.html#cb359-23" aria-hidden="true" tabindex="-1"></a>vehpub_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;vehpub&quot;</span> , unzipped_survey_data )</span>
-<span id="cb359-24"><a href="national-household-travel-survey-nhts.html#cb359-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb359-25"><a href="national-household-travel-survey-nhts.html#cb359-25" aria-hidden="true" tabindex="-1"></a>hhwgt_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;hhwgt&quot;</span> , unzipped_replicate_weights )</span>
-<span id="cb359-26"><a href="national-household-travel-survey-nhts.html#cb359-26" aria-hidden="true" tabindex="-1"></a>perwgt_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;perwgt&quot;</span> , unzipped_replicate_weights )</span></code></pre></div>
+<div class="sourceCode" id="cb360"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb360-1"><a href="national-household-travel-survey-nhts.html#cb360-1" aria-hidden="true" tabindex="-1"></a>nhts_import <span class="ot">&lt;-</span></span>
+<span id="cb360-2"><a href="national-household-travel-survey-nhts.html#cb360-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( this_prefix , this_unzip ){</span>
+<span id="cb360-3"><a href="national-household-travel-survey-nhts.html#cb360-3" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb360-4"><a href="national-household-travel-survey-nhts.html#cb360-4" aria-hidden="true" tabindex="-1"></a>        this_sas7bdat <span class="ot">&lt;-</span></span>
+<span id="cb360-5"><a href="national-household-travel-survey-nhts.html#cb360-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">grep</span>( </span>
+<span id="cb360-6"><a href="national-household-travel-survey-nhts.html#cb360-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste0</span>( this_prefix , <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.sas7bdat$&quot;</span> ) , </span>
+<span id="cb360-7"><a href="national-household-travel-survey-nhts.html#cb360-7" aria-hidden="true" tabindex="-1"></a>                this_unzip , </span>
+<span id="cb360-8"><a href="national-household-travel-survey-nhts.html#cb360-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">value =</span> <span class="cn">TRUE</span> </span>
+<span id="cb360-9"><a href="national-household-travel-survey-nhts.html#cb360-9" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb360-10"><a href="national-household-travel-survey-nhts.html#cb360-10" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb360-11"><a href="national-household-travel-survey-nhts.html#cb360-11" aria-hidden="true" tabindex="-1"></a>        this_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( this_sas7bdat )</span>
+<span id="cb360-12"><a href="national-household-travel-survey-nhts.html#cb360-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb360-13"><a href="national-household-travel-survey-nhts.html#cb360-13" aria-hidden="true" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( this_tbl )</span>
+<span id="cb360-14"><a href="national-household-travel-survey-nhts.html#cb360-14" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb360-15"><a href="national-household-travel-survey-nhts.html#cb360-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
+<span id="cb360-16"><a href="national-household-travel-survey-nhts.html#cb360-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb360-17"><a href="national-household-travel-survey-nhts.html#cb360-17" aria-hidden="true" tabindex="-1"></a>        this_df</span>
+<span id="cb360-18"><a href="national-household-travel-survey-nhts.html#cb360-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb360-19"><a href="national-household-travel-survey-nhts.html#cb360-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb360-20"><a href="national-household-travel-survey-nhts.html#cb360-20" aria-hidden="true" tabindex="-1"></a>hhpub_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;hhpub&quot;</span> , unzipped_survey_data )</span>
+<span id="cb360-21"><a href="national-household-travel-survey-nhts.html#cb360-21" aria-hidden="true" tabindex="-1"></a>perpub_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;perpub&quot;</span> , unzipped_survey_data )</span>
+<span id="cb360-22"><a href="national-household-travel-survey-nhts.html#cb360-22" aria-hidden="true" tabindex="-1"></a>trippub_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;trippub&quot;</span> , unzipped_survey_data )</span>
+<span id="cb360-23"><a href="national-household-travel-survey-nhts.html#cb360-23" aria-hidden="true" tabindex="-1"></a>vehpub_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;vehpub&quot;</span> , unzipped_survey_data )</span>
+<span id="cb360-24"><a href="national-household-travel-survey-nhts.html#cb360-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb360-25"><a href="national-household-travel-survey-nhts.html#cb360-25" aria-hidden="true" tabindex="-1"></a>hhwgt_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;hhwgt&quot;</span> , unzipped_replicate_weights )</span>
+<span id="cb360-26"><a href="national-household-travel-survey-nhts.html#cb360-26" aria-hidden="true" tabindex="-1"></a>perwgt_df <span class="ot">&lt;-</span> <span class="fu">nhts_import</span>( <span class="st">&quot;perwgt&quot;</span> , unzipped_replicate_weights )</span></code></pre></div>
 <p>Add a column of ones to three of those tables, then a column of non-missing mileage to the trips table:</p>
-<div class="sourceCode" id="cb360"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb360-1"><a href="national-household-travel-survey-nhts.html#cb360-1" aria-hidden="true" tabindex="-1"></a>hhpub_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb360-2"><a href="national-household-travel-survey-nhts.html#cb360-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb360-3"><a href="national-household-travel-survey-nhts.html#cb360-3" aria-hidden="true" tabindex="-1"></a>perpub_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb360-4"><a href="national-household-travel-survey-nhts.html#cb360-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb360-5"><a href="national-household-travel-survey-nhts.html#cb360-5" aria-hidden="true" tabindex="-1"></a>trippub_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb360-6"><a href="national-household-travel-survey-nhts.html#cb360-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb360-7"><a href="national-household-travel-survey-nhts.html#cb360-7" aria-hidden="true" tabindex="-1"></a>trippub_df[ <span class="sc">!</span>( trippub_df[ , <span class="st">&#39;trpmiles&#39;</span> ] <span class="sc">%in%</span> <span class="sc">-</span><span class="dv">9</span> ) , <span class="st">&#39;tripmiles_no_nines&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb360-8"><a href="national-household-travel-survey-nhts.html#cb360-8" aria-hidden="true" tabindex="-1"></a>    trippub_df[ <span class="sc">!</span>( trippub_df[ , <span class="st">&#39;trpmiles&#39;</span> ] <span class="sc">%in%</span> <span class="sc">-</span><span class="dv">9</span> ) , <span class="st">&#39;trpmiles&#39;</span> ]</span></code></pre></div>
+<div class="sourceCode" id="cb361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb361-1"><a href="national-household-travel-survey-nhts.html#cb361-1" aria-hidden="true" tabindex="-1"></a>hhpub_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb361-2"><a href="national-household-travel-survey-nhts.html#cb361-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb361-3"><a href="national-household-travel-survey-nhts.html#cb361-3" aria-hidden="true" tabindex="-1"></a>perpub_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb361-4"><a href="national-household-travel-survey-nhts.html#cb361-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb361-5"><a href="national-household-travel-survey-nhts.html#cb361-5" aria-hidden="true" tabindex="-1"></a>trippub_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb361-6"><a href="national-household-travel-survey-nhts.html#cb361-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb361-7"><a href="national-household-travel-survey-nhts.html#cb361-7" aria-hidden="true" tabindex="-1"></a>trippub_df[ <span class="sc">!</span>( trippub_df[ , <span class="st">&#39;trpmiles&#39;</span> ] <span class="sc">%in%</span> <span class="sc">-</span><span class="dv">9</span> ) , <span class="st">&#39;tripmiles_no_nines&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb361-8"><a href="national-household-travel-survey-nhts.html#cb361-8" aria-hidden="true" tabindex="-1"></a>    trippub_df[ <span class="sc">!</span>( trippub_df[ , <span class="st">&#39;trpmiles&#39;</span> ] <span class="sc">%in%</span> <span class="sc">-</span><span class="dv">9</span> ) , <span class="st">&#39;trpmiles&#39;</span> ]</span></code></pre></div>
 <p>Sum the total trip count and mileage to the person-level, both overall and restricted to walking only:</p>
-<div class="sourceCode" id="cb361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb361-1"><a href="national-household-travel-survey-nhts.html#cb361-1" aria-hidden="true" tabindex="-1"></a>trips_per_person <span class="ot">&lt;-</span> </span>
-<span id="cb361-2"><a href="national-household-travel-survey-nhts.html#cb361-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>( </span>
-<span id="cb361-3"><a href="national-household-travel-survey-nhts.html#cb361-3" aria-hidden="true" tabindex="-1"></a>        trippub_df , </span>
-<span id="cb361-4"><a href="national-household-travel-survey-nhts.html#cb361-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aggregate</span>( </span>
-<span id="cb361-5"><a href="national-household-travel-survey-nhts.html#cb361-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">cbind</span>( one , tripmiles_no_nines ) , </span>
-<span id="cb361-6"><a href="national-household-travel-survey-nhts.html#cb361-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>( houseid , personid ) , </span>
-<span id="cb361-7"><a href="national-household-travel-survey-nhts.html#cb361-7" aria-hidden="true" tabindex="-1"></a>            sum , </span>
-<span id="cb361-8"><a href="national-household-travel-survey-nhts.html#cb361-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb361-9"><a href="national-household-travel-survey-nhts.html#cb361-9" aria-hidden="true" tabindex="-1"></a>        ) </span>
-<span id="cb361-10"><a href="national-household-travel-survey-nhts.html#cb361-10" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb361-11"><a href="national-household-travel-survey-nhts.html#cb361-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb361-12"><a href="national-household-travel-survey-nhts.html#cb361-12" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( trips_per_person ) <span class="ot">&lt;-</span></span>
-<span id="cb361-13"><a href="national-household-travel-survey-nhts.html#cb361-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> , <span class="st">&#39;trips_per_person&#39;</span> , <span class="st">&#39;miles_per_person&#39;</span> )</span>
-<span id="cb361-14"><a href="national-household-travel-survey-nhts.html#cb361-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb361-15"><a href="national-household-travel-survey-nhts.html#cb361-15" aria-hidden="true" tabindex="-1"></a>walks_per_person <span class="ot">&lt;-</span> </span>
-<span id="cb361-16"><a href="national-household-travel-survey-nhts.html#cb361-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>( </span>
-<span id="cb361-17"><a href="national-household-travel-survey-nhts.html#cb361-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">subset</span>( trippub_df , trptrans <span class="sc">==</span> <span class="st">&#39;01&#39;</span> ) , </span>
-<span id="cb361-18"><a href="national-household-travel-survey-nhts.html#cb361-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aggregate</span>( </span>
-<span id="cb361-19"><a href="national-household-travel-survey-nhts.html#cb361-19" aria-hidden="true" tabindex="-1"></a>            <span class="fu">cbind</span>( one , tripmiles_no_nines ) , </span>
-<span id="cb361-20"><a href="national-household-travel-survey-nhts.html#cb361-20" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>( houseid , personid ) , </span>
-<span id="cb361-21"><a href="national-household-travel-survey-nhts.html#cb361-21" aria-hidden="true" tabindex="-1"></a>            sum , </span>
-<span id="cb361-22"><a href="national-household-travel-survey-nhts.html#cb361-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb361-23"><a href="national-household-travel-survey-nhts.html#cb361-23" aria-hidden="true" tabindex="-1"></a>        ) </span>
-<span id="cb361-24"><a href="national-household-travel-survey-nhts.html#cb361-24" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb361-25"><a href="national-household-travel-survey-nhts.html#cb361-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb361-26"><a href="national-household-travel-survey-nhts.html#cb361-26" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( walks_per_person ) <span class="ot">&lt;-</span></span>
-<span id="cb361-27"><a href="national-household-travel-survey-nhts.html#cb361-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> , <span class="st">&#39;walks_per_person&#39;</span> , <span class="st">&#39;walk_miles_per_person&#39;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="national-household-travel-survey-nhts.html#cb362-1" aria-hidden="true" tabindex="-1"></a>trips_per_person <span class="ot">&lt;-</span> </span>
+<span id="cb362-2"><a href="national-household-travel-survey-nhts.html#cb362-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>( </span>
+<span id="cb362-3"><a href="national-household-travel-survey-nhts.html#cb362-3" aria-hidden="true" tabindex="-1"></a>        trippub_df , </span>
+<span id="cb362-4"><a href="national-household-travel-survey-nhts.html#cb362-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aggregate</span>( </span>
+<span id="cb362-5"><a href="national-household-travel-survey-nhts.html#cb362-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">cbind</span>( one , tripmiles_no_nines ) , </span>
+<span id="cb362-6"><a href="national-household-travel-survey-nhts.html#cb362-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>( houseid , personid ) , </span>
+<span id="cb362-7"><a href="national-household-travel-survey-nhts.html#cb362-7" aria-hidden="true" tabindex="-1"></a>            sum , </span>
+<span id="cb362-8"><a href="national-household-travel-survey-nhts.html#cb362-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb362-9"><a href="national-household-travel-survey-nhts.html#cb362-9" aria-hidden="true" tabindex="-1"></a>        ) </span>
+<span id="cb362-10"><a href="national-household-travel-survey-nhts.html#cb362-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb362-11"><a href="national-household-travel-survey-nhts.html#cb362-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb362-12"><a href="national-household-travel-survey-nhts.html#cb362-12" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( trips_per_person ) <span class="ot">&lt;-</span></span>
+<span id="cb362-13"><a href="national-household-travel-survey-nhts.html#cb362-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> , <span class="st">&#39;trips_per_person&#39;</span> , <span class="st">&#39;miles_per_person&#39;</span> )</span>
+<span id="cb362-14"><a href="national-household-travel-survey-nhts.html#cb362-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb362-15"><a href="national-household-travel-survey-nhts.html#cb362-15" aria-hidden="true" tabindex="-1"></a>walks_per_person <span class="ot">&lt;-</span> </span>
+<span id="cb362-16"><a href="national-household-travel-survey-nhts.html#cb362-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>( </span>
+<span id="cb362-17"><a href="national-household-travel-survey-nhts.html#cb362-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">subset</span>( trippub_df , trptrans <span class="sc">==</span> <span class="st">&#39;01&#39;</span> ) , </span>
+<span id="cb362-18"><a href="national-household-travel-survey-nhts.html#cb362-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aggregate</span>( </span>
+<span id="cb362-19"><a href="national-household-travel-survey-nhts.html#cb362-19" aria-hidden="true" tabindex="-1"></a>            <span class="fu">cbind</span>( one , tripmiles_no_nines ) , </span>
+<span id="cb362-20"><a href="national-household-travel-survey-nhts.html#cb362-20" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>( houseid , personid ) , </span>
+<span id="cb362-21"><a href="national-household-travel-survey-nhts.html#cb362-21" aria-hidden="true" tabindex="-1"></a>            sum , </span>
+<span id="cb362-22"><a href="national-household-travel-survey-nhts.html#cb362-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb362-23"><a href="national-household-travel-survey-nhts.html#cb362-23" aria-hidden="true" tabindex="-1"></a>        ) </span>
+<span id="cb362-24"><a href="national-household-travel-survey-nhts.html#cb362-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb362-25"><a href="national-household-travel-survey-nhts.html#cb362-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb362-26"><a href="national-household-travel-survey-nhts.html#cb362-26" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( walks_per_person ) <span class="ot">&lt;-</span></span>
+<span id="cb362-27"><a href="national-household-travel-survey-nhts.html#cb362-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> , <span class="st">&#39;walks_per_person&#39;</span> , <span class="st">&#39;walk_miles_per_person&#39;</span> )</span></code></pre></div>
 <p>Merge these trip count and mileage values on to the person-level file, replacing non-matches with zero:</p>
-<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="national-household-travel-survey-nhts.html#cb362-1" aria-hidden="true" tabindex="-1"></a>nhts_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( perpub_df , trips_per_person , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb362-2"><a href="national-household-travel-survey-nhts.html#cb362-2" aria-hidden="true" tabindex="-1"></a>nhts_df[ <span class="fu">is.na</span>( nhts_df[ , <span class="st">&#39;trips_per_person&#39;</span> ] ) , <span class="st">&#39;trips_per_person&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb362-3"><a href="national-household-travel-survey-nhts.html#cb362-3" aria-hidden="true" tabindex="-1"></a>nhts_df[ <span class="fu">is.na</span>( nhts_df[ , <span class="st">&#39;miles_per_person&#39;</span> ] ) , <span class="st">&#39;miles_per_person&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb362-4"><a href="national-household-travel-survey-nhts.html#cb362-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb362-5"><a href="national-household-travel-survey-nhts.html#cb362-5" aria-hidden="true" tabindex="-1"></a>nhts_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( nhts_df , walks_per_person , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb362-6"><a href="national-household-travel-survey-nhts.html#cb362-6" aria-hidden="true" tabindex="-1"></a>nhts_df[ <span class="fu">is.na</span>( nhts_df[ , <span class="st">&#39;walks_per_person&#39;</span> ] ) , <span class="st">&#39;walks_per_person&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb362-7"><a href="national-household-travel-survey-nhts.html#cb362-7" aria-hidden="true" tabindex="-1"></a>nhts_df[ <span class="fu">is.na</span>( nhts_df[ , <span class="st">&#39;walk_miles_per_person&#39;</span> ] ) , <span class="st">&#39;walk_miles_per_person&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb362-8"><a href="national-household-travel-survey-nhts.html#cb362-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb362-9"><a href="national-household-travel-survey-nhts.html#cb362-9" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( nhts_df ) <span class="sc">==</span> <span class="fu">nrow</span>( perpub_df ) )</span></code></pre></div>
+<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb363-1"><a href="national-household-travel-survey-nhts.html#cb363-1" aria-hidden="true" tabindex="-1"></a>nhts_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( perpub_df , trips_per_person , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb363-2"><a href="national-household-travel-survey-nhts.html#cb363-2" aria-hidden="true" tabindex="-1"></a>nhts_df[ <span class="fu">is.na</span>( nhts_df[ , <span class="st">&#39;trips_per_person&#39;</span> ] ) , <span class="st">&#39;trips_per_person&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb363-3"><a href="national-household-travel-survey-nhts.html#cb363-3" aria-hidden="true" tabindex="-1"></a>nhts_df[ <span class="fu">is.na</span>( nhts_df[ , <span class="st">&#39;miles_per_person&#39;</span> ] ) , <span class="st">&#39;miles_per_person&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb363-4"><a href="national-household-travel-survey-nhts.html#cb363-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb363-5"><a href="national-household-travel-survey-nhts.html#cb363-5" aria-hidden="true" tabindex="-1"></a>nhts_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( nhts_df , walks_per_person , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb363-6"><a href="national-household-travel-survey-nhts.html#cb363-6" aria-hidden="true" tabindex="-1"></a>nhts_df[ <span class="fu">is.na</span>( nhts_df[ , <span class="st">&#39;walks_per_person&#39;</span> ] ) , <span class="st">&#39;walks_per_person&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb363-7"><a href="national-household-travel-survey-nhts.html#cb363-7" aria-hidden="true" tabindex="-1"></a>nhts_df[ <span class="fu">is.na</span>( nhts_df[ , <span class="st">&#39;walk_miles_per_person&#39;</span> ] ) , <span class="st">&#39;walk_miles_per_person&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb363-8"><a href="national-household-travel-survey-nhts.html#cb363-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb363-9"><a href="national-household-travel-survey-nhts.html#cb363-9" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( nhts_df ) <span class="sc">==</span> <span class="fu">nrow</span>( perpub_df ) )</span></code></pre></div>
 <div id="save-locally-12" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="national-household-travel-survey-nhts.html#save-locally-12" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb363-1"><a href="national-household-travel-survey-nhts.html#cb363-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhts_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NHTS&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb363-2"><a href="national-household-travel-survey-nhts.html#cb363-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( nhts_df , file = nhts_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb364-1"><a href="national-household-travel-survey-nhts.html#cb364-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhts_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NHTS&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb364-2"><a href="national-household-travel-survey-nhts.html#cb364-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( nhts_df , file = nhts_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb364-1"><a href="national-household-travel-survey-nhts.html#cb364-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhts_df &lt;- readRDS( nhts_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="national-household-travel-survey-nhts.html#cb365-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhts_df &lt;- readRDS( nhts_fn )</span></span></code></pre></div>
 </div>
 <div id="survey-design-definition-9" class="section level3 unnumbered hasAnchor">
 <h3>Survey Design Definition<a href="national-household-travel-survey-nhts.html#survey-design-definition-9" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Construct a complex sample survey design:</p>
 <p>Sort both the one record per household and household replicate weights tables, then define the design:</p>
-<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="national-household-travel-survey-nhts.html#cb365-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb365-2"><a href="national-household-travel-survey-nhts.html#cb365-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb365-3"><a href="national-household-travel-survey-nhts.html#cb365-3" aria-hidden="true" tabindex="-1"></a>hhpub_df <span class="ot">&lt;-</span> hhpub_df[ <span class="fu">order</span>( hhpub_df[ , <span class="st">&#39;houseid&#39;</span> ] ) , ]</span>
-<span id="cb365-4"><a href="national-household-travel-survey-nhts.html#cb365-4" aria-hidden="true" tabindex="-1"></a>hhwgt_df <span class="ot">&lt;-</span> hhwgt_df[ <span class="fu">order</span>( hhwgt_df[ , <span class="st">&#39;houseid&#39;</span> ] ) , ]</span>
-<span id="cb365-5"><a href="national-household-travel-survey-nhts.html#cb365-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb365-6"><a href="national-household-travel-survey-nhts.html#cb365-6" aria-hidden="true" tabindex="-1"></a>hh_design <span class="ot">&lt;-</span></span>
-<span id="cb365-7"><a href="national-household-travel-survey-nhts.html#cb365-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>(</span>
-<span id="cb365-8"><a href="national-household-travel-survey-nhts.html#cb365-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> wthhfin ,</span>
-<span id="cb365-9"><a href="national-household-travel-survey-nhts.html#cb365-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span></span>
-<span id="cb365-10"><a href="national-household-travel-survey-nhts.html#cb365-10" aria-hidden="true" tabindex="-1"></a>            hhwgt_df[ <span class="fu">grep</span>( <span class="st">&#39;wthhfin[0-9]&#39;</span> , <span class="fu">names</span>( hhwgt_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) ] ,</span>
-<span id="cb365-11"><a href="national-household-travel-survey-nhts.html#cb365-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">6</span> <span class="sc">/</span> <span class="dv">7</span> ,</span>
-<span id="cb365-12"><a href="national-household-travel-survey-nhts.html#cb365-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="dv">1</span> ,</span>
-<span id="cb365-13"><a href="national-household-travel-survey-nhts.html#cb365-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;JK1&#39;</span> ,</span>
-<span id="cb365-14"><a href="national-household-travel-survey-nhts.html#cb365-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb365-15"><a href="national-household-travel-survey-nhts.html#cb365-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> hhpub_df</span>
-<span id="cb365-16"><a href="national-household-travel-survey-nhts.html#cb365-16" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb366-1"><a href="national-household-travel-survey-nhts.html#cb366-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb366-2"><a href="national-household-travel-survey-nhts.html#cb366-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb366-3"><a href="national-household-travel-survey-nhts.html#cb366-3" aria-hidden="true" tabindex="-1"></a>hhpub_df <span class="ot">&lt;-</span> hhpub_df[ <span class="fu">order</span>( hhpub_df[ , <span class="st">&#39;houseid&#39;</span> ] ) , ]</span>
+<span id="cb366-4"><a href="national-household-travel-survey-nhts.html#cb366-4" aria-hidden="true" tabindex="-1"></a>hhwgt_df <span class="ot">&lt;-</span> hhwgt_df[ <span class="fu">order</span>( hhwgt_df[ , <span class="st">&#39;houseid&#39;</span> ] ) , ]</span>
+<span id="cb366-5"><a href="national-household-travel-survey-nhts.html#cb366-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb366-6"><a href="national-household-travel-survey-nhts.html#cb366-6" aria-hidden="true" tabindex="-1"></a>hh_design <span class="ot">&lt;-</span></span>
+<span id="cb366-7"><a href="national-household-travel-survey-nhts.html#cb366-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>(</span>
+<span id="cb366-8"><a href="national-household-travel-survey-nhts.html#cb366-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> wthhfin ,</span>
+<span id="cb366-9"><a href="national-household-travel-survey-nhts.html#cb366-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span></span>
+<span id="cb366-10"><a href="national-household-travel-survey-nhts.html#cb366-10" aria-hidden="true" tabindex="-1"></a>            hhwgt_df[ <span class="fu">grep</span>( <span class="st">&#39;wthhfin[0-9]&#39;</span> , <span class="fu">names</span>( hhwgt_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) ] ,</span>
+<span id="cb366-11"><a href="national-household-travel-survey-nhts.html#cb366-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">6</span> <span class="sc">/</span> <span class="dv">7</span> ,</span>
+<span id="cb366-12"><a href="national-household-travel-survey-nhts.html#cb366-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="dv">1</span> ,</span>
+<span id="cb366-13"><a href="national-household-travel-survey-nhts.html#cb366-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;JK1&#39;</span> ,</span>
+<span id="cb366-14"><a href="national-household-travel-survey-nhts.html#cb366-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb366-15"><a href="national-household-travel-survey-nhts.html#cb366-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> hhpub_df</span>
+<span id="cb366-16"><a href="national-household-travel-survey-nhts.html#cb366-16" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <p>Sort both the one record per person and person replicate weights tables, then define the design:</p>
-<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb366-1"><a href="national-household-travel-survey-nhts.html#cb366-1" aria-hidden="true" tabindex="-1"></a>nhts_df <span class="ot">&lt;-</span> nhts_df[ <span class="fu">do.call</span>( order , nhts_df[ , <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> ) ] ) , ]</span>
-<span id="cb366-2"><a href="national-household-travel-survey-nhts.html#cb366-2" aria-hidden="true" tabindex="-1"></a>perwgt_df <span class="ot">&lt;-</span> perwgt_df[ <span class="fu">do.call</span>( order , perwgt_df[ , <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> ) ] ) , ]</span>
-<span id="cb366-3"><a href="national-household-travel-survey-nhts.html#cb366-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb366-4"><a href="national-household-travel-survey-nhts.html#cb366-4" aria-hidden="true" tabindex="-1"></a>nhts_design <span class="ot">&lt;-</span></span>
-<span id="cb366-5"><a href="national-household-travel-survey-nhts.html#cb366-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>(</span>
-<span id="cb366-6"><a href="national-household-travel-survey-nhts.html#cb366-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> wtperfin ,</span>
-<span id="cb366-7"><a href="national-household-travel-survey-nhts.html#cb366-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span></span>
-<span id="cb366-8"><a href="national-household-travel-survey-nhts.html#cb366-8" aria-hidden="true" tabindex="-1"></a>            perwgt_df[ <span class="fu">grep</span>( <span class="st">&#39;wtperfin[0-9]&#39;</span> , <span class="fu">names</span>( perwgt_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) ] ,</span>
-<span id="cb366-9"><a href="national-household-travel-survey-nhts.html#cb366-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">6</span> <span class="sc">/</span> <span class="dv">7</span> ,</span>
-<span id="cb366-10"><a href="national-household-travel-survey-nhts.html#cb366-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="fu">rep</span>( <span class="dv">1</span> , <span class="dv">98</span> ) ,</span>
-<span id="cb366-11"><a href="national-household-travel-survey-nhts.html#cb366-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;JK1&#39;</span> ,</span>
-<span id="cb366-12"><a href="national-household-travel-survey-nhts.html#cb366-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb366-13"><a href="national-household-travel-survey-nhts.html#cb366-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> nhts_df</span>
-<span id="cb366-14"><a href="national-household-travel-survey-nhts.html#cb366-14" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
-<p>Sort both the one record per trip and person replicate weights tables, then define the design:</p>
-<div class="sourceCode" id="cb367"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb367-1"><a href="national-household-travel-survey-nhts.html#cb367-1" aria-hidden="true" tabindex="-1"></a>trippub_df <span class="ot">&lt;-</span> trippub_df[ <span class="fu">do.call</span>( order , trippub_df[ , <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> ) ] ) , ]</span>
+<div class="sourceCode" id="cb367"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb367-1"><a href="national-household-travel-survey-nhts.html#cb367-1" aria-hidden="true" tabindex="-1"></a>nhts_df <span class="ot">&lt;-</span> nhts_df[ <span class="fu">do.call</span>( order , nhts_df[ , <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> ) ] ) , ]</span>
 <span id="cb367-2"><a href="national-household-travel-survey-nhts.html#cb367-2" aria-hidden="true" tabindex="-1"></a>perwgt_df <span class="ot">&lt;-</span> perwgt_df[ <span class="fu">do.call</span>( order , perwgt_df[ , <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> ) ] ) , ]</span>
 <span id="cb367-3"><a href="national-household-travel-survey-nhts.html#cb367-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb367-4"><a href="national-household-travel-survey-nhts.html#cb367-4" aria-hidden="true" tabindex="-1"></a>trip_design <span class="ot">&lt;-</span></span>
+<span id="cb367-4"><a href="national-household-travel-survey-nhts.html#cb367-4" aria-hidden="true" tabindex="-1"></a>nhts_design <span class="ot">&lt;-</span></span>
 <span id="cb367-5"><a href="national-household-travel-survey-nhts.html#cb367-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>(</span>
-<span id="cb367-6"><a href="national-household-travel-survey-nhts.html#cb367-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> wttrdfin ,</span>
+<span id="cb367-6"><a href="national-household-travel-survey-nhts.html#cb367-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> wtperfin ,</span>
 <span id="cb367-7"><a href="national-household-travel-survey-nhts.html#cb367-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span></span>
-<span id="cb367-8"><a href="national-household-travel-survey-nhts.html#cb367-8" aria-hidden="true" tabindex="-1"></a>            perwgt_df[ <span class="fu">grep</span>( <span class="st">&#39;wttrdfin[0-9]&#39;</span> , <span class="fu">names</span>( perwgt_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) ] ,</span>
+<span id="cb367-8"><a href="national-household-travel-survey-nhts.html#cb367-8" aria-hidden="true" tabindex="-1"></a>            perwgt_df[ <span class="fu">grep</span>( <span class="st">&#39;wtperfin[0-9]&#39;</span> , <span class="fu">names</span>( perwgt_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) ] ,</span>
 <span id="cb367-9"><a href="national-household-travel-survey-nhts.html#cb367-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">6</span> <span class="sc">/</span> <span class="dv">7</span> ,</span>
-<span id="cb367-10"><a href="national-household-travel-survey-nhts.html#cb367-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="dv">1</span> ,</span>
+<span id="cb367-10"><a href="national-household-travel-survey-nhts.html#cb367-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="fu">rep</span>( <span class="dv">1</span> , <span class="dv">98</span> ) ,</span>
 <span id="cb367-11"><a href="national-household-travel-survey-nhts.html#cb367-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;JK1&#39;</span> ,</span>
 <span id="cb367-12"><a href="national-household-travel-survey-nhts.html#cb367-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb367-13"><a href="national-household-travel-survey-nhts.html#cb367-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> trippub_df</span>
+<span id="cb367-13"><a href="national-household-travel-survey-nhts.html#cb367-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> nhts_df</span>
 <span id="cb367-14"><a href="national-household-travel-survey-nhts.html#cb367-14" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<p>Sort both the one record per trip and person replicate weights tables, then define the design:</p>
+<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb368-1"><a href="national-household-travel-survey-nhts.html#cb368-1" aria-hidden="true" tabindex="-1"></a>trippub_df <span class="ot">&lt;-</span> trippub_df[ <span class="fu">do.call</span>( order , trippub_df[ , <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> ) ] ) , ]</span>
+<span id="cb368-2"><a href="national-household-travel-survey-nhts.html#cb368-2" aria-hidden="true" tabindex="-1"></a>perwgt_df <span class="ot">&lt;-</span> perwgt_df[ <span class="fu">do.call</span>( order , perwgt_df[ , <span class="fu">c</span>( <span class="st">&#39;houseid&#39;</span> , <span class="st">&#39;personid&#39;</span> ) ] ) , ]</span>
+<span id="cb368-3"><a href="national-household-travel-survey-nhts.html#cb368-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb368-4"><a href="national-household-travel-survey-nhts.html#cb368-4" aria-hidden="true" tabindex="-1"></a>trip_design <span class="ot">&lt;-</span></span>
+<span id="cb368-5"><a href="national-household-travel-survey-nhts.html#cb368-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svrepdesign</span>(</span>
+<span id="cb368-6"><a href="national-household-travel-survey-nhts.html#cb368-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> wttrdfin ,</span>
+<span id="cb368-7"><a href="national-household-travel-survey-nhts.html#cb368-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">repweights =</span></span>
+<span id="cb368-8"><a href="national-household-travel-survey-nhts.html#cb368-8" aria-hidden="true" tabindex="-1"></a>            perwgt_df[ <span class="fu">grep</span>( <span class="st">&#39;wttrdfin[0-9]&#39;</span> , <span class="fu">names</span>( perwgt_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> ) ] ,</span>
+<span id="cb368-9"><a href="national-household-travel-survey-nhts.html#cb368-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">6</span> <span class="sc">/</span> <span class="dv">7</span> ,</span>
+<span id="cb368-10"><a href="national-household-travel-survey-nhts.html#cb368-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">rscales =</span> <span class="dv">1</span> ,</span>
+<span id="cb368-11"><a href="national-household-travel-survey-nhts.html#cb368-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;JK1&#39;</span> ,</span>
+<span id="cb368-12"><a href="national-household-travel-survey-nhts.html#cb368-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb368-13"><a href="national-household-travel-survey-nhts.html#cb368-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> trippub_df</span>
+<span id="cb368-14"><a href="national-household-travel-survey-nhts.html#cb368-14" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="variable-recoding-12" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="national-household-travel-survey-nhts.html#variable-recoding-12" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb368-1"><a href="national-household-travel-survey-nhts.html#cb368-1" aria-hidden="true" tabindex="-1"></a>hh_design <span class="ot">&lt;-</span></span>
-<span id="cb368-2"><a href="national-household-travel-survey-nhts.html#cb368-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>(</span>
-<span id="cb368-3"><a href="national-household-travel-survey-nhts.html#cb368-3" aria-hidden="true" tabindex="-1"></a>        hh_design ,</span>
-<span id="cb368-4"><a href="national-household-travel-survey-nhts.html#cb368-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">hhsize_categories =</span></span>
-<span id="cb368-5"><a href="national-household-travel-survey-nhts.html#cb368-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
-<span id="cb368-6"><a href="national-household-travel-survey-nhts.html#cb368-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">findInterval</span>( hhsize , <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ) ,</span>
-<span id="cb368-7"><a href="national-household-travel-survey-nhts.html#cb368-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ,</span>
-<span id="cb368-8"><a href="national-household-travel-survey-nhts.html#cb368-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> , <span class="st">&#39;4 or more&#39;</span> )</span>
-<span id="cb368-9"><a href="national-household-travel-survey-nhts.html#cb368-9" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb368-10"><a href="national-household-travel-survey-nhts.html#cb368-10" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb368-11"><a href="national-household-travel-survey-nhts.html#cb368-11" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb368-12"><a href="national-household-travel-survey-nhts.html#cb368-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb368-13"><a href="national-household-travel-survey-nhts.html#cb368-13" aria-hidden="true" tabindex="-1"></a>nhts_design <span class="ot">&lt;-</span> </span>
-<span id="cb368-14"><a href="national-household-travel-survey-nhts.html#cb368-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb368-15"><a href="national-household-travel-survey-nhts.html#cb368-15" aria-hidden="true" tabindex="-1"></a>        nhts_design , </span>
-<span id="cb368-16"><a href="national-household-travel-survey-nhts.html#cb368-16" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb368-17"><a href="national-household-travel-survey-nhts.html#cb368-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">urban_area =</span> <span class="fu">as.numeric</span>( urbrur <span class="sc">==</span> <span class="st">&#39;01&#39;</span> )</span>
-<span id="cb368-18"><a href="national-household-travel-survey-nhts.html#cb368-18" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb368-19"><a href="national-household-travel-survey-nhts.html#cb368-19" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb369"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb369-1"><a href="national-household-travel-survey-nhts.html#cb369-1" aria-hidden="true" tabindex="-1"></a>hh_design <span class="ot">&lt;-</span></span>
+<span id="cb369-2"><a href="national-household-travel-survey-nhts.html#cb369-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>(</span>
+<span id="cb369-3"><a href="national-household-travel-survey-nhts.html#cb369-3" aria-hidden="true" tabindex="-1"></a>        hh_design ,</span>
+<span id="cb369-4"><a href="national-household-travel-survey-nhts.html#cb369-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">hhsize_categories =</span></span>
+<span id="cb369-5"><a href="national-household-travel-survey-nhts.html#cb369-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
+<span id="cb369-6"><a href="national-household-travel-survey-nhts.html#cb369-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">findInterval</span>( hhsize , <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ) ,</span>
+<span id="cb369-7"><a href="national-household-travel-survey-nhts.html#cb369-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ,</span>
+<span id="cb369-8"><a href="national-household-travel-survey-nhts.html#cb369-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> , <span class="st">&#39;4 or more&#39;</span> )</span>
+<span id="cb369-9"><a href="national-household-travel-survey-nhts.html#cb369-9" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb369-10"><a href="national-household-travel-survey-nhts.html#cb369-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb369-11"><a href="national-household-travel-survey-nhts.html#cb369-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb369-12"><a href="national-household-travel-survey-nhts.html#cb369-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb369-13"><a href="national-household-travel-survey-nhts.html#cb369-13" aria-hidden="true" tabindex="-1"></a>nhts_design <span class="ot">&lt;-</span> </span>
+<span id="cb369-14"><a href="national-household-travel-survey-nhts.html#cb369-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb369-15"><a href="national-household-travel-survey-nhts.html#cb369-15" aria-hidden="true" tabindex="-1"></a>        nhts_design , </span>
+<span id="cb369-16"><a href="national-household-travel-survey-nhts.html#cb369-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb369-17"><a href="national-household-travel-survey-nhts.html#cb369-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">urban_area =</span> <span class="fu">as.numeric</span>( urbrur <span class="sc">==</span> <span class="st">&#39;01&#39;</span> )</span>
+<span id="cb369-18"><a href="national-household-travel-survey-nhts.html#cb369-18" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb369-19"><a href="national-household-travel-survey-nhts.html#cb369-19" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -858,113 +858,113 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-12" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="national-household-travel-survey-nhts.html#unweighted-counts-12" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb369"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb369-1"><a href="national-household-travel-survey-nhts.html#cb369-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( nhts_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
-<span id="cb369-2"><a href="national-household-travel-survey-nhts.html#cb369-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb369-3"><a href="national-household-travel-survey-nhts.html#cb369-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> r_sex_imp , nhts_design , unwtd.count )</span></code></pre></div>
+<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb370-1"><a href="national-household-travel-survey-nhts.html#cb370-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( nhts_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
+<span id="cb370-2"><a href="national-household-travel-survey-nhts.html#cb370-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb370-3"><a href="national-household-travel-survey-nhts.html#cb370-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> r_sex_imp , nhts_design , unwtd.count )</span></code></pre></div>
 </div>
 <div id="weighted-counts-9" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="national-household-travel-survey-nhts.html#weighted-counts-9" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb370-1"><a href="national-household-travel-survey-nhts.html#cb370-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , nhts_design )</span>
-<span id="cb370-2"><a href="national-household-travel-survey-nhts.html#cb370-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb370-3"><a href="national-household-travel-survey-nhts.html#cb370-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> r_sex_imp , nhts_design , svytotal )</span></code></pre></div>
+<div class="sourceCode" id="cb371"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb371-1"><a href="national-household-travel-survey-nhts.html#cb371-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , nhts_design )</span>
+<span id="cb371-2"><a href="national-household-travel-survey-nhts.html#cb371-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb371-3"><a href="national-household-travel-survey-nhts.html#cb371-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> r_sex_imp , nhts_design , svytotal )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-12" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="national-household-travel-survey-nhts.html#descriptive-statistics-12" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb371"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb371-1"><a href="national-household-travel-survey-nhts.html#cb371-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , nhts_design )</span>
-<span id="cb371-2"><a href="national-household-travel-survey-nhts.html#cb371-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb371-3"><a href="national-household-travel-survey-nhts.html#cb371-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> miles_per_person , <span class="sc">~</span> r_sex_imp , nhts_design , svymean )</span></code></pre></div>
-<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb372"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb372-1"><a href="national-household-travel-survey-nhts.html#cb372-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> hhstate , nhts_design )</span>
+<div class="sourceCode" id="cb372"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb372-1"><a href="national-household-travel-survey-nhts.html#cb372-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , nhts_design )</span>
 <span id="cb372-2"><a href="national-household-travel-survey-nhts.html#cb372-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb372-3"><a href="national-household-travel-survey-nhts.html#cb372-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> hhstate , <span class="sc">~</span> r_sex_imp , nhts_design , svymean )</span></code></pre></div>
-<p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb373"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb373-1"><a href="national-household-travel-survey-nhts.html#cb373-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> miles_per_person , nhts_design )</span>
+<span id="cb372-3"><a href="national-household-travel-survey-nhts.html#cb372-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> miles_per_person , <span class="sc">~</span> r_sex_imp , nhts_design , svymean )</span></code></pre></div>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb373"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb373-1"><a href="national-household-travel-survey-nhts.html#cb373-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> hhstate , nhts_design )</span>
 <span id="cb373-2"><a href="national-household-travel-survey-nhts.html#cb373-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb373-3"><a href="national-household-travel-survey-nhts.html#cb373-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> miles_per_person , <span class="sc">~</span> r_sex_imp , nhts_design , svytotal )</span></code></pre></div>
-<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb374"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb374-1"><a href="national-household-travel-survey-nhts.html#cb374-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> hhstate , nhts_design )</span>
+<span id="cb373-3"><a href="national-household-travel-survey-nhts.html#cb373-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> hhstate , <span class="sc">~</span> r_sex_imp , nhts_design , svymean )</span></code></pre></div>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb374"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb374-1"><a href="national-household-travel-survey-nhts.html#cb374-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> miles_per_person , nhts_design )</span>
 <span id="cb374-2"><a href="national-household-travel-survey-nhts.html#cb374-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb374-3"><a href="national-household-travel-survey-nhts.html#cb374-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> hhstate , <span class="sc">~</span> r_sex_imp , nhts_design , svytotal )</span></code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb375"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb375-1"><a href="national-household-travel-survey-nhts.html#cb375-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> miles_per_person , nhts_design , <span class="fl">0.5</span> )</span>
+<span id="cb374-3"><a href="national-household-travel-survey-nhts.html#cb374-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> miles_per_person , <span class="sc">~</span> r_sex_imp , nhts_design , svytotal )</span></code></pre></div>
+<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb375"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb375-1"><a href="national-household-travel-survey-nhts.html#cb375-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> hhstate , nhts_design )</span>
 <span id="cb375-2"><a href="national-household-travel-survey-nhts.html#cb375-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb375-3"><a href="national-household-travel-survey-nhts.html#cb375-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
-<span id="cb375-4"><a href="national-household-travel-survey-nhts.html#cb375-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> miles_per_person , </span>
-<span id="cb375-5"><a href="national-household-travel-survey-nhts.html#cb375-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> r_sex_imp , </span>
-<span id="cb375-6"><a href="national-household-travel-survey-nhts.html#cb375-6" aria-hidden="true" tabindex="-1"></a>    nhts_design , </span>
-<span id="cb375-7"><a href="national-household-travel-survey-nhts.html#cb375-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
-<span id="cb375-8"><a href="national-household-travel-survey-nhts.html#cb375-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb375-9"><a href="national-household-travel-survey-nhts.html#cb375-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
-<span id="cb375-10"><a href="national-household-travel-survey-nhts.html#cb375-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb375-3"><a href="national-household-travel-survey-nhts.html#cb375-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> hhstate , <span class="sc">~</span> r_sex_imp , nhts_design , svytotal )</span></code></pre></div>
+<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="national-household-travel-survey-nhts.html#cb376-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> miles_per_person , nhts_design , <span class="fl">0.5</span> )</span>
+<span id="cb376-2"><a href="national-household-travel-survey-nhts.html#cb376-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb376-3"><a href="national-household-travel-survey-nhts.html#cb376-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
+<span id="cb376-4"><a href="national-household-travel-survey-nhts.html#cb376-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> miles_per_person , </span>
+<span id="cb376-5"><a href="national-household-travel-survey-nhts.html#cb376-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> r_sex_imp , </span>
+<span id="cb376-6"><a href="national-household-travel-survey-nhts.html#cb376-6" aria-hidden="true" tabindex="-1"></a>    nhts_design , </span>
+<span id="cb376-7"><a href="national-household-travel-survey-nhts.html#cb376-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
+<span id="cb376-8"><a href="national-household-travel-survey-nhts.html#cb376-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
+<span id="cb376-9"><a href="national-household-travel-survey-nhts.html#cb376-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
+<span id="cb376-10"><a href="national-household-travel-survey-nhts.html#cb376-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="national-household-travel-survey-nhts.html#cb376-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
-<span id="cb376-2"><a href="national-household-travel-survey-nhts.html#cb376-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> walk_miles_per_person , </span>
-<span id="cb376-3"><a href="national-household-travel-survey-nhts.html#cb376-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> miles_per_person , </span>
-<span id="cb376-4"><a href="national-household-travel-survey-nhts.html#cb376-4" aria-hidden="true" tabindex="-1"></a>    nhts_design </span>
-<span id="cb376-5"><a href="national-household-travel-survey-nhts.html#cb376-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb377-1"><a href="national-household-travel-survey-nhts.html#cb377-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
+<span id="cb377-2"><a href="national-household-travel-survey-nhts.html#cb377-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> walk_miles_per_person , </span>
+<span id="cb377-3"><a href="national-household-travel-survey-nhts.html#cb377-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> miles_per_person , </span>
+<span id="cb377-4"><a href="national-household-travel-survey-nhts.html#cb377-4" aria-hidden="true" tabindex="-1"></a>    nhts_design </span>
+<span id="cb377-5"><a href="national-household-travel-survey-nhts.html#cb377-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting-12" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="national-household-travel-survey-nhts.html#subsetting-12" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to ever cyclists:</p>
-<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb377-1"><a href="national-household-travel-survey-nhts.html#cb377-1" aria-hidden="true" tabindex="-1"></a>sub_nhts_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nhts_design , nbiketrp <span class="sc">&gt;</span> <span class="dv">0</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb378-1"><a href="national-household-travel-survey-nhts.html#cb378-1" aria-hidden="true" tabindex="-1"></a>sub_nhts_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nhts_design , nbiketrp <span class="sc">&gt;</span> <span class="dv">0</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb378-1"><a href="national-household-travel-survey-nhts.html#cb378-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , sub_nhts_design )</span></code></pre></div>
+<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb379-1"><a href="national-household-travel-survey-nhts.html#cb379-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , sub_nhts_design )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-12" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="national-household-travel-survey-nhts.html#measures-of-uncertainty-12" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb379-1"><a href="national-household-travel-survey-nhts.html#cb379-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , nhts_design )</span>
-<span id="cb379-2"><a href="national-household-travel-survey-nhts.html#cb379-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb379-3"><a href="national-household-travel-survey-nhts.html#cb379-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb379-4"><a href="national-household-travel-survey-nhts.html#cb379-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb379-5"><a href="national-household-travel-survey-nhts.html#cb379-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb379-6"><a href="national-household-travel-survey-nhts.html#cb379-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb379-7"><a href="national-household-travel-survey-nhts.html#cb379-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb379-8"><a href="national-household-travel-survey-nhts.html#cb379-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb379-9"><a href="national-household-travel-survey-nhts.html#cb379-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb379-10"><a href="national-household-travel-survey-nhts.html#cb379-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> miles_per_person , </span>
-<span id="cb379-11"><a href="national-household-travel-survey-nhts.html#cb379-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> r_sex_imp , </span>
-<span id="cb379-12"><a href="national-household-travel-survey-nhts.html#cb379-12" aria-hidden="true" tabindex="-1"></a>        nhts_design , </span>
-<span id="cb379-13"><a href="national-household-travel-survey-nhts.html#cb379-13" aria-hidden="true" tabindex="-1"></a>        svymean </span>
-<span id="cb379-14"><a href="national-household-travel-survey-nhts.html#cb379-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb379-15"><a href="national-household-travel-survey-nhts.html#cb379-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb379-16"><a href="national-household-travel-survey-nhts.html#cb379-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb379-17"><a href="national-household-travel-survey-nhts.html#cb379-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb379-18"><a href="national-household-travel-survey-nhts.html#cb379-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb379-19"><a href="national-household-travel-survey-nhts.html#cb379-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb380-1"><a href="national-household-travel-survey-nhts.html#cb380-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , nhts_design )</span>
+<span id="cb380-2"><a href="national-household-travel-survey-nhts.html#cb380-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb380-3"><a href="national-household-travel-survey-nhts.html#cb380-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb380-4"><a href="national-household-travel-survey-nhts.html#cb380-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb380-5"><a href="national-household-travel-survey-nhts.html#cb380-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb380-6"><a href="national-household-travel-survey-nhts.html#cb380-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb380-7"><a href="national-household-travel-survey-nhts.html#cb380-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb380-8"><a href="national-household-travel-survey-nhts.html#cb380-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb380-9"><a href="national-household-travel-survey-nhts.html#cb380-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb380-10"><a href="national-household-travel-survey-nhts.html#cb380-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> miles_per_person , </span>
+<span id="cb380-11"><a href="national-household-travel-survey-nhts.html#cb380-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> r_sex_imp , </span>
+<span id="cb380-12"><a href="national-household-travel-survey-nhts.html#cb380-12" aria-hidden="true" tabindex="-1"></a>        nhts_design , </span>
+<span id="cb380-13"><a href="national-household-travel-survey-nhts.html#cb380-13" aria-hidden="true" tabindex="-1"></a>        svymean </span>
+<span id="cb380-14"><a href="national-household-travel-survey-nhts.html#cb380-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb380-15"><a href="national-household-travel-survey-nhts.html#cb380-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb380-16"><a href="national-household-travel-survey-nhts.html#cb380-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb380-17"><a href="national-household-travel-survey-nhts.html#cb380-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb380-18"><a href="national-household-travel-survey-nhts.html#cb380-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb380-19"><a href="national-household-travel-survey-nhts.html#cb380-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb380-1"><a href="national-household-travel-survey-nhts.html#cb380-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( nhts_design )</span></code></pre></div>
+<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="national-household-travel-survey-nhts.html#cb381-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( nhts_design )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="national-household-travel-survey-nhts.html#cb381-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> miles_per_person , nhts_design )</span></code></pre></div>
+<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="national-household-travel-survey-nhts.html#cb382-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> miles_per_person , nhts_design )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="national-household-travel-survey-nhts.html#cb382-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb382-2"><a href="national-household-travel-survey-nhts.html#cb382-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , nhts_design , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb382-3"><a href="national-household-travel-survey-nhts.html#cb382-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb382-4"><a href="national-household-travel-survey-nhts.html#cb382-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb382-5"><a href="national-household-travel-survey-nhts.html#cb382-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , nhts_design , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="national-household-travel-survey-nhts.html#cb383-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb383-2"><a href="national-household-travel-survey-nhts.html#cb383-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , nhts_design , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb383-3"><a href="national-household-travel-survey-nhts.html#cb383-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb383-4"><a href="national-household-travel-survey-nhts.html#cb383-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb383-5"><a href="national-household-travel-survey-nhts.html#cb383-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> miles_per_person , nhts_design , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="national-household-travel-survey-nhts.html#cb383-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> urban_area , nhts_design ,</span>
-<span id="cb383-2"><a href="national-household-travel-survey-nhts.html#cb383-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="national-household-travel-survey-nhts.html#cb384-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> urban_area , nhts_design ,</span>
+<span id="cb384-2"><a href="national-household-travel-survey-nhts.html#cb384-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> )</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-12" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="national-household-travel-survey-nhts.html#regression-models-and-tests-of-association-12" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="national-household-travel-survey-nhts.html#cb384-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( miles_per_person <span class="sc">~</span> urban_area , nhts_design )</span></code></pre></div>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="national-household-travel-survey-nhts.html#cb385-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( miles_per_person <span class="sc">~</span> urban_area , nhts_design )</span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="national-household-travel-survey-nhts.html#cb385-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
-<span id="cb385-2"><a href="national-household-travel-survey-nhts.html#cb385-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> urban_area <span class="sc">+</span> hhstate , </span>
-<span id="cb385-3"><a href="national-household-travel-survey-nhts.html#cb385-3" aria-hidden="true" tabindex="-1"></a>    nhts_design </span>
-<span id="cb385-4"><a href="national-household-travel-survey-nhts.html#cb385-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="national-household-travel-survey-nhts.html#cb386-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
+<span id="cb386-2"><a href="national-household-travel-survey-nhts.html#cb386-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> urban_area <span class="sc">+</span> hhstate , </span>
+<span id="cb386-3"><a href="national-household-travel-survey-nhts.html#cb386-3" aria-hidden="true" tabindex="-1"></a>    nhts_design </span>
+<span id="cb386-4"><a href="national-household-travel-survey-nhts.html#cb386-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="national-household-travel-survey-nhts.html#cb386-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb386-2"><a href="national-household-travel-survey-nhts.html#cb386-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
-<span id="cb386-3"><a href="national-household-travel-survey-nhts.html#cb386-3" aria-hidden="true" tabindex="-1"></a>        miles_per_person <span class="sc">~</span> urban_area <span class="sc">+</span> hhstate , </span>
-<span id="cb386-4"><a href="national-household-travel-survey-nhts.html#cb386-4" aria-hidden="true" tabindex="-1"></a>        nhts_design </span>
-<span id="cb386-5"><a href="national-household-travel-survey-nhts.html#cb386-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb386-6"><a href="national-household-travel-survey-nhts.html#cb386-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb386-7"><a href="national-household-travel-survey-nhts.html#cb386-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="national-household-travel-survey-nhts.html#cb387-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb387-2"><a href="national-household-travel-survey-nhts.html#cb387-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
+<span id="cb387-3"><a href="national-household-travel-survey-nhts.html#cb387-3" aria-hidden="true" tabindex="-1"></a>        miles_per_person <span class="sc">~</span> urban_area <span class="sc">+</span> hhstate , </span>
+<span id="cb387-4"><a href="national-household-travel-survey-nhts.html#cb387-4" aria-hidden="true" tabindex="-1"></a>        nhts_design </span>
+<span id="cb387-5"><a href="national-household-travel-survey-nhts.html#cb387-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb387-6"><a href="national-household-travel-survey-nhts.html#cb387-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb387-7"><a href="national-household-travel-survey-nhts.html#cb387-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -978,46 +978,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="replication-example-11" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="national-household-travel-survey-nhts.html#replication-example-11" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example matches the 2017 rows from <a href="https://nhts.ornl.gov/assets/2017_nhts_summary_travel_trends.pdf#page=12">Summary of Travel Trends</a> Table 1a:</p>
-<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="national-household-travel-survey-nhts.html#cb387-1" aria-hidden="true" tabindex="-1"></a>hhsize_counts <span class="ot">&lt;-</span> <span class="fu">svytotal</span>( <span class="sc">~</span> hhsize_categories , hh_design )</span>
-<span id="cb387-2"><a href="national-household-travel-survey-nhts.html#cb387-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb387-3"><a href="national-household-travel-survey-nhts.html#cb387-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
-<span id="cb387-4"><a href="national-household-travel-survey-nhts.html#cb387-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hhsize_counts ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">0</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="dv">32952</span> , <span class="dv">40056</span> , <span class="dv">18521</span> , <span class="dv">26679</span> ) )</span>
-<span id="cb387-5"><a href="national-household-travel-survey-nhts.html#cb387-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb387-6"><a href="national-household-travel-survey-nhts.html#cb387-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb387-7"><a href="national-household-travel-survey-nhts.html#cb387-7" aria-hidden="true" tabindex="-1"></a>hhsize_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>( hhsize_counts , <span class="at">df =</span> <span class="fu">ncol</span>( hh_design<span class="sc">$</span>repweights ) )</span>
-<span id="cb387-8"><a href="national-household-travel-survey-nhts.html#cb387-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb387-9"><a href="national-household-travel-survey-nhts.html#cb387-9" aria-hidden="true" tabindex="-1"></a>hhsize_moe <span class="ot">&lt;-</span> hhsize_ci[ , <span class="dv">2</span> ] <span class="sc">-</span> <span class="fu">coef</span>( hhsize_counts )</span>
-<span id="cb387-10"><a href="national-household-travel-survey-nhts.html#cb387-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb387-11"><a href="national-household-travel-survey-nhts.html#cb387-11" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( hhsize_moe <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">0</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="dv">0</span> , <span class="dv">0</span> , <span class="dv">97</span> , <span class="dv">97</span> ) ) )  </span></code></pre></div>
-<p>This example matches 2017 NHTS <a href="https://nhts.ornl.gov/assets/2017_nhts_summary_travel_trends.pdf#page=2">Westat project co-author’s</a> workshop <a href="https://rawgit.com/Westat-Transportation/summarizeNHTS/master/inst/tutorials/workshop/Workshop.html#(38)">slide 38</a>:</p>
-<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="national-household-travel-survey-nhts.html#cb388-1" aria-hidden="true" tabindex="-1"></a>unwtd_n <span class="ot">&lt;-</span> <span class="fu">with</span>( nhts_df , <span class="fu">tapply</span>( trips_per_person , worker , sum ) )</span>
-<span id="cb388-2"><a href="national-household-travel-survey-nhts.html#cb388-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( unwtd_n <span class="sc">==</span> <span class="fu">c</span>( <span class="dv">79295</span> , <span class="dv">28</span> , <span class="dv">497944</span> , <span class="dv">346305</span> ) ) )</span>
-<span id="cb388-3"><a href="national-household-travel-survey-nhts.html#cb388-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb388-4"><a href="national-household-travel-survey-nhts.html#cb388-4" aria-hidden="true" tabindex="-1"></a>surveyed_n <span class="ot">&lt;-</span> <span class="fu">with</span>( nhts_df , <span class="fu">tapply</span>( trips_per_person , worker , mean ) )</span>
-<span id="cb388-5"><a href="national-household-travel-survey-nhts.html#cb388-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( surveyed_n , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="fl">2.84</span> , <span class="fl">1.65</span> , <span class="fl">3.88</span> , <span class="fl">3.21</span> ) ) )</span>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="national-household-travel-survey-nhts.html#cb388-1" aria-hidden="true" tabindex="-1"></a>hhsize_counts <span class="ot">&lt;-</span> <span class="fu">svytotal</span>( <span class="sc">~</span> hhsize_categories , hh_design )</span>
+<span id="cb388-2"><a href="national-household-travel-survey-nhts.html#cb388-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb388-3"><a href="national-household-travel-survey-nhts.html#cb388-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
+<span id="cb388-4"><a href="national-household-travel-survey-nhts.html#cb388-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hhsize_counts ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">0</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="dv">32952</span> , <span class="dv">40056</span> , <span class="dv">18521</span> , <span class="dv">26679</span> ) )</span>
+<span id="cb388-5"><a href="national-household-travel-survey-nhts.html#cb388-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb388-6"><a href="national-household-travel-survey-nhts.html#cb388-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb388-7"><a href="national-household-travel-survey-nhts.html#cb388-7" aria-hidden="true" tabindex="-1"></a>this_mean <span class="ot">&lt;-</span> <span class="fu">svyby</span>( <span class="sc">~</span> trips_per_person , <span class="sc">~</span> worker , nhts_design , svymean )</span>
-<span id="cb388-8"><a href="national-household-travel-survey-nhts.html#cb388-8" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( this_mean ) , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="fl">2.78</span> , <span class="fl">1.28</span> , <span class="fl">3.77</span> , <span class="fl">3.01</span> ) )</span>
-<span id="cb388-9"><a href="national-household-travel-survey-nhts.html#cb388-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb388-10"><a href="national-household-travel-survey-nhts.html#cb388-10" aria-hidden="true" tabindex="-1"></a>this_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>( this_mean , <span class="at">df =</span> <span class="fu">ncol</span>( nhts_design<span class="sc">$</span>repweights ) )</span>
-<span id="cb388-11"><a href="national-household-travel-survey-nhts.html#cb388-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb388-12"><a href="national-household-travel-survey-nhts.html#cb388-12" aria-hidden="true" tabindex="-1"></a>this_moe <span class="ot">&lt;-</span> this_ci[ , <span class="dv">2</span> ] <span class="sc">-</span> <span class="fu">coef</span>( this_mean )</span>
-<span id="cb388-13"><a href="national-household-travel-survey-nhts.html#cb388-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb388-14"><a href="national-household-travel-survey-nhts.html#cb388-14" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( this_moe , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="fl">0.06</span> , <span class="fl">2.21</span> , <span class="fl">0.03</span> , <span class="fl">0.06</span> ) ) )</span></code></pre></div>
+<span id="cb388-7"><a href="national-household-travel-survey-nhts.html#cb388-7" aria-hidden="true" tabindex="-1"></a>hhsize_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>( hhsize_counts , <span class="at">df =</span> <span class="fu">ncol</span>( hh_design<span class="sc">$</span>repweights ) )</span>
+<span id="cb388-8"><a href="national-household-travel-survey-nhts.html#cb388-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb388-9"><a href="national-household-travel-survey-nhts.html#cb388-9" aria-hidden="true" tabindex="-1"></a>hhsize_moe <span class="ot">&lt;-</span> hhsize_ci[ , <span class="dv">2</span> ] <span class="sc">-</span> <span class="fu">coef</span>( hhsize_counts )</span>
+<span id="cb388-10"><a href="national-household-travel-survey-nhts.html#cb388-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb388-11"><a href="national-household-travel-survey-nhts.html#cb388-11" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( hhsize_moe <span class="sc">/</span> <span class="dv">1000</span> , <span class="dv">0</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="dv">0</span> , <span class="dv">0</span> , <span class="dv">97</span> , <span class="dv">97</span> ) ) )  </span></code></pre></div>
+<p>This example matches 2017 NHTS <a href="https://nhts.ornl.gov/assets/2017_nhts_summary_travel_trends.pdf#page=2">Westat project co-author’s</a> workshop <a href="https://rawgit.com/Westat-Transportation/summarizeNHTS/master/inst/tutorials/workshop/Workshop.html#(38)">slide 38</a>:</p>
+<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="national-household-travel-survey-nhts.html#cb389-1" aria-hidden="true" tabindex="-1"></a>unwtd_n <span class="ot">&lt;-</span> <span class="fu">with</span>( nhts_df , <span class="fu">tapply</span>( trips_per_person , worker , sum ) )</span>
+<span id="cb389-2"><a href="national-household-travel-survey-nhts.html#cb389-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( unwtd_n <span class="sc">==</span> <span class="fu">c</span>( <span class="dv">79295</span> , <span class="dv">28</span> , <span class="dv">497944</span> , <span class="dv">346305</span> ) ) )</span>
+<span id="cb389-3"><a href="national-household-travel-survey-nhts.html#cb389-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb389-4"><a href="national-household-travel-survey-nhts.html#cb389-4" aria-hidden="true" tabindex="-1"></a>surveyed_n <span class="ot">&lt;-</span> <span class="fu">with</span>( nhts_df , <span class="fu">tapply</span>( trips_per_person , worker , mean ) )</span>
+<span id="cb389-5"><a href="national-household-travel-survey-nhts.html#cb389-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( surveyed_n , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="fl">2.84</span> , <span class="fl">1.65</span> , <span class="fl">3.88</span> , <span class="fl">3.21</span> ) ) )</span>
+<span id="cb389-6"><a href="national-household-travel-survey-nhts.html#cb389-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb389-7"><a href="national-household-travel-survey-nhts.html#cb389-7" aria-hidden="true" tabindex="-1"></a>this_mean <span class="ot">&lt;-</span> <span class="fu">svyby</span>( <span class="sc">~</span> trips_per_person , <span class="sc">~</span> worker , nhts_design , svymean )</span>
+<span id="cb389-8"><a href="national-household-travel-survey-nhts.html#cb389-8" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( this_mean ) , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="fl">2.78</span> , <span class="fl">1.28</span> , <span class="fl">3.77</span> , <span class="fl">3.01</span> ) )</span>
+<span id="cb389-9"><a href="national-household-travel-survey-nhts.html#cb389-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb389-10"><a href="national-household-travel-survey-nhts.html#cb389-10" aria-hidden="true" tabindex="-1"></a>this_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>( this_mean , <span class="at">df =</span> <span class="fu">ncol</span>( nhts_design<span class="sc">$</span>repweights ) )</span>
+<span id="cb389-11"><a href="national-household-travel-survey-nhts.html#cb389-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb389-12"><a href="national-household-travel-survey-nhts.html#cb389-12" aria-hidden="true" tabindex="-1"></a>this_moe <span class="ot">&lt;-</span> this_ci[ , <span class="dv">2</span> ] <span class="sc">-</span> <span class="fu">coef</span>( this_mean )</span>
+<span id="cb389-13"><a href="national-household-travel-survey-nhts.html#cb389-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb389-14"><a href="national-household-travel-survey-nhts.html#cb389-14" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( this_moe , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fu">c</span>( <span class="fl">0.06</span> , <span class="fl">2.21</span> , <span class="fl">0.03</span> , <span class="fl">0.06</span> ) ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-srvyr-8" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>srvyr</code>  <a href="national-household-travel-survey-nhts.html#analysis-examples-with-srvyr-8" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>srvyr</code> library calculates summary statistics from survey data, such as the mean, total or quantile using <a href="https://github.com/tidyverse/dplyr/">dplyr</a>-like syntax. <a href="https://github.com/gergness/srvyr">srvyr</a> allows for the use of many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, the <code>tidyverse</code> style of non-standard evaluation and more consistent return types than the <code>survey</code> package. <a href="https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html">This vignette</a> details the available features. As a starting point for NHTS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="national-household-travel-survey-nhts.html#cb389-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
-<span id="cb389-2"><a href="national-household-travel-survey-nhts.html#cb389-2" aria-hidden="true" tabindex="-1"></a>nhts_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nhts_design )</span></code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="national-household-travel-survey-nhts.html#cb390-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
+<span id="cb390-2"><a href="national-household-travel-survey-nhts.html#cb390-2" aria-hidden="true" tabindex="-1"></a>nhts_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nhts_design )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="national-household-travel-survey-nhts.html#cb390-1" aria-hidden="true" tabindex="-1"></a>nhts_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb390-2"><a href="national-household-travel-survey-nhts.html#cb390-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( miles_per_person ) )</span>
-<span id="cb390-3"><a href="national-household-travel-survey-nhts.html#cb390-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb390-4"><a href="national-household-travel-survey-nhts.html#cb390-4" aria-hidden="true" tabindex="-1"></a>nhts_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb390-5"><a href="national-household-travel-survey-nhts.html#cb390-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( r_sex_imp ) <span class="sc">%&gt;%</span></span>
-<span id="cb390-6"><a href="national-household-travel-survey-nhts.html#cb390-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( miles_per_person ) )</span></code></pre></div>
+<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="national-household-travel-survey-nhts.html#cb391-1" aria-hidden="true" tabindex="-1"></a>nhts_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb391-2"><a href="national-household-travel-survey-nhts.html#cb391-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( miles_per_person ) )</span>
+<span id="cb391-3"><a href="national-household-travel-survey-nhts.html#cb391-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb391-4"><a href="national-household-travel-survey-nhts.html#cb391-4" aria-hidden="true" tabindex="-1"></a>nhts_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb391-5"><a href="national-household-travel-survey-nhts.html#cb391-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( r_sex_imp ) <span class="sc">%&gt;%</span></span>
+<span id="cb391-6"><a href="national-household-travel-survey-nhts.html#cb391-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( miles_per_person ) )</span></code></pre></div>
 
 </div>
 </div>

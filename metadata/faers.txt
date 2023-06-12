@@ -11,9 +11,9 @@ The post-marketing safety surveillance program for drug and therapeutic biologic
 
 table_structure: * Multiple tables linked by `primaryid` including demographics, outcomes, drug start and end dates.
 
-publication_period: * Published quarterly since 2004, revisions at 2012Q4 and 2014Q3.
+publication_period: * Published quarterly since 2004, file structure revisions at 2012Q4 and 2014Q3.
 
-generalizable_population: * Voluntary reports from practitioners, consumers, mandatory reports from manufacturers.
+generalizable_population: * Voluntary reports from practitioners and patients, not representative, no verification of causality.
 
 administrative_organization: * Maintained by the United States [Food and Drug Administration (FDA)](http://www.fda.gov/).
 
@@ -21,7 +21,7 @@ administrative_organization: * Maintained by the United States [Food and Drug Ad
 ~~~{reading_block}
 Please skim before you begin:
 
-1. `ASC_NTS.DOC` included in each quarterly zipped file, especially the Entity Relationship Diagram
+1. `ASC_NTS.DOC` included in each [quarterly zipped file](https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip), especially the Entity Relationship Diagram
 
 2. [Questions and Answers on FDA's Adverse Event Reporting System (FAERS)](https://www.fda.gov/drugs/surveillance/questions-and-answers-fdas-adverse-event-reporting-system-faers)
 
@@ -38,7 +38,7 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-Download any quarterly file:
+Download the quarterly file:
 
 ```{r eval = FALSE , results = "hide" }
 library(httr)
@@ -61,7 +61,7 @@ read_faers <-
 	}
 ```	
 
-Import multiple files from the current quarter:
+Import multiple tables from the downloaded quarter of microdata:
 ```{r eval = FALSE , results = "hide" }
 # one record per report
 faers_demo_df <- read_faers( grep( 'DEMO23Q1\\\\.txt$' , unzipped_files , value = TRUE ) )
@@ -84,7 +84,7 @@ faers_df <-	merge( faers_demo_df , faers_deaths_df )
 # confirm that the analysis file matches the number of death outcomes
 stopifnot( nrow( faers_deaths_df ) == nrow( faers_df ) )
 
-# confirm zero reports include multiple deaths
+# confirm zero reports include multiple deaths from the same reported adverse event
 stopifnot( nrow( faers_df ) == length( unique( faers_df[ , 'primaryid' ] ) ) )
 ```
 
@@ -142,10 +142,9 @@ needs_duckdb_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-This example matches
+This example matches the death frequency counts in the `OUTC23Q1.pdf` file in [the downloaded quarter](https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip):
 
 ```{r eval = FALSE , results = "hide" }
-
-
+stopifnot( nrow( faers_df ) == 37704 )
 ```
 ~~~
