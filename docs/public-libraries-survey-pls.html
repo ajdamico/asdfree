@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Trend Analysis of Complex Survey Data | Analyze Survey Data for Free</title>
-  <meta name="description" content="Trend Analysis of Complex Survey Data | Analyze Survey Data for Free" />
+  <title>Public Libraries Survey (PLS) | Analyze Survey Data for Free</title>
+  <meta name="description" content="Public Libraries Survey (PLS) | Analyze Survey Data for Free" />
   <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Trend Analysis of Complex Survey Data | Analyze Survey Data for Free" />
+  <meta property="og:title" content="Public Libraries Survey (PLS) | Analyze Survey Data for Free" />
   <meta property="og:type" content="book" />
   
   
   <meta name="github-repo" content="ajdamico/asdfree" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Trend Analysis of Complex Survey Data | Analyze Survey Data for Free" />
+  <meta name="twitter:title" content="Public Libraries Survey (PLS) | Analyze Survey Data for Free" />
   
   
   
@@ -28,8 +28,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="social-security-public-use-data-files-ssa.html"/>
-<link rel="next" href="youth-risk-behavior-surveillance-system-yrbss.html"/>
+<link rel="prev" href="programme-for-the-international-assessment-of-adult-competencies-piaac.html"/>
+<link rel="next" href="residential-energy-consumption-survey-recs.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -672,252 +672,244 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="trend-analysis-of-complex-survey-data" class="section level1 unnumbered hasAnchor">
-<h1>Trend Analysis of Complex Survey Data<a href="trend-analysis-of-complex-survey-data.html#trend-analysis-of-complex-survey-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p><em>Contributed by Thomas Yokota &lt;<a href="mailto:thomasyokota@gmail.com" class="email">thomasyokota@gmail.com</a>&gt;</em></p>
-<p>Professor <a href="mailto:vito.muggeo@unipa.it">Vito Muggeo</a> wrote the joinpoint analysis section of the code below and <a href="https://cran.r-project.org/web/packages/segmented/index.html">the <code>segmented</code> package</a>. Professor <a href="mailto:t.lumley@auckland.ac.nz">Dr. Thomas Lumley</a> wrote <a href="https://cran.r-project.org/web/packages/survey/NEWS">the <code>svypredmeans</code> function</a> to replicate SUDAAN’s <code>PREDMARG</code> command and match the CDC to the decimal. <a href="mailto:rxl1@cdc.gov">Dr. Richard Lowry, M.D.</a> at the Centers for Disease Control &amp; Prevention wrote <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf">the original linear trend analysis</a> and then answered our infinite questions. Thanks to everyone.</p>
-<p>The purpose of this analysis is to make statistically valid statements such as, <em>“there was a significant linear decrease in the prevalence of high school aged americans who have ever smoked a cigarette across the period 1999-2011”</em> with complex sample survey data.</p>
-<p>This step-by-step walkthrough exactly reproduces the statistics presented in the <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf">Center for Disease Control &amp; Prevention’s (CDC) linear trend analysis</a>. This analysis may complement qualitative evaluation on prevalence changes observed from surveillance data by providing quantitative evidence, such as when a joinpoint (also called breakpoint or changepoint) occurred; however, this analysis does not explain why or how changes in trends occur.</p>
-<div id="download-import-preparation-23" class="section level2 unnumbered hasAnchor">
-<h2>Download, Import, Preparation<a href="trend-analysis-of-complex-survey-data.html#download-import-preparation-23" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Download and import the multi-year stacked file:</p>
-<div class="sourceCode" id="cb669"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb669-1"><a href="trend-analysis-of-complex-survey-data.html#cb669-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SAScii)</span>
-<span id="cb669-2"><a href="trend-analysis-of-complex-survey-data.html#cb669-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb669-3"><a href="trend-analysis-of-complex-survey-data.html#cb669-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb669-4"><a href="trend-analysis-of-complex-survey-data.html#cb669-4" aria-hidden="true" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
-<span id="cb669-5"><a href="trend-analysis-of-complex-survey-data.html#cb669-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/healthyyouth/data/yrbs/sadc_2019/2019-SADC-SAS-Input-Program.sas&quot;</span></span>
-<span id="cb669-6"><a href="trend-analysis-of-complex-survey-data.html#cb669-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb669-7"><a href="trend-analysis-of-complex-survey-data.html#cb669-7" aria-hidden="true" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span></span>
-<span id="cb669-8"><a href="trend-analysis-of-complex-survey-data.html#cb669-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/healthyyouth/data/yrbs/sadc_2019/sadc_2019_national.dat&quot;</span></span>
-<span id="cb669-9"><a href="trend-analysis-of-complex-survey-data.html#cb669-9" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb669-10"><a href="trend-analysis-of-complex-survey-data.html#cb669-10" aria-hidden="true" tabindex="-1"></a>sas_positions <span class="ot">&lt;-</span></span>
-<span id="cb669-11"><a href="trend-analysis-of-complex-survey-data.html#cb669-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">parse.SAScii</span>( sas_url )</span>
-<span id="cb669-12"><a href="trend-analysis-of-complex-survey-data.html#cb669-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb669-13"><a href="trend-analysis-of-complex-survey-data.html#cb669-13" aria-hidden="true" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb669-14"><a href="trend-analysis-of-complex-survey-data.html#cb669-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tolower</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] )</span>
-<span id="cb669-15"><a href="trend-analysis-of-complex-survey-data.html#cb669-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb669-16"><a href="trend-analysis-of-complex-survey-data.html#cb669-16" aria-hidden="true" tabindex="-1"></a>variables_to_keep <span class="ot">&lt;-</span></span>
-<span id="cb669-17"><a href="trend-analysis-of-complex-survey-data.html#cb669-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&quot;sex&quot;</span> , <span class="st">&quot;grade&quot;</span> , <span class="st">&quot;race4&quot;</span> , <span class="st">&quot;q30&quot;</span> , <span class="st">&quot;year&quot;</span> , <span class="st">&quot;psu&quot;</span> , <span class="st">&quot;stratum&quot;</span> , <span class="st">&quot;weight&quot;</span> )</span>
-<span id="cb669-18"><a href="trend-analysis-of-complex-survey-data.html#cb669-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb669-19"><a href="trend-analysis-of-complex-survey-data.html#cb669-19" aria-hidden="true" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb669-20"><a href="trend-analysis-of-complex-survey-data.html#cb669-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>( <span class="sc">!</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="sc">%in%</span> variables_to_keep ) , <span class="st">&quot;_&quot;</span> ,</span>
-<span id="cb669-21"><a href="trend-analysis-of-complex-survey-data.html#cb669-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ifelse</span>( sas_positions[ , <span class="st">&#39;char&#39;</span> ] , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> ) )</span>
-<span id="cb669-22"><a href="trend-analysis-of-complex-survey-data.html#cb669-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb669-23"><a href="trend-analysis-of-complex-survey-data.html#cb669-23" aria-hidden="true" tabindex="-1"></a>yrbss_tbl <span class="ot">&lt;-</span></span>
-<span id="cb669-24"><a href="trend-analysis-of-complex-survey-data.html#cb669-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_fwf</span>(</span>
-<span id="cb669-25"><a href="trend-analysis-of-complex-survey-data.html#cb669-25" aria-hidden="true" tabindex="-1"></a>        dat_url ,</span>
-<span id="cb669-26"><a href="trend-analysis-of-complex-survey-data.html#cb669-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">fwf_widths</span>( </span>
-<span id="cb669-27"><a href="trend-analysis-of-complex-survey-data.html#cb669-27" aria-hidden="true" tabindex="-1"></a>            <span class="fu">abs</span>( sas_positions[ , <span class="st">&#39;width&#39;</span> ] ) , </span>
-<span id="cb669-28"><a href="trend-analysis-of-complex-survey-data.html#cb669-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">col_names =</span> sas_positions[ , <span class="st">&#39;varname&#39;</span> ] </span>
-<span id="cb669-29"><a href="trend-analysis-of-complex-survey-data.html#cb669-29" aria-hidden="true" tabindex="-1"></a>        ) ,</span>
-<span id="cb669-30"><a href="trend-analysis-of-complex-survey-data.html#cb669-30" aria-hidden="true" tabindex="-1"></a>        <span class="at">col_types =</span> <span class="fu">paste0</span>( sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] , <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> ) ,</span>
-<span id="cb669-31"><a href="trend-analysis-of-complex-survey-data.html#cb669-31" aria-hidden="true" tabindex="-1"></a>        <span class="at">na =</span> <span class="fu">c</span>( <span class="st">&quot;&quot;</span> , <span class="st">&quot;.&quot;</span> )</span>
-<span id="cb669-32"><a href="trend-analysis-of-complex-survey-data.html#cb669-32" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb669-33"><a href="trend-analysis-of-complex-survey-data.html#cb669-33" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb669-34"><a href="trend-analysis-of-complex-survey-data.html#cb669-34" aria-hidden="true" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( yrbss_tbl )</span></code></pre></div>
-<p>Restrict the dataset to only years shown in the original analysis and re-name the main variable:</p>
-<div class="sourceCode" id="cb670"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb670-1"><a href="trend-analysis-of-complex-survey-data.html#cb670-1" aria-hidden="true" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( yrbss_df , year <span class="sc">%in%</span> <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) )</span>
-<span id="cb670-2"><a href="trend-analysis-of-complex-survey-data.html#cb670-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb670-3"><a href="trend-analysis-of-complex-survey-data.html#cb670-3" aria-hidden="true" tabindex="-1"></a>yrbss_df[ , <span class="st">&#39;ever_smoked&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb670-4"><a href="trend-analysis-of-complex-survey-data.html#cb670-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.numeric</span>( yrbss_df[ , <span class="st">&#39;q30&#39;</span> ] <span class="sc">==</span> <span class="dv">1</span> )</span>
-<span id="cb670-5"><a href="trend-analysis-of-complex-survey-data.html#cb670-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb670-6"><a href="trend-analysis-of-complex-survey-data.html#cb670-6" aria-hidden="true" tabindex="-1"></a>yrbss_df[ , <span class="st">&#39;q30&#39;</span> ] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
-<p>Recode each categorical variable to factor class:</p>
-<div class="sourceCode" id="cb671"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb671-1"><a href="trend-analysis-of-complex-survey-data.html#cb671-1" aria-hidden="true" tabindex="-1"></a>yrbss_df[ , <span class="st">&#39;sex&#39;</span> ] <span class="ot">&lt;-</span> <span class="fu">relevel</span>( <span class="fu">factor</span>( yrbss_df[ , <span class="st">&#39;sex&#39;</span> ] ) , <span class="at">ref =</span> <span class="st">&quot;2&quot;</span> )</span>
-<span id="cb671-2"><a href="trend-analysis-of-complex-survey-data.html#cb671-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb671-3"><a href="trend-analysis-of-complex-survey-data.html#cb671-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ( i <span class="cf">in</span> <span class="fu">c</span>( <span class="st">&#39;race4&#39;</span> , <span class="st">&#39;grade&#39;</span> ) ){</span>
-<span id="cb671-4"><a href="trend-analysis-of-complex-survey-data.html#cb671-4" aria-hidden="true" tabindex="-1"></a>    yrbss_df[ , i ] <span class="ot">&lt;-</span> <span class="fu">relevel</span>( <span class="fu">factor</span>( yrbss_df[ , i ] ) , <span class="at">ref =</span> <span class="st">&quot;1&quot;</span> )</span>
-<span id="cb671-5"><a href="trend-analysis-of-complex-survey-data.html#cb671-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-</div>
-<div id="append-polynomials-to-each-year" class="section level2 unnumbered hasAnchor">
-<h2>Append Polynomials to Each Year<a href="trend-analysis-of-complex-survey-data.html#append-polynomials-to-each-year" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><em>“The polynomials we have used as predictors to this point are natural polynomials, generated from the linear predictor by centering and then powering the linear predictor.”</em></p>
-<p>For more detail on this subject, see page 216 of Applied Multiple Regression/Correlation Analysis for the Behavioral Sciences By Jacob Cohen, Patricia Cohen, Stephen G. West, Leona S. Aiken</p>
-<div class="sourceCode" id="cb672"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb672-1"><a href="trend-analysis-of-complex-survey-data.html#cb672-1" aria-hidden="true" tabindex="-1"></a>distinct_years_available <span class="ot">&lt;-</span> <span class="fu">length</span>( <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) )</span>
-<span id="cb672-2"><a href="trend-analysis-of-complex-survey-data.html#cb672-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb672-3"><a href="trend-analysis-of-complex-survey-data.html#cb672-3" aria-hidden="true" tabindex="-1"></a><span class="co"># store the linear polynomials</span></span>
-<span id="cb672-4"><a href="trend-analysis-of-complex-survey-data.html#cb672-4" aria-hidden="true" tabindex="-1"></a>c11l <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( distinct_years_available )[ , <span class="st">&quot;.L&quot;</span> ]</span>
-<span id="cb672-5"><a href="trend-analysis-of-complex-survey-data.html#cb672-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb672-6"><a href="trend-analysis-of-complex-survey-data.html#cb672-6" aria-hidden="true" tabindex="-1"></a><span class="co"># store the quadratic polynomials</span></span>
-<span id="cb672-7"><a href="trend-analysis-of-complex-survey-data.html#cb672-7" aria-hidden="true" tabindex="-1"></a>c11q <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( distinct_years_available )[ , <span class="st">&quot;.Q&quot;</span> ]</span>
-<span id="cb672-8"><a href="trend-analysis-of-complex-survey-data.html#cb672-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb672-9"><a href="trend-analysis-of-complex-survey-data.html#cb672-9" aria-hidden="true" tabindex="-1"></a><span class="co"># store the cubic polynomials</span></span>
-<span id="cb672-10"><a href="trend-analysis-of-complex-survey-data.html#cb672-10" aria-hidden="true" tabindex="-1"></a>c11c <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( distinct_years_available )[ , <span class="st">&quot;.C&quot;</span> ]</span></code></pre></div>
-<p>For each record in the data set, tack on the linear, quadratic, and cubic contrast value, these contrast values will serve as replacement for the linear <code>year</code> variable in any regression:</p>
-<div class="sourceCode" id="cb673"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb673-1"><a href="trend-analysis-of-complex-survey-data.html#cb673-1" aria-hidden="true" tabindex="-1"></a><span class="co"># year^1 term (linear)</span></span>
-<span id="cb673-2"><a href="trend-analysis-of-complex-survey-data.html#cb673-2" aria-hidden="true" tabindex="-1"></a>yrbss_df[ , <span class="st">&quot;t11l&quot;</span> ] <span class="ot">&lt;-</span> c11l[ <span class="fu">match</span>( yrbss_df[ , <span class="st">&quot;year&quot;</span> ] , <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) ) ]</span>
-<span id="cb673-3"><a href="trend-analysis-of-complex-survey-data.html#cb673-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb673-4"><a href="trend-analysis-of-complex-survey-data.html#cb673-4" aria-hidden="true" tabindex="-1"></a><span class="co"># year^2 term (quadratic)</span></span>
-<span id="cb673-5"><a href="trend-analysis-of-complex-survey-data.html#cb673-5" aria-hidden="true" tabindex="-1"></a>yrbss_df[ , <span class="st">&quot;t11q&quot;</span> ] <span class="ot">&lt;-</span> c11q[ <span class="fu">match</span>( yrbss_df[ , <span class="st">&quot;year&quot;</span> ] , <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) ) ]</span>
-<span id="cb673-6"><a href="trend-analysis-of-complex-survey-data.html#cb673-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb673-7"><a href="trend-analysis-of-complex-survey-data.html#cb673-7" aria-hidden="true" tabindex="-1"></a><span class="co"># year^3 term (cubic)</span></span>
-<span id="cb673-8"><a href="trend-analysis-of-complex-survey-data.html#cb673-8" aria-hidden="true" tabindex="-1"></a>yrbss_df[ , <span class="st">&quot;t11c&quot;</span> ] <span class="ot">&lt;-</span> c11c[ <span class="fu">match</span>( yrbss_df[ , <span class="st">&quot;year&quot;</span> ] , <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) ) ]</span></code></pre></div>
-</div>
-<div id="unadjusted-analysis-examples" class="section level2 unnumbered hasAnchor">
-<h2>Unadjusted Analysis Examples<a href="trend-analysis-of-complex-survey-data.html#unadjusted-analysis-examples" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Construct a complex sample survey design and match the <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6">published unadjusted prevalence rates</a>:</p>
-<div class="sourceCode" id="cb674"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb674-1"><a href="trend-analysis-of-complex-survey-data.html#cb674-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>( <span class="at">survey.lonely.psu =</span> <span class="st">&quot;adjust&quot;</span> )</span>
-<span id="cb674-2"><a href="trend-analysis-of-complex-survey-data.html#cb674-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb674-3"><a href="trend-analysis-of-complex-survey-data.html#cb674-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb674-4"><a href="trend-analysis-of-complex-survey-data.html#cb674-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb674-5"><a href="trend-analysis-of-complex-survey-data.html#cb674-5" aria-hidden="true" tabindex="-1"></a>des <span class="ot">&lt;-</span> </span>
-<span id="cb674-6"><a href="trend-analysis-of-complex-survey-data.html#cb674-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
-<span id="cb674-7"><a href="trend-analysis-of-complex-survey-data.html#cb674-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span>psu , </span>
-<span id="cb674-8"><a href="trend-analysis-of-complex-survey-data.html#cb674-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span><span class="fu">interaction</span>( stratum , year ) ,</span>
-<span id="cb674-9"><a href="trend-analysis-of-complex-survey-data.html#cb674-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> yrbss_df , </span>
-<span id="cb674-10"><a href="trend-analysis-of-complex-survey-data.html#cb674-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span>weight , </span>
-<span id="cb674-11"><a href="trend-analysis-of-complex-survey-data.html#cb674-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span></span>
-<span id="cb674-12"><a href="trend-analysis-of-complex-survey-data.html#cb674-12" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb674-13"><a href="trend-analysis-of-complex-survey-data.html#cb674-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb674-14"><a href="trend-analysis-of-complex-survey-data.html#cb674-14" aria-hidden="true" tabindex="-1"></a>prevalence_over_time <span class="ot">&lt;-</span></span>
-<span id="cb674-15"><a href="trend-analysis-of-complex-survey-data.html#cb674-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb674-16"><a href="trend-analysis-of-complex-survey-data.html#cb674-16" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> ever_smoked , </span>
-<span id="cb674-17"><a href="trend-analysis-of-complex-survey-data.html#cb674-17" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> year , </span>
-<span id="cb674-18"><a href="trend-analysis-of-complex-survey-data.html#cb674-18" aria-hidden="true" tabindex="-1"></a>        des , </span>
-<span id="cb674-19"><a href="trend-analysis-of-complex-survey-data.html#cb674-19" aria-hidden="true" tabindex="-1"></a>        svymean , </span>
-<span id="cb674-20"><a href="trend-analysis-of-complex-survey-data.html#cb674-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb674-21"><a href="trend-analysis-of-complex-survey-data.html#cb674-21" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb674-22"><a href="trend-analysis-of-complex-survey-data.html#cb674-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb674-23"><a href="trend-analysis-of-complex-survey-data.html#cb674-23" aria-hidden="true" tabindex="-1"></a><span class="co"># confirm prevalence rates match published estimates</span></span>
-<span id="cb674-24"><a href="trend-analysis-of-complex-survey-data.html#cb674-24" aria-hidden="true" tabindex="-1"></a><span class="co"># of high school students that ever smoked</span></span>
-<span id="cb674-25"><a href="trend-analysis-of-complex-survey-data.html#cb674-25" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
-<span id="cb674-26"><a href="trend-analysis-of-complex-survey-data.html#cb674-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all.equal</span>( </span>
-<span id="cb674-27"><a href="trend-analysis-of-complex-survey-data.html#cb674-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">round</span>( <span class="fu">coef</span>( prevalence_over_time ) , <span class="dv">3</span> ) , </span>
-<span id="cb674-28"><a href="trend-analysis-of-complex-survey-data.html#cb674-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>( .<span class="dv">701</span> , .<span class="dv">695</span> , .<span class="dv">713</span> , .<span class="dv">702</span> , .<span class="dv">704</span> , .<span class="dv">639</span> , .<span class="dv">584</span> , .<span class="dv">543</span> , .<span class="dv">503</span> , .<span class="dv">463</span> , .<span class="dv">447</span> ) ,</span>
-<span id="cb674-29"><a href="trend-analysis-of-complex-survey-data.html#cb674-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">check.attributes =</span> <span class="cn">FALSE</span></span>
-<span id="cb674-30"><a href="trend-analysis-of-complex-survey-data.html#cb674-30" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb674-31"><a href="trend-analysis-of-complex-survey-data.html#cb674-31" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-</div>
-<div id="calculate-joinpoints-needed" class="section level2 unnumbered hasAnchor">
-<h2>Calculate Joinpoints Needed<a href="trend-analysis-of-complex-survey-data.html#calculate-joinpoints-needed" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Using the orthogonal coefficients (linear, quadratic, cubic terms) that we previously added to our <code>yrbss_df</code> object before constructing the multi-year stacked survey design, determine how many joinpoints will be needed for a trend analysis.</p>
-<p>Epidemiological models typically control for possible confounding variables such as age, sex, and race/ethnicity, so those have been included alongside the linear, cubic, and quadratic year terms.</p>
-<p>Calculate the “ever smoked” regression, adjusted by sex, grade, race/ethnicity, and linear year contrast:</p>
-<div class="sourceCode" id="cb675"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb675-1"><a href="trend-analysis-of-complex-survey-data.html#cb675-1" aria-hidden="true" tabindex="-1"></a>linyear <span class="ot">&lt;-</span> </span>
-<span id="cb675-2"><a href="trend-analysis-of-complex-survey-data.html#cb675-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
-<span id="cb675-3"><a href="trend-analysis-of-complex-survey-data.html#cb675-3" aria-hidden="true" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t11l , </span>
-<span id="cb675-4"><a href="trend-analysis-of-complex-survey-data.html#cb675-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">design =</span> des , </span>
-<span id="cb675-5"><a href="trend-analysis-of-complex-survey-data.html#cb675-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial</span>
-<span id="cb675-6"><a href="trend-analysis-of-complex-survey-data.html#cb675-6" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb675-7"><a href="trend-analysis-of-complex-survey-data.html#cb675-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb675-8"><a href="trend-analysis-of-complex-survey-data.html#cb675-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( linyear )</span></code></pre></div>
-<p>The linear year-contrast variable <code>t11l</code> is significant. Therefore, there is probably going to be some sort of trend. A linear trend by itself does not need joinpoints. Not one, just zero joinpoints. If the linear term were the only significant term (out of linear, quadratic, cubic), then we would not need to calculate a joinpoint. In other words, we would not need to figure out where to best break our time trend into two, three, or even four segments.</p>
-<p>Since the linear trend is significant, we know there is at least one change across the entire 1991 to 2011 period.</p>
+<div id="public-libraries-survey-pls" class="section level1 unnumbered hasAnchor">
+<h1>Public Libraries Survey (PLS)<a href="public-libraries-survey-pls.html#public-libraries-survey-pls" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><a href="https://github.com/asdfree/pls/actions"><img src="https://github.com/asdfree/pls/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+<p>An annual census of public libraries in the United States.</p>
+<ul>
+<li><p>One table with one row per state, a second table with one row per library system, and a third table with one row per library building or bookmobile.</p></li>
+<li></li>
+<li><p>Released annually since 1992.</p></li>
+<li><p>Conducted by the <a href="https://www.imls.gov/">Institute of Museum and Library Services (IMLS)</a> and collected by the <a href="http://www.census.gov/">US Census Bureau</a>.</p></li>
+</ul>
 <hr />
-<p><strong>Interpretation note</strong> about segments of time: The linear term <code>t11l</code> was significant, so we probably have a significant linear trend somewhere to report. Now we need to figure out when that significant linear trend started and when it ended. It might be semantically true that there was a significant linear decrease in high school aged smoking over the entire period of our data 1991-2011; however, it’s inexact to end this analysis after only detecting a linear trend. The purpose of the following few steps is to <em>cordon off</em> different time points from one another. As you’ll see later, there actually was not any detectable decrease from 1991-1999. The entirety of the decline in smoking occurred over the period from 1999-2011. So these next (methodologically tricky) steps serve to provide you and your audience with a more careful statement of statistical significance. It’s not technically wrong to conclude that smoking declined over the period of 1991-2011, it’s just verbose.</p>
-<p>Think of it as the difference between “humans first walked on the moon in the sixties” and “humans first walked on the moon in 1969” - both statements are correct, but the latter exhibits greater scientific precision.</p>
+<p>Please skim before you begin:</p>
+<ol style="list-style-type: decimal">
+<li></li>
+<li></li>
+<li>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Public%20Libraries%20Survey">artificial intelligence-generated limericks</a></li>
+</ol>
+<div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb522-1"><a href="public-libraries-survey-pls.html#cb522-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb522-2"><a href="public-libraries-survey-pls.html#cb522-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb522-3"><a href="public-libraries-survey-pls.html#cb522-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span></code></pre></div>
 <hr />
-<p>Calculate the “ever smoked” binomial regression, adjusted by sex, grade, race/ethnicity, and both linear and quadratic year contrasts. Notice the addition of <code>t11q</code>:</p>
-<div class="sourceCode" id="cb676"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb676-1"><a href="trend-analysis-of-complex-survey-data.html#cb676-1" aria-hidden="true" tabindex="-1"></a>quadyear <span class="ot">&lt;-</span></span>
-<span id="cb676-2"><a href="trend-analysis-of-complex-survey-data.html#cb676-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
-<span id="cb676-3"><a href="trend-analysis-of-complex-survey-data.html#cb676-3" aria-hidden="true" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t11l <span class="sc">+</span> t11q , </span>
-<span id="cb676-4"><a href="trend-analysis-of-complex-survey-data.html#cb676-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">design =</span> des , </span>
-<span id="cb676-5"><a href="trend-analysis-of-complex-survey-data.html#cb676-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial </span>
-<span id="cb676-6"><a href="trend-analysis-of-complex-survey-data.html#cb676-6" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb676-7"><a href="trend-analysis-of-complex-survey-data.html#cb676-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb676-8"><a href="trend-analysis-of-complex-survey-data.html#cb676-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( quadyear )</span></code></pre></div>
-<p>The linear year-contrast variable is significant but the quadratic year-contrast variable is also significant. Therefore, we should use joinpoint software (the <code>segmented</code> package) for this analysis. A significant quadratic trend needs one joinpoint.</p>
-<p>Since both linear and quadratic terms are significant, we can also move ahead and test whether the cubic term is also significant.</p>
-<p>Calculate the “ever smoked” binomial regression, adjusted by sex, grade, race/ethnicity, and linear, quadratic, and cubic year contrasts. Notice the addition of <code>t11c</code>:</p>
-<div class="sourceCode" id="cb677"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb677-1"><a href="trend-analysis-of-complex-survey-data.html#cb677-1" aria-hidden="true" tabindex="-1"></a>cubyear <span class="ot">&lt;-</span></span>
-<span id="cb677-2"><a href="trend-analysis-of-complex-survey-data.html#cb677-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
-<span id="cb677-3"><a href="trend-analysis-of-complex-survey-data.html#cb677-3" aria-hidden="true" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t11l <span class="sc">+</span> t11q <span class="sc">+</span> t11c , </span>
-<span id="cb677-4"><a href="trend-analysis-of-complex-survey-data.html#cb677-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">design =</span> des , </span>
-<span id="cb677-5"><a href="trend-analysis-of-complex-survey-data.html#cb677-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial </span>
-<span id="cb677-6"><a href="trend-analysis-of-complex-survey-data.html#cb677-6" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb677-7"><a href="trend-analysis-of-complex-survey-data.html#cb677-7" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb677-8"><a href="trend-analysis-of-complex-survey-data.html#cb677-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( cubyear )</span></code></pre></div>
-<p>The cubic year-contrast term is also significant in this model. Therefore, we might potentially evaluate this trend using two joinpoints. In other words, a significant result for all linear, quadratic, and cubic year contrasts at this point means we might be able to evaluate three distinct trends (separated by our two joinpoints) across the broader 1991 - 2011 time period of analysis.</p>
-<p>Although we might now have the statistical ability to analyze three distinct time periods (separated by two joinpoints) across our data, the utility of this depends on the circumstances. Cubic and higher polynomials account for not only the direction of change but also the pace of that change, allowing statistical statements that might not be of interest to an audience: While it might be an exercise in precision to conclude that smoking rates dropped quickest across 1999-2003 and less quickly across 2003-2011, that scientific pair of findings may not be as compelling as the simpler (quadratic but not cubic) statement that smoking rates have dropped across the period of 1999-2011.</p>
+<div id="download-import-preparation-18" class="section level2 unnumbered hasAnchor">
+<h2>Download, Import, Preparation<a href="public-libraries-survey-pls.html#download-import-preparation-18" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Download and import the most recent administrative entity sas file:</p>
+<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="public-libraries-survey-pls.html#cb523-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb523-2"><a href="public-libraries-survey-pls.html#cb523-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb523-3"><a href="public-libraries-survey-pls.html#cb523-3" aria-hidden="true" tabindex="-1"></a>this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb523-4"><a href="public-libraries-survey-pls.html#cb523-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb523-5"><a href="public-libraries-survey-pls.html#cb523-5" aria-hidden="true" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.imls.gov/sites/default/files/2022-07/pls_fy2020_sas.zip&quot;</span></span>
+<span id="cb523-6"><a href="public-libraries-survey-pls.html#cb523-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb523-7"><a href="public-libraries-survey-pls.html#cb523-7" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( sas_url , this_tf, <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb523-8"><a href="public-libraries-survey-pls.html#cb523-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb523-9"><a href="public-libraries-survey-pls.html#cb523-9" aria-hidden="true" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb523-10"><a href="public-libraries-survey-pls.html#cb523-10" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb523-11"><a href="public-libraries-survey-pls.html#cb523-11" aria-hidden="true" tabindex="-1"></a>administrative_entity_sas_fn <span class="ot">&lt;-</span></span>
+<span id="cb523-12"><a href="public-libraries-survey-pls.html#cb523-12" aria-hidden="true" tabindex="-1"></a>    unzipped_files[ <span class="fu">grepl</span>( <span class="st">&#39;AE(.*)sas7bdat$&#39;</span> , <span class="fu">basename</span>( unzipped_files ) ) ]</span>
+<span id="cb523-13"><a href="public-libraries-survey-pls.html#cb523-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb523-14"><a href="public-libraries-survey-pls.html#cb523-14" aria-hidden="true" tabindex="-1"></a>pls_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( administrative_entity_sas_fn )</span>
+<span id="cb523-15"><a href="public-libraries-survey-pls.html#cb523-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb523-16"><a href="public-libraries-survey-pls.html#cb523-16" aria-hidden="true" tabindex="-1"></a>pls_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( pls_tbl )</span>
+<span id="cb523-17"><a href="public-libraries-survey-pls.html#cb523-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb523-18"><a href="public-libraries-survey-pls.html#cb523-18" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( pls_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( pls_df ) )</span>
+<span id="cb523-19"><a href="public-libraries-survey-pls.html#cb523-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb523-20"><a href="public-libraries-survey-pls.html#cb523-20" aria-hidden="true" tabindex="-1"></a>pls_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
+<p>Recode missing values as described in the readme included with each zipped file:</p>
+<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb524-1"><a href="public-libraries-survey-pls.html#cb524-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>( this_col <span class="cf">in</span> <span class="fu">names</span>( pls_df ) ){</span>
+<span id="cb524-2"><a href="public-libraries-survey-pls.html#cb524-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb524-3"><a href="public-libraries-survey-pls.html#cb524-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>( <span class="fu">class</span>( pls_df[ , this_col ] ) <span class="sc">==</span> <span class="st">&#39;character&#39;</span> ){</span>
+<span id="cb524-4"><a href="public-libraries-survey-pls.html#cb524-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb524-5"><a href="public-libraries-survey-pls.html#cb524-5" aria-hidden="true" tabindex="-1"></a>        pls_df[ pls_df[ , this_col ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , this_col ] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb524-6"><a href="public-libraries-survey-pls.html#cb524-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb524-7"><a href="public-libraries-survey-pls.html#cb524-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb524-8"><a href="public-libraries-survey-pls.html#cb524-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb524-9"><a href="public-libraries-survey-pls.html#cb524-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>( </span>
+<span id="cb524-10"><a href="public-libraries-survey-pls.html#cb524-10" aria-hidden="true" tabindex="-1"></a>        ( <span class="fu">class</span>( pls_df[ , this_col ] ) <span class="sc">==</span> <span class="st">&#39;numeric&#39;</span> ) <span class="sc">|</span> </span>
+<span id="cb524-11"><a href="public-libraries-survey-pls.html#cb524-11" aria-hidden="true" tabindex="-1"></a>        ( this_col <span class="sc">%in%</span> <span class="fu">c</span>( <span class="st">&#39;phone&#39;</span> , <span class="st">&#39;startdat&#39;</span> , <span class="st">&#39;enddate&#39;</span> ) ) </span>
+<span id="cb524-12"><a href="public-libraries-survey-pls.html#cb524-12" aria-hidden="true" tabindex="-1"></a>    ){</span>
+<span id="cb524-13"><a href="public-libraries-survey-pls.html#cb524-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb524-14"><a href="public-libraries-survey-pls.html#cb524-14" aria-hidden="true" tabindex="-1"></a>        pls_df[ pls_df[ , this_col ] <span class="sc">%in%</span> <span class="fu">c</span>( <span class="sc">-</span><span class="dv">1</span> , <span class="sc">-</span><span class="dv">3</span> , <span class="sc">-</span><span class="dv">4</span> , <span class="sc">-</span><span class="dv">9</span> ) , this_col ] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb524-15"><a href="public-libraries-survey-pls.html#cb524-15" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb524-16"><a href="public-libraries-survey-pls.html#cb524-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb524-17"><a href="public-libraries-survey-pls.html#cb524-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb524-18"><a href="public-libraries-survey-pls.html#cb524-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div id="save-locally-18" class="section level3 unnumbered hasAnchor">
+<h3>Save locally  <a href="public-libraries-survey-pls.html#save-locally-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Save the object at any point:</p>
+<div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb525-1"><a href="public-libraries-survey-pls.html#cb525-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pls_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;PLS&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb525-2"><a href="public-libraries-survey-pls.html#cb525-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( pls_df , file = pls_fn , compress = FALSE )</span></span></code></pre></div>
+<p>Load the same object:</p>
+<div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb526-1"><a href="public-libraries-survey-pls.html#cb526-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pls_df &lt;- readRDS( pls_fn )</span></span></code></pre></div>
 </div>
-<div id="calculate-predicted-marginals" class="section level2 unnumbered hasAnchor">
-<h2>Calculate Predicted Marginals<a href="trend-analysis-of-complex-survey-data.html#calculate-predicted-marginals" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Calculate the survey-year-independent predictor effects and store these results:</p>
-<div class="sourceCode" id="cb678"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb678-1"><a href="trend-analysis-of-complex-survey-data.html#cb678-1" aria-hidden="true" tabindex="-1"></a>marginals <span class="ot">&lt;-</span> </span>
-<span id="cb678-2"><a href="trend-analysis-of-complex-survey-data.html#cb678-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
-<span id="cb678-3"><a href="trend-analysis-of-complex-survey-data.html#cb678-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">formula =</span> ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade ,</span>
-<span id="cb678-4"><a href="trend-analysis-of-complex-survey-data.html#cb678-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">design =</span> des , </span>
-<span id="cb678-5"><a href="trend-analysis-of-complex-survey-data.html#cb678-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial</span>
-<span id="cb678-6"><a href="trend-analysis-of-complex-survey-data.html#cb678-6" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
-<p>Run these marginals through the <code>svypredmeans</code> function. For archaeology fans out there, this function emulates the <code>PREDMARG</code> statement in the ancient language of SUDAAN:</p>
-<div class="sourceCode" id="cb679"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb679-1"><a href="trend-analysis-of-complex-survey-data.html#cb679-1" aria-hidden="true" tabindex="-1"></a>( means_for_joinpoint <span class="ot">&lt;-</span> <span class="fu">svypredmeans</span>( marginals , <span class="sc">~</span><span class="fu">factor</span>( year ) ) )</span></code></pre></div>
-<p>Clean up these results a bit in preparation for a joinpoint analysis:</p>
-<div class="sourceCode" id="cb680"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb680-1"><a href="trend-analysis-of-complex-survey-data.html#cb680-1" aria-hidden="true" tabindex="-1"></a><span class="co"># coerce the results to a data.frame object</span></span>
-<span id="cb680-2"><a href="trend-analysis-of-complex-survey-data.html#cb680-2" aria-hidden="true" tabindex="-1"></a>means_for_joinpoint <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>( means_for_joinpoint )</span>
-<span id="cb680-3"><a href="trend-analysis-of-complex-survey-data.html#cb680-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb680-4"><a href="trend-analysis-of-complex-survey-data.html#cb680-4" aria-hidden="true" tabindex="-1"></a><span class="co"># extract the row names as the survey year</span></span>
-<span id="cb680-5"><a href="trend-analysis-of-complex-survey-data.html#cb680-5" aria-hidden="true" tabindex="-1"></a>means_for_joinpoint[ , <span class="st">&quot;year&quot;</span> ] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>( <span class="fu">rownames</span>( means_for_joinpoint ) )</span>
-<span id="cb680-6"><a href="trend-analysis-of-complex-survey-data.html#cb680-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb680-7"><a href="trend-analysis-of-complex-survey-data.html#cb680-7" aria-hidden="true" tabindex="-1"></a><span class="co"># must be sorted, just in case it&#39;s not already</span></span>
-<span id="cb680-8"><a href="trend-analysis-of-complex-survey-data.html#cb680-8" aria-hidden="true" tabindex="-1"></a>means_for_joinpoint <span class="ot">&lt;-</span> means_for_joinpoint[ <span class="fu">order</span>( means_for_joinpoint[ , <span class="st">&quot;year&quot;</span> ] ) , ]</span></code></pre></div>
+<div id="variable-recoding-18" class="section level3 unnumbered hasAnchor">
+<h3>Variable Recoding<a href="public-libraries-survey-pls.html#variable-recoding-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Add new columns to the data set:</p>
+<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="public-libraries-survey-pls.html#cb527-1" aria-hidden="true" tabindex="-1"></a>pls_df <span class="ot">&lt;-</span> </span>
+<span id="cb527-2"><a href="public-libraries-survey-pls.html#cb527-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transform</span>( </span>
+<span id="cb527-3"><a href="public-libraries-survey-pls.html#cb527-3" aria-hidden="true" tabindex="-1"></a>        pls_df , </span>
+<span id="cb527-4"><a href="public-libraries-survey-pls.html#cb527-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb527-5"><a href="public-libraries-survey-pls.html#cb527-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">c_relatn =</span> </span>
+<span id="cb527-6"><a href="public-libraries-survey-pls.html#cb527-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( c_relatn , <span class="at">levels =</span> <span class="fu">c</span>( <span class="st">&quot;HQ&quot;</span> , <span class="st">&quot;ME&quot;</span> , <span class="st">&quot;NO&quot;</span> ) ,</span>
+<span id="cb527-7"><a href="public-libraries-survey-pls.html#cb527-7" aria-hidden="true" tabindex="-1"></a>                <span class="fu">c</span>( <span class="st">&quot;HQ-Headquarters of a federation or cooperative&quot;</span> ,</span>
+<span id="cb527-8"><a href="public-libraries-survey-pls.html#cb527-8" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;ME-Member of a federation or cooperative&quot;</span> ,</span>
+<span id="cb527-9"><a href="public-libraries-survey-pls.html#cb527-9" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;NO-Not a member of a federation or cooperative&quot;</span> )</span>
+<span id="cb527-10"><a href="public-libraries-survey-pls.html#cb527-10" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
+<span id="cb527-11"><a href="public-libraries-survey-pls.html#cb527-11" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb527-12"><a href="public-libraries-survey-pls.html#cb527-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">more_than_one_librarian =</span> <span class="fu">as.numeric</span>( libraria <span class="sc">&gt;</span> <span class="dv">1</span> )</span>
+<span id="cb527-13"><a href="public-libraries-survey-pls.html#cb527-13" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb527-14"><a href="public-libraries-survey-pls.html#cb527-14" aria-hidden="true" tabindex="-1"></a>    )   </span></code></pre></div>
+<hr />
 </div>
-<div id="identify-joinpoints-or-breakpoints" class="section level2 unnumbered hasAnchor">
-<h2>Identify Joinpoint(s) or Breakpoint(s)<a href="trend-analysis-of-complex-survey-data.html#identify-joinpoints-or-breakpoints" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Let’s take a look at how confident we are in the value at each adjusted timepoint. Carrying out a trend analysis requires creating new weights to fit a piecewise linear regression. First, create that weight variable:</p>
-<div class="sourceCode" id="cb681"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb681-1"><a href="trend-analysis-of-complex-survey-data.html#cb681-1" aria-hidden="true" tabindex="-1"></a>means_for_joinpoint[ , <span class="st">&quot;wgt&quot;</span> ] <span class="ot">&lt;-</span> <span class="fu">with</span>( means_for_joinpoint, ( mean <span class="sc">/</span> SE ) <span class="sc">^</span> <span class="dv">2</span> ) </span></code></pre></div>
-<p>Second, fit a piecewise linear regression, estimating the ‘starting’ linear model with the usual <code>lm</code> function using the log values and the weights:</p>
-<div class="sourceCode" id="cb682"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb682-1"><a href="trend-analysis-of-complex-survey-data.html#cb682-1" aria-hidden="true" tabindex="-1"></a>o <span class="ot">&lt;-</span> <span class="fu">lm</span>( <span class="fu">log</span>( mean ) <span class="sc">~</span> year , <span class="at">weights =</span> wgt , <span class="at">data =</span> means_for_joinpoint )</span></code></pre></div>
-<p>Now that the regression has been structured correctly, estimate the year that our complex survey trend should be broken into two or more segments:</p>
-<div class="sourceCode" id="cb683"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb683-1"><a href="trend-analysis-of-complex-survey-data.html#cb683-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(segmented)</span>
-<span id="cb683-2"><a href="trend-analysis-of-complex-survey-data.html#cb683-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb683-3"><a href="trend-analysis-of-complex-survey-data.html#cb683-3" aria-hidden="true" tabindex="-1"></a><span class="co"># find only one joinpoint</span></span>
-<span id="cb683-4"><a href="trend-analysis-of-complex-survey-data.html#cb683-4" aria-hidden="true" tabindex="-1"></a>os <span class="ot">&lt;-</span> <span class="fu">segmented</span>( o , <span class="sc">~</span>year )</span>
-<span id="cb683-5"><a href="trend-analysis-of-complex-survey-data.html#cb683-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb683-6"><a href="trend-analysis-of-complex-survey-data.html#cb683-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( os )</span></code></pre></div>
-<p>Look for the <code>Estimated Break-Point(s)</code> in that result - that’s the critical number from this joinpoint analysis. The <code>segmented</code> package uses an iterative procedure (described in the article below); between-year solutions are returned and should be rounded to the nearest time point in the analysis. The joinpoint software implements two estimating algorithms: the grid-search and the Hudson algorithm. For more detail about these methods, see <a href="http://onlinelibrary.wiley.com/doi/10.1002/sim.1545/abstract">Muggeo V. (2003) Estimating regression models with unknown break-points. Statistics in Medicine, 22: 3055-3071.</a>.</p>
-<p>Obtain the annual percent change estimates for each time point:</p>
-<div class="sourceCode" id="cb684"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb684-1"><a href="trend-analysis-of-complex-survey-data.html#cb684-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slope</span>( os , <span class="at">APC =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>The confidence intervals for the annual percent change (APC) may be different from the ones returned by <a href="surveillance.cancer.gov/joinpoint/">NCI’s Joinpoint Software</a>; for further details, check out <a href="http://onlinelibrary.wiley.com/doi/10.1002/sim.3850/abstract">Muggeo V. (2010) A Comment on `Estimating average annual per cent change in trend analysis’ by Clegg et al., Statistics in Medicine; 28, 3670-3682. Statistics in Medicine, 29, 1958-1960.</a></p>
-<p>This analysis returned similar results to the NCI’s Joinpoint Regression Program by estimating a joinpoint at <code>year=1999</code> - and, more precisely, that the start of that decreasing trend in smoking prevalence happened at an APC of -3.92 percent. That is, <code>slope2</code> from the output above.</p>
-<p>Remember that the cubic-year model above had significant terms as well. Therefore, it would be statistically defensible to calculate two joinpoints rather than only one. However, for this analyses, breaking the 1999-2011 trend into two separate downward trends might not be of interest to the audience. Looking at the <code>slope2</code> and <code>slope3</code> estimates and confidence intervals, we might be able to conclude that “ever smoking” decreased across 1999-2003 and also decreased (albeit less rapidly) across 2003-2011. However, communicating two <em>consecutive</em> downward trends might not be of much interest to a lay audience. Forgoing a second possible joinpoint makes sense when the direction of change is more compelling than the pace of change:</p>
-<div class="sourceCode" id="cb685"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb685-1"><a href="trend-analysis-of-complex-survey-data.html#cb685-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find two joinpoints rather than only one</span></span>
-<span id="cb685-2"><a href="trend-analysis-of-complex-survey-data.html#cb685-2" aria-hidden="true" tabindex="-1"></a>os2 <span class="ot">&lt;-</span> <span class="fu">segmented</span>( o , <span class="sc">~</span>year , <span class="at">npsi =</span> <span class="dv">2</span> )</span>
-<span id="cb685-3"><a href="trend-analysis-of-complex-survey-data.html#cb685-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb685-4"><a href="trend-analysis-of-complex-survey-data.html#cb685-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( os2 )</span>
-<span id="cb685-5"><a href="trend-analysis-of-complex-survey-data.html#cb685-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb685-6"><a href="trend-analysis-of-complex-survey-data.html#cb685-6" aria-hidden="true" tabindex="-1"></a><span class="fu">slope</span>( os2 , <span class="at">APC =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
-<div id="interpret-and-conclude" class="section level2 unnumbered hasAnchor">
-<h2>Interpret and Conclude<a href="trend-analysis-of-complex-survey-data.html#interpret-and-conclude" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>After identifying the joinpoint for smoking prevalence, we can create two regression models (one for each time segment - if we had two joinpoints, we would need three regression models). The first model covers the years leading up to (and including) the joinpoint (i.e., 1991 to 1999). The second model includes the years from the joinpoint forward (i.e., 1999 to 2011). So start with 1991, 1993, 1995, 1997, 1999, the five year-points before (and including) 1999:</p>
-<div class="sourceCode" id="cb686"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb686-1"><a href="trend-analysis-of-complex-survey-data.html#cb686-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate a five-timepoint linear contrast vector</span></span>
-<span id="cb686-2"><a href="trend-analysis-of-complex-survey-data.html#cb686-2" aria-hidden="true" tabindex="-1"></a>c5l <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( <span class="dv">5</span> )[ , <span class="dv">1</span> ]</span>
-<span id="cb686-3"><a href="trend-analysis-of-complex-survey-data.html#cb686-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb686-4"><a href="trend-analysis-of-complex-survey-data.html#cb686-4" aria-hidden="true" tabindex="-1"></a><span class="co"># tack the five-timepoint linear contrast vectors onto the current survey design object</span></span>
-<span id="cb686-5"><a href="trend-analysis-of-complex-survey-data.html#cb686-5" aria-hidden="true" tabindex="-1"></a>des <span class="ot">&lt;-</span> <span class="fu">update</span>( des , <span class="at">t5l =</span> c5l[ <span class="fu">match</span>( year , <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">1999</span> , <span class="dv">2</span> ) ) ] )</span>
-<span id="cb686-6"><a href="trend-analysis-of-complex-survey-data.html#cb686-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb686-7"><a href="trend-analysis-of-complex-survey-data.html#cb686-7" aria-hidden="true" tabindex="-1"></a>pre_91_99 <span class="ot">&lt;-</span></span>
-<span id="cb686-8"><a href="trend-analysis-of-complex-survey-data.html#cb686-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
-<span id="cb686-9"><a href="trend-analysis-of-complex-survey-data.html#cb686-9" aria-hidden="true" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t5l ,</span>
-<span id="cb686-10"><a href="trend-analysis-of-complex-survey-data.html#cb686-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">design =</span> <span class="fu">subset</span>( des , year <span class="sc">&lt;=</span> <span class="dv">1999</span> ) , </span>
-<span id="cb686-11"><a href="trend-analysis-of-complex-survey-data.html#cb686-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial</span>
-<span id="cb686-12"><a href="trend-analysis-of-complex-survey-data.html#cb686-12" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb686-13"><a href="trend-analysis-of-complex-survey-data.html#cb686-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb686-14"><a href="trend-analysis-of-complex-survey-data.html#cb686-14" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( pre_91_99 )</span>
-<span id="cb686-15"><a href="trend-analysis-of-complex-survey-data.html#cb686-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb686-16"><a href="trend-analysis-of-complex-survey-data.html#cb686-16" aria-hidden="true" tabindex="-1"></a><span class="co"># confirm 1991-1999 trend coefficient matches published estimates</span></span>
-<span id="cb686-17"><a href="trend-analysis-of-complex-survey-data.html#cb686-17" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( pre_91_99<span class="sc">$</span>coefficients[<span class="st">&#39;t5l&#39;</span>] , <span class="dv">5</span> ) <span class="sc">==</span> .<span class="dv">03704</span> )</span></code></pre></div>
-<p>This reproduces the calculations behind the sentence on <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6">pdf page 6 of the original document</a>: <strong>In this example, T5L_L had a p-value=0.52261 and beta=0.03704. Therefore, there was “no significant change in the prevalence of ever smoking a cigarette during 1991-1999.”</strong></p>
-<p>Then move on to 1999, 2001, 2003, 2005, 2007, 2009, and 2011, the seven year-points after (and including) 1999:</p>
-<div class="sourceCode" id="cb687"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb687-1"><a href="trend-analysis-of-complex-survey-data.html#cb687-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate a seven-timepoint linear contrast vector</span></span>
-<span id="cb687-2"><a href="trend-analysis-of-complex-survey-data.html#cb687-2" aria-hidden="true" tabindex="-1"></a>c7l <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( <span class="dv">7</span> )[ , <span class="dv">1</span> ]</span>
-<span id="cb687-3"><a href="trend-analysis-of-complex-survey-data.html#cb687-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb687-4"><a href="trend-analysis-of-complex-survey-data.html#cb687-4" aria-hidden="true" tabindex="-1"></a><span class="co"># tack the seven-timepoint linear contrast vectors onto the current survey design object</span></span>
-<span id="cb687-5"><a href="trend-analysis-of-complex-survey-data.html#cb687-5" aria-hidden="true" tabindex="-1"></a>des <span class="ot">&lt;-</span> <span class="fu">update</span>( des , <span class="at">t7l =</span> c7l[ <span class="fu">match</span>( year , <span class="fu">seq</span>( <span class="dv">1999</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) ) ] )</span>
-<span id="cb687-6"><a href="trend-analysis-of-complex-survey-data.html#cb687-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb687-7"><a href="trend-analysis-of-complex-survey-data.html#cb687-7" aria-hidden="true" tabindex="-1"></a>post_99_11 <span class="ot">&lt;-</span></span>
-<span id="cb687-8"><a href="trend-analysis-of-complex-survey-data.html#cb687-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
-<span id="cb687-9"><a href="trend-analysis-of-complex-survey-data.html#cb687-9" aria-hidden="true" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t7l ,</span>
-<span id="cb687-10"><a href="trend-analysis-of-complex-survey-data.html#cb687-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">design =</span> <span class="fu">subset</span>( des , year <span class="sc">&gt;=</span> <span class="dv">1999</span> ) , </span>
-<span id="cb687-11"><a href="trend-analysis-of-complex-survey-data.html#cb687-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial</span>
-<span id="cb687-12"><a href="trend-analysis-of-complex-survey-data.html#cb687-12" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb687-13"><a href="trend-analysis-of-complex-survey-data.html#cb687-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb687-14"><a href="trend-analysis-of-complex-survey-data.html#cb687-14" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( post_99_11 )</span>
-<span id="cb687-15"><a href="trend-analysis-of-complex-survey-data.html#cb687-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb687-16"><a href="trend-analysis-of-complex-survey-data.html#cb687-16" aria-hidden="true" tabindex="-1"></a><span class="co"># confirm 1999-2011 trend coefficient matches published estimates</span></span>
-<span id="cb687-17"><a href="trend-analysis-of-complex-survey-data.html#cb687-17" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( post_99_11<span class="sc">$</span>coefficients[<span class="st">&#39;t7l&#39;</span>] , <span class="dv">5</span> ) <span class="sc">==</span> <span class="sc">-</span><span class="fl">0.99165</span> )</span></code></pre></div>
-<p>This reproduces the calculations behind the sentence on <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6">pdf page 6 of the original document</a>: <strong>In this example, T7L_R had a p-value&lt;0.0001 and beta=-0.99165. Therefore, there was a “significant linear decrease in the prevalence of ever smoking a cigarette during 1999-2011.”</strong></p>
+<div id="analysis-examples-with-base-r-4" class="section level2 unnumbered hasAnchor">
+<h2>Analysis Examples with base R  <a href="public-libraries-survey-pls.html#analysis-examples-with-base-r-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="unweighted-counts-18" class="section level3 unnumbered hasAnchor">
+<h3>Unweighted Counts<a href="public-libraries-survey-pls.html#unweighted-counts-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Count the unweighted number of records in the table, overall and by groups:</p>
+<div class="sourceCode" id="cb528"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb528-1"><a href="public-libraries-survey-pls.html#cb528-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>( pls_df )</span>
+<span id="cb528-2"><a href="public-libraries-survey-pls.html#cb528-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb528-3"><a href="public-libraries-survey-pls.html#cb528-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>( pls_df[ , <span class="st">&quot;stabr&quot;</span> ] , <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span> )</span></code></pre></div>
+</div>
+<div id="descriptive-statistics-18" class="section level3 unnumbered hasAnchor">
+<h3>Descriptive Statistics<a href="public-libraries-survey-pls.html#descriptive-statistics-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="public-libraries-survey-pls.html#cb529-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb529-2"><a href="public-libraries-survey-pls.html#cb529-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb529-3"><a href="public-libraries-survey-pls.html#cb529-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb529-4"><a href="public-libraries-survey-pls.html#cb529-4" aria-hidden="true" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
+<span id="cb529-5"><a href="public-libraries-survey-pls.html#cb529-5" aria-hidden="true" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
+<span id="cb529-6"><a href="public-libraries-survey-pls.html#cb529-6" aria-hidden="true" tabindex="-1"></a>    mean ,</span>
+<span id="cb529-7"><a href="public-libraries-survey-pls.html#cb529-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb529-8"><a href="public-libraries-survey-pls.html#cb529-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="public-libraries-survey-pls.html#cb530-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>( <span class="fu">table</span>( pls_df[ , <span class="st">&quot;c_relatn&quot;</span> ] ) )</span>
+<span id="cb530-2"><a href="public-libraries-survey-pls.html#cb530-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb530-3"><a href="public-libraries-survey-pls.html#cb530-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(</span>
+<span id="cb530-4"><a href="public-libraries-survey-pls.html#cb530-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">table</span>( pls_df[ , <span class="fu">c</span>( <span class="st">&quot;c_relatn&quot;</span> , <span class="st">&quot;stabr&quot;</span> ) ] ) ,</span>
+<span id="cb530-5"><a href="public-libraries-survey-pls.html#cb530-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">margin =</span> <span class="dv">2</span></span>
+<span id="cb530-6"><a href="public-libraries-survey-pls.html#cb530-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="public-libraries-survey-pls.html#cb531-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb531-2"><a href="public-libraries-survey-pls.html#cb531-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb531-3"><a href="public-libraries-survey-pls.html#cb531-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb531-4"><a href="public-libraries-survey-pls.html#cb531-4" aria-hidden="true" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
+<span id="cb531-5"><a href="public-libraries-survey-pls.html#cb531-5" aria-hidden="true" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
+<span id="cb531-6"><a href="public-libraries-survey-pls.html#cb531-6" aria-hidden="true" tabindex="-1"></a>    sum ,</span>
+<span id="cb531-7"><a href="public-libraries-survey-pls.html#cb531-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb531-8"><a href="public-libraries-survey-pls.html#cb531-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="public-libraries-survey-pls.html#cb532-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb532-2"><a href="public-libraries-survey-pls.html#cb532-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb532-3"><a href="public-libraries-survey-pls.html#cb532-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb532-4"><a href="public-libraries-survey-pls.html#cb532-4" aria-hidden="true" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
+<span id="cb532-5"><a href="public-libraries-survey-pls.html#cb532-5" aria-hidden="true" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
+<span id="cb532-6"><a href="public-libraries-survey-pls.html#cb532-6" aria-hidden="true" tabindex="-1"></a>    quantile ,</span>
+<span id="cb532-7"><a href="public-libraries-survey-pls.html#cb532-7" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
+<span id="cb532-8"><a href="public-libraries-survey-pls.html#cb532-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb532-9"><a href="public-libraries-survey-pls.html#cb532-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="subsetting-18" class="section level3 unnumbered hasAnchor">
+<h3>Subsetting<a href="public-libraries-survey-pls.html#subsetting-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Limit your <code>data.frame</code> to more than one million annual visits:</p>
+<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="public-libraries-survey-pls.html#cb533-1" aria-hidden="true" tabindex="-1"></a>sub_pls_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( pls_df , visits <span class="sc">&gt;</span> <span class="dv">1000000</span> )</span></code></pre></div>
+<p>Calculate the mean (average) of this subset:</p>
+<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="public-libraries-survey-pls.html#cb534-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( sub_pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+</div>
+<div id="measures-of-uncertainty-18" class="section level3 unnumbered hasAnchor">
+<h3>Measures of Uncertainty<a href="public-libraries-survey-pls.html#measures-of-uncertainty-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Calculate the variance, overall and by groups:</p>
+<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="public-libraries-survey-pls.html#cb535-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb535-2"><a href="public-libraries-survey-pls.html#cb535-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb535-3"><a href="public-libraries-survey-pls.html#cb535-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb535-4"><a href="public-libraries-survey-pls.html#cb535-4" aria-hidden="true" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
+<span id="cb535-5"><a href="public-libraries-survey-pls.html#cb535-5" aria-hidden="true" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
+<span id="cb535-6"><a href="public-libraries-survey-pls.html#cb535-6" aria-hidden="true" tabindex="-1"></a>    var ,</span>
+<span id="cb535-7"><a href="public-libraries-survey-pls.html#cb535-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb535-8"><a href="public-libraries-survey-pls.html#cb535-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="regression-models-and-tests-of-association-18" class="section level3 unnumbered hasAnchor">
+<h3>Regression Models and Tests of Association<a href="public-libraries-survey-pls.html#regression-models-and-tests-of-association-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Perform a t-test:</p>
+<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="public-libraries-survey-pls.html#cb536-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>( popu_lsa <span class="sc">~</span> more_than_one_librarian , pls_df )</span></code></pre></div>
+<p>Perform a chi-squared test of association:</p>
+<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="public-libraries-survey-pls.html#cb537-1" aria-hidden="true" tabindex="-1"></a>this_table <span class="ot">&lt;-</span> <span class="fu">table</span>( pls_df[ , <span class="fu">c</span>( <span class="st">&quot;more_than_one_librarian&quot;</span> , <span class="st">&quot;c_relatn&quot;</span> ) ] )</span>
+<span id="cb537-2"><a href="public-libraries-survey-pls.html#cb537-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb537-3"><a href="public-libraries-survey-pls.html#cb537-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>( this_table )</span></code></pre></div>
+<p>Perform a generalized linear model:</p>
+<div class="sourceCode" id="cb538"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb538-1"><a href="public-libraries-survey-pls.html#cb538-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb538-2"><a href="public-libraries-survey-pls.html#cb538-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glm</span>( </span>
+<span id="cb538-3"><a href="public-libraries-survey-pls.html#cb538-3" aria-hidden="true" tabindex="-1"></a>        popu_lsa <span class="sc">~</span> more_than_one_librarian <span class="sc">+</span> c_relatn , </span>
+<span id="cb538-4"><a href="public-libraries-survey-pls.html#cb538-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> pls_df</span>
+<span id="cb538-5"><a href="public-libraries-survey-pls.html#cb538-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb538-6"><a href="public-libraries-survey-pls.html#cb538-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb538-7"><a href="public-libraries-survey-pls.html#cb538-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="intermish-18" class="section level2 unnumbered hasAnchor">
+<h2>Intermish<a href="public-libraries-survey-pls.html#intermish-18" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<center>
+<a href="https://en.wikipedia.org/wiki/Lorem_ipsum" class="uri">https://en.wikipedia.org/wiki/Lorem_ipsum</a>
+</center>
+<hr />
+</div>
+<div id="replication-example-16" class="section level2 unnumbered hasAnchor">
+<h2>Replication Example<a href="public-libraries-survey-pls.html#replication-example-16" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example matches Interlibrary Relationship Frequencies on <a href="https://www.imls.gov/sites/default/files/2022-07/2020_pls_data_file_documentation.pdf#page=163">PDF page 163 of the User’s Guide</a>:</p>
+<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb539-1"><a href="public-libraries-survey-pls.html#cb539-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove closed and temporarily closed libraries</span></span>
+<span id="cb539-2"><a href="public-libraries-survey-pls.html#cb539-2" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">table</span>( pls_df[ <span class="sc">!</span>( pls_df[ , <span class="st">&#39;statstru&#39;</span> ] <span class="sc">%in%</span> <span class="fu">c</span>( <span class="st">&#39;03&#39;</span> , <span class="st">&#39;23&#39;</span> ) ) , <span class="st">&#39;c_relatn&#39;</span> ] )</span>
+<span id="cb539-3"><a href="public-libraries-survey-pls.html#cb539-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb539-4"><a href="public-libraries-survey-pls.html#cb539-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;HQ-Headquarters of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">116</span> )</span>
+<span id="cb539-5"><a href="public-libraries-survey-pls.html#cb539-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;ME-Member of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">6858</span> )</span>
+<span id="cb539-6"><a href="public-libraries-survey-pls.html#cb539-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;NO-Not a member of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">2254</span> )</span></code></pre></div>
+<hr />
+</div>
+<div id="analysis-examples-with-dplyr-4" class="section level2 unnumbered hasAnchor">
+<h2>Analysis Examples with <code>dplyr</code>  <a href="public-libraries-survey-pls.html#analysis-examples-with-dplyr-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The R <code>dplyr</code> library offers an alternative grammar of data manipulation to base R and SQL syntax. <a href="https://github.com/tidyverse/dplyr/">dplyr</a> offers many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, and the <code>tidyverse</code> style of non-standard evaluation. <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html">This vignette</a> details the available features. As a starting point for PLS users, this code replicates previously-presented examples:</p>
+<div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb540-1"><a href="public-libraries-survey-pls.html#cb540-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb540-2"><a href="public-libraries-survey-pls.html#cb540-2" aria-hidden="true" tabindex="-1"></a>pls_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>( pls_df )</span></code></pre></div>
+<p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb541-1"><a href="public-libraries-survey-pls.html#cb541-1" aria-hidden="true" tabindex="-1"></a>pls_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb541-2"><a href="public-libraries-survey-pls.html#cb541-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb541-3"><a href="public-libraries-survey-pls.html#cb541-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb541-4"><a href="public-libraries-survey-pls.html#cb541-4" aria-hidden="true" tabindex="-1"></a>pls_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb541-5"><a href="public-libraries-survey-pls.html#cb541-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( stabr ) <span class="sc">%&gt;%</span></span>
+<span id="cb541-6"><a href="public-libraries-survey-pls.html#cb541-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<hr />
+</div>
+<div id="analysis-examples-with-data.table-4" class="section level2 unnumbered hasAnchor">
+<h2>Analysis Examples with <code>data.table</code>  <a href="public-libraries-survey-pls.html#analysis-examples-with-data.table-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The R <code>data.table</code> library provides a high-performance version of base R’s data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. <a href="https://r-datatable.com">data.table</a> offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">This vignette</a> details the available features. As a starting point for PLS users, this code replicates previously-presented examples:</p>
+<div class="sourceCode" id="cb542"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb542-1"><a href="public-libraries-survey-pls.html#cb542-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb542-2"><a href="public-libraries-survey-pls.html#cb542-2" aria-hidden="true" tabindex="-1"></a>pls_dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>( pls_df )</span></code></pre></div>
+<p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb543"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb543-1"><a href="public-libraries-survey-pls.html#cb543-1" aria-hidden="true" tabindex="-1"></a>pls_dt[ , <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) ]</span>
+<span id="cb543-2"><a href="public-libraries-survey-pls.html#cb543-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb543-3"><a href="public-libraries-survey-pls.html#cb543-3" aria-hidden="true" tabindex="-1"></a>pls_dt[ , <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) , by <span class="ot">=</span> stabr ]</span></code></pre></div>
+<hr />
+</div>
+<div id="analysis-examples-with-duckdb-4" class="section level2 unnumbered hasAnchor">
+<h2>Analysis Examples with <code>duckdb</code>  <a href="public-libraries-survey-pls.html#analysis-examples-with-duckdb-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The R <code>duckdb</code> library provides an embedded analytical data management system with support for the Structured Query Language (SQL). <a href="https://duckdb.org">duckdb</a> offers a simple, feature-rich, fast, and free SQL OLAP management system. <a href="https://duckdb.org/docs/api/r">This vignette</a> details the available features. As a starting point for PLS users, this code replicates previously-presented examples:</p>
+<div class="sourceCode" id="cb544"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb544-1"><a href="public-libraries-survey-pls.html#cb544-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(duckdb)</span>
+<span id="cb544-2"><a href="public-libraries-survey-pls.html#cb544-2" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>( duckdb<span class="sc">::</span><span class="fu">duckdb</span>() , <span class="at">dbdir =</span> <span class="st">&#39;my-db.duckdb&#39;</span> )</span>
+<span id="cb544-3"><a href="public-libraries-survey-pls.html#cb544-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>( con , <span class="st">&#39;pls&#39;</span> , pls_df )</span></code></pre></div>
+<p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb545"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb545-1"><a href="public-libraries-survey-pls.html#cb545-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>( con , <span class="st">&#39;SELECT AVG( popu_lsa ) FROM pls&#39;</span> )</span>
+<span id="cb545-2"><a href="public-libraries-survey-pls.html#cb545-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb545-3"><a href="public-libraries-survey-pls.html#cb545-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(</span>
+<span id="cb545-4"><a href="public-libraries-survey-pls.html#cb545-4" aria-hidden="true" tabindex="-1"></a>    con ,</span>
+<span id="cb545-5"><a href="public-libraries-survey-pls.html#cb545-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;SELECT</span></span>
+<span id="cb545-6"><a href="public-libraries-survey-pls.html#cb545-6" aria-hidden="true" tabindex="-1"></a><span class="st">        stabr ,</span></span>
+<span id="cb545-7"><a href="public-libraries-survey-pls.html#cb545-7" aria-hidden="true" tabindex="-1"></a><span class="st">        AVG( popu_lsa )</span></span>
+<span id="cb545-8"><a href="public-libraries-survey-pls.html#cb545-8" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM</span></span>
+<span id="cb545-9"><a href="public-libraries-survey-pls.html#cb545-9" aria-hidden="true" tabindex="-1"></a><span class="st">        pls</span></span>
+<span id="cb545-10"><a href="public-libraries-survey-pls.html#cb545-10" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY</span></span>
+<span id="cb545-11"><a href="public-libraries-survey-pls.html#cb545-11" aria-hidden="true" tabindex="-1"></a><span class="st">        stabr&#39;</span></span>
+<span id="cb545-12"><a href="public-libraries-survey-pls.html#cb545-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 
 </div>
 </div>
@@ -926,8 +918,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="social-security-public-use-data-files-ssa.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="youth-risk-behavior-surveillance-system-yrbss.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="programme-for-the-international-assessment-of-adult-competencies-piaac.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="residential-energy-consumption-survey-recs.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -948,7 +940,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ajdamico/asdfree/edit/master/trendy.Rmd",
+"link": "https://github.com/ajdamico/asdfree/edit/master/metadata/pls.txt",
 "text": "Edit"
 },
 "history": {
