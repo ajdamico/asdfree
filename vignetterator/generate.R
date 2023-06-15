@@ -1,4 +1,4 @@
-commit_memo <- "'https://www.youtube.com/watch?v=vu2NK5REvWM'"
+commit_memo <- "'pls draft'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
