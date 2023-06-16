@@ -627,6 +627,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html#append-polynomials-to-each-year"><i class="fa fa-check"></i>Append Polynomials to Each Year</a></li>
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html#unadjusted-analysis-examples"><i class="fa fa-check"></i>Unadjusted Analysis Examples</a></li>
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html#calculate-joinpoints-needed"><i class="fa fa-check"></i>Calculate Joinpoints Needed</a></li>
+<li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html#intermish-23"><i class="fa fa-check"></i>Intermish</a></li>
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html#calculate-predicted-marginals"><i class="fa fa-check"></i>Calculate Predicted Marginals</a></li>
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html#identify-joinpoints-or-breakpoints"><i class="fa fa-check"></i>Identify Joinpoint(s) or Breakpoint(s)</a></li>
 <li class="chapter" data-level="" data-path="trend-analysis-of-complex-survey-data.html"><a href="trend-analysis-of-complex-survey-data.html#interpret-and-conclude"><i class="fa fa-check"></i>Interpret and Conclude</a></li>
@@ -648,7 +649,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#measures-of-uncertainty-23"><i class="fa fa-check"></i>Measures of Uncertainty</a></li>
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#regression-models-and-tests-of-association-23"><i class="fa fa-check"></i>Regression Models and Tests of Association</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#intermish-23"><i class="fa fa-check"></i>Intermish</a></li>
+<li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#intermish-24"><i class="fa fa-check"></i>Intermish</a></li>
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#replication-example-21"><i class="fa fa-check"></i>Replication Example</a></li>
 <li class="chapter" data-level="" data-path="youth-risk-behavior-surveillance-system-yrbss.html"><a href="youth-risk-behavior-surveillance-system-yrbss.html#analysis-examples-with-srvyr-13"><i class="fa fa-check"></i>Analysis Examples with <code>srvyr</code>  </a></li>
 </ul></li>
@@ -675,8 +676,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="trend-analysis-of-complex-survey-data" class="section level1 unnumbered hasAnchor">
 <h1>Trend Analysis of Complex Survey Data<a href="trend-analysis-of-complex-survey-data.html#trend-analysis-of-complex-survey-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p><em>Contributed by Thomas Yokota &lt;<a href="mailto:thomasyokota@gmail.com" class="email">thomasyokota@gmail.com</a>&gt;</em></p>
-<p>Professor <a href="mailto:vito.muggeo@unipa.it">Vito Muggeo</a> wrote the joinpoint analysis section of the code below and <a href="https://cran.r-project.org/web/packages/segmented/index.html">the <code>segmented</code> package</a>. Professor <a href="mailto:t.lumley@auckland.ac.nz">Dr. Thomas Lumley</a> wrote <a href="https://cran.r-project.org/web/packages/survey/NEWS">the <code>svypredmeans</code> function</a> to replicate SUDAAN’s <code>PREDMARG</code> command and match the CDC to the decimal. <a href="mailto:rxl1@cdc.gov">Dr. Richard Lowry, M.D.</a> at the Centers for Disease Control &amp; Prevention wrote <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf">the original linear trend analysis</a> and then answered our infinite questions. Thanks to everyone.</p>
 <p>The purpose of this analysis is to make statistically valid statements such as, <em>“there was a significant linear decrease in the prevalence of high school aged americans who have ever smoked a cigarette across the period 1999-2011”</em> with complex sample survey data.</p>
 <p>This step-by-step walkthrough exactly reproduces the statistics presented in the <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf">Center for Disease Control &amp; Prevention’s (CDC) linear trend analysis</a>. This analysis may complement qualitative evaluation on prevalence changes observed from surveillance data by providing quantitative evidence, such as when a joinpoint (also called breakpoint or changepoint) occurred; however, this analysis does not explain why or how changes in trends occur.</p>
 <div id="download-import-preparation-23" class="section level2 unnumbered hasAnchor">
@@ -830,6 +829,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb677-8"><a href="trend-analysis-of-complex-survey-data.html#cb677-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( cubyear )</span></code></pre></div>
 <p>The cubic year-contrast term is also significant in this model. Therefore, we might potentially evaluate this trend using two joinpoints. In other words, a significant result for all linear, quadratic, and cubic year contrasts at this point means we might be able to evaluate three distinct trends (separated by our two joinpoints) across the broader 1991 - 2011 time period of analysis.</p>
 <p>Although we might now have the statistical ability to analyze three distinct time periods (separated by two joinpoints) across our data, the utility of this depends on the circumstances. Cubic and higher polynomials account for not only the direction of change but also the pace of that change, allowing statistical statements that might not be of interest to an audience: While it might be an exercise in precision to conclude that smoking rates dropped quickest across 1999-2003 and less quickly across 2003-2011, that scientific pair of findings may not be as compelling as the simpler (quadratic but not cubic) statement that smoking rates have dropped across the period of 1999-2011.</p>
+<hr />
+</div>
+<div id="intermish-23" class="section level2 unnumbered hasAnchor">
+<h2>Intermish<a href="trend-analysis-of-complex-survey-data.html#intermish-23" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<center>
+<img src="https://1.bp.blogspot.com/-iwm7r7PRQRs/YPcur-o-v-I/AAAAAAABy-4/yYCMsJ2UOhQb-2NX-MSNnYE8sgfjcadwgCLcBGAsYHQ/s2048/WhatsApp%2BImage%2B2021-07-19%2Bat%2B10.42.16%2BPM%2B%25281%2529.jpeg">
+<p>
+<i><b>the author programming in sas</b></i>
+</center>
+<hr />
 </div>
 <div id="calculate-predicted-marginals" class="section level2 unnumbered hasAnchor">
 <h2>Calculate Predicted Marginals<a href="trend-analysis-of-complex-survey-data.html#calculate-predicted-marginals" class="anchor-section" aria-label="Anchor link to header"></a></h2>

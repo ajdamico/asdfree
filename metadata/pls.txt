@@ -4,17 +4,14 @@ chapter_title: Public Libraries Survey
 needs_actions_build_status_line: yes
 
 ~~~{dataset_introduction}
-An annual census of public libraries in the United States.
+A comprehensive compilation of administrative information on all public libraries in the United States.
 ~~~
 
-table_structure: * One table with one row per state, a second table with one row per library system, and a third table with one row per library building or bookmobile.
-
-generalizable_population: * 
-
+table_structure: * Three tables with one row per state, per library system, and per library building or bookmobile.
 
 publication_period: * Released annually since 1992.
 
-administrative_organization: * Conducted by the [Institute of Museum and Library Services (IMLS)](https://www.imls.gov/) and collected by the [US Census Bureau](http://www.census.gov/).
+administrative_organization: * Conducted by the [Institute of Museum and Library Services (IMLS)](https://www.imls.gov/), collected by the [Census Bureau](http://www.census.gov/).
 
 
 
@@ -23,9 +20,9 @@ administrative_organization: * Conducted by the [Institute of Museum and Library
 ~~~{reading_block}
 Please skim before you begin:
 
-1.
+1. [Data FIle Documentation and User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf)
 
-2.
+2. `README FY #### PLS PUD.txt` included in each [zipped file](https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_sas.zip)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
 
@@ -50,7 +47,7 @@ library(haven)
 
 this_tf <- tempfile()
 
-sas_url <- "https://www.imls.gov/sites/default/files/2022-07/pls_fy2020_sas.zip"
+sas_url <- "https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_sas.zip"
 
 download.file( sas_url , this_tf, mode = 'wb' )
 
@@ -139,15 +136,15 @@ needs_duckdb_block: yes
 
 ~~~{replication_example_block}
 ## Replication Example {-}
-This example matches Interlibrary Relationship Frequencies on [PDF page 163 of the User's Guide](https://www.imls.gov/sites/default/files/2022-07/2020_pls_data_file_documentation.pdf#page=163):
+This example matches Interlibrary Relationship Frequencies on [PDF page 169 of the User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf#page=169):
 
 ```{r messages = FALSE , eval = FALSE }
 # remove closed and temporarily closed libraries
 results <- table( pls_df[ !( pls_df[ , 'statstru' ] %in% c( '03' , '23' ) ) , 'c_relatn' ] )
 
-stopifnot( results[ "HQ-Headquarters of a federation or cooperative" ] == 116 )
-stopifnot( results[ "ME-Member of a federation or cooperative" ] == 6858 )
-stopifnot( results[ "NO-Not a member of a federation or cooperative" ] == 2254 )
+stopifnot( results[ "HQ-Headquarters of a federation or cooperative" ] == 112 )
+stopifnot( results[ "ME-Member of a federation or cooperative" ] == 6859 )
+stopifnot( results[ "NO-Not a member of a federation or cooperative" ] == 2236 )
 ```
 
 ~~~
