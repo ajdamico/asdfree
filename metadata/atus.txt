@@ -42,7 +42,7 @@ Please skim before you begin:
 
 Define a function to download, unzip, and import each comma-separated value dat file:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 
 atus_csv_import <-
 	function( this_url ){
@@ -68,7 +68,7 @@ atus_csv_import <-
 
 Download and import the activity, respondent, roster, and weights tables:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 act_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusact-2021.zip" )
 
 resp_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusresp-2021.zip" )
@@ -80,7 +80,7 @@ wgts_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atuswgts-2021.zip
 
 
 Specify which variables to keep in each of the `data.frame` objects:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 act_df <- act_df[ c( 'tucaseid' , 'tutier1code' , 'tutier2code' , 'tuactdur24' ) ]
 
 resp_df <- resp_df[ c( 'tucaseid' , 'tufinlwgt' , 'tulineno' ) ]
@@ -92,7 +92,7 @@ rost_df <- rost_df[ , c( 'tucaseid' , 'tulineno' , 'teage' , 'tesex' ) ]
 
 Distribute travel-related activities (`tutier1code == 18` from the [lexicon](https://www.bls.gov/tus/lexicons/lexiconnoex2021.pdf)) based on their second tier code:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 act_df[ act_df[ , 'tutier1code' ] == 18 & act_df[ , 'tutier2code' ] == 99 , 'tutier1code' ] <- 50
 
 act_df[ act_df[ , 'tutier1code' ] == 18 , 'tutier1code' ] <-
@@ -102,7 +102,7 @@ act_df[ act_df[ , 'tutier1code' ] == 18 , 'tutier1code' ] <-
 
 Sum up all durations at the (respondent x major activity category)-level:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 act_long_df <- aggregate( tuactdur24 ~ tucaseid + tutier1code , data = act_df , sum )
 
 act_wide_df <-
@@ -118,7 +118,7 @@ act_wide_df[ , -1 ] <- act_wide_df[ , -1 ] / 60
 
 Merge the respondent and summed activity tables, then the roster table, and finally the replicate weights:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 resp_act_df <- merge( resp_df , act_wide_df )
 
 stopifnot( nrow( resp_act_df ) == nrow( resp_df ) )
@@ -144,7 +144,7 @@ chapter_tag_df[ , 'one' ] <- 1
 
 ~~~{analysis_examples_survey_design}
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 library(survey)
 
 chapter_tag_design <- 
@@ -211,7 +211,7 @@ needs_srvyr_block: yes
 
 This example matches the "Caring for and helping household members" row of [Table A-1](https://www.bls.gov/tus/tables/a1_2021.pdf):
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 hours_per_day_civilian_population <- svymean( ~ tuactdur24_3 , chapter_tag_design )
 
 stopifnot( round( coef( hours_per_day_civilian_population ) , 2 ) == 0.47 )
@@ -229,7 +229,7 @@ This example matches the average hours and SE from Section 7.5 of the [User's Gu
 
 Download and import the activity, activity summary, respondent, and weights tables:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 actsum07_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atussum_2007.zip" )
 resp07_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusresp_2007.zip" )
 act07_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atusact_2007.zip" )
@@ -241,7 +241,7 @@ wgts07_df <- atus_csv_import( "https://www.bls.gov/tus/datafiles/atuswgts_2007.z
 
 Option 1. Sum the two television fields from the activity summary file, removing zeroes:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 television_per_person <-
 	data.frame(
 		tucaseid = actsum07_df[ , 'tucaseid' ] ,
@@ -256,7 +256,7 @@ television_per_person <-
 
 Option 2. Limit the activity file to television watching records according to the [2007 Lexicon](https://www.bls.gov/tus/lexicons/lexiconwex2007.pdf):
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 television_activity <- 
 	subset( 
 		act07_df , 
@@ -275,7 +275,7 @@ television_activity_summed <-
 
 Confirm both aggregation options yield the same results:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 stopifnot(
 	all( television_per_person[ , 'tucaseid' ] == television_activity_summed[ , 'tucaseid' ] )
 )
@@ -287,7 +287,7 @@ stopifnot(
 
 Merge the respondent and summed activity tables, then the replicate weights:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 resp07_tpp_df <- 
 	merge( 
 		resp07_df[ , c( 'tucaseid' , 'tufinlwgt' ) ] , 
@@ -310,7 +310,7 @@ stopifnot( nrow( chapter_tag07_df ) == nrow( resp07_df ) )
 
 Construct a complex sample survey design:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 chapter_tag07_design <- 
 	svrepdesign(
 		weights = ~ tufinlwgt ,
@@ -323,7 +323,7 @@ chapter_tag07_design <-
 
 Match the statistic and SE of the number of hours daily that americans older than 14 watch tv:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 result <- svymean( ~ tuactdur24_hour , chapter_tag07_design )
 
 stopifnot( round( coef( result ) , 2 ) == 2.62 )

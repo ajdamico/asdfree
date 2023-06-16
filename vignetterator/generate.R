@@ -1,4 +1,4 @@
-commit_memo <- "'pls draft'"
+commit_memo <- "'message typo'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -283,7 +283,7 @@ for ( i in seq_along( chapter_tag ) ){
 rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
 local_testing_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Local Testing Badge" , readLines( w ) ) ) )
 local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_files ] )
-for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE , warning = FALSE , messages = FALSE" , readLines( this_rmd ) ) , this_rmd )
+for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE , warning = FALSE , message = FALSE" , readLines( this_rmd ) ) , this_rmd )
 
 
 setwd( book_folder )

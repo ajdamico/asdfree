@@ -36,7 +36,7 @@ Please skim before you begin:
 ~~~{download_and_import_block}
 
 Download and unzip each of the main 2017 files:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 library(haven)
 
 nhts_dl_uz <-
@@ -60,7 +60,7 @@ unzipped_trip_chains <-
 ```
 
 Import the tables containing one record per household, person, trip, and vehicle:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 nhts_import <-
 	function( this_prefix , this_unzip ){
 		
@@ -90,7 +90,7 @@ perwgt_df <- nhts_import( "perwgt" , unzipped_replicate_weights )
 ```	
 
 Add a column of ones to three of those tables, then a column of non-missing mileage to the trips table:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 hhpub_df[ , 'one' ] <- 1
 
 perpub_df[ , 'one' ] <- 1
@@ -102,7 +102,7 @@ trippub_df[ !( trippub_df[ , 'trpmiles' ] %in% -9 ) , 'tripmiles_no_nines' ] <-
 ```
 
 Sum the total trip count and mileage to the person-level, both overall and restricted to walking only:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 trips_per_person <- 
 	with( 
 		trippub_df , 
@@ -133,7 +133,7 @@ names( walks_per_person ) <-
 ```
 
 Merge these trip count and mileage values on to the person-level file, replacing non-matches with zero:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 chapter_tag_df <- merge( perpub_df , trips_per_person , all.x = TRUE )
 chapter_tag_df[ is.na( chapter_tag_df[ , 'trips_per_person' ] ) , 'trips_per_person' ] <- 0
 chapter_tag_df[ is.na( chapter_tag_df[ , 'miles_per_person' ] ) , 'miles_per_person' ] <- 0
@@ -156,7 +156,7 @@ stopifnot( nrow( chapter_tag_df ) == nrow( perpub_df ) )
 ~~~{analysis_examples_survey_design}
 
 Sort both the one record per household and household replicate weights tables, then define the design:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 library(survey)
 
 hhpub_df <- hhpub_df[ order( hhpub_df[ , 'houseid' ] ) , ]
@@ -177,7 +177,7 @@ hh_design <-
 
 
 Sort both the one record per person and person replicate weights tables, then define the design:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 chapter_tag_df <- chapter_tag_df[ do.call( order , chapter_tag_df[ , c( 'houseid' , 'personid' ) ] ) , ]
 perwgt_df <- perwgt_df[ do.call( order , perwgt_df[ , c( 'houseid' , 'personid' ) ] ) , ]
 
@@ -196,7 +196,7 @@ chapter_tag_design <-
 
 
 Sort both the one record per trip and person replicate weights tables, then define the design:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 trippub_df <- trippub_df[ do.call( order , trippub_df[ , c( 'houseid' , 'personid' ) ] ) , ]
 perwgt_df <- perwgt_df[ do.call( order , perwgt_df[ , c( 'houseid' , 'personid' ) ] ) , ]
 
@@ -269,7 +269,7 @@ needs_srvyr_block: yes
 
 This example matches the 2017 rows from [Summary of Travel Trends](https://nhts.ornl.gov/assets/2017_nhts_summary_travel_trends.pdf#page=12) Table 1a:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 hhsize_counts <- svytotal( ~ hhsize_categories , hh_design )
 
 stopifnot(
@@ -286,7 +286,7 @@ stopifnot( all( round( hhsize_moe / 1000 , 0 ) == c( 0 , 0 , 97 , 97 ) ) )
 
 This example matches 2017 NHTS [Westat project co-author's](https://nhts.ornl.gov/assets/2017_nhts_summary_travel_trends.pdf#page=2) workshop [slide 38](https://rawgit.com/Westat-Transportation/summarizeNHTS/master/inst/tutorials/workshop/Workshop.html#(38)):
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 unwtd_n <- with( chapter_tag_df , tapply( trips_per_person , worker , sum ) )
 stopifnot( all( unwtd_n == c( 79295 , 28 , 497944 , 346305 ) ) )
 

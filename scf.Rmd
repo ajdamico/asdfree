@@ -77,7 +77,7 @@ scf_MIcombine <-
 
 Define a function to download and import each stata file:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 library(haven)
 
 scf_dta_import <-
@@ -102,7 +102,7 @@ scf_dta_import <-
 
 Download and import the full, summary extract, and replicate weights tables:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 scf_df <- scf_dta_import( "https://www.federalreserve.gov/econres/files/scf2019s.zip" )
 
 ext_df <- scf_dta_import( "https://www.federalreserve.gov/econres/files/scfp2019s.zip" )
@@ -112,20 +112,20 @@ scf_rw_df <- scf_dta_import( "https://www.federalreserve.gov/econres/files/scf20
 ```
 
 Confirm both the full public data and the summary extract contain five records per family:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 stopifnot( nrow( scf_df ) == nrow( scf_rw_df ) * 5 )
 stopifnot( nrow( scf_df ) == nrow( ext_df ) )
 ```
 
 Confirm only the primary economic unit and the five implicate identifiers overlap:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 stopifnot( all( sort( intersect( names( scf_df ) , names( ext_df ) ) ) == c( 'y1' , 'yy1' ) ) )
 stopifnot( all( sort( intersect( names( scf_df ) , names( scf_rw_df ) ) ) == c( 'y1' , 'yy1' ) ) )
 stopifnot( all( sort( intersect( names( ext_df ) , names( scf_rw_df ) ) ) == c( 'y1' , 'yy1' ) ) )
 ```
 
 Remove the implicate identifier from the replicate weights table, add a column of fives for weighting:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 scf_rw_df[ , 'y1' ] <- NULL
 
 scf_df[ , 'five' ] <- 5
@@ -150,7 +150,7 @@ Load the same object:
 Construct a multiply-imputed, complex sample survey design:
 
 Break the main table into five different implicates based on the final character of the column `y1`:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 library(stringr)
 
 s1_df <- scf_df[ str_sub( scf_df[ , 'y1' ] , -1 , -1 ) == 1 , ]
@@ -161,7 +161,7 @@ s5_df <- scf_df[ str_sub( scf_df[ , 'y1' ] , -1 , -1 ) == 5 , ]
 ```
 
 Combine these into a single `list`, then merge each implicate with the summary extract:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 scf_imp <- list( s1_df , s2_df , s3_df , s4_df , s5_df )
 
 scf_list <- lapply( scf_imp , merge , ext_df )
@@ -169,7 +169,7 @@ scf_list <- lapply( scf_imp , merge , ext_df )
 ```
 
 Replace all missing values in the replicate weights table with zeroes, multiply the replicate weights by the multiplication factor, then only keep the unique identifier and the final (combined) replicate weights:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 scf_rw_df[ is.na( scf_rw_df ) ] <- 0
 
 scf_rw_df[ , paste0( 'wgt' , 1:999 ) ] <-
@@ -180,14 +180,14 @@ scf_rw_df <- scf_rw_df[ , c( 'yy1' , paste0( 'wgt' , 1:999 ) ) ]
 
 Sort both the five implicates and also the replicate weights table by the unique identifier:
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 scf_list <- lapply( scf_list , function( w ) w[ order( w[ , 'yy1' ] ) , ] )
 
 scf_rw_df <- scf_rw_df[ order( scf_rw_df[ , 'yy1' ] ) , ]
 ```
 
 Define the design:
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 library(survey)
 library(mitools)
 

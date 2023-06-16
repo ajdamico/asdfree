@@ -4,7 +4,7 @@
 
 A comprehensive compilation of administrative information on all public libraries in the United States.
 
-* Three tables with one row per state, per library system, and per library building or bookmobile.
+* Two tables, the first with one per library system, the second with one row per library building or bookmobile.
 
 * Released annually since 1992.
 
@@ -16,7 +16,7 @@ Please skim before you begin:
 
 1. [Data FIle Documentation and User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf)
 
-2. `README FY #### PLS PUD.txt` included in each [zipped file](https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_sas.zip)
+2. `README FY #### PLS PUD.txt` included in each [zipped file](https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_spss.zip)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Public Libraries Survey)
 
@@ -36,16 +36,16 @@ library(haven)
 
 this_tf <- tempfile()
 
-sas_url <- "https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_sas.zip"
+spss_url <- "https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_spss.zip"
 
-download.file( sas_url , this_tf, mode = 'wb' )
+download.file( spss_url , this_tf, mode = 'wb' )
 
 unzipped_files <- unzip( this_tf , exdir = tempdir() )
 		
-administrative_entity_sas_fn <-
-	unzipped_files[ grepl( 'AE(.*)sas7bdat$' , basename( unzipped_files ) ) ]
+administrative_entity_spss_fn <-
+	unzipped_files[ grepl( 'AE(.*)sav$' , basename( unzipped_files ) ) ]
 
-pls_tbl <- read_sas( administrative_entity_sas_fn )
+pls_tbl <- read_spss( administrative_entity_spss_fn )
 
 pls_df <- data.frame( pls_tbl )
 
@@ -238,7 +238,7 @@ summary( glm_result )
 ## Replication Example {-}
 This example matches Interlibrary Relationship Frequencies on [PDF page 169 of the User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf#page=169):
 
-```{r messages = FALSE , eval = FALSE }
+```{r message = FALSE , eval = FALSE }
 # remove closed and temporarily closed libraries
 results <- table( pls_df[ !( pls_df[ , 'statstru' ] %in% c( '03' , '23' ) ) , 'c_relatn' ] )
 
