@@ -16,7 +16,7 @@ Please skim before you begin:
 
 1. [Data FIle Documentation and User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf)
 
-2. `README FY #### PLS PUD.txt` included in each [zipped file](https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_spss.zip)
+2. `README FY #### PLS PUD.txt` included in each [zipped file](https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Public Libraries Survey)
 
@@ -36,20 +36,16 @@ library(haven)
 
 this_tf <- tempfile()
 
-spss_url <- "https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_spss.zip"
+csv_url <- "https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip"
 
-download.file( spss_url , this_tf, mode = 'wb' )
+download.file( csv_url , this_tf, mode = 'wb' )
 
 unzipped_files <- unzip( this_tf , exdir = tempdir() )
 		
-administrative_entity_spss_fn <-
+administrative_entity_csv_fn <-
 	unzipped_files[ grepl( 'AE(.*)sav$' , basename( unzipped_files ) ) ]
 
-pls_tbl <- read_spss( administrative_entity_spss_fn )
-
-pls_df <- data.frame( pls_tbl )
-
-pls_df <- zap_labels( pls_df )
+pls_tbl <- read.csv( administrative_entity_csv_fn )
 
 names( pls_df ) <- tolower( names( pls_df ) )
 
