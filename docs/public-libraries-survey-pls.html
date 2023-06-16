@@ -695,25 +695,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-18" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="public-libraries-survey-pls.html#download-import-preparation-18" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Download and import the most recent administrative entity sas file:</p>
-<div class="sourceCode" id="cb514"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb514-1"><a href="public-libraries-survey-pls.html#cb514-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<p>Download and import the most recent administrative entity csv file:</p>
+<div class="sourceCode" id="cb514"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb514-1"><a href="public-libraries-survey-pls.html#cb514-1" aria-hidden="true" tabindex="-1"></a>this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb514-2"><a href="public-libraries-survey-pls.html#cb514-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-3"><a href="public-libraries-survey-pls.html#cb514-3" aria-hidden="true" tabindex="-1"></a>this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb514-3"><a href="public-libraries-survey-pls.html#cb514-3" aria-hidden="true" tabindex="-1"></a>csv_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip&quot;</span></span>
 <span id="cb514-4"><a href="public-libraries-survey-pls.html#cb514-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-5"><a href="public-libraries-survey-pls.html#cb514-5" aria-hidden="true" tabindex="-1"></a>csv_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip&quot;</span></span>
+<span id="cb514-5"><a href="public-libraries-survey-pls.html#cb514-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( csv_url , this_tf, <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
 <span id="cb514-6"><a href="public-libraries-survey-pls.html#cb514-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-7"><a href="public-libraries-survey-pls.html#cb514-7" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( csv_url , this_tf, <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb514-8"><a href="public-libraries-survey-pls.html#cb514-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-9"><a href="public-libraries-survey-pls.html#cb514-9" aria-hidden="true" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb514-10"><a href="public-libraries-survey-pls.html#cb514-10" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb514-11"><a href="public-libraries-survey-pls.html#cb514-11" aria-hidden="true" tabindex="-1"></a>administrative_entity_csv_fn <span class="ot">&lt;-</span></span>
-<span id="cb514-12"><a href="public-libraries-survey-pls.html#cb514-12" aria-hidden="true" tabindex="-1"></a>    unzipped_files[ <span class="fu">grepl</span>( <span class="st">&#39;AE(.*)csv$&#39;</span> , <span class="fu">basename</span>( unzipped_files ) ) ]</span>
+<span id="cb514-7"><a href="public-libraries-survey-pls.html#cb514-7" aria-hidden="true" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb514-8"><a href="public-libraries-survey-pls.html#cb514-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb514-9"><a href="public-libraries-survey-pls.html#cb514-9" aria-hidden="true" tabindex="-1"></a>administrative_entity_csv_fn <span class="ot">&lt;-</span></span>
+<span id="cb514-10"><a href="public-libraries-survey-pls.html#cb514-10" aria-hidden="true" tabindex="-1"></a>    unzipped_files[ <span class="fu">grepl</span>( <span class="st">&#39;AE(.*)csv$&#39;</span> , <span class="fu">basename</span>( unzipped_files ) ) ]</span>
+<span id="cb514-11"><a href="public-libraries-survey-pls.html#cb514-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb514-12"><a href="public-libraries-survey-pls.html#cb514-12" aria-hidden="true" tabindex="-1"></a>pls_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( administrative_entity_csv_fn )</span>
 <span id="cb514-13"><a href="public-libraries-survey-pls.html#cb514-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-14"><a href="public-libraries-survey-pls.html#cb514-14" aria-hidden="true" tabindex="-1"></a>pls_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( administrative_entity_csv_fn )</span>
+<span id="cb514-14"><a href="public-libraries-survey-pls.html#cb514-14" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( pls_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( pls_df ) )</span>
 <span id="cb514-15"><a href="public-libraries-survey-pls.html#cb514-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-16"><a href="public-libraries-survey-pls.html#cb514-16" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( pls_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( pls_df ) )</span>
-<span id="cb514-17"><a href="public-libraries-survey-pls.html#cb514-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-18"><a href="public-libraries-survey-pls.html#cb514-18" aria-hidden="true" tabindex="-1"></a>pls_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
+<span id="cb514-16"><a href="public-libraries-survey-pls.html#cb514-16" aria-hidden="true" tabindex="-1"></a>pls_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
 <p>Recode missing values as described in the readme included with each zipped file:</p>
 <div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="public-libraries-survey-pls.html#cb515-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>( this_col <span class="cf">in</span> <span class="fu">names</span>( pls_df ) ){</span>
 <span id="cb515-2"><a href="public-libraries-survey-pls.html#cb515-2" aria-hidden="true" tabindex="-1"></a></span>
