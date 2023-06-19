@@ -15,6 +15,7 @@ national-health-interview-survey-nhis: <p><a href="https://github.com/asdfree/nh
 national-household-travel-survey-nhts: <p><a href="https://github.com/asdfree/nhts/actions"><img src="https://github.com/asdfree/nhts/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-immunization-survey-nis: <p><a href="https://github.com/asdfree/nis/actions"><img src="https://github.com/asdfree/nis/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-plan-and-provider-enumeration-system-nppes: <p><a href="https://github.com/asdfree/nppes/actions"><img src="https://github.com/asdfree/nppes/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-survey-of-childrens-health-nsch: <p><a href="https://github.com/asdfree/nsch/actions"><img src="https://github.com/asdfree/nsch/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-survey-of-family-growth-nsfg: <p><a href="https://github.com/asdfree/nsfg/actions"><img src="https://github.com/asdfree/nsfg/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-survey-on-drug-use-and-health-nsduh: <p><a href="https://github.com/asdfree/nsduh/actions"><img src="https://github.com/asdfree/nsduh/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 programme-for-the-international-assessment-of-adult-competencies-piaac: <p><a href="https://github.com/asdfree/piaac/actions"><img src="https://github.com/asdfree/piaac/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
