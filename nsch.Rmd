@@ -2,30 +2,30 @@
 
 <a href="https://github.com/asdfree/nsch/actions"><img src="https://github.com/asdfree/nsch/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-The National Survey of Children's Health (NSCH) offers state-level estimates of children's health care and the family environment.
+Estimates of children's health care and family environments to inform reports like [Healthy People 2030](https://www.healthypeople.gov/).
 
-* One row per sampled child under eighteen.
+* One screener table with one row per eligible child (1+ rows per household), one topical table with the sampled child (only one row per household) from three stacked age-specific questionnaires.
 
-* A complex sample survey designed to generalize to non-institutionalized children in the United States at the state-level.
+* A complex sample survey designed to generalize to non-institutionalized U.S. children under 18.
 
-* Released every four or five years since 2003.
+* Released every four or five years since 2003, annually since 2016.
 
-* Sponsored by the [Maternal and Child Health Bureau of the Health Resources and Services Administration](http://www.mchb.hrsa.gov/).
+* Sponsored by the [Maternal and Child Health Bureau, Health Resources and Services Administration](http://www.mchb.hrsa.gov/).
 
 ---
 
 Please skim before you begin:
 
-1.
+1. [2021 National Survey of Children's Health Methodology Report](https://www2.census.gov/programs-surveys/nsch/technical-documentation/methodology/2021-NSCH-Methodology-Report.pdf)
 
-2.
+2. [2021 National Survey of Children's Health Data Users Frequently Asked Questions (FAQs)](https://www2.census.gov/programs-surveys/nsch/technical-documentation/methodology/2021-NSCH-FAQs.pdf)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National Survey of Children's Health)
 
 ```{r}
-# 
-# 
-# 
+# "age but a number"
+# lied babe from crib. "your nose grows"
+# cried gramps changing bib
 ```
 
 ---
@@ -166,7 +166,7 @@ nsch_design <-
 					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
 					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
 					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
-					56L, 72L) ,
+					56L) ,
 				labels =
 					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
 					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
@@ -177,7 +177,7 @@ nsch_design <-
 					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
 					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
 					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
-					"Washington", "West Virginia", "Wisconsin", "Wyoming", "Puerto Rico")
+					"Washington", "West Virginia", "Wisconsin", "Wyoming")
 			) ,
 
 		
@@ -187,17 +187,7 @@ nsch_design <-
 				levels = 1:3 , 
 				labels = c( 'excellent or very good' , 'good' , 'fair or poor' ) 
 			) ,
-		
-		indicator_1_3 = ifelse( k6q40 > 1 , NA , k6q40 ) ,
-
-# 		indicator_5_2 =
-# 			ifelse( k7q05r %in% 1:5 , 1 ,
-# 			ifelse( k7q05r %in% 0 , 0 , NA ) ) ,
-			
-		indicator_5_3 =
-			ifelse( k7q30 == 1 | k7q31 == 1 | k7q32 == 1 , 1 ,
-			ifelse( k7q30 == 0 | k7q31 == 0 | k7q32 == 0 , 0 , NA ) ) ,
-			
+					
 		poverty_categories = 
 			factor( 
 				1 + findInterval( fpl , c( 100 , 200 , 400 ) ) ,
@@ -205,6 +195,9 @@ nsch_design <-
 					c( "below poverty" , "100-199% fpl" , "200-399% fpl" , "400%+ fpl" )
 			) ,
 		
+		under_six_ever_breastfed =
+			as.numeric( k6q40 == 1 ) ,
+
 		sc_sex =
 			factor( ifelse( sc_sex %in% 1:2 , sc_sex , NA ) , labels = c( "male" , "female" ) )
 		
@@ -221,7 +214,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 MIcombine( with( nsch_design , svyby( ~ one , ~ one , unwtd.count ) ) )
 
-MIcombine( with( nsch_design , svyby( ~ one , ~ state , unwtd.count ) ) )
+MIcombine( with( nsch_design , svyby( ~ one , ~ state_name , unwtd.count ) ) )
 ```
 
 ### Weighted Counts {-}
@@ -230,7 +223,7 @@ Count the weighted size of the generalizable population, overall and by groups:
 MIcombine( with( nsch_design , svytotal( ~ one ) ) )
 
 MIcombine( with( nsch_design ,
-	svyby( ~ one , ~ state , svytotal )
+	svyby( ~ one , ~ state_name , svytotal )
 ) )
 ```
 
@@ -238,10 +231,10 @@ MIcombine( with( nsch_design ,
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-MIcombine( with( nsch_design , svymean( ~ ageyr_child ) ) )
+MIcombine( with( nsch_design , svymean( ~ sc_age_years ) ) )
 
 MIcombine( with( nsch_design ,
-	svyby( ~ ageyr_child , ~ state , svymean )
+	svyby( ~ sc_age_years , ~ state_name , svymean )
 ) )
 ```
 
@@ -250,16 +243,16 @@ Calculate the distribution of a categorical variable, overall and by groups:
 MIcombine( with( nsch_design , svymean( ~ poverty_categories ) ) )
 
 MIcombine( with( nsch_design ,
-	svyby( ~ poverty_categories , ~ state , svymean )
+	svyby( ~ poverty_categories , ~ state_name , svymean )
 ) )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-MIcombine( with( nsch_design , svytotal( ~ ageyr_child ) ) )
+MIcombine( with( nsch_design , svytotal( ~ sc_age_years ) ) )
 
 MIcombine( with( nsch_design ,
-	svyby( ~ ageyr_child , ~ state , svytotal )
+	svyby( ~ sc_age_years , ~ state_name , svytotal )
 ) )
 ```
 
@@ -268,7 +261,7 @@ Calculate the weighted sum of a categorical variable, overall and by groups:
 MIcombine( with( nsch_design , svytotal( ~ poverty_categories ) ) )
 
 MIcombine( with( nsch_design ,
-	svyby( ~ poverty_categories , ~ state , svytotal )
+	svyby( ~ poverty_categories , ~ state_name , svytotal )
 ) )
 ```
 
@@ -276,13 +269,13 @@ Calculate the median (50th percentile) of a linear variable, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 MIcombine( with( nsch_design ,
 	svyquantile(
-		~ ageyr_child ,
+		~ sc_age_years ,
 		0.5 , se = TRUE 
 ) ) )
 
 MIcombine( with( nsch_design ,
 	svyby(
-		~ ageyr_child , ~ state , svyquantile ,
+		~ sc_age_years , ~ state_name , svyquantile ,
 		0.5 , se = TRUE ,
 		ci = TRUE 
 ) ) )
@@ -291,7 +284,7 @@ MIcombine( with( nsch_design ,
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 MIcombine( with( nsch_design ,
-	svyratio( numerator = ~ k6q63 , denominator = ~ totkids4 )
+	svyratio( numerator = ~ liveusa_yr , denominator = ~ sc_age_years )
 ) )
 ```
 
@@ -303,7 +296,7 @@ sub_nsch_design <- subset( nsch_design , agepos4 == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-MIcombine( with( sub_nsch_design , svymean( ~ ageyr_child ) ) )
+MIcombine( with( sub_nsch_design , svymean( ~ sc_age_years ) ) )
 ```
 
 ### Measures of Uncertainty {-}
@@ -312,7 +305,7 @@ Extract the coefficient, standard error, confidence interval, and coefficient of
 ```{r eval = FALSE , results = "hide" }
 this_result <-
 	MIcombine( with( nsch_design ,
-		svymean( ~ ageyr_child )
+		svymean( ~ sc_age_years )
 	) )
 
 coef( this_result )
@@ -322,7 +315,7 @@ cv( this_result )
 
 grouped_result <-
 	MIcombine( with( nsch_design ,
-		svyby( ~ ageyr_child , ~ state , svymean )
+		svyby( ~ sc_age_years , ~ state_name , svymean )
 	) )
 
 coef( grouped_result )
@@ -338,25 +331,25 @@ degf( nsch_design$designs[[1]] )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-MIcombine( with( nsch_design , svyvar( ~ ageyr_child ) ) )
+MIcombine( with( nsch_design , svyvar( ~ sc_age_years ) ) )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
 MIcombine( with( nsch_design ,
-	svymean( ~ ageyr_child , deff = TRUE )
+	svymean( ~ sc_age_years , deff = TRUE )
 ) )
 
 # SRS with replacement
 MIcombine( with( nsch_design ,
-	svymean( ~ ageyr_child , deff = "replace" )
+	svymean( ~ sc_age_years , deff = "replace" )
 ) )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-# MIsvyciprop( ~ indicator_5_2 , nsch_design ,
+# MIsvyciprop( ~ under_six_ever_breastfed , nsch_design ,
 # 	method = "likelihood" )
 ```
 
@@ -364,19 +357,19 @@ Compute confidence intervals for proportions using methods that may be more accu
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-# MIsvyttest( ageyr_child ~ indicator_5_2 , nsch_design )
+# MIsvyttest( sc_age_years ~ under_six_ever_breastfed , nsch_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
-# MIsvychisq( ~ indicator_5_2 + poverty_categories , nsch_design )
+# MIsvychisq( ~ under_six_ever_breastfed + poverty_categories , nsch_design )
 ```
 
 Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	MIcombine( with( nsch_design ,
-		svyglm( ageyr_child ~ indicator_5_2 + poverty_categories )
+		svyglm( sc_age_years ~ under_six_ever_breastfed + poverty_categories )
 	) )
 	
 summary( glm_result )
@@ -396,7 +389,7 @@ summary( glm_result )
 
 ## Replication Example {-}
 
-**As noted in the bold red footnote of their published table, this technique is not correct and should not be used. The technical documents recommend a method matching the `MIcombine` syntax shown above.** Nonetheless, this code matches statistics and confidence intervals within 0.1% from the `Excellent or very good` column of [Indicator 1.1: In general, how would you describe this child's health?](https://www.childhealthdata.org/browse/survey/results?q=9238&r=1&g=1043):
+**As noted in the bold red footnote of their published table, this technique is not correct and should not be used. The [technical documents](https://www2.census.gov/programs-surveys/nsch/technical-documentation/methodology/NSCH-Analysis-with-Imputed-Data-Guide.pdf) recommend a method matching the `MIcombine` syntax shown above.** Nonetheless, this code matches statistics and confidence intervals within 0.1% from the `Excellent or very good` column of [Indicator 1.1: In general, how would you describe this child's health?](https://www.childhealthdata.org/browse/survey/results?q=9238&r=1&g=1043):
 
 ```{r eval = FALSE , results = "hide" }
 results <-
