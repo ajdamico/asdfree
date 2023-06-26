@@ -1,0 +1,155 @@
+chapter_title: American Housing Survey
+
+needs_actions_build_status_line: yes
+
+
+
+~~~{dataset_introduction}
+The American Housing Survey tracks housing structures across the United States.
+~~~
+
+table_structure: * A collection of tables, most with one row per housing unit.
+
+generalizable_population: * A complex sample survey designed to generalize to both occupied and vacant housing units across the United States and also for about twenty-five metropolitan areas.
+
+publication_period: * Released more or less biennially since 1973.
+
+administrative_organization: * Sponsored by [the Department of Housing and Urban Development (HUD)](https://www.hud.gov/) and conducted by the [U.S. Census Bureau](https://www.census.gov/).
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Getting Started with the Public Use File: 2015 and Beyond](https://www.census.gov/content/dam/Census/programs-surveys/ahs/tech-documentation/2015/Getting%20Started%20with%20the%20AHS%20PUF%202015%20and%20Beyond.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/American_Housing_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+```{r}
+#
+#
+#
+```
+~~~
+
+
+
+~~~{download_and_import_block}
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+library(httr)
+
+tf <- tempfile()
+
+this_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/ahs/" ,
+		"2021/AHS%202021%20National%20PUF%20v1.0%20Flat%20SAS.zip"
+	)
+
+GET( this_url , write_disk( tf ) , progress() )
+
+chapter_tag_tbl <- read_sas( tf )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+~~~
+
+
+
+~~~{analysis_examples_survey_design}
+```{r message = FALSE , eval = FALSE }
+library(survey)
+
+chapter_tag_design <- 
+	svrepdesign(
+		weights = ~ weight ,
+		repweights = "repweight[1-9]" ,
+		type = "Fay" ,
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		mse = TRUE ,
+		data = chapter_tag_df
+	)
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+
+		one = 1 ,
+
+		tenure = 
+			factor( 
+				ifelse( tenure %in% c( -6 , 'N' ) , 4 , tenure ) , 
+				levels = 1:4 , 
+				labels = 
+					c( 'Owned or being bought' ,
+					'Rented for cash rent' ,
+					'Occupied without payment of cash rent' ,
+					'Not occupied' )
+			) ,
+			
+			
+		lotsize =
+			factor( 
+				lotsize , 
+				levels = 1:7 ,
+				labels = c( "Less then 1/8 acre" , 
+				"1/8 up to 1/4 acre" , "1/4 up to 1/2 acre" ,
+				"1/2 up to 1 acre" , "1 up to 5 acres" , 
+				"5 up to 10 acres" , "10 acres or more" ) ) ,
+				
+				
+		below_poverty = as.numeric( perpovlvl < 100 )
+				
+	)
+~~~
+
+group_by_variable: tenure
+
+categorical_variable: lotsize
+categorical_narm: , na.rm = TRUE
+
+linear_variable: totrooms
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: totrooms
+ratio_estimation_denominator: rent
+ratio_narm: , na.rm = TRUE
+
+subset_definition: garage == 1
+subset_definition_description: homes with a garage or carport
+
+binary_variable: below_poverty
+binary_narm: , na.rm = TRUE
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches the estimate and margin of error of the `Total` row of the `General Housing` tab from the [AHS 2021 Table Specifications and PUF Estimates for User Verification](https://www2.census.gov/programs-surveys/ahs/2021/2021%20AHS%20Table%20Specifications%20and%20PUF%20Estimates%20for%20User%20Verification.xlsx):
+
+```{r eval = FALSE , results = "hide" }
+result <- svytotal( ~ as.numeric( intstatus == 1 ) , chapter_tag_design )
+
+stopifnot( round( coef( result ) / 1000 , 0 ) == 128504 )
+
+ci_results <- confint( result , level = 0.9 )
+
+stopifnot( round( ( ci_results[ 2 ] - coef( result ) ) / 1000 , 0 ) == 388 )
+```
+
+~~~
+
+
+
