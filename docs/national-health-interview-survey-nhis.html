@@ -751,105 +751,105 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><a href="https://en.wikipedia.org/wiki/National_Health_Interview_Survey">Wikipedia Entry</a></p></li>
 <li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National%20Health%20Interview%20Survey">artificial intelligence-generated limericks</a></p></li>
 </ol>
-<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="national-health-interview-survey-nhis.html#cb376-1" aria-hidden="true" tabindex="-1"></a><span class="co"># excellent health poor</span></span>
-<span id="cb376-2"><a href="national-health-interview-survey-nhis.html#cb376-2" aria-hidden="true" tabindex="-1"></a><span class="co"># wealth. &quot;sup, doc?&quot; bugs, daft bills, free</span></span>
-<span id="cb376-3"><a href="national-health-interview-survey-nhis.html#cb376-3" aria-hidden="true" tabindex="-1"></a><span class="co"># laughs best medicine</span></span></code></pre></div>
+<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="national-health-interview-survey-nhis.html#cb376-1" tabindex="-1"></a><span class="co"># excellent health poor</span></span>
+<span id="cb376-2"><a href="national-health-interview-survey-nhis.html#cb376-2" tabindex="-1"></a><span class="co"># wealth. &quot;sup, doc?&quot; bugs, daft bills, free</span></span>
+<span id="cb376-3"><a href="national-health-interview-survey-nhis.html#cb376-3" tabindex="-1"></a><span class="co"># laughs best medicine</span></span></code></pre></div>
 <hr />
 <div id="download-import-preparation-13" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="national-health-interview-survey-nhis.html#download-import-preparation-13" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Define a function to download, unzip, and import each comma-separated value file:</p>
-<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb377-1"><a href="national-health-interview-survey-nhis.html#cb377-1" aria-hidden="true" tabindex="-1"></a>nhis_csv_import <span class="ot">&lt;-</span></span>
-<span id="cb377-2"><a href="national-health-interview-survey-nhis.html#cb377-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( this_url ){</span>
-<span id="cb377-3"><a href="national-health-interview-survey-nhis.html#cb377-3" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb377-4"><a href="national-health-interview-survey-nhis.html#cb377-4" aria-hidden="true" tabindex="-1"></a>        this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb377-5"><a href="national-health-interview-survey-nhis.html#cb377-5" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb377-6"><a href="national-health-interview-survey-nhis.html#cb377-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">download.file</span>( this_url , this_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb377-7"><a href="national-health-interview-survey-nhis.html#cb377-7" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb377-8"><a href="national-health-interview-survey-nhis.html#cb377-8" aria-hidden="true" tabindex="-1"></a>        unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb377-9"><a href="national-health-interview-survey-nhis.html#cb377-9" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb377-10"><a href="national-health-interview-survey-nhis.html#cb377-10" aria-hidden="true" tabindex="-1"></a>        this_csv <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.csv$&#39;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb377-11"><a href="national-health-interview-survey-nhis.html#cb377-11" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb377-12"><a href="national-health-interview-survey-nhis.html#cb377-12" aria-hidden="true" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( this_csv )</span>
-<span id="cb377-13"><a href="national-health-interview-survey-nhis.html#cb377-13" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb377-14"><a href="national-health-interview-survey-nhis.html#cb377-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">file.remove</span>( <span class="fu">c</span>( this_tf , unzipped_files ) )</span>
-<span id="cb377-15"><a href="national-health-interview-survey-nhis.html#cb377-15" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb377-16"><a href="national-health-interview-survey-nhis.html#cb377-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
-<span id="cb377-17"><a href="national-health-interview-survey-nhis.html#cb377-17" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb377-18"><a href="national-health-interview-survey-nhis.html#cb377-18" aria-hidden="true" tabindex="-1"></a>        this_df</span>
-<span id="cb377-19"><a href="national-health-interview-survey-nhis.html#cb377-19" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb377-1"><a href="national-health-interview-survey-nhis.html#cb377-1" tabindex="-1"></a>nhis_csv_import <span class="ot">&lt;-</span></span>
+<span id="cb377-2"><a href="national-health-interview-survey-nhis.html#cb377-2" tabindex="-1"></a>    <span class="cf">function</span>( this_url ){</span>
+<span id="cb377-3"><a href="national-health-interview-survey-nhis.html#cb377-3" tabindex="-1"></a>        </span>
+<span id="cb377-4"><a href="national-health-interview-survey-nhis.html#cb377-4" tabindex="-1"></a>        this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb377-5"><a href="national-health-interview-survey-nhis.html#cb377-5" tabindex="-1"></a>        </span>
+<span id="cb377-6"><a href="national-health-interview-survey-nhis.html#cb377-6" tabindex="-1"></a>        <span class="fu">download.file</span>( this_url , this_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb377-7"><a href="national-health-interview-survey-nhis.html#cb377-7" tabindex="-1"></a>        </span>
+<span id="cb377-8"><a href="national-health-interview-survey-nhis.html#cb377-8" tabindex="-1"></a>        unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb377-9"><a href="national-health-interview-survey-nhis.html#cb377-9" tabindex="-1"></a>        </span>
+<span id="cb377-10"><a href="national-health-interview-survey-nhis.html#cb377-10" tabindex="-1"></a>        this_csv <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.csv$&#39;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb377-11"><a href="national-health-interview-survey-nhis.html#cb377-11" tabindex="-1"></a>        </span>
+<span id="cb377-12"><a href="national-health-interview-survey-nhis.html#cb377-12" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( this_csv )</span>
+<span id="cb377-13"><a href="national-health-interview-survey-nhis.html#cb377-13" tabindex="-1"></a>        </span>
+<span id="cb377-14"><a href="national-health-interview-survey-nhis.html#cb377-14" tabindex="-1"></a>        <span class="fu">file.remove</span>( <span class="fu">c</span>( this_tf , unzipped_files ) )</span>
+<span id="cb377-15"><a href="national-health-interview-survey-nhis.html#cb377-15" tabindex="-1"></a>        </span>
+<span id="cb377-16"><a href="national-health-interview-survey-nhis.html#cb377-16" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
+<span id="cb377-17"><a href="national-health-interview-survey-nhis.html#cb377-17" tabindex="-1"></a>        </span>
+<span id="cb377-18"><a href="national-health-interview-survey-nhis.html#cb377-18" tabindex="-1"></a>        this_df</span>
+<span id="cb377-19"><a href="national-health-interview-survey-nhis.html#cb377-19" tabindex="-1"></a>    }</span></code></pre></div>
 <p>Download and import the sample adult interview and imputed income files:</p>
-<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb378-1"><a href="national-health-interview-survey-nhis.html#cb378-1" aria-hidden="true" tabindex="-1"></a>nhis_df <span class="ot">&lt;-</span></span>
-<span id="cb378-2"><a href="national-health-interview-survey-nhis.html#cb378-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nhis_csv_import</span>( </span>
-<span id="cb378-3"><a href="national-health-interview-survey-nhis.html#cb378-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adult21csv.zip&quot;</span> </span>
-<span id="cb378-4"><a href="national-health-interview-survey-nhis.html#cb378-4" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb378-5"><a href="national-health-interview-survey-nhis.html#cb378-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb378-6"><a href="national-health-interview-survey-nhis.html#cb378-6" aria-hidden="true" tabindex="-1"></a>imputed_income_df <span class="ot">&lt;-</span> </span>
-<span id="cb378-7"><a href="national-health-interview-survey-nhis.html#cb378-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nhis_csv_import</span>( </span>
-<span id="cb378-8"><a href="national-health-interview-survey-nhis.html#cb378-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adultinc21csv.zip&quot;</span> </span>
-<span id="cb378-9"><a href="national-health-interview-survey-nhis.html#cb378-9" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb378-1"><a href="national-health-interview-survey-nhis.html#cb378-1" tabindex="-1"></a>nhis_df <span class="ot">&lt;-</span></span>
+<span id="cb378-2"><a href="national-health-interview-survey-nhis.html#cb378-2" tabindex="-1"></a>    <span class="fu">nhis_csv_import</span>( </span>
+<span id="cb378-3"><a href="national-health-interview-survey-nhis.html#cb378-3" tabindex="-1"></a>        <span class="st">&quot;https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adult21csv.zip&quot;</span> </span>
+<span id="cb378-4"><a href="national-health-interview-survey-nhis.html#cb378-4" tabindex="-1"></a>    )</span>
+<span id="cb378-5"><a href="national-health-interview-survey-nhis.html#cb378-5" tabindex="-1"></a></span>
+<span id="cb378-6"><a href="national-health-interview-survey-nhis.html#cb378-6" tabindex="-1"></a>imputed_income_df <span class="ot">&lt;-</span> </span>
+<span id="cb378-7"><a href="national-health-interview-survey-nhis.html#cb378-7" tabindex="-1"></a>    <span class="fu">nhis_csv_import</span>( </span>
+<span id="cb378-8"><a href="national-health-interview-survey-nhis.html#cb378-8" tabindex="-1"></a>        <span class="st">&quot;https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adultinc21csv.zip&quot;</span> </span>
+<span id="cb378-9"><a href="national-health-interview-survey-nhis.html#cb378-9" tabindex="-1"></a>    )</span></code></pre></div>
 <div id="save-locally-13" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="national-health-interview-survey-nhis.html#save-locally-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb379-1"><a href="national-health-interview-survey-nhis.html#cb379-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhis_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NHIS&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb379-2"><a href="national-health-interview-survey-nhis.html#cb379-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( nhis_df , file = nhis_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb379-1"><a href="national-health-interview-survey-nhis.html#cb379-1" tabindex="-1"></a><span class="co"># nhis_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NHIS&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb379-2"><a href="national-health-interview-survey-nhis.html#cb379-2" tabindex="-1"></a><span class="co"># saveRDS( nhis_df , file = nhis_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb380-1"><a href="national-health-interview-survey-nhis.html#cb380-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhis_df &lt;- readRDS( nhis_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb380-1"><a href="national-health-interview-survey-nhis.html#cb380-1" tabindex="-1"></a><span class="co"># nhis_df &lt;- readRDS( nhis_fn )</span></span></code></pre></div>
 </div>
 <div id="survey-design-definition-10" class="section level3 unnumbered hasAnchor">
 <h3>Survey Design Definition<a href="national-health-interview-survey-nhis.html#survey-design-definition-10" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Construct a multiply-imputed, complex sample survey design:</p>
 <p>Reshape the imputed income data.frame into a list based on the implicate number:</p>
-<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="national-health-interview-survey-nhis.html#cb381-1" aria-hidden="true" tabindex="-1"></a>imputed_income_list <span class="ot">&lt;-</span> <span class="fu">split</span>( imputed_income_df , imputed_income_df[ , <span class="st">&#39;impnum_a&#39;</span> ] )</span></code></pre></div>
+<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="national-health-interview-survey-nhis.html#cb381-1" tabindex="-1"></a>imputed_income_list <span class="ot">&lt;-</span> <span class="fu">split</span>( imputed_income_df , imputed_income_df[ , <span class="st">&#39;impnum_a&#39;</span> ] )</span></code></pre></div>
 <p>Remove overlapping columns except the merge variable:</p>
-<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="national-health-interview-survey-nhis.html#cb382-1" aria-hidden="true" tabindex="-1"></a>variables_to_remove <span class="ot">&lt;-</span></span>
-<span id="cb382-2"><a href="national-health-interview-survey-nhis.html#cb382-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setdiff</span>( <span class="fu">intersect</span>( <span class="fu">names</span>( nhis_df ) , <span class="fu">names</span>( imputed_income_df ) ) , <span class="st">&#39;hhx&#39;</span> )</span>
-<span id="cb382-3"><a href="national-health-interview-survey-nhis.html#cb382-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb382-4"><a href="national-health-interview-survey-nhis.html#cb382-4" aria-hidden="true" tabindex="-1"></a>nhis_df <span class="ot">&lt;-</span> nhis_df[ , <span class="sc">!</span>( <span class="fu">names</span>( nhis_df ) <span class="sc">%in%</span> variables_to_remove ) ]</span></code></pre></div>
+<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="national-health-interview-survey-nhis.html#cb382-1" tabindex="-1"></a>variables_to_remove <span class="ot">&lt;-</span></span>
+<span id="cb382-2"><a href="national-health-interview-survey-nhis.html#cb382-2" tabindex="-1"></a>    <span class="fu">setdiff</span>( <span class="fu">intersect</span>( <span class="fu">names</span>( nhis_df ) , <span class="fu">names</span>( imputed_income_df ) ) , <span class="st">&#39;hhx&#39;</span> )</span>
+<span id="cb382-3"><a href="national-health-interview-survey-nhis.html#cb382-3" tabindex="-1"></a></span>
+<span id="cb382-4"><a href="national-health-interview-survey-nhis.html#cb382-4" tabindex="-1"></a>nhis_df <span class="ot">&lt;-</span> nhis_df[ , <span class="sc">!</span>( <span class="fu">names</span>( nhis_df ) <span class="sc">%in%</span> variables_to_remove ) ]</span></code></pre></div>
 <p>Merge each implicate onto the sample adult table:</p>
-<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="national-health-interview-survey-nhis.html#cb383-1" aria-hidden="true" tabindex="-1"></a>nhis_list <span class="ot">&lt;-</span></span>
-<span id="cb383-2"><a href="national-health-interview-survey-nhis.html#cb383-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>( imputed_income_list ,</span>
-<span id="cb383-3"><a href="national-health-interview-survey-nhis.html#cb383-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>( w ){</span>
-<span id="cb383-4"><a href="national-health-interview-survey-nhis.html#cb383-4" aria-hidden="true" tabindex="-1"></a>            this_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( nhis_df , w )</span>
-<span id="cb383-5"><a href="national-health-interview-survey-nhis.html#cb383-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">stopifnot</span>( <span class="fu">nrow</span>( this_df ) <span class="sc">==</span> <span class="fu">nrow</span>( nhis_df ) )</span>
-<span id="cb383-6"><a href="national-health-interview-survey-nhis.html#cb383-6" aria-hidden="true" tabindex="-1"></a>            this_df</span>
-<span id="cb383-7"><a href="national-health-interview-survey-nhis.html#cb383-7" aria-hidden="true" tabindex="-1"></a>        } )</span></code></pre></div>
+<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="national-health-interview-survey-nhis.html#cb383-1" tabindex="-1"></a>nhis_list <span class="ot">&lt;-</span></span>
+<span id="cb383-2"><a href="national-health-interview-survey-nhis.html#cb383-2" tabindex="-1"></a>    <span class="fu">lapply</span>( imputed_income_list ,</span>
+<span id="cb383-3"><a href="national-health-interview-survey-nhis.html#cb383-3" tabindex="-1"></a>        <span class="cf">function</span>( w ){</span>
+<span id="cb383-4"><a href="national-health-interview-survey-nhis.html#cb383-4" tabindex="-1"></a>            this_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( nhis_df , w )</span>
+<span id="cb383-5"><a href="national-health-interview-survey-nhis.html#cb383-5" tabindex="-1"></a>            <span class="fu">stopifnot</span>( <span class="fu">nrow</span>( this_df ) <span class="sc">==</span> <span class="fu">nrow</span>( nhis_df ) )</span>
+<span id="cb383-6"><a href="national-health-interview-survey-nhis.html#cb383-6" tabindex="-1"></a>            this_df</span>
+<span id="cb383-7"><a href="national-health-interview-survey-nhis.html#cb383-7" tabindex="-1"></a>        } )</span></code></pre></div>
 <p>Define the design:</p>
-<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="national-health-interview-survey-nhis.html#cb384-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb384-2"><a href="national-health-interview-survey-nhis.html#cb384-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
-<span id="cb384-3"><a href="national-health-interview-survey-nhis.html#cb384-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb384-4"><a href="national-health-interview-survey-nhis.html#cb384-4" aria-hidden="true" tabindex="-1"></a>nhis_design <span class="ot">&lt;-</span> </span>
-<span id="cb384-5"><a href="national-health-interview-survey-nhis.html#cb384-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>( </span>
-<span id="cb384-6"><a href="national-health-interview-survey-nhis.html#cb384-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> ppsu , </span>
-<span id="cb384-7"><a href="national-health-interview-survey-nhis.html#cb384-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> pstrat ,</span>
-<span id="cb384-8"><a href="national-health-interview-survey-nhis.html#cb384-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb384-9"><a href="national-health-interview-survey-nhis.html#cb384-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> wtfa_a ,</span>
-<span id="cb384-10"><a href="national-health-interview-survey-nhis.html#cb384-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( nhis_list )</span>
-<span id="cb384-11"><a href="national-health-interview-survey-nhis.html#cb384-11" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="national-health-interview-survey-nhis.html#cb384-1" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb384-2"><a href="national-health-interview-survey-nhis.html#cb384-2" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
+<span id="cb384-3"><a href="national-health-interview-survey-nhis.html#cb384-3" tabindex="-1"></a></span>
+<span id="cb384-4"><a href="national-health-interview-survey-nhis.html#cb384-4" tabindex="-1"></a>nhis_design <span class="ot">&lt;-</span> </span>
+<span id="cb384-5"><a href="national-health-interview-survey-nhis.html#cb384-5" tabindex="-1"></a>    <span class="fu">svydesign</span>( </span>
+<span id="cb384-6"><a href="national-health-interview-survey-nhis.html#cb384-6" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> ppsu , </span>
+<span id="cb384-7"><a href="national-health-interview-survey-nhis.html#cb384-7" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> pstrat ,</span>
+<span id="cb384-8"><a href="national-health-interview-survey-nhis.html#cb384-8" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb384-9"><a href="national-health-interview-survey-nhis.html#cb384-9" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> wtfa_a ,</span>
+<span id="cb384-10"><a href="national-health-interview-survey-nhis.html#cb384-10" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( nhis_list )</span>
+<span id="cb384-11"><a href="national-health-interview-survey-nhis.html#cb384-11" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="variable-recoding-13" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="national-health-interview-survey-nhis.html#variable-recoding-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="national-health-interview-survey-nhis.html#cb385-1" aria-hidden="true" tabindex="-1"></a>nhis_design <span class="ot">&lt;-</span> </span>
-<span id="cb385-2"><a href="national-health-interview-survey-nhis.html#cb385-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb385-3"><a href="national-health-interview-survey-nhis.html#cb385-3" aria-hidden="true" tabindex="-1"></a>        nhis_design , </span>
-<span id="cb385-4"><a href="national-health-interview-survey-nhis.html#cb385-4" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb385-5"><a href="national-health-interview-survey-nhis.html#cb385-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
-<span id="cb385-6"><a href="national-health-interview-survey-nhis.html#cb385-6" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb385-7"><a href="national-health-interview-survey-nhis.html#cb385-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">poverty_category =</span></span>
-<span id="cb385-8"><a href="national-health-interview-survey-nhis.html#cb385-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb385-9"><a href="national-health-interview-survey-nhis.html#cb385-9" aria-hidden="true" tabindex="-1"></a>                <span class="fu">findInterval</span>( povrattc_a , <span class="fu">c</span>( <span class="dv">1</span> , <span class="dv">2</span> , <span class="dv">4</span> ) ) ,</span>
-<span id="cb385-10"><a href="national-health-interview-survey-nhis.html#cb385-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> </span>
-<span id="cb385-11"><a href="national-health-interview-survey-nhis.html#cb385-11" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="st">&quot;below poverty&quot;</span> , <span class="st">&quot;100-199%&quot;</span> , <span class="st">&quot;200-399%&quot;</span> , <span class="st">&quot;400%+&quot;</span> )</span>
-<span id="cb385-12"><a href="national-health-interview-survey-nhis.html#cb385-12" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
-<span id="cb385-13"><a href="national-health-interview-survey-nhis.html#cb385-13" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb385-14"><a href="national-health-interview-survey-nhis.html#cb385-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">fair_or_poor_reported_health =</span> </span>
-<span id="cb385-15"><a href="national-health-interview-survey-nhis.html#cb385-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">ifelse</span>( phstat_a <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> , <span class="fu">as.numeric</span>( phstat_a <span class="sc">&gt;=</span> <span class="dv">4</span> ) , <span class="cn">NA</span> ) ,</span>
-<span id="cb385-16"><a href="national-health-interview-survey-nhis.html#cb385-16" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb385-17"><a href="national-health-interview-survey-nhis.html#cb385-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">sex_a =</span> <span class="fu">factor</span>( sex_a , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) ) ,</span>
-<span id="cb385-18"><a href="national-health-interview-survey-nhis.html#cb385-18" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb385-19"><a href="national-health-interview-survey-nhis.html#cb385-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">annual_premium_first_plan =</span> <span class="fu">ifelse</span>( hicostr1_a <span class="sc">&gt;</span> <span class="dv">40000</span> , <span class="cn">NA</span> , hicostr1_a )</span>
-<span id="cb385-20"><a href="national-health-interview-survey-nhis.html#cb385-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb385-21"><a href="national-health-interview-survey-nhis.html#cb385-21" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="national-health-interview-survey-nhis.html#cb385-1" tabindex="-1"></a>nhis_design <span class="ot">&lt;-</span> </span>
+<span id="cb385-2"><a href="national-health-interview-survey-nhis.html#cb385-2" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb385-3"><a href="national-health-interview-survey-nhis.html#cb385-3" tabindex="-1"></a>        nhis_design , </span>
+<span id="cb385-4"><a href="national-health-interview-survey-nhis.html#cb385-4" tabindex="-1"></a>        </span>
+<span id="cb385-5"><a href="national-health-interview-survey-nhis.html#cb385-5" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
+<span id="cb385-6"><a href="national-health-interview-survey-nhis.html#cb385-6" tabindex="-1"></a>        </span>
+<span id="cb385-7"><a href="national-health-interview-survey-nhis.html#cb385-7" tabindex="-1"></a>        <span class="at">poverty_category =</span></span>
+<span id="cb385-8"><a href="national-health-interview-survey-nhis.html#cb385-8" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
+<span id="cb385-9"><a href="national-health-interview-survey-nhis.html#cb385-9" tabindex="-1"></a>                <span class="fu">findInterval</span>( povrattc_a , <span class="fu">c</span>( <span class="dv">1</span> , <span class="dv">2</span> , <span class="dv">4</span> ) ) ,</span>
+<span id="cb385-10"><a href="national-health-interview-survey-nhis.html#cb385-10" tabindex="-1"></a>                <span class="at">labels =</span> </span>
+<span id="cb385-11"><a href="national-health-interview-survey-nhis.html#cb385-11" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="st">&quot;below poverty&quot;</span> , <span class="st">&quot;100-199%&quot;</span> , <span class="st">&quot;200-399%&quot;</span> , <span class="st">&quot;400%+&quot;</span> )</span>
+<span id="cb385-12"><a href="national-health-interview-survey-nhis.html#cb385-12" tabindex="-1"></a>            ) ,</span>
+<span id="cb385-13"><a href="national-health-interview-survey-nhis.html#cb385-13" tabindex="-1"></a>            </span>
+<span id="cb385-14"><a href="national-health-interview-survey-nhis.html#cb385-14" tabindex="-1"></a>        <span class="at">fair_or_poor_reported_health =</span> </span>
+<span id="cb385-15"><a href="national-health-interview-survey-nhis.html#cb385-15" tabindex="-1"></a>            <span class="fu">ifelse</span>( phstat_a <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> , <span class="fu">as.numeric</span>( phstat_a <span class="sc">&gt;=</span> <span class="dv">4</span> ) , <span class="cn">NA</span> ) ,</span>
+<span id="cb385-16"><a href="national-health-interview-survey-nhis.html#cb385-16" tabindex="-1"></a>            </span>
+<span id="cb385-17"><a href="national-health-interview-survey-nhis.html#cb385-17" tabindex="-1"></a>        <span class="at">sex_a =</span> <span class="fu">factor</span>( sex_a , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) ) ,</span>
+<span id="cb385-18"><a href="national-health-interview-survey-nhis.html#cb385-18" tabindex="-1"></a>        </span>
+<span id="cb385-19"><a href="national-health-interview-survey-nhis.html#cb385-19" tabindex="-1"></a>        <span class="at">annual_premium_first_plan =</span> <span class="fu">ifelse</span>( hicostr1_a <span class="sc">&gt;</span> <span class="dv">40000</span> , <span class="cn">NA</span> , hicostr1_a )</span>
+<span id="cb385-20"><a href="national-health-interview-survey-nhis.html#cb385-20" tabindex="-1"></a></span>
+<span id="cb385-21"><a href="national-health-interview-survey-nhis.html#cb385-21" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -858,123 +858,123 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-13" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="national-health-interview-survey-nhis.html#unweighted-counts-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="national-health-interview-survey-nhis.html#cb386-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
-<span id="cb386-2"><a href="national-health-interview-survey-nhis.html#cb386-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb386-3"><a href="national-health-interview-survey-nhis.html#cb386-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> poverty_category , unwtd.count ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="national-health-interview-survey-nhis.html#cb386-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
+<span id="cb386-2"><a href="national-health-interview-survey-nhis.html#cb386-2" tabindex="-1"></a></span>
+<span id="cb386-3"><a href="national-health-interview-survey-nhis.html#cb386-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> poverty_category , unwtd.count ) ) )</span></code></pre></div>
 </div>
 <div id="weighted-counts-10" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="national-health-interview-survey-nhis.html#weighted-counts-10" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="national-health-interview-survey-nhis.html#cb387-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
-<span id="cb387-2"><a href="national-health-interview-survey-nhis.html#cb387-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb387-3"><a href="national-health-interview-survey-nhis.html#cb387-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb387-4"><a href="national-health-interview-survey-nhis.html#cb387-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> poverty_category , svytotal )</span>
-<span id="cb387-5"><a href="national-health-interview-survey-nhis.html#cb387-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="national-health-interview-survey-nhis.html#cb387-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
+<span id="cb387-2"><a href="national-health-interview-survey-nhis.html#cb387-2" tabindex="-1"></a></span>
+<span id="cb387-3"><a href="national-health-interview-survey-nhis.html#cb387-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb387-4"><a href="national-health-interview-survey-nhis.html#cb387-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> poverty_category , svytotal )</span>
+<span id="cb387-5"><a href="national-health-interview-survey-nhis.html#cb387-5" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-13" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="national-health-interview-survey-nhis.html#descriptive-statistics-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="national-health-interview-survey-nhis.html#cb388-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svymean</span>( <span class="sc">~</span> agep_a ) ) )</span>
-<span id="cb388-2"><a href="national-health-interview-survey-nhis.html#cb388-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb388-3"><a href="national-health-interview-survey-nhis.html#cb388-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb388-4"><a href="national-health-interview-survey-nhis.html#cb388-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> agep_a , <span class="sc">~</span> poverty_category , svymean )</span>
-<span id="cb388-5"><a href="national-health-interview-survey-nhis.html#cb388-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="national-health-interview-survey-nhis.html#cb388-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svymean</span>( <span class="sc">~</span> agep_a ) ) )</span>
+<span id="cb388-2"><a href="national-health-interview-survey-nhis.html#cb388-2" tabindex="-1"></a></span>
+<span id="cb388-3"><a href="national-health-interview-survey-nhis.html#cb388-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb388-4"><a href="national-health-interview-survey-nhis.html#cb388-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> agep_a , <span class="sc">~</span> poverty_category , svymean )</span>
+<span id="cb388-5"><a href="national-health-interview-survey-nhis.html#cb388-5" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="national-health-interview-survey-nhis.html#cb389-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svymean</span>( <span class="sc">~</span> sex_a ) ) )</span>
-<span id="cb389-2"><a href="national-health-interview-survey-nhis.html#cb389-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb389-3"><a href="national-health-interview-survey-nhis.html#cb389-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb389-4"><a href="national-health-interview-survey-nhis.html#cb389-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sex_a , <span class="sc">~</span> poverty_category , svymean )</span>
-<span id="cb389-5"><a href="national-health-interview-survey-nhis.html#cb389-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="national-health-interview-survey-nhis.html#cb389-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svymean</span>( <span class="sc">~</span> sex_a ) ) )</span>
+<span id="cb389-2"><a href="national-health-interview-survey-nhis.html#cb389-2" tabindex="-1"></a></span>
+<span id="cb389-3"><a href="national-health-interview-survey-nhis.html#cb389-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb389-4"><a href="national-health-interview-survey-nhis.html#cb389-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sex_a , <span class="sc">~</span> poverty_category , svymean )</span>
+<span id="cb389-5"><a href="national-health-interview-survey-nhis.html#cb389-5" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="national-health-interview-survey-nhis.html#cb390-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svytotal</span>( <span class="sc">~</span> agep_a ) ) )</span>
-<span id="cb390-2"><a href="national-health-interview-survey-nhis.html#cb390-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb390-3"><a href="national-health-interview-survey-nhis.html#cb390-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb390-4"><a href="national-health-interview-survey-nhis.html#cb390-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> agep_a , <span class="sc">~</span> poverty_category , svytotal )</span>
-<span id="cb390-5"><a href="national-health-interview-survey-nhis.html#cb390-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="national-health-interview-survey-nhis.html#cb390-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svytotal</span>( <span class="sc">~</span> agep_a ) ) )</span>
+<span id="cb390-2"><a href="national-health-interview-survey-nhis.html#cb390-2" tabindex="-1"></a></span>
+<span id="cb390-3"><a href="national-health-interview-survey-nhis.html#cb390-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb390-4"><a href="national-health-interview-survey-nhis.html#cb390-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> agep_a , <span class="sc">~</span> poverty_category , svytotal )</span>
+<span id="cb390-5"><a href="national-health-interview-survey-nhis.html#cb390-5" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="national-health-interview-survey-nhis.html#cb391-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svytotal</span>( <span class="sc">~</span> sex_a ) ) )</span>
-<span id="cb391-2"><a href="national-health-interview-survey-nhis.html#cb391-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb391-3"><a href="national-health-interview-survey-nhis.html#cb391-3" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb391-4"><a href="national-health-interview-survey-nhis.html#cb391-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sex_a , <span class="sc">~</span> poverty_category , svytotal )</span>
-<span id="cb391-5"><a href="national-health-interview-survey-nhis.html#cb391-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="national-health-interview-survey-nhis.html#cb391-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svytotal</span>( <span class="sc">~</span> sex_a ) ) )</span>
+<span id="cb391-2"><a href="national-health-interview-survey-nhis.html#cb391-2" tabindex="-1"></a></span>
+<span id="cb391-3"><a href="national-health-interview-survey-nhis.html#cb391-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb391-4"><a href="national-health-interview-survey-nhis.html#cb391-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sex_a , <span class="sc">~</span> poverty_category , svytotal )</span>
+<span id="cb391-5"><a href="national-health-interview-survey-nhis.html#cb391-5" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="national-health-interview-survey-nhis.html#cb392-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb392-2"><a href="national-health-interview-survey-nhis.html#cb392-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
-<span id="cb392-3"><a href="national-health-interview-survey-nhis.html#cb392-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> agep_a ,</span>
-<span id="cb392-4"><a href="national-health-interview-survey-nhis.html#cb392-4" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> </span>
-<span id="cb392-5"><a href="national-health-interview-survey-nhis.html#cb392-5" aria-hidden="true" tabindex="-1"></a>) ) )</span>
-<span id="cb392-6"><a href="national-health-interview-survey-nhis.html#cb392-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb392-7"><a href="national-health-interview-survey-nhis.html#cb392-7" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb392-8"><a href="national-health-interview-survey-nhis.html#cb392-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
-<span id="cb392-9"><a href="national-health-interview-survey-nhis.html#cb392-9" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> agep_a , <span class="sc">~</span> poverty_category , svyquantile ,</span>
-<span id="cb392-10"><a href="national-health-interview-survey-nhis.html#cb392-10" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb392-11"><a href="national-health-interview-survey-nhis.html#cb392-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
-<span id="cb392-12"><a href="national-health-interview-survey-nhis.html#cb392-12" aria-hidden="true" tabindex="-1"></a>) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="national-health-interview-survey-nhis.html#cb392-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb392-2"><a href="national-health-interview-survey-nhis.html#cb392-2" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
+<span id="cb392-3"><a href="national-health-interview-survey-nhis.html#cb392-3" tabindex="-1"></a>        <span class="sc">~</span> agep_a ,</span>
+<span id="cb392-4"><a href="national-health-interview-survey-nhis.html#cb392-4" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> </span>
+<span id="cb392-5"><a href="national-health-interview-survey-nhis.html#cb392-5" tabindex="-1"></a>) ) )</span>
+<span id="cb392-6"><a href="national-health-interview-survey-nhis.html#cb392-6" tabindex="-1"></a></span>
+<span id="cb392-7"><a href="national-health-interview-survey-nhis.html#cb392-7" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb392-8"><a href="national-health-interview-survey-nhis.html#cb392-8" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
+<span id="cb392-9"><a href="national-health-interview-survey-nhis.html#cb392-9" tabindex="-1"></a>        <span class="sc">~</span> agep_a , <span class="sc">~</span> poverty_category , svyquantile ,</span>
+<span id="cb392-10"><a href="national-health-interview-survey-nhis.html#cb392-10" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb392-11"><a href="national-health-interview-survey-nhis.html#cb392-11" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
+<span id="cb392-12"><a href="national-health-interview-survey-nhis.html#cb392-12" tabindex="-1"></a>) ) )</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="national-health-interview-survey-nhis.html#cb393-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb393-2"><a href="national-health-interview-survey-nhis.html#cb393-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> annual_premium_first_plan , <span class="at">denominator =</span> <span class="sc">~</span> agep_a , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb393-3"><a href="national-health-interview-survey-nhis.html#cb393-3" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="national-health-interview-survey-nhis.html#cb393-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb393-2"><a href="national-health-interview-survey-nhis.html#cb393-2" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> annual_premium_first_plan , <span class="at">denominator =</span> <span class="sc">~</span> agep_a , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb393-3"><a href="national-health-interview-survey-nhis.html#cb393-3" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="subsetting-13" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="national-health-interview-survey-nhis.html#subsetting-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to uninsured:</p>
-<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="national-health-interview-survey-nhis.html#cb394-1" aria-hidden="true" tabindex="-1"></a>sub_nhis_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nhis_design , notcov_a <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="national-health-interview-survey-nhis.html#cb394-1" tabindex="-1"></a>sub_nhis_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nhis_design , notcov_a <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="national-health-interview-survey-nhis.html#cb395-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( sub_nhis_design , <span class="fu">svymean</span>( <span class="sc">~</span> agep_a ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="national-health-interview-survey-nhis.html#cb395-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( sub_nhis_design , <span class="fu">svymean</span>( <span class="sc">~</span> agep_a ) ) )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-13" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="national-health-interview-survey-nhis.html#measures-of-uncertainty-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="national-health-interview-survey-nhis.html#cb396-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
-<span id="cb396-2"><a href="national-health-interview-survey-nhis.html#cb396-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb396-3"><a href="national-health-interview-survey-nhis.html#cb396-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> agep_a )</span>
-<span id="cb396-4"><a href="national-health-interview-survey-nhis.html#cb396-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb396-5"><a href="national-health-interview-survey-nhis.html#cb396-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb396-6"><a href="national-health-interview-survey-nhis.html#cb396-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb396-7"><a href="national-health-interview-survey-nhis.html#cb396-7" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb396-8"><a href="national-health-interview-survey-nhis.html#cb396-8" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb396-9"><a href="national-health-interview-survey-nhis.html#cb396-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb396-10"><a href="national-health-interview-survey-nhis.html#cb396-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb396-11"><a href="national-health-interview-survey-nhis.html#cb396-11" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb396-12"><a href="national-health-interview-survey-nhis.html#cb396-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb396-13"><a href="national-health-interview-survey-nhis.html#cb396-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> agep_a , <span class="sc">~</span> poverty_category , svymean )</span>
-<span id="cb396-14"><a href="national-health-interview-survey-nhis.html#cb396-14" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb396-15"><a href="national-health-interview-survey-nhis.html#cb396-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb396-16"><a href="national-health-interview-survey-nhis.html#cb396-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb396-17"><a href="national-health-interview-survey-nhis.html#cb396-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb396-18"><a href="national-health-interview-survey-nhis.html#cb396-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb396-19"><a href="national-health-interview-survey-nhis.html#cb396-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="national-health-interview-survey-nhis.html#cb396-1" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
+<span id="cb396-2"><a href="national-health-interview-survey-nhis.html#cb396-2" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb396-3"><a href="national-health-interview-survey-nhis.html#cb396-3" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> agep_a )</span>
+<span id="cb396-4"><a href="national-health-interview-survey-nhis.html#cb396-4" tabindex="-1"></a>    ) )</span>
+<span id="cb396-5"><a href="national-health-interview-survey-nhis.html#cb396-5" tabindex="-1"></a></span>
+<span id="cb396-6"><a href="national-health-interview-survey-nhis.html#cb396-6" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb396-7"><a href="national-health-interview-survey-nhis.html#cb396-7" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb396-8"><a href="national-health-interview-survey-nhis.html#cb396-8" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb396-9"><a href="national-health-interview-survey-nhis.html#cb396-9" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb396-10"><a href="national-health-interview-survey-nhis.html#cb396-10" tabindex="-1"></a></span>
+<span id="cb396-11"><a href="national-health-interview-survey-nhis.html#cb396-11" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb396-12"><a href="national-health-interview-survey-nhis.html#cb396-12" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb396-13"><a href="national-health-interview-survey-nhis.html#cb396-13" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> agep_a , <span class="sc">~</span> poverty_category , svymean )</span>
+<span id="cb396-14"><a href="national-health-interview-survey-nhis.html#cb396-14" tabindex="-1"></a>    ) )</span>
+<span id="cb396-15"><a href="national-health-interview-survey-nhis.html#cb396-15" tabindex="-1"></a></span>
+<span id="cb396-16"><a href="national-health-interview-survey-nhis.html#cb396-16" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb396-17"><a href="national-health-interview-survey-nhis.html#cb396-17" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb396-18"><a href="national-health-interview-survey-nhis.html#cb396-18" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb396-19"><a href="national-health-interview-survey-nhis.html#cb396-19" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="national-health-interview-survey-nhis.html#cb397-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( nhis_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] )</span></code></pre></div>
+<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="national-health-interview-survey-nhis.html#cb397-1" tabindex="-1"></a><span class="fu">degf</span>( nhis_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="national-health-interview-survey-nhis.html#cb398-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svyvar</span>( <span class="sc">~</span> agep_a ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="national-health-interview-survey-nhis.html#cb398-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design , <span class="fu">svyvar</span>( <span class="sc">~</span> agep_a ) ) )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="national-health-interview-survey-nhis.html#cb399-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb399-2"><a href="national-health-interview-survey-nhis.html#cb399-2" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb399-3"><a href="national-health-interview-survey-nhis.html#cb399-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> agep_a , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb399-4"><a href="national-health-interview-survey-nhis.html#cb399-4" aria-hidden="true" tabindex="-1"></a>) )</span>
-<span id="cb399-5"><a href="national-health-interview-survey-nhis.html#cb399-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb399-6"><a href="national-health-interview-survey-nhis.html#cb399-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb399-7"><a href="national-health-interview-survey-nhis.html#cb399-7" aria-hidden="true" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb399-8"><a href="national-health-interview-survey-nhis.html#cb399-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> agep_a , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
-<span id="cb399-9"><a href="national-health-interview-survey-nhis.html#cb399-9" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="national-health-interview-survey-nhis.html#cb399-1" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb399-2"><a href="national-health-interview-survey-nhis.html#cb399-2" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb399-3"><a href="national-health-interview-survey-nhis.html#cb399-3" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> agep_a , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb399-4"><a href="national-health-interview-survey-nhis.html#cb399-4" tabindex="-1"></a>) )</span>
+<span id="cb399-5"><a href="national-health-interview-survey-nhis.html#cb399-5" tabindex="-1"></a></span>
+<span id="cb399-6"><a href="national-health-interview-survey-nhis.html#cb399-6" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb399-7"><a href="national-health-interview-survey-nhis.html#cb399-7" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb399-8"><a href="national-health-interview-survey-nhis.html#cb399-8" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> agep_a , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
+<span id="cb399-9"><a href="national-health-interview-survey-nhis.html#cb399-9" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="national-health-interview-survey-nhis.html#cb400-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyciprop( ~ fair_or_poor_reported_health , nhis_design ,</span></span>
-<span id="cb400-2"><a href="national-health-interview-survey-nhis.html#cb400-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; , na.rm = TRUE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="national-health-interview-survey-nhis.html#cb400-1" tabindex="-1"></a><span class="co"># MIsvyciprop( ~ fair_or_poor_reported_health , nhis_design ,</span></span>
+<span id="cb400-2"><a href="national-health-interview-survey-nhis.html#cb400-2" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; , na.rm = TRUE )</span></span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-13" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="national-health-interview-survey-nhis.html#regression-models-and-tests-of-association-13" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="national-health-interview-survey-nhis.html#cb401-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvyttest( agep_a ~ fair_or_poor_reported_health , nhis_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="national-health-interview-survey-nhis.html#cb401-1" tabindex="-1"></a><span class="co"># MIsvyttest( agep_a ~ fair_or_poor_reported_health , nhis_design )</span></span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb402-1"><a href="national-health-interview-survey-nhis.html#cb402-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MIsvychisq( ~ fair_or_poor_reported_health + sex_a , nhis_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb402-1"><a href="national-health-interview-survey-nhis.html#cb402-1" tabindex="-1"></a><span class="co"># MIsvychisq( ~ fair_or_poor_reported_health + sex_a , nhis_design )</span></span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="national-health-interview-survey-nhis.html#cb403-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb403-2"><a href="national-health-interview-survey-nhis.html#cb403-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
-<span id="cb403-3"><a href="national-health-interview-survey-nhis.html#cb403-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyglm</span>( agep_a <span class="sc">~</span> fair_or_poor_reported_health <span class="sc">+</span> sex_a )</span>
-<span id="cb403-4"><a href="national-health-interview-survey-nhis.html#cb403-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
-<span id="cb403-5"><a href="national-health-interview-survey-nhis.html#cb403-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb403-6"><a href="national-health-interview-survey-nhis.html#cb403-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="national-health-interview-survey-nhis.html#cb403-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb403-2"><a href="national-health-interview-survey-nhis.html#cb403-2" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nhis_design ,</span>
+<span id="cb403-3"><a href="national-health-interview-survey-nhis.html#cb403-3" tabindex="-1"></a>        <span class="fu">svyglm</span>( agep_a <span class="sc">~</span> fair_or_poor_reported_health <span class="sc">+</span> sex_a )</span>
+<span id="cb403-4"><a href="national-health-interview-survey-nhis.html#cb403-4" tabindex="-1"></a>    ) )</span>
+<span id="cb403-5"><a href="national-health-interview-survey-nhis.html#cb403-5" tabindex="-1"></a>    </span>
+<span id="cb403-6"><a href="national-health-interview-survey-nhis.html#cb403-6" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -988,30 +988,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="replication-example-12" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="national-health-interview-survey-nhis.html#replication-example-12" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example matches statistics and standard errors within 0.01% from <a href="https://www.cdc.gov/nchs/data/databriefs/db470-tables.pdf#3">Figure 3</a> of this <a href="https://www.cdc.gov/nchs/products/databriefs/db470.htm">Characteristics of Adults Aged 18–64 Who Did Not Take Medication as Prescribed to Reduce Costs</a> Data Brief:</p>
-<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="national-health-interview-survey-nhis.html#cb404-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
-<span id="cb404-2"><a href="national-health-interview-survey-nhis.html#cb404-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MIcombine</span>( </span>
-<span id="cb404-3"><a href="national-health-interview-survey-nhis.html#cb404-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">with</span>(</span>
-<span id="cb404-4"><a href="national-health-interview-survey-nhis.html#cb404-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">subset</span>( nhis_design , agep_a <span class="sc">&lt;</span> <span class="dv">65</span> ) , </span>
-<span id="cb404-5"><a href="national-health-interview-survey-nhis.html#cb404-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">svyby</span>(</span>
-<span id="cb404-6"><a href="national-health-interview-survey-nhis.html#cb404-6" aria-hidden="true" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">as.numeric</span>( rxsk12m_a <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> rxls12m_a <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> rxdl12m_a <span class="sc">==</span> <span class="dv">1</span> ) , </span>
-<span id="cb404-7"><a href="national-health-interview-survey-nhis.html#cb404-7" aria-hidden="true" tabindex="-1"></a>                <span class="sc">~</span> poverty_category , </span>
-<span id="cb404-8"><a href="national-health-interview-survey-nhis.html#cb404-8" aria-hidden="true" tabindex="-1"></a>                svymean , </span>
-<span id="cb404-9"><a href="national-health-interview-survey-nhis.html#cb404-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb404-10"><a href="national-health-interview-survey-nhis.html#cb404-10" aria-hidden="true" tabindex="-1"></a>            ) </span>
-<span id="cb404-11"><a href="national-health-interview-survey-nhis.html#cb404-11" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb404-12"><a href="national-health-interview-survey-nhis.html#cb404-12" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb404-13"><a href="national-health-interview-survey-nhis.html#cb404-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb404-14"><a href="national-health-interview-survey-nhis.html#cb404-14" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
-<span id="cb404-15"><a href="national-health-interview-survey-nhis.html#cb404-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all</span>(</span>
-<span id="cb404-16"><a href="national-health-interview-survey-nhis.html#cb404-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results ) , <span class="dv">3</span> ) ) <span class="sc">==</span> <span class="fu">c</span>( <span class="fl">0.145</span> , <span class="fl">0.138</span> , <span class="fl">0.099</span> , <span class="fl">0.039</span> )</span>
-<span id="cb404-17"><a href="national-health-interview-survey-nhis.html#cb404-17" aria-hidden="true" tabindex="-1"></a>    ) </span>
-<span id="cb404-18"><a href="national-health-interview-survey-nhis.html#cb404-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb404-19"><a href="national-health-interview-survey-nhis.html#cb404-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb404-20"><a href="national-health-interview-survey-nhis.html#cb404-20" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
-<span id="cb404-21"><a href="national-health-interview-survey-nhis.html#cb404-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all</span>( </span>
-<span id="cb404-22"><a href="national-health-interview-survey-nhis.html#cb404-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results ) , <span class="dv">5</span> ) ) <span class="sc">-</span> <span class="fu">c</span>( <span class="fl">0.0126</span> , <span class="fl">0.0098</span> , <span class="fl">0.0062</span> , <span class="fl">0.0031</span> ) <span class="sc">&lt;</span> <span class="fl">0.0001</span></span>
-<span id="cb404-23"><a href="national-health-interview-survey-nhis.html#cb404-23" aria-hidden="true" tabindex="-1"></a>    ) </span>
-<span id="cb404-24"><a href="national-health-interview-survey-nhis.html#cb404-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="national-health-interview-survey-nhis.html#cb404-1" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
+<span id="cb404-2"><a href="national-health-interview-survey-nhis.html#cb404-2" tabindex="-1"></a>    <span class="fu">MIcombine</span>( </span>
+<span id="cb404-3"><a href="national-health-interview-survey-nhis.html#cb404-3" tabindex="-1"></a>        <span class="fu">with</span>(</span>
+<span id="cb404-4"><a href="national-health-interview-survey-nhis.html#cb404-4" tabindex="-1"></a>            <span class="fu">subset</span>( nhis_design , agep_a <span class="sc">&lt;</span> <span class="dv">65</span> ) , </span>
+<span id="cb404-5"><a href="national-health-interview-survey-nhis.html#cb404-5" tabindex="-1"></a>            <span class="fu">svyby</span>(</span>
+<span id="cb404-6"><a href="national-health-interview-survey-nhis.html#cb404-6" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">as.numeric</span>( rxsk12m_a <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> rxls12m_a <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> rxdl12m_a <span class="sc">==</span> <span class="dv">1</span> ) , </span>
+<span id="cb404-7"><a href="national-health-interview-survey-nhis.html#cb404-7" tabindex="-1"></a>                <span class="sc">~</span> poverty_category , </span>
+<span id="cb404-8"><a href="national-health-interview-survey-nhis.html#cb404-8" tabindex="-1"></a>                svymean , </span>
+<span id="cb404-9"><a href="national-health-interview-survey-nhis.html#cb404-9" tabindex="-1"></a>                <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb404-10"><a href="national-health-interview-survey-nhis.html#cb404-10" tabindex="-1"></a>            ) </span>
+<span id="cb404-11"><a href="national-health-interview-survey-nhis.html#cb404-11" tabindex="-1"></a>        )</span>
+<span id="cb404-12"><a href="national-health-interview-survey-nhis.html#cb404-12" tabindex="-1"></a>    )</span>
+<span id="cb404-13"><a href="national-health-interview-survey-nhis.html#cb404-13" tabindex="-1"></a></span>
+<span id="cb404-14"><a href="national-health-interview-survey-nhis.html#cb404-14" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
+<span id="cb404-15"><a href="national-health-interview-survey-nhis.html#cb404-15" tabindex="-1"></a>    <span class="fu">all</span>(</span>
+<span id="cb404-16"><a href="national-health-interview-survey-nhis.html#cb404-16" tabindex="-1"></a>        <span class="fu">as.numeric</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results ) , <span class="dv">3</span> ) ) <span class="sc">==</span> <span class="fu">c</span>( <span class="fl">0.145</span> , <span class="fl">0.138</span> , <span class="fl">0.099</span> , <span class="fl">0.039</span> )</span>
+<span id="cb404-17"><a href="national-health-interview-survey-nhis.html#cb404-17" tabindex="-1"></a>    ) </span>
+<span id="cb404-18"><a href="national-health-interview-survey-nhis.html#cb404-18" tabindex="-1"></a>)</span>
+<span id="cb404-19"><a href="national-health-interview-survey-nhis.html#cb404-19" tabindex="-1"></a></span>
+<span id="cb404-20"><a href="national-health-interview-survey-nhis.html#cb404-20" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
+<span id="cb404-21"><a href="national-health-interview-survey-nhis.html#cb404-21" tabindex="-1"></a>    <span class="fu">all</span>( </span>
+<span id="cb404-22"><a href="national-health-interview-survey-nhis.html#cb404-22" tabindex="-1"></a>        <span class="fu">as.numeric</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results ) , <span class="dv">5</span> ) ) <span class="sc">-</span> <span class="fu">c</span>( <span class="fl">0.0126</span> , <span class="fl">0.0098</span> , <span class="fl">0.0062</span> , <span class="fl">0.0031</span> ) <span class="sc">&lt;</span> <span class="fl">0.0001</span></span>
+<span id="cb404-23"><a href="national-health-interview-survey-nhis.html#cb404-23" tabindex="-1"></a>    ) </span>
+<span id="cb404-24"><a href="national-health-interview-survey-nhis.html#cb404-24" tabindex="-1"></a>)</span></code></pre></div>
 
 </div>
 </div>

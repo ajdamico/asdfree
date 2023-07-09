@@ -751,97 +751,97 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><a href="https://en.wikipedia.org/wiki/Youth_Risk_Behavior_Surveillance_System">Wikipedia Entry</a></p></li>
 <li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Youth%20Risk%20Behavior%20Surveillance%20System">artificial intelligence-generated limericks</a></p></li>
 </ol>
-<div class="sourceCode" id="cb765"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb765-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb765-1" aria-hidden="true" tabindex="-1"></a><span class="co"># maladolescence</span></span>
-<span id="cb765-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb765-2" aria-hidden="true" tabindex="-1"></a><span class="co"># epidemiology</span></span>
-<span id="cb765-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb765-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sex, drugs, rock and roll</span></span></code></pre></div>
+<div class="sourceCode" id="cb765"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb765-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb765-1" tabindex="-1"></a><span class="co"># maladolescence</span></span>
+<span id="cb765-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb765-2" tabindex="-1"></a><span class="co"># epidemiology</span></span>
+<span id="cb765-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb765-3" tabindex="-1"></a><span class="co"># sex, drugs, rock and roll</span></span></code></pre></div>
 <hr />
 <div id="download-import-preparation-27" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="youth-risk-behavior-surveillance-system-yrbss.html#download-import-preparation-27" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Load the <code>SAScii</code> library to interpret a SAS input program, and also re-arrange the SAS input program:</p>
-<div class="sourceCode" id="cb766"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb766-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SAScii)</span>
-<span id="cb766-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-3" aria-hidden="true" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
-<span id="cb766-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/2019XXH-SAS-Input-Program.sas&quot;</span></span>
-<span id="cb766-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-6" aria-hidden="true" tabindex="-1"></a>sas_text <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">readLines</span>( sas_url ) )</span>
-<span id="cb766-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-8" aria-hidden="true" tabindex="-1"></a><span class="co"># find the (out of numerical order)</span></span>
-<span id="cb766-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-9" aria-hidden="true" tabindex="-1"></a><span class="co"># `site` location variable&#39;s position</span></span>
-<span id="cb766-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-10" aria-hidden="true" tabindex="-1"></a><span class="co"># within the SAS input program</span></span>
-<span id="cb766-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-11" aria-hidden="true" tabindex="-1"></a>site_location <span class="ot">&lt;-</span> <span class="fu">which</span>( sas_text <span class="sc">==</span> <span class="st">&#39;@1 site $3.&#39;</span> )</span>
-<span id="cb766-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-13"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-13" aria-hidden="true" tabindex="-1"></a><span class="co"># find the start field&#39;s position</span></span>
-<span id="cb766-14"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-14" aria-hidden="true" tabindex="-1"></a><span class="co"># within the SAS input program</span></span>
-<span id="cb766-15"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-15" aria-hidden="true" tabindex="-1"></a>input_location <span class="ot">&lt;-</span> <span class="fu">which</span>( sas_text <span class="sc">==</span> <span class="st">&quot;input&quot;</span> )</span>
-<span id="cb766-16"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-17"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-17" aria-hidden="true" tabindex="-1"></a><span class="co"># create a vector from 1 to the length of the text file</span></span>
-<span id="cb766-18"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-18" aria-hidden="true" tabindex="-1"></a>sas_length <span class="ot">&lt;-</span> <span class="fu">seq</span>( <span class="fu">length</span>( sas_text ) )</span>
-<span id="cb766-19"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-20"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-20" aria-hidden="true" tabindex="-1"></a><span class="co"># remove the site_location</span></span>
-<span id="cb766-21"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-21" aria-hidden="true" tabindex="-1"></a>sas_length <span class="ot">&lt;-</span> sas_length[ <span class="sc">-</span>site_location ]</span>
-<span id="cb766-22"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-23"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-23" aria-hidden="true" tabindex="-1"></a><span class="co"># re-insert the site variable&#39;s location</span></span>
-<span id="cb766-24"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-24" aria-hidden="true" tabindex="-1"></a><span class="co"># immediately after the starting position</span></span>
-<span id="cb766-25"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-25" aria-hidden="true" tabindex="-1"></a>sas_reorder <span class="ot">&lt;-</span> </span>
-<span id="cb766-26"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>( </span>
-<span id="cb766-27"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-27" aria-hidden="true" tabindex="-1"></a>        sas_length[ <span class="fu">seq</span>( input_location ) ] , </span>
-<span id="cb766-28"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-28" aria-hidden="true" tabindex="-1"></a>        site_location , </span>
-<span id="cb766-29"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-29" aria-hidden="true" tabindex="-1"></a>        sas_length[ <span class="fu">seq</span>( input_location <span class="sc">+</span> <span class="dv">1</span> , <span class="fu">length</span>( sas_length ) ) ] </span>
-<span id="cb766-30"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-30" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb766-31"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-32"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-32" aria-hidden="true" tabindex="-1"></a><span class="co"># re-order the sas text file</span></span>
-<span id="cb766-33"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-33" aria-hidden="true" tabindex="-1"></a>sas_text <span class="ot">&lt;-</span> sas_text[ sas_reorder ]</span>
-<span id="cb766-34"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-35"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-35" aria-hidden="true" tabindex="-1"></a>sas_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb766-36"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb766-37"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-37" aria-hidden="true" tabindex="-1"></a><span class="fu">writeLines</span>( sas_text , sas_tf )</span></code></pre></div>
+<div class="sourceCode" id="cb766"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb766-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-1" tabindex="-1"></a><span class="fu">library</span>(SAScii)</span>
+<span id="cb766-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-2" tabindex="-1"></a></span>
+<span id="cb766-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-3" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
+<span id="cb766-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-4" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/2019XXH-SAS-Input-Program.sas&quot;</span></span>
+<span id="cb766-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-5" tabindex="-1"></a></span>
+<span id="cb766-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-6" tabindex="-1"></a>sas_text <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">readLines</span>( sas_url ) )</span>
+<span id="cb766-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-7" tabindex="-1"></a></span>
+<span id="cb766-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-8" tabindex="-1"></a><span class="co"># find the (out of numerical order)</span></span>
+<span id="cb766-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-9" tabindex="-1"></a><span class="co"># `site` location variable&#39;s position</span></span>
+<span id="cb766-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-10" tabindex="-1"></a><span class="co"># within the SAS input program</span></span>
+<span id="cb766-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-11" tabindex="-1"></a>site_location <span class="ot">&lt;-</span> <span class="fu">which</span>( sas_text <span class="sc">==</span> <span class="st">&#39;@1 site $3.&#39;</span> )</span>
+<span id="cb766-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-12" tabindex="-1"></a></span>
+<span id="cb766-13"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-13" tabindex="-1"></a><span class="co"># find the start field&#39;s position</span></span>
+<span id="cb766-14"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-14" tabindex="-1"></a><span class="co"># within the SAS input program</span></span>
+<span id="cb766-15"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-15" tabindex="-1"></a>input_location <span class="ot">&lt;-</span> <span class="fu">which</span>( sas_text <span class="sc">==</span> <span class="st">&quot;input&quot;</span> )</span>
+<span id="cb766-16"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-16" tabindex="-1"></a></span>
+<span id="cb766-17"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-17" tabindex="-1"></a><span class="co"># create a vector from 1 to the length of the text file</span></span>
+<span id="cb766-18"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-18" tabindex="-1"></a>sas_length <span class="ot">&lt;-</span> <span class="fu">seq</span>( <span class="fu">length</span>( sas_text ) )</span>
+<span id="cb766-19"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-19" tabindex="-1"></a></span>
+<span id="cb766-20"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-20" tabindex="-1"></a><span class="co"># remove the site_location</span></span>
+<span id="cb766-21"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-21" tabindex="-1"></a>sas_length <span class="ot">&lt;-</span> sas_length[ <span class="sc">-</span>site_location ]</span>
+<span id="cb766-22"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-22" tabindex="-1"></a></span>
+<span id="cb766-23"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-23" tabindex="-1"></a><span class="co"># re-insert the site variable&#39;s location</span></span>
+<span id="cb766-24"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-24" tabindex="-1"></a><span class="co"># immediately after the starting position</span></span>
+<span id="cb766-25"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-25" tabindex="-1"></a>sas_reorder <span class="ot">&lt;-</span> </span>
+<span id="cb766-26"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-26" tabindex="-1"></a>    <span class="fu">c</span>( </span>
+<span id="cb766-27"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-27" tabindex="-1"></a>        sas_length[ <span class="fu">seq</span>( input_location ) ] , </span>
+<span id="cb766-28"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-28" tabindex="-1"></a>        site_location , </span>
+<span id="cb766-29"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-29" tabindex="-1"></a>        sas_length[ <span class="fu">seq</span>( input_location <span class="sc">+</span> <span class="dv">1</span> , <span class="fu">length</span>( sas_length ) ) ] </span>
+<span id="cb766-30"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-30" tabindex="-1"></a>    )</span>
+<span id="cb766-31"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-31" tabindex="-1"></a></span>
+<span id="cb766-32"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-32" tabindex="-1"></a><span class="co"># re-order the sas text file</span></span>
+<span id="cb766-33"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-33" tabindex="-1"></a>sas_text <span class="ot">&lt;-</span> sas_text[ sas_reorder ]</span>
+<span id="cb766-34"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-34" tabindex="-1"></a></span>
+<span id="cb766-35"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-35" tabindex="-1"></a>sas_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb766-36"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-36" tabindex="-1"></a></span>
+<span id="cb766-37"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb766-37" tabindex="-1"></a><span class="fu">writeLines</span>( sas_text , sas_tf )</span></code></pre></div>
 <p>Download and import the national file:</p>
-<div class="sourceCode" id="cb767"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb767-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-1" aria-hidden="true" tabindex="-1"></a>dat_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb767-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb767-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-3" aria-hidden="true" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span></span>
-<span id="cb767-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/XXH2019_YRBS_Data.dat&quot;</span></span>
-<span id="cb767-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb767-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( dat_url , dat_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb767-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb767-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-8" aria-hidden="true" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">read.SAScii</span>( dat_tf , sas_tf )</span>
-<span id="cb767-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb767-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( yrbss_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( yrbss_df ) )</span>
-<span id="cb767-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb767-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-12" aria-hidden="true" tabindex="-1"></a>yrbss_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb767"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb767-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-1" tabindex="-1"></a>dat_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb767-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-2" tabindex="-1"></a></span>
+<span id="cb767-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-3" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span></span>
+<span id="cb767-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-4" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/XXH2019_YRBS_Data.dat&quot;</span></span>
+<span id="cb767-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-5" tabindex="-1"></a>    </span>
+<span id="cb767-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-6" tabindex="-1"></a><span class="fu">download.file</span>( dat_url , dat_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb767-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-7" tabindex="-1"></a></span>
+<span id="cb767-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-8" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">read.SAScii</span>( dat_tf , sas_tf )</span>
+<span id="cb767-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-9" tabindex="-1"></a></span>
+<span id="cb767-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-10" tabindex="-1"></a><span class="fu">names</span>( yrbss_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( yrbss_df ) )</span>
+<span id="cb767-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-11" tabindex="-1"></a></span>
+<span id="cb767-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb767-12" tabindex="-1"></a>yrbss_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
 <div id="save-locally-26" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="youth-risk-behavior-surveillance-system-yrbss.html#save-locally-26" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb768"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb768-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb768-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yrbss_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;YRBSS&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb768-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb768-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( yrbss_df , file = yrbss_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb768"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb768-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb768-1" tabindex="-1"></a><span class="co"># yrbss_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;YRBSS&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb768-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb768-2" tabindex="-1"></a><span class="co"># saveRDS( yrbss_df , file = yrbss_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb769"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb769-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb769-1" aria-hidden="true" tabindex="-1"></a><span class="co"># yrbss_df &lt;- readRDS( yrbss_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb769"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb769-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb769-1" tabindex="-1"></a><span class="co"># yrbss_df &lt;- readRDS( yrbss_fn )</span></span></code></pre></div>
 </div>
 <div id="survey-design-definition-20" class="section level3 unnumbered hasAnchor">
 <h3>Survey Design Definition<a href="youth-risk-behavior-surveillance-system-yrbss.html#survey-design-definition-20" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Construct a complex sample survey design:</p>
-<div class="sourceCode" id="cb770"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb770-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb770-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb770-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-3" aria-hidden="true" tabindex="-1"></a>yrbss_design <span class="ot">&lt;-</span> </span>
-<span id="cb770-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>( </span>
-<span id="cb770-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-5" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> psu , </span>
-<span id="cb770-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> stratum , </span>
-<span id="cb770-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> yrbss_df , </span>
-<span id="cb770-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> weight , </span>
-<span id="cb770-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span> </span>
-<span id="cb770-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-10" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb770"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb770-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-1" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb770-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-2" tabindex="-1"></a></span>
+<span id="cb770-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-3" tabindex="-1"></a>yrbss_design <span class="ot">&lt;-</span> </span>
+<span id="cb770-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-4" tabindex="-1"></a>    <span class="fu">svydesign</span>( </span>
+<span id="cb770-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-5" tabindex="-1"></a>        <span class="sc">~</span> psu , </span>
+<span id="cb770-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-6" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> stratum , </span>
+<span id="cb770-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-7" tabindex="-1"></a>        <span class="at">data =</span> yrbss_df , </span>
+<span id="cb770-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-8" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> weight , </span>
+<span id="cb770-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-9" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span> </span>
+<span id="cb770-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb770-10" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="variable-recoding-26" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="youth-risk-behavior-surveillance-system-yrbss.html#variable-recoding-26" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb771"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb771-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-1" aria-hidden="true" tabindex="-1"></a>yrbss_design <span class="ot">&lt;-</span> </span>
-<span id="cb771-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb771-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-3" aria-hidden="true" tabindex="-1"></a>        yrbss_design , </span>
-<span id="cb771-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">q2 =</span> q2 ,</span>
-<span id="cb771-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">never_rarely_wore_seat_belt =</span> <span class="fu">as.numeric</span>( qn8 <span class="sc">==</span> <span class="dv">1</span> ) ,</span>
-<span id="cb771-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">ever_used_marijuana =</span> <span class="fu">as.numeric</span>( qn45 <span class="sc">==</span> <span class="dv">1</span> ) ,</span>
-<span id="cb771-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">tried_to_quit_tobacco_past_year =</span> <span class="fu">as.numeric</span>( q39 <span class="sc">==</span> <span class="dv">2</span> ) ,</span>
-<span id="cb771-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">used_tobacco_past_year =</span> <span class="fu">as.numeric</span>( q39 <span class="sc">&gt;</span> <span class="dv">1</span> )</span>
-<span id="cb771-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-9" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb771"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb771-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-1" tabindex="-1"></a>yrbss_design <span class="ot">&lt;-</span> </span>
+<span id="cb771-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-2" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb771-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-3" tabindex="-1"></a>        yrbss_design , </span>
+<span id="cb771-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-4" tabindex="-1"></a>        <span class="at">q2 =</span> q2 ,</span>
+<span id="cb771-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-5" tabindex="-1"></a>        <span class="at">never_rarely_wore_seat_belt =</span> <span class="fu">as.numeric</span>( qn8 <span class="sc">==</span> <span class="dv">1</span> ) ,</span>
+<span id="cb771-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-6" tabindex="-1"></a>        <span class="at">ever_used_marijuana =</span> <span class="fu">as.numeric</span>( qn45 <span class="sc">==</span> <span class="dv">1</span> ) ,</span>
+<span id="cb771-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-7" tabindex="-1"></a>        <span class="at">tried_to_quit_tobacco_past_year =</span> <span class="fu">as.numeric</span>( q39 <span class="sc">==</span> <span class="dv">2</span> ) ,</span>
+<span id="cb771-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-8" tabindex="-1"></a>        <span class="at">used_tobacco_past_year =</span> <span class="fu">as.numeric</span>( q39 <span class="sc">&gt;</span> <span class="dv">1</span> )</span>
+<span id="cb771-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb771-9" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -850,115 +850,115 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-26" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="youth-risk-behavior-surveillance-system-yrbss.html#unweighted-counts-26" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb772"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb772-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb772-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( yrbss_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
-<span id="cb772-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb772-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb772-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb772-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> ever_used_marijuana , yrbss_design , unwtd.count )</span></code></pre></div>
+<div class="sourceCode" id="cb772"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb772-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb772-1" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( yrbss_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
+<span id="cb772-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb772-2" tabindex="-1"></a></span>
+<span id="cb772-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb772-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> ever_used_marijuana , yrbss_design , unwtd.count )</span></code></pre></div>
 </div>
 <div id="weighted-counts-20" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="youth-risk-behavior-surveillance-system-yrbss.html#weighted-counts-20" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb773"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb773-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb773-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , yrbss_design )</span>
-<span id="cb773-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb773-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb773-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb773-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svytotal )</span></code></pre></div>
+<div class="sourceCode" id="cb773"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb773-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb773-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , yrbss_design )</span>
+<span id="cb773-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb773-2" tabindex="-1"></a></span>
+<span id="cb773-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb773-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svytotal )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-26" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="youth-risk-behavior-surveillance-system-yrbss.html#descriptive-statistics-26" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb774"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb774-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb774-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb774-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb774-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb774-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb774-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> bmipct , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb774"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb774-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb774-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb774-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb774-2" tabindex="-1"></a></span>
+<span id="cb774-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb774-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> bmipct , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb775"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb775-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb775-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> q2 , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb775-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb775-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb775-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb775-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> q2 , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb775"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb775-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb775-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> q2 , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb775-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb775-2" tabindex="-1"></a></span>
+<span id="cb775-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb775-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> q2 , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb776"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb776-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb776-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb776-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb776-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb776-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb776-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> bmipct , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb776"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb776-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb776-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb776-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb776-2" tabindex="-1"></a></span>
+<span id="cb776-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb776-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> bmipct , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb777"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb777-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb777-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> q2 , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb777-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb777-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb777-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb777-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> q2 , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb777"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb777-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb777-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> q2 , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb777-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb777-2" tabindex="-1"></a></span>
+<span id="cb777-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb777-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> q2 , <span class="sc">~</span> ever_used_marijuana , yrbss_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb778"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb778-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb778-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb778-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-3" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>( </span>
-<span id="cb778-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> bmipct , </span>
-<span id="cb778-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> ever_used_marijuana , </span>
-<span id="cb778-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-6" aria-hidden="true" tabindex="-1"></a>    yrbss_design , </span>
-<span id="cb778-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-7" aria-hidden="true" tabindex="-1"></a>    svyquantile , </span>
-<span id="cb778-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb778-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb778-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb778"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb778-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-1" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb778-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-2" tabindex="-1"></a></span>
+<span id="cb778-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-3" tabindex="-1"></a><span class="fu">svyby</span>( </span>
+<span id="cb778-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-4" tabindex="-1"></a>    <span class="sc">~</span> bmipct , </span>
+<span id="cb778-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-5" tabindex="-1"></a>    <span class="sc">~</span> ever_used_marijuana , </span>
+<span id="cb778-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-6" tabindex="-1"></a>    yrbss_design , </span>
+<span id="cb778-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-7" tabindex="-1"></a>    svyquantile , </span>
+<span id="cb778-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-8" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
+<span id="cb778-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-9" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
+<span id="cb778-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb778-10" tabindex="-1"></a>)</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb779"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb779-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
-<span id="cb779-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> tried_to_quit_tobacco_past_year , </span>
-<span id="cb779-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> used_tobacco_past_year , </span>
-<span id="cb779-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-4" aria-hidden="true" tabindex="-1"></a>    yrbss_design ,</span>
-<span id="cb779-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb779-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb779"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb779-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-1" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
+<span id="cb779-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-2" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> tried_to_quit_tobacco_past_year , </span>
+<span id="cb779-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-3" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> used_tobacco_past_year , </span>
+<span id="cb779-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-4" tabindex="-1"></a>    yrbss_design ,</span>
+<span id="cb779-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-5" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
+<span id="cb779-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb779-6" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting-26" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="youth-risk-behavior-surveillance-system-yrbss.html#subsetting-26" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to youths who ever drank alcohol:</p>
-<div class="sourceCode" id="cb780"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb780-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb780-1" aria-hidden="true" tabindex="-1"></a>sub_yrbss_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( yrbss_design , qn40 <span class="sc">&gt;</span> <span class="dv">1</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb780"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb780-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb780-1" tabindex="-1"></a>sub_yrbss_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( yrbss_design , qn40 <span class="sc">&gt;</span> <span class="dv">1</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb781"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb781-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb781-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> bmipct , sub_yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb781"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb781-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb781-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> bmipct , sub_yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-26" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="youth-risk-behavior-surveillance-system-yrbss.html#measures-of-uncertainty-26" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb782"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb782-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb782-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb782-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb782-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-4" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb782-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-5" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb782-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb782-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb782-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-8" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb782-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb782-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> bmipct , </span>
-<span id="cb782-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> ever_used_marijuana , </span>
-<span id="cb782-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-12" aria-hidden="true" tabindex="-1"></a>        yrbss_design , </span>
-<span id="cb782-13"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-13" aria-hidden="true" tabindex="-1"></a>        svymean ,</span>
-<span id="cb782-14"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb782-15"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb782-16"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb782-17"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-17" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb782-18"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-18" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb782-19"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-19" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb782-20"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb782"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb782-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-1" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb782-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-2" tabindex="-1"></a></span>
+<span id="cb782-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-3" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb782-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-4" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb782-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-5" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb782-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-6" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb782-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-7" tabindex="-1"></a></span>
+<span id="cb782-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-8" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb782-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-9" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb782-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-10" tabindex="-1"></a>        <span class="sc">~</span> bmipct , </span>
+<span id="cb782-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-11" tabindex="-1"></a>        <span class="sc">~</span> ever_used_marijuana , </span>
+<span id="cb782-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-12" tabindex="-1"></a>        yrbss_design , </span>
+<span id="cb782-13"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-13" tabindex="-1"></a>        svymean ,</span>
+<span id="cb782-14"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-14" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb782-15"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-15" tabindex="-1"></a>    )</span>
+<span id="cb782-16"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-16" tabindex="-1"></a>    </span>
+<span id="cb782-17"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-17" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb782-18"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-18" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb782-19"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-19" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb782-20"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb782-20" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb783"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb783-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb783-1" aria-hidden="true" tabindex="-1"></a><span class="fu">degf</span>( yrbss_design )</span></code></pre></div>
+<div class="sourceCode" id="cb783"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb783-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb783-1" tabindex="-1"></a><span class="fu">degf</span>( yrbss_design )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb784"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb784-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb784-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb784"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb784-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb784-1" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb785"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb785-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb785-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb785-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb785-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb785-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-5" aria-hidden="true" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb785"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb785-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-1" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb785-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-2" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb785-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-3" tabindex="-1"></a></span>
+<span id="cb785-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-4" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb785-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb785-5" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> bmipct , yrbss_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb786"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb786-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb786-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> never_rarely_wore_seat_belt , yrbss_design ,</span>
-<span id="cb786-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb786-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb786"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb786-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb786-1" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> never_rarely_wore_seat_belt , yrbss_design ,</span>
+<span id="cb786-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb786-2" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-26" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="youth-risk-behavior-surveillance-system-yrbss.html#regression-models-and-tests-of-association-26" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb787"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb787-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb787-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svyttest</span>( bmipct <span class="sc">~</span> never_rarely_wore_seat_belt , yrbss_design )</span></code></pre></div>
+<div class="sourceCode" id="cb787"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb787-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb787-1" tabindex="-1"></a><span class="fu">svyttest</span>( bmipct <span class="sc">~</span> never_rarely_wore_seat_belt , yrbss_design )</span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb788"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb788-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb788-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
-<span id="cb788-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb788-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> never_rarely_wore_seat_belt <span class="sc">+</span> q2 , </span>
-<span id="cb788-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb788-3" aria-hidden="true" tabindex="-1"></a>    yrbss_design </span>
-<span id="cb788-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb788-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb788"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb788-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb788-1" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
+<span id="cb788-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb788-2" tabindex="-1"></a>    <span class="sc">~</span> never_rarely_wore_seat_belt <span class="sc">+</span> q2 , </span>
+<span id="cb788-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb788-3" tabindex="-1"></a>    yrbss_design </span>
+<span id="cb788-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb788-4" tabindex="-1"></a>)</span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb789"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb789-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb789-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
-<span id="cb789-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-3" aria-hidden="true" tabindex="-1"></a>        bmipct <span class="sc">~</span> never_rarely_wore_seat_belt <span class="sc">+</span> q2 , </span>
-<span id="cb789-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-4" aria-hidden="true" tabindex="-1"></a>        yrbss_design </span>
-<span id="cb789-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb789-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb789-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb789"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb789-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb789-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-2" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
+<span id="cb789-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-3" tabindex="-1"></a>        bmipct <span class="sc">~</span> never_rarely_wore_seat_belt <span class="sc">+</span> q2 , </span>
+<span id="cb789-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-4" tabindex="-1"></a>        yrbss_design </span>
+<span id="cb789-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-5" tabindex="-1"></a>    )</span>
+<span id="cb789-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-6" tabindex="-1"></a></span>
+<span id="cb789-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb789-7" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -972,58 +972,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="replication-example-24" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="youth-risk-behavior-surveillance-system-yrbss.html#replication-example-24" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example matches statistics, standard errors, and confidence intervals from the “never/rarely wore seat belt” row of <a href="https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2019/2019_yrbs_analysis_software.pdf#page=29">PDF page 29 of this CDC analysis software document</a>:</p>
-<div class="sourceCode" id="cb790"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb790-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-1" aria-hidden="true" tabindex="-1"></a>unwtd_count_result <span class="ot">&lt;-</span></span>
-<span id="cb790-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unwtd.count</span>( <span class="sc">~</span> never_rarely_wore_seat_belt , yrbss_design )</span>
-<span id="cb790-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">coef</span>( unwtd_count_result ) <span class="sc">==</span> <span class="dv">11149</span> )</span>
-<span id="cb790-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-6" aria-hidden="true" tabindex="-1"></a>wtd_n_result <span class="ot">&lt;-</span></span>
-<span id="cb790-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svytotal</span>( </span>
-<span id="cb790-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-8" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> one , </span>
-<span id="cb790-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">subset</span>(</span>
-<span id="cb790-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-10" aria-hidden="true" tabindex="-1"></a>            yrbss_design , </span>
-<span id="cb790-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-11" aria-hidden="true" tabindex="-1"></a>            <span class="sc">!</span><span class="fu">is.na</span>( never_rarely_wore_seat_belt ) </span>
-<span id="cb790-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-12" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb790-13"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb790-14"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-15"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-15" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( wtd_n_result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">12132</span> )</span>
-<span id="cb790-16"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-17"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-17" aria-hidden="true" tabindex="-1"></a>share_result <span class="ot">&lt;-</span></span>
-<span id="cb790-18"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>(</span>
-<span id="cb790-19"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-19" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> never_rarely_wore_seat_belt ,</span>
-<span id="cb790-20"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-20" aria-hidden="true" tabindex="-1"></a>        yrbss_design ,</span>
-<span id="cb790-21"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb790-22"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-22" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb790-23"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-24"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-24" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( share_result ) , <span class="dv">4</span> ) <span class="sc">==</span> .<span class="dv">0654</span> )</span>
-<span id="cb790-25"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-26"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-26" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( share_result ) , <span class="dv">4</span> ) <span class="sc">==</span> .<span class="dv">0065</span> )</span>
-<span id="cb790-27"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-28"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-28" aria-hidden="true" tabindex="-1"></a>ci_result <span class="ot">&lt;-</span></span>
-<span id="cb790-29"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyciprop</span>(</span>
-<span id="cb790-30"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-30" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> never_rarely_wore_seat_belt ,</span>
-<span id="cb790-31"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-31" aria-hidden="true" tabindex="-1"></a>        yrbss_design , </span>
-<span id="cb790-32"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb790-33"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">method =</span> <span class="st">&quot;beta&quot;</span></span>
-<span id="cb790-34"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-34" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb790-35"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-36"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-36" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">confint</span>( ci_result )[<span class="dv">1</span>] , <span class="dv">4</span> ) <span class="sc">==</span> <span class="fl">0.0529</span> )</span>
-<span id="cb790-37"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb790-38"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-38" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">confint</span>( ci_result )[<span class="dv">2</span>] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.08</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb790"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb790-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-1" tabindex="-1"></a>unwtd_count_result <span class="ot">&lt;-</span></span>
+<span id="cb790-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-2" tabindex="-1"></a>    <span class="fu">unwtd.count</span>( <span class="sc">~</span> never_rarely_wore_seat_belt , yrbss_design )</span>
+<span id="cb790-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-3" tabindex="-1"></a></span>
+<span id="cb790-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-4" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">coef</span>( unwtd_count_result ) <span class="sc">==</span> <span class="dv">11149</span> )</span>
+<span id="cb790-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-5" tabindex="-1"></a></span>
+<span id="cb790-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-6" tabindex="-1"></a>wtd_n_result <span class="ot">&lt;-</span></span>
+<span id="cb790-7"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-7" tabindex="-1"></a>    <span class="fu">svytotal</span>( </span>
+<span id="cb790-8"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-8" tabindex="-1"></a>        <span class="sc">~</span> one , </span>
+<span id="cb790-9"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-9" tabindex="-1"></a>        <span class="fu">subset</span>(</span>
+<span id="cb790-10"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-10" tabindex="-1"></a>            yrbss_design , </span>
+<span id="cb790-11"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-11" tabindex="-1"></a>            <span class="sc">!</span><span class="fu">is.na</span>( never_rarely_wore_seat_belt ) </span>
+<span id="cb790-12"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-12" tabindex="-1"></a>        )</span>
+<span id="cb790-13"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-13" tabindex="-1"></a>    )</span>
+<span id="cb790-14"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-14" tabindex="-1"></a></span>
+<span id="cb790-15"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-15" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( wtd_n_result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">12132</span> )</span>
+<span id="cb790-16"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-16" tabindex="-1"></a></span>
+<span id="cb790-17"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-17" tabindex="-1"></a>share_result <span class="ot">&lt;-</span></span>
+<span id="cb790-18"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-18" tabindex="-1"></a>    <span class="fu">svymean</span>(</span>
+<span id="cb790-19"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-19" tabindex="-1"></a>        <span class="sc">~</span> never_rarely_wore_seat_belt ,</span>
+<span id="cb790-20"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-20" tabindex="-1"></a>        yrbss_design ,</span>
+<span id="cb790-21"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-21" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb790-22"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-22" tabindex="-1"></a>    )</span>
+<span id="cb790-23"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-23" tabindex="-1"></a></span>
+<span id="cb790-24"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-24" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( share_result ) , <span class="dv">4</span> ) <span class="sc">==</span> .<span class="dv">0654</span> )</span>
+<span id="cb790-25"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-25" tabindex="-1"></a></span>
+<span id="cb790-26"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-26" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( share_result ) , <span class="dv">4</span> ) <span class="sc">==</span> .<span class="dv">0065</span> )</span>
+<span id="cb790-27"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-27" tabindex="-1"></a></span>
+<span id="cb790-28"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-28" tabindex="-1"></a>ci_result <span class="ot">&lt;-</span></span>
+<span id="cb790-29"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-29" tabindex="-1"></a>    <span class="fu">svyciprop</span>(</span>
+<span id="cb790-30"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-30" tabindex="-1"></a>        <span class="sc">~</span> never_rarely_wore_seat_belt ,</span>
+<span id="cb790-31"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-31" tabindex="-1"></a>        yrbss_design , </span>
+<span id="cb790-32"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-32" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb790-33"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-33" tabindex="-1"></a>        <span class="at">method =</span> <span class="st">&quot;beta&quot;</span></span>
+<span id="cb790-34"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-34" tabindex="-1"></a>    )</span>
+<span id="cb790-35"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-35" tabindex="-1"></a></span>
+<span id="cb790-36"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-36" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">confint</span>( ci_result )[<span class="dv">1</span>] , <span class="dv">4</span> ) <span class="sc">==</span> <span class="fl">0.0529</span> )</span>
+<span id="cb790-37"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-37" tabindex="-1"></a></span>
+<span id="cb790-38"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb790-38" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">confint</span>( ci_result )[<span class="dv">2</span>] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.08</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-srvyr-14" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>srvyr</code>  <a href="youth-risk-behavior-surveillance-system-yrbss.html#analysis-examples-with-srvyr-14" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>srvyr</code> library calculates summary statistics from survey data, such as the mean, total or quantile using <a href="https://github.com/tidyverse/dplyr/">dplyr</a>-like syntax. <a href="https://github.com/gergness/srvyr">srvyr</a> allows for the use of many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, the <code>tidyverse</code> style of non-standard evaluation and more consistent return types than the <code>survey</code> package. <a href="https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html">This vignette</a> details the available features. As a starting point for YRBSS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb791"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb791-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb791-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
-<span id="cb791-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb791-2" aria-hidden="true" tabindex="-1"></a>yrbss_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( yrbss_design )</span></code></pre></div>
+<div class="sourceCode" id="cb791"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb791-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb791-1" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
+<span id="cb791-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb791-2" tabindex="-1"></a>yrbss_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( yrbss_design )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb792"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb792-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-1" aria-hidden="true" tabindex="-1"></a>yrbss_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb792-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( bmipct , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
-<span id="cb792-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb792-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-4" aria-hidden="true" tabindex="-1"></a>yrbss_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb792-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( ever_used_marijuana ) <span class="sc">%&gt;%</span></span>
-<span id="cb792-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( bmipct , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<div class="sourceCode" id="cb792"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb792-1"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-1" tabindex="-1"></a>yrbss_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb792-2"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( bmipct , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb792-3"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-3" tabindex="-1"></a></span>
+<span id="cb792-4"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-4" tabindex="-1"></a>yrbss_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb792-5"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-5" tabindex="-1"></a>    <span class="fu">group_by</span>( ever_used_marijuana ) <span class="sc">%&gt;%</span></span>
+<span id="cb792-6"><a href="youth-risk-behavior-surveillance-system-yrbss.html#cb792-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( bmipct , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
 
 </div>
 </div>
