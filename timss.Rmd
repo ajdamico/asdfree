@@ -1,0 +1,478 @@
+# Trends in International Mathematics and Science Study (TIMSS) {-}
+
+<a href="https://github.com/asdfree/timss/actions"><img src="https://github.com/asdfree/timss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The Trends in International Mathematics and Science Study (TIMSS) tracks the math and science competency of fourth graders across about fifty nations.
+
+* A series of tables with one record per school (ACG), per student (ASG), per teacher (ATG), as well as files containing student achievement (ASA), home background (ASH), student-teacher linkage (AST), and within-country scoring reliability (ASR).
+
+* A complex sample survey designed to generalize to the fourth-grade student population of participating countries.
+
+* Released quadrennially since 1995.
+
+* Funded by the [International Association for the Evaluation of Educational Achievement](https://www.iea.nl/) and compiled by the [Lynch School of Education at Boston College](http://www.bc.edu/bc-web/schools/lsoe.html).
+
+---
+
+Please skim before you begin:
+
+1. [TIMSS 2019 User Guide for the International Database, 2nd Edition](https://timss2019.org/international-database/downloads/TIMSS-2019-User-Guide-for-the-International-Database-2nd-Ed.pdf)
+
+2. [Methods and Procedures: TIMSS 2019 Technical Report](https://timssandpirls.bc.edu/timss2019/methods/pdf/TIMSS-2019-MP-Technical-Report.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Trends in International Mathematics and Science Study)
+
+```{r}
+# brando for stella,
+# gump's jenny, rock's adrian,
+# students toward math test
+```
+
+---
+
+## Function Definitions {-}
+
+This survey uses a multiply-imputed variance estimation technique described in the [2004 Codebook](https://www.federalreserve.gov/econres/files/2004_codebk2004.txt). Most users do not need to study this function carefully. Define a function specific to only this dataset:
+
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine <-
+	function (results, variances, call = sys.call(), df.complete = Inf, ...) {
+		m <- length(results)
+		oldcall <- attr(results, "call")
+		if (missing(variances)) {
+			variances <- suppressWarnings(lapply(results, vcov))
+			results <- lapply(results, coef)
+		}
+		vbar <- variances[[1]]
+		cbar <- results[[1]]
+		for (i in 2:m) {
+			cbar <- cbar + results[[i]]
+			vbar <- vbar + variances[[i]]
+		}
+		cbar <- cbar/m
+		vbar <- vbar/m
+
+		# MODIFICATION
+		# evar <- var(do.call("rbind", results))
+		evar <- sum( ( unlist( results ) - cbar )^2 / 4 )
+
+		
+		r <- (1 + 1/m) * evar/vbar
+		df <- (m - 1) * (1 + 1/r)^2
+		if (is.matrix(df)) df <- diag(df)
+		if (is.finite(df.complete)) {
+			dfobs <- ((df.complete + 1)/(df.complete + 3)) * df.complete *
+			vbar/(vbar + evar)
+			if (is.matrix(dfobs)) dfobs <- diag(dfobs)
+			df <- 1/(1/dfobs + 1/df)
+		}
+		if (is.matrix(r)) r <- diag(r)
+		rval <- list(coefficients = cbar, variance = vbar + evar *
+		(m + 1)/m, call = c(oldcall, call), nimp = m, df = df,
+		missinfo = (r + 2/(df + 3))/(r + 1))
+		class(rval) <- "MIresult"
+		rval
+	}
+```
+---
+
+## Download, Import, Preparation {-}
+
+Download and unzip the 2019 fourth grade international database:
+
+```{r message = FALSE , eval = FALSE }
+library(httr)
+
+tf <- tempfile()
+
+this_url <- "https://timss2019.org/international-database/downloads/T19_G4_SPSS%20Data.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+```
+
+Import and stack each of the student context data files for all countries and benchmarking participants:
+
+```{r message = FALSE , eval = FALSE }
+library(haven)
+
+timss_df <- NULL
+
+for( spss_fn in unzipped_files[ grepl( '^asg[a-z][a-z][a-z]m7' , basename( unzipped_files ) ) ] ){
+
+	this_tbl <- read_spss( spss_fn )
+	
+	this_tbl <- zap_labels( this_tbl )
+	
+	this_df <- data.frame( this_tbl )
+	
+	names( this_df ) <- tolower( names( this_df ) )
+	
+	timss_df <- rbind( timss_df , this_df )
+	
+}
+
+timss_df <- timss_df[ with( timss_df , order( idcntry , idstud ) ) , ]
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# timss_fn <- file.path( path.expand( "~" ) , "TIMSS" , "this_file.rds" )
+# saveRDS( timss_df , file = timss_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# timss_df <- readRDS( timss_fn )
+```
+
+### Survey Design Definition {-}
+Construct a multiply-imputed, complex sample survey design:
+
+```{r message = FALSE , eval = FALSE }
+ppv <- grep( "(.*)0[1-5]$" , names( timss_df ) , value = TRUE )
+ppv_prefix <- gsub( "0[1-5]$" , "" , ppv )
+pv <- names( table( ppv_prefix )[ table( ppv_prefix ) == 5 ] )
+pv_columns <- grep( paste0( "^" , pv , "0[1-5]$" , collapse = "|" ) , names( timss_df ) , value = TRUE )
+
+id_columns <- c( 'idcntry' , 'idstud' )
+
+pv_wide_df <- timss_df[ c( id_columns , pv_columns ) ]
+
+timss_df[ pv_columns ] <- NULL
+
+pv_long_df <- 
+	reshape( 
+		pv_wide_df , 
+		varying = lapply( paste0( pv , '0' ) , paste0 , 1:5 ) , 
+		direction = 'long' , 
+		timevar = 'implicate' , 
+		idvar = id_columns 
+	)
+
+names( pv_long_df ) <- gsub( "01$" , "" , names( pv_long_df ) )
+
+timss_long_df <- merge( timss_df , pv_long_df )
+
+timss_long_df <- timss_long_df[ with( timss_long_df , order( idcntry , idstud ) ) , ]
+
+stopifnot( nrow( timss_long_df ) == nrow( pv_long_df ) )
+
+stopifnot( nrow( timss_long_df ) / 5 == nrow( timss_df ) )
+```
+
+Reshape the plausible values data.frame into a list based on the implicate number:
+```{r message = FALSE , eval = FALSE }
+timss_list <- split( timss_long_df , timss_long_df[ , 'implicate' ] )
+```
+
+```{r message = FALSE , eval = FALSE }
+weights_df <- timss_df[ c( 'jkrep' , 'jkzone' ) ]
+
+for( j in 1:75 ){
+	for( i in 0:1 ){
+		weights_df[ weights_df[ , 'jkzone' ] != j , paste0( 'rw' , i , j ) ] <- 1
+		
+		weights_df[ weights_df[ , 'jkzone' ] == j , paste0( 'rw' , i , j ) ] <- 
+			2 * ( weights_df[ weights_df[ , 'jkzone' ] == j , 'jkrep' ] == i )
+	}
+}
+
+weights_df[ c( 'jkrep' , 'jkzone' ) ] <- NULL
+
+```
+
+Define the design:
+```{r message = FALSE , eval = FALSE }
+library(survey)
+library(mitools)
+
+timss_design <- 
+	svrepdesign(
+		weights = ~totwgt ,
+		repweights = weights_df , 
+		data = imputationList( timss_list ) ,
+		type = "other" ,
+		scale = 0.5 ,
+		rscales = rep( 1 , 150 ) ,
+		combined.weights = FALSE ,
+		mse = TRUE
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+timss_design <- 
+	update( 
+		timss_design , 
+		
+		one = 1 ,
+		
+		idcntry = factor( idcntry ) ,
+		
+		sex = factor( itsex , labels = c( "male" , "female" ) ) ,
+		
+		born_2005_or_later = as.numeric( itbirthy >= 2005 )
+
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design , svyby( ~ one , ~ one , unwtd.count ) ) )
+
+timss_MIcombine( with( timss_design , svyby( ~ one , ~ sex , unwtd.count ) ) )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design , svytotal( ~ one ) ) )
+
+timss_MIcombine( with( timss_design ,
+	svyby( ~ one , ~ sex , svytotal )
+) )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design , svymean( ~ asmmat ) ) )
+
+timss_MIcombine( with( timss_design ,
+	svyby( ~ asmmat , ~ sex , svymean )
+) )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design , svymean( ~ idcntry ) ) )
+
+timss_MIcombine( with( timss_design ,
+	svyby( ~ idcntry , ~ sex , svymean )
+) )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design , svytotal( ~ asmmat ) ) )
+
+timss_MIcombine( with( timss_design ,
+	svyby( ~ asmmat , ~ sex , svytotal )
+) )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design , svytotal( ~ idcntry ) ) )
+
+timss_MIcombine( with( timss_design ,
+	svyby( ~ idcntry , ~ sex , svytotal )
+) )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design ,
+	svyquantile(
+		~ asmmat ,
+		0.5 , se = TRUE 
+) ) )
+
+timss_MIcombine( with( timss_design ,
+	svyby(
+		~ asmmat , ~ sex , svyquantile ,
+		0.5 , se = TRUE ,
+		ci = TRUE 
+) ) )
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design ,
+	svyratio( numerator = ~ asssci , denominator = ~ asmmat )
+) )
+```
+
+### Subsetting {-}
+
+Restrict the survey design to Australia, Austria, Azerbaijan, Belgium (French):
+```{r eval = FALSE , results = "hide" }
+sub_timss_design <- subset( timss_design , idcntry %in% c( 36 , 40 , 31 , 957 ) )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( sub_timss_design , svymean( ~ asmmat ) ) )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <-
+	timss_MIcombine( with( timss_design ,
+		svymean( ~ asmmat )
+	) )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	timss_MIcombine( with( timss_design ,
+		svyby( ~ asmmat , ~ sex , svymean )
+	) )
+
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( timss_design$designs[[1]] )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+timss_MIcombine( with( timss_design , svyvar( ~ asmmat ) ) )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+timss_MIcombine( with( timss_design ,
+	svymean( ~ asmmat , deff = TRUE )
+) )
+
+# SRS with replacement
+timss_MIcombine( with( timss_design ,
+	svymean( ~ asmmat , deff = "replace" )
+) )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+# MIsvyciprop( ~ born_2001_or_later , timss_design ,
+# 	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+# MIsvyttest( asmmat ~ born_2001_or_later , timss_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+# MIsvychisq( ~ born_2001_or_later + idcntry , timss_design )
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	timss_MIcombine( with( timss_design ,
+		svyglm( asmmat ~ born_2001_or_later + idcntry )
+	) )
+	
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+timss_design <- update( timss_design , one = 1 )
+w <- subset( timss_design , idcntry == 36 )
+nrow(w)
+lapply( w$designs , function( u ) vcov( svymean( ~ asmmat , u ) ) )
+mean( unlist( lapply( w$designs , function( u ) vcov( svymean( ~ asmmat , u ) ) ) ) )
+timss_MIcombine( with( w , svymean( ~ asmmat ) ) )
+
+library(haven)
+
+this_df <- read_spss( grep( 'asgaus' , unzipped_files , value = TRUE ) )
+this_df <- zap_labels( this_df )
+this_df <- data.frame( this_df )
+names( this_df ) <- tolower( names( this_df ) )
+
+mean( c(
+	with( this_df , weighted.mean( asmmat01 , totwgt ) ) ,
+	with( this_df , weighted.mean( asmmat02 , totwgt ) ) ,
+	with( this_df , weighted.mean( asmmat03 , totwgt ) ) ,
+	with( this_df , weighted.mean( asmmat04 , totwgt ) ) ,
+	with( this_df , weighted.mean( asmmat05 , totwgt ) )
+) )
+
+for( k in 1:5 ){
+
+	this_variance <- 0
+	
+	for( j in 1:75 ){
+		for( i in 0:1 ){
+			this_variance <- 
+				this_variance + 
+				( 
+					weighted.mean( 
+						this_df[ , paste0( 'asmmat0' , k ) ] , 
+						ifelse( j == this_df[ , 'jkzone' ] , this_df[ , 'totwgt' ] * 2 * ( this_df[ , 'jkrep' ] == i ) , this_df[ , 'totwgt' ] )
+					) -
+					weighted.mean( 
+						this_df[ , paste0( 'asmmat0' , k ) ] , 
+						this_df[ , 'totwgt' ]
+					)
+				)^2
+		}
+	}
+	
+	assign( paste0( 'v' , k ) , this_variance * 0.5 )
+
+}
+
+# sampling variance
+mean( c( v1 , v2 , v3 , v4 , v5 ) )
+
+t0 <-
+	mean( c(
+		with( this_df , weighted.mean( asmmat01 , totwgt ) ) ,
+		with( this_df , weighted.mean( asmmat02 , totwgt ) ) ,
+		with( this_df , weighted.mean( asmmat03 , totwgt ) ) ,
+		with( this_df , weighted.mean( asmmat04 , totwgt ) ) ,
+		with( this_df , weighted.mean( asmmat05 , totwgt ) )
+	) )
+
+# imputation variance
+( 6 / 5 ) * 
+	( 
+		( ( with( this_df , weighted.mean( asmmat01 , totwgt ) ) - t0 )^2 / 4 ) +
+		( ( with( this_df , weighted.mean( asmmat02 , totwgt ) ) - t0 )^2 / 4 ) +
+		( ( with( this_df , weighted.mean( asmmat03 , totwgt ) ) - t0 )^2 / 4 ) +
+		( ( with( this_df , weighted.mean( asmmat04 , totwgt ) ) - t0 )^2 / 4 ) +
+		( ( with( this_df , weighted.mean( asmmat05 , totwgt ) ) - t0 )^2 / 4 ) 
+	)
+
+```
+
+
