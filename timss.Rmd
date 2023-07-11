@@ -300,10 +300,10 @@ timss_MIcombine( with( timss_design ,
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-timss_MIcombine( with( timss_design , svymean( ~ asmmat ) ) )
+timss_MIcombine( with( timss_design , svymean( ~ asmmat , na.rm = TRUE ) ) )
 
 timss_MIcombine( with( timss_design ,
-	svyby( ~ asmmat , ~ sex , svymean )
+	svyby( ~ asmmat , ~ sex , svymean , na.rm = TRUE )
 ) )
 ```
 
@@ -318,10 +318,10 @@ timss_MIcombine( with( timss_design ,
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-timss_MIcombine( with( timss_design , svytotal( ~ asmmat ) ) )
+timss_MIcombine( with( timss_design , svytotal( ~ asmmat , na.rm = TRUE ) ) )
 
 timss_MIcombine( with( timss_design ,
-	svyby( ~ asmmat , ~ sex , svytotal )
+	svyby( ~ asmmat , ~ sex , svytotal , na.rm = TRUE )
 ) )
 ```
 
@@ -339,14 +339,14 @@ Calculate the median (50th percentile) of a linear variable, overall and by grou
 timss_MIcombine( with( timss_design ,
 	svyquantile(
 		~ asmmat ,
-		0.5 , se = TRUE 
+		0.5 , se = TRUE , na.rm = TRUE 
 ) ) )
 
 timss_MIcombine( with( timss_design ,
 	svyby(
 		~ asmmat , ~ sex , svyquantile ,
 		0.5 , se = TRUE ,
-		ci = TRUE 
+		ci = TRUE , na.rm = TRUE
 ) ) )
 ```
 
@@ -365,7 +365,7 @@ sub_timss_design <- subset( timss_design , idcntry %in% c( 36 , 40 , 31 , 956 ) 
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-timss_MIcombine( with( sub_timss_design , svymean( ~ asmmat ) ) )
+timss_MIcombine( with( sub_timss_design , svymean( ~ asmmat , na.rm = TRUE ) ) )
 ```
 
 ### Measures of Uncertainty {-}
@@ -374,7 +374,7 @@ Extract the coefficient, standard error, confidence interval, and coefficient of
 ```{r eval = FALSE , results = "hide" }
 this_result <-
 	timss_MIcombine( with( timss_design ,
-		svymean( ~ asmmat )
+		svymean( ~ asmmat , na.rm = TRUE )
 	) )
 
 coef( this_result )
@@ -384,7 +384,7 @@ cv( this_result )
 
 grouped_result <-
 	timss_MIcombine( with( timss_design ,
-		svyby( ~ asmmat , ~ sex , svymean )
+		svyby( ~ asmmat , ~ sex , svymean , na.rm = TRUE )
 	) )
 
 coef( grouped_result )
@@ -400,19 +400,19 @@ degf( timss_design$designs[[1]] )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-timss_MIcombine( with( timss_design , svyvar( ~ asmmat ) ) )
+timss_MIcombine( with( timss_design , svyvar( ~ asmmat , na.rm = TRUE ) ) )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
 timss_MIcombine( with( timss_design ,
-	svymean( ~ asmmat , deff = TRUE )
+	svymean( ~ asmmat , na.rm = TRUE , deff = TRUE )
 ) )
 
 # SRS with replacement
 timss_MIcombine( with( timss_design ,
-	svymean( ~ asmmat , deff = "replace" )
+	svymean( ~ asmmat , na.rm = TRUE , deff = "replace" )
 ) )
 ```
 
