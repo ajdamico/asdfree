@@ -6,7 +6,7 @@ The Trends in International Mathematics and Science Study (TIMSS) tracks the mat
 
 * A series of tables with one record per school (ACG), per student (ASG), per teacher (ATG), as well as files containing student achievement (ASA), home background (ASH), student-teacher linkage (AST), and within-country scoring reliability (ASR).
 
-* A complex sample survey designed to generalize to the fourth-grade student population of participating countries.
+* A complex sample survey designed to generalize to the fourth- and eighth-grade student populations of participating countries.
 
 * Released quadrennially since 1995.
 
@@ -32,7 +32,7 @@ Please skim before you begin:
 
 ## Function Definitions {-}
 
-This survey uses a multiply-imputed variance estimation technique described in the [2004 Codebook](https://www.federalreserve.gov/econres/files/2004_codebk2004.txt). Most users do not need to study this function carefully. Define a function specific to only this dataset:
+This survey uses a multiply-imputed variance estimation technique described in [Chapter 14: Estimating Standard Errors in the TIMSS 2019 Results](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html). Most users do not need to study this function carefully. Define a function specific to only this dataset:
 
 ```{r eval = FALSE , results = "hide" }
 timss_MIcombine <-
@@ -97,9 +97,12 @@ Import and stack each of the student context data files for all countries and be
 ```{r message = FALSE , eval = FALSE }
 library(haven)
 
+# limit unzipped files to those starting with `asg` followed by three letters followed by `m7`
+asg_fns <- unzipped_files[ grepl( '^asg[a-z][a-z][a-z]m7' , basename( unzipped_files ) ) ]
+
 timss_df <- NULL
 
-for( spss_fn in unzipped_files[ grepl( '^asg[a-z][a-z][a-z]m7' , basename( unzipped_files ) ) ] ){
+for( spss_fn in asg_fns ){
 
 	this_tbl <- read_spss( spss_fn )
 	
@@ -113,6 +116,7 @@ for( spss_fn in unzipped_files[ grepl( '^asg[a-z][a-z][a-z]m7' , basename( unzip
 	
 }
 
+# order the data.frame by unique student id
 timss_df <- timss_df[ with( timss_df , order( idcntry , idstud ) ) , ]
 ```
 
@@ -134,29 +138,50 @@ Load the same object:
 ### Survey Design Definition {-}
 Construct a multiply-imputed, complex sample survey design:
 
+From among the possibly plausible values, determine all columns that are plausible values (multiply-imputed):
+
 ```{r message = FALSE , eval = FALSE }
+# identify all columns ending with `01` thru `05`
 ppv <- grep( "(.*)0[1-5]$" , names( timss_df ) , value = TRUE )
+
+# remove those ending digits
 ppv_prefix <- gsub( "0[1-5]$" , "" , ppv )
+
+# identify each of the possibilities with exactly five matches (five implicates)
 pv <- names( table( ppv_prefix )[ table( ppv_prefix ) == 5 ] )
-pv_columns <- grep( paste0( "^" , pv , "0[1-5]$" , collapse = "|" ) , names( timss_df ) , value = TRUE )
 
-id_columns <- c( 'idcntry' , 'idstud' )
+# identify each of the `01` thru `05` plausible value columns
+pv_columns <-
+	grep( 
+		paste0( "^" , pv , "0[1-5]$" , collapse = "|" ) , 
+		names( timss_df ) , 
+		value = TRUE 
+	)
+```
 
-pv_wide_df <- timss_df[ c( id_columns , pv_columns ) ]
+Extract those multiply-imputed columns into a separate data.frame, then remove them from the source data.frame:
+```{r message = FALSE , eval = FALSE }
+pv_wide_df <- timss_df[ c( 'idcntry' , 'idstud' , pv_columns ) ]
 
 timss_df[ pv_columns ] <- NULL
+```
 
+Reshape the multiply-imputed columns from one record per student to one record per student per implicate:
+```{r message = FALSE , eval = FALSE }
 pv_long_df <- 
 	reshape( 
 		pv_wide_df , 
 		varying = lapply( paste0( pv , '0' ) , paste0 , 1:5 ) , 
 		direction = 'long' , 
 		timevar = 'implicate' , 
-		idvar = id_columns 
+		idvar = c( 'idcntry' , 'idstud' ) 
 	)
 
 names( pv_long_df ) <- gsub( "01$" , "" , names( pv_long_df ) )
+```
 
+Merge the columns from the source data.frame onto the one record per student per implicate data.frame:
+```{r message = FALSE , eval = FALSE }
 timss_long_df <- merge( timss_df , pv_long_df )
 
 timss_long_df <- timss_long_df[ with( timss_long_df , order( idcntry , idstud ) ) , ]
@@ -166,10 +191,12 @@ stopifnot( nrow( timss_long_df ) == nrow( pv_long_df ) )
 stopifnot( nrow( timss_long_df ) / 5 == nrow( timss_df ) )
 ```
 
-Reshape the plausible values data.frame into a list based on the implicate number:
+Divide the five plausible value implicates into a list with five data.frames based on the implicate number:
 ```{r message = FALSE , eval = FALSE }
 timss_list <- split( timss_long_df , timss_long_df[ , 'implicate' ] )
 ```
+
+Construct a replicate weights table following the estimation technique described in [Chapter 14: Estimating Standard Errors in the TIMSS 2019 Results](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html):
 
 ```{r message = FALSE , eval = FALSE }
 weights_df <- timss_df[ c( 'jkrep' , 'jkzone' ) ]
@@ -215,11 +242,22 @@ timss_design <-
 		
 		one = 1 ,
 		
-		idcntry = factor( idcntry ) ,
+		countries_thru_canada = 
 		
-		sex = factor( itsex , labels = c( "male" , "female" ) ) ,
+			factor( 
+				idcntry ,
+				
+				levels = c(8L, 51L, 36L, 40L, 31L, 48L, 956L, 70L, 100L, 124L) ,
+
+				labels =
+					c("Albania", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahrain",
+					"Belgium (Flemish)", "Bosnia and Herzegovina", "Bulgaria", "Canada")
+				
+			) ,
 		
-		born_2005_or_later = as.numeric( itbirthy >= 2005 )
+		sex = factor( asbg01 , levels = 1:2 , labels = c( "female" , "male" ) ) ,
+		
+		born_in_country = ifelse( asbg07 %in% 1:2 , as.numeric( asbg07 == 1 ) , NA )
 
 	)
 ```
@@ -260,10 +298,10 @@ timss_MIcombine( with( timss_design ,
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-timss_MIcombine( with( timss_design , svymean( ~ idcntry ) ) )
+timss_MIcombine( with( timss_design , svymean( ~ countries_thru_canada ) ) )
 
 timss_MIcombine( with( timss_design ,
-	svyby( ~ idcntry , ~ sex , svymean )
+	svyby( ~ countries_thru_canada , ~ sex , svymean )
 ) )
 ```
 
@@ -278,10 +316,10 @@ timss_MIcombine( with( timss_design ,
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-timss_MIcombine( with( timss_design , svytotal( ~ idcntry ) ) )
+timss_MIcombine( with( timss_design , svytotal( ~ countries_thru_canada ) ) )
 
 timss_MIcombine( with( timss_design ,
-	svyby( ~ idcntry , ~ sex , svytotal )
+	svyby( ~ countries_thru_canada , ~ sex , svytotal )
 ) )
 ```
 
@@ -312,7 +350,7 @@ timss_MIcombine( with( timss_design ,
 
 Restrict the survey design to Australia, Austria, Azerbaijan, Belgium (French):
 ```{r eval = FALSE , results = "hide" }
-sub_timss_design <- subset( timss_design , idcntry %in% c( 36 , 40 , 31 , 957 ) )
+sub_timss_design <- subset( timss_design , idcntry %in% c( 36 , 40 , 31 , 956 ) )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
@@ -369,7 +407,7 @@ timss_MIcombine( with( timss_design ,
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-# MIsvyciprop( ~ born_2001_or_later , timss_design ,
+# MIsvyciprop( ~ born_in_country , timss_design ,
 # 	method = "likelihood" , na.rm = TRUE )
 ```
 
@@ -377,19 +415,19 @@ Compute confidence intervals for proportions using methods that may be more accu
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-# MIsvyttest( asmmat ~ born_2001_or_later , timss_design )
+# MIsvyttest( asmmat ~ born_in_country , timss_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
-# MIsvychisq( ~ born_2001_or_later + idcntry , timss_design )
+# MIsvychisq( ~ born_in_country + countries_thru_canada , timss_design )
 ```
 
 Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	timss_MIcombine( with( timss_design ,
-		svyglm( asmmat ~ born_2001_or_later + idcntry )
+		svyglm( asmmat ~ born_in_country + countries_thru_canada )
 	) )
 	
 summary( glm_result )
@@ -403,28 +441,37 @@ summary( glm_result )
 
 ## Replication Example {-}
 
+https://timss.bc.edu/timss2019/methods/pdf/T19_MP_Ch14-estimating-standard-errors.pdf#page=13
+
 ```{r eval = FALSE , results = "hide" }
-timss_design <- update( timss_design , one = 1 )
-w <- subset( timss_design , idcntry == 36 )
-nrow(w)
-lapply( w$designs , function( u ) vcov( svymean( ~ asmmat , u ) ) )
-mean( unlist( lapply( w$designs , function( u ) vcov( svymean( ~ asmmat , u ) ) ) ) )
-timss_MIcombine( with( w , svymean( ~ asmmat ) ) )
+australia_design <- subset( timss_design , countries_thru_canada == "Australia" )
 
-library(haven)
+stopifnot( nrow( australia_design ) == 5890 )
 
-this_df <- read_spss( grep( 'asgaus' , unzipped_files , value = TRUE ) )
-this_df <- zap_labels( this_df )
-this_df <- data.frame( this_df )
-names( this_df ) <- tolower( names( this_df ) )
+result <- timss_MIcombine( with( australia_design , svymean( ~ asmmat ) ) )
 
-mean( c(
-	with( this_df , weighted.mean( asmmat01 , totwgt ) ) ,
-	with( this_df , weighted.mean( asmmat02 , totwgt ) ) ,
-	with( this_df , weighted.mean( asmmat03 , totwgt ) ) ,
-	with( this_df , weighted.mean( asmmat04 , totwgt ) ) ,
-	with( this_df , weighted.mean( asmmat05 , totwgt ) )
-) )
+stopifnot( round( coef( result ) , 3 ) == 515.880 )
+
+stopifnot( round( SE( result ) , 3 ) == 2.776 )
+
+```
+
+```{r eval = FALSE , results = "hide" }
+australia_tbl <- read_spss( grep( 'asgaus' , unzipped_files , value = TRUE ) )
+australia_tbl <- zap_labels( australia_tbl )
+australia_df <- data.frame( australia_tbl )
+names( australia_df ) <- tolower( names( australia_df ) )
+
+mean_proficiency <-
+	mean( c(
+		with( australia_df , weighted.mean( asmmat01 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat02 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat03 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat04 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat05 , totwgt ) )
+	) )
+
+stopifnot( round( mean_proficiency , 3 ) == 515.880 )
 
 for( k in 1:5 ){
 
@@ -436,12 +483,16 @@ for( k in 1:5 ){
 				this_variance + 
 				( 
 					weighted.mean( 
-						this_df[ , paste0( 'asmmat0' , k ) ] , 
-						ifelse( j == this_df[ , 'jkzone' ] , this_df[ , 'totwgt' ] * 2 * ( this_df[ , 'jkrep' ] == i ) , this_df[ , 'totwgt' ] )
+						australia_df[ , paste0( 'asmmat0' , k ) ] , 
+						ifelse( 
+							j == australia_df[ , 'jkzone' ] , 
+							australia_df[ , 'totwgt' ] * 2 * ( australia_df[ , 'jkrep' ] == i ) , 
+							australia_df[ , 'totwgt' ] 
+						)
 					) -
 					weighted.mean( 
-						this_df[ , paste0( 'asmmat0' , k ) ] , 
-						this_df[ , 'totwgt' ]
+						australia_df[ , paste0( 'asmmat0' , k ) ] , 
+						australia_df[ , 'totwgt' ]
 					)
 				)^2
 		}
@@ -451,27 +502,31 @@ for( k in 1:5 ){
 
 }
 
-# sampling variance
-mean( c( v1 , v2 , v3 , v4 , v5 ) )
+sampling_variance <- mean( c( v1 , v2 , v3 , v4 , v5 ) )
+stopifnot( round( sampling_variance , 3 ) == 7.397 )
 
 t0 <-
 	mean( c(
-		with( this_df , weighted.mean( asmmat01 , totwgt ) ) ,
-		with( this_df , weighted.mean( asmmat02 , totwgt ) ) ,
-		with( this_df , weighted.mean( asmmat03 , totwgt ) ) ,
-		with( this_df , weighted.mean( asmmat04 , totwgt ) ) ,
-		with( this_df , weighted.mean( asmmat05 , totwgt ) )
+		with( australia_df , weighted.mean( asmmat01 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat02 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat03 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat04 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat05 , totwgt ) )
 	) )
 
-# imputation variance
-( 6 / 5 ) * 
-	( 
-		( ( with( this_df , weighted.mean( asmmat01 , totwgt ) ) - t0 )^2 / 4 ) +
-		( ( with( this_df , weighted.mean( asmmat02 , totwgt ) ) - t0 )^2 / 4 ) +
-		( ( with( this_df , weighted.mean( asmmat03 , totwgt ) ) - t0 )^2 / 4 ) +
-		( ( with( this_df , weighted.mean( asmmat04 , totwgt ) ) - t0 )^2 / 4 ) +
-		( ( with( this_df , weighted.mean( asmmat05 , totwgt ) ) - t0 )^2 / 4 ) 
-	)
+imputation_variance <-
+	( 6 / 5 ) * 
+		( 
+			( ( with( australia_df , weighted.mean( asmmat01 , totwgt ) ) - t0 )^2 / 4 ) +
+			( ( with( australia_df , weighted.mean( asmmat02 , totwgt ) ) - t0 )^2 / 4 ) +
+			( ( with( australia_df , weighted.mean( asmmat03 , totwgt ) ) - t0 )^2 / 4 ) +
+			( ( with( australia_df , weighted.mean( asmmat04 , totwgt ) ) - t0 )^2 / 4 ) +
+			( ( with( australia_df , weighted.mean( asmmat05 , totwgt ) ) - t0 )^2 / 4 ) 
+		)
+
+stopifnot( round( imputation_variance , 3 ) == 0.309 )
+
+stopifnot( round( sampling_variance + imputation_variance , 3 ) == 7.706 )
 
 ```
 
