@@ -2,15 +2,15 @@
 
 <a href="https://github.com/asdfree/timss/actions"><img src="https://github.com/asdfree/timss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-The Trends in International Mathematics and Science Study (TIMSS) tracks the math and science competency of fourth graders across about fifty nations.
+A comparative study of student achievement in math and science across more than 50 nations.
 
-* A series of tables with one record per school (ACG), per student (ASG), per teacher (ATG), as well as files containing student achievement (ASA), home background (ASH), student-teacher linkage (AST), and within-country scoring reliability (ASR).
+* Grade-specific tables with one record per school, student, teacher, plus files containing student achievement, home background, student-teacher linkage, and within-country scoring reliability.
 
-* A complex sample survey designed to generalize to the fourth- and eighth-grade student populations of participating countries.
+* A complex survey generalizing to fourth- and eighth-grade populations of participating countries.
 
 * Released quadrennially since 1995.
 
-* Funded by the [International Association for the Evaluation of Educational Achievement](https://www.iea.nl/) and compiled by the [Lynch School of Education at Boston College](http://www.bc.edu/bc-web/schools/lsoe.html).
+* Funded by the [International Association for the Evaluation of Educational Achievement](https://www.iea.nl/), run at [BC](http://www.bc.edu/bc-web/schools/lsoe.html).
 
 ---
 
@@ -32,7 +32,7 @@ Please skim before you begin:
 
 ## Function Definitions {-}
 
-This survey uses a multiply-imputed variance estimation technique described in [Chapter 14: Estimating Standard Errors in the TIMSS 2019 Results](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html). Most users do not need to study this function carefully. Define a function specific to only this dataset:
+This survey uses a multiply-imputed variance estimation technique described in [Methods Chapter 14](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html). Most users do not need to study this function carefully. Define a function specific to only this dataset:
 
 ```{r eval = FALSE , results = "hide" }
 timss_MIcombine <-
@@ -145,7 +145,7 @@ Load the same object:
 ### Survey Design Definition {-}
 Construct a multiply-imputed, complex sample survey design:
 
-From among the possibly plausible values, determine all columns that are plausible values (multiply-imputed):
+From among possibly plausible values, determine all columns that are multiply-imputed plausible values:
 
 ```{r message = FALSE , eval = FALSE }
 # identify all columns ending with `01` thru `05`
@@ -166,14 +166,14 @@ pv_columns <-
 	)
 ```
 
-Extract those multiply-imputed columns into a separate data.frame, then remove them from the source data.frame:
+Extract those multiply-imputed columns into a separate data.frame, then remove them from the source:
 ```{r message = FALSE , eval = FALSE }
 pv_wide_df <- timss_df[ c( 'idcntry' , 'idstud' , pv_columns ) ]
 
 timss_df[ pv_columns ] <- NULL
 ```
 
-Reshape the multiply-imputed columns from one record per student to one record per student per implicate:
+Reshape these columns from one record per student to one record per student per implicate:
 ```{r message = FALSE , eval = FALSE }
 pv_long_df <- 
 	reshape( 
@@ -203,7 +203,7 @@ Divide the five plausible value implicates into a list with five data.frames bas
 timss_list <- split( timss_long_df , timss_long_df[ , 'implicate' ] )
 ```
 
-Construct a replicate weights table following the estimation technique described in [Chapter 14: Estimating Standard Errors in the TIMSS 2019 Results](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html):
+Construct a replicate weights table following the estimation technique described in [Methods Chapter 14](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html):
 
 ```{r message = FALSE , eval = FALSE }
 weights_df <- timss_df[ c( 'jkrep' , 'jkzone' ) ]
@@ -451,7 +451,7 @@ summary( glm_result )
 
 ## Replication Example {-}
 
-https://timss.bc.edu/timss2019/methods/pdf/T19_MP_Ch14-estimating-standard-errors.pdf#page=13
+This example matches the mean proficiency and standard error of the `Australia` row of the `Summary Statistics and Standard Errors for Proficiency in Overall Mathematics-Grade 4` table from the [Appendix 14A: Summary Statistics and Standard Errors for Proficiency in Grade 4 Mathematics](https://timss.bc.edu/timss2019/methods/pdf/T19_MP_Ch14-estimating-standard-errors.pdf#page=13):
 
 ```{r eval = FALSE , results = "hide" }
 australia_design <- subset( timss_design , countries_thru_canada %in% "Australia" )
@@ -466,6 +466,8 @@ stopifnot( round( SE( result ) , 3 ) == 2.776 )
 
 ```
 
+This example matches the jackknife sampling, imputation, and total variances of the same row:
+
 ```{r eval = FALSE , results = "hide" }
 australia_fn <- unzipped_files[ grepl( 'asgaus' , basename( unzipped_files ) ) ]
 australia_tbl <- read_spss( australia_fn )
@@ -473,7 +475,7 @@ australia_tbl <- zap_labels( australia_tbl )
 australia_df <- data.frame( australia_tbl )
 names( australia_df ) <- tolower( names( australia_df ) )
 
-mean_proficiency <-
+estimate <-
 	mean( c(
 		with( australia_df , weighted.mean( asmmat01 , totwgt ) ) ,
 		with( australia_df , weighted.mean( asmmat02 , totwgt ) ) ,
@@ -482,7 +484,7 @@ mean_proficiency <-
 		with( australia_df , weighted.mean( asmmat05 , totwgt ) )
 	) )
 
-stopifnot( round( mean_proficiency , 3 ) == 515.880 )
+stopifnot( round( estimate , 3 ) == 515.880 )
 
 for( k in 1:5 ){
 
@@ -516,24 +518,15 @@ for( k in 1:5 ){
 sampling_variance <- mean( c( v1 , v2 , v3 , v4 , v5 ) )
 stopifnot( round( sampling_variance , 3 ) == 7.397 )
 
-t0 <-
-	mean( c(
-		with( australia_df , weighted.mean( asmmat01 , totwgt ) ) ,
-		with( australia_df , weighted.mean( asmmat02 , totwgt ) ) ,
-		with( australia_df , weighted.mean( asmmat03 , totwgt ) ) ,
-		with( australia_df , weighted.mean( asmmat04 , totwgt ) ) ,
-		with( australia_df , weighted.mean( asmmat05 , totwgt ) )
-	) )
-
 imputation_variance <-
 	( 6 / 5 ) * 
-		( 
-			( ( with( australia_df , weighted.mean( asmmat01 , totwgt ) ) - t0 )^2 / 4 ) +
-			( ( with( australia_df , weighted.mean( asmmat02 , totwgt ) ) - t0 )^2 / 4 ) +
-			( ( with( australia_df , weighted.mean( asmmat03 , totwgt ) ) - t0 )^2 / 4 ) +
-			( ( with( australia_df , weighted.mean( asmmat04 , totwgt ) ) - t0 )^2 / 4 ) +
-			( ( with( australia_df , weighted.mean( asmmat05 , totwgt ) ) - t0 )^2 / 4 ) 
-		)
+	( 
+		( ( with( australia_df , weighted.mean( asmmat01 , totwgt ) ) - estimate )^2 / 4 ) +
+		( ( with( australia_df , weighted.mean( asmmat02 , totwgt ) ) - estimate )^2 / 4 ) +
+		( ( with( australia_df , weighted.mean( asmmat03 , totwgt ) ) - estimate )^2 / 4 ) +
+		( ( with( australia_df , weighted.mean( asmmat04 , totwgt ) ) - estimate )^2 / 4 ) +
+		( ( with( australia_df , weighted.mean( asmmat05 , totwgt ) ) - estimate )^2 / 4 ) 
+	)
 
 stopifnot( round( imputation_variance , 3 ) == 0.309 )
 
