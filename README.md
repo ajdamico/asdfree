@@ -20,6 +20,7 @@ national-survey-of-childrens-health-nsch: <p><a href="https://github.com/asdfree
 national-survey-of-family-growth-nsfg: <p><a href="https://github.com/asdfree/nsfg/actions"><img src="https://github.com/asdfree/nsfg/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-survey-on-drug-use-and-health-nsduh: <p><a href="https://github.com/asdfree/nsduh/actions"><img src="https://github.com/asdfree/nsduh/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 programme-for-the-international-assessment-of-adult-competencies-piaac: <p><a href="https://github.com/asdfree/piaac/actions"><img src="https://github.com/asdfree/piaac/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+progress-in-international-reading-literacy-study-pirls: <p><a href="https://github.com/asdfree/pirls/actions"><img src="https://github.com/asdfree/pirls/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 public-libraries-survey-pls: <p><a href="https://github.com/asdfree/pls/actions"><img src="https://github.com/asdfree/pls/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 residential-energy-consumption-survey-recs: <p><a href="https://github.com/asdfree/recs/actions"><img src="https://github.com/asdfree/recs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 social-security-public-use-data-files-ssa: <p><a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
