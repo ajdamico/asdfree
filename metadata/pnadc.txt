@@ -1,5 +1,6 @@
 chapter_title: Pesquisa Nacional por Amostra de Domicilios - Continua
 
+needs_actions_build_status_line: yes
 
 ~~~{dataset_introduction}
 Brazil's principal household survey, the Pesquisa Nacional por Amostra de Domicilios Continua (PNADC) measures general education, labor, income, and housing characteristics of the population.
@@ -14,17 +15,114 @@ publication_period: * Released quarterly since 2012.
 administrative_organization: * Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
 
 
+~~~{reading_block}
+Please skim before you begin:
+
+1.
+
+2.
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# 
+# 
+# 
+```
+~~~
+
+
+
+
+~~~{download_and_import_block}
+
+Download and import the latest quarterly file:
+
+```{r eval = FALSE , results = "hide" }
+dictionary_tf <- tempfile()
+
+dictionary_url <- "https://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/Dicionario_e_input_20221031.zip"
+
+download.file( dictionary_url , dictionary_tf , mode = 'wb' )
+
+dictionary_files <- unzip( dictionary_tf , exdir = tempdir() )
+
+sas_fn <- grep( '\\.sas$' , dictionary_files , value = TRUE )
+```
+
+```{r eval = FALSE , results = "hide" }
+sas_lines <- readLines( sas_fn , encoding = 'latin1' )
+sas_start <- grep( '@0001' , sas_lines )
+sas_end <- grep( ';' , sas_lines )
+sas_end <- sas_end[ sas_end > sas_start ][ 1 ]
+
+sas_lines <- sas_lines[ seq( sas_start , sas_end - 1 ) ]
+sas_lines <- gsub( "\\/\\*(.*)" , "" , sas_lines )
+sas_lines <- gsub( "( +)" , " " , sas_lines )
+sas_lines <- gsub( " $" , "" , sas_lines )
+
+sas_results <- 
+	read.table( 
+		textConnection( sas_lines ) , 
+		sep = ' ' , 
+		col.names = c( 'position' , 'column_name' , 'length' ) ,
+		header = FALSE 
+	)
+
+sas_results[ , 'character' ] <- grepl( '\\$' , sas_results[ , 'length' ] )
+
+sas_results[ , 'position' ] <- as.integer( gsub( "\\@" , "" , sas_results[ , 'position' ] ) )
+
+sas_results[ , 'length' ] <- as.integer( gsub( "\\$" , "" , sas_results[ , 'length' ] ) )
+
+stopifnot( sum( sas_results[ , 'length' ] ) == ( sas_results[ nrow( sas_results ) , 'position' ] + sas_results[ nrow( sas_results ) , 'length' ] - 1 ) )
+
+```
+
+```{r eval = FALSE , results = "hide" }
+
+this_tf <- tempfile()
+
+this_url <-
+	"https://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/2023/PNADC_012023.zip"
+	
+
+download.file( this_url , this_tf , mode = 'wb' )
+
+
+```
+
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+chapter_tag_tbl <-
+	readr::read_fwf(
+			this_tf ,
+			fwf_widths( 
+				widths = sas_results[ , 'length' ] , 
+				col_names = sas_results[ , 'column_name' ] 
+			) ,
+			col_types = 
+				paste0( ifelse( sas_results[ , 'character' ] , "c" , "d" ) , collapse = '' )
+		)
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+
+~~~
+
 
 
 
 
 
 ~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
 library(survey)
 
-options( survey.lonely.psu = "adjust" )
-
-chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "pnadc 2015 03.rds" ) )
 
 # add a column of all ones
 chapter_tag_df$one <- 1
@@ -51,28 +149,22 @@ chapter_tag_df <- merge( chapter_tag_df , uf , all.x = TRUE )
 # confirm complete matches
 stopifnot( all( !is.na( chapter_tag_df$uf_name ) ) )
 
-# preliminary survey design
-pre_stratified <-
-	svydesign(
-		ids = ~ upa , 
-		strata = ~ estrato , 
-		weights = ~ v1027 , 
+
+chapter_tag_design <-
+	svrepdesign(
 		data = chapter_tag_df ,
-		nest = TRUE
+		weight = ~ v1028 ,
+		type = 'bootstrap' ,
+		repweights = 'v1028[0-9]+' ,
+		mse = TRUE ,
 	)
-# warning: do not use `pre_stratified` in your analyses!
-# you must use the `chapter_tag_design` object created below.
+	
+# https://sidra.ibge.gov.br/tabela/5917
+result <- svyby( ~ v2007 , ~ uf_name , chapter_tag_design , svytotal )
+round(cv(result)*100,1)
 
-# post-stratification targets
-df_pos <- 
-	data.frame( posest = unique( chapter_tag_df$posest ) , Freq = unique( chapter_tag_df$v1029 ) )
-
-# final survey design object
-chapter_tag_design <- postStratify( pre_stratified , ~ posest , df_pos )
-
-# remove the `chapter_tag_df` data.frame object
-# and the `pre_stratified` design before stratification
-rm( chapter_tag_df , pre_stratified )
+	
+```
 ~~~
 
 
@@ -274,12 +366,3 @@ regional_ocupacao <-
 ```
 
 ~~~
-
-
-
-
-needs_actions_build_status_line: yes
-
-
-
-
