@@ -2,13 +2,13 @@
 
 <a href="https://github.com/asdfree/pnadc/actions"><img src="https://github.com/asdfree/pnadc/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-Brazil's principal household survey, the Pesquisa Nacional por Amostra de Domicilios Continua (PNADC) measures general education, labor, income, and housing characteristics of the population.
+Brazil's principal labor force survey, measuring education, employment, income, housing characteristics.
 
-* One table with one row per sampled household and a second table with one row per individual within each sampled household.
+* One consolidated table with one row per individual within each sampled household.
 
 * A complex sample survey designed to generalize to the civilian non-institutional population of Brazil.
 
-* Released quarterly since 2012.
+* Released quarterly since 2012, with microdata available both quarterly and annually.
 
 * Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
 
@@ -16,9 +16,9 @@ Brazil's principal household survey, the Pesquisa Nacional por Amostra de Domici
 
 Please skim before you begin:
 
-1.
+1. [Conceitos e métodos](https://www.ibge.gov.br/estatisticas/sociais/trabalho/17270-pnad-continua.html?=&t=conceitos-e-metodos)
 
-2.
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Pesquisa_Nacional_por_Amostra_de_Domic%C3%ADlios)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Pesquisa Nacional por Amostra de Domicilios - Continua)
 
@@ -126,6 +126,8 @@ pnadc_tbl <-
 pnadc_df <- data.frame( pnadc_tbl )
 
 names( pnadc_df ) <- tolower( names( pnadc_df ) )
+
+pnadc_df[ , 'one' ] <- 1
 ```
 
 ### Save locally \ {-}
@@ -149,31 +151,6 @@ Construct a complex sample survey design:
 ```{r eval = FALSE , results = "hide" }
 library(survey)
 
-# add a column of all ones
-pnadc_df$one <- 1
-
-# construct a data.frame object with all state names.
-uf <-
- structure(list(V1 = c(11L, 12L, 13L, 14L, 15L, 16L, 17L, 21L, 
- 22L, 23L, 24L, 25L, 26L, 27L, 28L, 29L, 31L, 32L, 33L, 35L, 41L, 
- 42L, 43L, 50L, 51L, 52L, 53L), V2 = structure(c(22L, 1L, 4L, 
- 23L, 14L, 3L, 27L, 10L, 18L, 6L, 20L, 15L, 17L, 2L, 26L, 5L, 
- 13L, 8L, 19L, 25L, 16L, 24L, 21L, 12L, 11L, 9L, 7L), .Label = c("Acre", 
- "Alagoas", "Amapa", "Amazonas", "Bahia", "Ceara", "Distrito Federal", 
- "Espirito Santo", "Goias", "Maranhao", "Mato Grosso", "Mato Grosso do Sul", 
- "Minas Gerais", "Para", "Paraiba", "Parana", "Pernambuco", "Piaui", 
- "Rio de Janeiro", "Rio Grande do Norte", "Rio Grande do Sul", 
- "Rondonia", "Roraima", "Santa Catarina", "Sao Paulo", "Sergipe", 
- "Tocantins"), class = "factor")), .Names = c("uf", "uf_name"), 
-		class = "data.frame", row.names = c(NA, -27L))
-
-# merge this data.frame onto the main `x` data.frame
-# using `uf` as the merge field, keeping all non-matches.
-pnadc_df <- merge( pnadc_df , uf , all.x = TRUE )
-
-# confirm complete matches
-stopifnot( all( !is.na( pnadc_df$uf_name ) ) )
-
 pnadc_design <-
 	svrepdesign(
 		data = pnadc_df ,
@@ -182,18 +159,6 @@ pnadc_design <-
 		repweights = 'v1028[0-9]+' ,
 		mse = TRUE ,
 	)
-	
-# https://sidra.ibge.gov.br/tabela/5917
-result <- svyby( ~ v2007 , ~ uf_name , pnadc_design , svytotal )
-round(cv(result)*100,1)
-
-# official package also rounds acre mulheres up to 1 not down to 0.9
-# neither match sidra
-# library(survey)
-# library(PNADcIBGE)
-# w <- get_pnadc( year = 2023 , quarter = 1 )
-# v <- subset( w , UF == "Acre" )
-# cv(svytotal( ~ V2007 , v ))
 
 ```
 
@@ -206,6 +171,27 @@ pnadc_design <-
 	update( 
 
 		pnadc_design , 
+
+		uf_name =
+		
+			factor(
+			
+				as.numeric( uf ) ,
+				
+				levels = 
+					c(11L, 12L, 13L, 14L, 15L, 16L, 17L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 31L, 32L, 33L, 35L, 41L, 42L, 43L, 50L, 51L, 
+					52L, 53L) ,
+					
+				labels =
+					c("Rondonia", "Acre", "Amazonas", "Roraima", "Para", "Amapa", 
+					"Tocantins", "Maranhao", "Piaui", "Ceara", "Rio Grande do Norte", 
+					"Paraiba", "Pernambuco", "Alagoas", "Sergipe", "Bahia", "Minas Gerais", 
+					"Espirito Santo", "Rio de Janeiro", "Sao Paulo", "Parana", "Santa Catarina", 
+					"Rio Grande do Sul", "Mato Grosso do Sul", "Mato Grosso", "Goias", 
+					"Distrito Federal")
+					
+			) ,
 
 		age_categories = factor( 1 + findInterval( v2009 , seq( 5 , 60 , 5 ) ) ) ,
 
@@ -237,6 +223,7 @@ pnadc_design <-
 
 		# determine the potential labor force
 		pea_c = as.numeric( ocup_c == 1 | desocup30 == 1 )
+		
 	)
 ```
 
@@ -407,28 +394,42 @@ summary( glm_result )
 
 ## Intermish {-}
 
-<center>
-<img src="http://1.bp.blogspot.com/-ZgjcgNlBxcs/T9lsT5G7u-I/AAAAAAAALGI/AO2XTxehPJU/s1600/IMG_5555.JPG">
-<p>
-<i><b>the author as c++ increment operator</b></i>
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
 
 ---
 
 ## Replication Example {-}
 
+This example matches statistics and coefficients of variation from [Tabela 4092 - Pessoas de 14 anos ou mais de idade, por condição em relação à força de trabalho e condição de ocupação](https://sidra.ibge.gov.br/tabela/4092):
+
 ```{r eval = FALSE , results = "hide" }
-nationwide_pop <- 
-	svytotal( ~ pia , pnadc_design , na.rm = TRUE )
-nationwide_forca <- 
-	svytotal( ~ factor( vd4001 ) , pnadc_design , na.rm = TRUE )
-nationwide_ocupacao <- 
-	svytotal( ~ factor( vd4002 ) , pnadc_design , na.rm = TRUE )
-regional_pop <- 
-	svyby( ~ pia , ~ region , pnadc_design , svytotal , na.rm = TRUE )
-regional_forca <- 
-	svyby( ~ factor( vd4001 ) , ~ region , pnadc_design , svytotal , na.rm = TRUE )
-regional_ocupacao <- 
-	svyby( ~ factor( vd4002 ) , ~ region , pnadc_design , svytotal , na.rm = TRUE )
+nationwide_adult_population <- svytotal( ~ pia , pnadc_design , na.rm = TRUE )
+	
+stopifnot( round( coef( nationwide_adult_population ) / 1000000 , 3 ) == 174.228 )
+stopifnot( round( cv( nationwide_adult_population ) / 1000000 , 3 ) == 0 )
+	
+nationwide_labor_force <- svytotal( ~ pea_c , pnadc_design , na.rm = TRUE )
+
+stopifnot( round( coef( nationwide_labor_force ) / 1000000 , 3 ) == 107.257 )
+stopifnot( round( cv( nationwide_labor_force ) * 100 , 1 ) == 0.2 )
+	
+nationwide_employed <- svytotal( ~ ocup_c , pnadc_design , na.rm = TRUE )
+
+stopifnot( round( coef( nationwide_employed ) / 1000000 , 3 ) == 97.825 )
+stopifnot( round( cv( nationwide_employed ) * 100 , 1 ) == 0.2 )
+	
+nationwide_unemployed <- svytotal( ~ desocup30 , pnadc_design , na.rm = TRUE )
+
+stopifnot( round( coef( nationwide_unemployed ) / 1000000 , 3 ) == 9.432 )
+stopifnot( round( cv( nationwide_unemployed ) * 100 , 1 ) == 1.2 )
+	
+nationwide_not_in_labor_force <-
+	svytotal( ~ as.numeric( pia & !pea_c ) , pnadc_design , na.rm = TRUE )
+
+stopifnot( round( coef( nationwide_not_in_labor_force ) / 1000000 , 3 ) == 66.972 )
+stopifnot( round( cv( nationwide_not_in_labor_force ) * 100 , 1 ) == 0.3 )
+	
+
 ```
 
 ---
