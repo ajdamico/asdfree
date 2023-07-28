@@ -32,32 +32,46 @@ Please skim before you begin:
 
 ## Download, Import, Preparation {-}
 
-Download and import the latest quarterly file:
+Download and import the dictionary file:
 
 ```{r eval = FALSE , results = "hide" }
 dictionary_tf <- tempfile()
 
-dictionary_url <- "https://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/Dicionario_e_input_20221031.zip"
+dictionary_url <-
+	paste0(
+		"https://ftp.ibge.gov.br/Trabalho_e_Rendimento/" ,
+		"Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/" ,
+		"Trimestral/Microdados/Documentacao/Dicionario_e_input_20221031.zip"
+	)
 
 download.file( dictionary_url , dictionary_tf , mode = 'wb' )
 
 dictionary_files <- unzip( dictionary_tf , exdir = tempdir() )
 
-sas_fn <- grep( '\.sas$' , dictionary_files , value = TRUE )
+sas_fn <- grep( '\\.sas$' , dictionary_files , value = TRUE )
+
+sas_lines <- readLines( sas_fn , encoding = 'latin1' )
 ```
 
+Determine fixed-width file positions from the SAS import script:
+
 ```{r eval = FALSE , results = "hide" }
-sas_lines <- readLines( sas_fn , encoding = 'latin1' )
 sas_start <- grep( '@0001' , sas_lines )
+
 sas_end <- grep( ';' , sas_lines )
+
 sas_end <- sas_end[ sas_end > sas_start ][ 1 ]
 
 sas_lines <- sas_lines[ seq( sas_start , sas_end - 1 ) ]
-sas_lines <- gsub( "\/\*(.*)" , "" , sas_lines )
+
+# remove SAS comments
+sas_lines <- gsub( "\\/\\*(.*)" , "" , sas_lines )
+
+# remove multiple spaces and spaces at the end of each string
 sas_lines <- gsub( "( +)" , " " , sas_lines )
 sas_lines <- gsub( " $" , "" , sas_lines )
 
-sas_results <- 
+sas_df <- 
 	read.table( 
 		textConnection( sas_lines ) , 
 		sep = ' ' , 
@@ -65,41 +79,49 @@ sas_results <-
 		header = FALSE 
 	)
 
-sas_results[ , 'character' ] <- grepl( '\$' , sas_results[ , 'length' ] )
+sas_df[ , 'character' ] <- grepl( '\\$' , sas_df[ , 'length' ] )
 
-sas_results[ , 'position' ] <- as.integer( gsub( "\@" , "" , sas_results[ , 'position' ] ) )
+sas_df[ , 'position' ] <- as.integer( gsub( "\\@" , "" , sas_df[ , 'position' ] ) )
 
-sas_results[ , 'length' ] <- as.integer( gsub( "\$" , "" , sas_results[ , 'length' ] ) )
+sas_df[ , 'length' ] <- as.integer( gsub( "\\$" , "" , sas_df[ , 'length' ] ) )
 
-stopifnot( sum( sas_results[ , 'length' ] ) == ( sas_results[ nrow( sas_results ) , 'position' ] + sas_results[ nrow( sas_results ) , 'length' ] - 1 ) )
+stopifnot( 
+	sum( sas_df[ , 'length' ] ) == 
+	( sas_df[ nrow( sas_df ) , 'position' ] + sas_df[ nrow( sas_df ) , 'length' ] - 1 ) 
+)
 
 ```
 
-```{r eval = FALSE , results = "hide" }
+Download the latest quarterly file:
 
+```{r eval = FALSE , results = "hide" }
 this_tf <- tempfile()
 
 this_url <-
-	"https://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/2023/PNADC_012023.zip"
-	
+	paste0(
+		"https://ftp.ibge.gov.br/Trabalho_e_Rendimento/" ,
+		"Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/" ,
+		"Trimestral/Microdados/2023/PNADC_012023.zip"
+	)
 
 download.file( this_url , this_tf , mode = 'wb' )
-
 ```
+
+Import the latest quarterly file:
 
 ```{r eval = FALSE , results = "hide" }
 library(readr)
 
 pnadc_tbl <-
-	readr::read_fwf(
-			this_tf ,
-			fwf_widths( 
-				widths = sas_results[ , 'length' ] , 
-				col_names = sas_results[ , 'column_name' ] 
-			) ,
-			col_types = 
-				paste0( ifelse( sas_results[ , 'character' ] , "c" , "d" ) , collapse = '' )
-		)
+	read_fwf(
+		this_tf ,
+		fwf_widths( 
+			widths = sas_df[ , 'length' ] , 
+			col_names = sas_df[ , 'column_name' ] 
+		) ,
+		col_types = 
+			paste0( ifelse( sas_df[ , 'character' ] , "c" , "d" ) , collapse = '' )
+	)
 
 pnadc_df <- data.frame( pnadc_tbl )
 
@@ -180,33 +202,40 @@ round(cv(result)*100,1)
 Add new columns to the data set:
 ```{r eval = FALSE , results = "hide" }
 pnadc_design <- 
+
 	update( 
+
 		pnadc_design , 
+
 		age_categories = factor( 1 + findInterval( v2009 , seq( 5 , 60 , 5 ) ) ) ,
+
 		male = as.numeric( v2007 == 1 ) ,
+
 		pia = as.numeric( v2009 >= 14 ) ,
-		region = substr( uf , 1 , 1 )
-	)
-	
-pnadc_design <- 
-	update( 
-		pnadc_design , 
+
+		region = substr( uf , 1 , 1 ) ,
+
 		ocup_c = ifelse( pia == 1 , as.numeric( vd4002 %in% 1 ) , NA ) ,
+
 		desocup30 = ifelse( pia == 1 , as.numeric( vd4002 %in% 2 ) , NA ) ,
+
 		# calculate usual income from main job
 		# (rendimento habitual do trabalho principal)
 		vd4016n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4016 , NA ) ,
+
 		# calculate effective income from main job
 		# (rendimento efetivo do trabalho principal) 
 		vd4017n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4017 , NA ) ,
+
 		# calculate usual income from all jobs
 		# (variavel rendimento habitual de todos os trabalhos)
 		vd4019n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4019 , NA ) ,
+
 		# calculate effective income from all jobs
 		# (rendimento efetivo do todos os trabalhos) 
 		vd4020n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4020 , NA ) ,
-		# determine individuals who are either working or not working
-		# (that is, the potential labor force)
+
+		# determine the potential labor force
 		pea_c = as.numeric( ocup_c == 1 | desocup30 == 1 )
 	)
 ```
@@ -378,6 +407,11 @@ summary( glm_result )
 
 ## Intermish {-}
 
+<center>
+<img src="http://1.bp.blogspot.com/-ZgjcgNlBxcs/T9lsT5G7u-I/AAAAAAAALGI/AO2XTxehPJU/s1600/IMG_5555.JPG">
+<p>
+<i><b>the author as c++ increment operator</b></i>
+
 ---
 
 ## Replication Example {-}
@@ -404,122 +438,30 @@ regional_ocupacao <-
 The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for PNADC users, this code calculates the gini coefficient on complex sample survey data:
 
 ```{r eval = FALSE , results = "hide" }
-
 library(convey)
+pnadc_design <- convey_prep( pnadc_design )
 
-# read pnadc microdata for the year 2017 visita 1 
+svygini( ~ vd4020n , pnadc_design , na.rm = TRUE )
+```
 
-repeated_cat <- 
-	get_catalog( "pnadc" , 
-		output_dir = file.path( path.expand( "~" ) , "PNADC" ) 
-	)
+---
 
-repeated_cat <- subset( repeated_cat , year == 2017 & interview == 1 )
+## Analysis Examples with `srvyr` \ {-}
 
-repeated_cat <- lodown( "pnadc" , repeated_cat )
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for PNADC users, this code replicates previously-presented examples:
 
-visita_df <- readRDS( file.path( path.expand( "~" ) , "PNADC" , "pnadc 2017 visita_1.rds" ) )
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+pnadc_srvyr_design <- as_survey( pnadc_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+pnadc_srvyr_design %>%
+	summarize( mean = survey_mean( vd4020n , na.rm = TRUE ) )
 
-# read deflators file
-
-library(readxl)
-
-annual.ftp <- "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Anual/Microdados/Documentacao/"
-
-tf <- tempfile()
-
-download.file( paste0( annual.ftp , "deflator_2017_pnadc.xls" ) , tf , mode = "wb" )
-
-deflator_2017_pnadc <- read_excel( path = tf )
-
-names(deflator_2017_pnadc)[2]<- "trimestre"
-
-names(deflator_2017_pnadc)<- tolower(names(deflator_2017_pnadc))
-
-# merge the two files using the variables ano, trimestre, uf
-
-visita_df <- merge(visita_df, deflator_2017_pnadc, by= c("ano","trimestre", "uf") )
-
-# define region variable
-
-visita_df$region <- factor(substring(visita_df$uf, 1, 1),
- levels = 1:5,
- labels = c("North", "Northeast", "Southeast", "South", "Center-West")
-)
- 
-
-visita_df$state_name <- factor( visita_df$uf , 
- levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
- labels = c( "Rondonia" , "Acre" , "Amazonas" , 
- "Roraima" , "Para" , "Amapa" , "Tocantins" , 
- "Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
- "Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
- "Bahia" , "Minas Gerais" , "Espirito Santo" , 
- "Rio de Janeiro" , "Sao Paulo" , "Parana" , 
- "Santa Catarina" , "Rio Grande do Sul" , 
- "Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
- "Distrito Federal" )
- )
-
-# define deflated effective working income variable:
-visita_df$vd4020_def <- visita_df$vd4020 * visita_df$co2
- 
-# deflated effective per capita household income variable:
-visita_df$vd5002_def<- visita_df$vd5002 * visita_df$co2
-
-# lonely psu
-options(survey.lonely.psu = "adjust")
-
-# preliminary survey design
-pre_stratified <- svydesign(id=~upa, strata =~estrato , weights =~v1031, nest=T, data = visita_df)
-
-# post-stratification targets
-df.pos <- data.frame(posest = as.character(unique(visita_df[,"posest"])),
- Freq = as.numeric(unique(visita_df[,"v1030"])))
-
-# final survey design object
-visita_design <- postStratify( pre_stratified, ~ posest, df.pos)
-
-visita_design <- convey_prep(visita_design)
-
-# estimating Gini index based on the efective income from all jobs
-# defining the filter - ocupied people
-
-sub_visita_design <-
- subset(visita_design, vd4018==1 & vd4002==1 & v2009>=14)
-
-# for the whole country
-svygini(~ vd4020_def, sub_visita_design, na.rm=TRUE)
-
-# by regions
-
-svyby(~vd4020_def, ~region, sub_visita_design, svygini, na.rm=TRUE )
-
-# by states
-
-svyby(~vd4020_def, ~state_name, sub_visita_design, svygini, na.rm=TRUE )
-
-# estimating the Gini index based on the per capita household income
-# defining the filter - people in the households
-
-sub_visita_design<-subset(visita_design, vd2002<=14)
-
-# for the whole country
-
-svygini (~vd5002_def, sub_visita_design, na.rm=TRUE)
-
-# by regions 
-
-svyby(~vd5002_def, ~region, sub_visita_design, svygini, na.rm=TRUE )
-
-# by states
-
-svyby(~vd5002_def, ~state_name, sub_visita_design, svygini, na.rm=TRUE )
-
-# to check the results see:
-
-# https://www.ibge.gov.br/estatisticas-novoportal/sociais/trabalho/17270-pnad-continua.html?edicao=20635&t=resultados
-
+pnadc_srvyr_design %>%
+	group_by( uf_name ) %>%
+	summarize( mean = survey_mean( vd4020n , na.rm = TRUE ) )
 ```
 
 
