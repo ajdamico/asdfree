@@ -27,6 +27,7 @@ residential-energy-consumption-survey-recs: <p><a href="https://github.com/asdfr
 social-security-public-use-data-files-ssa: <p><a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 survey-of-business-owners-sbo: <p><a href="https://github.com/asdfree/sbo/actions"><img src="https://github.com/asdfree/sbo/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 survey-of-consumer-finances-scf: <p><a href="https://github.com/asdfree/scf/actions"><img src="https://github.com/asdfree/scf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+survey-of-income-and-program-participation-sipp: <p><a href="https://github.com/asdfree/sipp/actions"><img src="https://github.com/asdfree/sipp/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 trend-analysis-of-complex-survey-data: <p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 trends-in-international-mathematics-and-science-study-timss: <p><a href="https://github.com/asdfree/timss/actions"><img src="https://github.com/asdfree/timss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 youth-risk-behavior-surveillance-system-yrbss: <p><a href="https://github.com/asdfree/yrbss/actions"><img src="https://github.com/asdfree/yrbss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>

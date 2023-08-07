@@ -1,0 +1,206 @@
+chapter_title: Survey of Income and Program Participation
+
+
+needs_actions_build_status_line: yes
+
+
+~~~{dataset_introduction}
+The US Census Bureau's longitudinal assessment of the dynamics of income, labor force participation, social program participation and eligibility, with general demographic characteristics to measure the effectiveness of existing federal, state, and local programs.
+~~~
+
+
+table_structure: * 
+generalizable_population: *
+
+publication_period: *
+
+administrative_organization: *
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [2022 Survey of Income and Program Participation Users' Guide](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf#page=15)
+
+2. [2022 Data User Notes](https://www.census.gov/programs-surveys/sipp/tech-documentation/user-notes/2022-usernotes.html)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# federal programs
+# poverty oversample
+# monthly dynamics
+```
+~~~
+
+
+
+
+
+~~~{download_and_import_block}
+
+Download and import the latest main file:
+```{r eval = FALSE , results = "hide" }
+library(httr)
+library(data.table)
+
+main_tf <- tempfile()
+
+main_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/sipp/" ,
+		"data/datasets/2022/pu2022_csv.zip"
+	)
+
+GET( main_url , write_disk( main_tf ) , progress() )
+
+main_csv <- unzip( main_tf , exdir = tempdir() )
+
+chapter_tag_main_dt <- 
+	fread( 
+		main_csv , 
+		sep = "|" , 
+		select = 
+		c( 'SSUID','PNUM','MONTHCODE','SPANEL','SWAVE','WPFINWGT')
+	)
+
+
+chapter_tag_main_df <- data.frame( chapter_tag_main_dt )
+
+names( chapter_tag_main_df ) <- tolower( names( chapter_tag_main_df ) )
+
+
+```
+
+Download and import the appropriate replicate weights file:
+```{r eval = FALSE , results = "hide" }
+rw_tf <- tempfile()
+
+rw_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/sipp/" ,
+		"data/datasets/2022/rw2022_csv.zip"
+	)
+
+GET( rw_url , write_disk( rw_tf ) , progress() )
+
+rw_csv <- unzip( rw_tf , exdir = tempdir() )
+
+chapter_tag_rw_dt <- 
+	fread( 
+		rw_csv , 
+		sep = "|"
+	)
+
+
+chapter_tag_rw_df <- data.frame( chapter_tag_rw_dt )
+
+names( chapter_tag_rw_df ) <- tolower( names( chapter_tag_rw_df ) )
+```
+
+Merge these two files:
+```{r eval = FALSE , results = "hide" }
+
+chapter_tag_df <-
+	merge(
+		chapter_tag_main_df[ chapter_tag_main_df[ , 'monthcode' ] %in% 12 , ] ,
+		chapter_tag_rw_df[ chapter_tag_rw_df[ , 'monthcode' ] %in% 12 , ] ,
+		by = c( 'ssuid' , 'pnum' , 'monthcode' , 'spanel' , 'swave' )
+	)
+	
+stopifnot( nrow( chapter_tag_df ) == sum( chapter_tag_main_df[ , 'monthcode' ] %in% 12 ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+```{r message = FALSE , eval = FALSE }
+library(survey)
+
+chapter_tag_design <- 
+	svrepdesign(
+			data = chapter_tag_df ,
+			weights = ~ wpfinwgt ,
+			repweights = "repwgt([1-9]+)" ,
+			type = "Fay" ,
+			rho = 0.5
+		)
+	
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	
+	update( 
+		
+		chapter_tag_design , 
+		
+		one = 1
+			
+	)
+~~~
+
+group_by_variable: state
+group_by_variable_description: state of residence
+
+categorical_variable: sex
+categorical_variable_description: sex (1=female, 2=male)
+categorical_narm: , na.rm = TRUE
+
+linear_variable: first_fed_formula
+linear_variable_description: age in days when child first fed formula
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: bf_exclr06
+ratio_estimation_denominator: bf_endr06
+ratio_narm: , na.rm = TRUE
+
+subset_definition: p_utdpol == 1
+subset_definition_description: toddlers up to date on polio shots
+
+binary_variable: dtap_3p
+binary_variable_description: received 3+ DTaP recommendation
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
+needs_srvyr_block: yes
+
+
+~~~{convey_block}
+## Poverty and Inequality Estimation with `convey` \\ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+chapter_tag_design <- convey_prep( chapter_tag_design )
+
+svygini( ~ vd4020n , chapter_tag_design , na.rm = TRUE )
+```
+~~~
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+
+This example matches the statistics and standard errors from
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
