@@ -32,6 +32,13 @@ Please skim before you begin:
 
 ## Download, Import, Preparation {-}
 
+Determine which variables from the main table to import:
+```{r eval = FALSE , results = "hide" }
+variables_to_keep <-
+	c( 'ssuid' , 'pnum' , 'monthcode' , 'spanel' , 'swave' , 'erelrpe' , 'tlivqtr' , 'wpfinwgt' , 
+	'rmesr' , 'thcyincpov' , 'tfcyincpov' , 'tehc_st' , 'rhicovann' , 'rfpov' , 'thnetworth' )
+```
+
 Download and import the latest main file:
 ```{r eval = FALSE , results = "hide" }
 library(httr)
@@ -49,7 +56,7 @@ GET( main_url , write_disk( main_tf ) , progress() )
 
 main_csv <- unzip( main_tf , exdir = tempdir() )
 
-sipp_main_dt <- fread( main_csv , sep = "|" )
+sipp_main_dt <- fread( main_csv , sep = "|" , select = variables_to_keep )
 
 sipp_main_df <- data.frame( sipp_main_dt )
 
@@ -78,7 +85,7 @@ sipp_rw_df <- data.frame( sipp_rw_dt )
 names( sipp_rw_df ) <- tolower( names( sipp_rw_df ) )
 ```
 
-Merge these two files:
+Merge the december records from these two files:
 ```{r eval = FALSE , results = "hide" }
 
 sipp_df <-
@@ -89,8 +96,6 @@ sipp_df <-
 	)
 	
 stopifnot( nrow( sipp_df ) == sum( sipp_rw_df[ , 'monthcode' ] %in% 12 ) )
-
-sipp_df[ , 'one' ] <- 1
 ```
 
 ### Save locally \ {-}
@@ -129,13 +134,61 @@ sipp_design <-
 
 Add new columns to the data set:
 ```{r eval = FALSE , results = "hide" }
+rmesr_values <-
+	c( 
+		"With a job entire month, worked all weeks",
+		"With a job all month, absent from work without pay 1+ weeks, absence not due to layoff",
+		"With a job all month, absent from work without pay 1+ weeks, absence due to layoff",
+		"With a job at least 1 but not all weeks, no time on layoff and no time looking for work",
+		"With a job at least 1 but not all weeks, some weeks on layoff or looking for work",
+		"No job all month, on layoff or looking for work all weeks",
+		"No job all month, at least one but not all weeks on layoff or looking for work",
+		"No job all month, no time on layoff and no time looking for work"
+	)
+
 sipp_design <- 
 	
 	update( 
 		
 		sipp_design , 
 		
-		one = 1
+		one = 1 ,
+		
+		employment_status = factor( rmesr , levels = 1:8 , labels = rmesr_values ) ,
+			
+		household_below_poverty = as.numeric( thcyincpov < 1 ) ,
+		
+		family_below_poverty = as.numeric( tfcyincpov < 1 ) ,
+		
+		state_name =
+			
+			factor(
+				
+				as.numeric( tehc_st ) ,
+				
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L, 60L, 61L) ,
+		
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming", "Puerto Rico",
+					"Foreign Country")
+			)
 			
 	)
 ```
@@ -150,7 +203,7 @@ Count the unweighted number of records in the survey sample, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 sum( weights( sipp_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ state , sipp_design , unwtd.count )
+svyby( ~ one , ~ state_name , sipp_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
@@ -158,46 +211,46 @@ Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , sipp_design )
 
-svyby( ~ one , ~ state , sipp_design , svytotal )
+svyby( ~ one , ~ state_name , sipp_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ first_fed_formula , sipp_design , na.rm = TRUE )
+svymean( ~ tftotinc , sipp_design , na.rm = TRUE )
 
-svyby( ~ first_fed_formula , ~ state , sipp_design , svymean , na.rm = TRUE )
+svyby( ~ tftotinc , ~ state_name , sipp_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ sex , sipp_design , na.rm = TRUE )
+svymean( ~ employment_status , sipp_design , na.rm = TRUE )
 
-svyby( ~ sex , ~ state , sipp_design , svymean , na.rm = TRUE )
+svyby( ~ employment_status , ~ state_name , sipp_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ first_fed_formula , sipp_design , na.rm = TRUE )
+svytotal( ~ tftotinc , sipp_design , na.rm = TRUE )
 
-svyby( ~ first_fed_formula , ~ state , sipp_design , svytotal , na.rm = TRUE )
+svyby( ~ tftotinc , ~ state_name , sipp_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ sex , sipp_design , na.rm = TRUE )
+svytotal( ~ employment_status , sipp_design , na.rm = TRUE )
 
-svyby( ~ sex , ~ state , sipp_design , svytotal , na.rm = TRUE )
+svyby( ~ employment_status , ~ state_name , sipp_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ first_fed_formula , sipp_design , 0.5 , na.rm = TRUE )
+svyquantile( ~ tftotinc , sipp_design , 0.5 , na.rm = TRUE )
 
 svyby( 
-	~ first_fed_formula , 
-	~ state , 
+	~ tftotinc , 
+	~ state_name , 
 	sipp_design , 
 	svyquantile , 
 	0.5 ,
@@ -208,8 +261,8 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ bf_exclr06 , 
-	denominator = ~ bf_endr06 , 
+	numerator = ~ tftotinc , 
+	denominator = ~ rfpov , 
 	sipp_design ,
 	na.rm = TRUE
 )
@@ -217,20 +270,20 @@ svyratio(
 
 ### Subsetting {-}
 
-Restrict the survey design to toddlers up to date on polio shots:
+Restrict the survey design to individuals ever covered by health insurance during the year:
 ```{r eval = FALSE , results = "hide" }
-sub_sipp_design <- subset( sipp_design , p_utdpol == 1 )
+sub_sipp_design <- subset( sipp_design , rhicovann == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ first_fed_formula , sub_sipp_design , na.rm = TRUE )
+svymean( ~ tftotinc , sub_sipp_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ first_fed_formula , sipp_design , na.rm = TRUE )
+this_result <- svymean( ~ tftotinc , sipp_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -239,8 +292,8 @@ cv( this_result )
 
 grouped_result <-
 	svyby( 
-		~ first_fed_formula , 
-		~ state , 
+		~ tftotinc , 
+		~ state_name , 
 		sipp_design , 
 		svymean ,
 		na.rm = TRUE 
@@ -259,21 +312,21 @@ degf( sipp_design )
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ first_fed_formula , sipp_design , na.rm = TRUE )
+svyvar( ~ tftotinc , sipp_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ first_fed_formula , sipp_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ tftotinc , sipp_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ first_fed_formula , sipp_design , na.rm = TRUE , deff = "replace" )
+svymean( ~ tftotinc , sipp_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-svyciprop( ~ dtap_3p , sipp_design ,
+svyciprop( ~ family_below_poverty , sipp_design ,
 	method = "likelihood" )
 ```
 
@@ -281,13 +334,13 @@ svyciprop( ~ dtap_3p , sipp_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( first_fed_formula ~ dtap_3p , sipp_design )
+svyttest( tftotinc ~ family_below_poverty , sipp_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
 svychisq( 
-	~ dtap_3p + sex , 
+	~ family_below_poverty + employment_status , 
 	sipp_design 
 )
 ```
@@ -296,7 +349,7 @@ Perform a survey-weighted generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
-		first_fed_formula ~ dtap_3p + sex , 
+		tftotinc ~ family_below_poverty + employment_status , 
 		sipp_design 
 	)
 
@@ -331,7 +384,7 @@ The R `convey` library estimates measures of income concentration, poverty, ineq
 library(convey)
 sipp_design <- convey_prep( sipp_design )
 
-svygini( ~ vd4020n , sipp_design , na.rm = TRUE )
+svygini( ~ tftotinc , sipp_design , na.rm = TRUE )
 ```
 
 ---
@@ -347,11 +400,11 @@ sipp_srvyr_design <- as_survey( sipp_design )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 sipp_srvyr_design %>%
-	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
+	summarize( mean = survey_mean( tftotinc , na.rm = TRUE ) )
 
 sipp_srvyr_design %>%
-	group_by( state ) %>%
-	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
+	group_by( state_name ) %>%
+	summarize( mean = survey_mean( tftotinc , na.rm = TRUE ) )
 ```
 
 
