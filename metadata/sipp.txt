@@ -63,7 +63,7 @@ GET( main_url , write_disk( main_tf ) , progress() )
 
 main_csv <- unzip( main_tf , exdir = tempdir() )
 
-chapter_tag_main_dt <- fread( main_csv , sep = "|" , select = variables_to_keep )
+chapter_tag_main_dt <- fread( main_csv , sep = "|" , select = toupper( variables_to_keep ) )
 
 chapter_tag_main_df <- data.frame( chapter_tag_main_dt )
 
@@ -228,12 +228,49 @@ svygini( ~ tftotinc , chapter_tag_design , na.rm = TRUE )
 ~~~{replication_example_block}
 ## Replication Example {-}
 
+This example matches statistics and standard errors from the [Wealth and Asset Ownership for Households, by Type of Asset and Selected Characteristics: 2021](https://www2.census.gov/programs-surveys/demo/tables/wealth/2021/wealth-asset-ownership/Wealth_tables_dy2021.xlsx):
 
-This example matches the statistics and standard errors from
+Match the number of households shown in Table 4:
 
 ```{r eval = FALSE , results = "hide" }
-# table 4 and table 4a
-svymean( ~ factor( findInterval( thnetworth , c( 1 , 5000 , 10000 , 25000 , 50000 , 100000 , 250000 , 500000 ) ) ) , subset( sipp_design , erelrpe %in% 1:2 & tlivqtr %in% 1:2 ))
+chapter_tag_household_design <- subset( sipp_design , erelrpe %in% 1:2 & tlivqtr %in% 1:2 )
+
+stopifnot( round( coef( svytotal( ~ one , chapter_tag_household_design ) ) / 1000 , -2 ) == 132700 )
+```
+	
+	
+Compute Household Net Worth distribution and standard errors across the Total row of Tables 4 and 4A:
+
+
+```{r eval = FALSE , results = "hide" }
+chapter_tag_household_design <-
+	update(
+		chapter_tag_household_design ,
+		thnetworth_category =
+			factor(
+				findInterval( 
+					thnetworth , 
+					c( 1 , 5000 , 10000 , 25000 , 50000 , 100000 , 250000 , 500000 ) 
+				) ,
+				levels = 0:8 ,
+				labels = c( "Zero or Negative" , "$1 to $4,999" , "$5,000 to $9,999" , 
+				"$10,000 to $24,999" , "$25,000 to $49,999" , "$50,000 to $99,999" , 
+				"$100,000 to $249,999" , "$250,000 to $499,999" , "$500,000 or over" )
+			)
+	)
+
+results <- svymean( ~ thnetworth_category , chapter_tag_household_design )
+
+stopifnot( 
+	all.equal( as.numeric( round( coef( results ) * 100 , 1 ) ) , 
+	c( 11.3 , 6.9 , 3.5 , 5.9 , 6.4 , 8.2 , 15.3 , 13.9 , 28.7 ) ) 
+)
+
+stopifnot(
+	all.equal( as.numeric( round( SE( results ) * 100 , 1 ) ) ,
+	c( 0.3 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.3 , 0.3 , 0.3 ) )
+)
+
 
 ```
 
