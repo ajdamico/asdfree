@@ -823,17 +823,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="survey-of-income-and-program-participation-sipp" class="section level1 unnumbered hasAnchor">
 <h1>Survey of Income and Program Participation (SIPP)<a href="survey-of-income-and-program-participation-sipp.html#survey-of-income-and-program-participation-sipp" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/sipp/actions"><img src="https://github.com/asdfree/sipp/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>The US Census Bureau’s longitudinal assessment of the dynamics of income, labor force participation, social program participation and eligibility, with general demographic characteristics to measure the effectiveness of existing federal, state, and local programs.</p>
+<p>The primary longitudinal assessment of income fluctuation, labor force participation, social programs.</p>
 <ul>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
+<li><p>Annual tables with one record per month per person per sampled household, time period weights.</p></li>
+<li><p>A complex sample generalizing to the U.S. civilian non-institutionalized across varying time periods.</p></li>
+<li><p>Multi-year panels since 1980s, its current and now permanent <a href="https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf#page=15">four year rotation</a> beginning in 2018.</p></li>
+<li><p>Administered and financed by the <a href="http://www.census.gov/">US Census Bureau</a>.</p></li>
 </ul>
 <hr />
 <p>Please skim before you begin:</p>
 <ol style="list-style-type: decimal">
-<li><p><a href="https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf#page=15">2022 Survey of Income and Program Participation Users’ Guide</a></p></li>
+<li><p><a href="https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf">2022 Survey of Income and Program Participation Users’ Guide</a></p></li>
 <li><p><a href="https://www.census.gov/programs-surveys/sipp/tech-documentation/user-notes/2022-usernotes.html">2022 Data User Notes</a></p></li>
 <li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Survey%20of%20Income%20and%20Program%20Participation">artificial intelligence-generated limericks</a></p></li>
 </ol>
@@ -887,7 +887,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb785-15"><a href="survey-of-income-and-program-participation-sipp.html#cb785-15" tabindex="-1"></a>sipp_rw_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( sipp_rw_dt )</span>
 <span id="cb785-16"><a href="survey-of-income-and-program-participation-sipp.html#cb785-16" tabindex="-1"></a></span>
 <span id="cb785-17"><a href="survey-of-income-and-program-participation-sipp.html#cb785-17" tabindex="-1"></a><span class="fu">names</span>( sipp_rw_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( sipp_rw_df ) )</span></code></pre></div>
-<p>Merge the december records from these two files:</p>
+<p>Limit both files to December records for a point-in-time estimate, then merge:</p>
 <div class="sourceCode" id="cb786"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb786-1"><a href="survey-of-income-and-program-participation-sipp.html#cb786-1" tabindex="-1"></a>sipp_df <span class="ot">&lt;-</span></span>
 <span id="cb786-2"><a href="survey-of-income-and-program-participation-sipp.html#cb786-2" tabindex="-1"></a>    <span class="fu">merge</span>(</span>
 <span id="cb786-3"><a href="survey-of-income-and-program-participation-sipp.html#cb786-3" tabindex="-1"></a>        sipp_main_df[ sipp_main_df[ , <span class="st">&#39;monthcode&#39;</span> ] <span class="sc">%in%</span> <span class="dv">12</span> , ] ,</span>
@@ -1108,7 +1108,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="replication-example-25" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="survey-of-income-and-program-participation-sipp.html#replication-example-25" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example matches statistics and standard errors from the <a href="https://www2.census.gov/programs-surveys/demo/tables/wealth/2021/wealth-asset-ownership/Wealth_tables_dy2021.xlsx">Wealth and Asset Ownership for Households, by Type of Asset and Selected Characteristics: 2021</a>:</p>
-<p>Match the number of households shown in Table 4:</p>
+<p>Restrict the design to permanent residence-based householders to match the count in Table 4:</p>
 <div class="sourceCode" id="cb809"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb809-1"><a href="survey-of-income-and-program-participation-sipp.html#cb809-1" tabindex="-1"></a>sipp_household_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( sipp_design , erelrpe <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> <span class="sc">&amp;</span> tlivqtr <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> )</span>
 <span id="cb809-2"><a href="survey-of-income-and-program-participation-sipp.html#cb809-2" tabindex="-1"></a></span>
 <span id="cb809-3"><a href="survey-of-income-and-program-participation-sipp.html#cb809-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( <span class="fu">svytotal</span>( <span class="sc">~</span> one , sipp_household_design ) ) <span class="sc">/</span> <span class="dv">1000</span> , <span class="sc">-</span><span class="dv">2</span> ) <span class="sc">==</span> <span class="dv">132700</span> )</span></code></pre></div>
