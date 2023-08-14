@@ -4,16 +4,16 @@ needs_actions_build_status_line: yes
 
 
 ~~~{dataset_introduction}
-xyz
+A study of financial knowledge and behavior, like making ends meet, planning ahead, managing assets.
 ~~~
 
-table_structure: * 
+table_structure: * One state-by-state survey table with one row per sampled respondent, separate investor survey.
 
-generalizable_population: * 
+generalizable_population: * An online non-probability sample of U.S. adults (18+) calibrated to the American Community Survey.
 
-publication_period: * 
+publication_period: * Released triennially since 2009.
 
-administrative_organization: * 
+administrative_organization: * Funded by the [FINRA Investor Education Foundation](https://www.finrafoundation.org/) and conducted by [FGS Global](https://fgsglobal.com/).
 
 
 
@@ -21,36 +21,64 @@ administrative_organization: *
 ~~~{reading_block}
 Please skim before you begin:
 
-1. 
+1. [2021 National Financial Capability Study: State-by-State Survey Methodology](https://finrafoundation.org/sites/finrafoundation/files/NFCS-2021-State-by-State-Methodology.pdf)
 
-2. 
+2. [Financial Capability Insights: What the NFCS Reveals](https://www.finrafoundation.org/knowledge-we-gain-share/nfcs/other-research)
 
-3. 
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# 
+# 
+# 
+```
+
 ~~~
 
 
 
 ~~~{download_and_import_block}
 
+Download and import the latest state-by-state microdata:
 ```{r eval = FALSE , results = "hide" }
 library(haven)
 
 zip_tf <- tempfile()
 
-zip_url <- 'https://finrafoundation.org/sites/finrafoundation/files/2021-SxS-Data-and-Data-Info.zip'
+zip_url <- 
+	'https://finrafoundation.org/sites/finrafoundation/files/2021-SxS-Data-and-Data-Info.zip'
 
 download.file( zip_url , zip_tf , mode = 'wb' )
 
 unzipped_files <- unzip( zip_tf , exdir = tempdir() )
 
-# load the stata file
-chapter_tag_tbl <- read_dta( grep( "\\.dta$" , unzipped_files , value = TRUE ) )
+stata_fn <- grep( "\\\\.dta$" , unzipped_files , value = TRUE )
+
+chapter_tag_tbl <- read_dta( stata_fn )
 
 chapter_tag_df <- data.frame( chapter_tag_tbl )
 
 names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
 
+Add a column of all ones, add labels to state names, add labels to the rainy day fund question:
+```{r eval = FALSE , results = "hide" }
 chapter_tag_df[ , 'one' ] <- 1
+
+chapter_tag_df[ , 'state_name' ] <-
+	factor(
+		chapter_tag_df[ , 'stateq' ] , 
+		levels = 1:51 , 
+		labels = sort( c( 'District of Columbia' , state.name ) ) 
+	)
+
+chapter_tag_df[ , 'rainy_day_fund' ] <-
+	factor(
+		chapter_tag_df[ , 'j5' ] ,
+		levels = c( 1 , 2 , 98 , 99 ) ,
+		labels = c( 'Yes' , 'No' , "Don't Know" , "Prefer not to say" )
+	)
+
 ```
 ~~~
 
@@ -60,21 +88,6 @@ chapter_tag_df[ , 'one' ] <- 1
 ~~~{analysis_examples_survey_design}
 ```{r message = FALSE , eval = FALSE }
 
-# add labels to state names
-chapter_tag_df[ , 'state_name' ] <-
-	factor(
-		chapter_tag_df[ , 'stateq' ] , 
-		levels = 1:51 , 
-		labels = sort( c( 'District of Columbia' , state.name ) ) 
-	)
-
-# add labels to rainy day fund question
-chapter_tag_df[ , 'rainy_day_fund' ] <-
-	factor(
-		chapter_tag_df[ , 'j5' ] ,
-		levels = c( 1 , 2 , 98 , 99 ) ,
-		labels = c( 'Yes' , 'No' , "Don't Know" , "Prefer not to say" )
-	)
 library(survey)
 
 chapter_tag_design <- svydesign( ~ 1 , data = chapter_tag_df , weights = ~ wgt_n2 )
@@ -91,7 +104,7 @@ chapter_tag_design <-
 	update( 
 		chapter_tag_design ,
 		
-		ten_point_satisfaction_with_financial_condtion =
+		satisfaction_w_finances =
 			ifelse( j1 > 10 , NA , j1 ) ,
 			
 		
@@ -99,14 +112,28 @@ chapter_tag_design <-
 			factor(
 				j4 ,
 				levels = c( 1 , 2 , 3 , 98 , 99 ) ,
-				labels = c( 'Very difficult' , 'Somewhat difficult' , 'Not at all difficult' , "Don't know" , 'Prefer not to say' )
+				labels = 
+					c( 
+						'Very difficult' , 
+						'Somewhat difficult' , 
+						'Not at all difficult' , 
+						"Don't know" , 
+						'Prefer not to say' 
+					)
 			) ,
 				
 		spending_vs_income =
 			factor(
 				j3 ,
 				levels = c( 1 , 2 , 3 , 98 , 99 ) ,
-				labels = c( 'Spending less than income' , 'Spending more than income' , 'Spending about equal to income' , "Don't know" , 'Prefer not to say' )
+				labels = 
+					c( 
+						'Spending less than income' , 
+						'Spending more than income' , 
+						'Spending about equal to income' , 
+						"Don't know" , 
+						'Prefer not to say' 
+					)
 			) ,
 		
 		unpaid_medical_bills =
@@ -116,7 +143,7 @@ chapter_tag_design <-
 
 
 group_by_variable: spending_vs_income
-linear_variable: ten_point_satisfaction_with_financial_condtion
+linear_variable: satisfaction_w_finances
 linear_narm: , na.rm = TRUE
 categorical_variable: difficult_to_pay_bills
 ratio_estimation_numerator: nummen
@@ -127,6 +154,11 @@ subset_definition_description: persons receiving pandemic-related stimulus payme
 binary_variable: unpaid_medical_bills
 binary_narm: , na.rm = TRUE
 
+
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
 
 
 needs_srvyr_block: yes

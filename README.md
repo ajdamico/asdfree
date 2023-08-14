@@ -11,6 +11,7 @@ medical-expenditure-panel-survey-meps: <p><a href="https://github.com/asdfree/me
 medical-large-claims-experience-study-mlces: <p><a href="https://github.com/asdfree/mlces/actions"><img src="https://github.com/asdfree/mlces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 medicare-current-beneficiary-survey-mcbs: <p><a href="https://github.com/asdfree/mcbs/actions"><img src="https://github.com/asdfree/mcbs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-beneficiary-survey-nbs: <p><a href="https://github.com/asdfree/nbs/actions"><img src="https://github.com/asdfree/nbs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-financial-capability-study-nfcs: <p><a href="https://github.com/asdfree/nfcs/actions"><img src="https://github.com/asdfree/nfcs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-health-and-nutrition-examination-survey-nhanes: <p><a href="https://github.com/asdfree/nhanes/actions"><img src="https://github.com/asdfree/nhanes/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-health-interview-survey-nhis: <p><a href="https://github.com/asdfree/nhis/actions"><img src="https://github.com/asdfree/nhis/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-household-travel-survey-nhts: <p><a href="https://github.com/asdfree/nhts/actions"><img src="https://github.com/asdfree/nhts/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
