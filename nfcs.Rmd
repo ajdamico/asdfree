@@ -4,7 +4,7 @@
 
 A study of financial knowledge and behavior, like making ends meet, planning ahead, managing assets.
 
-* One state-by-state survey table with one row per sampled respondent, separate investor survey.
+* One state-by-state survey table with one row per sampled respondent, a separate investor survey.
 
 * An online non-probability sample of U.S. adults (18+) calibrated to the American Community Survey.
 
@@ -114,6 +114,8 @@ nfcs_design <-
 		satisfaction_w_finances =
 			ifelse( j1 > 10 , NA , j1 ) ,
 			
+		risk_taking =
+			ifelse( j2 > 10 , NA , j2 ) ,
 		
 		difficult_to_pay_bills =
 			factor(
@@ -216,8 +218,8 @@ svyby(
 Estimate a ratio:
 ```{r eval = FALSE , results = "hide" }
 svyratio( 
-	numerator = ~ nummen , 
-	denominator = ~ numadult , 
+	numerator = ~ satisfaction_w_finances , 
+	denominator = ~ risk_taking , 
 	nfcs_design ,
 	na.rm = TRUE
 )
@@ -327,14 +329,13 @@ This example matches the unweighted count shown on [PDF page 4](https://finrafou
 stopifnot( nrow( nfcs_df ) == 27118 )
 ```
 
-This example matches the national estimate of _53% have three months of rainy day funds_ from
-[PDF page 7](https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7):
+This example matches the [PDF page 7](https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7) estimate that _53% have three months of rainy day funds_:
 ```{r eval = FALSE , results = "hide" }
 national_rainy_day <- svymean( ~ rainy_day_fund , nfcs_design )
 stopifnot( round( coef( national_rainy_day )[ 'rainy_day_fundYes' ] , 2 ) == 0.53 )
 ```
 
-This example matches the state-based unweighted counts and rainy day estimates from [The Geography of Financial Capability](https://cdn.finra.org/nfcs/2021/geography.html):
+This example matches counts and rainy day estimates from [The Geography of Financial Capability](https://cdn.finra.org/nfcs/2021/geography.html):
 ```{r eval = FALSE , results = "hide" }
 state_counts <-
 	svyby(
