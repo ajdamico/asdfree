@@ -858,151 +858,151 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><a href="https://www2.census.gov/programs-surveys/nsch/technical-documentation/methodology/2021-NSCH-FAQs.pdf">2021 National Survey of Children’s Health Data Users Frequently Asked Questions (FAQs)</a></p></li>
 <li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National%20Survey%20of%20Children&#39;s%20Health">artificial intelligence-generated limericks</a></p></li>
 </ol>
-<div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb517-1"><a href="national-survey-of-childrens-health-nsch.html#cb517-1" tabindex="-1"></a><span class="co"># &quot;age but a number&quot;</span></span>
-<span id="cb517-2"><a href="national-survey-of-childrens-health-nsch.html#cb517-2" tabindex="-1"></a><span class="co"># lied babe from crib. &quot;your nose grows&quot;</span></span>
-<span id="cb517-3"><a href="national-survey-of-childrens-health-nsch.html#cb517-3" tabindex="-1"></a><span class="co"># cried gramps changing bib</span></span></code></pre></div>
+<div class="sourceCode" id="cb519"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb519-1"><a href="national-survey-of-childrens-health-nsch.html#cb519-1" tabindex="-1"></a><span class="co"># &quot;age but a number&quot;</span></span>
+<span id="cb519-2"><a href="national-survey-of-childrens-health-nsch.html#cb519-2" tabindex="-1"></a><span class="co"># lied babe from crib. &quot;your nose grows&quot;</span></span>
+<span id="cb519-3"><a href="national-survey-of-childrens-health-nsch.html#cb519-3" tabindex="-1"></a><span class="co"># cried gramps changing bib</span></span></code></pre></div>
 <hr />
 <div id="download-import-preparation-18" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="national-survey-of-childrens-health-nsch.html#download-import-preparation-18" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Define a function to download, unzip, and import each comma-separated value file:</p>
-<div class="sourceCode" id="cb518"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb518-1"><a href="national-survey-of-childrens-health-nsch.html#cb518-1" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
-<span id="cb518-2"><a href="national-survey-of-childrens-health-nsch.html#cb518-2" tabindex="-1"></a></span>
-<span id="cb518-3"><a href="national-survey-of-childrens-health-nsch.html#cb518-3" tabindex="-1"></a>nsch_stata_import <span class="ot">&lt;-</span></span>
-<span id="cb518-4"><a href="national-survey-of-childrens-health-nsch.html#cb518-4" tabindex="-1"></a>    <span class="cf">function</span>( this_url ){</span>
-<span id="cb518-5"><a href="national-survey-of-childrens-health-nsch.html#cb518-5" tabindex="-1"></a>        </span>
-<span id="cb518-6"><a href="national-survey-of-childrens-health-nsch.html#cb518-6" tabindex="-1"></a>        this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb518-7"><a href="national-survey-of-childrens-health-nsch.html#cb518-7" tabindex="-1"></a>        </span>
-<span id="cb518-8"><a href="national-survey-of-childrens-health-nsch.html#cb518-8" tabindex="-1"></a>        <span class="fu">download.file</span>( this_url , this_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb518-9"><a href="national-survey-of-childrens-health-nsch.html#cb518-9" tabindex="-1"></a>        </span>
-<span id="cb518-10"><a href="national-survey-of-childrens-health-nsch.html#cb518-10" tabindex="-1"></a>        unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb518-11"><a href="national-survey-of-childrens-health-nsch.html#cb518-11" tabindex="-1"></a>        </span>
-<span id="cb518-12"><a href="national-survey-of-childrens-health-nsch.html#cb518-12" tabindex="-1"></a>        this_stata <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.dta$&#39;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb518-13"><a href="national-survey-of-childrens-health-nsch.html#cb518-13" tabindex="-1"></a>        </span>
-<span id="cb518-14"><a href="national-survey-of-childrens-health-nsch.html#cb518-14" tabindex="-1"></a>        this_tbl <span class="ot">&lt;-</span> <span class="fu">read_stata</span>( this_stata )</span>
-<span id="cb518-15"><a href="national-survey-of-childrens-health-nsch.html#cb518-15" tabindex="-1"></a>        </span>
-<span id="cb518-16"><a href="national-survey-of-childrens-health-nsch.html#cb518-16" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( this_tbl )</span>
-<span id="cb518-17"><a href="national-survey-of-childrens-health-nsch.html#cb518-17" tabindex="-1"></a>        </span>
-<span id="cb518-18"><a href="national-survey-of-childrens-health-nsch.html#cb518-18" tabindex="-1"></a>        <span class="fu">file.remove</span>( <span class="fu">c</span>( this_tf , unzipped_files ) )</span>
-<span id="cb518-19"><a href="national-survey-of-childrens-health-nsch.html#cb518-19" tabindex="-1"></a>        </span>
-<span id="cb518-20"><a href="national-survey-of-childrens-health-nsch.html#cb518-20" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
-<span id="cb518-21"><a href="national-survey-of-childrens-health-nsch.html#cb518-21" tabindex="-1"></a>        </span>
-<span id="cb518-22"><a href="national-survey-of-childrens-health-nsch.html#cb518-22" tabindex="-1"></a>        this_df</span>
-<span id="cb518-23"><a href="national-survey-of-childrens-health-nsch.html#cb518-23" tabindex="-1"></a>    }</span></code></pre></div>
+<div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb520-1"><a href="national-survey-of-childrens-health-nsch.html#cb520-1" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb520-2"><a href="national-survey-of-childrens-health-nsch.html#cb520-2" tabindex="-1"></a></span>
+<span id="cb520-3"><a href="national-survey-of-childrens-health-nsch.html#cb520-3" tabindex="-1"></a>nsch_stata_import <span class="ot">&lt;-</span></span>
+<span id="cb520-4"><a href="national-survey-of-childrens-health-nsch.html#cb520-4" tabindex="-1"></a>    <span class="cf">function</span>( this_url ){</span>
+<span id="cb520-5"><a href="national-survey-of-childrens-health-nsch.html#cb520-5" tabindex="-1"></a>        </span>
+<span id="cb520-6"><a href="national-survey-of-childrens-health-nsch.html#cb520-6" tabindex="-1"></a>        this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb520-7"><a href="national-survey-of-childrens-health-nsch.html#cb520-7" tabindex="-1"></a>        </span>
+<span id="cb520-8"><a href="national-survey-of-childrens-health-nsch.html#cb520-8" tabindex="-1"></a>        <span class="fu">download.file</span>( this_url , this_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb520-9"><a href="national-survey-of-childrens-health-nsch.html#cb520-9" tabindex="-1"></a>        </span>
+<span id="cb520-10"><a href="national-survey-of-childrens-health-nsch.html#cb520-10" tabindex="-1"></a>        unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb520-11"><a href="national-survey-of-childrens-health-nsch.html#cb520-11" tabindex="-1"></a>        </span>
+<span id="cb520-12"><a href="national-survey-of-childrens-health-nsch.html#cb520-12" tabindex="-1"></a>        this_stata <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.dta$&#39;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb520-13"><a href="national-survey-of-childrens-health-nsch.html#cb520-13" tabindex="-1"></a>        </span>
+<span id="cb520-14"><a href="national-survey-of-childrens-health-nsch.html#cb520-14" tabindex="-1"></a>        this_tbl <span class="ot">&lt;-</span> <span class="fu">read_stata</span>( this_stata )</span>
+<span id="cb520-15"><a href="national-survey-of-childrens-health-nsch.html#cb520-15" tabindex="-1"></a>        </span>
+<span id="cb520-16"><a href="national-survey-of-childrens-health-nsch.html#cb520-16" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( this_tbl )</span>
+<span id="cb520-17"><a href="national-survey-of-childrens-health-nsch.html#cb520-17" tabindex="-1"></a>        </span>
+<span id="cb520-18"><a href="national-survey-of-childrens-health-nsch.html#cb520-18" tabindex="-1"></a>        <span class="fu">file.remove</span>( <span class="fu">c</span>( this_tf , unzipped_files ) )</span>
+<span id="cb520-19"><a href="national-survey-of-childrens-health-nsch.html#cb520-19" tabindex="-1"></a>        </span>
+<span id="cb520-20"><a href="national-survey-of-childrens-health-nsch.html#cb520-20" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
+<span id="cb520-21"><a href="national-survey-of-childrens-health-nsch.html#cb520-21" tabindex="-1"></a>        </span>
+<span id="cb520-22"><a href="national-survey-of-childrens-health-nsch.html#cb520-22" tabindex="-1"></a>        this_df</span>
+<span id="cb520-23"><a href="national-survey-of-childrens-health-nsch.html#cb520-23" tabindex="-1"></a>    }</span></code></pre></div>
 <p>Download and import the sample adult interview and imputed income files:</p>
-<div class="sourceCode" id="cb519"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb519-1"><a href="national-survey-of-childrens-health-nsch.html#cb519-1" tabindex="-1"></a>nsch_screener_url <span class="ot">&lt;-</span></span>
-<span id="cb519-2"><a href="national-survey-of-childrens-health-nsch.html#cb519-2" tabindex="-1"></a>    <span class="st">&quot;https://www2.census.gov/programs-surveys/nsch/datasets/2021/nsch_2021_screener_Stata.zip&quot;</span></span>
-<span id="cb519-3"><a href="national-survey-of-childrens-health-nsch.html#cb519-3" tabindex="-1"></a></span>
-<span id="cb519-4"><a href="national-survey-of-childrens-health-nsch.html#cb519-4" tabindex="-1"></a>nsch_topical_url <span class="ot">&lt;-</span></span>
-<span id="cb519-5"><a href="national-survey-of-childrens-health-nsch.html#cb519-5" tabindex="-1"></a>    <span class="st">&quot;https://www2.census.gov/programs-surveys/nsch/datasets/2021/nsch_2021_topical_Stata.zip&quot;</span> </span>
-<span id="cb519-6"><a href="national-survey-of-childrens-health-nsch.html#cb519-6" tabindex="-1"></a></span>
-<span id="cb519-7"><a href="national-survey-of-childrens-health-nsch.html#cb519-7" tabindex="-1"></a>nsch_screener_df <span class="ot">&lt;-</span> <span class="fu">nsch_stata_import</span>( nsch_screener_url )</span>
-<span id="cb519-8"><a href="national-survey-of-childrens-health-nsch.html#cb519-8" tabindex="-1"></a></span>
-<span id="cb519-9"><a href="national-survey-of-childrens-health-nsch.html#cb519-9" tabindex="-1"></a>nsch_df <span class="ot">&lt;-</span> <span class="fu">nsch_stata_import</span>( nsch_topical_url )</span></code></pre></div>
+<div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb521-1"><a href="national-survey-of-childrens-health-nsch.html#cb521-1" tabindex="-1"></a>nsch_screener_url <span class="ot">&lt;-</span></span>
+<span id="cb521-2"><a href="national-survey-of-childrens-health-nsch.html#cb521-2" tabindex="-1"></a>    <span class="st">&quot;https://www2.census.gov/programs-surveys/nsch/datasets/2021/nsch_2021_screener_Stata.zip&quot;</span></span>
+<span id="cb521-3"><a href="national-survey-of-childrens-health-nsch.html#cb521-3" tabindex="-1"></a></span>
+<span id="cb521-4"><a href="national-survey-of-childrens-health-nsch.html#cb521-4" tabindex="-1"></a>nsch_topical_url <span class="ot">&lt;-</span></span>
+<span id="cb521-5"><a href="national-survey-of-childrens-health-nsch.html#cb521-5" tabindex="-1"></a>    <span class="st">&quot;https://www2.census.gov/programs-surveys/nsch/datasets/2021/nsch_2021_topical_Stata.zip&quot;</span> </span>
+<span id="cb521-6"><a href="national-survey-of-childrens-health-nsch.html#cb521-6" tabindex="-1"></a></span>
+<span id="cb521-7"><a href="national-survey-of-childrens-health-nsch.html#cb521-7" tabindex="-1"></a>nsch_screener_df <span class="ot">&lt;-</span> <span class="fu">nsch_stata_import</span>( nsch_screener_url )</span>
+<span id="cb521-8"><a href="national-survey-of-childrens-health-nsch.html#cb521-8" tabindex="-1"></a></span>
+<span id="cb521-9"><a href="national-survey-of-childrens-health-nsch.html#cb521-9" tabindex="-1"></a>nsch_df <span class="ot">&lt;-</span> <span class="fu">nsch_stata_import</span>( nsch_topical_url )</span></code></pre></div>
 <div id="save-locally-18" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="national-survey-of-childrens-health-nsch.html#save-locally-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb520-1"><a href="national-survey-of-childrens-health-nsch.html#cb520-1" tabindex="-1"></a><span class="co"># nsch_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NSCH&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb520-2"><a href="national-survey-of-childrens-health-nsch.html#cb520-2" tabindex="-1"></a><span class="co"># saveRDS( nsch_df , file = nsch_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb522-1"><a href="national-survey-of-childrens-health-nsch.html#cb522-1" tabindex="-1"></a><span class="co"># nsch_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NSCH&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb522-2"><a href="national-survey-of-childrens-health-nsch.html#cb522-2" tabindex="-1"></a><span class="co"># saveRDS( nsch_df , file = nsch_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb521-1"><a href="national-survey-of-childrens-health-nsch.html#cb521-1" tabindex="-1"></a><span class="co"># nsch_df &lt;- readRDS( nsch_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="national-survey-of-childrens-health-nsch.html#cb523-1" tabindex="-1"></a><span class="co"># nsch_df &lt;- readRDS( nsch_fn )</span></span></code></pre></div>
 </div>
 <div id="survey-design-definition-14" class="section level3 unnumbered hasAnchor">
 <h3>Survey Design Definition<a href="national-survey-of-childrens-health-nsch.html#survey-design-definition-14" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Construct a multiply-imputed, complex sample survey design:</p>
 <p>Remove the fpl columns from the main data.frame:</p>
-<div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb522-1"><a href="national-survey-of-childrens-health-nsch.html#cb522-1" tabindex="-1"></a>fpl_columns <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;^fpl_i[0-9]&#39;</span> , <span class="fu">names</span>( nsch_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb522-2"><a href="national-survey-of-childrens-health-nsch.html#cb522-2" tabindex="-1"></a></span>
-<span id="cb522-3"><a href="national-survey-of-childrens-health-nsch.html#cb522-3" tabindex="-1"></a>fpl_wide_df <span class="ot">&lt;-</span> nsch_df[ <span class="fu">c</span>( <span class="st">&#39;hhid&#39;</span> , fpl_columns ) ]</span>
-<span id="cb522-4"><a href="national-survey-of-childrens-health-nsch.html#cb522-4" tabindex="-1"></a></span>
-<span id="cb522-5"><a href="national-survey-of-childrens-health-nsch.html#cb522-5" tabindex="-1"></a>nsch_df[ fpl_columns ] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
-<p>Reshape the fpl columns from wide to long:</p>
-<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="national-survey-of-childrens-health-nsch.html#cb523-1" tabindex="-1"></a>fpl_long_df <span class="ot">&lt;-</span> </span>
-<span id="cb523-2"><a href="national-survey-of-childrens-health-nsch.html#cb523-2" tabindex="-1"></a>    <span class="fu">reshape</span>( </span>
-<span id="cb523-3"><a href="national-survey-of-childrens-health-nsch.html#cb523-3" tabindex="-1"></a>        fpl_wide_df , </span>
-<span id="cb523-4"><a href="national-survey-of-childrens-health-nsch.html#cb523-4" tabindex="-1"></a>        <span class="at">varying =</span> <span class="fu">list</span>( fpl_columns ) , </span>
-<span id="cb523-5"><a href="national-survey-of-childrens-health-nsch.html#cb523-5" tabindex="-1"></a>        <span class="at">direction =</span> <span class="st">&#39;long&#39;</span> , </span>
-<span id="cb523-6"><a href="national-survey-of-childrens-health-nsch.html#cb523-6" tabindex="-1"></a>        <span class="at">timevar =</span> <span class="st">&#39;implicate&#39;</span> , </span>
-<span id="cb523-7"><a href="national-survey-of-childrens-health-nsch.html#cb523-7" tabindex="-1"></a>        <span class="at">idvar =</span> <span class="st">&#39;hhid&#39;</span> </span>
-<span id="cb523-8"><a href="national-survey-of-childrens-health-nsch.html#cb523-8" tabindex="-1"></a>    )</span>
-<span id="cb523-9"><a href="national-survey-of-childrens-health-nsch.html#cb523-9" tabindex="-1"></a>    </span>
-<span id="cb523-10"><a href="national-survey-of-childrens-health-nsch.html#cb523-10" tabindex="-1"></a><span class="fu">names</span>( fpl_long_df )[ <span class="fu">ncol</span>( fpl_long_df ) ] <span class="ot">&lt;-</span> <span class="st">&#39;fpl&#39;</span></span></code></pre></div>
-<p>Merge the fpl table with multiple records per child onto the main table:</p>
-<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb524-1"><a href="national-survey-of-childrens-health-nsch.html#cb524-1" tabindex="-1"></a>nsch_long_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( nsch_df , fpl_long_df )</span>
+<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb524-1"><a href="national-survey-of-childrens-health-nsch.html#cb524-1" tabindex="-1"></a>fpl_columns <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;^fpl_i[0-9]&#39;</span> , <span class="fu">names</span>( nsch_df ) , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb524-2"><a href="national-survey-of-childrens-health-nsch.html#cb524-2" tabindex="-1"></a></span>
-<span id="cb524-3"><a href="national-survey-of-childrens-health-nsch.html#cb524-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( nsch_long_df ) <span class="sc">==</span> <span class="fu">nrow</span>( fpl_long_df ) )</span>
+<span id="cb524-3"><a href="national-survey-of-childrens-health-nsch.html#cb524-3" tabindex="-1"></a>fpl_wide_df <span class="ot">&lt;-</span> nsch_df[ <span class="fu">c</span>( <span class="st">&#39;hhid&#39;</span> , fpl_columns ) ]</span>
 <span id="cb524-4"><a href="national-survey-of-childrens-health-nsch.html#cb524-4" tabindex="-1"></a></span>
-<span id="cb524-5"><a href="national-survey-of-childrens-health-nsch.html#cb524-5" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( nsch_long_df ) <span class="sc">/</span> <span class="fu">length</span>( fpl_columns ) <span class="sc">==</span> <span class="fu">nrow</span>( nsch_df ) )</span></code></pre></div>
+<span id="cb524-5"><a href="national-survey-of-childrens-health-nsch.html#cb524-5" tabindex="-1"></a>nsch_df[ fpl_columns ] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+<p>Reshape the fpl columns from wide to long:</p>
+<div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb525-1"><a href="national-survey-of-childrens-health-nsch.html#cb525-1" tabindex="-1"></a>fpl_long_df <span class="ot">&lt;-</span> </span>
+<span id="cb525-2"><a href="national-survey-of-childrens-health-nsch.html#cb525-2" tabindex="-1"></a>    <span class="fu">reshape</span>( </span>
+<span id="cb525-3"><a href="national-survey-of-childrens-health-nsch.html#cb525-3" tabindex="-1"></a>        fpl_wide_df , </span>
+<span id="cb525-4"><a href="national-survey-of-childrens-health-nsch.html#cb525-4" tabindex="-1"></a>        <span class="at">varying =</span> <span class="fu">list</span>( fpl_columns ) , </span>
+<span id="cb525-5"><a href="national-survey-of-childrens-health-nsch.html#cb525-5" tabindex="-1"></a>        <span class="at">direction =</span> <span class="st">&#39;long&#39;</span> , </span>
+<span id="cb525-6"><a href="national-survey-of-childrens-health-nsch.html#cb525-6" tabindex="-1"></a>        <span class="at">timevar =</span> <span class="st">&#39;implicate&#39;</span> , </span>
+<span id="cb525-7"><a href="national-survey-of-childrens-health-nsch.html#cb525-7" tabindex="-1"></a>        <span class="at">idvar =</span> <span class="st">&#39;hhid&#39;</span> </span>
+<span id="cb525-8"><a href="national-survey-of-childrens-health-nsch.html#cb525-8" tabindex="-1"></a>    )</span>
+<span id="cb525-9"><a href="national-survey-of-childrens-health-nsch.html#cb525-9" tabindex="-1"></a>    </span>
+<span id="cb525-10"><a href="national-survey-of-childrens-health-nsch.html#cb525-10" tabindex="-1"></a><span class="fu">names</span>( fpl_long_df )[ <span class="fu">ncol</span>( fpl_long_df ) ] <span class="ot">&lt;-</span> <span class="st">&#39;fpl&#39;</span></span></code></pre></div>
+<p>Merge the fpl table with multiple records per child onto the main table:</p>
+<div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb526-1"><a href="national-survey-of-childrens-health-nsch.html#cb526-1" tabindex="-1"></a>nsch_long_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( nsch_df , fpl_long_df )</span>
+<span id="cb526-2"><a href="national-survey-of-childrens-health-nsch.html#cb526-2" tabindex="-1"></a></span>
+<span id="cb526-3"><a href="national-survey-of-childrens-health-nsch.html#cb526-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( nsch_long_df ) <span class="sc">==</span> <span class="fu">nrow</span>( fpl_long_df ) )</span>
+<span id="cb526-4"><a href="national-survey-of-childrens-health-nsch.html#cb526-4" tabindex="-1"></a></span>
+<span id="cb526-5"><a href="national-survey-of-childrens-health-nsch.html#cb526-5" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( nsch_long_df ) <span class="sc">/</span> <span class="fu">length</span>( fpl_columns ) <span class="sc">==</span> <span class="fu">nrow</span>( nsch_df ) )</span></code></pre></div>
 <p>Reshape the imputed income data.frame into a list based on the implicate number:</p>
-<div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb525-1"><a href="national-survey-of-childrens-health-nsch.html#cb525-1" tabindex="-1"></a>nsch_list <span class="ot">&lt;-</span> <span class="fu">split</span>( nsch_long_df , nsch_long_df[ , <span class="st">&#39;implicate&#39;</span> ] )</span></code></pre></div>
+<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="national-survey-of-childrens-health-nsch.html#cb527-1" tabindex="-1"></a>nsch_list <span class="ot">&lt;-</span> <span class="fu">split</span>( nsch_long_df , nsch_long_df[ , <span class="st">&#39;implicate&#39;</span> ] )</span></code></pre></div>
 <p>Define the design:</p>
-<div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb526-1"><a href="national-survey-of-childrens-health-nsch.html#cb526-1" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb526-2"><a href="national-survey-of-childrens-health-nsch.html#cb526-2" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
-<span id="cb526-3"><a href="national-survey-of-childrens-health-nsch.html#cb526-3" tabindex="-1"></a></span>
-<span id="cb526-4"><a href="national-survey-of-childrens-health-nsch.html#cb526-4" tabindex="-1"></a>nsch_design <span class="ot">&lt;-</span> </span>
-<span id="cb526-5"><a href="national-survey-of-childrens-health-nsch.html#cb526-5" tabindex="-1"></a>    <span class="fu">svydesign</span>( </span>
-<span id="cb526-6"><a href="national-survey-of-childrens-health-nsch.html#cb526-6" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> <span class="dv">1</span> , </span>
-<span id="cb526-7"><a href="national-survey-of-childrens-health-nsch.html#cb526-7" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> fipsst <span class="sc">+</span> stratum , </span>
-<span id="cb526-8"><a href="national-survey-of-childrens-health-nsch.html#cb526-8" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> fwc , </span>
-<span id="cb526-9"><a href="national-survey-of-childrens-health-nsch.html#cb526-9" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( nsch_list ) ,</span>
-<span id="cb526-10"><a href="national-survey-of-childrens-health-nsch.html#cb526-10" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span></span>
-<span id="cb526-11"><a href="national-survey-of-childrens-health-nsch.html#cb526-11" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb528"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb528-1"><a href="national-survey-of-childrens-health-nsch.html#cb528-1" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb528-2"><a href="national-survey-of-childrens-health-nsch.html#cb528-2" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
+<span id="cb528-3"><a href="national-survey-of-childrens-health-nsch.html#cb528-3" tabindex="-1"></a></span>
+<span id="cb528-4"><a href="national-survey-of-childrens-health-nsch.html#cb528-4" tabindex="-1"></a>nsch_design <span class="ot">&lt;-</span> </span>
+<span id="cb528-5"><a href="national-survey-of-childrens-health-nsch.html#cb528-5" tabindex="-1"></a>    <span class="fu">svydesign</span>( </span>
+<span id="cb528-6"><a href="national-survey-of-childrens-health-nsch.html#cb528-6" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> <span class="dv">1</span> , </span>
+<span id="cb528-7"><a href="national-survey-of-childrens-health-nsch.html#cb528-7" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> fipsst <span class="sc">+</span> stratum , </span>
+<span id="cb528-8"><a href="national-survey-of-childrens-health-nsch.html#cb528-8" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> fwc , </span>
+<span id="cb528-9"><a href="national-survey-of-childrens-health-nsch.html#cb528-9" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( nsch_list ) ,</span>
+<span id="cb528-10"><a href="national-survey-of-childrens-health-nsch.html#cb528-10" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span></span>
+<span id="cb528-11"><a href="national-survey-of-childrens-health-nsch.html#cb528-11" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="variable-recoding-18" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="national-survey-of-childrens-health-nsch.html#variable-recoding-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="national-survey-of-childrens-health-nsch.html#cb527-1" tabindex="-1"></a>nsch_design <span class="ot">&lt;-</span></span>
-<span id="cb527-2"><a href="national-survey-of-childrens-health-nsch.html#cb527-2" tabindex="-1"></a>    <span class="fu">update</span>(</span>
-<span id="cb527-3"><a href="national-survey-of-childrens-health-nsch.html#cb527-3" tabindex="-1"></a>        nsch_design ,</span>
-<span id="cb527-4"><a href="national-survey-of-childrens-health-nsch.html#cb527-4" tabindex="-1"></a>        </span>
-<span id="cb527-5"><a href="national-survey-of-childrens-health-nsch.html#cb527-5" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
-<span id="cb527-6"><a href="national-survey-of-childrens-health-nsch.html#cb527-6" tabindex="-1"></a>        </span>
-<span id="cb527-7"><a href="national-survey-of-childrens-health-nsch.html#cb527-7" tabindex="-1"></a>        <span class="at">state_name =</span></span>
-<span id="cb527-8"><a href="national-survey-of-childrens-health-nsch.html#cb527-8" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
-<span id="cb527-9"><a href="national-survey-of-childrens-health-nsch.html#cb527-9" tabindex="-1"></a>                fipsst ,</span>
-<span id="cb527-10"><a href="national-survey-of-childrens-health-nsch.html#cb527-10" tabindex="-1"></a>                <span class="at">levels =</span> </span>
-<span id="cb527-11"><a href="national-survey-of-childrens-health-nsch.html#cb527-11" tabindex="-1"></a>                    <span class="fu">c</span>(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, </span>
-<span id="cb527-12"><a href="national-survey-of-childrens-health-nsch.html#cb527-12" tabindex="-1"></a>                    11L, 12L, 13L, 15L, 16L, 17L, 18L, </span>
-<span id="cb527-13"><a href="national-survey-of-childrens-health-nsch.html#cb527-13" tabindex="-1"></a>                    19L, 20L, 21L, 22L, 23L, 24L, 25L, </span>
-<span id="cb527-14"><a href="national-survey-of-childrens-health-nsch.html#cb527-14" tabindex="-1"></a>                    26L, 27L, 28L, 29L, 30L, 31L, 32L, </span>
-<span id="cb527-15"><a href="national-survey-of-childrens-health-nsch.html#cb527-15" tabindex="-1"></a>                    33L, 34L, 35L, 36L, 37L, 38L, 39L, </span>
-<span id="cb527-16"><a href="national-survey-of-childrens-health-nsch.html#cb527-16" tabindex="-1"></a>                    40L, 41L, 42L, 44L, 45L, 46L, 47L, </span>
-<span id="cb527-17"><a href="national-survey-of-childrens-health-nsch.html#cb527-17" tabindex="-1"></a>                    48L, 49L, 50L, 51L, 53L, 54L, 55L, </span>
-<span id="cb527-18"><a href="national-survey-of-childrens-health-nsch.html#cb527-18" tabindex="-1"></a>                    56L) ,</span>
-<span id="cb527-19"><a href="national-survey-of-childrens-health-nsch.html#cb527-19" tabindex="-1"></a>                <span class="at">labels =</span></span>
-<span id="cb527-20"><a href="national-survey-of-childrens-health-nsch.html#cb527-20" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;Alabama&quot;</span>, <span class="st">&quot;Alaska&quot;</span>, <span class="st">&quot;Arizona&quot;</span>, <span class="st">&quot;Arkansas&quot;</span>, <span class="st">&quot;California&quot;</span>, </span>
-<span id="cb527-21"><a href="national-survey-of-childrens-health-nsch.html#cb527-21" tabindex="-1"></a>                    <span class="st">&quot;Colorado&quot;</span>, <span class="st">&quot;Connecticut&quot;</span>, <span class="st">&quot;Delaware&quot;</span>, <span class="st">&quot;District of Columbia&quot;</span>, </span>
-<span id="cb527-22"><a href="national-survey-of-childrens-health-nsch.html#cb527-22" tabindex="-1"></a>                    <span class="st">&quot;Florida&quot;</span>, <span class="st">&quot;Georgia&quot;</span>, <span class="st">&quot;Hawaii&quot;</span>, <span class="st">&quot;Idaho&quot;</span>, <span class="st">&quot;Illinois&quot;</span>, <span class="st">&quot;Indiana&quot;</span>, </span>
-<span id="cb527-23"><a href="national-survey-of-childrens-health-nsch.html#cb527-23" tabindex="-1"></a>                    <span class="st">&quot;Iowa&quot;</span>, <span class="st">&quot;Kansas&quot;</span>, <span class="st">&quot;Kentucky&quot;</span>, <span class="st">&quot;Louisiana&quot;</span>, <span class="st">&quot;Maine&quot;</span>, <span class="st">&quot;Maryland&quot;</span>, </span>
-<span id="cb527-24"><a href="national-survey-of-childrens-health-nsch.html#cb527-24" tabindex="-1"></a>                    <span class="st">&quot;Massachusetts&quot;</span>, <span class="st">&quot;Michigan&quot;</span>, <span class="st">&quot;Minnesota&quot;</span>, <span class="st">&quot;Mississippi&quot;</span>, <span class="st">&quot;Missouri&quot;</span>, </span>
-<span id="cb527-25"><a href="national-survey-of-childrens-health-nsch.html#cb527-25" tabindex="-1"></a>                    <span class="st">&quot;Montana&quot;</span>, <span class="st">&quot;Nebraska&quot;</span>, <span class="st">&quot;Nevada&quot;</span>, <span class="st">&quot;New Hampshire&quot;</span>, <span class="st">&quot;New Jersey&quot;</span>, </span>
-<span id="cb527-26"><a href="national-survey-of-childrens-health-nsch.html#cb527-26" tabindex="-1"></a>                    <span class="st">&quot;New Mexico&quot;</span>, <span class="st">&quot;New York&quot;</span>, <span class="st">&quot;North Carolina&quot;</span>, <span class="st">&quot;North Dakota&quot;</span>, <span class="st">&quot;Ohio&quot;</span>, </span>
-<span id="cb527-27"><a href="national-survey-of-childrens-health-nsch.html#cb527-27" tabindex="-1"></a>                    <span class="st">&quot;Oklahoma&quot;</span>, <span class="st">&quot;Oregon&quot;</span>, <span class="st">&quot;Pennsylvania&quot;</span>, <span class="st">&quot;Rhode Island&quot;</span>, <span class="st">&quot;South Carolina&quot;</span>, </span>
-<span id="cb527-28"><a href="national-survey-of-childrens-health-nsch.html#cb527-28" tabindex="-1"></a>                    <span class="st">&quot;South Dakota&quot;</span>, <span class="st">&quot;Tennessee&quot;</span>, <span class="st">&quot;Texas&quot;</span>, <span class="st">&quot;Utah&quot;</span>, <span class="st">&quot;Vermont&quot;</span>, <span class="st">&quot;Virginia&quot;</span>, </span>
-<span id="cb527-29"><a href="national-survey-of-childrens-health-nsch.html#cb527-29" tabindex="-1"></a>                    <span class="st">&quot;Washington&quot;</span>, <span class="st">&quot;West Virginia&quot;</span>, <span class="st">&quot;Wisconsin&quot;</span>, <span class="st">&quot;Wyoming&quot;</span>)</span>
-<span id="cb527-30"><a href="national-survey-of-childrens-health-nsch.html#cb527-30" tabindex="-1"></a>            ) ,</span>
-<span id="cb527-31"><a href="national-survey-of-childrens-health-nsch.html#cb527-31" tabindex="-1"></a></span>
-<span id="cb527-32"><a href="national-survey-of-childrens-health-nsch.html#cb527-32" tabindex="-1"></a>        </span>
-<span id="cb527-33"><a href="national-survey-of-childrens-health-nsch.html#cb527-33" tabindex="-1"></a>        <span class="at">overall_health =</span></span>
-<span id="cb527-34"><a href="national-survey-of-childrens-health-nsch.html#cb527-34" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb527-35"><a href="national-survey-of-childrens-health-nsch.html#cb527-35" tabindex="-1"></a>                <span class="fu">c</span>( <span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">2</span> , <span class="dv">3</span> , <span class="dv">3</span> )[ k2q01 ] , </span>
-<span id="cb527-36"><a href="national-survey-of-childrens-health-nsch.html#cb527-36" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> , </span>
-<span id="cb527-37"><a href="national-survey-of-childrens-health-nsch.html#cb527-37" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;excellent or very good&#39;</span> , <span class="st">&#39;good&#39;</span> , <span class="st">&#39;fair or poor&#39;</span> ) </span>
-<span id="cb527-38"><a href="national-survey-of-childrens-health-nsch.html#cb527-38" tabindex="-1"></a>            ) ,</span>
-<span id="cb527-39"><a href="national-survey-of-childrens-health-nsch.html#cb527-39" tabindex="-1"></a>                    </span>
-<span id="cb527-40"><a href="national-survey-of-childrens-health-nsch.html#cb527-40" tabindex="-1"></a>        <span class="at">poverty_categories =</span> </span>
-<span id="cb527-41"><a href="national-survey-of-childrens-health-nsch.html#cb527-41" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb527-42"><a href="national-survey-of-childrens-health-nsch.html#cb527-42" tabindex="-1"></a>                <span class="dv">1</span> <span class="sc">+</span> <span class="fu">findInterval</span>( fpl , <span class="fu">c</span>( <span class="dv">100</span> , <span class="dv">200</span> , <span class="dv">400</span> ) ) ,</span>
-<span id="cb527-43"><a href="national-survey-of-childrens-health-nsch.html#cb527-43" tabindex="-1"></a>                <span class="at">labels =</span> </span>
-<span id="cb527-44"><a href="national-survey-of-childrens-health-nsch.html#cb527-44" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="st">&quot;below poverty&quot;</span> , <span class="st">&quot;100-199% fpl&quot;</span> , <span class="st">&quot;200-399% fpl&quot;</span> , <span class="st">&quot;400%+ fpl&quot;</span> )</span>
-<span id="cb527-45"><a href="national-survey-of-childrens-health-nsch.html#cb527-45" tabindex="-1"></a>            ) ,</span>
-<span id="cb527-46"><a href="national-survey-of-childrens-health-nsch.html#cb527-46" tabindex="-1"></a>        </span>
-<span id="cb527-47"><a href="national-survey-of-childrens-health-nsch.html#cb527-47" tabindex="-1"></a>        <span class="at">under_six_ever_breastfed =</span></span>
-<span id="cb527-48"><a href="national-survey-of-childrens-health-nsch.html#cb527-48" tabindex="-1"></a>            <span class="fu">as.numeric</span>( k6q40 <span class="sc">==</span> <span class="dv">1</span> ) ,</span>
-<span id="cb527-49"><a href="national-survey-of-childrens-health-nsch.html#cb527-49" tabindex="-1"></a></span>
-<span id="cb527-50"><a href="national-survey-of-childrens-health-nsch.html#cb527-50" tabindex="-1"></a>        <span class="at">sc_sex =</span></span>
-<span id="cb527-51"><a href="national-survey-of-childrens-health-nsch.html#cb527-51" tabindex="-1"></a>            <span class="fu">factor</span>( <span class="fu">ifelse</span>( sc_sex <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , sc_sex , <span class="cn">NA</span> ) , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) )</span>
-<span id="cb527-52"><a href="national-survey-of-childrens-health-nsch.html#cb527-52" tabindex="-1"></a>        </span>
-<span id="cb527-53"><a href="national-survey-of-childrens-health-nsch.html#cb527-53" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="national-survey-of-childrens-health-nsch.html#cb529-1" tabindex="-1"></a>nsch_design <span class="ot">&lt;-</span></span>
+<span id="cb529-2"><a href="national-survey-of-childrens-health-nsch.html#cb529-2" tabindex="-1"></a>    <span class="fu">update</span>(</span>
+<span id="cb529-3"><a href="national-survey-of-childrens-health-nsch.html#cb529-3" tabindex="-1"></a>        nsch_design ,</span>
+<span id="cb529-4"><a href="national-survey-of-childrens-health-nsch.html#cb529-4" tabindex="-1"></a>        </span>
+<span id="cb529-5"><a href="national-survey-of-childrens-health-nsch.html#cb529-5" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
+<span id="cb529-6"><a href="national-survey-of-childrens-health-nsch.html#cb529-6" tabindex="-1"></a>        </span>
+<span id="cb529-7"><a href="national-survey-of-childrens-health-nsch.html#cb529-7" tabindex="-1"></a>        <span class="at">state_name =</span></span>
+<span id="cb529-8"><a href="national-survey-of-childrens-health-nsch.html#cb529-8" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
+<span id="cb529-9"><a href="national-survey-of-childrens-health-nsch.html#cb529-9" tabindex="-1"></a>                fipsst ,</span>
+<span id="cb529-10"><a href="national-survey-of-childrens-health-nsch.html#cb529-10" tabindex="-1"></a>                <span class="at">levels =</span> </span>
+<span id="cb529-11"><a href="national-survey-of-childrens-health-nsch.html#cb529-11" tabindex="-1"></a>                    <span class="fu">c</span>(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, </span>
+<span id="cb529-12"><a href="national-survey-of-childrens-health-nsch.html#cb529-12" tabindex="-1"></a>                    11L, 12L, 13L, 15L, 16L, 17L, 18L, </span>
+<span id="cb529-13"><a href="national-survey-of-childrens-health-nsch.html#cb529-13" tabindex="-1"></a>                    19L, 20L, 21L, 22L, 23L, 24L, 25L, </span>
+<span id="cb529-14"><a href="national-survey-of-childrens-health-nsch.html#cb529-14" tabindex="-1"></a>                    26L, 27L, 28L, 29L, 30L, 31L, 32L, </span>
+<span id="cb529-15"><a href="national-survey-of-childrens-health-nsch.html#cb529-15" tabindex="-1"></a>                    33L, 34L, 35L, 36L, 37L, 38L, 39L, </span>
+<span id="cb529-16"><a href="national-survey-of-childrens-health-nsch.html#cb529-16" tabindex="-1"></a>                    40L, 41L, 42L, 44L, 45L, 46L, 47L, </span>
+<span id="cb529-17"><a href="national-survey-of-childrens-health-nsch.html#cb529-17" tabindex="-1"></a>                    48L, 49L, 50L, 51L, 53L, 54L, 55L, </span>
+<span id="cb529-18"><a href="national-survey-of-childrens-health-nsch.html#cb529-18" tabindex="-1"></a>                    56L) ,</span>
+<span id="cb529-19"><a href="national-survey-of-childrens-health-nsch.html#cb529-19" tabindex="-1"></a>                <span class="at">labels =</span></span>
+<span id="cb529-20"><a href="national-survey-of-childrens-health-nsch.html#cb529-20" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;Alabama&quot;</span>, <span class="st">&quot;Alaska&quot;</span>, <span class="st">&quot;Arizona&quot;</span>, <span class="st">&quot;Arkansas&quot;</span>, <span class="st">&quot;California&quot;</span>, </span>
+<span id="cb529-21"><a href="national-survey-of-childrens-health-nsch.html#cb529-21" tabindex="-1"></a>                    <span class="st">&quot;Colorado&quot;</span>, <span class="st">&quot;Connecticut&quot;</span>, <span class="st">&quot;Delaware&quot;</span>, <span class="st">&quot;District of Columbia&quot;</span>, </span>
+<span id="cb529-22"><a href="national-survey-of-childrens-health-nsch.html#cb529-22" tabindex="-1"></a>                    <span class="st">&quot;Florida&quot;</span>, <span class="st">&quot;Georgia&quot;</span>, <span class="st">&quot;Hawaii&quot;</span>, <span class="st">&quot;Idaho&quot;</span>, <span class="st">&quot;Illinois&quot;</span>, <span class="st">&quot;Indiana&quot;</span>, </span>
+<span id="cb529-23"><a href="national-survey-of-childrens-health-nsch.html#cb529-23" tabindex="-1"></a>                    <span class="st">&quot;Iowa&quot;</span>, <span class="st">&quot;Kansas&quot;</span>, <span class="st">&quot;Kentucky&quot;</span>, <span class="st">&quot;Louisiana&quot;</span>, <span class="st">&quot;Maine&quot;</span>, <span class="st">&quot;Maryland&quot;</span>, </span>
+<span id="cb529-24"><a href="national-survey-of-childrens-health-nsch.html#cb529-24" tabindex="-1"></a>                    <span class="st">&quot;Massachusetts&quot;</span>, <span class="st">&quot;Michigan&quot;</span>, <span class="st">&quot;Minnesota&quot;</span>, <span class="st">&quot;Mississippi&quot;</span>, <span class="st">&quot;Missouri&quot;</span>, </span>
+<span id="cb529-25"><a href="national-survey-of-childrens-health-nsch.html#cb529-25" tabindex="-1"></a>                    <span class="st">&quot;Montana&quot;</span>, <span class="st">&quot;Nebraska&quot;</span>, <span class="st">&quot;Nevada&quot;</span>, <span class="st">&quot;New Hampshire&quot;</span>, <span class="st">&quot;New Jersey&quot;</span>, </span>
+<span id="cb529-26"><a href="national-survey-of-childrens-health-nsch.html#cb529-26" tabindex="-1"></a>                    <span class="st">&quot;New Mexico&quot;</span>, <span class="st">&quot;New York&quot;</span>, <span class="st">&quot;North Carolina&quot;</span>, <span class="st">&quot;North Dakota&quot;</span>, <span class="st">&quot;Ohio&quot;</span>, </span>
+<span id="cb529-27"><a href="national-survey-of-childrens-health-nsch.html#cb529-27" tabindex="-1"></a>                    <span class="st">&quot;Oklahoma&quot;</span>, <span class="st">&quot;Oregon&quot;</span>, <span class="st">&quot;Pennsylvania&quot;</span>, <span class="st">&quot;Rhode Island&quot;</span>, <span class="st">&quot;South Carolina&quot;</span>, </span>
+<span id="cb529-28"><a href="national-survey-of-childrens-health-nsch.html#cb529-28" tabindex="-1"></a>                    <span class="st">&quot;South Dakota&quot;</span>, <span class="st">&quot;Tennessee&quot;</span>, <span class="st">&quot;Texas&quot;</span>, <span class="st">&quot;Utah&quot;</span>, <span class="st">&quot;Vermont&quot;</span>, <span class="st">&quot;Virginia&quot;</span>, </span>
+<span id="cb529-29"><a href="national-survey-of-childrens-health-nsch.html#cb529-29" tabindex="-1"></a>                    <span class="st">&quot;Washington&quot;</span>, <span class="st">&quot;West Virginia&quot;</span>, <span class="st">&quot;Wisconsin&quot;</span>, <span class="st">&quot;Wyoming&quot;</span>)</span>
+<span id="cb529-30"><a href="national-survey-of-childrens-health-nsch.html#cb529-30" tabindex="-1"></a>            ) ,</span>
+<span id="cb529-31"><a href="national-survey-of-childrens-health-nsch.html#cb529-31" tabindex="-1"></a></span>
+<span id="cb529-32"><a href="national-survey-of-childrens-health-nsch.html#cb529-32" tabindex="-1"></a>        </span>
+<span id="cb529-33"><a href="national-survey-of-childrens-health-nsch.html#cb529-33" tabindex="-1"></a>        <span class="at">overall_health =</span></span>
+<span id="cb529-34"><a href="national-survey-of-childrens-health-nsch.html#cb529-34" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
+<span id="cb529-35"><a href="national-survey-of-childrens-health-nsch.html#cb529-35" tabindex="-1"></a>                <span class="fu">c</span>( <span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">2</span> , <span class="dv">3</span> , <span class="dv">3</span> )[ k2q01 ] , </span>
+<span id="cb529-36"><a href="national-survey-of-childrens-health-nsch.html#cb529-36" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> , </span>
+<span id="cb529-37"><a href="national-survey-of-childrens-health-nsch.html#cb529-37" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;excellent or very good&#39;</span> , <span class="st">&#39;good&#39;</span> , <span class="st">&#39;fair or poor&#39;</span> ) </span>
+<span id="cb529-38"><a href="national-survey-of-childrens-health-nsch.html#cb529-38" tabindex="-1"></a>            ) ,</span>
+<span id="cb529-39"><a href="national-survey-of-childrens-health-nsch.html#cb529-39" tabindex="-1"></a>                    </span>
+<span id="cb529-40"><a href="national-survey-of-childrens-health-nsch.html#cb529-40" tabindex="-1"></a>        <span class="at">poverty_categories =</span> </span>
+<span id="cb529-41"><a href="national-survey-of-childrens-health-nsch.html#cb529-41" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
+<span id="cb529-42"><a href="national-survey-of-childrens-health-nsch.html#cb529-42" tabindex="-1"></a>                <span class="dv">1</span> <span class="sc">+</span> <span class="fu">findInterval</span>( fpl , <span class="fu">c</span>( <span class="dv">100</span> , <span class="dv">200</span> , <span class="dv">400</span> ) ) ,</span>
+<span id="cb529-43"><a href="national-survey-of-childrens-health-nsch.html#cb529-43" tabindex="-1"></a>                <span class="at">labels =</span> </span>
+<span id="cb529-44"><a href="national-survey-of-childrens-health-nsch.html#cb529-44" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="st">&quot;below poverty&quot;</span> , <span class="st">&quot;100-199% fpl&quot;</span> , <span class="st">&quot;200-399% fpl&quot;</span> , <span class="st">&quot;400%+ fpl&quot;</span> )</span>
+<span id="cb529-45"><a href="national-survey-of-childrens-health-nsch.html#cb529-45" tabindex="-1"></a>            ) ,</span>
+<span id="cb529-46"><a href="national-survey-of-childrens-health-nsch.html#cb529-46" tabindex="-1"></a>        </span>
+<span id="cb529-47"><a href="national-survey-of-childrens-health-nsch.html#cb529-47" tabindex="-1"></a>        <span class="at">under_six_ever_breastfed =</span></span>
+<span id="cb529-48"><a href="national-survey-of-childrens-health-nsch.html#cb529-48" tabindex="-1"></a>            <span class="fu">as.numeric</span>( k6q40 <span class="sc">==</span> <span class="dv">1</span> ) ,</span>
+<span id="cb529-49"><a href="national-survey-of-childrens-health-nsch.html#cb529-49" tabindex="-1"></a></span>
+<span id="cb529-50"><a href="national-survey-of-childrens-health-nsch.html#cb529-50" tabindex="-1"></a>        <span class="at">sc_sex =</span></span>
+<span id="cb529-51"><a href="national-survey-of-childrens-health-nsch.html#cb529-51" tabindex="-1"></a>            <span class="fu">factor</span>( <span class="fu">ifelse</span>( sc_sex <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , sc_sex , <span class="cn">NA</span> ) , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;male&quot;</span> , <span class="st">&quot;female&quot;</span> ) )</span>
+<span id="cb529-52"><a href="national-survey-of-childrens-health-nsch.html#cb529-52" tabindex="-1"></a>        </span>
+<span id="cb529-53"><a href="national-survey-of-childrens-health-nsch.html#cb529-53" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1011,123 +1011,123 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-18" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="national-survey-of-childrens-health-nsch.html#unweighted-counts-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb528"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb528-1"><a href="national-survey-of-childrens-health-nsch.html#cb528-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
-<span id="cb528-2"><a href="national-survey-of-childrens-health-nsch.html#cb528-2" tabindex="-1"></a></span>
-<span id="cb528-3"><a href="national-survey-of-childrens-health-nsch.html#cb528-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> state_name , unwtd.count ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="national-survey-of-childrens-health-nsch.html#cb530-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
+<span id="cb530-2"><a href="national-survey-of-childrens-health-nsch.html#cb530-2" tabindex="-1"></a></span>
+<span id="cb530-3"><a href="national-survey-of-childrens-health-nsch.html#cb530-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> state_name , unwtd.count ) ) )</span></code></pre></div>
 </div>
 <div id="weighted-counts-14" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="national-survey-of-childrens-health-nsch.html#weighted-counts-14" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="national-survey-of-childrens-health-nsch.html#cb529-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
-<span id="cb529-2"><a href="national-survey-of-childrens-health-nsch.html#cb529-2" tabindex="-1"></a></span>
-<span id="cb529-3"><a href="national-survey-of-childrens-health-nsch.html#cb529-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb529-4"><a href="national-survey-of-childrens-health-nsch.html#cb529-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> state_name , svytotal )</span>
-<span id="cb529-5"><a href="national-survey-of-childrens-health-nsch.html#cb529-5" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="national-survey-of-childrens-health-nsch.html#cb531-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
+<span id="cb531-2"><a href="national-survey-of-childrens-health-nsch.html#cb531-2" tabindex="-1"></a></span>
+<span id="cb531-3"><a href="national-survey-of-childrens-health-nsch.html#cb531-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb531-4"><a href="national-survey-of-childrens-health-nsch.html#cb531-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> state_name , svytotal )</span>
+<span id="cb531-5"><a href="national-survey-of-childrens-health-nsch.html#cb531-5" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-18" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="national-survey-of-childrens-health-nsch.html#descriptive-statistics-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="national-survey-of-childrens-health-nsch.html#cb530-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years ) ) )</span>
-<span id="cb530-2"><a href="national-survey-of-childrens-health-nsch.html#cb530-2" tabindex="-1"></a></span>
-<span id="cb530-3"><a href="national-survey-of-childrens-health-nsch.html#cb530-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb530-4"><a href="national-survey-of-childrens-health-nsch.html#cb530-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sc_age_years , <span class="sc">~</span> state_name , svymean )</span>
-<span id="cb530-5"><a href="national-survey-of-childrens-health-nsch.html#cb530-5" tabindex="-1"></a>) )</span></code></pre></div>
-<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="national-survey-of-childrens-health-nsch.html#cb531-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svymean</span>( <span class="sc">~</span> poverty_categories ) ) )</span>
-<span id="cb531-2"><a href="national-survey-of-childrens-health-nsch.html#cb531-2" tabindex="-1"></a></span>
-<span id="cb531-3"><a href="national-survey-of-childrens-health-nsch.html#cb531-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb531-4"><a href="national-survey-of-childrens-health-nsch.html#cb531-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> poverty_categories , <span class="sc">~</span> state_name , svymean )</span>
-<span id="cb531-5"><a href="national-survey-of-childrens-health-nsch.html#cb531-5" tabindex="-1"></a>) )</span></code></pre></div>
-<p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="national-survey-of-childrens-health-nsch.html#cb532-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svytotal</span>( <span class="sc">~</span> sc_age_years ) ) )</span>
+<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="national-survey-of-childrens-health-nsch.html#cb532-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years ) ) )</span>
 <span id="cb532-2"><a href="national-survey-of-childrens-health-nsch.html#cb532-2" tabindex="-1"></a></span>
 <span id="cb532-3"><a href="national-survey-of-childrens-health-nsch.html#cb532-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb532-4"><a href="national-survey-of-childrens-health-nsch.html#cb532-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sc_age_years , <span class="sc">~</span> state_name , svytotal )</span>
+<span id="cb532-4"><a href="national-survey-of-childrens-health-nsch.html#cb532-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sc_age_years , <span class="sc">~</span> state_name , svymean )</span>
 <span id="cb532-5"><a href="national-survey-of-childrens-health-nsch.html#cb532-5" tabindex="-1"></a>) )</span></code></pre></div>
-<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="national-survey-of-childrens-health-nsch.html#cb533-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svytotal</span>( <span class="sc">~</span> poverty_categories ) ) )</span>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="national-survey-of-childrens-health-nsch.html#cb533-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svymean</span>( <span class="sc">~</span> poverty_categories ) ) )</span>
 <span id="cb533-2"><a href="national-survey-of-childrens-health-nsch.html#cb533-2" tabindex="-1"></a></span>
 <span id="cb533-3"><a href="national-survey-of-childrens-health-nsch.html#cb533-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb533-4"><a href="national-survey-of-childrens-health-nsch.html#cb533-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> poverty_categories , <span class="sc">~</span> state_name , svytotal )</span>
+<span id="cb533-4"><a href="national-survey-of-childrens-health-nsch.html#cb533-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> poverty_categories , <span class="sc">~</span> state_name , svymean )</span>
 <span id="cb533-5"><a href="national-survey-of-childrens-health-nsch.html#cb533-5" tabindex="-1"></a>) )</span></code></pre></div>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="national-survey-of-childrens-health-nsch.html#cb534-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svytotal</span>( <span class="sc">~</span> sc_age_years ) ) )</span>
+<span id="cb534-2"><a href="national-survey-of-childrens-health-nsch.html#cb534-2" tabindex="-1"></a></span>
+<span id="cb534-3"><a href="national-survey-of-childrens-health-nsch.html#cb534-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb534-4"><a href="national-survey-of-childrens-health-nsch.html#cb534-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> sc_age_years , <span class="sc">~</span> state_name , svytotal )</span>
+<span id="cb534-5"><a href="national-survey-of-childrens-health-nsch.html#cb534-5" tabindex="-1"></a>) )</span></code></pre></div>
+<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="national-survey-of-childrens-health-nsch.html#cb535-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svytotal</span>( <span class="sc">~</span> poverty_categories ) ) )</span>
+<span id="cb535-2"><a href="national-survey-of-childrens-health-nsch.html#cb535-2" tabindex="-1"></a></span>
+<span id="cb535-3"><a href="national-survey-of-childrens-health-nsch.html#cb535-3" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb535-4"><a href="national-survey-of-childrens-health-nsch.html#cb535-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> poverty_categories , <span class="sc">~</span> state_name , svytotal )</span>
+<span id="cb535-5"><a href="national-survey-of-childrens-health-nsch.html#cb535-5" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="national-survey-of-childrens-health-nsch.html#cb534-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb534-2"><a href="national-survey-of-childrens-health-nsch.html#cb534-2" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
-<span id="cb534-3"><a href="national-survey-of-childrens-health-nsch.html#cb534-3" tabindex="-1"></a>        <span class="sc">~</span> sc_age_years ,</span>
-<span id="cb534-4"><a href="national-survey-of-childrens-health-nsch.html#cb534-4" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> </span>
-<span id="cb534-5"><a href="national-survey-of-childrens-health-nsch.html#cb534-5" tabindex="-1"></a>) ) )</span>
-<span id="cb534-6"><a href="national-survey-of-childrens-health-nsch.html#cb534-6" tabindex="-1"></a></span>
-<span id="cb534-7"><a href="national-survey-of-childrens-health-nsch.html#cb534-7" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb534-8"><a href="national-survey-of-childrens-health-nsch.html#cb534-8" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
-<span id="cb534-9"><a href="national-survey-of-childrens-health-nsch.html#cb534-9" tabindex="-1"></a>        <span class="sc">~</span> sc_age_years , <span class="sc">~</span> state_name , svyquantile ,</span>
-<span id="cb534-10"><a href="national-survey-of-childrens-health-nsch.html#cb534-10" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb534-11"><a href="national-survey-of-childrens-health-nsch.html#cb534-11" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
-<span id="cb534-12"><a href="national-survey-of-childrens-health-nsch.html#cb534-12" tabindex="-1"></a>) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="national-survey-of-childrens-health-nsch.html#cb536-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb536-2"><a href="national-survey-of-childrens-health-nsch.html#cb536-2" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
+<span id="cb536-3"><a href="national-survey-of-childrens-health-nsch.html#cb536-3" tabindex="-1"></a>        <span class="sc">~</span> sc_age_years ,</span>
+<span id="cb536-4"><a href="national-survey-of-childrens-health-nsch.html#cb536-4" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> </span>
+<span id="cb536-5"><a href="national-survey-of-childrens-health-nsch.html#cb536-5" tabindex="-1"></a>) ) )</span>
+<span id="cb536-6"><a href="national-survey-of-childrens-health-nsch.html#cb536-6" tabindex="-1"></a></span>
+<span id="cb536-7"><a href="national-survey-of-childrens-health-nsch.html#cb536-7" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb536-8"><a href="national-survey-of-childrens-health-nsch.html#cb536-8" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
+<span id="cb536-9"><a href="national-survey-of-childrens-health-nsch.html#cb536-9" tabindex="-1"></a>        <span class="sc">~</span> sc_age_years , <span class="sc">~</span> state_name , svyquantile ,</span>
+<span id="cb536-10"><a href="national-survey-of-childrens-health-nsch.html#cb536-10" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb536-11"><a href="national-survey-of-childrens-health-nsch.html#cb536-11" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
+<span id="cb536-12"><a href="national-survey-of-childrens-health-nsch.html#cb536-12" tabindex="-1"></a>) ) )</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="national-survey-of-childrens-health-nsch.html#cb535-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb535-2"><a href="national-survey-of-childrens-health-nsch.html#cb535-2" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> liveusa_yr , <span class="at">denominator =</span> <span class="sc">~</span> sc_age_years )</span>
-<span id="cb535-3"><a href="national-survey-of-childrens-health-nsch.html#cb535-3" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="national-survey-of-childrens-health-nsch.html#cb537-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb537-2"><a href="national-survey-of-childrens-health-nsch.html#cb537-2" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> liveusa_yr , <span class="at">denominator =</span> <span class="sc">~</span> sc_age_years )</span>
+<span id="cb537-3"><a href="national-survey-of-childrens-health-nsch.html#cb537-3" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="subsetting-18" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="national-survey-of-childrens-health-nsch.html#subsetting-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to only children:</p>
-<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="national-survey-of-childrens-health-nsch.html#cb536-1" tabindex="-1"></a>sub_nsch_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nsch_design , agepos4 <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb538"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb538-1"><a href="national-survey-of-childrens-health-nsch.html#cb538-1" tabindex="-1"></a>sub_nsch_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nsch_design , agepos4 <span class="sc">==</span> <span class="dv">1</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="national-survey-of-childrens-health-nsch.html#cb537-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( sub_nsch_design , <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb539-1"><a href="national-survey-of-childrens-health-nsch.html#cb539-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( sub_nsch_design , <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years ) ) )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-18" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="national-survey-of-childrens-health-nsch.html#measures-of-uncertainty-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb538"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb538-1"><a href="national-survey-of-childrens-health-nsch.html#cb538-1" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
-<span id="cb538-2"><a href="national-survey-of-childrens-health-nsch.html#cb538-2" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb538-3"><a href="national-survey-of-childrens-health-nsch.html#cb538-3" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years )</span>
-<span id="cb538-4"><a href="national-survey-of-childrens-health-nsch.html#cb538-4" tabindex="-1"></a>    ) )</span>
-<span id="cb538-5"><a href="national-survey-of-childrens-health-nsch.html#cb538-5" tabindex="-1"></a></span>
-<span id="cb538-6"><a href="national-survey-of-childrens-health-nsch.html#cb538-6" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb538-7"><a href="national-survey-of-childrens-health-nsch.html#cb538-7" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb538-8"><a href="national-survey-of-childrens-health-nsch.html#cb538-8" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb538-9"><a href="national-survey-of-childrens-health-nsch.html#cb538-9" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb538-10"><a href="national-survey-of-childrens-health-nsch.html#cb538-10" tabindex="-1"></a></span>
-<span id="cb538-11"><a href="national-survey-of-childrens-health-nsch.html#cb538-11" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb538-12"><a href="national-survey-of-childrens-health-nsch.html#cb538-12" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb538-13"><a href="national-survey-of-childrens-health-nsch.html#cb538-13" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> sc_age_years , <span class="sc">~</span> state_name , svymean )</span>
-<span id="cb538-14"><a href="national-survey-of-childrens-health-nsch.html#cb538-14" tabindex="-1"></a>    ) )</span>
-<span id="cb538-15"><a href="national-survey-of-childrens-health-nsch.html#cb538-15" tabindex="-1"></a></span>
-<span id="cb538-16"><a href="national-survey-of-childrens-health-nsch.html#cb538-16" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb538-17"><a href="national-survey-of-childrens-health-nsch.html#cb538-17" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb538-18"><a href="national-survey-of-childrens-health-nsch.html#cb538-18" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb538-19"><a href="national-survey-of-childrens-health-nsch.html#cb538-19" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb540-1"><a href="national-survey-of-childrens-health-nsch.html#cb540-1" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
+<span id="cb540-2"><a href="national-survey-of-childrens-health-nsch.html#cb540-2" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb540-3"><a href="national-survey-of-childrens-health-nsch.html#cb540-3" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years )</span>
+<span id="cb540-4"><a href="national-survey-of-childrens-health-nsch.html#cb540-4" tabindex="-1"></a>    ) )</span>
+<span id="cb540-5"><a href="national-survey-of-childrens-health-nsch.html#cb540-5" tabindex="-1"></a></span>
+<span id="cb540-6"><a href="national-survey-of-childrens-health-nsch.html#cb540-6" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb540-7"><a href="national-survey-of-childrens-health-nsch.html#cb540-7" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb540-8"><a href="national-survey-of-childrens-health-nsch.html#cb540-8" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb540-9"><a href="national-survey-of-childrens-health-nsch.html#cb540-9" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb540-10"><a href="national-survey-of-childrens-health-nsch.html#cb540-10" tabindex="-1"></a></span>
+<span id="cb540-11"><a href="national-survey-of-childrens-health-nsch.html#cb540-11" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb540-12"><a href="national-survey-of-childrens-health-nsch.html#cb540-12" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb540-13"><a href="national-survey-of-childrens-health-nsch.html#cb540-13" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> sc_age_years , <span class="sc">~</span> state_name , svymean )</span>
+<span id="cb540-14"><a href="national-survey-of-childrens-health-nsch.html#cb540-14" tabindex="-1"></a>    ) )</span>
+<span id="cb540-15"><a href="national-survey-of-childrens-health-nsch.html#cb540-15" tabindex="-1"></a></span>
+<span id="cb540-16"><a href="national-survey-of-childrens-health-nsch.html#cb540-16" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb540-17"><a href="national-survey-of-childrens-health-nsch.html#cb540-17" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb540-18"><a href="national-survey-of-childrens-health-nsch.html#cb540-18" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb540-19"><a href="national-survey-of-childrens-health-nsch.html#cb540-19" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb539-1"><a href="national-survey-of-childrens-health-nsch.html#cb539-1" tabindex="-1"></a><span class="fu">degf</span>( nsch_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] )</span></code></pre></div>
+<div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb541-1"><a href="national-survey-of-childrens-health-nsch.html#cb541-1" tabindex="-1"></a><span class="fu">degf</span>( nsch_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb540-1"><a href="national-survey-of-childrens-health-nsch.html#cb540-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svyvar</span>( <span class="sc">~</span> sc_age_years ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb542"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb542-1"><a href="national-survey-of-childrens-health-nsch.html#cb542-1" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design , <span class="fu">svyvar</span>( <span class="sc">~</span> sc_age_years ) ) )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb541-1"><a href="national-survey-of-childrens-health-nsch.html#cb541-1" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb541-2"><a href="national-survey-of-childrens-health-nsch.html#cb541-2" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb541-3"><a href="national-survey-of-childrens-health-nsch.html#cb541-3" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb541-4"><a href="national-survey-of-childrens-health-nsch.html#cb541-4" tabindex="-1"></a>) )</span>
-<span id="cb541-5"><a href="national-survey-of-childrens-health-nsch.html#cb541-5" tabindex="-1"></a></span>
-<span id="cb541-6"><a href="national-survey-of-childrens-health-nsch.html#cb541-6" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb541-7"><a href="national-survey-of-childrens-health-nsch.html#cb541-7" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb541-8"><a href="national-survey-of-childrens-health-nsch.html#cb541-8" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
-<span id="cb541-9"><a href="national-survey-of-childrens-health-nsch.html#cb541-9" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb543"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb543-1"><a href="national-survey-of-childrens-health-nsch.html#cb543-1" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb543-2"><a href="national-survey-of-childrens-health-nsch.html#cb543-2" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb543-3"><a href="national-survey-of-childrens-health-nsch.html#cb543-3" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb543-4"><a href="national-survey-of-childrens-health-nsch.html#cb543-4" tabindex="-1"></a>) )</span>
+<span id="cb543-5"><a href="national-survey-of-childrens-health-nsch.html#cb543-5" tabindex="-1"></a></span>
+<span id="cb543-6"><a href="national-survey-of-childrens-health-nsch.html#cb543-6" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb543-7"><a href="national-survey-of-childrens-health-nsch.html#cb543-7" tabindex="-1"></a><span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb543-8"><a href="national-survey-of-childrens-health-nsch.html#cb543-8" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> sc_age_years , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
+<span id="cb543-9"><a href="national-survey-of-childrens-health-nsch.html#cb543-9" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb542"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb542-1"><a href="national-survey-of-childrens-health-nsch.html#cb542-1" tabindex="-1"></a><span class="co"># MIsvyciprop( ~ under_six_ever_breastfed , nsch_design ,</span></span>
-<span id="cb542-2"><a href="national-survey-of-childrens-health-nsch.html#cb542-2" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; )</span></span></code></pre></div>
+<div class="sourceCode" id="cb544"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb544-1"><a href="national-survey-of-childrens-health-nsch.html#cb544-1" tabindex="-1"></a><span class="co"># MIsvyciprop( ~ under_six_ever_breastfed , nsch_design ,</span></span>
+<span id="cb544-2"><a href="national-survey-of-childrens-health-nsch.html#cb544-2" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; )</span></span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-18" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="national-survey-of-childrens-health-nsch.html#regression-models-and-tests-of-association-18" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb543"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb543-1"><a href="national-survey-of-childrens-health-nsch.html#cb543-1" tabindex="-1"></a><span class="co"># MIsvyttest( sc_age_years ~ under_six_ever_breastfed , nsch_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb545"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb545-1"><a href="national-survey-of-childrens-health-nsch.html#cb545-1" tabindex="-1"></a><span class="co"># MIsvyttest( sc_age_years ~ under_six_ever_breastfed , nsch_design )</span></span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb544"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb544-1"><a href="national-survey-of-childrens-health-nsch.html#cb544-1" tabindex="-1"></a><span class="co"># MIsvychisq( ~ under_six_ever_breastfed + poverty_categories , nsch_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb546"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb546-1"><a href="national-survey-of-childrens-health-nsch.html#cb546-1" tabindex="-1"></a><span class="co"># MIsvychisq( ~ under_six_ever_breastfed + poverty_categories , nsch_design )</span></span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb545"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb545-1"><a href="national-survey-of-childrens-health-nsch.html#cb545-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb545-2"><a href="national-survey-of-childrens-health-nsch.html#cb545-2" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
-<span id="cb545-3"><a href="national-survey-of-childrens-health-nsch.html#cb545-3" tabindex="-1"></a>        <span class="fu">svyglm</span>( sc_age_years <span class="sc">~</span> under_six_ever_breastfed <span class="sc">+</span> poverty_categories )</span>
-<span id="cb545-4"><a href="national-survey-of-childrens-health-nsch.html#cb545-4" tabindex="-1"></a>    ) )</span>
-<span id="cb545-5"><a href="national-survey-of-childrens-health-nsch.html#cb545-5" tabindex="-1"></a>    </span>
-<span id="cb545-6"><a href="national-survey-of-childrens-health-nsch.html#cb545-6" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb547"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb547-1"><a href="national-survey-of-childrens-health-nsch.html#cb547-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb547-2"><a href="national-survey-of-childrens-health-nsch.html#cb547-2" tabindex="-1"></a>    <span class="fu">MIcombine</span>( <span class="fu">with</span>( nsch_design ,</span>
+<span id="cb547-3"><a href="national-survey-of-childrens-health-nsch.html#cb547-3" tabindex="-1"></a>        <span class="fu">svyglm</span>( sc_age_years <span class="sc">~</span> under_six_ever_breastfed <span class="sc">+</span> poverty_categories )</span>
+<span id="cb547-4"><a href="national-survey-of-childrens-health-nsch.html#cb547-4" tabindex="-1"></a>    ) )</span>
+<span id="cb547-5"><a href="national-survey-of-childrens-health-nsch.html#cb547-5" tabindex="-1"></a>    </span>
+<span id="cb547-6"><a href="national-survey-of-childrens-health-nsch.html#cb547-6" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1144,28 +1144,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="replication-example-16" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="national-survey-of-childrens-health-nsch.html#replication-example-16" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p><strong>As noted in the bold red footnote of their published table, this technique is not correct and should not be used. The <a href="https://www2.census.gov/programs-surveys/nsch/technical-documentation/methodology/NSCH-Analysis-with-Imputed-Data-Guide.pdf">technical documents</a> recommend a method matching the <code>MIcombine</code> syntax shown above.</strong> Nonetheless, this code matches statistics and confidence intervals within 0.1% from the <code>Excellent or very good</code> column of <a href="https://www.childhealthdata.org/browse/survey/results?q=9238&amp;r=1&amp;g=1043">Indicator 1.1: In general, how would you describe this child’s health?</a>:</p>
-<div class="sourceCode" id="cb546"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb546-1"><a href="national-survey-of-childrens-health-nsch.html#cb546-1" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
-<span id="cb546-2"><a href="national-survey-of-childrens-health-nsch.html#cb546-2" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb546-3"><a href="national-survey-of-childrens-health-nsch.html#cb546-3" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">as.numeric</span>( overall_health <span class="sc">==</span> <span class="st">&#39;excellent or very good&#39;</span> ) ,</span>
-<span id="cb546-4"><a href="national-survey-of-childrens-health-nsch.html#cb546-4" tabindex="-1"></a>        <span class="sc">~</span> poverty_categories , </span>
-<span id="cb546-5"><a href="national-survey-of-childrens-health-nsch.html#cb546-5" tabindex="-1"></a>        nsch_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] , </span>
-<span id="cb546-6"><a href="national-survey-of-childrens-health-nsch.html#cb546-6" tabindex="-1"></a>        svymean , </span>
-<span id="cb546-7"><a href="national-survey-of-childrens-health-nsch.html#cb546-7" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb546-8"><a href="national-survey-of-childrens-health-nsch.html#cb546-8" tabindex="-1"></a>    )</span>
-<span id="cb546-9"><a href="national-survey-of-childrens-health-nsch.html#cb546-9" tabindex="-1"></a></span>
-<span id="cb546-10"><a href="national-survey-of-childrens-health-nsch.html#cb546-10" tabindex="-1"></a>published_proportions <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">0.833</span> , <span class="fl">0.859</span> , <span class="fl">0.907</span> , <span class="fl">0.955</span> )</span>
-<span id="cb546-11"><a href="national-survey-of-childrens-health-nsch.html#cb546-11" tabindex="-1"></a></span>
-<span id="cb546-12"><a href="national-survey-of-childrens-health-nsch.html#cb546-12" tabindex="-1"></a>published_lb <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">0.810</span> , <span class="fl">0.838</span> , <span class="fl">0.894</span> , <span class="fl">0.949</span> )</span>
-<span id="cb546-13"><a href="national-survey-of-childrens-health-nsch.html#cb546-13" tabindex="-1"></a></span>
-<span id="cb546-14"><a href="national-survey-of-childrens-health-nsch.html#cb546-14" tabindex="-1"></a>published_ub <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">0.854</span> , <span class="fl">0.878</span> , <span class="fl">0.919</span> , <span class="fl">0.961</span> )</span>
-<span id="cb546-15"><a href="national-survey-of-childrens-health-nsch.html#cb546-15" tabindex="-1"></a></span>
-<span id="cb546-16"><a href="national-survey-of-childrens-health-nsch.html#cb546-16" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results ) , <span class="dv">3</span> ) <span class="sc">==</span> published_proportions ) )</span>
-<span id="cb546-17"><a href="national-survey-of-childrens-health-nsch.html#cb546-17" tabindex="-1"></a></span>
-<span id="cb546-18"><a href="national-survey-of-childrens-health-nsch.html#cb546-18" tabindex="-1"></a>( ci_results <span class="ot">&lt;-</span> <span class="fu">confint</span>( results ) )</span>
-<span id="cb546-19"><a href="national-survey-of-childrens-health-nsch.html#cb546-19" tabindex="-1"></a></span>
-<span id="cb546-20"><a href="national-survey-of-childrens-health-nsch.html#cb546-20" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">abs</span>( ci_results[ , <span class="dv">1</span> ] <span class="sc">-</span> published_lb ) <span class="sc">&lt;</span> <span class="fl">0.0015</span> ) )</span>
-<span id="cb546-21"><a href="national-survey-of-childrens-health-nsch.html#cb546-21" tabindex="-1"></a></span>
-<span id="cb546-22"><a href="national-survey-of-childrens-health-nsch.html#cb546-22" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">abs</span>( ci_results[ , <span class="dv">2</span> ] <span class="sc">-</span> published_ub ) <span class="sc">&lt;</span> <span class="fl">0.0015</span> ) )</span></code></pre></div>
+<div class="sourceCode" id="cb548"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb548-1"><a href="national-survey-of-childrens-health-nsch.html#cb548-1" tabindex="-1"></a>results <span class="ot">&lt;-</span></span>
+<span id="cb548-2"><a href="national-survey-of-childrens-health-nsch.html#cb548-2" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb548-3"><a href="national-survey-of-childrens-health-nsch.html#cb548-3" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">as.numeric</span>( overall_health <span class="sc">==</span> <span class="st">&#39;excellent or very good&#39;</span> ) ,</span>
+<span id="cb548-4"><a href="national-survey-of-childrens-health-nsch.html#cb548-4" tabindex="-1"></a>        <span class="sc">~</span> poverty_categories , </span>
+<span id="cb548-5"><a href="national-survey-of-childrens-health-nsch.html#cb548-5" tabindex="-1"></a>        nsch_design<span class="sc">$</span>designs[[<span class="dv">1</span>]] , </span>
+<span id="cb548-6"><a href="national-survey-of-childrens-health-nsch.html#cb548-6" tabindex="-1"></a>        svymean , </span>
+<span id="cb548-7"><a href="national-survey-of-childrens-health-nsch.html#cb548-7" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb548-8"><a href="national-survey-of-childrens-health-nsch.html#cb548-8" tabindex="-1"></a>    )</span>
+<span id="cb548-9"><a href="national-survey-of-childrens-health-nsch.html#cb548-9" tabindex="-1"></a></span>
+<span id="cb548-10"><a href="national-survey-of-childrens-health-nsch.html#cb548-10" tabindex="-1"></a>published_proportions <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">0.833</span> , <span class="fl">0.859</span> , <span class="fl">0.907</span> , <span class="fl">0.955</span> )</span>
+<span id="cb548-11"><a href="national-survey-of-childrens-health-nsch.html#cb548-11" tabindex="-1"></a></span>
+<span id="cb548-12"><a href="national-survey-of-childrens-health-nsch.html#cb548-12" tabindex="-1"></a>published_lb <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">0.810</span> , <span class="fl">0.838</span> , <span class="fl">0.894</span> , <span class="fl">0.949</span> )</span>
+<span id="cb548-13"><a href="national-survey-of-childrens-health-nsch.html#cb548-13" tabindex="-1"></a></span>
+<span id="cb548-14"><a href="national-survey-of-childrens-health-nsch.html#cb548-14" tabindex="-1"></a>published_ub <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">0.854</span> , <span class="fl">0.878</span> , <span class="fl">0.919</span> , <span class="fl">0.961</span> )</span>
+<span id="cb548-15"><a href="national-survey-of-childrens-health-nsch.html#cb548-15" tabindex="-1"></a></span>
+<span id="cb548-16"><a href="national-survey-of-childrens-health-nsch.html#cb548-16" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results ) , <span class="dv">3</span> ) <span class="sc">==</span> published_proportions ) )</span>
+<span id="cb548-17"><a href="national-survey-of-childrens-health-nsch.html#cb548-17" tabindex="-1"></a></span>
+<span id="cb548-18"><a href="national-survey-of-childrens-health-nsch.html#cb548-18" tabindex="-1"></a>( ci_results <span class="ot">&lt;-</span> <span class="fu">confint</span>( results ) )</span>
+<span id="cb548-19"><a href="national-survey-of-childrens-health-nsch.html#cb548-19" tabindex="-1"></a></span>
+<span id="cb548-20"><a href="national-survey-of-childrens-health-nsch.html#cb548-20" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">abs</span>( ci_results[ , <span class="dv">1</span> ] <span class="sc">-</span> published_lb ) <span class="sc">&lt;</span> <span class="fl">0.0015</span> ) )</span>
+<span id="cb548-21"><a href="national-survey-of-childrens-health-nsch.html#cb548-21" tabindex="-1"></a></span>
+<span id="cb548-22"><a href="national-survey-of-childrens-health-nsch.html#cb548-22" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">abs</span>( ci_results[ , <span class="dv">2</span> ] <span class="sc">-</span> published_ub ) <span class="sc">&lt;</span> <span class="fl">0.0015</span> ) )</span></code></pre></div>
 
 </div>
 </div>

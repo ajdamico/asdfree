@@ -1089,57 +1089,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-12" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="national-financial-capability-study-nfcs.html#replication-example-12" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb366-1"><a href="national-financial-capability-study-nfcs.html#cb366-1" tabindex="-1"></a><span class="co"># match https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=4</span></span>
-<span id="cb366-2"><a href="national-financial-capability-study-nfcs.html#cb366-2" tabindex="-1"></a><span class="co"># The fifth and latest wave of the NFCS was fielded from June to October 2021 (N=27,118), providing a view of</span></span>
-<span id="cb366-3"><a href="national-financial-capability-study-nfcs.html#cb366-3" tabindex="-1"></a><span class="co"># financial capability during the COVID-19 pandemic. This unusual context is important to bear in mind while</span></span>
-<span id="cb366-4"><a href="national-financial-capability-study-nfcs.html#cb366-4" tabindex="-1"></a><span class="co"># interpreting the study’s findings.</span></span>
-<span id="cb366-5"><a href="national-financial-capability-study-nfcs.html#cb366-5" tabindex="-1"></a></span>
-<span id="cb366-6"><a href="national-financial-capability-study-nfcs.html#cb366-6" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( nfcs_df ) <span class="sc">==</span> <span class="dv">27118</span> )</span>
-<span id="cb366-7"><a href="national-financial-capability-study-nfcs.html#cb366-7" tabindex="-1"></a></span>
-<span id="cb366-8"><a href="national-financial-capability-study-nfcs.html#cb366-8" tabindex="-1"></a><span class="co"># match 53% have three months of rainy day funds from</span></span>
-<span id="cb366-9"><a href="national-financial-capability-study-nfcs.html#cb366-9" tabindex="-1"></a><span class="co"># https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7</span></span>
-<span id="cb366-10"><a href="national-financial-capability-study-nfcs.html#cb366-10" tabindex="-1"></a>national_rainy_day <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> rainy_day_fund , nfcs_design )</span>
-<span id="cb366-11"><a href="national-financial-capability-study-nfcs.html#cb366-11" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( national_rainy_day )[ <span class="st">&#39;rainy_day_fundYes&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.53</span> )</span>
-<span id="cb366-12"><a href="national-financial-capability-study-nfcs.html#cb366-12" tabindex="-1"></a></span>
-<span id="cb366-13"><a href="national-financial-capability-study-nfcs.html#cb366-13" tabindex="-1"></a><span class="co"># match unweighted counts from https://cdn.finra.org/nfcs/2021/geography.html</span></span>
-<span id="cb366-14"><a href="national-financial-capability-study-nfcs.html#cb366-14" tabindex="-1"></a>state_counts <span class="ot">&lt;-</span></span>
-<span id="cb366-15"><a href="national-financial-capability-study-nfcs.html#cb366-15" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
-<span id="cb366-16"><a href="national-financial-capability-study-nfcs.html#cb366-16" tabindex="-1"></a>        <span class="sc">~</span> one ,</span>
-<span id="cb366-17"><a href="national-financial-capability-study-nfcs.html#cb366-17" tabindex="-1"></a>        <span class="sc">~</span> state_name ,</span>
-<span id="cb366-18"><a href="national-financial-capability-study-nfcs.html#cb366-18" tabindex="-1"></a>        state_design ,</span>
-<span id="cb366-19"><a href="national-financial-capability-study-nfcs.html#cb366-19" tabindex="-1"></a>        unwtd.count</span>
-<span id="cb366-20"><a href="national-financial-capability-study-nfcs.html#cb366-20" tabindex="-1"></a>    )</span>
-<span id="cb366-21"><a href="national-financial-capability-study-nfcs.html#cb366-21" tabindex="-1"></a>    </span>
-<span id="cb366-22"><a href="national-financial-capability-study-nfcs.html#cb366-22" tabindex="-1"></a><span class="fu">stopifnot</span>( state_counts[ <span class="st">&#39;California&#39;</span> , <span class="st">&#39;counts&#39;</span> ] <span class="sc">==</span> <span class="dv">1252</span> )</span>
-<span id="cb366-23"><a href="national-financial-capability-study-nfcs.html#cb366-23" tabindex="-1"></a><span class="fu">stopifnot</span>( state_counts[ <span class="st">&#39;Missouri&#39;</span> , <span class="st">&#39;counts&#39;</span> ] <span class="sc">==</span> <span class="dv">501</span> )</span>
-<span id="cb366-24"><a href="national-financial-capability-study-nfcs.html#cb366-24" tabindex="-1"></a><span class="fu">stopifnot</span>( state_counts[ <span class="st">&#39;Oregon&#39;</span> , <span class="st">&#39;counts&#39;</span> ] <span class="sc">==</span> <span class="dv">1261</span> )</span>
-<span id="cb366-25"><a href="national-financial-capability-study-nfcs.html#cb366-25" tabindex="-1"></a></span>
-<span id="cb366-26"><a href="national-financial-capability-study-nfcs.html#cb366-26" tabindex="-1"></a><span class="co"># match weighted rainy day estimates from https://cdn.finra.org/nfcs/2021/geography.html</span></span>
-<span id="cb366-27"><a href="national-financial-capability-study-nfcs.html#cb366-27" tabindex="-1"></a>state_rainy_day <span class="ot">&lt;-</span></span>
-<span id="cb366-28"><a href="national-financial-capability-study-nfcs.html#cb366-28" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
-<span id="cb366-29"><a href="national-financial-capability-study-nfcs.html#cb366-29" tabindex="-1"></a>        <span class="sc">~</span> rainy_day_fund ,</span>
-<span id="cb366-30"><a href="national-financial-capability-study-nfcs.html#cb366-30" tabindex="-1"></a>        <span class="sc">~</span> state_name ,</span>
-<span id="cb366-31"><a href="national-financial-capability-study-nfcs.html#cb366-31" tabindex="-1"></a>        state_design ,</span>
-<span id="cb366-32"><a href="national-financial-capability-study-nfcs.html#cb366-32" tabindex="-1"></a>        svymean</span>
-<span id="cb366-33"><a href="national-financial-capability-study-nfcs.html#cb366-33" tabindex="-1"></a>    )</span>
-<span id="cb366-34"><a href="national-financial-capability-study-nfcs.html#cb366-34" tabindex="-1"></a>    </span>
-<span id="cb366-35"><a href="national-financial-capability-study-nfcs.html#cb366-35" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( state_rainy_day[ <span class="st">&#39;California&#39;</span> , <span class="st">&#39;rainy_day_fundYes&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.57</span> )</span>
-<span id="cb366-36"><a href="national-financial-capability-study-nfcs.html#cb366-36" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( state_rainy_day[ <span class="st">&#39;Missouri&#39;</span> , <span class="st">&#39;rainy_day_fundYes&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.51</span> )</span>
-<span id="cb366-37"><a href="national-financial-capability-study-nfcs.html#cb366-37" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( state_rainy_day[ <span class="st">&#39;Oregon&#39;</span> , <span class="st">&#39;rainy_day_fundYes&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.52</span> )</span></code></pre></div>
+<p>This example matches the unweighted count shown on <a href="https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=4">PDF page 4</a>:</p>
+<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb366-1"><a href="national-financial-capability-study-nfcs.html#cb366-1" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( nfcs_df ) <span class="sc">==</span> <span class="dv">27118</span> )</span></code></pre></div>
+<p>This example matches the national estimate of <em>53% have three months of rainy day funds</em> from
+<a href="https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7">PDF page 7</a>:</p>
+<div class="sourceCode" id="cb367"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb367-1"><a href="national-financial-capability-study-nfcs.html#cb367-1" tabindex="-1"></a>national_rainy_day <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> rainy_day_fund , nfcs_design )</span>
+<span id="cb367-2"><a href="national-financial-capability-study-nfcs.html#cb367-2" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( national_rainy_day )[ <span class="st">&#39;rainy_day_fundYes&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.53</span> )</span></code></pre></div>
+<p>This example matches the state-based unweighted counts and rainy day estimates from <a href="https://cdn.finra.org/nfcs/2021/geography.html">The Geography of Financial Capability</a>:</p>
+<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb368-1"><a href="national-financial-capability-study-nfcs.html#cb368-1" tabindex="-1"></a>state_counts <span class="ot">&lt;-</span></span>
+<span id="cb368-2"><a href="national-financial-capability-study-nfcs.html#cb368-2" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
+<span id="cb368-3"><a href="national-financial-capability-study-nfcs.html#cb368-3" tabindex="-1"></a>        <span class="sc">~</span> one ,</span>
+<span id="cb368-4"><a href="national-financial-capability-study-nfcs.html#cb368-4" tabindex="-1"></a>        <span class="sc">~</span> state_name ,</span>
+<span id="cb368-5"><a href="national-financial-capability-study-nfcs.html#cb368-5" tabindex="-1"></a>        state_design ,</span>
+<span id="cb368-6"><a href="national-financial-capability-study-nfcs.html#cb368-6" tabindex="-1"></a>        unwtd.count</span>
+<span id="cb368-7"><a href="national-financial-capability-study-nfcs.html#cb368-7" tabindex="-1"></a>    )</span>
+<span id="cb368-8"><a href="national-financial-capability-study-nfcs.html#cb368-8" tabindex="-1"></a>    </span>
+<span id="cb368-9"><a href="national-financial-capability-study-nfcs.html#cb368-9" tabindex="-1"></a><span class="fu">stopifnot</span>( state_counts[ <span class="st">&#39;California&#39;</span> , <span class="st">&#39;counts&#39;</span> ] <span class="sc">==</span> <span class="dv">1252</span> )</span>
+<span id="cb368-10"><a href="national-financial-capability-study-nfcs.html#cb368-10" tabindex="-1"></a><span class="fu">stopifnot</span>( state_counts[ <span class="st">&#39;Missouri&#39;</span> , <span class="st">&#39;counts&#39;</span> ] <span class="sc">==</span> <span class="dv">501</span> )</span>
+<span id="cb368-11"><a href="national-financial-capability-study-nfcs.html#cb368-11" tabindex="-1"></a><span class="fu">stopifnot</span>( state_counts[ <span class="st">&#39;Oregon&#39;</span> , <span class="st">&#39;counts&#39;</span> ] <span class="sc">==</span> <span class="dv">1261</span> )</span>
+<span id="cb368-12"><a href="national-financial-capability-study-nfcs.html#cb368-12" tabindex="-1"></a></span>
+<span id="cb368-13"><a href="national-financial-capability-study-nfcs.html#cb368-13" tabindex="-1"></a>state_rainy_day <span class="ot">&lt;-</span></span>
+<span id="cb368-14"><a href="national-financial-capability-study-nfcs.html#cb368-14" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
+<span id="cb368-15"><a href="national-financial-capability-study-nfcs.html#cb368-15" tabindex="-1"></a>        <span class="sc">~</span> rainy_day_fund ,</span>
+<span id="cb368-16"><a href="national-financial-capability-study-nfcs.html#cb368-16" tabindex="-1"></a>        <span class="sc">~</span> state_name ,</span>
+<span id="cb368-17"><a href="national-financial-capability-study-nfcs.html#cb368-17" tabindex="-1"></a>        state_design ,</span>
+<span id="cb368-18"><a href="national-financial-capability-study-nfcs.html#cb368-18" tabindex="-1"></a>        svymean</span>
+<span id="cb368-19"><a href="national-financial-capability-study-nfcs.html#cb368-19" tabindex="-1"></a>    )</span>
+<span id="cb368-20"><a href="national-financial-capability-study-nfcs.html#cb368-20" tabindex="-1"></a>    </span>
+<span id="cb368-21"><a href="national-financial-capability-study-nfcs.html#cb368-21" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( state_rainy_day[ <span class="st">&#39;California&#39;</span> , <span class="st">&#39;rainy_day_fundYes&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.57</span> )</span>
+<span id="cb368-22"><a href="national-financial-capability-study-nfcs.html#cb368-22" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( state_rainy_day[ <span class="st">&#39;Missouri&#39;</span> , <span class="st">&#39;rainy_day_fundYes&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.51</span> )</span>
+<span id="cb368-23"><a href="national-financial-capability-study-nfcs.html#cb368-23" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( state_rainy_day[ <span class="st">&#39;Oregon&#39;</span> , <span class="st">&#39;rainy_day_fundYes&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.52</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-srvyr-8" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>srvyr</code>  <a href="national-financial-capability-study-nfcs.html#analysis-examples-with-srvyr-8" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>srvyr</code> library calculates summary statistics from survey data, such as the mean, total or quantile using <a href="https://github.com/tidyverse/dplyr/">dplyr</a>-like syntax. <a href="https://github.com/gergness/srvyr">srvyr</a> allows for the use of many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, the <code>tidyverse</code> style of non-standard evaluation and more consistent return types than the <code>survey</code> package. <a href="https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html">This vignette</a> details the available features. As a starting point for NFCS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb367"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb367-1"><a href="national-financial-capability-study-nfcs.html#cb367-1" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
-<span id="cb367-2"><a href="national-financial-capability-study-nfcs.html#cb367-2" tabindex="-1"></a>nfcs_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nfcs_design )</span></code></pre></div>
+<div class="sourceCode" id="cb369"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb369-1"><a href="national-financial-capability-study-nfcs.html#cb369-1" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
+<span id="cb369-2"><a href="national-financial-capability-study-nfcs.html#cb369-2" tabindex="-1"></a>nfcs_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nfcs_design )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb368-1"><a href="national-financial-capability-study-nfcs.html#cb368-1" tabindex="-1"></a>nfcs_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb368-2"><a href="national-financial-capability-study-nfcs.html#cb368-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( satisfaction_w_finances , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
-<span id="cb368-3"><a href="national-financial-capability-study-nfcs.html#cb368-3" tabindex="-1"></a></span>
-<span id="cb368-4"><a href="national-financial-capability-study-nfcs.html#cb368-4" tabindex="-1"></a>nfcs_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb368-5"><a href="national-financial-capability-study-nfcs.html#cb368-5" tabindex="-1"></a>    <span class="fu">group_by</span>( spending_vs_income ) <span class="sc">%&gt;%</span></span>
-<span id="cb368-6"><a href="national-financial-capability-study-nfcs.html#cb368-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( satisfaction_w_finances , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb370-1"><a href="national-financial-capability-study-nfcs.html#cb370-1" tabindex="-1"></a>nfcs_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb370-2"><a href="national-financial-capability-study-nfcs.html#cb370-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( satisfaction_w_finances , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb370-3"><a href="national-financial-capability-study-nfcs.html#cb370-3" tabindex="-1"></a></span>
+<span id="cb370-4"><a href="national-financial-capability-study-nfcs.html#cb370-4" tabindex="-1"></a>nfcs_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb370-5"><a href="national-financial-capability-study-nfcs.html#cb370-5" tabindex="-1"></a>    <span class="fu">group_by</span>( spending_vs_income ) <span class="sc">%&gt;%</span></span>
+<span id="cb370-6"><a href="national-financial-capability-study-nfcs.html#cb370-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( satisfaction_w_finances , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
 
 </div>
 </div>

@@ -107,6 +107,8 @@ chapter_tag_design <-
 		satisfaction_w_finances =
 			ifelse( j1 > 10 , NA , j1 ) ,
 			
+		risk_taking =
+			ifelse( j2 > 10 , NA , j2 ) ,
 		
 		difficult_to_pay_bills =
 			factor(
@@ -146,8 +148,8 @@ group_by_variable: spending_vs_income
 linear_variable: satisfaction_w_finances
 linear_narm: , na.rm = TRUE
 categorical_variable: difficult_to_pay_bills
-ratio_estimation_numerator: nummen
-ratio_estimation_denominator: numadult
+ratio_estimation_numerator: satisfaction_w_finances
+ratio_estimation_denominator: risk_taking
 ratio_narm: , na.rm = TRUE
 subset_definition: j50 == 1
 subset_definition_description: persons receiving pandemic-related stimulus payment
@@ -166,25 +168,21 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
+This example matches the unweighted count shown on [PDF page 4](https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=4):
 
 
 ```{r eval = FALSE , results = "hide" }
-
-# match https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=4
-# The fifth and latest wave of the NFCS was fielded from June to October 2021 (N=27,118), providing a view of
-# financial capability during the COVID-19 pandemic. This unusual context is important to bear in mind while
-# interpreting the study’s findings.
-
 stopifnot( nrow( chapter_tag_df ) == 27118 )
+```
 
-
-# match 53% have three months of rainy day funds from
-# https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7
+This example matches the [PDF page 7](https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7) estimate that _53% have three months of rainy day funds_:
+```{r eval = FALSE , results = "hide" }
 national_rainy_day <- svymean( ~ rainy_day_fund , chapter_tag_design )
 stopifnot( round( coef( national_rainy_day )[ 'rainy_day_fundYes' ] , 2 ) == 0.53 )
+```
 
-
-# match unweighted counts from https://cdn.finra.org/nfcs/2021/geography.html
+This example matches unweighted counts and rainy day estimates from [The Geography of Financial Capability](https://cdn.finra.org/nfcs/2021/geography.html):
+```{r eval = FALSE , results = "hide" }
 state_counts <-
 	svyby(
 		~ one ,
@@ -197,8 +195,6 @@ stopifnot( state_counts[ 'California' , 'counts' ] == 1252 )
 stopifnot( state_counts[ 'Missouri' , 'counts' ] == 501 )
 stopifnot( state_counts[ 'Oregon' , 'counts' ] == 1261 )
 
-
-# match weighted rainy day estimates from https://cdn.finra.org/nfcs/2021/geography.html
 state_rainy_day <-
 	svyby(
 		~ rainy_day_fund ,
@@ -210,7 +206,6 @@ state_rainy_day <-
 stopifnot( round( state_rainy_day[ 'California' , 'rainy_day_fundYes' ] , 2 ) == 0.57 )
 stopifnot( round( state_rainy_day[ 'Missouri' , 'rainy_day_fundYes' ] , 2 ) == 0.51 )
 stopifnot( round( state_rainy_day[ 'Oregon' , 'rainy_day_fundYes' ] , 2 ) == 0.52 )
-
 ```
 
 ~~~
