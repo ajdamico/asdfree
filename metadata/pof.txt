@@ -134,9 +134,7 @@ domicilio_tbl <-
 		fwf_widths( 
 			widths = domicilio_dictionary_df[ , 'length' ] , 
 			col_names = domicilio_dictionary_df[ , 'column_name' ] 
-		) ,
-		col_types = 
-			paste0( ifelse( is.na( domicilio_dictionary_df[ , 'decimals' ] ) , "c" , "d" ) , collapse = '' )
+		)
 	)
 
 domicilio_df <- data.frame( domicilio_tbl )
@@ -156,9 +154,7 @@ morador_tbl <-
 		fwf_widths( 
 			widths = morador_dictionary_df[ , 'length' ] , 
 			col_names = morador_dictionary_df[ , 'column_name' ] 
-		) ,
-		col_types = 
-			paste0( ifelse( is.na( morador_dictionary_df[ , 'decimals' ] ) , "c" , "d" ) , collapse = '' )
+		)
 	)
 
 morador_df <- data.frame( morador_tbl )
@@ -195,16 +191,15 @@ pre_stratified_design <-
 	svydesign(
 		id = ~ cod_upa , 
 		strata = ~ estrato_pof ,
-		weights = ~ peso_final ,
+		weights = ~ peso ,
 		data = chapter_tag_df ,
 		nest = TRUE
 	)
 
 population_totals <- 
-	data.frame(
-		pos_estrato = unique( chapter_tag_df[ , 'pos_estrato' ] ) , 
-		Freq = unique( chapter_tag_df[ , 'total_pessoas' ] ) 
-	)
+	aggregate( peso_final ~ pos_estrato , data = pof_df , sum )
+	
+names( population_totals ) <- c( 'pos_estrato' , 'Freq' )
 
 chapter_tag_design <-
 	postStratify(
@@ -225,49 +220,21 @@ chapter_tag_design <-
 		
 		one = 1 ,
 		
-		food_security = factor( v6199 , levels = 1:4 , labels = c( 'food secure' , 'mild' , 'moderate' , 'severe' ) )
-	)
+		food_security = factor( v6199 , levels = 1:4 , labels = c( 'food secure' , 'mild' , 'moderate' , 'severe' ) ) ,
 	
-		
-chapter_tag_design <- 
-	update(
-		chapter_tag_design , 
-		
-		one = 1 ,
-		
-		# centimeters instead of meters
-		altura_imputado = altura_imputado / 100 ,
-		
 		age_categories =
 			factor( 
-				1 + findInterval( idade_anos , 
+				1 + findInterval( v0403 , 
 					c( 20 , 25 , 30 , 35 , 45 , 55 , 65 , 75 ) ) ,
 				levels = 1:9 , labels = c( "under 20" , "20-24" , "25-29" ,
 				"30-34" , "35-44" , "45-54" , "55-64" , "65-74" , "75+" )
 			) ,
 		
-		# create a body mass index (bmi) variable, excluding babies (who have altura_imputado==0)			
-		body_mass_index = ifelse( altura_imputado == 0 , 0 , peso_imputado / ( altura_imputado ^ 2 ) ) ,
+		sexo = factor( v0404 , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
 		
-		sexo = ifelse( cod_sexo == '01' , "masculino" , ifelse( cod_sexo == '02' , "feminino" , NA ) )
-		
-		
-	)
+		urban = as.numeric( tipo_situacao_reg )
 
-chapter_tag_design <-
-	transform(
-		chapter_tag_design ,
-		
-		# individuals with a low bmi - underweight
-		underweight = ifelse( body_mass_index < 18.5 , 1 , 0 ) ,
-		
-		# individuals with a high bmi - overweight
-		overweight = ifelse( body_mass_index >= 25 , 1 , 0 ) ,
-		
-		# individuals with a very high bmi - obese
-		obese = ifelse( body_mass_index >= 30 , 1 , 0 )
 	)
-
 
 
 ~~~
@@ -277,17 +244,16 @@ group_by_variable: sexo
 
 categorical_variable: age_categories
 
-linear_variable: body_mass_index
-linear_narm: , na.rm = TRUE
+linear_variable: renda_total
 
-ratio_estimation_numerator: peso_imputado
-ratio_estimation_denominator: altura_imputado
+ratio_estimation_numerator: renda_total
+ratio_estimation_denominator: anos_estudo
 ratio_narm: , na.rm = TRUE
 
-subset_definition: underweight == 1
+subset_definition: v0409 > 0
+subset_definition_description: credit card holders
 
-binary_variable: obese
-binary_narm: , na.rm = TRUE
+binary_variable: urban
 
 
 
@@ -310,7 +276,7 @@ The R `convey` library estimates measures of income concentration, poverty, ineq
 library(convey)
 chapter_tag_design <- convey_prep( chapter_tag_design )
 
-svygini( ~ vd4020n , chapter_tag_design , na.rm = TRUE )
+svygini( ~ renda_total , chapter_tag_design , na.rm = TRUE )
 ```
 ~~~
 
