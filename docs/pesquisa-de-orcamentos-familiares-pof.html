@@ -866,11 +866,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="pesquisa-de-orcamentos-familiares-pof" class="section level1 unnumbered hasAnchor">
 <h1>Pesquisa de Orcamentos Familiares (POF)<a href="pesquisa-de-orcamentos-familiares-pof.html#pesquisa-de-orcamentos-familiares-pof" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/pof/actions"><img src="https://github.com/asdfree/pof/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>The Pesquisa de Orcamentos Familiares is Brazil’s national survey of household budgets.</p>
+<p>Brazil’s household budget survey designed to guide major economic indicators like the Contas nacionais.</p>
 <ul>
-<li><p>One table of survey responses per sampled household. Additional tables, many containing one record per expenditure.</p></li>
+<li><p>Various tables with one record per sampled household, resident, job, expenditure.</p></li>
 <li><p>A complex sample survey designed to generalize to the civilian population of Brazil.</p></li>
-<li><p>Released at irregular intervals, with only 2002-2003 and 2008-2009 microdata available.</p></li>
+<li><p>Released at irregular intervals, 2002-2003, 2008-2009, and 2017-2018 microdata available.</p></li>
 <li><p>Administered by the <a href="http://www.ibge.gov.br/">Instituto Brasileiro de Geografia e Estatistica</a>.</p></li>
 </ul>
 <hr />
@@ -886,7 +886,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <hr />
 <div id="download-import-preparation-25" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="pesquisa-de-orcamentos-familiares-pof.html#download-import-preparation-25" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Download and import the dictionary file:</p>
+<p>Download the dictionary files:</p>
 <div class="sourceCode" id="cb719"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb719-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb719-1" tabindex="-1"></a><span class="fu">library</span>(archive)</span>
 <span id="cb719-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb719-2" tabindex="-1"></a></span>
 <span id="cb719-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb719-3" tabindex="-1"></a>dictionary_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
@@ -909,21 +909,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb720-6"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-6" tabindex="-1"></a></span>
 <span id="cb720-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-7" tabindex="-1"></a>domicilio_dictionary_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( domicilio_dictionary_tbl )</span>
 <span id="cb720-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-8" tabindex="-1"></a></span>
-<span id="cb720-9"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-9" tabindex="-1"></a><span class="fu">names</span>( domicilio_dictionary_df ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> , <span class="st">&#39;column_name&#39;</span> , <span class="st">&#39;description&#39;</span> , <span class="st">&#39;variable_labels&#39;</span> )</span>
-<span id="cb720-10"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-10" tabindex="-1"></a></span>
-<span id="cb720-11"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-11" tabindex="-1"></a>domicilio_dictionary_df[ <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> ) ] <span class="ot">&lt;-</span> <span class="fu">sapply</span>( domicilio_dictionary_df[ <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> ) ] , as.integer )</span>
-<span id="cb720-12"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-12" tabindex="-1"></a></span>
-<span id="cb720-13"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-13" tabindex="-1"></a>domicilio_dictionary_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( domicilio_dictionary_df , <span class="sc">!</span><span class="fu">is.na</span>( position ) )</span></code></pre></div>
+<span id="cb720-9"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-9" tabindex="-1"></a><span class="fu">names</span>( domicilio_dictionary_df ) <span class="ot">&lt;-</span></span>
+<span id="cb720-10"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-10" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> , <span class="st">&#39;column_name&#39;</span> , <span class="st">&#39;description&#39;</span> , <span class="st">&#39;variable_labels&#39;</span> )</span>
+<span id="cb720-11"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-11" tabindex="-1"></a></span>
+<span id="cb720-12"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-12" tabindex="-1"></a>domicilio_dictionary_df[ <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> ) ] <span class="ot">&lt;-</span></span>
+<span id="cb720-13"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-13" tabindex="-1"></a>    <span class="fu">sapply</span>( domicilio_dictionary_df[ <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> ) ] , as.integer )</span>
+<span id="cb720-14"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-14" tabindex="-1"></a></span>
+<span id="cb720-15"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb720-15" tabindex="-1"></a>domicilio_dictionary_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( domicilio_dictionary_df , <span class="sc">!</span><span class="fu">is.na</span>( position ) )</span></code></pre></div>
 <p>Import the resident variable dictionary:</p>
 <div class="sourceCode" id="cb721"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb721-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-1" tabindex="-1"></a>morador_dictionary_tbl <span class="ot">&lt;-</span> <span class="fu">read_excel</span>( dictionary_fn , <span class="at">sheet =</span> <span class="st">&quot;Morador&quot;</span> , <span class="at">skip =</span> <span class="dv">3</span> )</span>
 <span id="cb721-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-2" tabindex="-1"></a></span>
 <span id="cb721-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-3" tabindex="-1"></a>morador_dictionary_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( morador_dictionary_tbl )</span>
 <span id="cb721-4"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-4" tabindex="-1"></a></span>
-<span id="cb721-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-5" tabindex="-1"></a><span class="fu">names</span>( morador_dictionary_df ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> , <span class="st">&#39;column_name&#39;</span> , <span class="st">&#39;description&#39;</span> , <span class="st">&#39;variable_labels&#39;</span> )</span>
-<span id="cb721-6"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-6" tabindex="-1"></a></span>
-<span id="cb721-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-7" tabindex="-1"></a>morador_dictionary_df[ <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> ) ] <span class="ot">&lt;-</span> <span class="fu">sapply</span>( morador_dictionary_df[ <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> ) ] , as.integer )</span>
-<span id="cb721-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-8" tabindex="-1"></a></span>
-<span id="cb721-9"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-9" tabindex="-1"></a>morador_dictionary_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( morador_dictionary_df , <span class="sc">!</span><span class="fu">is.na</span>( position ) )</span></code></pre></div>
+<span id="cb721-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-5" tabindex="-1"></a><span class="fu">names</span>( morador_dictionary_df ) <span class="ot">&lt;-</span></span>
+<span id="cb721-6"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-6" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> , <span class="st">&#39;column_name&#39;</span> , <span class="st">&#39;description&#39;</span> , <span class="st">&#39;variable_labels&#39;</span> )</span>
+<span id="cb721-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-7" tabindex="-1"></a></span>
+<span id="cb721-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-8" tabindex="-1"></a>morador_dictionary_df[ <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> ) ] <span class="ot">&lt;-</span></span>
+<span id="cb721-9"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-9" tabindex="-1"></a>    <span class="fu">sapply</span>( morador_dictionary_df[ <span class="fu">c</span>( <span class="st">&#39;position&#39;</span> , <span class="st">&#39;length&#39;</span> , <span class="st">&#39;decimals&#39;</span> ) ] , as.integer )</span>
+<span id="cb721-10"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-10" tabindex="-1"></a></span>
+<span id="cb721-11"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb721-11" tabindex="-1"></a>morador_dictionary_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( morador_dictionary_df , <span class="sc">!</span><span class="fu">is.na</span>( position ) )</span></code></pre></div>
 <p>Import the post-stratification totals:</p>
 <div class="sourceCode" id="cb722"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb722-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb722-1" tabindex="-1"></a>post_stratification_fn <span class="ot">&lt;-</span> <span class="fu">file.path</span>( <span class="fu">tempdir</span>() , <span class="st">&quot;Pos_estratos_totais.xlsx&quot;</span> )</span>
 <span id="cb722-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb722-2" tabindex="-1"></a></span>
@@ -931,8 +935,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb722-4"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb722-4" tabindex="-1"></a>    </span>
 <span id="cb722-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb722-5" tabindex="-1"></a>post_stratification_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( post_stratification_tbl )</span>
 <span id="cb722-6"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb722-6" tabindex="-1"></a></span>
-<span id="cb722-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb722-7" tabindex="-1"></a><span class="fu">names</span>( post_stratification_df ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;estrato_pof&#39;</span> , <span class="st">&#39;pos_estrato&#39;</span> , <span class="st">&#39;total_pessoas&#39;</span> , <span class="st">&#39;uf&#39;</span> , <span class="st">&#39;cod_upa&#39;</span> )</span></code></pre></div>
-<p>Download the latest quarterly file:</p>
+<span id="cb722-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb722-7" tabindex="-1"></a><span class="fu">names</span>( post_stratification_df ) <span class="ot">&lt;-</span></span>
+<span id="cb722-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb722-8" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&#39;estrato_pof&#39;</span> , <span class="st">&#39;pos_estrato&#39;</span> , <span class="st">&#39;total_pessoas&#39;</span> , <span class="st">&#39;uf&#39;</span> , <span class="st">&#39;cod_upa&#39;</span> )</span></code></pre></div>
+<p>Download the full dataset:</p>
 <div class="sourceCode" id="cb723"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb723-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb723-1" tabindex="-1"></a>this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb723-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb723-2" tabindex="-1"></a></span>
 <span id="cb723-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb723-3" tabindex="-1"></a>this_url <span class="ot">&lt;-</span></span>
@@ -976,7 +981,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb725-12"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb725-12" tabindex="-1"></a>morador_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( morador_tbl )</span>
 <span id="cb725-13"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb725-13" tabindex="-1"></a></span>
 <span id="cb725-14"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb725-14" tabindex="-1"></a><span class="fu">names</span>( morador_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( morador_df ) )</span></code></pre></div>
-<p>Import the latest quarterly file:</p>
+<p>Merge one household-level variable and also the post-stratification info onto the person-level table:</p>
 <div class="sourceCode" id="cb726"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb726-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb726-1" tabindex="-1"></a>dom_mor_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( domicilio_df[ <span class="fu">c</span>( <span class="st">&#39;cod_upa&#39;</span> , <span class="st">&#39;num_dom&#39;</span> , <span class="st">&#39;v6199&#39;</span> ) ] , morador_df )</span>
 <span id="cb726-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb726-2" tabindex="-1"></a></span>
 <span id="cb726-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb726-3" tabindex="-1"></a>pof_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( dom_mor_df , post_stratification_df )</span>
@@ -1027,21 +1032,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb730-4"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-4" tabindex="-1"></a>        </span>
 <span id="cb730-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-5" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
 <span id="cb730-6"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-6" tabindex="-1"></a>        </span>
-<span id="cb730-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-7" tabindex="-1"></a>        <span class="at">food_security =</span> <span class="fu">factor</span>( v6199 , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;food secure&#39;</span> , <span class="st">&#39;mild&#39;</span> , <span class="st">&#39;moderate&#39;</span> , <span class="st">&#39;severe&#39;</span> ) ) ,</span>
-<span id="cb730-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-8" tabindex="-1"></a>    </span>
-<span id="cb730-9"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-9" tabindex="-1"></a>        <span class="at">age_categories =</span></span>
-<span id="cb730-10"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-10" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb730-11"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-11" tabindex="-1"></a>                <span class="dv">1</span> <span class="sc">+</span> <span class="fu">findInterval</span>( v0403 , </span>
-<span id="cb730-12"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-12" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="dv">20</span> , <span class="dv">25</span> , <span class="dv">30</span> , <span class="dv">35</span> , <span class="dv">45</span> , <span class="dv">55</span> , <span class="dv">65</span> , <span class="dv">75</span> ) ) ,</span>
-<span id="cb730-13"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-13" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;under 20&quot;</span> , <span class="st">&quot;20-24&quot;</span> , <span class="st">&quot;25-29&quot;</span> ,</span>
-<span id="cb730-14"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-14" tabindex="-1"></a>                <span class="st">&quot;30-34&quot;</span> , <span class="st">&quot;35-44&quot;</span> , <span class="st">&quot;45-54&quot;</span> , <span class="st">&quot;55-64&quot;</span> , <span class="st">&quot;65-74&quot;</span> , <span class="st">&quot;75+&quot;</span> )</span>
-<span id="cb730-15"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-15" tabindex="-1"></a>            ) ,</span>
-<span id="cb730-16"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-16" tabindex="-1"></a>        </span>
-<span id="cb730-17"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-17" tabindex="-1"></a>        <span class="at">sexo =</span> <span class="fu">factor</span>( v0404 , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,</span>
-<span id="cb730-18"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-18" tabindex="-1"></a>        </span>
-<span id="cb730-19"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-19" tabindex="-1"></a>        <span class="at">urban =</span> <span class="fu">as.numeric</span>( tipo_situacao_reg <span class="sc">==</span> <span class="dv">1</span> )</span>
-<span id="cb730-20"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-20" tabindex="-1"></a></span>
-<span id="cb730-21"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-21" tabindex="-1"></a>    )</span></code></pre></div>
+<span id="cb730-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-7" tabindex="-1"></a>        <span class="at">food_security =</span></span>
+<span id="cb730-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-8" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
+<span id="cb730-9"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-9" tabindex="-1"></a>                v6199 , </span>
+<span id="cb730-10"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-10" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> , </span>
+<span id="cb730-11"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-11" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;food secure&#39;</span> , <span class="st">&#39;mild&#39;</span> , <span class="st">&#39;moderate&#39;</span> , <span class="st">&#39;severe&#39;</span> ) </span>
+<span id="cb730-12"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-12" tabindex="-1"></a>            ) ,</span>
+<span id="cb730-13"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-13" tabindex="-1"></a>    </span>
+<span id="cb730-14"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-14" tabindex="-1"></a>        <span class="at">age_categories =</span></span>
+<span id="cb730-15"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-15" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
+<span id="cb730-16"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-16" tabindex="-1"></a>                <span class="dv">1</span> <span class="sc">+</span> <span class="fu">findInterval</span>( v0403 , </span>
+<span id="cb730-17"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-17" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="dv">20</span> , <span class="dv">25</span> , <span class="dv">30</span> , <span class="dv">35</span> , <span class="dv">45</span> , <span class="dv">55</span> , <span class="dv">65</span> , <span class="dv">75</span> ) ) ,</span>
+<span id="cb730-18"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-18" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span> , </span>
+<span id="cb730-19"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-19" tabindex="-1"></a>                <span class="at">labels =</span></span>
+<span id="cb730-20"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-20" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="st">&quot;under 20&quot;</span> , <span class="st">&quot;20-24&quot;</span> , <span class="st">&quot;25-29&quot;</span> , <span class="st">&quot;30-34&quot;</span> , <span class="st">&quot;35-44&quot;</span> , </span>
+<span id="cb730-21"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-21" tabindex="-1"></a>                    <span class="st">&quot;45-54&quot;</span> , <span class="st">&quot;55-64&quot;</span> , <span class="st">&quot;65-74&quot;</span> , <span class="st">&quot;75+&quot;</span> )</span>
+<span id="cb730-22"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-22" tabindex="-1"></a>            ) ,</span>
+<span id="cb730-23"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-23" tabindex="-1"></a>        </span>
+<span id="cb730-24"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-24" tabindex="-1"></a>        <span class="at">sex =</span> <span class="fu">factor</span>( v0404 , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,</span>
+<span id="cb730-25"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-25" tabindex="-1"></a>        </span>
+<span id="cb730-26"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-26" tabindex="-1"></a>        <span class="at">urban =</span> <span class="fu">as.numeric</span>( tipo_situacao_reg <span class="sc">==</span> <span class="dv">1</span> )</span>
+<span id="cb730-27"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-27" tabindex="-1"></a></span>
+<span id="cb730-28"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb730-28" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1052,39 +1064,39 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
 <div class="sourceCode" id="cb731"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb731-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb731-1" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( pof_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
 <span id="cb731-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb731-2" tabindex="-1"></a></span>
-<span id="cb731-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb731-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> sexo , pof_design , unwtd.count )</span></code></pre></div>
+<span id="cb731-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb731-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> sex , pof_design , unwtd.count )</span></code></pre></div>
 </div>
 <div id="weighted-counts-20" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="pesquisa-de-orcamentos-familiares-pof.html#weighted-counts-20" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
 <div class="sourceCode" id="cb732"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb732-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb732-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , pof_design )</span>
 <span id="cb732-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb732-2" tabindex="-1"></a></span>
-<span id="cb732-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb732-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> sexo , pof_design , svytotal )</span></code></pre></div>
+<span id="cb732-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb732-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> sex , pof_design , svytotal )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-25" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="pesquisa-de-orcamentos-familiares-pof.html#descriptive-statistics-25" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
 <div class="sourceCode" id="cb733"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb733-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb733-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> renda_total , pof_design )</span>
 <span id="cb733-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb733-2" tabindex="-1"></a></span>
-<span id="cb733-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb733-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> renda_total , <span class="sc">~</span> sexo , pof_design , svymean )</span></code></pre></div>
+<span id="cb733-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb733-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> renda_total , <span class="sc">~</span> sex , pof_design , svymean )</span></code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
 <div class="sourceCode" id="cb734"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb734-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb734-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> age_categories , pof_design )</span>
 <span id="cb734-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb734-2" tabindex="-1"></a></span>
-<span id="cb734-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb734-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> age_categories , <span class="sc">~</span> sexo , pof_design , svymean )</span></code></pre></div>
+<span id="cb734-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb734-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> age_categories , <span class="sc">~</span> sex , pof_design , svymean )</span></code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
 <div class="sourceCode" id="cb735"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb735-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb735-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> renda_total , pof_design )</span>
 <span id="cb735-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb735-2" tabindex="-1"></a></span>
-<span id="cb735-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb735-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> renda_total , <span class="sc">~</span> sexo , pof_design , svytotal )</span></code></pre></div>
+<span id="cb735-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb735-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> renda_total , <span class="sc">~</span> sex , pof_design , svytotal )</span></code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
 <div class="sourceCode" id="cb736"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb736-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb736-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> age_categories , pof_design )</span>
 <span id="cb736-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb736-2" tabindex="-1"></a></span>
-<span id="cb736-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb736-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> age_categories , <span class="sc">~</span> sexo , pof_design , svytotal )</span></code></pre></div>
+<span id="cb736-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb736-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> age_categories , <span class="sc">~</span> sex , pof_design , svytotal )</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
 <div class="sourceCode" id="cb737"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb737-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-1" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> renda_total , pof_design , <span class="fl">0.5</span> )</span>
 <span id="cb737-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-2" tabindex="-1"></a></span>
 <span id="cb737-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-3" tabindex="-1"></a><span class="fu">svyby</span>( </span>
 <span id="cb737-4"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-4" tabindex="-1"></a>    <span class="sc">~</span> renda_total , </span>
-<span id="cb737-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-5" tabindex="-1"></a>    <span class="sc">~</span> sexo , </span>
+<span id="cb737-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-5" tabindex="-1"></a>    <span class="sc">~</span> sex , </span>
 <span id="cb737-6"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-6" tabindex="-1"></a>    pof_design , </span>
 <span id="cb737-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-7" tabindex="-1"></a>    svyquantile , </span>
 <span id="cb737-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb737-8" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
@@ -1118,7 +1130,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb741-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb741-8" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
 <span id="cb741-9"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb741-9" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
 <span id="cb741-10"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb741-10" tabindex="-1"></a>        <span class="sc">~</span> renda_total , </span>
-<span id="cb741-11"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb741-11" tabindex="-1"></a>        <span class="sc">~</span> sexo , </span>
+<span id="cb741-11"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb741-11" tabindex="-1"></a>        <span class="sc">~</span> sex , </span>
 <span id="cb741-12"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb741-12" tabindex="-1"></a>        pof_design , </span>
 <span id="cb741-13"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb741-13" tabindex="-1"></a>        svymean </span>
 <span id="cb741-14"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb741-14" tabindex="-1"></a>    )</span>
@@ -1170,10 +1182,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-23" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="pesquisa-de-orcamentos-familiares-pof.html#replication-example-23" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><a href="https://biblioteca.ibge.gov.br/visualizacao/livros/liv101749.pdf#page=32" class="uri">https://biblioteca.ibge.gov.br/visualizacao/livros/liv101749.pdf#page=32</a></p>
+<p>This example matches the 2017-2018 person-level food security estimates from <a href="https://biblioteca.ibge.gov.br/visualizacao/livros/liv101749.pdf#page=32">Tabela 3</a>:</p>
 <div class="sourceCode" id="cb749"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb749-1"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-1" tabindex="-1"></a>person_level_food_security <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> food_security , pof_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb749-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-2" tabindex="-1"></a>    </span>
-<span id="cb749-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all.equal</span>( <span class="fu">round</span>( <span class="fu">coef</span>( person_level_food_security ) , <span class="dv">2</span> ) , <span class="fu">c</span>( <span class="fl">0.59</span> , <span class="fl">0.27</span> , <span class="fl">0.09</span> , <span class="fl">0.05</span> ) , <span class="at">check.attributes =</span> <span class="cn">FALSE</span> ) )</span></code></pre></div>
+<span id="cb749-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-3" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
+<span id="cb749-4"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-4" tabindex="-1"></a>    <span class="fu">all.equal</span>(</span>
+<span id="cb749-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-5" tabindex="-1"></a>        <span class="fu">round</span>( <span class="fu">coef</span>( person_level_food_security ) , <span class="dv">2</span> ) , </span>
+<span id="cb749-6"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-6" tabindex="-1"></a>        <span class="fu">c</span>( <span class="fl">0.59</span> , <span class="fl">0.27</span> , <span class="fl">0.09</span> , <span class="fl">0.05</span> ) , </span>
+<span id="cb749-7"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-7" tabindex="-1"></a>        <span class="at">check.attributes =</span> <span class="cn">FALSE</span> </span>
+<span id="cb749-8"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-8" tabindex="-1"></a>    )</span>
+<span id="cb749-9"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb749-9" tabindex="-1"></a>)</span></code></pre></div>
 <hr />
 </div>
 <div id="poverty-and-inequality-estimation-with-convey-2" class="section level2 unnumbered hasAnchor">
@@ -1195,7 +1213,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb752-2"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb752-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( renda_total ) )</span>
 <span id="cb752-3"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb752-3" tabindex="-1"></a></span>
 <span id="cb752-4"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb752-4" tabindex="-1"></a>pof_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb752-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb752-5" tabindex="-1"></a>    <span class="fu">group_by</span>( sexo ) <span class="sc">%&gt;%</span></span>
+<span id="cb752-5"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb752-5" tabindex="-1"></a>    <span class="fu">group_by</span>( sex ) <span class="sc">%&gt;%</span></span>
 <span id="cb752-6"><a href="pesquisa-de-orcamentos-familiares-pof.html#cb752-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( renda_total ) )</span></code></pre></div>
 
 </div>
