@@ -1,5 +1,7 @@
 chapter_title: General Social Survey
 
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
 The General Social Survey (GSS) has captured political beliefs and social attitudes since 1972.  In contrast to non-trendable tracking polls that capture newspaper headlines, the GSS has sustained a set of questions over four decades.
 ~~~
@@ -12,44 +14,66 @@ publication_period: * Updated biennially since 1972.
 
 administrative_organization: * Funded by the [National Science Foundation](http://www.nsf.gov/) and administered by the [National Opinion Research Center](http://www.norc.org/).
 
+~~~{reading_block}
+Please skim before you begin:
+
+1.
+
+2.
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# chat about who will
+# be allowed marriage, children.
+# first date questionnaire
+```
+~~~
+
+
+~~~{download_and_import_block}
+Download and import the 1972-2022 cumulative data file:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+zip_tf <- tempfile()
+
+zip_url <- "https://gss.norc.org/Documents/sas/GSS_sas.zip"
+	
+download.file( zip_url , zip_tf , mode = 'wb' )
+
+unzipped_files <- unzip( zip_tf , exdir = tempdir() )
+
+chapter_tag_tbl <- read_sas( grep( '\\\\.sas7bdat$' , unzipped_files , value = TRUE ) )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
+
+
 
 
 ~~~{analysis_examples_survey_design}
+
+```{r eval = FALSE , results = "hide" }
 library(survey)
 
-chapter_tag_files <-
-	list.files(
-		file.path( path.expand( "~" ) , "CHAPTER_TAG" ) ,
-		full.names = TRUE 
-	)
+options( survey.lonely.psu = "adjust" )
 
-chapter_tag_rds <-
-	grep( 
-		"cross sectional cumulative(.*)([0-9][0-9][0-9][0-9])\\\\.rds$" , 
-		chapter_tag_files , 
-		value = TRUE 
-	)
-	
-chapter_tag_df <- readRDS( chapter_tag_rds )
-
-# keep only the variables you need
-keep_vars <- 
-	c( "vpsu" , "vstrat" , "compwt" , "polviews" , 
-		"born" , "adults" , "hompop" , "race" , "region" ,
-		"age" , "sex" , "one" )
-		
-chapter_tag_df <- chapter_tag_df[ keep_vars ] ; gc()
-# this step conserves RAM
-
-# https://gssdataexplorer.norc.org/pages/show?page=gss%2Fstandard_error
 chapter_tag_design <- 
 	svydesign( 
 		~ vpsu , 
-		strata = ~ vstrat , 
-		data = chapter_tag_df , 
-		weights = ~ wtssall , 
+		strata = ~ interaction( year , vstrat ) , 
+		data = subset( chapter_tag_df , year >= 1975 ) , 
+		weights = ~ wtsscomp , 
 		nest = TRUE 
 	)
+```
 ~~~
 
 ~~~{variable_recoding_block}
@@ -105,6 +129,18 @@ binary_variable: born_in_usa
 binary_variable_description: born in the United States
 binary_narm: , na.rm = TRUE
 
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
 needs_srvyr_block: yes
 
-needs_actions_build_status_line: yes
+~~~{replication_example_block}
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+~~~
+
