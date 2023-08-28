@@ -910,7 +910,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><a href="https://github.com/asdfree/gss/actions"><img src="https://github.com/asdfree/gss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 <p>A historical record of the concerns, experiences, attitudes, and practices of residents of the United States.</p>
 <ul>
-<li><p>One table with one row per sampled respondent.</p></li>
+<li><p>Both cross-sectional and panel tables with one row per sampled respondent.</p></li>
 <li><p>A complex sample survey generalizing to non-institutionalized adults (18+) in the United States.</p></li>
 <li><p>Updated biennially since 1972.</p></li>
 <li><p>Funded by <a href="http://www.nsf.gov/">National Science Foundation</a>, administered by the <a href="http://www.norc.org/">National Opinion Research Center</a>.</p></li>
@@ -1131,20 +1131,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-9" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="general-social-survey-gss.html#replication-example-9" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Match the unweighted record count on <a href="https://gss.norc.org/Documents/codebook/GSS%202022%20Codebook.pdf#page=10">PDF page 10</a> of the Public Use File codebook:</p>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="general-social-survey-gss.html#cb279-1" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( <span class="fu">subset</span>( gss_design , year <span class="sc">==</span> <span class="dv">2022</span> ) ) <span class="sc">==</span> <span class="dv">3544</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-srvyr-5" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>srvyr</code>  <a href="general-social-survey-gss.html#analysis-examples-with-srvyr-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>srvyr</code> library calculates summary statistics from survey data, such as the mean, total or quantile using <a href="https://github.com/tidyverse/dplyr/">dplyr</a>-like syntax. <a href="https://github.com/gergness/srvyr">srvyr</a> allows for the use of many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, the <code>tidyverse</code> style of non-standard evaluation and more consistent return types than the <code>survey</code> package. <a href="https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html">This vignette</a> details the available features. As a starting point for GSS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="general-social-survey-gss.html#cb279-1" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
-<span id="cb279-2"><a href="general-social-survey-gss.html#cb279-2" tabindex="-1"></a>gss_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( gss_design )</span></code></pre></div>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="general-social-survey-gss.html#cb280-1" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
+<span id="cb280-2"><a href="general-social-survey-gss.html#cb280-2" tabindex="-1"></a>gss_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( gss_design )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="general-social-survey-gss.html#cb280-1" tabindex="-1"></a>gss_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb280-2"><a href="general-social-survey-gss.html#cb280-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( age , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
-<span id="cb280-3"><a href="general-social-survey-gss.html#cb280-3" tabindex="-1"></a></span>
-<span id="cb280-4"><a href="general-social-survey-gss.html#cb280-4" tabindex="-1"></a>gss_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb280-5"><a href="general-social-survey-gss.html#cb280-5" tabindex="-1"></a>    <span class="fu">group_by</span>( region ) <span class="sc">%&gt;%</span></span>
-<span id="cb280-6"><a href="general-social-survey-gss.html#cb280-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( age , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="general-social-survey-gss.html#cb281-1" tabindex="-1"></a>gss_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb281-2"><a href="general-social-survey-gss.html#cb281-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( age , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb281-3"><a href="general-social-survey-gss.html#cb281-3" tabindex="-1"></a></span>
+<span id="cb281-4"><a href="general-social-survey-gss.html#cb281-4" tabindex="-1"></a>gss_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb281-5"><a href="general-social-survey-gss.html#cb281-5" tabindex="-1"></a>    <span class="fu">group_by</span>( region ) <span class="sc">%&gt;%</span></span>
+<span id="cb281-6"><a href="general-social-survey-gss.html#cb281-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( age , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
 
 </div>
 </div>

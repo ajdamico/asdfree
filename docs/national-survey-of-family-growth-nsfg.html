@@ -922,94 +922,94 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><a href="https://en.wikipedia.org/wiki/National_Survey_of_Family_Growth">Wikipedia Entry</a></p></li>
 <li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National%20Survey%20of%20Family%20Growth">artificial intelligence-generated limericks</a></p></li>
 </ol>
-<div class="sourceCode" id="cb625"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb625-1"><a href="national-survey-of-family-growth-nsfg.html#cb625-1" tabindex="-1"></a><span class="co"># family structure</span></span>
-<span id="cb625-2"><a href="national-survey-of-family-growth-nsfg.html#cb625-2" tabindex="-1"></a><span class="co"># questions cuz radar fails at</span></span>
-<span id="cb625-3"><a href="national-survey-of-family-growth-nsfg.html#cb625-3" tabindex="-1"></a><span class="co"># storks with bassinets</span></span></code></pre></div>
+<div class="sourceCode" id="cb626"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb626-1"><a href="national-survey-of-family-growth-nsfg.html#cb626-1" tabindex="-1"></a><span class="co"># family structure</span></span>
+<span id="cb626-2"><a href="national-survey-of-family-growth-nsfg.html#cb626-2" tabindex="-1"></a><span class="co"># questions cuz radar fails at</span></span>
+<span id="cb626-3"><a href="national-survey-of-family-growth-nsfg.html#cb626-3" tabindex="-1"></a><span class="co"># storks with bassinets</span></span></code></pre></div>
 <hr />
 <div id="download-import-preparation-22" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="national-survey-of-family-growth-nsfg.html#download-import-preparation-22" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb626"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb626-1"><a href="national-survey-of-family-growth-nsfg.html#cb626-1" tabindex="-1"></a><span class="fu">library</span>(SAScii)</span>
-<span id="cb626-2"><a href="national-survey-of-family-growth-nsfg.html#cb626-2" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb626-3"><a href="national-survey-of-family-growth-nsfg.html#cb626-3" tabindex="-1"></a></span>
-<span id="cb626-4"><a href="national-survey-of-family-growth-nsfg.html#cb626-4" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span></span>
-<span id="cb626-5"><a href="national-survey-of-family-growth-nsfg.html#cb626-5" tabindex="-1"></a>    <span class="st">&quot;https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/2017_2019_FemRespData.dat&quot;</span></span>
-<span id="cb626-6"><a href="national-survey-of-family-growth-nsfg.html#cb626-6" tabindex="-1"></a></span>
-<span id="cb626-7"><a href="national-survey-of-family-growth-nsfg.html#cb626-7" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
-<span id="cb626-8"><a href="national-survey-of-family-growth-nsfg.html#cb626-8" tabindex="-1"></a>    <span class="fu">file.path</span>( <span class="fu">dirname</span>( dat_url ) , <span class="st">&quot;sas/2017_2019_FemRespSetup.sas&quot;</span> )</span>
-<span id="cb626-9"><a href="national-survey-of-family-growth-nsfg.html#cb626-9" tabindex="-1"></a>    </span>
-<span id="cb626-10"><a href="national-survey-of-family-growth-nsfg.html#cb626-10" tabindex="-1"></a>sas_positions <span class="ot">&lt;-</span></span>
-<span id="cb626-11"><a href="national-survey-of-family-growth-nsfg.html#cb626-11" tabindex="-1"></a>    <span class="fu">parse.SAScii</span>( sas_url )</span>
-<span id="cb626-12"><a href="national-survey-of-family-growth-nsfg.html#cb626-12" tabindex="-1"></a></span>
-<span id="cb626-13"><a href="national-survey-of-family-growth-nsfg.html#cb626-13" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb626-14"><a href="national-survey-of-family-growth-nsfg.html#cb626-14" tabindex="-1"></a>    <span class="fu">tolower</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] )</span>
-<span id="cb626-15"><a href="national-survey-of-family-growth-nsfg.html#cb626-15" tabindex="-1"></a></span>
-<span id="cb626-16"><a href="national-survey-of-family-growth-nsfg.html#cb626-16" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb626-17"><a href="national-survey-of-family-growth-nsfg.html#cb626-17" tabindex="-1"></a>        <span class="fu">ifelse</span>( sas_positions[ , <span class="st">&#39;char&#39;</span> ] , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> )</span>
-<span id="cb626-18"><a href="national-survey-of-family-growth-nsfg.html#cb626-18" tabindex="-1"></a></span>
-<span id="cb626-19"><a href="national-survey-of-family-growth-nsfg.html#cb626-19" tabindex="-1"></a>nsfg_tbl <span class="ot">&lt;-</span></span>
-<span id="cb626-20"><a href="national-survey-of-family-growth-nsfg.html#cb626-20" tabindex="-1"></a>    <span class="fu">read_fwf</span>(</span>
-<span id="cb626-21"><a href="national-survey-of-family-growth-nsfg.html#cb626-21" tabindex="-1"></a>        dat_url ,</span>
-<span id="cb626-22"><a href="national-survey-of-family-growth-nsfg.html#cb626-22" tabindex="-1"></a>        <span class="fu">fwf_widths</span>( </span>
-<span id="cb626-23"><a href="national-survey-of-family-growth-nsfg.html#cb626-23" tabindex="-1"></a>            <span class="fu">abs</span>( sas_positions[ , <span class="st">&#39;width&#39;</span> ] ) , </span>
-<span id="cb626-24"><a href="national-survey-of-family-growth-nsfg.html#cb626-24" tabindex="-1"></a>            <span class="at">col_names =</span> sas_positions[ , <span class="st">&#39;varname&#39;</span> ] </span>
-<span id="cb626-25"><a href="national-survey-of-family-growth-nsfg.html#cb626-25" tabindex="-1"></a>        ) ,</span>
-<span id="cb626-26"><a href="national-survey-of-family-growth-nsfg.html#cb626-26" tabindex="-1"></a>        <span class="at">col_types =</span> <span class="fu">paste0</span>( sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] , <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> ) ,</span>
-<span id="cb626-27"><a href="national-survey-of-family-growth-nsfg.html#cb626-27" tabindex="-1"></a>        <span class="at">na =</span> <span class="fu">c</span>( <span class="st">&quot;&quot;</span> , <span class="st">&quot;.&quot;</span> )</span>
-<span id="cb626-28"><a href="national-survey-of-family-growth-nsfg.html#cb626-28" tabindex="-1"></a>    )</span>
-<span id="cb626-29"><a href="national-survey-of-family-growth-nsfg.html#cb626-29" tabindex="-1"></a>    </span>
-<span id="cb626-30"><a href="national-survey-of-family-growth-nsfg.html#cb626-30" tabindex="-1"></a>nsfg_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( nsfg_tbl )</span></code></pre></div>
+<div class="sourceCode" id="cb627"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb627-1"><a href="national-survey-of-family-growth-nsfg.html#cb627-1" tabindex="-1"></a><span class="fu">library</span>(SAScii)</span>
+<span id="cb627-2"><a href="national-survey-of-family-growth-nsfg.html#cb627-2" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb627-3"><a href="national-survey-of-family-growth-nsfg.html#cb627-3" tabindex="-1"></a></span>
+<span id="cb627-4"><a href="national-survey-of-family-growth-nsfg.html#cb627-4" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span></span>
+<span id="cb627-5"><a href="national-survey-of-family-growth-nsfg.html#cb627-5" tabindex="-1"></a>    <span class="st">&quot;https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/2017_2019_FemRespData.dat&quot;</span></span>
+<span id="cb627-6"><a href="national-survey-of-family-growth-nsfg.html#cb627-6" tabindex="-1"></a></span>
+<span id="cb627-7"><a href="national-survey-of-family-growth-nsfg.html#cb627-7" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
+<span id="cb627-8"><a href="national-survey-of-family-growth-nsfg.html#cb627-8" tabindex="-1"></a>    <span class="fu">file.path</span>( <span class="fu">dirname</span>( dat_url ) , <span class="st">&quot;sas/2017_2019_FemRespSetup.sas&quot;</span> )</span>
+<span id="cb627-9"><a href="national-survey-of-family-growth-nsfg.html#cb627-9" tabindex="-1"></a>    </span>
+<span id="cb627-10"><a href="national-survey-of-family-growth-nsfg.html#cb627-10" tabindex="-1"></a>sas_positions <span class="ot">&lt;-</span></span>
+<span id="cb627-11"><a href="national-survey-of-family-growth-nsfg.html#cb627-11" tabindex="-1"></a>    <span class="fu">parse.SAScii</span>( sas_url )</span>
+<span id="cb627-12"><a href="national-survey-of-family-growth-nsfg.html#cb627-12" tabindex="-1"></a></span>
+<span id="cb627-13"><a href="national-survey-of-family-growth-nsfg.html#cb627-13" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb627-14"><a href="national-survey-of-family-growth-nsfg.html#cb627-14" tabindex="-1"></a>    <span class="fu">tolower</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] )</span>
+<span id="cb627-15"><a href="national-survey-of-family-growth-nsfg.html#cb627-15" tabindex="-1"></a></span>
+<span id="cb627-16"><a href="national-survey-of-family-growth-nsfg.html#cb627-16" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb627-17"><a href="national-survey-of-family-growth-nsfg.html#cb627-17" tabindex="-1"></a>        <span class="fu">ifelse</span>( sas_positions[ , <span class="st">&#39;char&#39;</span> ] , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> )</span>
+<span id="cb627-18"><a href="national-survey-of-family-growth-nsfg.html#cb627-18" tabindex="-1"></a></span>
+<span id="cb627-19"><a href="national-survey-of-family-growth-nsfg.html#cb627-19" tabindex="-1"></a>nsfg_tbl <span class="ot">&lt;-</span></span>
+<span id="cb627-20"><a href="national-survey-of-family-growth-nsfg.html#cb627-20" tabindex="-1"></a>    <span class="fu">read_fwf</span>(</span>
+<span id="cb627-21"><a href="national-survey-of-family-growth-nsfg.html#cb627-21" tabindex="-1"></a>        dat_url ,</span>
+<span id="cb627-22"><a href="national-survey-of-family-growth-nsfg.html#cb627-22" tabindex="-1"></a>        <span class="fu">fwf_widths</span>( </span>
+<span id="cb627-23"><a href="national-survey-of-family-growth-nsfg.html#cb627-23" tabindex="-1"></a>            <span class="fu">abs</span>( sas_positions[ , <span class="st">&#39;width&#39;</span> ] ) , </span>
+<span id="cb627-24"><a href="national-survey-of-family-growth-nsfg.html#cb627-24" tabindex="-1"></a>            <span class="at">col_names =</span> sas_positions[ , <span class="st">&#39;varname&#39;</span> ] </span>
+<span id="cb627-25"><a href="national-survey-of-family-growth-nsfg.html#cb627-25" tabindex="-1"></a>        ) ,</span>
+<span id="cb627-26"><a href="national-survey-of-family-growth-nsfg.html#cb627-26" tabindex="-1"></a>        <span class="at">col_types =</span> <span class="fu">paste0</span>( sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] , <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> ) ,</span>
+<span id="cb627-27"><a href="national-survey-of-family-growth-nsfg.html#cb627-27" tabindex="-1"></a>        <span class="at">na =</span> <span class="fu">c</span>( <span class="st">&quot;&quot;</span> , <span class="st">&quot;.&quot;</span> )</span>
+<span id="cb627-28"><a href="national-survey-of-family-growth-nsfg.html#cb627-28" tabindex="-1"></a>    )</span>
+<span id="cb627-29"><a href="national-survey-of-family-growth-nsfg.html#cb627-29" tabindex="-1"></a>    </span>
+<span id="cb627-30"><a href="national-survey-of-family-growth-nsfg.html#cb627-30" tabindex="-1"></a>nsfg_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( nsfg_tbl )</span></code></pre></div>
 <div id="save-locally-22" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="national-survey-of-family-growth-nsfg.html#save-locally-22" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb627"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb627-1"><a href="national-survey-of-family-growth-nsfg.html#cb627-1" tabindex="-1"></a><span class="co"># nsfg_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NSFG&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb627-2"><a href="national-survey-of-family-growth-nsfg.html#cb627-2" tabindex="-1"></a><span class="co"># saveRDS( nsfg_df , file = nsfg_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb628"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb628-1"><a href="national-survey-of-family-growth-nsfg.html#cb628-1" tabindex="-1"></a><span class="co"># nsfg_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NSFG&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb628-2"><a href="national-survey-of-family-growth-nsfg.html#cb628-2" tabindex="-1"></a><span class="co"># saveRDS( nsfg_df , file = nsfg_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb628"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb628-1"><a href="national-survey-of-family-growth-nsfg.html#cb628-1" tabindex="-1"></a><span class="co"># nsfg_df &lt;- readRDS( nsfg_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="national-survey-of-family-growth-nsfg.html#cb629-1" tabindex="-1"></a><span class="co"># nsfg_df &lt;- readRDS( nsfg_fn )</span></span></code></pre></div>
 </div>
 <div id="survey-design-definition-17" class="section level3 unnumbered hasAnchor">
 <h3>Survey Design Definition<a href="national-survey-of-family-growth-nsfg.html#survey-design-definition-17" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Construct a complex sample survey design:</p>
-<div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="national-survey-of-family-growth-nsfg.html#cb629-1" tabindex="-1"></a><span class="fu">options</span>( <span class="at">survey.lonely.psu =</span> <span class="st">&quot;adjust&quot;</span> )</span>
-<span id="cb629-2"><a href="national-survey-of-family-growth-nsfg.html#cb629-2" tabindex="-1"></a></span>
-<span id="cb629-3"><a href="national-survey-of-family-growth-nsfg.html#cb629-3" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb629-4"><a href="national-survey-of-family-growth-nsfg.html#cb629-4" tabindex="-1"></a></span>
-<span id="cb629-5"><a href="national-survey-of-family-growth-nsfg.html#cb629-5" tabindex="-1"></a>nsfg_design <span class="ot">&lt;-</span> </span>
-<span id="cb629-6"><a href="national-survey-of-family-growth-nsfg.html#cb629-6" tabindex="-1"></a>    <span class="fu">svydesign</span>( </span>
-<span id="cb629-7"><a href="national-survey-of-family-growth-nsfg.html#cb629-7" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> secu , </span>
-<span id="cb629-8"><a href="national-survey-of-family-growth-nsfg.html#cb629-8" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> sest , </span>
-<span id="cb629-9"><a href="national-survey-of-family-growth-nsfg.html#cb629-9" tabindex="-1"></a>        <span class="at">data =</span> nsfg_df , </span>
-<span id="cb629-10"><a href="national-survey-of-family-growth-nsfg.html#cb629-10" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> wgt2017_2019 , </span>
-<span id="cb629-11"><a href="national-survey-of-family-growth-nsfg.html#cb629-11" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span> </span>
-<span id="cb629-12"><a href="national-survey-of-family-growth-nsfg.html#cb629-12" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb630"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb630-1"><a href="national-survey-of-family-growth-nsfg.html#cb630-1" tabindex="-1"></a><span class="fu">options</span>( <span class="at">survey.lonely.psu =</span> <span class="st">&quot;adjust&quot;</span> )</span>
+<span id="cb630-2"><a href="national-survey-of-family-growth-nsfg.html#cb630-2" tabindex="-1"></a></span>
+<span id="cb630-3"><a href="national-survey-of-family-growth-nsfg.html#cb630-3" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb630-4"><a href="national-survey-of-family-growth-nsfg.html#cb630-4" tabindex="-1"></a></span>
+<span id="cb630-5"><a href="national-survey-of-family-growth-nsfg.html#cb630-5" tabindex="-1"></a>nsfg_design <span class="ot">&lt;-</span> </span>
+<span id="cb630-6"><a href="national-survey-of-family-growth-nsfg.html#cb630-6" tabindex="-1"></a>    <span class="fu">svydesign</span>( </span>
+<span id="cb630-7"><a href="national-survey-of-family-growth-nsfg.html#cb630-7" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> secu , </span>
+<span id="cb630-8"><a href="national-survey-of-family-growth-nsfg.html#cb630-8" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> sest , </span>
+<span id="cb630-9"><a href="national-survey-of-family-growth-nsfg.html#cb630-9" tabindex="-1"></a>        <span class="at">data =</span> nsfg_df , </span>
+<span id="cb630-10"><a href="national-survey-of-family-growth-nsfg.html#cb630-10" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> wgt2017_2019 , </span>
+<span id="cb630-11"><a href="national-survey-of-family-growth-nsfg.html#cb630-11" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span> </span>
+<span id="cb630-12"><a href="national-survey-of-family-growth-nsfg.html#cb630-12" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="variable-recoding-22" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="national-survey-of-family-growth-nsfg.html#variable-recoding-22" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb630"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb630-1"><a href="national-survey-of-family-growth-nsfg.html#cb630-1" tabindex="-1"></a>nsfg_design <span class="ot">&lt;-</span> </span>
-<span id="cb630-2"><a href="national-survey-of-family-growth-nsfg.html#cb630-2" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb630-3"><a href="national-survey-of-family-growth-nsfg.html#cb630-3" tabindex="-1"></a>        nsfg_design , </span>
-<span id="cb630-4"><a href="national-survey-of-family-growth-nsfg.html#cb630-4" tabindex="-1"></a></span>
-<span id="cb630-5"><a href="national-survey-of-family-growth-nsfg.html#cb630-5" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
-<span id="cb630-6"><a href="national-survey-of-family-growth-nsfg.html#cb630-6" tabindex="-1"></a>        </span>
-<span id="cb630-7"><a href="national-survey-of-family-growth-nsfg.html#cb630-7" tabindex="-1"></a>        <span class="at">birth_control_pill =</span> <span class="fu">as.numeric</span>( constat1 <span class="sc">==</span> <span class="dv">6</span> ) ,</span>
-<span id="cb630-8"><a href="national-survey-of-family-growth-nsfg.html#cb630-8" tabindex="-1"></a>        </span>
-<span id="cb630-9"><a href="national-survey-of-family-growth-nsfg.html#cb630-9" tabindex="-1"></a>        <span class="at">age_categories =</span> </span>
-<span id="cb630-10"><a href="national-survey-of-family-growth-nsfg.html#cb630-10" tabindex="-1"></a>            <span class="fu">factor</span>( <span class="fu">findInterval</span>( ager , <span class="fu">c</span>( <span class="dv">15</span> , <span class="dv">20</span> , <span class="dv">25</span> , <span class="dv">30</span> , <span class="dv">35</span> , <span class="dv">40</span> ) ) ,</span>
-<span id="cb630-11"><a href="national-survey-of-family-growth-nsfg.html#cb630-11" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;15-19&#39;</span> , <span class="st">&#39;20-24&#39;</span> , <span class="st">&#39;25-29&#39;</span> , <span class="st">&#39;30-34&#39;</span> , <span class="st">&#39;35-39&#39;</span> , <span class="st">&#39;40-49&#39;</span> ) ) ,</span>
-<span id="cb630-12"><a href="national-survey-of-family-growth-nsfg.html#cb630-12" tabindex="-1"></a>        </span>
-<span id="cb630-13"><a href="national-survey-of-family-growth-nsfg.html#cb630-13" tabindex="-1"></a>        <span class="at">marstat =</span></span>
-<span id="cb630-14"><a href="national-survey-of-family-growth-nsfg.html#cb630-14" tabindex="-1"></a>            <span class="fu">factor</span>( marstat , <span class="at">levels =</span> <span class="fu">c</span>( <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span> , <span class="dv">8</span><span class="sc">:</span><span class="dv">9</span> ) ,</span>
-<span id="cb630-15"><a href="national-survey-of-family-growth-nsfg.html#cb630-15" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>(</span>
-<span id="cb630-16"><a href="national-survey-of-family-growth-nsfg.html#cb630-16" tabindex="-1"></a>                    <span class="st">&quot;Married to a person of the opposite sex&quot;</span> ,</span>
-<span id="cb630-17"><a href="national-survey-of-family-growth-nsfg.html#cb630-17" tabindex="-1"></a>                    <span class="st">&quot;Not married but living together with a partner of the opposite sex&quot;</span> ,</span>
-<span id="cb630-18"><a href="national-survey-of-family-growth-nsfg.html#cb630-18" tabindex="-1"></a>                    <span class="st">&quot;Widowed&quot;</span> ,</span>
-<span id="cb630-19"><a href="national-survey-of-family-growth-nsfg.html#cb630-19" tabindex="-1"></a>                    <span class="st">&quot;Divorced or annulled&quot;</span> ,</span>
-<span id="cb630-20"><a href="national-survey-of-family-growth-nsfg.html#cb630-20" tabindex="-1"></a>                    <span class="st">&quot;Separated, because you and your spouse are not getting along&quot;</span> ,</span>
-<span id="cb630-21"><a href="national-survey-of-family-growth-nsfg.html#cb630-21" tabindex="-1"></a>                    <span class="st">&quot;Never been married&quot;</span> ,</span>
-<span id="cb630-22"><a href="national-survey-of-family-growth-nsfg.html#cb630-22" tabindex="-1"></a>                    <span class="st">&quot;Refused&quot;</span> ,</span>
-<span id="cb630-23"><a href="national-survey-of-family-growth-nsfg.html#cb630-23" tabindex="-1"></a>                    <span class="st">&quot;Don&#39;t know&quot;</span> )</span>
-<span id="cb630-24"><a href="national-survey-of-family-growth-nsfg.html#cb630-24" tabindex="-1"></a>            )</span>
-<span id="cb630-25"><a href="national-survey-of-family-growth-nsfg.html#cb630-25" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="national-survey-of-family-growth-nsfg.html#cb631-1" tabindex="-1"></a>nsfg_design <span class="ot">&lt;-</span> </span>
+<span id="cb631-2"><a href="national-survey-of-family-growth-nsfg.html#cb631-2" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb631-3"><a href="national-survey-of-family-growth-nsfg.html#cb631-3" tabindex="-1"></a>        nsfg_design , </span>
+<span id="cb631-4"><a href="national-survey-of-family-growth-nsfg.html#cb631-4" tabindex="-1"></a></span>
+<span id="cb631-5"><a href="national-survey-of-family-growth-nsfg.html#cb631-5" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
+<span id="cb631-6"><a href="national-survey-of-family-growth-nsfg.html#cb631-6" tabindex="-1"></a>        </span>
+<span id="cb631-7"><a href="national-survey-of-family-growth-nsfg.html#cb631-7" tabindex="-1"></a>        <span class="at">birth_control_pill =</span> <span class="fu">as.numeric</span>( constat1 <span class="sc">==</span> <span class="dv">6</span> ) ,</span>
+<span id="cb631-8"><a href="national-survey-of-family-growth-nsfg.html#cb631-8" tabindex="-1"></a>        </span>
+<span id="cb631-9"><a href="national-survey-of-family-growth-nsfg.html#cb631-9" tabindex="-1"></a>        <span class="at">age_categories =</span> </span>
+<span id="cb631-10"><a href="national-survey-of-family-growth-nsfg.html#cb631-10" tabindex="-1"></a>            <span class="fu">factor</span>( <span class="fu">findInterval</span>( ager , <span class="fu">c</span>( <span class="dv">15</span> , <span class="dv">20</span> , <span class="dv">25</span> , <span class="dv">30</span> , <span class="dv">35</span> , <span class="dv">40</span> ) ) ,</span>
+<span id="cb631-11"><a href="national-survey-of-family-growth-nsfg.html#cb631-11" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;15-19&#39;</span> , <span class="st">&#39;20-24&#39;</span> , <span class="st">&#39;25-29&#39;</span> , <span class="st">&#39;30-34&#39;</span> , <span class="st">&#39;35-39&#39;</span> , <span class="st">&#39;40-49&#39;</span> ) ) ,</span>
+<span id="cb631-12"><a href="national-survey-of-family-growth-nsfg.html#cb631-12" tabindex="-1"></a>        </span>
+<span id="cb631-13"><a href="national-survey-of-family-growth-nsfg.html#cb631-13" tabindex="-1"></a>        <span class="at">marstat =</span></span>
+<span id="cb631-14"><a href="national-survey-of-family-growth-nsfg.html#cb631-14" tabindex="-1"></a>            <span class="fu">factor</span>( marstat , <span class="at">levels =</span> <span class="fu">c</span>( <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span> , <span class="dv">8</span><span class="sc">:</span><span class="dv">9</span> ) ,</span>
+<span id="cb631-15"><a href="national-survey-of-family-growth-nsfg.html#cb631-15" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>(</span>
+<span id="cb631-16"><a href="national-survey-of-family-growth-nsfg.html#cb631-16" tabindex="-1"></a>                    <span class="st">&quot;Married to a person of the opposite sex&quot;</span> ,</span>
+<span id="cb631-17"><a href="national-survey-of-family-growth-nsfg.html#cb631-17" tabindex="-1"></a>                    <span class="st">&quot;Not married but living together with a partner of the opposite sex&quot;</span> ,</span>
+<span id="cb631-18"><a href="national-survey-of-family-growth-nsfg.html#cb631-18" tabindex="-1"></a>                    <span class="st">&quot;Widowed&quot;</span> ,</span>
+<span id="cb631-19"><a href="national-survey-of-family-growth-nsfg.html#cb631-19" tabindex="-1"></a>                    <span class="st">&quot;Divorced or annulled&quot;</span> ,</span>
+<span id="cb631-20"><a href="national-survey-of-family-growth-nsfg.html#cb631-20" tabindex="-1"></a>                    <span class="st">&quot;Separated, because you and your spouse are not getting along&quot;</span> ,</span>
+<span id="cb631-21"><a href="national-survey-of-family-growth-nsfg.html#cb631-21" tabindex="-1"></a>                    <span class="st">&quot;Never been married&quot;</span> ,</span>
+<span id="cb631-22"><a href="national-survey-of-family-growth-nsfg.html#cb631-22" tabindex="-1"></a>                    <span class="st">&quot;Refused&quot;</span> ,</span>
+<span id="cb631-23"><a href="national-survey-of-family-growth-nsfg.html#cb631-23" tabindex="-1"></a>                    <span class="st">&quot;Don&#39;t know&quot;</span> )</span>
+<span id="cb631-24"><a href="national-survey-of-family-growth-nsfg.html#cb631-24" tabindex="-1"></a>            )</span>
+<span id="cb631-25"><a href="national-survey-of-family-growth-nsfg.html#cb631-25" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1018,115 +1018,115 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-22" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="national-survey-of-family-growth-nsfg.html#unweighted-counts-22" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="national-survey-of-family-growth-nsfg.html#cb631-1" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( nsfg_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
-<span id="cb631-2"><a href="national-survey-of-family-growth-nsfg.html#cb631-2" tabindex="-1"></a></span>
-<span id="cb631-3"><a href="national-survey-of-family-growth-nsfg.html#cb631-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> age_categories , nsfg_design , unwtd.count )</span></code></pre></div>
+<div class="sourceCode" id="cb632"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb632-1"><a href="national-survey-of-family-growth-nsfg.html#cb632-1" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( nsfg_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
+<span id="cb632-2"><a href="national-survey-of-family-growth-nsfg.html#cb632-2" tabindex="-1"></a></span>
+<span id="cb632-3"><a href="national-survey-of-family-growth-nsfg.html#cb632-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> age_categories , nsfg_design , unwtd.count )</span></code></pre></div>
 </div>
 <div id="weighted-counts-17" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="national-survey-of-family-growth-nsfg.html#weighted-counts-17" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb632"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb632-1"><a href="national-survey-of-family-growth-nsfg.html#cb632-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , nsfg_design )</span>
-<span id="cb632-2"><a href="national-survey-of-family-growth-nsfg.html#cb632-2" tabindex="-1"></a></span>
-<span id="cb632-3"><a href="national-survey-of-family-growth-nsfg.html#cb632-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> age_categories , nsfg_design , svytotal )</span></code></pre></div>
+<div class="sourceCode" id="cb633"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb633-1"><a href="national-survey-of-family-growth-nsfg.html#cb633-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , nsfg_design )</span>
+<span id="cb633-2"><a href="national-survey-of-family-growth-nsfg.html#cb633-2" tabindex="-1"></a></span>
+<span id="cb633-3"><a href="national-survey-of-family-growth-nsfg.html#cb633-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> age_categories , nsfg_design , svytotal )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-22" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="national-survey-of-family-growth-nsfg.html#descriptive-statistics-22" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb633"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb633-1"><a href="national-survey-of-family-growth-nsfg.html#cb633-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb633-2"><a href="national-survey-of-family-growth-nsfg.html#cb633-2" tabindex="-1"></a></span>
-<span id="cb633-3"><a href="national-survey-of-family-growth-nsfg.html#cb633-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> pregnum , <span class="sc">~</span> age_categories , nsfg_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb634"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb634-1"><a href="national-survey-of-family-growth-nsfg.html#cb634-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> marstat , nsfg_design )</span>
+<div class="sourceCode" id="cb634"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb634-1"><a href="national-survey-of-family-growth-nsfg.html#cb634-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb634-2"><a href="national-survey-of-family-growth-nsfg.html#cb634-2" tabindex="-1"></a></span>
-<span id="cb634-3"><a href="national-survey-of-family-growth-nsfg.html#cb634-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> marstat , <span class="sc">~</span> age_categories , nsfg_design , svymean )</span></code></pre></div>
-<p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb635"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb635-1"><a href="national-survey-of-family-growth-nsfg.html#cb635-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb634-3"><a href="national-survey-of-family-growth-nsfg.html#cb634-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> pregnum , <span class="sc">~</span> age_categories , nsfg_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb635"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb635-1"><a href="national-survey-of-family-growth-nsfg.html#cb635-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> marstat , nsfg_design )</span>
 <span id="cb635-2"><a href="national-survey-of-family-growth-nsfg.html#cb635-2" tabindex="-1"></a></span>
-<span id="cb635-3"><a href="national-survey-of-family-growth-nsfg.html#cb635-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> pregnum , <span class="sc">~</span> age_categories , nsfg_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb636"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb636-1"><a href="national-survey-of-family-growth-nsfg.html#cb636-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> marstat , nsfg_design )</span>
+<span id="cb635-3"><a href="national-survey-of-family-growth-nsfg.html#cb635-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> marstat , <span class="sc">~</span> age_categories , nsfg_design , svymean )</span></code></pre></div>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb636"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb636-1"><a href="national-survey-of-family-growth-nsfg.html#cb636-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb636-2"><a href="national-survey-of-family-growth-nsfg.html#cb636-2" tabindex="-1"></a></span>
-<span id="cb636-3"><a href="national-survey-of-family-growth-nsfg.html#cb636-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> marstat , <span class="sc">~</span> age_categories , nsfg_design , svytotal )</span></code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb637"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb637-1"><a href="national-survey-of-family-growth-nsfg.html#cb637-1" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb636-3"><a href="national-survey-of-family-growth-nsfg.html#cb636-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> pregnum , <span class="sc">~</span> age_categories , nsfg_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb637"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb637-1"><a href="national-survey-of-family-growth-nsfg.html#cb637-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> marstat , nsfg_design )</span>
 <span id="cb637-2"><a href="national-survey-of-family-growth-nsfg.html#cb637-2" tabindex="-1"></a></span>
-<span id="cb637-3"><a href="national-survey-of-family-growth-nsfg.html#cb637-3" tabindex="-1"></a><span class="fu">svyby</span>( </span>
-<span id="cb637-4"><a href="national-survey-of-family-growth-nsfg.html#cb637-4" tabindex="-1"></a>    <span class="sc">~</span> pregnum , </span>
-<span id="cb637-5"><a href="national-survey-of-family-growth-nsfg.html#cb637-5" tabindex="-1"></a>    <span class="sc">~</span> age_categories , </span>
-<span id="cb637-6"><a href="national-survey-of-family-growth-nsfg.html#cb637-6" tabindex="-1"></a>    nsfg_design , </span>
-<span id="cb637-7"><a href="national-survey-of-family-growth-nsfg.html#cb637-7" tabindex="-1"></a>    svyquantile , </span>
-<span id="cb637-8"><a href="national-survey-of-family-growth-nsfg.html#cb637-8" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb637-9"><a href="national-survey-of-family-growth-nsfg.html#cb637-9" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb637-10"><a href="national-survey-of-family-growth-nsfg.html#cb637-10" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb637-3"><a href="national-survey-of-family-growth-nsfg.html#cb637-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> marstat , <span class="sc">~</span> age_categories , nsfg_design , svytotal )</span></code></pre></div>
+<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb638"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb638-1"><a href="national-survey-of-family-growth-nsfg.html#cb638-1" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb638-2"><a href="national-survey-of-family-growth-nsfg.html#cb638-2" tabindex="-1"></a></span>
+<span id="cb638-3"><a href="national-survey-of-family-growth-nsfg.html#cb638-3" tabindex="-1"></a><span class="fu">svyby</span>( </span>
+<span id="cb638-4"><a href="national-survey-of-family-growth-nsfg.html#cb638-4" tabindex="-1"></a>    <span class="sc">~</span> pregnum , </span>
+<span id="cb638-5"><a href="national-survey-of-family-growth-nsfg.html#cb638-5" tabindex="-1"></a>    <span class="sc">~</span> age_categories , </span>
+<span id="cb638-6"><a href="national-survey-of-family-growth-nsfg.html#cb638-6" tabindex="-1"></a>    nsfg_design , </span>
+<span id="cb638-7"><a href="national-survey-of-family-growth-nsfg.html#cb638-7" tabindex="-1"></a>    svyquantile , </span>
+<span id="cb638-8"><a href="national-survey-of-family-growth-nsfg.html#cb638-8" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
+<span id="cb638-9"><a href="national-survey-of-family-growth-nsfg.html#cb638-9" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
+<span id="cb638-10"><a href="national-survey-of-family-growth-nsfg.html#cb638-10" tabindex="-1"></a>)</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb638"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb638-1"><a href="national-survey-of-family-growth-nsfg.html#cb638-1" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
-<span id="cb638-2"><a href="national-survey-of-family-growth-nsfg.html#cb638-2" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> pregnum , </span>
-<span id="cb638-3"><a href="national-survey-of-family-growth-nsfg.html#cb638-3" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> lbpregs , </span>
-<span id="cb638-4"><a href="national-survey-of-family-growth-nsfg.html#cb638-4" tabindex="-1"></a>    nsfg_design ,</span>
-<span id="cb638-5"><a href="national-survey-of-family-growth-nsfg.html#cb638-5" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb638-6"><a href="national-survey-of-family-growth-nsfg.html#cb638-6" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb639"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb639-1"><a href="national-survey-of-family-growth-nsfg.html#cb639-1" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
+<span id="cb639-2"><a href="national-survey-of-family-growth-nsfg.html#cb639-2" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> pregnum , </span>
+<span id="cb639-3"><a href="national-survey-of-family-growth-nsfg.html#cb639-3" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> lbpregs , </span>
+<span id="cb639-4"><a href="national-survey-of-family-growth-nsfg.html#cb639-4" tabindex="-1"></a>    nsfg_design ,</span>
+<span id="cb639-5"><a href="national-survey-of-family-growth-nsfg.html#cb639-5" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
+<span id="cb639-6"><a href="national-survey-of-family-growth-nsfg.html#cb639-6" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting-22" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="national-survey-of-family-growth-nsfg.html#subsetting-22" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to ever cohabited:</p>
-<div class="sourceCode" id="cb639"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb639-1"><a href="national-survey-of-family-growth-nsfg.html#cb639-1" tabindex="-1"></a>sub_nsfg_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nsfg_design , timescoh <span class="sc">&gt;</span> <span class="dv">0</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb640"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb640-1"><a href="national-survey-of-family-growth-nsfg.html#cb640-1" tabindex="-1"></a>sub_nsfg_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nsfg_design , timescoh <span class="sc">&gt;</span> <span class="dv">0</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb640"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb640-1"><a href="national-survey-of-family-growth-nsfg.html#cb640-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> pregnum , sub_nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb641"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb641-1"><a href="national-survey-of-family-growth-nsfg.html#cb641-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> pregnum , sub_nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-22" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="national-survey-of-family-growth-nsfg.html#measures-of-uncertainty-22" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb641"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb641-1"><a href="national-survey-of-family-growth-nsfg.html#cb641-1" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb641-2"><a href="national-survey-of-family-growth-nsfg.html#cb641-2" tabindex="-1"></a></span>
-<span id="cb641-3"><a href="national-survey-of-family-growth-nsfg.html#cb641-3" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb641-4"><a href="national-survey-of-family-growth-nsfg.html#cb641-4" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb641-5"><a href="national-survey-of-family-growth-nsfg.html#cb641-5" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb641-6"><a href="national-survey-of-family-growth-nsfg.html#cb641-6" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb641-7"><a href="national-survey-of-family-growth-nsfg.html#cb641-7" tabindex="-1"></a></span>
-<span id="cb641-8"><a href="national-survey-of-family-growth-nsfg.html#cb641-8" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb641-9"><a href="national-survey-of-family-growth-nsfg.html#cb641-9" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb641-10"><a href="national-survey-of-family-growth-nsfg.html#cb641-10" tabindex="-1"></a>        <span class="sc">~</span> pregnum , </span>
-<span id="cb641-11"><a href="national-survey-of-family-growth-nsfg.html#cb641-11" tabindex="-1"></a>        <span class="sc">~</span> age_categories , </span>
-<span id="cb641-12"><a href="national-survey-of-family-growth-nsfg.html#cb641-12" tabindex="-1"></a>        nsfg_design , </span>
-<span id="cb641-13"><a href="national-survey-of-family-growth-nsfg.html#cb641-13" tabindex="-1"></a>        svymean ,</span>
-<span id="cb641-14"><a href="national-survey-of-family-growth-nsfg.html#cb641-14" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb641-15"><a href="national-survey-of-family-growth-nsfg.html#cb641-15" tabindex="-1"></a>    )</span>
-<span id="cb641-16"><a href="national-survey-of-family-growth-nsfg.html#cb641-16" tabindex="-1"></a>    </span>
-<span id="cb641-17"><a href="national-survey-of-family-growth-nsfg.html#cb641-17" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb641-18"><a href="national-survey-of-family-growth-nsfg.html#cb641-18" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb641-19"><a href="national-survey-of-family-growth-nsfg.html#cb641-19" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb641-20"><a href="national-survey-of-family-growth-nsfg.html#cb641-20" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb642"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb642-1"><a href="national-survey-of-family-growth-nsfg.html#cb642-1" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb642-2"><a href="national-survey-of-family-growth-nsfg.html#cb642-2" tabindex="-1"></a></span>
+<span id="cb642-3"><a href="national-survey-of-family-growth-nsfg.html#cb642-3" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb642-4"><a href="national-survey-of-family-growth-nsfg.html#cb642-4" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb642-5"><a href="national-survey-of-family-growth-nsfg.html#cb642-5" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb642-6"><a href="national-survey-of-family-growth-nsfg.html#cb642-6" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb642-7"><a href="national-survey-of-family-growth-nsfg.html#cb642-7" tabindex="-1"></a></span>
+<span id="cb642-8"><a href="national-survey-of-family-growth-nsfg.html#cb642-8" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb642-9"><a href="national-survey-of-family-growth-nsfg.html#cb642-9" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb642-10"><a href="national-survey-of-family-growth-nsfg.html#cb642-10" tabindex="-1"></a>        <span class="sc">~</span> pregnum , </span>
+<span id="cb642-11"><a href="national-survey-of-family-growth-nsfg.html#cb642-11" tabindex="-1"></a>        <span class="sc">~</span> age_categories , </span>
+<span id="cb642-12"><a href="national-survey-of-family-growth-nsfg.html#cb642-12" tabindex="-1"></a>        nsfg_design , </span>
+<span id="cb642-13"><a href="national-survey-of-family-growth-nsfg.html#cb642-13" tabindex="-1"></a>        svymean ,</span>
+<span id="cb642-14"><a href="national-survey-of-family-growth-nsfg.html#cb642-14" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb642-15"><a href="national-survey-of-family-growth-nsfg.html#cb642-15" tabindex="-1"></a>    )</span>
+<span id="cb642-16"><a href="national-survey-of-family-growth-nsfg.html#cb642-16" tabindex="-1"></a>    </span>
+<span id="cb642-17"><a href="national-survey-of-family-growth-nsfg.html#cb642-17" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb642-18"><a href="national-survey-of-family-growth-nsfg.html#cb642-18" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb642-19"><a href="national-survey-of-family-growth-nsfg.html#cb642-19" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb642-20"><a href="national-survey-of-family-growth-nsfg.html#cb642-20" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb642"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb642-1"><a href="national-survey-of-family-growth-nsfg.html#cb642-1" tabindex="-1"></a><span class="fu">degf</span>( nsfg_design )</span></code></pre></div>
+<div class="sourceCode" id="cb643"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb643-1"><a href="national-survey-of-family-growth-nsfg.html#cb643-1" tabindex="-1"></a><span class="fu">degf</span>( nsfg_design )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb643"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb643-1"><a href="national-survey-of-family-growth-nsfg.html#cb643-1" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb644"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb644-1"><a href="national-survey-of-family-growth-nsfg.html#cb644-1" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb644"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb644-1"><a href="national-survey-of-family-growth-nsfg.html#cb644-1" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb644-2"><a href="national-survey-of-family-growth-nsfg.html#cb644-2" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb644-3"><a href="national-survey-of-family-growth-nsfg.html#cb644-3" tabindex="-1"></a></span>
-<span id="cb644-4"><a href="national-survey-of-family-growth-nsfg.html#cb644-4" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb644-5"><a href="national-survey-of-family-growth-nsfg.html#cb644-5" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb645"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb645-1"><a href="national-survey-of-family-growth-nsfg.html#cb645-1" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb645-2"><a href="national-survey-of-family-growth-nsfg.html#cb645-2" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb645-3"><a href="national-survey-of-family-growth-nsfg.html#cb645-3" tabindex="-1"></a></span>
+<span id="cb645-4"><a href="national-survey-of-family-growth-nsfg.html#cb645-4" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb645-5"><a href="national-survey-of-family-growth-nsfg.html#cb645-5" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> pregnum , nsfg_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb645"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb645-1"><a href="national-survey-of-family-growth-nsfg.html#cb645-1" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> birth_control_pill , nsfg_design ,</span>
-<span id="cb645-2"><a href="national-survey-of-family-growth-nsfg.html#cb645-2" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb646"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb646-1"><a href="national-survey-of-family-growth-nsfg.html#cb646-1" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> birth_control_pill , nsfg_design ,</span>
+<span id="cb646-2"><a href="national-survey-of-family-growth-nsfg.html#cb646-2" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-22" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="national-survey-of-family-growth-nsfg.html#regression-models-and-tests-of-association-22" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb646"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb646-1"><a href="national-survey-of-family-growth-nsfg.html#cb646-1" tabindex="-1"></a><span class="fu">svyttest</span>( pregnum <span class="sc">~</span> birth_control_pill , nsfg_design )</span></code></pre></div>
+<div class="sourceCode" id="cb647"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb647-1"><a href="national-survey-of-family-growth-nsfg.html#cb647-1" tabindex="-1"></a><span class="fu">svyttest</span>( pregnum <span class="sc">~</span> birth_control_pill , nsfg_design )</span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb647"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb647-1"><a href="national-survey-of-family-growth-nsfg.html#cb647-1" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
-<span id="cb647-2"><a href="national-survey-of-family-growth-nsfg.html#cb647-2" tabindex="-1"></a>    <span class="sc">~</span> birth_control_pill <span class="sc">+</span> marstat , </span>
-<span id="cb647-3"><a href="national-survey-of-family-growth-nsfg.html#cb647-3" tabindex="-1"></a>    nsfg_design </span>
-<span id="cb647-4"><a href="national-survey-of-family-growth-nsfg.html#cb647-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="national-survey-of-family-growth-nsfg.html#cb648-1" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
+<span id="cb648-2"><a href="national-survey-of-family-growth-nsfg.html#cb648-2" tabindex="-1"></a>    <span class="sc">~</span> birth_control_pill <span class="sc">+</span> marstat , </span>
+<span id="cb648-3"><a href="national-survey-of-family-growth-nsfg.html#cb648-3" tabindex="-1"></a>    nsfg_design </span>
+<span id="cb648-4"><a href="national-survey-of-family-growth-nsfg.html#cb648-4" tabindex="-1"></a>)</span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="national-survey-of-family-growth-nsfg.html#cb648-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb648-2"><a href="national-survey-of-family-growth-nsfg.html#cb648-2" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
-<span id="cb648-3"><a href="national-survey-of-family-growth-nsfg.html#cb648-3" tabindex="-1"></a>        pregnum <span class="sc">~</span> birth_control_pill <span class="sc">+</span> marstat , </span>
-<span id="cb648-4"><a href="national-survey-of-family-growth-nsfg.html#cb648-4" tabindex="-1"></a>        nsfg_design </span>
-<span id="cb648-5"><a href="national-survey-of-family-growth-nsfg.html#cb648-5" tabindex="-1"></a>    )</span>
-<span id="cb648-6"><a href="national-survey-of-family-growth-nsfg.html#cb648-6" tabindex="-1"></a></span>
-<span id="cb648-7"><a href="national-survey-of-family-growth-nsfg.html#cb648-7" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb649"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb649-1"><a href="national-survey-of-family-growth-nsfg.html#cb649-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb649-2"><a href="national-survey-of-family-growth-nsfg.html#cb649-2" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
+<span id="cb649-3"><a href="national-survey-of-family-growth-nsfg.html#cb649-3" tabindex="-1"></a>        pregnum <span class="sc">~</span> birth_control_pill <span class="sc">+</span> marstat , </span>
+<span id="cb649-4"><a href="national-survey-of-family-growth-nsfg.html#cb649-4" tabindex="-1"></a>        nsfg_design </span>
+<span id="cb649-5"><a href="national-survey-of-family-growth-nsfg.html#cb649-5" tabindex="-1"></a>    )</span>
+<span id="cb649-6"><a href="national-survey-of-family-growth-nsfg.html#cb649-6" tabindex="-1"></a></span>
+<span id="cb649-7"><a href="national-survey-of-family-growth-nsfg.html#cb649-7" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1143,35 +1143,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Replication Example<a href="national-survey-of-family-growth-nsfg.html#replication-example-20" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example matches the <a href="https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf">Variance Estimates for Percentages using SAS (9.4) and STATA (14)</a>:</p>
 <p>Match the sum of the weights:</p>
-<div class="sourceCode" id="cb649"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb649-1"><a href="national-survey-of-family-growth-nsfg.html#cb649-1" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">svytotal</span>( <span class="sc">~</span> one , nsfg_design )</span>
-<span id="cb649-2"><a href="national-survey-of-family-growth-nsfg.html#cb649-2" tabindex="-1"></a></span>
-<span id="cb649-3"><a href="national-survey-of-family-growth-nsfg.html#cb649-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">72671926</span> )</span>
-<span id="cb649-4"><a href="national-survey-of-family-growth-nsfg.html#cb649-4" tabindex="-1"></a></span>
-<span id="cb649-5"><a href="national-survey-of-family-growth-nsfg.html#cb649-5" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">3521465</span> )</span></code></pre></div>
-<p>Match row percentages of women currently using the pill by age:</p>
-<div class="sourceCode" id="cb650"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb650-1"><a href="national-survey-of-family-growth-nsfg.html#cb650-1" tabindex="-1"></a>row_percents <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">19.5112</span> , <span class="fl">23.7833</span> , <span class="fl">19.6916</span> , <span class="fl">15.2800</span> , <span class="fl">6.4965</span> , <span class="fl">6.5215</span> )</span>
+<div class="sourceCode" id="cb650"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb650-1"><a href="national-survey-of-family-growth-nsfg.html#cb650-1" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">svytotal</span>( <span class="sc">~</span> one , nsfg_design )</span>
 <span id="cb650-2"><a href="national-survey-of-family-growth-nsfg.html#cb650-2" tabindex="-1"></a></span>
-<span id="cb650-3"><a href="national-survey-of-family-growth-nsfg.html#cb650-3" tabindex="-1"></a>std_err_row_percents <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">1.8670</span> , <span class="fl">2.1713</span> , <span class="fl">2.2773</span> , <span class="fl">1.7551</span> , <span class="fl">0.9895</span> , <span class="fl">1.0029</span> )</span>
+<span id="cb650-3"><a href="national-survey-of-family-growth-nsfg.html#cb650-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">72671926</span> )</span>
 <span id="cb650-4"><a href="national-survey-of-family-growth-nsfg.html#cb650-4" tabindex="-1"></a></span>
-<span id="cb650-5"><a href="national-survey-of-family-growth-nsfg.html#cb650-5" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">svyby</span>( <span class="sc">~</span> birth_control_pill , <span class="sc">~</span> age_categories , nsfg_design , svymean )</span>
-<span id="cb650-6"><a href="national-survey-of-family-growth-nsfg.html#cb650-6" tabindex="-1"></a></span>
-<span id="cb650-7"><a href="national-survey-of-family-growth-nsfg.html#cb650-7" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results ) <span class="sc">*</span> <span class="dv">100</span> , <span class="dv">4</span> ) <span class="sc">==</span> row_percents ) )</span>
-<span id="cb650-8"><a href="national-survey-of-family-growth-nsfg.html#cb650-8" tabindex="-1"></a></span>
-<span id="cb650-9"><a href="national-survey-of-family-growth-nsfg.html#cb650-9" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results ) <span class="sc">*</span> <span class="dv">100</span> , <span class="dv">4</span> ) <span class="sc">==</span> std_err_row_percents ) )</span></code></pre></div>
+<span id="cb650-5"><a href="national-survey-of-family-growth-nsfg.html#cb650-5" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">3521465</span> )</span></code></pre></div>
+<p>Match row percentages of women currently using the pill by age:</p>
+<div class="sourceCode" id="cb651"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb651-1"><a href="national-survey-of-family-growth-nsfg.html#cb651-1" tabindex="-1"></a>row_percents <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">19.5112</span> , <span class="fl">23.7833</span> , <span class="fl">19.6916</span> , <span class="fl">15.2800</span> , <span class="fl">6.4965</span> , <span class="fl">6.5215</span> )</span>
+<span id="cb651-2"><a href="national-survey-of-family-growth-nsfg.html#cb651-2" tabindex="-1"></a></span>
+<span id="cb651-3"><a href="national-survey-of-family-growth-nsfg.html#cb651-3" tabindex="-1"></a>std_err_row_percents <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="fl">1.8670</span> , <span class="fl">2.1713</span> , <span class="fl">2.2773</span> , <span class="fl">1.7551</span> , <span class="fl">0.9895</span> , <span class="fl">1.0029</span> )</span>
+<span id="cb651-4"><a href="national-survey-of-family-growth-nsfg.html#cb651-4" tabindex="-1"></a></span>
+<span id="cb651-5"><a href="national-survey-of-family-growth-nsfg.html#cb651-5" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">svyby</span>( <span class="sc">~</span> birth_control_pill , <span class="sc">~</span> age_categories , nsfg_design , svymean )</span>
+<span id="cb651-6"><a href="national-survey-of-family-growth-nsfg.html#cb651-6" tabindex="-1"></a></span>
+<span id="cb651-7"><a href="national-survey-of-family-growth-nsfg.html#cb651-7" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results ) <span class="sc">*</span> <span class="dv">100</span> , <span class="dv">4</span> ) <span class="sc">==</span> row_percents ) )</span>
+<span id="cb651-8"><a href="national-survey-of-family-growth-nsfg.html#cb651-8" tabindex="-1"></a></span>
+<span id="cb651-9"><a href="national-survey-of-family-growth-nsfg.html#cb651-9" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results ) <span class="sc">*</span> <span class="dv">100</span> , <span class="dv">4</span> ) <span class="sc">==</span> std_err_row_percents ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-srvyr-14" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>srvyr</code>  <a href="national-survey-of-family-growth-nsfg.html#analysis-examples-with-srvyr-14" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>srvyr</code> library calculates summary statistics from survey data, such as the mean, total or quantile using <a href="https://github.com/tidyverse/dplyr/">dplyr</a>-like syntax. <a href="https://github.com/gergness/srvyr">srvyr</a> allows for the use of many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, the <code>tidyverse</code> style of non-standard evaluation and more consistent return types than the <code>survey</code> package. <a href="https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html">This vignette</a> details the available features. As a starting point for NSFG users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb651"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb651-1"><a href="national-survey-of-family-growth-nsfg.html#cb651-1" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
-<span id="cb651-2"><a href="national-survey-of-family-growth-nsfg.html#cb651-2" tabindex="-1"></a>nsfg_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nsfg_design )</span></code></pre></div>
+<div class="sourceCode" id="cb652"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb652-1"><a href="national-survey-of-family-growth-nsfg.html#cb652-1" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
+<span id="cb652-2"><a href="national-survey-of-family-growth-nsfg.html#cb652-2" tabindex="-1"></a>nsfg_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nsfg_design )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb652"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb652-1"><a href="national-survey-of-family-growth-nsfg.html#cb652-1" tabindex="-1"></a>nsfg_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb652-2"><a href="national-survey-of-family-growth-nsfg.html#cb652-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( pregnum , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
-<span id="cb652-3"><a href="national-survey-of-family-growth-nsfg.html#cb652-3" tabindex="-1"></a></span>
-<span id="cb652-4"><a href="national-survey-of-family-growth-nsfg.html#cb652-4" tabindex="-1"></a>nsfg_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb652-5"><a href="national-survey-of-family-growth-nsfg.html#cb652-5" tabindex="-1"></a>    <span class="fu">group_by</span>( age_categories ) <span class="sc">%&gt;%</span></span>
-<span id="cb652-6"><a href="national-survey-of-family-growth-nsfg.html#cb652-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( pregnum , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<div class="sourceCode" id="cb653"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb653-1"><a href="national-survey-of-family-growth-nsfg.html#cb653-1" tabindex="-1"></a>nsfg_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb653-2"><a href="national-survey-of-family-growth-nsfg.html#cb653-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( pregnum , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb653-3"><a href="national-survey-of-family-growth-nsfg.html#cb653-3" tabindex="-1"></a></span>
+<span id="cb653-4"><a href="national-survey-of-family-growth-nsfg.html#cb653-4" tabindex="-1"></a>nsfg_srvyr_design <span class="sc">%&gt;%</span></span>
+<span id="cb653-5"><a href="national-survey-of-family-growth-nsfg.html#cb653-5" tabindex="-1"></a>    <span class="fu">group_by</span>( age_categories ) <span class="sc">%&gt;%</span></span>
+<span id="cb653-6"><a href="national-survey-of-family-growth-nsfg.html#cb653-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( pregnum , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
 
 </div>
 </div>

@@ -6,7 +6,7 @@ needs_actions_build_status_line: yes -linux -windows
 A historical record of the concerns, experiences, attitudes, and practices of residents of the United States. 
 ~~~
 
-table_structure: * One table with one row per sampled respondent.
+table_structure: * Both cross-sectional and panel tables with one row per sampled respondent.
 
 generalizable_population: * A complex sample survey generalizing to non-institutionalized adults (18+) in the United States.
 
@@ -82,23 +82,19 @@ chapter_tag_design <-
 		chapter_tag_design , 
 
 		polviews = 
-			factor( polviews ,
+			factor( polviews , levels = 1:7 ,
 				labels = c( "Extremely liberal" , "Liberal" ,
 				"Slightly liberal" , "Moderate, middle of the road" ,
 				"Slightly conservative" , "Conservative" ,
 				"Extremely conservative" )
 			) ,
 		
-		born_in_usa = ifelse( born %in% 1:2 , as.numeric( born == 1 ) , NA ) ,
+		born_in_usa = as.numeric( born == 1 ) ,
 		
-		adults_in_hh = ifelse( adults > 8 , NA , adults ) ,
-		
-		persons_in_hh = ifelse( hompop > 11 , NA , hompop ) ,
-		
-		race = factor( race , labels = c( "white" , "black" , "other" ) ) ,
+		race = factor( race , levels = 1:3 , labels = c( "white" , "black" , "other" ) ) ,
 		
 		region = 
-			factor( region , 
+			factor( region , levels = 1:9 ,
 				labels = c( "New England" , "Middle Atlantic" ,
 					"East North Central" , "West North Central" ,
 					"South Atlantic" , "East South Central" ,
@@ -118,8 +114,8 @@ linear_variable: age
 linear_variable_description: age
 linear_narm: , na.rm = TRUE
 
-ratio_estimation_numerator: adults_in_hh
-ratio_estimation_denominator: persons_in_hh
+ratio_estimation_numerator: adults
+ratio_estimation_denominator: hompop
 ratio_narm: , na.rm = TRUE
 
 subset_definition: sex == 2
@@ -139,8 +135,9 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
+Match the unweighted record count on [PDF page 10](https://gss.norc.org/Documents/codebook/GSS%202022%20Codebook.pdf#page=10) of the Public Use File codebook:
 ```{r eval = FALSE , results = "hide" }
-
+stopifnot( nrow( subset( chapter_tag_design , year == 2022 ) ) == 3544 )
 ```
 ~~~
 

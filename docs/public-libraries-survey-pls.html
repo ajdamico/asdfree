@@ -921,73 +921,73 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><code>README FY #### PLS PUD.txt</code> included in each <a href="https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip">zipped file</a></p></li>
 <li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Public%20Libraries%20Survey">artificial intelligence-generated limericks</a></p></li>
 </ol>
-<div class="sourceCode" id="cb712"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb712-1"><a href="public-libraries-survey-pls.html#cb712-1" tabindex="-1"></a><span class="co"># census, not survey.</span></span>
-<span id="cb712-2"><a href="public-libraries-survey-pls.html#cb712-2" tabindex="-1"></a><span class="co"># dewey decimal index</span></span>
-<span id="cb712-3"><a href="public-libraries-survey-pls.html#cb712-3" tabindex="-1"></a><span class="co"># finger to lips shush</span></span></code></pre></div>
+<div class="sourceCode" id="cb713"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb713-1"><a href="public-libraries-survey-pls.html#cb713-1" tabindex="-1"></a><span class="co"># census, not survey.</span></span>
+<span id="cb713-2"><a href="public-libraries-survey-pls.html#cb713-2" tabindex="-1"></a><span class="co"># dewey decimal index</span></span>
+<span id="cb713-3"><a href="public-libraries-survey-pls.html#cb713-3" tabindex="-1"></a><span class="co"># finger to lips shush</span></span></code></pre></div>
 <hr />
 <div id="download-import-preparation-25" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="public-libraries-survey-pls.html#download-import-preparation-25" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download and import the most recent administrative entity csv file:</p>
-<div class="sourceCode" id="cb713"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb713-1"><a href="public-libraries-survey-pls.html#cb713-1" tabindex="-1"></a>this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb713-2"><a href="public-libraries-survey-pls.html#cb713-2" tabindex="-1"></a></span>
-<span id="cb713-3"><a href="public-libraries-survey-pls.html#cb713-3" tabindex="-1"></a>csv_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip&quot;</span></span>
-<span id="cb713-4"><a href="public-libraries-survey-pls.html#cb713-4" tabindex="-1"></a></span>
-<span id="cb713-5"><a href="public-libraries-survey-pls.html#cb713-5" tabindex="-1"></a><span class="fu">download.file</span>( csv_url , this_tf, <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb713-6"><a href="public-libraries-survey-pls.html#cb713-6" tabindex="-1"></a></span>
-<span id="cb713-7"><a href="public-libraries-survey-pls.html#cb713-7" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb713-8"><a href="public-libraries-survey-pls.html#cb713-8" tabindex="-1"></a>        </span>
-<span id="cb713-9"><a href="public-libraries-survey-pls.html#cb713-9" tabindex="-1"></a>administrative_entity_csv_fn <span class="ot">&lt;-</span></span>
-<span id="cb713-10"><a href="public-libraries-survey-pls.html#cb713-10" tabindex="-1"></a>    unzipped_files[ <span class="fu">grepl</span>( <span class="st">&#39;AE(.*)csv$&#39;</span> , <span class="fu">basename</span>( unzipped_files ) ) ]</span>
-<span id="cb713-11"><a href="public-libraries-survey-pls.html#cb713-11" tabindex="-1"></a></span>
-<span id="cb713-12"><a href="public-libraries-survey-pls.html#cb713-12" tabindex="-1"></a>pls_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( administrative_entity_csv_fn )</span>
-<span id="cb713-13"><a href="public-libraries-survey-pls.html#cb713-13" tabindex="-1"></a></span>
-<span id="cb713-14"><a href="public-libraries-survey-pls.html#cb713-14" tabindex="-1"></a><span class="fu">names</span>( pls_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( pls_df ) )</span>
-<span id="cb713-15"><a href="public-libraries-survey-pls.html#cb713-15" tabindex="-1"></a></span>
-<span id="cb713-16"><a href="public-libraries-survey-pls.html#cb713-16" tabindex="-1"></a>pls_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
-<p>Recode missing values as described in the readme included with each zipped file:</p>
-<div class="sourceCode" id="cb714"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb714-1"><a href="public-libraries-survey-pls.html#cb714-1" tabindex="-1"></a><span class="cf">for</span>( this_col <span class="cf">in</span> <span class="fu">names</span>( pls_df ) ){</span>
+<div class="sourceCode" id="cb714"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb714-1"><a href="public-libraries-survey-pls.html#cb714-1" tabindex="-1"></a>this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb714-2"><a href="public-libraries-survey-pls.html#cb714-2" tabindex="-1"></a></span>
-<span id="cb714-3"><a href="public-libraries-survey-pls.html#cb714-3" tabindex="-1"></a>    <span class="cf">if</span>( <span class="fu">class</span>( pls_df[ , this_col ] ) <span class="sc">==</span> <span class="st">&#39;character&#39;</span> ){</span>
-<span id="cb714-4"><a href="public-libraries-survey-pls.html#cb714-4" tabindex="-1"></a>    </span>
-<span id="cb714-5"><a href="public-libraries-survey-pls.html#cb714-5" tabindex="-1"></a>        pls_df[ pls_df[ , this_col ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , this_col ] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb714-6"><a href="public-libraries-survey-pls.html#cb714-6" tabindex="-1"></a>        </span>
-<span id="cb714-7"><a href="public-libraries-survey-pls.html#cb714-7" tabindex="-1"></a>    }</span>
-<span id="cb714-8"><a href="public-libraries-survey-pls.html#cb714-8" tabindex="-1"></a>    </span>
-<span id="cb714-9"><a href="public-libraries-survey-pls.html#cb714-9" tabindex="-1"></a>    <span class="cf">if</span>( </span>
-<span id="cb714-10"><a href="public-libraries-survey-pls.html#cb714-10" tabindex="-1"></a>        ( <span class="fu">class</span>( pls_df[ , this_col ] ) <span class="sc">==</span> <span class="st">&#39;numeric&#39;</span> ) <span class="sc">|</span> </span>
-<span id="cb714-11"><a href="public-libraries-survey-pls.html#cb714-11" tabindex="-1"></a>        ( this_col <span class="sc">%in%</span> <span class="fu">c</span>( <span class="st">&#39;phone&#39;</span> , <span class="st">&#39;startdat&#39;</span> , <span class="st">&#39;enddate&#39;</span> ) ) </span>
-<span id="cb714-12"><a href="public-libraries-survey-pls.html#cb714-12" tabindex="-1"></a>    ){</span>
-<span id="cb714-13"><a href="public-libraries-survey-pls.html#cb714-13" tabindex="-1"></a>    </span>
-<span id="cb714-14"><a href="public-libraries-survey-pls.html#cb714-14" tabindex="-1"></a>        pls_df[ pls_df[ , this_col ] <span class="sc">%in%</span> <span class="fu">c</span>( <span class="sc">-</span><span class="dv">1</span> , <span class="sc">-</span><span class="dv">3</span> , <span class="sc">-</span><span class="dv">4</span> , <span class="sc">-</span><span class="dv">9</span> ) , this_col ] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb714-15"><a href="public-libraries-survey-pls.html#cb714-15" tabindex="-1"></a>        </span>
-<span id="cb714-16"><a href="public-libraries-survey-pls.html#cb714-16" tabindex="-1"></a>    }</span>
-<span id="cb714-17"><a href="public-libraries-survey-pls.html#cb714-17" tabindex="-1"></a>    </span>
-<span id="cb714-18"><a href="public-libraries-survey-pls.html#cb714-18" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb714-3"><a href="public-libraries-survey-pls.html#cb714-3" tabindex="-1"></a>csv_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip&quot;</span></span>
+<span id="cb714-4"><a href="public-libraries-survey-pls.html#cb714-4" tabindex="-1"></a></span>
+<span id="cb714-5"><a href="public-libraries-survey-pls.html#cb714-5" tabindex="-1"></a><span class="fu">download.file</span>( csv_url , this_tf, <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb714-6"><a href="public-libraries-survey-pls.html#cb714-6" tabindex="-1"></a></span>
+<span id="cb714-7"><a href="public-libraries-survey-pls.html#cb714-7" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb714-8"><a href="public-libraries-survey-pls.html#cb714-8" tabindex="-1"></a>        </span>
+<span id="cb714-9"><a href="public-libraries-survey-pls.html#cb714-9" tabindex="-1"></a>administrative_entity_csv_fn <span class="ot">&lt;-</span></span>
+<span id="cb714-10"><a href="public-libraries-survey-pls.html#cb714-10" tabindex="-1"></a>    unzipped_files[ <span class="fu">grepl</span>( <span class="st">&#39;AE(.*)csv$&#39;</span> , <span class="fu">basename</span>( unzipped_files ) ) ]</span>
+<span id="cb714-11"><a href="public-libraries-survey-pls.html#cb714-11" tabindex="-1"></a></span>
+<span id="cb714-12"><a href="public-libraries-survey-pls.html#cb714-12" tabindex="-1"></a>pls_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( administrative_entity_csv_fn )</span>
+<span id="cb714-13"><a href="public-libraries-survey-pls.html#cb714-13" tabindex="-1"></a></span>
+<span id="cb714-14"><a href="public-libraries-survey-pls.html#cb714-14" tabindex="-1"></a><span class="fu">names</span>( pls_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( pls_df ) )</span>
+<span id="cb714-15"><a href="public-libraries-survey-pls.html#cb714-15" tabindex="-1"></a></span>
+<span id="cb714-16"><a href="public-libraries-survey-pls.html#cb714-16" tabindex="-1"></a>pls_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
+<p>Recode missing values as described in the readme included with each zipped file:</p>
+<div class="sourceCode" id="cb715"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb715-1"><a href="public-libraries-survey-pls.html#cb715-1" tabindex="-1"></a><span class="cf">for</span>( this_col <span class="cf">in</span> <span class="fu">names</span>( pls_df ) ){</span>
+<span id="cb715-2"><a href="public-libraries-survey-pls.html#cb715-2" tabindex="-1"></a></span>
+<span id="cb715-3"><a href="public-libraries-survey-pls.html#cb715-3" tabindex="-1"></a>    <span class="cf">if</span>( <span class="fu">class</span>( pls_df[ , this_col ] ) <span class="sc">==</span> <span class="st">&#39;character&#39;</span> ){</span>
+<span id="cb715-4"><a href="public-libraries-survey-pls.html#cb715-4" tabindex="-1"></a>    </span>
+<span id="cb715-5"><a href="public-libraries-survey-pls.html#cb715-5" tabindex="-1"></a>        pls_df[ pls_df[ , this_col ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , this_col ] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb715-6"><a href="public-libraries-survey-pls.html#cb715-6" tabindex="-1"></a>        </span>
+<span id="cb715-7"><a href="public-libraries-survey-pls.html#cb715-7" tabindex="-1"></a>    }</span>
+<span id="cb715-8"><a href="public-libraries-survey-pls.html#cb715-8" tabindex="-1"></a>    </span>
+<span id="cb715-9"><a href="public-libraries-survey-pls.html#cb715-9" tabindex="-1"></a>    <span class="cf">if</span>( </span>
+<span id="cb715-10"><a href="public-libraries-survey-pls.html#cb715-10" tabindex="-1"></a>        ( <span class="fu">class</span>( pls_df[ , this_col ] ) <span class="sc">==</span> <span class="st">&#39;numeric&#39;</span> ) <span class="sc">|</span> </span>
+<span id="cb715-11"><a href="public-libraries-survey-pls.html#cb715-11" tabindex="-1"></a>        ( this_col <span class="sc">%in%</span> <span class="fu">c</span>( <span class="st">&#39;phone&#39;</span> , <span class="st">&#39;startdat&#39;</span> , <span class="st">&#39;enddate&#39;</span> ) ) </span>
+<span id="cb715-12"><a href="public-libraries-survey-pls.html#cb715-12" tabindex="-1"></a>    ){</span>
+<span id="cb715-13"><a href="public-libraries-survey-pls.html#cb715-13" tabindex="-1"></a>    </span>
+<span id="cb715-14"><a href="public-libraries-survey-pls.html#cb715-14" tabindex="-1"></a>        pls_df[ pls_df[ , this_col ] <span class="sc">%in%</span> <span class="fu">c</span>( <span class="sc">-</span><span class="dv">1</span> , <span class="sc">-</span><span class="dv">3</span> , <span class="sc">-</span><span class="dv">4</span> , <span class="sc">-</span><span class="dv">9</span> ) , this_col ] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb715-15"><a href="public-libraries-survey-pls.html#cb715-15" tabindex="-1"></a>        </span>
+<span id="cb715-16"><a href="public-libraries-survey-pls.html#cb715-16" tabindex="-1"></a>    }</span>
+<span id="cb715-17"><a href="public-libraries-survey-pls.html#cb715-17" tabindex="-1"></a>    </span>
+<span id="cb715-18"><a href="public-libraries-survey-pls.html#cb715-18" tabindex="-1"></a>}</span></code></pre></div>
 <div id="save-locally-25" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="public-libraries-survey-pls.html#save-locally-25" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb715"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb715-1"><a href="public-libraries-survey-pls.html#cb715-1" tabindex="-1"></a><span class="co"># pls_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;PLS&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb715-2"><a href="public-libraries-survey-pls.html#cb715-2" tabindex="-1"></a><span class="co"># saveRDS( pls_df , file = pls_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb716"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb716-1"><a href="public-libraries-survey-pls.html#cb716-1" tabindex="-1"></a><span class="co"># pls_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;PLS&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb716-2"><a href="public-libraries-survey-pls.html#cb716-2" tabindex="-1"></a><span class="co"># saveRDS( pls_df , file = pls_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb716"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb716-1"><a href="public-libraries-survey-pls.html#cb716-1" tabindex="-1"></a><span class="co"># pls_df &lt;- readRDS( pls_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb717"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb717-1"><a href="public-libraries-survey-pls.html#cb717-1" tabindex="-1"></a><span class="co"># pls_df &lt;- readRDS( pls_fn )</span></span></code></pre></div>
 </div>
 <div id="variable-recoding-25" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="public-libraries-survey-pls.html#variable-recoding-25" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb717"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb717-1"><a href="public-libraries-survey-pls.html#cb717-1" tabindex="-1"></a>pls_df <span class="ot">&lt;-</span> </span>
-<span id="cb717-2"><a href="public-libraries-survey-pls.html#cb717-2" tabindex="-1"></a>    <span class="fu">transform</span>( </span>
-<span id="cb717-3"><a href="public-libraries-survey-pls.html#cb717-3" tabindex="-1"></a>        pls_df , </span>
-<span id="cb717-4"><a href="public-libraries-survey-pls.html#cb717-4" tabindex="-1"></a>        </span>
-<span id="cb717-5"><a href="public-libraries-survey-pls.html#cb717-5" tabindex="-1"></a>        <span class="at">c_relatn =</span> </span>
-<span id="cb717-6"><a href="public-libraries-survey-pls.html#cb717-6" tabindex="-1"></a>            <span class="fu">factor</span>( c_relatn , <span class="at">levels =</span> <span class="fu">c</span>( <span class="st">&quot;HQ&quot;</span> , <span class="st">&quot;ME&quot;</span> , <span class="st">&quot;NO&quot;</span> ) ,</span>
-<span id="cb717-7"><a href="public-libraries-survey-pls.html#cb717-7" tabindex="-1"></a>                <span class="fu">c</span>( <span class="st">&quot;HQ-Headquarters of a federation or cooperative&quot;</span> ,</span>
-<span id="cb717-8"><a href="public-libraries-survey-pls.html#cb717-8" tabindex="-1"></a>                <span class="st">&quot;ME-Member of a federation or cooperative&quot;</span> ,</span>
-<span id="cb717-9"><a href="public-libraries-survey-pls.html#cb717-9" tabindex="-1"></a>                <span class="st">&quot;NO-Not a member of a federation or cooperative&quot;</span> )</span>
-<span id="cb717-10"><a href="public-libraries-survey-pls.html#cb717-10" tabindex="-1"></a>            ) ,</span>
-<span id="cb717-11"><a href="public-libraries-survey-pls.html#cb717-11" tabindex="-1"></a>            </span>
-<span id="cb717-12"><a href="public-libraries-survey-pls.html#cb717-12" tabindex="-1"></a>        <span class="at">more_than_one_librarian =</span> <span class="fu">as.numeric</span>( libraria <span class="sc">&gt;</span> <span class="dv">1</span> )</span>
-<span id="cb717-13"><a href="public-libraries-survey-pls.html#cb717-13" tabindex="-1"></a>                </span>
-<span id="cb717-14"><a href="public-libraries-survey-pls.html#cb717-14" tabindex="-1"></a>    )   </span></code></pre></div>
+<div class="sourceCode" id="cb718"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb718-1"><a href="public-libraries-survey-pls.html#cb718-1" tabindex="-1"></a>pls_df <span class="ot">&lt;-</span> </span>
+<span id="cb718-2"><a href="public-libraries-survey-pls.html#cb718-2" tabindex="-1"></a>    <span class="fu">transform</span>( </span>
+<span id="cb718-3"><a href="public-libraries-survey-pls.html#cb718-3" tabindex="-1"></a>        pls_df , </span>
+<span id="cb718-4"><a href="public-libraries-survey-pls.html#cb718-4" tabindex="-1"></a>        </span>
+<span id="cb718-5"><a href="public-libraries-survey-pls.html#cb718-5" tabindex="-1"></a>        <span class="at">c_relatn =</span> </span>
+<span id="cb718-6"><a href="public-libraries-survey-pls.html#cb718-6" tabindex="-1"></a>            <span class="fu">factor</span>( c_relatn , <span class="at">levels =</span> <span class="fu">c</span>( <span class="st">&quot;HQ&quot;</span> , <span class="st">&quot;ME&quot;</span> , <span class="st">&quot;NO&quot;</span> ) ,</span>
+<span id="cb718-7"><a href="public-libraries-survey-pls.html#cb718-7" tabindex="-1"></a>                <span class="fu">c</span>( <span class="st">&quot;HQ-Headquarters of a federation or cooperative&quot;</span> ,</span>
+<span id="cb718-8"><a href="public-libraries-survey-pls.html#cb718-8" tabindex="-1"></a>                <span class="st">&quot;ME-Member of a federation or cooperative&quot;</span> ,</span>
+<span id="cb718-9"><a href="public-libraries-survey-pls.html#cb718-9" tabindex="-1"></a>                <span class="st">&quot;NO-Not a member of a federation or cooperative&quot;</span> )</span>
+<span id="cb718-10"><a href="public-libraries-survey-pls.html#cb718-10" tabindex="-1"></a>            ) ,</span>
+<span id="cb718-11"><a href="public-libraries-survey-pls.html#cb718-11" tabindex="-1"></a>            </span>
+<span id="cb718-12"><a href="public-libraries-survey-pls.html#cb718-12" tabindex="-1"></a>        <span class="at">more_than_one_librarian =</span> <span class="fu">as.numeric</span>( libraria <span class="sc">&gt;</span> <span class="dv">1</span> )</span>
+<span id="cb718-13"><a href="public-libraries-survey-pls.html#cb718-13" tabindex="-1"></a>                </span>
+<span id="cb718-14"><a href="public-libraries-survey-pls.html#cb718-14" tabindex="-1"></a>    )   </span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -996,83 +996,83 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-25" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="public-libraries-survey-pls.html#unweighted-counts-25" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the table, overall and by groups:</p>
-<div class="sourceCode" id="cb718"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb718-1"><a href="public-libraries-survey-pls.html#cb718-1" tabindex="-1"></a><span class="fu">nrow</span>( pls_df )</span>
-<span id="cb718-2"><a href="public-libraries-survey-pls.html#cb718-2" tabindex="-1"></a></span>
-<span id="cb718-3"><a href="public-libraries-survey-pls.html#cb718-3" tabindex="-1"></a><span class="fu">table</span>( pls_df[ , <span class="st">&quot;stabr&quot;</span> ] , <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb719"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb719-1"><a href="public-libraries-survey-pls.html#cb719-1" tabindex="-1"></a><span class="fu">nrow</span>( pls_df )</span>
+<span id="cb719-2"><a href="public-libraries-survey-pls.html#cb719-2" tabindex="-1"></a></span>
+<span id="cb719-3"><a href="public-libraries-survey-pls.html#cb719-3" tabindex="-1"></a><span class="fu">table</span>( pls_df[ , <span class="st">&quot;stabr&quot;</span> ] , <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span> )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-25" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="public-libraries-survey-pls.html#descriptive-statistics-25" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb719"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb719-1"><a href="public-libraries-survey-pls.html#cb719-1" tabindex="-1"></a><span class="fu">mean</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb719-2"><a href="public-libraries-survey-pls.html#cb719-2" tabindex="-1"></a></span>
-<span id="cb719-3"><a href="public-libraries-survey-pls.html#cb719-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb719-4"><a href="public-libraries-survey-pls.html#cb719-4" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
-<span id="cb719-5"><a href="public-libraries-survey-pls.html#cb719-5" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
-<span id="cb719-6"><a href="public-libraries-survey-pls.html#cb719-6" tabindex="-1"></a>    mean ,</span>
-<span id="cb719-7"><a href="public-libraries-survey-pls.html#cb719-7" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb719-8"><a href="public-libraries-survey-pls.html#cb719-8" tabindex="-1"></a>)</span></code></pre></div>
-<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb720"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb720-1"><a href="public-libraries-survey-pls.html#cb720-1" tabindex="-1"></a><span class="fu">prop.table</span>( <span class="fu">table</span>( pls_df[ , <span class="st">&quot;c_relatn&quot;</span> ] ) )</span>
+<div class="sourceCode" id="cb720"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb720-1"><a href="public-libraries-survey-pls.html#cb720-1" tabindex="-1"></a><span class="fu">mean</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb720-2"><a href="public-libraries-survey-pls.html#cb720-2" tabindex="-1"></a></span>
-<span id="cb720-3"><a href="public-libraries-survey-pls.html#cb720-3" tabindex="-1"></a><span class="fu">prop.table</span>(</span>
-<span id="cb720-4"><a href="public-libraries-survey-pls.html#cb720-4" tabindex="-1"></a>    <span class="fu">table</span>( pls_df[ , <span class="fu">c</span>( <span class="st">&quot;c_relatn&quot;</span> , <span class="st">&quot;stabr&quot;</span> ) ] ) ,</span>
-<span id="cb720-5"><a href="public-libraries-survey-pls.html#cb720-5" tabindex="-1"></a>    <span class="at">margin =</span> <span class="dv">2</span></span>
-<span id="cb720-6"><a href="public-libraries-survey-pls.html#cb720-6" tabindex="-1"></a>)</span></code></pre></div>
-<p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb721"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb721-1"><a href="public-libraries-survey-pls.html#cb721-1" tabindex="-1"></a><span class="fu">sum</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb720-3"><a href="public-libraries-survey-pls.html#cb720-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb720-4"><a href="public-libraries-survey-pls.html#cb720-4" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
+<span id="cb720-5"><a href="public-libraries-survey-pls.html#cb720-5" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
+<span id="cb720-6"><a href="public-libraries-survey-pls.html#cb720-6" tabindex="-1"></a>    mean ,</span>
+<span id="cb720-7"><a href="public-libraries-survey-pls.html#cb720-7" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb720-8"><a href="public-libraries-survey-pls.html#cb720-8" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
+<div class="sourceCode" id="cb721"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb721-1"><a href="public-libraries-survey-pls.html#cb721-1" tabindex="-1"></a><span class="fu">prop.table</span>( <span class="fu">table</span>( pls_df[ , <span class="st">&quot;c_relatn&quot;</span> ] ) )</span>
 <span id="cb721-2"><a href="public-libraries-survey-pls.html#cb721-2" tabindex="-1"></a></span>
-<span id="cb721-3"><a href="public-libraries-survey-pls.html#cb721-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb721-4"><a href="public-libraries-survey-pls.html#cb721-4" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
-<span id="cb721-5"><a href="public-libraries-survey-pls.html#cb721-5" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
-<span id="cb721-6"><a href="public-libraries-survey-pls.html#cb721-6" tabindex="-1"></a>    sum ,</span>
-<span id="cb721-7"><a href="public-libraries-survey-pls.html#cb721-7" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb721-8"><a href="public-libraries-survey-pls.html#cb721-8" tabindex="-1"></a>)</span></code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb722"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb722-1"><a href="public-libraries-survey-pls.html#cb722-1" tabindex="-1"></a><span class="fu">quantile</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb721-3"><a href="public-libraries-survey-pls.html#cb721-3" tabindex="-1"></a><span class="fu">prop.table</span>(</span>
+<span id="cb721-4"><a href="public-libraries-survey-pls.html#cb721-4" tabindex="-1"></a>    <span class="fu">table</span>( pls_df[ , <span class="fu">c</span>( <span class="st">&quot;c_relatn&quot;</span> , <span class="st">&quot;stabr&quot;</span> ) ] ) ,</span>
+<span id="cb721-5"><a href="public-libraries-survey-pls.html#cb721-5" tabindex="-1"></a>    <span class="at">margin =</span> <span class="dv">2</span></span>
+<span id="cb721-6"><a href="public-libraries-survey-pls.html#cb721-6" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the sum of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb722"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb722-1"><a href="public-libraries-survey-pls.html#cb722-1" tabindex="-1"></a><span class="fu">sum</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb722-2"><a href="public-libraries-survey-pls.html#cb722-2" tabindex="-1"></a></span>
 <span id="cb722-3"><a href="public-libraries-survey-pls.html#cb722-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
 <span id="cb722-4"><a href="public-libraries-survey-pls.html#cb722-4" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
 <span id="cb722-5"><a href="public-libraries-survey-pls.html#cb722-5" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
-<span id="cb722-6"><a href="public-libraries-survey-pls.html#cb722-6" tabindex="-1"></a>    quantile ,</span>
-<span id="cb722-7"><a href="public-libraries-survey-pls.html#cb722-7" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb722-8"><a href="public-libraries-survey-pls.html#cb722-8" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb722-9"><a href="public-libraries-survey-pls.html#cb722-9" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb722-6"><a href="public-libraries-survey-pls.html#cb722-6" tabindex="-1"></a>    sum ,</span>
+<span id="cb722-7"><a href="public-libraries-survey-pls.html#cb722-7" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb722-8"><a href="public-libraries-survey-pls.html#cb722-8" tabindex="-1"></a>)</span></code></pre></div>
+<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
+<div class="sourceCode" id="cb723"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb723-1"><a href="public-libraries-survey-pls.html#cb723-1" tabindex="-1"></a><span class="fu">quantile</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb723-2"><a href="public-libraries-survey-pls.html#cb723-2" tabindex="-1"></a></span>
+<span id="cb723-3"><a href="public-libraries-survey-pls.html#cb723-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb723-4"><a href="public-libraries-survey-pls.html#cb723-4" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
+<span id="cb723-5"><a href="public-libraries-survey-pls.html#cb723-5" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
+<span id="cb723-6"><a href="public-libraries-survey-pls.html#cb723-6" tabindex="-1"></a>    quantile ,</span>
+<span id="cb723-7"><a href="public-libraries-survey-pls.html#cb723-7" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
+<span id="cb723-8"><a href="public-libraries-survey-pls.html#cb723-8" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb723-9"><a href="public-libraries-survey-pls.html#cb723-9" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting-25" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="public-libraries-survey-pls.html#subsetting-25" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Limit your <code>data.frame</code> to more than one million annual visits:</p>
-<div class="sourceCode" id="cb723"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb723-1"><a href="public-libraries-survey-pls.html#cb723-1" tabindex="-1"></a>sub_pls_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( pls_df , visits <span class="sc">&gt;</span> <span class="dv">1000000</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb724"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb724-1"><a href="public-libraries-survey-pls.html#cb724-1" tabindex="-1"></a>sub_pls_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( pls_df , visits <span class="sc">&gt;</span> <span class="dv">1000000</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb724"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb724-1"><a href="public-libraries-survey-pls.html#cb724-1" tabindex="-1"></a><span class="fu">mean</span>( sub_pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb725"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb725-1"><a href="public-libraries-survey-pls.html#cb725-1" tabindex="-1"></a><span class="fu">mean</span>( sub_pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-25" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="public-libraries-survey-pls.html#measures-of-uncertainty-25" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the variance, overall and by groups:</p>
-<div class="sourceCode" id="cb725"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb725-1"><a href="public-libraries-survey-pls.html#cb725-1" tabindex="-1"></a><span class="fu">var</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb725-2"><a href="public-libraries-survey-pls.html#cb725-2" tabindex="-1"></a></span>
-<span id="cb725-3"><a href="public-libraries-survey-pls.html#cb725-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb725-4"><a href="public-libraries-survey-pls.html#cb725-4" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
-<span id="cb725-5"><a href="public-libraries-survey-pls.html#cb725-5" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
-<span id="cb725-6"><a href="public-libraries-survey-pls.html#cb725-6" tabindex="-1"></a>    var ,</span>
-<span id="cb725-7"><a href="public-libraries-survey-pls.html#cb725-7" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb725-8"><a href="public-libraries-survey-pls.html#cb725-8" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb726"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb726-1"><a href="public-libraries-survey-pls.html#cb726-1" tabindex="-1"></a><span class="fu">var</span>( pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb726-2"><a href="public-libraries-survey-pls.html#cb726-2" tabindex="-1"></a></span>
+<span id="cb726-3"><a href="public-libraries-survey-pls.html#cb726-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb726-4"><a href="public-libraries-survey-pls.html#cb726-4" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;popu_lsa&quot;</span> ] ,</span>
+<span id="cb726-5"><a href="public-libraries-survey-pls.html#cb726-5" tabindex="-1"></a>    pls_df[ , <span class="st">&quot;stabr&quot;</span> ] ,</span>
+<span id="cb726-6"><a href="public-libraries-survey-pls.html#cb726-6" tabindex="-1"></a>    var ,</span>
+<span id="cb726-7"><a href="public-libraries-survey-pls.html#cb726-7" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb726-8"><a href="public-libraries-survey-pls.html#cb726-8" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-25" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="public-libraries-survey-pls.html#regression-models-and-tests-of-association-25" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a t-test:</p>
-<div class="sourceCode" id="cb726"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb726-1"><a href="public-libraries-survey-pls.html#cb726-1" tabindex="-1"></a><span class="fu">t.test</span>( popu_lsa <span class="sc">~</span> more_than_one_librarian , pls_df )</span></code></pre></div>
+<div class="sourceCode" id="cb727"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb727-1"><a href="public-libraries-survey-pls.html#cb727-1" tabindex="-1"></a><span class="fu">t.test</span>( popu_lsa <span class="sc">~</span> more_than_one_librarian , pls_df )</span></code></pre></div>
 <p>Perform a chi-squared test of association:</p>
-<div class="sourceCode" id="cb727"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb727-1"><a href="public-libraries-survey-pls.html#cb727-1" tabindex="-1"></a>this_table <span class="ot">&lt;-</span> <span class="fu">table</span>( pls_df[ , <span class="fu">c</span>( <span class="st">&quot;more_than_one_librarian&quot;</span> , <span class="st">&quot;c_relatn&quot;</span> ) ] )</span>
-<span id="cb727-2"><a href="public-libraries-survey-pls.html#cb727-2" tabindex="-1"></a></span>
-<span id="cb727-3"><a href="public-libraries-survey-pls.html#cb727-3" tabindex="-1"></a><span class="fu">chisq.test</span>( this_table )</span></code></pre></div>
+<div class="sourceCode" id="cb728"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb728-1"><a href="public-libraries-survey-pls.html#cb728-1" tabindex="-1"></a>this_table <span class="ot">&lt;-</span> <span class="fu">table</span>( pls_df[ , <span class="fu">c</span>( <span class="st">&quot;more_than_one_librarian&quot;</span> , <span class="st">&quot;c_relatn&quot;</span> ) ] )</span>
+<span id="cb728-2"><a href="public-libraries-survey-pls.html#cb728-2" tabindex="-1"></a></span>
+<span id="cb728-3"><a href="public-libraries-survey-pls.html#cb728-3" tabindex="-1"></a><span class="fu">chisq.test</span>( this_table )</span></code></pre></div>
 <p>Perform a generalized linear model:</p>
-<div class="sourceCode" id="cb728"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb728-1"><a href="public-libraries-survey-pls.html#cb728-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb728-2"><a href="public-libraries-survey-pls.html#cb728-2" tabindex="-1"></a>    <span class="fu">glm</span>( </span>
-<span id="cb728-3"><a href="public-libraries-survey-pls.html#cb728-3" tabindex="-1"></a>        popu_lsa <span class="sc">~</span> more_than_one_librarian <span class="sc">+</span> c_relatn , </span>
-<span id="cb728-4"><a href="public-libraries-survey-pls.html#cb728-4" tabindex="-1"></a>        <span class="at">data =</span> pls_df</span>
-<span id="cb728-5"><a href="public-libraries-survey-pls.html#cb728-5" tabindex="-1"></a>    )</span>
-<span id="cb728-6"><a href="public-libraries-survey-pls.html#cb728-6" tabindex="-1"></a></span>
-<span id="cb728-7"><a href="public-libraries-survey-pls.html#cb728-7" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb729"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb729-1"><a href="public-libraries-survey-pls.html#cb729-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb729-2"><a href="public-libraries-survey-pls.html#cb729-2" tabindex="-1"></a>    <span class="fu">glm</span>( </span>
+<span id="cb729-3"><a href="public-libraries-survey-pls.html#cb729-3" tabindex="-1"></a>        popu_lsa <span class="sc">~</span> more_than_one_librarian <span class="sc">+</span> c_relatn , </span>
+<span id="cb729-4"><a href="public-libraries-survey-pls.html#cb729-4" tabindex="-1"></a>        <span class="at">data =</span> pls_df</span>
+<span id="cb729-5"><a href="public-libraries-survey-pls.html#cb729-5" tabindex="-1"></a>    )</span>
+<span id="cb729-6"><a href="public-libraries-survey-pls.html#cb729-6" tabindex="-1"></a></span>
+<span id="cb729-7"><a href="public-libraries-survey-pls.html#cb729-7" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1089,58 +1089,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="replication-example-23" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="public-libraries-survey-pls.html#replication-example-23" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example matches Interlibrary Relationship Frequencies on <a href="https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf#page=169">PDF page 169 of the User’s Guide</a>:</p>
-<div class="sourceCode" id="cb729"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb729-1"><a href="public-libraries-survey-pls.html#cb729-1" tabindex="-1"></a><span class="co"># remove closed and temporarily closed libraries</span></span>
-<span id="cb729-2"><a href="public-libraries-survey-pls.html#cb729-2" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">table</span>( pls_df[ <span class="sc">!</span>( pls_df[ , <span class="st">&#39;statstru&#39;</span> ] <span class="sc">%in%</span> <span class="fu">c</span>( <span class="dv">3</span> , <span class="dv">23</span> ) ) , <span class="st">&#39;c_relatn&#39;</span> ] )</span>
-<span id="cb729-3"><a href="public-libraries-survey-pls.html#cb729-3" tabindex="-1"></a></span>
-<span id="cb729-4"><a href="public-libraries-survey-pls.html#cb729-4" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;HQ-Headquarters of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">112</span> )</span>
-<span id="cb729-5"><a href="public-libraries-survey-pls.html#cb729-5" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;ME-Member of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">6859</span> )</span>
-<span id="cb729-6"><a href="public-libraries-survey-pls.html#cb729-6" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;NO-Not a member of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">2236</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb730"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb730-1"><a href="public-libraries-survey-pls.html#cb730-1" tabindex="-1"></a><span class="co"># remove closed and temporarily closed libraries</span></span>
+<span id="cb730-2"><a href="public-libraries-survey-pls.html#cb730-2" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">table</span>( pls_df[ <span class="sc">!</span>( pls_df[ , <span class="st">&#39;statstru&#39;</span> ] <span class="sc">%in%</span> <span class="fu">c</span>( <span class="dv">3</span> , <span class="dv">23</span> ) ) , <span class="st">&#39;c_relatn&#39;</span> ] )</span>
+<span id="cb730-3"><a href="public-libraries-survey-pls.html#cb730-3" tabindex="-1"></a></span>
+<span id="cb730-4"><a href="public-libraries-survey-pls.html#cb730-4" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;HQ-Headquarters of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">112</span> )</span>
+<span id="cb730-5"><a href="public-libraries-survey-pls.html#cb730-5" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;ME-Member of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">6859</span> )</span>
+<span id="cb730-6"><a href="public-libraries-survey-pls.html#cb730-6" tabindex="-1"></a><span class="fu">stopifnot</span>( results[ <span class="st">&quot;NO-Not a member of a federation or cooperative&quot;</span> ] <span class="sc">==</span> <span class="dv">2236</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-dplyr-5" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>dplyr</code>  <a href="public-libraries-survey-pls.html#analysis-examples-with-dplyr-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>dplyr</code> library offers an alternative grammar of data manipulation to base R and SQL syntax. <a href="https://github.com/tidyverse/dplyr/">dplyr</a> offers many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, and the <code>tidyverse</code> style of non-standard evaluation. <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html">This vignette</a> details the available features. As a starting point for PLS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb730"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb730-1"><a href="public-libraries-survey-pls.html#cb730-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb730-2"><a href="public-libraries-survey-pls.html#cb730-2" tabindex="-1"></a>pls_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>( pls_df )</span></code></pre></div>
+<div class="sourceCode" id="cb731"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb731-1"><a href="public-libraries-survey-pls.html#cb731-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb731-2"><a href="public-libraries-survey-pls.html#cb731-2" tabindex="-1"></a>pls_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>( pls_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb731"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb731-1"><a href="public-libraries-survey-pls.html#cb731-1" tabindex="-1"></a>pls_tbl <span class="sc">%&gt;%</span></span>
-<span id="cb731-2"><a href="public-libraries-survey-pls.html#cb731-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
-<span id="cb731-3"><a href="public-libraries-survey-pls.html#cb731-3" tabindex="-1"></a></span>
-<span id="cb731-4"><a href="public-libraries-survey-pls.html#cb731-4" tabindex="-1"></a>pls_tbl <span class="sc">%&gt;%</span></span>
-<span id="cb731-5"><a href="public-libraries-survey-pls.html#cb731-5" tabindex="-1"></a>    <span class="fu">group_by</span>( stabr ) <span class="sc">%&gt;%</span></span>
-<span id="cb731-6"><a href="public-libraries-survey-pls.html#cb731-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<div class="sourceCode" id="cb732"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb732-1"><a href="public-libraries-survey-pls.html#cb732-1" tabindex="-1"></a>pls_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb732-2"><a href="public-libraries-survey-pls.html#cb732-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb732-3"><a href="public-libraries-survey-pls.html#cb732-3" tabindex="-1"></a></span>
+<span id="cb732-4"><a href="public-libraries-survey-pls.html#cb732-4" tabindex="-1"></a>pls_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb732-5"><a href="public-libraries-survey-pls.html#cb732-5" tabindex="-1"></a>    <span class="fu">group_by</span>( stabr ) <span class="sc">%&gt;%</span></span>
+<span id="cb732-6"><a href="public-libraries-survey-pls.html#cb732-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-data.table-5" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>data.table</code>  <a href="public-libraries-survey-pls.html#analysis-examples-with-data.table-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>data.table</code> library provides a high-performance version of base R’s data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. <a href="https://r-datatable.com">data.table</a> offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">This vignette</a> details the available features. As a starting point for PLS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb732"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb732-1"><a href="public-libraries-survey-pls.html#cb732-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb732-2"><a href="public-libraries-survey-pls.html#cb732-2" tabindex="-1"></a>pls_dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>( pls_df )</span></code></pre></div>
+<div class="sourceCode" id="cb733"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb733-1"><a href="public-libraries-survey-pls.html#cb733-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb733-2"><a href="public-libraries-survey-pls.html#cb733-2" tabindex="-1"></a>pls_dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>( pls_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb733"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb733-1"><a href="public-libraries-survey-pls.html#cb733-1" tabindex="-1"></a>pls_dt[ , <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) ]</span>
-<span id="cb733-2"><a href="public-libraries-survey-pls.html#cb733-2" tabindex="-1"></a></span>
-<span id="cb733-3"><a href="public-libraries-survey-pls.html#cb733-3" tabindex="-1"></a>pls_dt[ , <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) , by <span class="ot">=</span> stabr ]</span></code></pre></div>
+<div class="sourceCode" id="cb734"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb734-1"><a href="public-libraries-survey-pls.html#cb734-1" tabindex="-1"></a>pls_dt[ , <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) ]</span>
+<span id="cb734-2"><a href="public-libraries-survey-pls.html#cb734-2" tabindex="-1"></a></span>
+<span id="cb734-3"><a href="public-libraries-survey-pls.html#cb734-3" tabindex="-1"></a>pls_dt[ , <span class="fu">mean</span>( popu_lsa , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) , by <span class="ot">=</span> stabr ]</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-duckdb-5" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>duckdb</code>  <a href="public-libraries-survey-pls.html#analysis-examples-with-duckdb-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>duckdb</code> library provides an embedded analytical data management system with support for the Structured Query Language (SQL). <a href="https://duckdb.org">duckdb</a> offers a simple, feature-rich, fast, and free SQL OLAP management system. <a href="https://duckdb.org/docs/api/r">This vignette</a> details the available features. As a starting point for PLS users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb734"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb734-1"><a href="public-libraries-survey-pls.html#cb734-1" tabindex="-1"></a><span class="fu">library</span>(duckdb)</span>
-<span id="cb734-2"><a href="public-libraries-survey-pls.html#cb734-2" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>( duckdb<span class="sc">::</span><span class="fu">duckdb</span>() , <span class="at">dbdir =</span> <span class="st">&#39;my-db.duckdb&#39;</span> )</span>
-<span id="cb734-3"><a href="public-libraries-survey-pls.html#cb734-3" tabindex="-1"></a><span class="fu">dbWriteTable</span>( con , <span class="st">&#39;pls&#39;</span> , pls_df )</span></code></pre></div>
+<div class="sourceCode" id="cb735"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb735-1"><a href="public-libraries-survey-pls.html#cb735-1" tabindex="-1"></a><span class="fu">library</span>(duckdb)</span>
+<span id="cb735-2"><a href="public-libraries-survey-pls.html#cb735-2" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>( duckdb<span class="sc">::</span><span class="fu">duckdb</span>() , <span class="at">dbdir =</span> <span class="st">&#39;my-db.duckdb&#39;</span> )</span>
+<span id="cb735-3"><a href="public-libraries-survey-pls.html#cb735-3" tabindex="-1"></a><span class="fu">dbWriteTable</span>( con , <span class="st">&#39;pls&#39;</span> , pls_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb735"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb735-1"><a href="public-libraries-survey-pls.html#cb735-1" tabindex="-1"></a><span class="fu">dbGetQuery</span>( con , <span class="st">&#39;SELECT AVG( popu_lsa ) FROM pls&#39;</span> )</span>
-<span id="cb735-2"><a href="public-libraries-survey-pls.html#cb735-2" tabindex="-1"></a></span>
-<span id="cb735-3"><a href="public-libraries-survey-pls.html#cb735-3" tabindex="-1"></a><span class="fu">dbGetQuery</span>(</span>
-<span id="cb735-4"><a href="public-libraries-survey-pls.html#cb735-4" tabindex="-1"></a>    con ,</span>
-<span id="cb735-5"><a href="public-libraries-survey-pls.html#cb735-5" tabindex="-1"></a>    <span class="st">&#39;SELECT</span></span>
-<span id="cb735-6"><a href="public-libraries-survey-pls.html#cb735-6" tabindex="-1"></a><span class="st">        stabr ,</span></span>
-<span id="cb735-7"><a href="public-libraries-survey-pls.html#cb735-7" tabindex="-1"></a><span class="st">        AVG( popu_lsa )</span></span>
-<span id="cb735-8"><a href="public-libraries-survey-pls.html#cb735-8" tabindex="-1"></a><span class="st">    FROM</span></span>
-<span id="cb735-9"><a href="public-libraries-survey-pls.html#cb735-9" tabindex="-1"></a><span class="st">        pls</span></span>
-<span id="cb735-10"><a href="public-libraries-survey-pls.html#cb735-10" tabindex="-1"></a><span class="st">    GROUP BY</span></span>
-<span id="cb735-11"><a href="public-libraries-survey-pls.html#cb735-11" tabindex="-1"></a><span class="st">        stabr&#39;</span></span>
-<span id="cb735-12"><a href="public-libraries-survey-pls.html#cb735-12" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb736"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb736-1"><a href="public-libraries-survey-pls.html#cb736-1" tabindex="-1"></a><span class="fu">dbGetQuery</span>( con , <span class="st">&#39;SELECT AVG( popu_lsa ) FROM pls&#39;</span> )</span>
+<span id="cb736-2"><a href="public-libraries-survey-pls.html#cb736-2" tabindex="-1"></a></span>
+<span id="cb736-3"><a href="public-libraries-survey-pls.html#cb736-3" tabindex="-1"></a><span class="fu">dbGetQuery</span>(</span>
+<span id="cb736-4"><a href="public-libraries-survey-pls.html#cb736-4" tabindex="-1"></a>    con ,</span>
+<span id="cb736-5"><a href="public-libraries-survey-pls.html#cb736-5" tabindex="-1"></a>    <span class="st">&#39;SELECT</span></span>
+<span id="cb736-6"><a href="public-libraries-survey-pls.html#cb736-6" tabindex="-1"></a><span class="st">        stabr ,</span></span>
+<span id="cb736-7"><a href="public-libraries-survey-pls.html#cb736-7" tabindex="-1"></a><span class="st">        AVG( popu_lsa )</span></span>
+<span id="cb736-8"><a href="public-libraries-survey-pls.html#cb736-8" tabindex="-1"></a><span class="st">    FROM</span></span>
+<span id="cb736-9"><a href="public-libraries-survey-pls.html#cb736-9" tabindex="-1"></a><span class="st">        pls</span></span>
+<span id="cb736-10"><a href="public-libraries-survey-pls.html#cb736-10" tabindex="-1"></a><span class="st">    GROUP BY</span></span>
+<span id="cb736-11"><a href="public-libraries-survey-pls.html#cb736-11" tabindex="-1"></a><span class="st">        stabr&#39;</span></span>
+<span id="cb736-12"><a href="public-libraries-survey-pls.html#cb736-12" tabindex="-1"></a>)</span></code></pre></div>
 
 </div>
 </div>
