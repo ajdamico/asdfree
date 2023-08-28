@@ -1,0 +1,112 @@
+chapter_title: Area Health Resources Files
+
+needs_actions_build_status_line: yes
+
+~~~{dataset_introduction}
+National, state, and county-level data on health care professions, health facilities, population characteristics, health workforce training, hospital utilization and expenditure, and the environment.
+~~~
+
+table_structure: * One table with one row per county and a second table with one row per state.
+
+publication_period: * Replaced annually with the latest available county- and state-level statistics.
+
+administrative_organization: * Compiled by the [Bureau of Health Workforce](https://bhw.hrsa.gov/) at the [Health Services and Resources Administration](http://www.hrsa.gov/).
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [User Documentation for the County Area Health Resources File (AHRF) 2021-2022 Release](https://data.hrsa.gov/DataDownload/AHRF/AHRF%202021-2022_User_Tech.zip)
+
+2. [Frequently Asked Questions](https://data.hrsa.gov/faq)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+#
+#
+#
+```
+~~~
+
+~~~{download_and_import_block}
+
+Download and import the most current county-level file:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+tf <- tempfile()
+
+chapter_tag_url <- "https://data.hrsa.gov//DataDownload/AHRF/AHRF_2021-2022_SAS.zip"
+
+download.file( chapter_tag_url , tf , mode = 'wb' )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+
+sas_fn <- grep( "\\\\.sas7bdat$" , unzipped_files , value = TRUE )
+
+chapter_tag_tbl <- read_sas( sas_fn )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+```
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		cbsa_indicator_code = 
+			factor( 
+				as.numeric( f1406720 ) , 
+				levels = 0:2 ,
+				labels = c( "not metro" , "metro" , "micro" ) 
+			) ,
+			
+		mhi_2020 = f1322620 ,
+		
+		whole_county_hpsa_2022 = as.numeric( f0978722 ) == 1 ,
+		
+		census_region = 
+			factor( 
+				as.numeric( f04439 ) , 
+				labels = c( "northeast" , "midwest" , "south" , "west" ) 
+			)
+
+	)
+	
+~~~
+
+group_by_variable: cbsa_indicator_code
+linear_variable: mhi_2020
+linear_narm: , na.rm = TRUE
+categorical_variable: census_region
+subset_definition: f12424 == "CA"
+subset_definition_description: California
+binary_variable: whole_county_hpsa_2022
+
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
+
+needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
+
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+Match the record count in row number 8,543 of `AHRF 2021-2022 Technical Documentation.xlsx`:
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( chapter_tag_df ) == 3232 )
+```
+~~~
