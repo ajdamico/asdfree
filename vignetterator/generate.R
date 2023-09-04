@@ -1,4 +1,4 @@
-commit_memo <- "'ahrf draft'"
+commit_memo <- "'pns draft'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 

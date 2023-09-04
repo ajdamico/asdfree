@@ -1,0 +1,256 @@
+chapter_title: Pesquisa Nacional de Saude
+
+
+needs_actions_build_status_line: yes
+
+~~~{dataset_introduction}
+The Pesquisa Nacional de Saude (PNS) is Brazil's healthcare survey.
+~~~
+
+table_structure: * One table with one row per long-questionnaire respondent and a second table with one row for all respondents.
+
+generalizable_population: * A complex sample survey designed to generalize to Brazil's civilian population.
+
+publication_period: * First released 2013.
+
+administrative_organization: * Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1.
+
+2.
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+#
+#
+#
+```
+~~~
+
+
+
+~~~{download_and_import_block}
+
+Download and import the dictionary file:
+
+```{r eval = FALSE , results = "hide" }
+dictionary_tf <- tempfile()
+
+dictionary_url <-
+	paste0(
+		"https://ftp.ibge.gov.br/PNS/" ,
+		"2019/Microdados/Documentacao/" ,
+		"Dicionario_e_input_20220530.zip"
+	)
+
+download.file( dictionary_url , dictionary_tf , mode = 'wb' )
+
+dictionary_files <- unzip( dictionary_tf , exdir = tempdir() )
+
+sas_fn <- grep( '\\\\.sas$' , dictionary_files , value = TRUE )
+
+sas_lines <- readLines( sas_fn , encoding = 'latin1' )
+```
+
+Determine fixed-width file positions from the SAS import script:
+
+```{r eval = FALSE , results = "hide" }
+sas_start <- grep( '@00001' , sas_lines )
+
+sas_end <- grep( ';' , sas_lines )
+
+sas_end <- sas_end[ sas_end > sas_start ][ 1 ]
+
+sas_lines <- sas_lines[ seq( sas_start , sas_end - 1 ) ]
+
+# remove SAS comments
+sas_lines <- gsub( "\\\\/\\\\*(.*)" , "" , sas_lines )
+
+# remove tabs, multiple spaces and spaces at the end of each string
+sas_lines <- gsub( "\\\\t" , " " , sas_lines )
+sas_lines <- gsub( "( +)" , " " , sas_lines )
+sas_lines <- gsub( " $" , "" , sas_lines )
+
+sas_df <- 
+	read.table( 
+		textConnection( sas_lines ) , 
+		sep = ' ' , 
+		col.names = c( 'position' , 'column_name' , 'length' ) ,
+		header = FALSE 
+	)
+
+sas_df[ , 'character' ] <- grepl( '\\\\$' , sas_df[ , 'length' ] )
+
+sas_df[ , 'position' ] <- as.integer( gsub( "\\\\@" , "" , sas_df[ , 'position' ] ) )
+
+sas_df[ , 'length' ] <- as.integer( gsub( "\\\\$" , "" , sas_df[ , 'length' ] ) )
+
+stopifnot( 
+	sum( sas_df[ , 'length' ] ) == 
+	( sas_df[ nrow( sas_df ) , 'position' ] + sas_df[ nrow( sas_df ) , 'length' ] - 1 ) 
+)
+```
+
+Download the latest data file:
+
+```{r eval = FALSE , results = "hide" }
+this_tf <- tempfile()
+
+this_url <-
+	paste0(
+		"https://ftp.ibge.gov.br/PNS/" ,
+		"2019/Microdados/Dados/" ,
+		"PNS_2019_20220525.zip"
+	)
+
+download.file( this_url , this_tf , mode = 'wb' )
+```
+
+Import the latest data file:
+
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+chapter_tag_tbl <-
+	read_fwf(
+		this_tf ,
+		fwf_widths( 
+			widths = sas_df[ , 'length' ] , 
+			col_names = sas_df[ , 'column_name' ] 
+		) ,
+		col_types = 
+			paste0( ifelse( sas_df[ , 'character' ] , "c" , "d" ) , collapse = '' )
+	)
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+
+
+
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+chapter_tag_prestratified_design <-
+	svydesign(
+		id = ~ upa_pns ,
+		strata = ~v0024 ,
+		data = subset( chapter_tag_df , !is.na( v0028 ) ) ,
+		weights = ~v0028 ,
+		nest = TRUE
+	)
+
+popc.types <-
+	data.frame(
+		v00283 = as.character( unique( chapter_tag_df[ , 'v00283' ] ) ) ,
+		Freq = as.numeric( unique( chapter_tag_df[ , 'v00282' ] ) )
+	)
+
+popc.types <- popc.types[ order( popc.types[ , 'v00283' ] ) , ]
+
+chapter_tag_design <-
+	postStratify(
+		chapter_tag_prestratified_design ,
+		strata = ~v00283 ,
+		population = popc.types
+	)
+
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+
+		one = 1 ,
+		
+		medical_insurance = ifelse( i00102 %in% 1:2 , as.numeric( i00102 == 1 ) , NA ) ,
+		
+		uf_name =
+		
+			factor(
+			
+				as.numeric( v0001 ) ,
+				
+				levels = 
+					c(11L, 12L, 13L, 14L, 15L, 16L, 17L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 31L, 32L, 33L, 35L, 41L, 42L, 43L, 50L, 51L, 
+					52L, 53L) ,
+					
+				labels =
+					c("Rondonia", "Acre", "Amazonas", "Roraima", "Para", "Amapa", 
+					"Tocantins", "Maranhao", "Piaui", "Ceara", "Rio Grande do Norte", 
+					"Paraiba", "Pernambuco", "Alagoas", "Sergipe", "Bahia", "Minas Gerais", 
+					"Espirito Santo", "Rio de Janeiro", "Sao Paulo", "Parana", "Santa Catarina", 
+					"Rio Grande do Sul", "Mato Grosso do Sul", "Mato Grosso", "Goias", 
+					"Distrito Federal")
+					
+			) ,
+
+		age_categories = factor( 1 + findInterval( c008 , seq( 5 , 90 , 5 ) ) ) ,
+
+		male = as.numeric( v006 == 1 )
+		
+	)
+~~~
+
+group_by_variable: uf_name
+group_by_variable_description: state
+
+categorical_variable: c006
+
+linear_variable: e01602
+linear_variable_description: gross monthly income
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: p00104
+ratio_estimation_denominator: p00404
+ratio_narm: , na.rm = TRUE
+
+subset_definition: p035 %in% 3:7
+subset_definition_description: three or more days of exercise per week
+
+binary_variable: medical_insurance
+binary_narm: , na.rm = TRUE
+
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+
+```{r eval = FALSE , results = "hide" }
+total_renda <- svytotal( ~ e01602 , chapter_tag_design )
+stopifnot( round( coef( total_renda ) , 0 ) == 213227874692 )
+stopifnot( round( SE( total_renda ) , 0 ) == 3604489769 )
+```
+
+~~~
+
+
