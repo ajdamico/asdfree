@@ -2,23 +2,23 @@
 
 <a href="https://github.com/asdfree/pns/actions"><img src="https://github.com/asdfree/pns/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-The Pesquisa Nacional de Saude (PNS) is Brazil's healthcare survey.
+Brazil's health survey, measuring medical conditions, risk behaviors, access to and use of care.
 
-* One table with one row per long-questionnaire respondent and a second table with one row for all respondents.
+* One consolidated table with one row per individual within each sampled household.
 
 * A complex sample survey designed to generalize to Brazil's civilian population.
 
-* First released 2013.
+* Released at approximately five year intervals starting in 2013.
 
-* Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+* Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/) partnered with the [Ministério da Saúde](https://www.gov.br/saude/pt-br/).
 
 ---
 
 Please skim before you begin:
 
-1.
+1. [Conceitos e métodos](https://www.ibge.gov.br/estatisticas/sociais/saude/9160-pesquisa-nacional-de-saude.html?=&t=conceitos-e-metodos)
 
-2.
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Pesquisa_Nacional_de_Sa%C3%BAde)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Pesquisa Nacional de Saude)
 
@@ -38,11 +38,7 @@ Download and import the dictionary file:
 dictionary_tf <- tempfile()
 
 dictionary_url <-
-	paste0(
-		"https://ftp.ibge.gov.br/PNS/" ,
-		"2019/Microdados/Documentacao/" ,
-		"Dicionario_e_input_20220530.zip"
-	)
+	"https://ftp.ibge.gov.br/PNS/2019/Microdados/Documentacao/Dicionario_e_input_20220530.zip"
 
 download.file( dictionary_url , dictionary_tf , mode = 'wb' )
 
@@ -68,7 +64,7 @@ sas_lines <- sas_lines[ seq( sas_start , sas_end - 1 ) ]
 sas_lines <- gsub( "\\/\\*(.*)" , "" , sas_lines )
 
 # remove tabs, multiple spaces and spaces at the end of each string
-sas_lines <- gsub( "	" , " " , sas_lines )
+sas_lines <- gsub( "\t" , " " , sas_lines )
 sas_lines <- gsub( "( +)" , " " , sas_lines )
 sas_lines <- gsub( " $" , "" , sas_lines )
 
@@ -98,11 +94,7 @@ Download the latest data file:
 this_tf <- tempfile()
 
 this_url <-
-	paste0(
-		"https://ftp.ibge.gov.br/PNS/" ,
-		"2019/Microdados/Dados/" ,
-		"PNS_2019_20220525.zip"
-	)
+	"https://ftp.ibge.gov.br/PNS/2019/Microdados/Dados/PNS_2019_20220525.zip"
 
 download.file( this_url , this_tf , mode = 'wb' )
 ```
@@ -187,8 +179,6 @@ pns_design <-
 	update( 
 		pns_design , 
 
-		one = 1 ,
-		
 		medical_insurance = ifelse( i00102 %in% 1:2 , as.numeric( i00102 == 1 ) , NA ) ,
 		
 		uf_name =
@@ -296,7 +286,7 @@ svyratio(
 
 ### Subsetting {-}
 
-Restrict the survey design to three or more days of exercise per week:
+Restrict the survey design to individuals that exercise three or more days per week:
 ```{r eval = FALSE , results = "hide" }
 sub_pns_design <- subset( pns_design , p035 %in% 3:7 )
 ```
@@ -391,6 +381,8 @@ summary( glm_result )
 ---
 
 ## Replication Example {-}
+
+This example matches the `Estimando totais` of gross monthly income from [the official `PNSIBGE` R package](https://rpubs.com/gabriel-assuncao-ibge/pns):
 
 ```{r eval = FALSE , results = "hide" }
 total_renda <- svytotal( ~ e01602 , pns_design , na.rm = TRUE )

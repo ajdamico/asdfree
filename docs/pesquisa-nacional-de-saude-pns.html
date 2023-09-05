@@ -929,19 +929,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="pesquisa-nacional-de-saude-pns" class="section level1 unnumbered hasAnchor">
 <h1>Pesquisa Nacional de Saude (PNS)<a href="pesquisa-nacional-de-saude-pns.html#pesquisa-nacional-de-saude-pns" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/pns/actions"><img src="https://github.com/asdfree/pns/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>The Pesquisa Nacional de Saude (PNS) is Brazil’s healthcare survey.</p>
+<p>Brazil’s health survey, measuring medical conditions, risk behaviors, access to and use of care.</p>
 <ul>
-<li><p>One table with one row per long-questionnaire respondent and a second table with one row for all respondents.</p></li>
+<li><p>One consolidated table with one row per individual within each sampled household.</p></li>
 <li><p>A complex sample survey designed to generalize to Brazil’s civilian population.</p></li>
-<li><p>First released 2013.</p></li>
-<li><p>Administered by the <a href="http://www.ibge.gov.br/">Instituto Brasileiro de Geografia e Estatistica</a>.</p></li>
+<li><p>Released at approximately five year intervals starting in 2013.</p></li>
+<li><p>Administered by the <a href="http://www.ibge.gov.br/">Instituto Brasileiro de Geografia e Estatistica</a> partnered with the <a href="https://www.gov.br/saude/pt-br/">Ministério da Saúde</a>.</p></li>
 </ul>
 <hr />
 <p>Please skim before you begin:</p>
 <ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Pesquisa%20Nacional%20de%20Saude">artificial intelligence-generated limericks</a></li>
+<li><p><a href="https://www.ibge.gov.br/estatisticas/sociais/saude/9160-pesquisa-nacional-de-saude.html?=&amp;t=conceitos-e-metodos">Conceitos e métodos</a></p></li>
+<li><p><a href="https://pt.wikipedia.org/wiki/Pesquisa_Nacional_de_Sa%C3%BAde">Wikipedia Entry</a></p></li>
+<li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Pesquisa%20Nacional%20de%20Saude">artificial intelligence-generated limericks</a></p></li>
 </ol>
 <div class="sourceCode" id="cb768"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb768-1"><a href="pesquisa-nacional-de-saude-pns.html#cb768-1" tabindex="-1"></a><span class="co">#</span></span>
 <span id="cb768-2"><a href="pesquisa-nacional-de-saude-pns.html#cb768-2" tabindex="-1"></a><span class="co">#</span></span>
@@ -953,19 +953,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb769"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb769-1"><a href="pesquisa-nacional-de-saude-pns.html#cb769-1" tabindex="-1"></a>dictionary_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb769-2"><a href="pesquisa-nacional-de-saude-pns.html#cb769-2" tabindex="-1"></a></span>
 <span id="cb769-3"><a href="pesquisa-nacional-de-saude-pns.html#cb769-3" tabindex="-1"></a>dictionary_url <span class="ot">&lt;-</span></span>
-<span id="cb769-4"><a href="pesquisa-nacional-de-saude-pns.html#cb769-4" tabindex="-1"></a>    <span class="fu">paste0</span>(</span>
-<span id="cb769-5"><a href="pesquisa-nacional-de-saude-pns.html#cb769-5" tabindex="-1"></a>        <span class="st">&quot;https://ftp.ibge.gov.br/PNS/&quot;</span> ,</span>
-<span id="cb769-6"><a href="pesquisa-nacional-de-saude-pns.html#cb769-6" tabindex="-1"></a>        <span class="st">&quot;2019/Microdados/Documentacao/&quot;</span> ,</span>
-<span id="cb769-7"><a href="pesquisa-nacional-de-saude-pns.html#cb769-7" tabindex="-1"></a>        <span class="st">&quot;Dicionario_e_input_20220530.zip&quot;</span></span>
-<span id="cb769-8"><a href="pesquisa-nacional-de-saude-pns.html#cb769-8" tabindex="-1"></a>    )</span>
+<span id="cb769-4"><a href="pesquisa-nacional-de-saude-pns.html#cb769-4" tabindex="-1"></a>    <span class="st">&quot;https://ftp.ibge.gov.br/PNS/2019/Microdados/Documentacao/Dicionario_e_input_20220530.zip&quot;</span></span>
+<span id="cb769-5"><a href="pesquisa-nacional-de-saude-pns.html#cb769-5" tabindex="-1"></a></span>
+<span id="cb769-6"><a href="pesquisa-nacional-de-saude-pns.html#cb769-6" tabindex="-1"></a><span class="fu">download.file</span>( dictionary_url , dictionary_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb769-7"><a href="pesquisa-nacional-de-saude-pns.html#cb769-7" tabindex="-1"></a></span>
+<span id="cb769-8"><a href="pesquisa-nacional-de-saude-pns.html#cb769-8" tabindex="-1"></a>dictionary_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( dictionary_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb769-9"><a href="pesquisa-nacional-de-saude-pns.html#cb769-9" tabindex="-1"></a></span>
-<span id="cb769-10"><a href="pesquisa-nacional-de-saude-pns.html#cb769-10" tabindex="-1"></a><span class="fu">download.file</span>( dictionary_url , dictionary_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb769-10"><a href="pesquisa-nacional-de-saude-pns.html#cb769-10" tabindex="-1"></a>sas_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.sas$&#39;</span> , dictionary_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb769-11"><a href="pesquisa-nacional-de-saude-pns.html#cb769-11" tabindex="-1"></a></span>
-<span id="cb769-12"><a href="pesquisa-nacional-de-saude-pns.html#cb769-12" tabindex="-1"></a>dictionary_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( dictionary_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb769-13"><a href="pesquisa-nacional-de-saude-pns.html#cb769-13" tabindex="-1"></a></span>
-<span id="cb769-14"><a href="pesquisa-nacional-de-saude-pns.html#cb769-14" tabindex="-1"></a>sas_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.sas$&#39;</span> , dictionary_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb769-15"><a href="pesquisa-nacional-de-saude-pns.html#cb769-15" tabindex="-1"></a></span>
-<span id="cb769-16"><a href="pesquisa-nacional-de-saude-pns.html#cb769-16" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">readLines</span>( sas_fn , <span class="at">encoding =</span> <span class="st">&#39;latin1&#39;</span> )</span></code></pre></div>
+<span id="cb769-12"><a href="pesquisa-nacional-de-saude-pns.html#cb769-12" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">readLines</span>( sas_fn , <span class="at">encoding =</span> <span class="st">&#39;latin1&#39;</span> )</span></code></pre></div>
 <p>Determine fixed-width file positions from the SAS import script:</p>
 <div class="sourceCode" id="cb770"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb770-1"><a href="pesquisa-nacional-de-saude-pns.html#cb770-1" tabindex="-1"></a>sas_start <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;@00001&#39;</span> , sas_lines )</span>
 <span id="cb770-2"><a href="pesquisa-nacional-de-saude-pns.html#cb770-2" tabindex="-1"></a></span>
@@ -979,7 +975,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb770-10"><a href="pesquisa-nacional-de-saude-pns.html#cb770-10" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;</span><span class="sc">\\</span><span class="st">/</span><span class="sc">\\</span><span class="st">*(.*)&quot;</span> , <span class="st">&quot;&quot;</span> , sas_lines )</span>
 <span id="cb770-11"><a href="pesquisa-nacional-de-saude-pns.html#cb770-11" tabindex="-1"></a></span>
 <span id="cb770-12"><a href="pesquisa-nacional-de-saude-pns.html#cb770-12" tabindex="-1"></a><span class="co"># remove tabs, multiple spaces and spaces at the end of each string</span></span>
-<span id="cb770-13"><a href="pesquisa-nacional-de-saude-pns.html#cb770-13" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;    &quot;</span> , <span class="st">&quot; &quot;</span> , sas_lines )</span>
+<span id="cb770-13"><a href="pesquisa-nacional-de-saude-pns.html#cb770-13" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span> , <span class="st">&quot; &quot;</span> , sas_lines )</span>
 <span id="cb770-14"><a href="pesquisa-nacional-de-saude-pns.html#cb770-14" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;( +)&quot;</span> , <span class="st">&quot; &quot;</span> , sas_lines )</span>
 <span id="cb770-15"><a href="pesquisa-nacional-de-saude-pns.html#cb770-15" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot; $&quot;</span> , <span class="st">&quot;&quot;</span> , sas_lines )</span>
 <span id="cb770-16"><a href="pesquisa-nacional-de-saude-pns.html#cb770-16" tabindex="-1"></a></span>
@@ -1005,13 +1001,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb771"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb771-1"><a href="pesquisa-nacional-de-saude-pns.html#cb771-1" tabindex="-1"></a>this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb771-2"><a href="pesquisa-nacional-de-saude-pns.html#cb771-2" tabindex="-1"></a></span>
 <span id="cb771-3"><a href="pesquisa-nacional-de-saude-pns.html#cb771-3" tabindex="-1"></a>this_url <span class="ot">&lt;-</span></span>
-<span id="cb771-4"><a href="pesquisa-nacional-de-saude-pns.html#cb771-4" tabindex="-1"></a>    <span class="fu">paste0</span>(</span>
-<span id="cb771-5"><a href="pesquisa-nacional-de-saude-pns.html#cb771-5" tabindex="-1"></a>        <span class="st">&quot;https://ftp.ibge.gov.br/PNS/&quot;</span> ,</span>
-<span id="cb771-6"><a href="pesquisa-nacional-de-saude-pns.html#cb771-6" tabindex="-1"></a>        <span class="st">&quot;2019/Microdados/Dados/&quot;</span> ,</span>
-<span id="cb771-7"><a href="pesquisa-nacional-de-saude-pns.html#cb771-7" tabindex="-1"></a>        <span class="st">&quot;PNS_2019_20220525.zip&quot;</span></span>
-<span id="cb771-8"><a href="pesquisa-nacional-de-saude-pns.html#cb771-8" tabindex="-1"></a>    )</span>
-<span id="cb771-9"><a href="pesquisa-nacional-de-saude-pns.html#cb771-9" tabindex="-1"></a></span>
-<span id="cb771-10"><a href="pesquisa-nacional-de-saude-pns.html#cb771-10" tabindex="-1"></a><span class="fu">download.file</span>( this_url , this_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span></code></pre></div>
+<span id="cb771-4"><a href="pesquisa-nacional-de-saude-pns.html#cb771-4" tabindex="-1"></a>    <span class="st">&quot;https://ftp.ibge.gov.br/PNS/2019/Microdados/Dados/PNS_2019_20220525.zip&quot;</span></span>
+<span id="cb771-5"><a href="pesquisa-nacional-de-saude-pns.html#cb771-5" tabindex="-1"></a></span>
+<span id="cb771-6"><a href="pesquisa-nacional-de-saude-pns.html#cb771-6" tabindex="-1"></a><span class="fu">download.file</span>( this_url , this_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span></code></pre></div>
 <p>Import the latest data file:</p>
 <div class="sourceCode" id="cb772"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb772-1"><a href="pesquisa-nacional-de-saude-pns.html#cb772-1" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
 <span id="cb772-2"><a href="pesquisa-nacional-de-saude-pns.html#cb772-2" tabindex="-1"></a></span>
@@ -1077,36 +1069,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb776-2"><a href="pesquisa-nacional-de-saude-pns.html#cb776-2" tabindex="-1"></a>    <span class="fu">update</span>( </span>
 <span id="cb776-3"><a href="pesquisa-nacional-de-saude-pns.html#cb776-3" tabindex="-1"></a>        pns_design , </span>
 <span id="cb776-4"><a href="pesquisa-nacional-de-saude-pns.html#cb776-4" tabindex="-1"></a></span>
-<span id="cb776-5"><a href="pesquisa-nacional-de-saude-pns.html#cb776-5" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
+<span id="cb776-5"><a href="pesquisa-nacional-de-saude-pns.html#cb776-5" tabindex="-1"></a>        <span class="at">medical_insurance =</span> <span class="fu">ifelse</span>( i00102 <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="fu">as.numeric</span>( i00102 <span class="sc">==</span> <span class="dv">1</span> ) , <span class="cn">NA</span> ) ,</span>
 <span id="cb776-6"><a href="pesquisa-nacional-de-saude-pns.html#cb776-6" tabindex="-1"></a>        </span>
-<span id="cb776-7"><a href="pesquisa-nacional-de-saude-pns.html#cb776-7" tabindex="-1"></a>        <span class="at">medical_insurance =</span> <span class="fu">ifelse</span>( i00102 <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="fu">as.numeric</span>( i00102 <span class="sc">==</span> <span class="dv">1</span> ) , <span class="cn">NA</span> ) ,</span>
+<span id="cb776-7"><a href="pesquisa-nacional-de-saude-pns.html#cb776-7" tabindex="-1"></a>        <span class="at">uf_name =</span></span>
 <span id="cb776-8"><a href="pesquisa-nacional-de-saude-pns.html#cb776-8" tabindex="-1"></a>        </span>
-<span id="cb776-9"><a href="pesquisa-nacional-de-saude-pns.html#cb776-9" tabindex="-1"></a>        <span class="at">uf_name =</span></span>
-<span id="cb776-10"><a href="pesquisa-nacional-de-saude-pns.html#cb776-10" tabindex="-1"></a>        </span>
-<span id="cb776-11"><a href="pesquisa-nacional-de-saude-pns.html#cb776-11" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
-<span id="cb776-12"><a href="pesquisa-nacional-de-saude-pns.html#cb776-12" tabindex="-1"></a>            </span>
-<span id="cb776-13"><a href="pesquisa-nacional-de-saude-pns.html#cb776-13" tabindex="-1"></a>                <span class="fu">as.numeric</span>( v0001 ) ,</span>
-<span id="cb776-14"><a href="pesquisa-nacional-de-saude-pns.html#cb776-14" tabindex="-1"></a>                </span>
-<span id="cb776-15"><a href="pesquisa-nacional-de-saude-pns.html#cb776-15" tabindex="-1"></a>                <span class="at">levels =</span> </span>
-<span id="cb776-16"><a href="pesquisa-nacional-de-saude-pns.html#cb776-16" tabindex="-1"></a>                    <span class="fu">c</span>(11L, 12L, 13L, 14L, 15L, 16L, 17L, 21L, 22L, 23L, 24L, 25L, </span>
-<span id="cb776-17"><a href="pesquisa-nacional-de-saude-pns.html#cb776-17" tabindex="-1"></a>                    26L, 27L, 28L, 29L, 31L, 32L, 33L, 35L, 41L, 42L, 43L, 50L, 51L, </span>
-<span id="cb776-18"><a href="pesquisa-nacional-de-saude-pns.html#cb776-18" tabindex="-1"></a>                    52L, 53L) ,</span>
-<span id="cb776-19"><a href="pesquisa-nacional-de-saude-pns.html#cb776-19" tabindex="-1"></a>                    </span>
-<span id="cb776-20"><a href="pesquisa-nacional-de-saude-pns.html#cb776-20" tabindex="-1"></a>                <span class="at">labels =</span></span>
-<span id="cb776-21"><a href="pesquisa-nacional-de-saude-pns.html#cb776-21" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;Rondonia&quot;</span>, <span class="st">&quot;Acre&quot;</span>, <span class="st">&quot;Amazonas&quot;</span>, <span class="st">&quot;Roraima&quot;</span>, <span class="st">&quot;Para&quot;</span>, <span class="st">&quot;Amapa&quot;</span>, </span>
-<span id="cb776-22"><a href="pesquisa-nacional-de-saude-pns.html#cb776-22" tabindex="-1"></a>                    <span class="st">&quot;Tocantins&quot;</span>, <span class="st">&quot;Maranhao&quot;</span>, <span class="st">&quot;Piaui&quot;</span>, <span class="st">&quot;Ceara&quot;</span>, <span class="st">&quot;Rio Grande do Norte&quot;</span>, </span>
-<span id="cb776-23"><a href="pesquisa-nacional-de-saude-pns.html#cb776-23" tabindex="-1"></a>                    <span class="st">&quot;Paraiba&quot;</span>, <span class="st">&quot;Pernambuco&quot;</span>, <span class="st">&quot;Alagoas&quot;</span>, <span class="st">&quot;Sergipe&quot;</span>, <span class="st">&quot;Bahia&quot;</span>, <span class="st">&quot;Minas Gerais&quot;</span>, </span>
-<span id="cb776-24"><a href="pesquisa-nacional-de-saude-pns.html#cb776-24" tabindex="-1"></a>                    <span class="st">&quot;Espirito Santo&quot;</span>, <span class="st">&quot;Rio de Janeiro&quot;</span>, <span class="st">&quot;Sao Paulo&quot;</span>, <span class="st">&quot;Parana&quot;</span>, <span class="st">&quot;Santa Catarina&quot;</span>, </span>
-<span id="cb776-25"><a href="pesquisa-nacional-de-saude-pns.html#cb776-25" tabindex="-1"></a>                    <span class="st">&quot;Rio Grande do Sul&quot;</span>, <span class="st">&quot;Mato Grosso do Sul&quot;</span>, <span class="st">&quot;Mato Grosso&quot;</span>, <span class="st">&quot;Goias&quot;</span>, </span>
-<span id="cb776-26"><a href="pesquisa-nacional-de-saude-pns.html#cb776-26" tabindex="-1"></a>                    <span class="st">&quot;Distrito Federal&quot;</span>)</span>
-<span id="cb776-27"><a href="pesquisa-nacional-de-saude-pns.html#cb776-27" tabindex="-1"></a>                    </span>
-<span id="cb776-28"><a href="pesquisa-nacional-de-saude-pns.html#cb776-28" tabindex="-1"></a>            ) ,</span>
+<span id="cb776-9"><a href="pesquisa-nacional-de-saude-pns.html#cb776-9" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
+<span id="cb776-10"><a href="pesquisa-nacional-de-saude-pns.html#cb776-10" tabindex="-1"></a>            </span>
+<span id="cb776-11"><a href="pesquisa-nacional-de-saude-pns.html#cb776-11" tabindex="-1"></a>                <span class="fu">as.numeric</span>( v0001 ) ,</span>
+<span id="cb776-12"><a href="pesquisa-nacional-de-saude-pns.html#cb776-12" tabindex="-1"></a>                </span>
+<span id="cb776-13"><a href="pesquisa-nacional-de-saude-pns.html#cb776-13" tabindex="-1"></a>                <span class="at">levels =</span> </span>
+<span id="cb776-14"><a href="pesquisa-nacional-de-saude-pns.html#cb776-14" tabindex="-1"></a>                    <span class="fu">c</span>(11L, 12L, 13L, 14L, 15L, 16L, 17L, 21L, 22L, 23L, 24L, 25L, </span>
+<span id="cb776-15"><a href="pesquisa-nacional-de-saude-pns.html#cb776-15" tabindex="-1"></a>                    26L, 27L, 28L, 29L, 31L, 32L, 33L, 35L, 41L, 42L, 43L, 50L, 51L, </span>
+<span id="cb776-16"><a href="pesquisa-nacional-de-saude-pns.html#cb776-16" tabindex="-1"></a>                    52L, 53L) ,</span>
+<span id="cb776-17"><a href="pesquisa-nacional-de-saude-pns.html#cb776-17" tabindex="-1"></a>                    </span>
+<span id="cb776-18"><a href="pesquisa-nacional-de-saude-pns.html#cb776-18" tabindex="-1"></a>                <span class="at">labels =</span></span>
+<span id="cb776-19"><a href="pesquisa-nacional-de-saude-pns.html#cb776-19" tabindex="-1"></a>                    <span class="fu">c</span>(<span class="st">&quot;Rondonia&quot;</span>, <span class="st">&quot;Acre&quot;</span>, <span class="st">&quot;Amazonas&quot;</span>, <span class="st">&quot;Roraima&quot;</span>, <span class="st">&quot;Para&quot;</span>, <span class="st">&quot;Amapa&quot;</span>, </span>
+<span id="cb776-20"><a href="pesquisa-nacional-de-saude-pns.html#cb776-20" tabindex="-1"></a>                    <span class="st">&quot;Tocantins&quot;</span>, <span class="st">&quot;Maranhao&quot;</span>, <span class="st">&quot;Piaui&quot;</span>, <span class="st">&quot;Ceara&quot;</span>, <span class="st">&quot;Rio Grande do Norte&quot;</span>, </span>
+<span id="cb776-21"><a href="pesquisa-nacional-de-saude-pns.html#cb776-21" tabindex="-1"></a>                    <span class="st">&quot;Paraiba&quot;</span>, <span class="st">&quot;Pernambuco&quot;</span>, <span class="st">&quot;Alagoas&quot;</span>, <span class="st">&quot;Sergipe&quot;</span>, <span class="st">&quot;Bahia&quot;</span>, <span class="st">&quot;Minas Gerais&quot;</span>, </span>
+<span id="cb776-22"><a href="pesquisa-nacional-de-saude-pns.html#cb776-22" tabindex="-1"></a>                    <span class="st">&quot;Espirito Santo&quot;</span>, <span class="st">&quot;Rio de Janeiro&quot;</span>, <span class="st">&quot;Sao Paulo&quot;</span>, <span class="st">&quot;Parana&quot;</span>, <span class="st">&quot;Santa Catarina&quot;</span>, </span>
+<span id="cb776-23"><a href="pesquisa-nacional-de-saude-pns.html#cb776-23" tabindex="-1"></a>                    <span class="st">&quot;Rio Grande do Sul&quot;</span>, <span class="st">&quot;Mato Grosso do Sul&quot;</span>, <span class="st">&quot;Mato Grosso&quot;</span>, <span class="st">&quot;Goias&quot;</span>, </span>
+<span id="cb776-24"><a href="pesquisa-nacional-de-saude-pns.html#cb776-24" tabindex="-1"></a>                    <span class="st">&quot;Distrito Federal&quot;</span>)</span>
+<span id="cb776-25"><a href="pesquisa-nacional-de-saude-pns.html#cb776-25" tabindex="-1"></a>                    </span>
+<span id="cb776-26"><a href="pesquisa-nacional-de-saude-pns.html#cb776-26" tabindex="-1"></a>            ) ,</span>
+<span id="cb776-27"><a href="pesquisa-nacional-de-saude-pns.html#cb776-27" tabindex="-1"></a></span>
+<span id="cb776-28"><a href="pesquisa-nacional-de-saude-pns.html#cb776-28" tabindex="-1"></a>        <span class="at">age_categories =</span> <span class="fu">factor</span>( <span class="dv">1</span> <span class="sc">+</span> <span class="fu">findInterval</span>( c008 , <span class="fu">seq</span>( <span class="dv">5</span> , <span class="dv">90</span> , <span class="dv">5</span> ) ) ) ,</span>
 <span id="cb776-29"><a href="pesquisa-nacional-de-saude-pns.html#cb776-29" tabindex="-1"></a></span>
-<span id="cb776-30"><a href="pesquisa-nacional-de-saude-pns.html#cb776-30" tabindex="-1"></a>        <span class="at">age_categories =</span> <span class="fu">factor</span>( <span class="dv">1</span> <span class="sc">+</span> <span class="fu">findInterval</span>( c008 , <span class="fu">seq</span>( <span class="dv">5</span> , <span class="dv">90</span> , <span class="dv">5</span> ) ) ) ,</span>
-<span id="cb776-31"><a href="pesquisa-nacional-de-saude-pns.html#cb776-31" tabindex="-1"></a></span>
-<span id="cb776-32"><a href="pesquisa-nacional-de-saude-pns.html#cb776-32" tabindex="-1"></a>        <span class="at">male =</span> <span class="fu">as.numeric</span>( v006 <span class="sc">==</span> <span class="dv">1</span> )</span>
-<span id="cb776-33"><a href="pesquisa-nacional-de-saude-pns.html#cb776-33" tabindex="-1"></a>        </span>
-<span id="cb776-34"><a href="pesquisa-nacional-de-saude-pns.html#cb776-34" tabindex="-1"></a>    )</span></code></pre></div>
+<span id="cb776-30"><a href="pesquisa-nacional-de-saude-pns.html#cb776-30" tabindex="-1"></a>        <span class="at">male =</span> <span class="fu">as.numeric</span>( v006 <span class="sc">==</span> <span class="dv">1</span> )</span>
+<span id="cb776-31"><a href="pesquisa-nacional-de-saude-pns.html#cb776-31" tabindex="-1"></a>        </span>
+<span id="cb776-32"><a href="pesquisa-nacional-de-saude-pns.html#cb776-32" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1165,7 +1155,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="subsetting-27" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="pesquisa-nacional-de-saude-pns.html#subsetting-27" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Restrict the survey design to three or more days of exercise per week:</p>
+<p>Restrict the survey design to individuals that exercise three or more days per week:</p>
 <div class="sourceCode" id="cb785"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb785-1"><a href="pesquisa-nacional-de-saude-pns.html#cb785-1" tabindex="-1"></a>sub_pns_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( pns_design , p035 <span class="sc">%in%</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">7</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
 <div class="sourceCode" id="cb786"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb786-1"><a href="pesquisa-nacional-de-saude-pns.html#cb786-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> e01602 , sub_pns_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
@@ -1236,6 +1226,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-25" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="pesquisa-nacional-de-saude-pns.html#replication-example-25" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example matches the <code>Estimando totais</code> of gross monthly income from <a href="https://rpubs.com/gabriel-assuncao-ibge/pns">the official <code>PNSIBGE</code> R package</a>:</p>
 <div class="sourceCode" id="cb795"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb795-1"><a href="pesquisa-nacional-de-saude-pns.html#cb795-1" tabindex="-1"></a>total_renda <span class="ot">&lt;-</span> <span class="fu">svytotal</span>( <span class="sc">~</span> e01602 , pns_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb795-2"><a href="pesquisa-nacional-de-saude-pns.html#cb795-2" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( total_renda ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">213227874692</span> )</span>
 <span id="cb795-3"><a href="pesquisa-nacional-de-saude-pns.html#cb795-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( total_renda ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">3604489769</span> )</span></code></pre></div>
