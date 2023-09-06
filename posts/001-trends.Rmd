@@ -1,0 +1,340 @@
+# Trend Analysis of Complex Survey Data  {-}
+
+<a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The purpose of this analysis is to make statistically valid statements such as, *"there was a significant linear decrease in the prevalence of high school aged americans who have ever smoked a cigarette across the period 1999-2011"* with complex sample survey data.
+
+This step-by-step walkthrough exactly reproduces the statistics presented in the [Center for Disease Control & Prevention's (CDC) linear trend analysis](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf).  This analysis may complement qualitative evaluation on prevalence changes observed from surveillance data by providing quantitative evidence, such as when a joinpoint (also called breakpoint or changepoint) occurred; however, this analysis does not explain why or how changes in trends occur.
+
+
+## Download, Import, Preparation {-}
+
+Download and import the multi-year stacked file:
+```{r eval = FALSE }
+library(SAScii)
+library(readr)
+
+sas_url <-
+	"https://www.cdc.gov/healthyyouth/data/yrbs/sadc_2019/2019-SADC-SAS-Input-Program.sas"
+
+dat_url <-
+	"https://www.cdc.gov/healthyyouth/data/yrbs/sadc_2019/sadc_2019_national.dat"
+	
+sas_positions <-
+	parse.SAScii( sas_url )
+
+sas_positions[ , 'varname' ] <-
+	tolower( sas_positions[ , 'varname' ] )
+	
+variables_to_keep <-
+	c( "sex" , "grade" , "race4" , "q30" , "year" , "psu" , "stratum" , "weight" )
+	
+sas_positions[ , 'column_types' ] <-
+	ifelse( !( sas_positions[ , 'varname' ] %in% variables_to_keep ) , "_" ,
+		ifelse( sas_positions[ , 'char' ] , "c" , "d" ) )
+
+yrbss_tbl <-
+	read_fwf(
+		dat_url ,
+		fwf_widths( 
+			abs( sas_positions[ , 'width' ] ) , 
+			col_names = sas_positions[ , 'varname' ] 
+		) ,
+		col_types = paste0( sas_positions[ , 'column_types' ] , collapse = "" ) ,
+		na = c( "" , "." )
+	)
+	
+yrbss_df <- data.frame( yrbss_tbl )
+```
+
+Restrict the dataset to only years shown in the original analysis and re-name the main variable:
+```{r eval = FALSE}
+yrbss_df <- subset( yrbss_df , year %in% seq( 1991 , 2011 , 2 ) )
+
+yrbss_df[ , 'ever_smoked' ] <-
+	as.numeric( yrbss_df[ , 'q30' ] == 1 )
+
+yrbss_df[ , 'q30' ] <- NULL
+```
+
+Recode each categorical variable to factor class:
+```{r eval = FALSE}
+yrbss_df[ , 'sex' ] <- relevel( factor( yrbss_df[ , 'sex' ] ) , ref = "2" )
+
+for ( i in c( 'race4' , 'grade' ) ){
+	yrbss_df[ , i ] <- relevel( factor( yrbss_df[ , i ] ) , ref = "1" )
+}
+```
+
+
+## Append Polynomials to Each Year {-}
+
+*"The polynomials we have used as predictors to this point are natural polynomials, generated from the linear predictor by centering and then powering the linear predictor."*
+
+For more detail on this subject, see page 216 of Applied Multiple Regression/Correlation Analysis for the Behavioral Sciences By Jacob Cohen, Patricia Cohen, Stephen G. West, Leona S. Aiken
+
+```{r eval = FALSE}
+distinct_years_available <- length( seq( 1991 , 2011 , 2 ) )
+
+# store the linear polynomials
+c11l <- contr.poly( distinct_years_available )[ , ".L" ]
+
+# store the quadratic polynomials
+c11q <- contr.poly( distinct_years_available )[ , ".Q" ]
+
+# store the cubic polynomials
+c11c <- contr.poly( distinct_years_available )[ , ".C" ]
+```
+
+For each record in the data set, tack on the linear, quadratic, and cubic contrast value, these contrast values will serve as replacement for the linear `year` variable in any regression:
+
+```{r eval = FALSE}
+# year^1 term (linear)
+yrbss_df[ , "t11l" ] <- c11l[ match( yrbss_df[ , "year" ] , seq( 1991 , 2011 , 2 ) ) ]
+
+# year^2 term (quadratic)
+yrbss_df[ , "t11q" ] <- c11q[ match( yrbss_df[ , "year" ] , seq( 1991 , 2011 , 2 ) ) ]
+
+# year^3 term (cubic)
+yrbss_df[ , "t11c" ] <- c11c[ match( yrbss_df[ , "year" ] , seq( 1991 , 2011 , 2 ) ) ]
+```
+
+## Unadjusted Analysis Examples {-}
+
+Construct a complex sample survey design and match the [published unadjusted prevalence rates](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6):
+```{r eval = FALSE}
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+des <- 
+	svydesign(
+		id = ~psu , 
+		strata = ~interaction( stratum , year ) ,
+		data = yrbss_df , 
+		weights = ~weight , 
+		nest = TRUE
+	)
+
+prevalence_over_time <-
+	svyby( 
+		~ ever_smoked , 
+		~ year , 
+		des , 
+		svymean , 
+		na.rm = TRUE 
+	)
+
+# confirm prevalence rates match published estimates
+# of high school students that ever smoked
+stopifnot(
+	all.equal( 
+		round( coef( prevalence_over_time ) , 3 ) , 
+		c( .701 , .695 , .713 , .702 , .704 , .639 , .584 , .543 , .503 , .463 , .447 ) ,
+		check.attributes = FALSE
+	)
+)
+```
+
+
+## Calculate Joinpoints Needed {-}
+
+Using the orthogonal coefficients (linear, quadratic, cubic terms) that we previously added to our `yrbss_df` object before constructing the multi-year stacked survey design, determine how many joinpoints will be needed for a trend analysis.
+
+Epidemiological models typically control for possible confounding variables such as age, sex, and race/ethnicity, so those have been included alongside the linear, cubic, and quadratic year terms.
+
+Calculate the "ever smoked" regression, adjusted by sex, grade, race/ethnicity, and linear year contrast:
+```{r eval = FALSE }
+linyear <- 
+	svyglm(
+		ever_smoked ~ sex + race4 + grade + t11l , 
+		design = des , 
+		family = quasibinomial
+	)
+
+summary( linyear )
+```
+
+The linear year-contrast variable `t11l` is significant.  Therefore, there is probably going to be some sort of trend.  A linear trend by itself does not need joinpoints.  Not one, just zero joinpoints.  If the linear term were the only significant term (out of linear, quadratic, cubic), then we would not need to calculate a joinpoint.  In other words, we would not need to figure out where to best break our time trend into two, three, or even four segments.
+
+Since the linear trend is significant, we know there is at least one change across the entire 1991 to 2011 period.
+
+-----
+
+**Interpretation note** about segments of time: The linear term `t11l` was significant, so we probably have a significant linear trend somewhere to report.  Now we need to figure out when that significant linear trend started and when it ended.  It might be semantically true that there was a significant linear decrease in high school aged smoking over the entire period of our data 1991-2011; however, it's inexact to end this analysis after only detecting a linear trend.  The purpose of the following few steps is to *cordon off* different time points from one another.  As you'll see later, there actually was not any detectable decrease from 1991-1999.  The entirety of the decline in smoking occurred over the period from 1999-2011.  So these next (methodologically tricky) steps serve to provide you and your audience with a more careful statement of statistical significance.  It's not technically wrong to conclude that smoking declined over the period of 1991-2011, it's just verbose.
+
+Think of it as the difference between "humans first walked on the moon in the sixties" and "humans first walked on the moon in 1969" - both statements are correct, but the latter exhibits greater scientific precision.
+
+-----
+
+Calculate the "ever smoked" binomial regression, adjusted by sex, grade, race/ethnicity, and both linear and quadratic year contrasts.  Notice the addition of `t11q`:
+
+```{r eval = FALSE }
+quadyear <-
+	svyglm(
+		ever_smoked ~ sex + race4 + grade + t11l + t11q , 
+		design = des , 
+		family = quasibinomial 
+	)
+
+summary( quadyear )
+```
+The linear year-contrast variable is significant but the quadratic year-contrast variable is also significant.  Therefore, we should use joinpoint software (the `segmented` package) for this analysis.  A significant quadratic trend needs one joinpoint.
+
+Since both linear and quadratic terms are significant, we can also move ahead and test whether the cubic term is also significant.
+
+Calculate the "ever smoked" binomial regression, adjusted by sex, grade, race/ethnicity, and linear, quadratic, and cubic year contrasts.  Notice the addition of `t11c`:
+```{r eval = FALSE }
+cubyear <-
+	svyglm(
+		ever_smoked ~ sex + race4 + grade + t11l + t11q + t11c , 
+		design = des , 
+		family = quasibinomial 
+	)
+	
+summary( cubyear )
+```
+The cubic year-contrast term is also significant in this model.  Therefore, we might potentially evaluate this trend using two joinpoints.  In other words, a significant result for all linear, quadratic, and cubic year contrasts at this point means we might be able to evaluate three distinct trends (separated by our two joinpoints) across the broader 1991 - 2011 time period of analysis.
+
+Although we might now have the statistical ability to analyze three distinct time periods (separated by two joinpoints) across our data, the utility of this depends on the circumstances.  Cubic and higher polynomials account for not only the direction of change but also the pace of that change, allowing statistical statements that might not be of interest to an audience:  While it might be an exercise in precision to conclude that smoking rates dropped quickest across 1999-2003 and less quickly across 2003-2011, that scientific pair of findings may not be as compelling as the simpler (quadratic but not cubic) statement that smoking rates have dropped across the period of 1999-2011.
+
+---
+
+## Intermish {-}
+<center>
+<img src="https://1.bp.blogspot.com/-iwm7r7PRQRs/YPcur-o-v-I/AAAAAAABy-4/yYCMsJ2UOhQb-2NX-MSNnYE8sgfjcadwgCLcBGAsYHQ/s2048/WhatsApp%2BImage%2B2021-07-19%2Bat%2B10.42.16%2BPM%2B%25281%2529.jpeg">
+<p>
+<i><b>the author programming in sas</b></i>
+</center>
+
+---
+
+## Calculate Predicted Marginals {-}
+
+Calculate the survey-year-independent predictor effects and store these results:
+```{r eval = FALSE }
+marginals <- 
+	svyglm(
+		formula = ever_smoked ~ sex + race4 + grade ,
+		design = des , 
+		family = quasibinomial
+	)
+```
+
+Run these marginals through the `svypredmeans` function.  For archaeology fans out there, this function emulates the `PREDMARG` statement in the ancient language of SUDAAN:
+```{r eval = FALSE }
+( means_for_joinpoint <- svypredmeans( marginals , ~factor( year ) ) )
+```
+
+Clean up these results a bit in preparation for a joinpoint analysis:
+```{r eval = FALSE }
+# coerce the results to a data.frame object
+means_for_joinpoint <- as.data.frame( means_for_joinpoint )
+
+# extract the row names as the survey year
+means_for_joinpoint[ , "year" ] <- as.numeric( rownames( means_for_joinpoint ) )
+
+# must be sorted, just in case it's not already
+means_for_joinpoint <- means_for_joinpoint[ order( means_for_joinpoint[ , "year" ] ) , ]
+```
+
+
+
+## Identify Joinpoint(s) or Breakpoint(s) {-}
+
+Let's take a look at how confident we are in the value at each adjusted timepoint.  Carrying out a trend analysis requires creating new weights to fit a piecewise linear regression.  First, create that weight variable:
+
+```{r eval = FALSE }
+means_for_joinpoint[ , "wgt" ] <- with( means_for_joinpoint, ( mean / SE ) ^ 2 ) 
+```
+
+Second, fit a piecewise linear regression, estimating the 'starting' linear model with the usual `lm` function using the log values and the weights:
+```{r eval = FALSE }
+o <- lm( log( mean ) ~ year , weights = wgt , data = means_for_joinpoint )
+``` 
+
+Now that the regression has been structured correctly, estimate the year that our complex survey trend should be broken into two or more segments:
+```{r eval = FALSE }
+library(segmented)
+
+# find only one joinpoint
+os <- segmented( o , ~year )
+
+summary( os )
+```
+
+Look for the `Estimated Break-Point(s)` in that result - that's the critical number from this joinpoint analysis.  The `segmented` package uses an iterative procedure (described in the article below); between-year solutions are returned and should be rounded to the nearest time point in the analysis.  The joinpoint software implements two estimating algorithms: the grid-search and the Hudson algorithm.  For more detail about these methods, see [Muggeo V. (2003) Estimating regression models with unknown break-points. Statistics in Medicine, 22: 3055-3071.](http://onlinelibrary.wiley.com/doi/10.1002/sim.1545/abstract).
+
+Obtain the annual percent change estimates for each time point:
+```{r eval = FALSE }
+slope( os , APC = TRUE )
+```
+
+The confidence intervals for the annual percent change (APC) may be different from the ones returned by [NCI's Joinpoint Software](surveillance.cancer.gov/joinpoint/); for further details, check out [Muggeo V. (2010) A Comment on `Estimating average annual per cent change in trend analysis' by Clegg et al., Statistics in Medicine; 28, 3670-3682. Statistics in Medicine, 29, 1958-1960.](http://onlinelibrary.wiley.com/doi/10.1002/sim.3850/abstract)
+
+This analysis returned similar results to the NCI's Joinpoint Regression Program by estimating a joinpoint at `year=1999` - and, more precisely, that the start of that decreasing trend in smoking prevalence happened at an APC of -3.92 percent.  That is, `slope2` from the output above.
+
+Remember that the cubic-year model above had significant terms as well.  Therefore, it would be statistically defensible to calculate two joinpoints rather than only one.  However, for this analyses, breaking the 1999-2011 trend into two separate downward trends might not be of interest to the audience.  Looking at the `slope2` and `slope3` estimates and confidence intervals, we might be able to conclude that "ever smoking" decreased across 1999-2003 and also decreased (albeit less rapidly) across 2003-2011.  However, communicating two *consecutive* downward trends might not be of much interest to a lay audience.  Forgoing a second possible joinpoint makes sense when the direction of change is more compelling than the pace of change:
+```{r eval = FALSE }
+# find two joinpoints rather than only one
+os2 <- segmented( o , ~year , npsi = 2 )
+
+summary( os2 )
+
+slope( os2 , APC = TRUE )
+```
+
+
+
+
+
+## Interpret and Conclude {-}
+
+After identifying the joinpoint for smoking prevalence, we can create two regression models (one for each time segment - if we had two joinpoints, we would need three regression models).  The first model covers the years leading up to (and including) the joinpoint (i.e., 1991 to 1999).  The second model includes the years from the joinpoint forward (i.e., 1999 to 2011).  So start with 1991, 1993, 1995, 1997, 1999, the five year-points before (and including) 1999:
+
+```{r eval = FALSE }
+# calculate a five-timepoint linear contrast vector
+c5l <- contr.poly( 5 )[ , 1 ]
+
+# tack the five-timepoint linear contrast vectors onto the current survey design object
+des <- update( des , t5l = c5l[ match( year , seq( 1991 , 1999 , 2 ) ) ] )
+
+pre_91_99 <-
+	svyglm(
+		ever_smoked ~ sex + race4 + grade + t5l ,
+		design = subset( des , year <= 1999 ) , 
+		family = quasibinomial
+	)
+
+summary( pre_91_99 )
+
+# confirm 1991-1999 trend coefficient matches published estimates
+stopifnot( round( pre_91_99$coefficients['t5l'] , 5 ) == .03704 )
+```
+
+This reproduces the calculations behind the sentence on [pdf page 6 of the original document](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6):  **In this example, T5L_L had a p-value=0.52261 and beta=0.03704. Therefore, there was "no significant change in the prevalence of ever smoking a cigarette during 1991-1999."**
+
+
+Then move on to 1999, 2001, 2003, 2005, 2007, 2009, and 2011, the seven year-points after (and including) 1999:
+
+```{r eval = FALSE }
+# calculate a seven-timepoint linear contrast vector
+c7l <- contr.poly( 7 )[ , 1 ]
+
+# tack the seven-timepoint linear contrast vectors onto the current survey design object
+des <- update( des , t7l = c7l[ match( year , seq( 1999 , 2011 , 2 ) ) ] )
+
+post_99_11 <-
+	svyglm(
+		ever_smoked ~ sex + race4 + grade + t7l ,
+		design = subset( des , year >= 1999 ) , 
+		family = quasibinomial
+	)
+	
+summary( post_99_11 )
+
+# confirm 1999-2011 trend coefficient matches published estimates
+stopifnot( round( post_99_11$coefficients['t7l'] , 5 ) == -0.99165 )
+``` 
+
+This reproduces the calculations behind the sentence on [pdf page 6 of the original document](https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6):  **In this example, T7L_R had a p-value<0.0001 and beta=-0.99165. Therefore, there was a "significant linear decrease in the prevalence of ever smoking a cigarette during 1999-2011."**

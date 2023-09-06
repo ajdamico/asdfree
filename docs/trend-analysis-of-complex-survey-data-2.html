@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>National Health and Nutrition Examination Survey (NHANES) | Analyze Survey Data for Free</title>
-  <meta name="description" content="National Health and Nutrition Examination Survey (NHANES) | Analyze Survey Data for Free" />
+  <title>Trend Analysis of Complex Survey Data | Analyze Survey Data for Free</title>
+  <meta name="description" content="Trend Analysis of Complex Survey Data | Analyze Survey Data for Free" />
   <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="National Health and Nutrition Examination Survey (NHANES) | Analyze Survey Data for Free" />
+  <meta property="og:title" content="Trend Analysis of Complex Survey Data | Analyze Survey Data for Free" />
   <meta property="og:type" content="book" />
   
   
   <meta name="github-repo" content="ajdamico/asdfree" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="National Health and Nutrition Examination Survey (NHANES) | Analyze Survey Data for Free" />
+  <meta name="twitter:title" content="Trend Analysis of Complex Survey Data | Analyze Survey Data for Free" />
   
   
   
@@ -28,8 +28,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="national-financial-capability-study-nfcs.html"/>
-<link rel="next" href="national-health-interview-survey-nhis.html"/>
+<link rel="prev" href="trends-in-international-mathematics-and-science-study-timss.html"/>
+<link rel="next" href="youth-risk-behavior-surveillance-system-yrbss.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -948,432 +948,260 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="national-health-and-nutrition-examination-survey-nhanes" class="section level1 unnumbered hasAnchor">
-<h1>National Health and Nutrition Examination Survey (NHANES)<a href="national-health-and-nutrition-examination-survey-nhanes.html#national-health-and-nutrition-examination-survey-nhanes" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><a href="https://github.com/asdfree/nhanes/actions"><img src="https://github.com/asdfree/nhanes/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-<p>Doctors and dentists accompany survey interviewers in a <a href="https://blogs.cdc.gov/nchs/2013/01/30/217/">mobile medical center</a> that travels the country. While survey researchers read the questionnaires, medical professionals administer laboratory tests and conduct a full medical examination. The blood work and in-person check-up allow epidemiologists to answer questions like, “how many people have diabetes but don’t know they have diabetes?”</p>
-<ul>
-<li><p>Many tables containing information from the various examinations, generally one row per respondent.</p></li>
-<li><p>A complex sample survey designed to generalize to the civilian non-institutionalized U.S. population.</p></li>
-<li><p>Released biennially since 1999-2000.</p></li>
-<li><p>Administered by the <a href="http://www.cdc.gov/">Centers for Disease Control and Prevention</a>.</p></li>
-</ul>
-<hr />
-<p>Please skim before you begin:</p>
-<ol style="list-style-type: decimal">
-<li><p><a href="https://www.cdc.gov/nchs/nhanes/about_nhanes.htm">About the National Health and Nutrition Examination Survey</a></p></li>
-<li><p><a href="https://wwwn.cdc.gov/nchs/nhanes/tutorials/default.aspx">NHANES Tutorials</a></p></li>
-<li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National%20Health%20and%20Nutrition%20Examination%20Survey">artificial intelligence-generated limericks</a></p></li>
-</ol>
-<div class="sourceCode" id="cb459"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb459-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb459-1" tabindex="-1"></a><span class="co"># doctor, dentist, labs</span></span>
-<span id="cb459-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb459-2" tabindex="-1"></a><span class="co"># mobile examination</span></span>
-<span id="cb459-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb459-3" tabindex="-1"></a><span class="co">#vanlife interviews</span></span></code></pre></div>
-<hr />
-<div id="download-import-preparation-17" class="section level2 unnumbered hasAnchor">
-<h2>Download, Import, Preparation<a href="national-health-and-nutrition-examination-survey-nhanes.html#download-import-preparation-17" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Download and import the demographics (demo) and total cholesterol laboratory (tchol) data:</p>
-<div class="sourceCode" id="cb460"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb460-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-1" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
-<span id="cb460-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-2" tabindex="-1"></a></span>
-<span id="cb460-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-3" tabindex="-1"></a>nhanes_2015_2016_demo_url <span class="ot">&lt;-</span> <span class="st">&quot;https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DEMO_I.XPT&quot;</span></span>
-<span id="cb460-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-4" tabindex="-1"></a></span>
-<span id="cb460-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-5" tabindex="-1"></a>nhanes_2017_2018_demo_url <span class="ot">&lt;-</span> <span class="st">&quot;https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DEMO_J.XPT&quot;</span></span>
-<span id="cb460-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-6" tabindex="-1"></a></span>
-<span id="cb460-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-7" tabindex="-1"></a>nhanes_2015_2016_tchol_url <span class="ot">&lt;-</span> <span class="st">&quot;https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/TCHOL_I.XPT&quot;</span></span>
-<span id="cb460-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-8" tabindex="-1"></a>    </span>
-<span id="cb460-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-9" tabindex="-1"></a>nhanes_2017_2018_tchol_url <span class="ot">&lt;-</span> <span class="st">&quot;https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/TCHOL_J.XPT&quot;</span></span>
-<span id="cb460-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-10" tabindex="-1"></a>    </span>
-<span id="cb460-11"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-11" tabindex="-1"></a></span>
-<span id="cb460-12"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-12" tabindex="-1"></a>nhanes_2015_2016_demo_tbl <span class="ot">&lt;-</span> <span class="fu">read_xpt</span>( nhanes_2015_2016_demo_url )</span>
-<span id="cb460-13"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-13" tabindex="-1"></a>nhanes_2017_2018_demo_tbl <span class="ot">&lt;-</span> <span class="fu">read_xpt</span>( nhanes_2017_2018_demo_url )</span>
-<span id="cb460-14"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-14" tabindex="-1"></a>nhanes_2015_2016_tchol_tbl <span class="ot">&lt;-</span> <span class="fu">read_xpt</span>( nhanes_2015_2016_tchol_url )</span>
-<span id="cb460-15"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-15" tabindex="-1"></a>nhanes_2017_2018_tchol_tbl <span class="ot">&lt;-</span> <span class="fu">read_xpt</span>( nhanes_2017_2018_tchol_url )</span>
-<span id="cb460-16"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-16" tabindex="-1"></a></span>
-<span id="cb460-17"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-17" tabindex="-1"></a>nhanes_2015_2016_demo_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( nhanes_2015_2016_demo_tbl )</span>
-<span id="cb460-18"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-18" tabindex="-1"></a>nhanes_2017_2018_demo_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( nhanes_2017_2018_demo_tbl )</span>
-<span id="cb460-19"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-19" tabindex="-1"></a>nhanes_2015_2016_tchol_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( nhanes_2015_2016_tchol_tbl )</span>
-<span id="cb460-20"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb460-20" tabindex="-1"></a>nhanes_2017_2018_tchol_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( nhanes_2017_2018_tchol_tbl )</span></code></pre></div>
-<p>Specify which variables to keep from both the demo and tchol data files, then stack the four years:</p>
-<div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb461-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-1" tabindex="-1"></a>demo_vars <span class="ot">&lt;-</span></span>
-<span id="cb461-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-2" tabindex="-1"></a>    <span class="fu">c</span>( </span>
-<span id="cb461-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-3" tabindex="-1"></a>         <span class="co"># unique person identifier (merge variable)</span></span>
-<span id="cb461-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-4" tabindex="-1"></a>        <span class="st">&quot;SEQN&quot;</span> ,</span>
-<span id="cb461-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-5" tabindex="-1"></a></span>
-<span id="cb461-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-6" tabindex="-1"></a>        <span class="co"># the two-year interviewed + MEC examined weight</span></span>
-<span id="cb461-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-7" tabindex="-1"></a>        <span class="st">&quot;WTMEC2YR&quot;</span> ,    </span>
-<span id="cb461-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-8" tabindex="-1"></a>        <span class="co"># note that this is a special weight for only</span></span>
-<span id="cb461-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-9" tabindex="-1"></a>        <span class="co"># individuals who took the mobile examination center (MEC) exam</span></span>
-<span id="cb461-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-10" tabindex="-1"></a>        <span class="co"># there is one other weight available - WTINT2YR - </span></span>
-<span id="cb461-11"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-11" tabindex="-1"></a>        <span class="co"># that should be used when MEC variables are not part of the analysis</span></span>
-<span id="cb461-12"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-12" tabindex="-1"></a>        </span>
-<span id="cb461-13"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-13" tabindex="-1"></a>        <span class="co"># interviewed only or interviewed + MEC</span></span>
-<span id="cb461-14"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-14" tabindex="-1"></a>        <span class="st">&quot;RIDSTATR&quot;</span> ,</span>
-<span id="cb461-15"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-15" tabindex="-1"></a>        </span>
-<span id="cb461-16"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-16" tabindex="-1"></a>        <span class="co"># primary sampling unit varaible, used in complex design</span></span>
-<span id="cb461-17"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-17" tabindex="-1"></a>        <span class="st">&quot;SDMVPSU&quot;</span> ,</span>
-<span id="cb461-18"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-18" tabindex="-1"></a>        </span>
-<span id="cb461-19"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-19" tabindex="-1"></a>        <span class="co"># strata variable, used in complex design</span></span>
-<span id="cb461-20"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-20" tabindex="-1"></a>        <span class="st">&quot;SDMVSTRA&quot;</span> ,</span>
-<span id="cb461-21"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-21" tabindex="-1"></a>        </span>
-<span id="cb461-22"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-22" tabindex="-1"></a>        <span class="co"># race / ethnicity</span></span>
-<span id="cb461-23"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-23" tabindex="-1"></a>        <span class="st">&quot;RIDRETH3&quot;</span> ,</span>
-<span id="cb461-24"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-24" tabindex="-1"></a></span>
-<span id="cb461-25"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-25" tabindex="-1"></a>        <span class="co"># age</span></span>
-<span id="cb461-26"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-26" tabindex="-1"></a>        <span class="st">&quot;RIDAGEYR&quot;</span> ,</span>
-<span id="cb461-27"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-27" tabindex="-1"></a>        </span>
-<span id="cb461-28"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-28" tabindex="-1"></a>        <span class="co"># gender</span></span>
-<span id="cb461-29"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-29" tabindex="-1"></a>        <span class="st">&quot;RIAGENDR&quot;</span> ,</span>
-<span id="cb461-30"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-30" tabindex="-1"></a>        </span>
-<span id="cb461-31"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-31" tabindex="-1"></a>        <span class="co"># pregnant at interview</span></span>
-<span id="cb461-32"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-32" tabindex="-1"></a>        <span class="st">&quot;RIDEXPRG&quot;</span></span>
-<span id="cb461-33"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-33" tabindex="-1"></a>    )</span>
-<span id="cb461-34"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-34" tabindex="-1"></a></span>
-<span id="cb461-35"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-35" tabindex="-1"></a>nhanes_2015_2018_demo_df <span class="ot">&lt;-</span></span>
-<span id="cb461-36"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-36" tabindex="-1"></a>    <span class="fu">rbind</span>(</span>
-<span id="cb461-37"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-37" tabindex="-1"></a>        nhanes_2015_2016_demo_df[ , demo_vars ] ,</span>
-<span id="cb461-38"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-38" tabindex="-1"></a>        nhanes_2017_2018_demo_df[ , demo_vars ]</span>
-<span id="cb461-39"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-39" tabindex="-1"></a>    )</span>
-<span id="cb461-40"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-40" tabindex="-1"></a>    </span>
-<span id="cb461-41"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-41" tabindex="-1"></a></span>
-<span id="cb461-42"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-42" tabindex="-1"></a>tchol_vars <span class="ot">&lt;-</span></span>
-<span id="cb461-43"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-43" tabindex="-1"></a>    <span class="fu">c</span>( </span>
-<span id="cb461-44"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-44" tabindex="-1"></a>        <span class="co"># unique person identifier (merge variable)</span></span>
-<span id="cb461-45"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-45" tabindex="-1"></a>        <span class="st">&quot;SEQN&quot;</span> ,</span>
-<span id="cb461-46"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-46" tabindex="-1"></a>        </span>
-<span id="cb461-47"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-47" tabindex="-1"></a>        <span class="co"># laboratory total cholesterol variable</span></span>
-<span id="cb461-48"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-48" tabindex="-1"></a>        <span class="co"># https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/TCHOL_J.htm</span></span>
-<span id="cb461-49"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-49" tabindex="-1"></a>        <span class="st">&quot;LBXTC&quot;</span>         </span>
-<span id="cb461-50"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-50" tabindex="-1"></a></span>
-<span id="cb461-51"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-51" tabindex="-1"></a>    )</span>
-<span id="cb461-52"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-52" tabindex="-1"></a></span>
-<span id="cb461-53"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-53" tabindex="-1"></a>nhanes_2015_2018_tchol_df <span class="ot">&lt;-</span></span>
-<span id="cb461-54"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-54" tabindex="-1"></a>    <span class="fu">rbind</span>(</span>
-<span id="cb461-55"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-55" tabindex="-1"></a>        nhanes_2015_2016_tchol_df[ , tchol_vars ] ,</span>
-<span id="cb461-56"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-56" tabindex="-1"></a>        nhanes_2017_2018_tchol_df[ , tchol_vars ]</span>
-<span id="cb461-57"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb461-57" tabindex="-1"></a>    )</span></code></pre></div>
-<p>Merge the two pooled datasets, limit the data.frame to mobile examination component respondents:</p>
-<div class="sourceCode" id="cb462"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb462-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-1" tabindex="-1"></a>nhanes_full_df <span class="ot">&lt;-</span></span>
-<span id="cb462-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-2" tabindex="-1"></a>    <span class="fu">merge</span>(</span>
-<span id="cb462-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-3" tabindex="-1"></a>        nhanes_2015_2018_demo_df ,</span>
-<span id="cb462-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-4" tabindex="-1"></a>        nhanes_2015_2018_tchol_df ,</span>
-<span id="cb462-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-5" tabindex="-1"></a>        <span class="at">all =</span> <span class="cn">TRUE</span></span>
-<span id="cb462-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-6" tabindex="-1"></a>    )</span>
-<span id="cb462-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-7" tabindex="-1"></a></span>
-<span id="cb462-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-8" tabindex="-1"></a><span class="fu">names</span>( nhanes_full_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( nhanes_full_df ) )</span>
-<span id="cb462-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-9" tabindex="-1"></a>    </span>
-<span id="cb462-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb462-10" tabindex="-1"></a>nhanes_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( nhanes_full_df , ridstatr <span class="sc">%in%</span> <span class="dv">2</span> )</span></code></pre></div>
-<p>Scale the mobile examination component two-year weight to generalize to the pooled, four year period:</p>
-<div class="sourceCode" id="cb463"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb463-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb463-1" tabindex="-1"></a>nhanes_df[ , <span class="st">&#39;wtmec4yr&#39;</span> ] <span class="ot">&lt;-</span> nhanes_df[ , <span class="st">&#39;wtmec2yr&#39;</span> ] <span class="sc">/</span> <span class="dv">2</span></span></code></pre></div>
-<div id="save-locally-15" class="section level3 unnumbered hasAnchor">
-<h3>Save locally  <a href="national-health-and-nutrition-examination-survey-nhanes.html#save-locally-15" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Save the object at any point:</p>
-<div class="sourceCode" id="cb464"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb464-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb464-1" tabindex="-1"></a><span class="co"># nhanes_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;NHANES&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb464-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb464-2" tabindex="-1"></a><span class="co"># saveRDS( nhanes_df , file = nhanes_fn , compress = FALSE )</span></span></code></pre></div>
-<p>Load the same object:</p>
-<div class="sourceCode" id="cb465"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb465-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb465-1" tabindex="-1"></a><span class="co"># nhanes_df &lt;- readRDS( nhanes_fn )</span></span></code></pre></div>
+<div id="trend-analysis-of-complex-survey-data-2" class="section level1 unnumbered hasAnchor">
+<h1>Trend Analysis of Complex Survey Data<a href="trend-analysis-of-complex-survey-data-2.html#trend-analysis-of-complex-survey-data-2" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+<p>The purpose of this analysis is to make statistically valid statements such as, <em>“there was a significant linear decrease in the prevalence of high school aged americans who have ever smoked a cigarette across the period 1999-2011”</em> with complex sample survey data.</p>
+<p>This step-by-step walkthrough exactly reproduces the statistics presented in the <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf">Center for Disease Control &amp; Prevention’s (CDC) linear trend analysis</a>. This analysis may complement qualitative evaluation on prevalence changes observed from surveillance data by providing quantitative evidence, such as when a joinpoint (also called breakpoint or changepoint) occurred; however, this analysis does not explain why or how changes in trends occur.</p>
+<div id="download-import-preparation-37" class="section level2 unnumbered hasAnchor">
+<h2>Download, Import, Preparation<a href="trend-analysis-of-complex-survey-data-2.html#download-import-preparation-37" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Download and import the multi-year stacked file:</p>
+<div class="sourceCode" id="cb1060"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1060-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-1" tabindex="-1"></a><span class="fu">library</span>(SAScii)</span>
+<span id="cb1060-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-2" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1060-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-3" tabindex="-1"></a></span>
+<span id="cb1060-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-4" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
+<span id="cb1060-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-5" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/healthyyouth/data/yrbs/sadc_2019/2019-SADC-SAS-Input-Program.sas&quot;</span></span>
+<span id="cb1060-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-6" tabindex="-1"></a></span>
+<span id="cb1060-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-7" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span></span>
+<span id="cb1060-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-8" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/healthyyouth/data/yrbs/sadc_2019/sadc_2019_national.dat&quot;</span></span>
+<span id="cb1060-9"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-9" tabindex="-1"></a>    </span>
+<span id="cb1060-10"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-10" tabindex="-1"></a>sas_positions <span class="ot">&lt;-</span></span>
+<span id="cb1060-11"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-11" tabindex="-1"></a>    <span class="fu">parse.SAScii</span>( sas_url )</span>
+<span id="cb1060-12"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-12" tabindex="-1"></a></span>
+<span id="cb1060-13"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-13" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1060-14"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-14" tabindex="-1"></a>    <span class="fu">tolower</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] )</span>
+<span id="cb1060-15"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-15" tabindex="-1"></a>    </span>
+<span id="cb1060-16"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-16" tabindex="-1"></a>variables_to_keep <span class="ot">&lt;-</span></span>
+<span id="cb1060-17"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-17" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&quot;sex&quot;</span> , <span class="st">&quot;grade&quot;</span> , <span class="st">&quot;race4&quot;</span> , <span class="st">&quot;q30&quot;</span> , <span class="st">&quot;year&quot;</span> , <span class="st">&quot;psu&quot;</span> , <span class="st">&quot;stratum&quot;</span> , <span class="st">&quot;weight&quot;</span> )</span>
+<span id="cb1060-18"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-18" tabindex="-1"></a>    </span>
+<span id="cb1060-19"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-19" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1060-20"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-20" tabindex="-1"></a>    <span class="fu">ifelse</span>( <span class="sc">!</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="sc">%in%</span> variables_to_keep ) , <span class="st">&quot;_&quot;</span> ,</span>
+<span id="cb1060-21"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-21" tabindex="-1"></a>        <span class="fu">ifelse</span>( sas_positions[ , <span class="st">&#39;char&#39;</span> ] , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> ) )</span>
+<span id="cb1060-22"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-22" tabindex="-1"></a></span>
+<span id="cb1060-23"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-23" tabindex="-1"></a>yrbss_tbl <span class="ot">&lt;-</span></span>
+<span id="cb1060-24"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-24" tabindex="-1"></a>    <span class="fu">read_fwf</span>(</span>
+<span id="cb1060-25"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-25" tabindex="-1"></a>        dat_url ,</span>
+<span id="cb1060-26"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-26" tabindex="-1"></a>        <span class="fu">fwf_widths</span>( </span>
+<span id="cb1060-27"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-27" tabindex="-1"></a>            <span class="fu">abs</span>( sas_positions[ , <span class="st">&#39;width&#39;</span> ] ) , </span>
+<span id="cb1060-28"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-28" tabindex="-1"></a>            <span class="at">col_names =</span> sas_positions[ , <span class="st">&#39;varname&#39;</span> ] </span>
+<span id="cb1060-29"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-29" tabindex="-1"></a>        ) ,</span>
+<span id="cb1060-30"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-30" tabindex="-1"></a>        <span class="at">col_types =</span> <span class="fu">paste0</span>( sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] , <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> ) ,</span>
+<span id="cb1060-31"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-31" tabindex="-1"></a>        <span class="at">na =</span> <span class="fu">c</span>( <span class="st">&quot;&quot;</span> , <span class="st">&quot;.&quot;</span> )</span>
+<span id="cb1060-32"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-32" tabindex="-1"></a>    )</span>
+<span id="cb1060-33"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-33" tabindex="-1"></a>    </span>
+<span id="cb1060-34"><a href="trend-analysis-of-complex-survey-data-2.html#cb1060-34" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( yrbss_tbl )</span></code></pre></div>
+<p>Restrict the dataset to only years shown in the original analysis and re-name the main variable:</p>
+<div class="sourceCode" id="cb1061"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1061-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1061-1" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( yrbss_df , year <span class="sc">%in%</span> <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) )</span>
+<span id="cb1061-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1061-2" tabindex="-1"></a></span>
+<span id="cb1061-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1061-3" tabindex="-1"></a>yrbss_df[ , <span class="st">&#39;ever_smoked&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1061-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1061-4" tabindex="-1"></a>    <span class="fu">as.numeric</span>( yrbss_df[ , <span class="st">&#39;q30&#39;</span> ] <span class="sc">==</span> <span class="dv">1</span> )</span>
+<span id="cb1061-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1061-5" tabindex="-1"></a></span>
+<span id="cb1061-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1061-6" tabindex="-1"></a>yrbss_df[ , <span class="st">&#39;q30&#39;</span> ] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+<p>Recode each categorical variable to factor class:</p>
+<div class="sourceCode" id="cb1062"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1062-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1062-1" tabindex="-1"></a>yrbss_df[ , <span class="st">&#39;sex&#39;</span> ] <span class="ot">&lt;-</span> <span class="fu">relevel</span>( <span class="fu">factor</span>( yrbss_df[ , <span class="st">&#39;sex&#39;</span> ] ) , <span class="at">ref =</span> <span class="st">&quot;2&quot;</span> )</span>
+<span id="cb1062-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1062-2" tabindex="-1"></a></span>
+<span id="cb1062-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1062-3" tabindex="-1"></a><span class="cf">for</span> ( i <span class="cf">in</span> <span class="fu">c</span>( <span class="st">&#39;race4&#39;</span> , <span class="st">&#39;grade&#39;</span> ) ){</span>
+<span id="cb1062-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1062-4" tabindex="-1"></a>    yrbss_df[ , i ] <span class="ot">&lt;-</span> <span class="fu">relevel</span>( <span class="fu">factor</span>( yrbss_df[ , i ] ) , <span class="at">ref =</span> <span class="st">&quot;1&quot;</span> )</span>
+<span id="cb1062-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1062-5" tabindex="-1"></a>}</span></code></pre></div>
 </div>
-<div id="survey-design-definition-11" class="section level3 unnumbered hasAnchor">
-<h3>Survey Design Definition<a href="national-health-and-nutrition-examination-survey-nhanes.html#survey-design-definition-11" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Construct a complex sample survey design:</p>
-<div class="sourceCode" id="cb466"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb466-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-1" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb466-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-2" tabindex="-1"></a></span>
-<span id="cb466-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-3" tabindex="-1"></a>nhanes_design <span class="ot">&lt;-</span> </span>
-<span id="cb466-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-4" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
-<span id="cb466-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-5" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> sdmvpsu , </span>
-<span id="cb466-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-6" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span> sdmvstra ,</span>
-<span id="cb466-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-7" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb466-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-8" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span> wtmec4yr ,</span>
-<span id="cb466-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-9" tabindex="-1"></a>        <span class="at">data =</span> nhanes_df</span>
-<span id="cb466-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb466-10" tabindex="-1"></a>    )</span></code></pre></div>
+<div id="append-polynomials-to-each-year-2" class="section level2 unnumbered hasAnchor">
+<h2>Append Polynomials to Each Year<a href="trend-analysis-of-complex-survey-data-2.html#append-polynomials-to-each-year-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><em>“The polynomials we have used as predictors to this point are natural polynomials, generated from the linear predictor by centering and then powering the linear predictor.”</em></p>
+<p>For more detail on this subject, see page 216 of Applied Multiple Regression/Correlation Analysis for the Behavioral Sciences By Jacob Cohen, Patricia Cohen, Stephen G. West, Leona S. Aiken</p>
+<div class="sourceCode" id="cb1063"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1063-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-1" tabindex="-1"></a>distinct_years_available <span class="ot">&lt;-</span> <span class="fu">length</span>( <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) )</span>
+<span id="cb1063-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-2" tabindex="-1"></a></span>
+<span id="cb1063-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-3" tabindex="-1"></a><span class="co"># store the linear polynomials</span></span>
+<span id="cb1063-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-4" tabindex="-1"></a>c11l <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( distinct_years_available )[ , <span class="st">&quot;.L&quot;</span> ]</span>
+<span id="cb1063-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-5" tabindex="-1"></a></span>
+<span id="cb1063-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-6" tabindex="-1"></a><span class="co"># store the quadratic polynomials</span></span>
+<span id="cb1063-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-7" tabindex="-1"></a>c11q <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( distinct_years_available )[ , <span class="st">&quot;.Q&quot;</span> ]</span>
+<span id="cb1063-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-8" tabindex="-1"></a></span>
+<span id="cb1063-9"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-9" tabindex="-1"></a><span class="co"># store the cubic polynomials</span></span>
+<span id="cb1063-10"><a href="trend-analysis-of-complex-survey-data-2.html#cb1063-10" tabindex="-1"></a>c11c <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( distinct_years_available )[ , <span class="st">&quot;.C&quot;</span> ]</span></code></pre></div>
+<p>For each record in the data set, tack on the linear, quadratic, and cubic contrast value, these contrast values will serve as replacement for the linear <code>year</code> variable in any regression:</p>
+<div class="sourceCode" id="cb1064"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1064-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1064-1" tabindex="-1"></a><span class="co"># year^1 term (linear)</span></span>
+<span id="cb1064-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1064-2" tabindex="-1"></a>yrbss_df[ , <span class="st">&quot;t11l&quot;</span> ] <span class="ot">&lt;-</span> c11l[ <span class="fu">match</span>( yrbss_df[ , <span class="st">&quot;year&quot;</span> ] , <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) ) ]</span>
+<span id="cb1064-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1064-3" tabindex="-1"></a></span>
+<span id="cb1064-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1064-4" tabindex="-1"></a><span class="co"># year^2 term (quadratic)</span></span>
+<span id="cb1064-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1064-5" tabindex="-1"></a>yrbss_df[ , <span class="st">&quot;t11q&quot;</span> ] <span class="ot">&lt;-</span> c11q[ <span class="fu">match</span>( yrbss_df[ , <span class="st">&quot;year&quot;</span> ] , <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) ) ]</span>
+<span id="cb1064-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1064-6" tabindex="-1"></a></span>
+<span id="cb1064-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1064-7" tabindex="-1"></a><span class="co"># year^3 term (cubic)</span></span>
+<span id="cb1064-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1064-8" tabindex="-1"></a>yrbss_df[ , <span class="st">&quot;t11c&quot;</span> ] <span class="ot">&lt;-</span> c11c[ <span class="fu">match</span>( yrbss_df[ , <span class="st">&quot;year&quot;</span> ] , <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) ) ]</span></code></pre></div>
 </div>
-<div id="variable-recoding-15" class="section level3 unnumbered hasAnchor">
-<h3>Variable Recoding<a href="national-health-and-nutrition-examination-survey-nhanes.html#variable-recoding-15" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb467"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb467-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-1" tabindex="-1"></a>nhanes_design <span class="ot">&lt;-</span></span>
-<span id="cb467-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-2" tabindex="-1"></a></span>
-<span id="cb467-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-3" tabindex="-1"></a>    <span class="fu">update</span>(</span>
-<span id="cb467-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-4" tabindex="-1"></a></span>
-<span id="cb467-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-5" tabindex="-1"></a>        nhanes_design ,</span>
-<span id="cb467-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-6" tabindex="-1"></a></span>
-<span id="cb467-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-7" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
-<span id="cb467-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-8" tabindex="-1"></a></span>
-<span id="cb467-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-9" tabindex="-1"></a>        <span class="co"># define high total cholesterol as 1 if mg/dL is at or above 240 and zero otherwise.</span></span>
-<span id="cb467-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-10" tabindex="-1"></a>        <span class="at">hi_tchol =</span> <span class="fu">ifelse</span>( lbxtc <span class="sc">&gt;=</span> <span class="dv">240</span> , <span class="dv">1</span> , <span class="dv">0</span> ) ,</span>
-<span id="cb467-11"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-11" tabindex="-1"></a>        </span>
-<span id="cb467-12"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-12" tabindex="-1"></a>        <span class="at">gender =</span> <span class="fu">factor</span>( riagendr , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,</span>
-<span id="cb467-13"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-13" tabindex="-1"></a>        </span>
-<span id="cb467-14"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-14" tabindex="-1"></a>        <span class="at">age_categories =</span></span>
-<span id="cb467-15"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-15" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb467-16"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-16" tabindex="-1"></a>                <span class="dv">1</span> <span class="sc">+</span> <span class="fu">findInterval</span>( ridageyr , <span class="fu">c</span>( <span class="dv">20</span> , <span class="dv">40</span> , <span class="dv">60</span> ) ) , </span>
-<span id="cb467-17"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-17" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> , </span>
-<span id="cb467-18"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-18" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;0-19&quot;</span> , <span class="st">&quot;20-39&quot;</span> , <span class="st">&quot;40-59&quot;</span> , <span class="st">&quot;60+&quot;</span> )</span>
-<span id="cb467-19"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-19" tabindex="-1"></a>            ) ,</span>
-<span id="cb467-20"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-20" tabindex="-1"></a></span>
-<span id="cb467-21"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-21" tabindex="-1"></a>        <span class="co"># recode the ridreth3 variable as:</span></span>
-<span id="cb467-22"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-22" tabindex="-1"></a>        <span class="co"># mexican american and other hispanic -&gt; 4</span></span>
-<span id="cb467-23"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-23" tabindex="-1"></a>        <span class="co"># non-hispanic white -&gt; 1</span></span>
-<span id="cb467-24"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-24" tabindex="-1"></a>        <span class="co"># non-hispanic black -&gt; 2</span></span>
-<span id="cb467-25"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-25" tabindex="-1"></a>        <span class="co"># non-hispanic asian -&gt; 3</span></span>
-<span id="cb467-26"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-26" tabindex="-1"></a>        <span class="co"># other race including multi-racial -&gt; 5</span></span>
-<span id="cb467-27"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-27" tabindex="-1"></a>        <span class="at">race_ethnicity =</span></span>
-<span id="cb467-28"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-28" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb467-29"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-29" tabindex="-1"></a>                <span class="fu">c</span>( <span class="dv">4</span> , <span class="dv">4</span> , <span class="dv">1</span> , <span class="dv">2</span> , <span class="cn">NA</span> , <span class="dv">3</span> , <span class="dv">5</span> )[ ridreth3 ] ,</span>
-<span id="cb467-30"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-30" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> ,</span>
-<span id="cb467-31"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-31" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;nh white&#39;</span> , <span class="st">&#39;nh black&#39;</span> , <span class="st">&#39;nh asian&#39;</span> , <span class="st">&#39;hispanic&#39;</span> , <span class="st">&#39;other&#39;</span> )</span>
-<span id="cb467-32"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-32" tabindex="-1"></a>            ) ,</span>
-<span id="cb467-33"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-33" tabindex="-1"></a>            </span>
-<span id="cb467-34"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-34" tabindex="-1"></a>        <span class="at">pregnant_at_interview =</span> </span>
-<span id="cb467-35"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-35" tabindex="-1"></a>            <span class="fu">ifelse</span>( ridexprg <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="fu">as.numeric</span>( ridexprg <span class="sc">==</span> <span class="dv">1</span> ) , <span class="cn">NA</span> )</span>
-<span id="cb467-36"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb467-36" tabindex="-1"></a>    )</span></code></pre></div>
+<div id="unadjusted-analysis-examples-2" class="section level2 unnumbered hasAnchor">
+<h2>Unadjusted Analysis Examples<a href="trend-analysis-of-complex-survey-data-2.html#unadjusted-analysis-examples-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Construct a complex sample survey design and match the <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6">published unadjusted prevalence rates</a>:</p>
+<div class="sourceCode" id="cb1065"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1065-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-1" tabindex="-1"></a><span class="fu">options</span>( <span class="at">survey.lonely.psu =</span> <span class="st">&quot;adjust&quot;</span> )</span>
+<span id="cb1065-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-2" tabindex="-1"></a></span>
+<span id="cb1065-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-3" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb1065-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-4" tabindex="-1"></a></span>
+<span id="cb1065-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-5" tabindex="-1"></a>des <span class="ot">&lt;-</span> </span>
+<span id="cb1065-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-6" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
+<span id="cb1065-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-7" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span>psu , </span>
+<span id="cb1065-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-8" tabindex="-1"></a>        <span class="at">strata =</span> <span class="sc">~</span><span class="fu">interaction</span>( stratum , year ) ,</span>
+<span id="cb1065-9"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-9" tabindex="-1"></a>        <span class="at">data =</span> yrbss_df , </span>
+<span id="cb1065-10"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-10" tabindex="-1"></a>        <span class="at">weights =</span> <span class="sc">~</span>weight , </span>
+<span id="cb1065-11"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-11" tabindex="-1"></a>        <span class="at">nest =</span> <span class="cn">TRUE</span></span>
+<span id="cb1065-12"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-12" tabindex="-1"></a>    )</span>
+<span id="cb1065-13"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-13" tabindex="-1"></a></span>
+<span id="cb1065-14"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-14" tabindex="-1"></a>prevalence_over_time <span class="ot">&lt;-</span></span>
+<span id="cb1065-15"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-15" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
+<span id="cb1065-16"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-16" tabindex="-1"></a>        <span class="sc">~</span> ever_smoked , </span>
+<span id="cb1065-17"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-17" tabindex="-1"></a>        <span class="sc">~</span> year , </span>
+<span id="cb1065-18"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-18" tabindex="-1"></a>        des , </span>
+<span id="cb1065-19"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-19" tabindex="-1"></a>        svymean , </span>
+<span id="cb1065-20"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-20" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
+<span id="cb1065-21"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-21" tabindex="-1"></a>    )</span>
+<span id="cb1065-22"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-22" tabindex="-1"></a></span>
+<span id="cb1065-23"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-23" tabindex="-1"></a><span class="co"># confirm prevalence rates match published estimates</span></span>
+<span id="cb1065-24"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-24" tabindex="-1"></a><span class="co"># of high school students that ever smoked</span></span>
+<span id="cb1065-25"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-25" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
+<span id="cb1065-26"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-26" tabindex="-1"></a>    <span class="fu">all.equal</span>( </span>
+<span id="cb1065-27"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-27" tabindex="-1"></a>        <span class="fu">round</span>( <span class="fu">coef</span>( prevalence_over_time ) , <span class="dv">3</span> ) , </span>
+<span id="cb1065-28"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-28" tabindex="-1"></a>        <span class="fu">c</span>( .<span class="dv">701</span> , .<span class="dv">695</span> , .<span class="dv">713</span> , .<span class="dv">702</span> , .<span class="dv">704</span> , .<span class="dv">639</span> , .<span class="dv">584</span> , .<span class="dv">543</span> , .<span class="dv">503</span> , .<span class="dv">463</span> , .<span class="dv">447</span> ) ,</span>
+<span id="cb1065-29"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-29" tabindex="-1"></a>        <span class="at">check.attributes =</span> <span class="cn">FALSE</span></span>
+<span id="cb1065-30"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-30" tabindex="-1"></a>    )</span>
+<span id="cb1065-31"><a href="trend-analysis-of-complex-survey-data-2.html#cb1065-31" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="calculate-joinpoints-needed-2" class="section level2 unnumbered hasAnchor">
+<h2>Calculate Joinpoints Needed<a href="trend-analysis-of-complex-survey-data-2.html#calculate-joinpoints-needed-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Using the orthogonal coefficients (linear, quadratic, cubic terms) that we previously added to our <code>yrbss_df</code> object before constructing the multi-year stacked survey design, determine how many joinpoints will be needed for a trend analysis.</p>
+<p>Epidemiological models typically control for possible confounding variables such as age, sex, and race/ethnicity, so those have been included alongside the linear, cubic, and quadratic year terms.</p>
+<p>Calculate the “ever smoked” regression, adjusted by sex, grade, race/ethnicity, and linear year contrast:</p>
+<div class="sourceCode" id="cb1066"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1066-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1066-1" tabindex="-1"></a>linyear <span class="ot">&lt;-</span> </span>
+<span id="cb1066-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1066-2" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
+<span id="cb1066-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1066-3" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t11l , </span>
+<span id="cb1066-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1066-4" tabindex="-1"></a>        <span class="at">design =</span> des , </span>
+<span id="cb1066-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1066-5" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial</span>
+<span id="cb1066-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1066-6" tabindex="-1"></a>    )</span>
+<span id="cb1066-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1066-7" tabindex="-1"></a></span>
+<span id="cb1066-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1066-8" tabindex="-1"></a><span class="fu">summary</span>( linyear )</span></code></pre></div>
+<p>The linear year-contrast variable <code>t11l</code> is significant. Therefore, there is probably going to be some sort of trend. A linear trend by itself does not need joinpoints. Not one, just zero joinpoints. If the linear term were the only significant term (out of linear, quadratic, cubic), then we would not need to calculate a joinpoint. In other words, we would not need to figure out where to best break our time trend into two, three, or even four segments.</p>
+<p>Since the linear trend is significant, we know there is at least one change across the entire 1991 to 2011 period.</p>
+<hr />
+<p><strong>Interpretation note</strong> about segments of time: The linear term <code>t11l</code> was significant, so we probably have a significant linear trend somewhere to report. Now we need to figure out when that significant linear trend started and when it ended. It might be semantically true that there was a significant linear decrease in high school aged smoking over the entire period of our data 1991-2011; however, it’s inexact to end this analysis after only detecting a linear trend. The purpose of the following few steps is to <em>cordon off</em> different time points from one another. As you’ll see later, there actually was not any detectable decrease from 1991-1999. The entirety of the decline in smoking occurred over the period from 1999-2011. So these next (methodologically tricky) steps serve to provide you and your audience with a more careful statement of statistical significance. It’s not technically wrong to conclude that smoking declined over the period of 1991-2011, it’s just verbose.</p>
+<p>Think of it as the difference between “humans first walked on the moon in the sixties” and “humans first walked on the moon in 1969” - both statements are correct, but the latter exhibits greater scientific precision.</p>
+<hr />
+<p>Calculate the “ever smoked” binomial regression, adjusted by sex, grade, race/ethnicity, and both linear and quadratic year contrasts. Notice the addition of <code>t11q</code>:</p>
+<div class="sourceCode" id="cb1067"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1067-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1067-1" tabindex="-1"></a>quadyear <span class="ot">&lt;-</span></span>
+<span id="cb1067-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1067-2" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
+<span id="cb1067-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1067-3" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t11l <span class="sc">+</span> t11q , </span>
+<span id="cb1067-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1067-4" tabindex="-1"></a>        <span class="at">design =</span> des , </span>
+<span id="cb1067-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1067-5" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial </span>
+<span id="cb1067-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1067-6" tabindex="-1"></a>    )</span>
+<span id="cb1067-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1067-7" tabindex="-1"></a></span>
+<span id="cb1067-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1067-8" tabindex="-1"></a><span class="fu">summary</span>( quadyear )</span></code></pre></div>
+<p>The linear year-contrast variable is significant but the quadratic year-contrast variable is also significant. Therefore, we should use joinpoint software (the <code>segmented</code> package) for this analysis. A significant quadratic trend needs one joinpoint.</p>
+<p>Since both linear and quadratic terms are significant, we can also move ahead and test whether the cubic term is also significant.</p>
+<p>Calculate the “ever smoked” binomial regression, adjusted by sex, grade, race/ethnicity, and linear, quadratic, and cubic year contrasts. Notice the addition of <code>t11c</code>:</p>
+<div class="sourceCode" id="cb1068"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1068-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1068-1" tabindex="-1"></a>cubyear <span class="ot">&lt;-</span></span>
+<span id="cb1068-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1068-2" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
+<span id="cb1068-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1068-3" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t11l <span class="sc">+</span> t11q <span class="sc">+</span> t11c , </span>
+<span id="cb1068-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1068-4" tabindex="-1"></a>        <span class="at">design =</span> des , </span>
+<span id="cb1068-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1068-5" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial </span>
+<span id="cb1068-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1068-6" tabindex="-1"></a>    )</span>
+<span id="cb1068-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1068-7" tabindex="-1"></a>    </span>
+<span id="cb1068-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1068-8" tabindex="-1"></a><span class="fu">summary</span>( cubyear )</span></code></pre></div>
+<p>The cubic year-contrast term is also significant in this model. Therefore, we might potentially evaluate this trend using two joinpoints. In other words, a significant result for all linear, quadratic, and cubic year contrasts at this point means we might be able to evaluate three distinct trends (separated by our two joinpoints) across the broader 1991 - 2011 time period of analysis.</p>
+<p>Although we might now have the statistical ability to analyze three distinct time periods (separated by two joinpoints) across our data, the utility of this depends on the circumstances. Cubic and higher polynomials account for not only the direction of change but also the pace of that change, allowing statistical statements that might not be of interest to an audience: While it might be an exercise in precision to conclude that smoking rates dropped quickest across 1999-2003 and less quickly across 2003-2011, that scientific pair of findings may not be as compelling as the simpler (quadratic but not cubic) statement that smoking rates have dropped across the period of 1999-2011.</p>
 <hr />
 </div>
-</div>
-<div id="analysis-examples-with-the-survey-library-11" class="section level2 unnumbered hasAnchor">
-<h2>Analysis Examples with the <code>survey</code> library  <a href="national-health-and-nutrition-examination-survey-nhanes.html#analysis-examples-with-the-survey-library-11" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="unweighted-counts-15" class="section level3 unnumbered hasAnchor">
-<h3>Unweighted Counts<a href="national-health-and-nutrition-examination-survey-nhanes.html#unweighted-counts-15" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb468"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb468-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb468-1" tabindex="-1"></a><span class="fu">sum</span>( <span class="fu">weights</span>( nhanes_design , <span class="st">&quot;sampling&quot;</span> ) <span class="sc">!=</span> <span class="dv">0</span> )</span>
-<span id="cb468-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb468-2" tabindex="-1"></a></span>
-<span id="cb468-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb468-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> race_ethnicity , nhanes_design , unwtd.count )</span></code></pre></div>
-</div>
-<div id="weighted-counts-11" class="section level3 unnumbered hasAnchor">
-<h3>Weighted Counts<a href="national-health-and-nutrition-examination-survey-nhanes.html#weighted-counts-11" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb469"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb469-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb469-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> one , nhanes_design )</span>
-<span id="cb469-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb469-2" tabindex="-1"></a></span>
-<span id="cb469-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb469-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> race_ethnicity , nhanes_design , svytotal )</span></code></pre></div>
-</div>
-<div id="descriptive-statistics-15" class="section level3 unnumbered hasAnchor">
-<h3>Descriptive Statistics<a href="national-health-and-nutrition-examination-survey-nhanes.html#descriptive-statistics-15" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb470-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb470-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> lbxtc , nhanes_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb470-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb470-2" tabindex="-1"></a></span>
-<span id="cb470-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb470-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> lbxtc , <span class="sc">~</span> race_ethnicity , nhanes_design , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb471-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> riagendr , nhanes_design )</span>
-<span id="cb471-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb471-2" tabindex="-1"></a></span>
-<span id="cb471-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb471-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> riagendr , <span class="sc">~</span> race_ethnicity , nhanes_design , svymean )</span></code></pre></div>
-<p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb472-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb472-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> lbxtc , nhanes_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb472-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb472-2" tabindex="-1"></a></span>
-<span id="cb472-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb472-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> lbxtc , <span class="sc">~</span> race_ethnicity , nhanes_design , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb473-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb473-1" tabindex="-1"></a><span class="fu">svytotal</span>( <span class="sc">~</span> riagendr , nhanes_design )</span>
-<span id="cb473-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb473-2" tabindex="-1"></a></span>
-<span id="cb473-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb473-3" tabindex="-1"></a><span class="fu">svyby</span>( <span class="sc">~</span> riagendr , <span class="sc">~</span> race_ethnicity , nhanes_design , svytotal )</span></code></pre></div>
-<p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb474-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-1" tabindex="-1"></a><span class="fu">svyquantile</span>( <span class="sc">~</span> lbxtc , nhanes_design , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb474-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-2" tabindex="-1"></a></span>
-<span id="cb474-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-3" tabindex="-1"></a><span class="fu">svyby</span>( </span>
-<span id="cb474-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-4" tabindex="-1"></a>    <span class="sc">~</span> lbxtc , </span>
-<span id="cb474-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-5" tabindex="-1"></a>    <span class="sc">~</span> race_ethnicity , </span>
-<span id="cb474-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-6" tabindex="-1"></a>    nhanes_design , </span>
-<span id="cb474-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-7" tabindex="-1"></a>    svyquantile , </span>
-<span id="cb474-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-8" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb474-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-9" tabindex="-1"></a>    <span class="at">ci =</span> <span class="cn">TRUE</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb474-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb474-10" tabindex="-1"></a>)</span></code></pre></div>
-<p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb475-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb475-1" tabindex="-1"></a><span class="fu">svyratio</span>( </span>
-<span id="cb475-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb475-2" tabindex="-1"></a>    <span class="at">numerator =</span> <span class="sc">~</span> lbxtc , </span>
-<span id="cb475-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb475-3" tabindex="-1"></a>    <span class="at">denominator =</span> <span class="sc">~</span> ridageyr , </span>
-<span id="cb475-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb475-4" tabindex="-1"></a>    nhanes_design ,</span>
-<span id="cb475-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb475-5" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb475-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb475-6" tabindex="-1"></a>)</span></code></pre></div>
-</div>
-<div id="subsetting-15" class="section level3 unnumbered hasAnchor">
-<h3>Subsetting<a href="national-health-and-nutrition-examination-survey-nhanes.html#subsetting-15" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Restrict the survey design to respondents aged 60 or older:</p>
-<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb476-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb476-1" tabindex="-1"></a>sub_nhanes_design <span class="ot">&lt;-</span> <span class="fu">subset</span>( nhanes_design , age_categories <span class="sc">==</span> <span class="st">&quot;60+&quot;</span> )</span></code></pre></div>
-<p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb477-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb477-1" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> lbxtc , sub_nhanes_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-</div>
-<div id="measures-of-uncertainty-15" class="section level3 unnumbered hasAnchor">
-<h3>Measures of Uncertainty<a href="national-health-and-nutrition-examination-survey-nhanes.html#measures-of-uncertainty-15" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb478-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-1" tabindex="-1"></a>this_result <span class="ot">&lt;-</span> <span class="fu">svymean</span>( <span class="sc">~</span> lbxtc , nhanes_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb478-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-2" tabindex="-1"></a></span>
-<span id="cb478-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-3" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb478-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-4" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb478-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-5" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb478-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-6" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb478-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-7" tabindex="-1"></a></span>
-<span id="cb478-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-8" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb478-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-9" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb478-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-10" tabindex="-1"></a>        <span class="sc">~</span> lbxtc , </span>
-<span id="cb478-11"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-11" tabindex="-1"></a>        <span class="sc">~</span> race_ethnicity , </span>
-<span id="cb478-12"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-12" tabindex="-1"></a>        nhanes_design , </span>
-<span id="cb478-13"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-13" tabindex="-1"></a>        svymean ,</span>
-<span id="cb478-14"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-14" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb478-15"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-15" tabindex="-1"></a>    )</span>
-<span id="cb478-16"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-16" tabindex="-1"></a>    </span>
-<span id="cb478-17"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-17" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb478-18"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-18" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb478-19"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-19" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb478-20"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb478-20" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
-<p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb479"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb479-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb479-1" tabindex="-1"></a><span class="fu">degf</span>( nhanes_design )</span></code></pre></div>
-<p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb480"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb480-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb480-1" tabindex="-1"></a><span class="fu">svyvar</span>( <span class="sc">~</span> lbxtc , nhanes_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-<p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb481"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb481-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb481-1" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb481-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb481-2" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> lbxtc , nhanes_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb481-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb481-3" tabindex="-1"></a></span>
-<span id="cb481-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb481-4" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb481-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb481-5" tabindex="-1"></a><span class="fu">svymean</span>( <span class="sc">~</span> lbxtc , nhanes_design , <span class="at">na.rm =</span> <span class="cn">TRUE</span> , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span></code></pre></div>
-<p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb482-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb482-1" tabindex="-1"></a><span class="fu">svyciprop</span>( <span class="sc">~</span> pregnant_at_interview , nhanes_design ,</span>
-<span id="cb482-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb482-2" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;likelihood&quot;</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
-</div>
-<div id="regression-models-and-tests-of-association-15" class="section level3 unnumbered hasAnchor">
-<h3>Regression Models and Tests of Association<a href="national-health-and-nutrition-examination-survey-nhanes.html#regression-models-and-tests-of-association-15" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb483"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb483-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb483-1" tabindex="-1"></a><span class="fu">svyttest</span>( lbxtc <span class="sc">~</span> pregnant_at_interview , nhanes_design )</span></code></pre></div>
-<p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb484"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb484-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb484-1" tabindex="-1"></a><span class="fu">svychisq</span>( </span>
-<span id="cb484-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb484-2" tabindex="-1"></a>    <span class="sc">~</span> pregnant_at_interview <span class="sc">+</span> riagendr , </span>
-<span id="cb484-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb484-3" tabindex="-1"></a>    nhanes_design </span>
-<span id="cb484-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb484-4" tabindex="-1"></a>)</span></code></pre></div>
-<p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb485-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb485-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb485-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb485-2" tabindex="-1"></a>    <span class="fu">svyglm</span>( </span>
-<span id="cb485-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb485-3" tabindex="-1"></a>        lbxtc <span class="sc">~</span> pregnant_at_interview <span class="sc">+</span> riagendr , </span>
-<span id="cb485-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb485-4" tabindex="-1"></a>        nhanes_design </span>
-<span id="cb485-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb485-5" tabindex="-1"></a>    )</span>
-<span id="cb485-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb485-6" tabindex="-1"></a></span>
-<span id="cb485-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb485-7" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
-<hr />
-</div>
-</div>
-<div id="intermish-17" class="section level2 unnumbered hasAnchor">
-<h2>Intermish<a href="national-health-and-nutrition-examination-survey-nhanes.html#intermish-17" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="intermish-37" class="section level2 unnumbered hasAnchor">
+<h2>Intermish<a href="trend-analysis-of-complex-survey-data-2.html#intermish-37" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <center>
-<i><b>intravenous capri sun</b></i>
+<img src="https://1.bp.blogspot.com/-iwm7r7PRQRs/YPcur-o-v-I/AAAAAAABy-4/yYCMsJ2UOhQb-2NX-MSNnYE8sgfjcadwgCLcBGAsYHQ/s2048/WhatsApp%2BImage%2B2021-07-19%2Bat%2B10.42.16%2BPM%2B%25281%2529.jpeg">
+<p>
+<i><b>the author programming in sas</b></i>
 </center>
 <hr />
 </div>
-<div id="direct-method-of-age-adjustment-replication-example" class="section level2 unnumbered hasAnchor">
-<h2>Direct Method of Age-Adjustment Replication Example<a href="national-health-and-nutrition-examination-survey-nhanes.html#direct-method-of-age-adjustment-replication-example" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>This example matches the total cholesterol statistics and standard errors in <a href="https://www.cdc.gov/nchs/data/databriefs/db363-tables-508.pdf#page=1">Table 1</a> from <a href="https://www.cdc.gov/nchs/products/databriefs/db363.htm">Data Brief 363</a>:</p>
-<p>Match the crude estimates in the footnote and also in the unadjusted age categories:</p>
-<div class="sourceCode" id="cb486"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb486-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-1" tabindex="-1"></a>crude_overall <span class="ot">&lt;-</span></span>
-<span id="cb486-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-2" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> hi_tchol , <span class="fu">subset</span>( nhanes_design , ridageyr <span class="sc">&gt;=</span> <span class="dv">20</span> ) , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb486-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-3" tabindex="-1"></a></span>
-<span id="cb486-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-4" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( crude_overall ) , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.115</span> )</span>
-<span id="cb486-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-5" tabindex="-1"></a></span>
-<span id="cb486-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-6" tabindex="-1"></a>crude_by_gender <span class="ot">&lt;-</span></span>
-<span id="cb486-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-7" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb486-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-8" tabindex="-1"></a>        <span class="sc">~</span> hi_tchol , </span>
-<span id="cb486-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-9" tabindex="-1"></a>        <span class="sc">~</span> gender , </span>
-<span id="cb486-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-10" tabindex="-1"></a>        <span class="fu">subset</span>( nhanes_design , ridageyr <span class="sc">&gt;=</span> <span class="dv">20</span> ) , </span>
-<span id="cb486-11"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-11" tabindex="-1"></a>        svymean , </span>
-<span id="cb486-12"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-12" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb486-13"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-13" tabindex="-1"></a>    )</span>
-<span id="cb486-14"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-14" tabindex="-1"></a>    </span>
-<span id="cb486-15"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-15" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( crude_by_gender )[ <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.103</span> )</span>
-<span id="cb486-16"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-16" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( crude_by_gender )[ <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.126</span> )</span>
-<span id="cb486-17"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-17" tabindex="-1"></a></span>
-<span id="cb486-18"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-18" tabindex="-1"></a>crude_by_age <span class="ot">&lt;-</span></span>
-<span id="cb486-19"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-19" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
-<span id="cb486-20"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-20" tabindex="-1"></a>        <span class="sc">~</span> hi_tchol , </span>
-<span id="cb486-21"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-21" tabindex="-1"></a>        <span class="sc">~</span> age_categories , </span>
-<span id="cb486-22"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-22" tabindex="-1"></a>        <span class="fu">subset</span>( nhanes_design , ridageyr <span class="sc">&gt;=</span> <span class="dv">20</span> ) , </span>
-<span id="cb486-23"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-23" tabindex="-1"></a>        svymean , </span>
-<span id="cb486-24"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-24" tabindex="-1"></a>        <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb486-25"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-25" tabindex="-1"></a>    )</span>
-<span id="cb486-26"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-26" tabindex="-1"></a>    </span>
-<span id="cb486-27"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-27" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( crude_by_age )[ <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.075</span> )</span>
-<span id="cb486-28"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-28" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( crude_by_age )[ <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.157</span> )</span>
-<span id="cb486-29"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-29" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( crude_by_age )[ <span class="dv">3</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.114</span> )</span>
-<span id="cb486-30"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-30" tabindex="-1"></a></span>
-<span id="cb486-31"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-31" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( crude_by_age )[ <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.005</span> )</span>
-<span id="cb486-32"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-32" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( crude_by_age )[ <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.011</span> )</span>
-<span id="cb486-33"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb486-33" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( crude_by_age )[ <span class="dv">3</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.008</span> )</span></code></pre></div>
-<p>Sum up <a href="https://seer.cancer.gov/seerstat/tutorials/aarates/step3.html">2000 Census totals</a> based on the age groupings specified in footnote:</p>
-<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb487-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb487-1" tabindex="-1"></a>pop_by_age <span class="ot">&lt;-</span> </span>
-<span id="cb487-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb487-2" tabindex="-1"></a>    <span class="fu">data.frame</span>( </span>
-<span id="cb487-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb487-3" tabindex="-1"></a>        <span class="at">age_categories =</span> <span class="fu">c</span>( <span class="st">&quot;0-19&quot;</span> , <span class="st">&quot;20-39&quot;</span> , <span class="st">&quot;40-59&quot;</span> , <span class="st">&quot;60+&quot;</span> ) ,</span>
-<span id="cb487-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb487-4" tabindex="-1"></a>        <span class="at">Freq =</span> <span class="fu">c</span>( <span class="dv">78782657</span> , <span class="dv">77670618</span> , <span class="dv">72816615</span> , <span class="dv">45363752</span> ) </span>
-<span id="cb487-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb487-5" tabindex="-1"></a>    )   </span></code></pre></div>
-<p>Create a design with the nationwide population stratified to the above census counts:</p>
-<div class="sourceCode" id="cb488"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb488-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb488-1" tabindex="-1"></a>nhanes_age_adjusted <span class="ot">&lt;-</span></span>
-<span id="cb488-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb488-2" tabindex="-1"></a>    <span class="fu">postStratify</span>( </span>
-<span id="cb488-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb488-3" tabindex="-1"></a>        <span class="fu">subset</span>( nhanes_design , <span class="sc">!</span><span class="fu">is.na</span>( hi_tchol ) ) , </span>
-<span id="cb488-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb488-4" tabindex="-1"></a>        <span class="sc">~</span> age_categories , </span>
-<span id="cb488-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb488-5" tabindex="-1"></a>        pop_by_age </span>
-<span id="cb488-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb488-6" tabindex="-1"></a>    )</span></code></pre></div>
-<p>Match the overall adjusted estimates:</p>
-<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb489-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb489-1" tabindex="-1"></a>results_overall <span class="ot">&lt;-</span></span>
-<span id="cb489-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb489-2" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> hi_tchol , <span class="fu">subset</span>( nhanes_age_adjusted , ridageyr <span class="sc">&gt;=</span> <span class="dv">20</span> ) , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb489-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb489-3" tabindex="-1"></a></span>
-<span id="cb489-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb489-4" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results_overall ) , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.114</span> )</span>
-<span id="cb489-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb489-5" tabindex="-1"></a></span>
-<span id="cb489-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb489-6" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results_overall ) , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.006</span> )</span></code></pre></div>
-<p>Create a design stratified to census counts broken out by gender, then match those estimates:</p>
-<div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb490-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-1" tabindex="-1"></a>nhanes_by_gender <span class="ot">&lt;-</span></span>
-<span id="cb490-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-2" tabindex="-1"></a>    <span class="fu">svystandardize</span>(</span>
-<span id="cb490-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-3" tabindex="-1"></a>        nhanes_design , </span>
-<span id="cb490-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-4" tabindex="-1"></a>        <span class="at">by =</span> <span class="sc">~</span> age_categories ,         <span class="co"># stratification variable</span></span>
-<span id="cb490-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-5" tabindex="-1"></a>        <span class="at">over =</span> <span class="sc">~</span> gender ,               <span class="co"># break out variable</span></span>
-<span id="cb490-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-6" tabindex="-1"></a>        <span class="at">population =</span> pop_by_age ,       <span class="co"># data.frame containing census populations</span></span>
-<span id="cb490-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-7" tabindex="-1"></a>        <span class="at">excluding.missing =</span> <span class="sc">~</span> hi_tchol  <span class="co"># analysis variable of interest</span></span>
-<span id="cb490-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-8" tabindex="-1"></a>    )</span>
-<span id="cb490-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-9" tabindex="-1"></a></span>
-<span id="cb490-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-10" tabindex="-1"></a>results_by_gender <span class="ot">&lt;-</span></span>
-<span id="cb490-11"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-11" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb490-12"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-12" tabindex="-1"></a>        <span class="sc">~</span> hi_tchol , </span>
-<span id="cb490-13"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-13" tabindex="-1"></a>        <span class="sc">~</span> gender , </span>
-<span id="cb490-14"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-14" tabindex="-1"></a>        <span class="fu">subset</span>( nhanes_by_gender , ridageyr <span class="sc">&gt;=</span> <span class="dv">20</span> ) ,</span>
-<span id="cb490-15"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-15" tabindex="-1"></a>        svymean , </span>
-<span id="cb490-16"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-16" tabindex="-1"></a>        <span class="at">na.rm=</span><span class="cn">TRUE</span></span>
-<span id="cb490-17"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-17" tabindex="-1"></a>    )</span>
-<span id="cb490-18"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-18" tabindex="-1"></a></span>
-<span id="cb490-19"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-19" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results_by_gender )[ <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.105</span> )</span>
-<span id="cb490-20"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-20" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results_by_gender )[ <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.121</span> )</span>
-<span id="cb490-21"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-21" tabindex="-1"></a></span>
-<span id="cb490-22"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-22" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results_by_gender )[ <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.007</span> )</span>
-<span id="cb490-23"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb490-23" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results_by_gender )[ <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.008</span> )</span></code></pre></div>
-<p>Create a design stratified to census counts broken out by race/ethnicity, then match those estimates:</p>
-<div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb491-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-1" tabindex="-1"></a>nhanes_by_race <span class="ot">&lt;-</span></span>
-<span id="cb491-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-2" tabindex="-1"></a>    <span class="fu">svystandardize</span>(</span>
-<span id="cb491-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-3" tabindex="-1"></a>        nhanes_design , </span>
-<span id="cb491-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-4" tabindex="-1"></a>        <span class="at">by =</span> <span class="sc">~</span> age_categories ,         <span class="co"># stratification variable</span></span>
-<span id="cb491-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-5" tabindex="-1"></a>        <span class="at">over =</span> <span class="sc">~</span> race_ethnicity ,       <span class="co"># break out variable</span></span>
-<span id="cb491-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-6" tabindex="-1"></a>        <span class="at">population =</span> pop_by_age ,       <span class="co"># data.frame containing census populations</span></span>
-<span id="cb491-7"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-7" tabindex="-1"></a>        <span class="at">excluding.missing =</span> <span class="sc">~</span> hi_tchol  <span class="co"># analysis variable of interest</span></span>
-<span id="cb491-8"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-8" tabindex="-1"></a>    )</span>
-<span id="cb491-9"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-9" tabindex="-1"></a></span>
-<span id="cb491-10"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-10" tabindex="-1"></a>results_by_race_ethnicity <span class="ot">&lt;-</span></span>
-<span id="cb491-11"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-11" tabindex="-1"></a>    <span class="fu">svyby</span>( </span>
-<span id="cb491-12"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-12" tabindex="-1"></a>        <span class="sc">~</span> hi_tchol , </span>
-<span id="cb491-13"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-13" tabindex="-1"></a>        <span class="sc">~</span> race_ethnicity , </span>
-<span id="cb491-14"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-14" tabindex="-1"></a>        <span class="at">design =</span> <span class="fu">subset</span>( nhanes_by_race , ridageyr <span class="sc">&gt;=</span> <span class="dv">20</span> ) ,</span>
-<span id="cb491-15"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-15" tabindex="-1"></a>        svymean , </span>
-<span id="cb491-16"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-16" tabindex="-1"></a>        <span class="at">na.rm=</span><span class="cn">TRUE</span></span>
-<span id="cb491-17"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-17" tabindex="-1"></a>    )</span>
-<span id="cb491-18"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-18" tabindex="-1"></a></span>
-<span id="cb491-19"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-19" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results_by_race_ethnicity )[ <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.117</span> )</span>
-<span id="cb491-20"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-20" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results_by_race_ethnicity )[ <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.100</span> )</span>
-<span id="cb491-21"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-21" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results_by_race_ethnicity )[ <span class="dv">3</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.116</span> )</span>
-<span id="cb491-22"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-22" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( results_by_race_ethnicity )[ <span class="dv">4</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.109</span> )</span>
-<span id="cb491-23"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-23" tabindex="-1"></a></span>
-<span id="cb491-24"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-24" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results_by_race_ethnicity )[ <span class="dv">1</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.007</span> )</span>
-<span id="cb491-25"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-25" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results_by_race_ethnicity )[ <span class="dv">2</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.009</span> )</span>
-<span id="cb491-26"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-26" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results_by_race_ethnicity )[ <span class="dv">3</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.011</span> ) </span>
-<span id="cb491-27"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb491-27" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( results_by_race_ethnicity )[ <span class="dv">4</span> ] , <span class="dv">3</span> ) <span class="sc">==</span> <span class="fl">0.009</span> ) </span></code></pre></div>
-<hr />
+<div id="calculate-predicted-marginals-2" class="section level2 unnumbered hasAnchor">
+<h2>Calculate Predicted Marginals<a href="trend-analysis-of-complex-survey-data-2.html#calculate-predicted-marginals-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Calculate the survey-year-independent predictor effects and store these results:</p>
+<div class="sourceCode" id="cb1069"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1069-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1069-1" tabindex="-1"></a>marginals <span class="ot">&lt;-</span> </span>
+<span id="cb1069-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1069-2" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
+<span id="cb1069-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1069-3" tabindex="-1"></a>        <span class="at">formula =</span> ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade ,</span>
+<span id="cb1069-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1069-4" tabindex="-1"></a>        <span class="at">design =</span> des , </span>
+<span id="cb1069-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1069-5" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial</span>
+<span id="cb1069-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1069-6" tabindex="-1"></a>    )</span></code></pre></div>
+<p>Run these marginals through the <code>svypredmeans</code> function. For archaeology fans out there, this function emulates the <code>PREDMARG</code> statement in the ancient language of SUDAAN:</p>
+<div class="sourceCode" id="cb1070"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1070-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1070-1" tabindex="-1"></a>( means_for_joinpoint <span class="ot">&lt;-</span> <span class="fu">svypredmeans</span>( marginals , <span class="sc">~</span><span class="fu">factor</span>( year ) ) )</span></code></pre></div>
+<p>Clean up these results a bit in preparation for a joinpoint analysis:</p>
+<div class="sourceCode" id="cb1071"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1071-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1071-1" tabindex="-1"></a><span class="co"># coerce the results to a data.frame object</span></span>
+<span id="cb1071-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1071-2" tabindex="-1"></a>means_for_joinpoint <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>( means_for_joinpoint )</span>
+<span id="cb1071-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1071-3" tabindex="-1"></a></span>
+<span id="cb1071-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1071-4" tabindex="-1"></a><span class="co"># extract the row names as the survey year</span></span>
+<span id="cb1071-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1071-5" tabindex="-1"></a>means_for_joinpoint[ , <span class="st">&quot;year&quot;</span> ] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>( <span class="fu">rownames</span>( means_for_joinpoint ) )</span>
+<span id="cb1071-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1071-6" tabindex="-1"></a></span>
+<span id="cb1071-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1071-7" tabindex="-1"></a><span class="co"># must be sorted, just in case it&#39;s not already</span></span>
+<span id="cb1071-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1071-8" tabindex="-1"></a>means_for_joinpoint <span class="ot">&lt;-</span> means_for_joinpoint[ <span class="fu">order</span>( means_for_joinpoint[ , <span class="st">&quot;year&quot;</span> ] ) , ]</span></code></pre></div>
 </div>
-<div id="analysis-examples-with-srvyr-10" class="section level2 unnumbered hasAnchor">
-<h2>Analysis Examples with <code>srvyr</code>  <a href="national-health-and-nutrition-examination-survey-nhanes.html#analysis-examples-with-srvyr-10" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The R <code>srvyr</code> library calculates summary statistics from survey data, such as the mean, total or quantile using <a href="https://github.com/tidyverse/dplyr/">dplyr</a>-like syntax. <a href="https://github.com/gergness/srvyr">srvyr</a> allows for the use of many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, the <code>tidyverse</code> style of non-standard evaluation and more consistent return types than the <code>survey</code> package. <a href="https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html">This vignette</a> details the available features. As a starting point for NHANES users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb492"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb492-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb492-1" tabindex="-1"></a><span class="fu">library</span>(srvyr)</span>
-<span id="cb492-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb492-2" tabindex="-1"></a>nhanes_srvyr_design <span class="ot">&lt;-</span> <span class="fu">as_survey</span>( nhanes_design )</span></code></pre></div>
-<p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb493"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb493-1"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb493-1" tabindex="-1"></a>nhanes_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb493-2"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb493-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( lbxtc , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
-<span id="cb493-3"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb493-3" tabindex="-1"></a></span>
-<span id="cb493-4"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb493-4" tabindex="-1"></a>nhanes_srvyr_design <span class="sc">%&gt;%</span></span>
-<span id="cb493-5"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb493-5" tabindex="-1"></a>    <span class="fu">group_by</span>( race_ethnicity ) <span class="sc">%&gt;%</span></span>
-<span id="cb493-6"><a href="national-health-and-nutrition-examination-survey-nhanes.html#cb493-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">survey_mean</span>( lbxtc , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<div id="identify-joinpoints-or-breakpoints-2" class="section level2 unnumbered hasAnchor">
+<h2>Identify Joinpoint(s) or Breakpoint(s)<a href="trend-analysis-of-complex-survey-data-2.html#identify-joinpoints-or-breakpoints-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Let’s take a look at how confident we are in the value at each adjusted timepoint. Carrying out a trend analysis requires creating new weights to fit a piecewise linear regression. First, create that weight variable:</p>
+<div class="sourceCode" id="cb1072"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1072-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1072-1" tabindex="-1"></a>means_for_joinpoint[ , <span class="st">&quot;wgt&quot;</span> ] <span class="ot">&lt;-</span> <span class="fu">with</span>( means_for_joinpoint, ( mean <span class="sc">/</span> SE ) <span class="sc">^</span> <span class="dv">2</span> ) </span></code></pre></div>
+<p>Second, fit a piecewise linear regression, estimating the ‘starting’ linear model with the usual <code>lm</code> function using the log values and the weights:</p>
+<div class="sourceCode" id="cb1073"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1073-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1073-1" tabindex="-1"></a>o <span class="ot">&lt;-</span> <span class="fu">lm</span>( <span class="fu">log</span>( mean ) <span class="sc">~</span> year , <span class="at">weights =</span> wgt , <span class="at">data =</span> means_for_joinpoint )</span></code></pre></div>
+<p>Now that the regression has been structured correctly, estimate the year that our complex survey trend should be broken into two or more segments:</p>
+<div class="sourceCode" id="cb1074"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1074-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1074-1" tabindex="-1"></a><span class="fu">library</span>(segmented)</span>
+<span id="cb1074-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1074-2" tabindex="-1"></a></span>
+<span id="cb1074-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1074-3" tabindex="-1"></a><span class="co"># find only one joinpoint</span></span>
+<span id="cb1074-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1074-4" tabindex="-1"></a>os <span class="ot">&lt;-</span> <span class="fu">segmented</span>( o , <span class="sc">~</span>year )</span>
+<span id="cb1074-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1074-5" tabindex="-1"></a></span>
+<span id="cb1074-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1074-6" tabindex="-1"></a><span class="fu">summary</span>( os )</span></code></pre></div>
+<p>Look for the <code>Estimated Break-Point(s)</code> in that result - that’s the critical number from this joinpoint analysis. The <code>segmented</code> package uses an iterative procedure (described in the article below); between-year solutions are returned and should be rounded to the nearest time point in the analysis. The joinpoint software implements two estimating algorithms: the grid-search and the Hudson algorithm. For more detail about these methods, see <a href="http://onlinelibrary.wiley.com/doi/10.1002/sim.1545/abstract">Muggeo V. (2003) Estimating regression models with unknown break-points. Statistics in Medicine, 22: 3055-3071.</a>.</p>
+<p>Obtain the annual percent change estimates for each time point:</p>
+<div class="sourceCode" id="cb1075"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1075-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1075-1" tabindex="-1"></a><span class="fu">slope</span>( os , <span class="at">APC =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<p>The confidence intervals for the annual percent change (APC) may be different from the ones returned by <a href="surveillance.cancer.gov/joinpoint/">NCI’s Joinpoint Software</a>; for further details, check out <a href="http://onlinelibrary.wiley.com/doi/10.1002/sim.3850/abstract">Muggeo V. (2010) A Comment on `Estimating average annual per cent change in trend analysis’ by Clegg et al., Statistics in Medicine; 28, 3670-3682. Statistics in Medicine, 29, 1958-1960.</a></p>
+<p>This analysis returned similar results to the NCI’s Joinpoint Regression Program by estimating a joinpoint at <code>year=1999</code> - and, more precisely, that the start of that decreasing trend in smoking prevalence happened at an APC of -3.92 percent. That is, <code>slope2</code> from the output above.</p>
+<p>Remember that the cubic-year model above had significant terms as well. Therefore, it would be statistically defensible to calculate two joinpoints rather than only one. However, for this analyses, breaking the 1999-2011 trend into two separate downward trends might not be of interest to the audience. Looking at the <code>slope2</code> and <code>slope3</code> estimates and confidence intervals, we might be able to conclude that “ever smoking” decreased across 1999-2003 and also decreased (albeit less rapidly) across 2003-2011. However, communicating two <em>consecutive</em> downward trends might not be of much interest to a lay audience. Forgoing a second possible joinpoint makes sense when the direction of change is more compelling than the pace of change:</p>
+<div class="sourceCode" id="cb1076"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1076-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1076-1" tabindex="-1"></a><span class="co"># find two joinpoints rather than only one</span></span>
+<span id="cb1076-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1076-2" tabindex="-1"></a>os2 <span class="ot">&lt;-</span> <span class="fu">segmented</span>( o , <span class="sc">~</span>year , <span class="at">npsi =</span> <span class="dv">2</span> )</span>
+<span id="cb1076-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1076-3" tabindex="-1"></a></span>
+<span id="cb1076-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1076-4" tabindex="-1"></a><span class="fu">summary</span>( os2 )</span>
+<span id="cb1076-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1076-5" tabindex="-1"></a></span>
+<span id="cb1076-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1076-6" tabindex="-1"></a><span class="fu">slope</span>( os2 , <span class="at">APC =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+</div>
+<div id="interpret-and-conclude-2" class="section level2 unnumbered hasAnchor">
+<h2>Interpret and Conclude<a href="trend-analysis-of-complex-survey-data-2.html#interpret-and-conclude-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>After identifying the joinpoint for smoking prevalence, we can create two regression models (one for each time segment - if we had two joinpoints, we would need three regression models). The first model covers the years leading up to (and including) the joinpoint (i.e., 1991 to 1999). The second model includes the years from the joinpoint forward (i.e., 1999 to 2011). So start with 1991, 1993, 1995, 1997, 1999, the five year-points before (and including) 1999:</p>
+<div class="sourceCode" id="cb1077"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1077-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-1" tabindex="-1"></a><span class="co"># calculate a five-timepoint linear contrast vector</span></span>
+<span id="cb1077-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-2" tabindex="-1"></a>c5l <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( <span class="dv">5</span> )[ , <span class="dv">1</span> ]</span>
+<span id="cb1077-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-3" tabindex="-1"></a></span>
+<span id="cb1077-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-4" tabindex="-1"></a><span class="co"># tack the five-timepoint linear contrast vectors onto the current survey design object</span></span>
+<span id="cb1077-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-5" tabindex="-1"></a>des <span class="ot">&lt;-</span> <span class="fu">update</span>( des , <span class="at">t5l =</span> c5l[ <span class="fu">match</span>( year , <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">1999</span> , <span class="dv">2</span> ) ) ] )</span>
+<span id="cb1077-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-6" tabindex="-1"></a></span>
+<span id="cb1077-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-7" tabindex="-1"></a>pre_91_99 <span class="ot">&lt;-</span></span>
+<span id="cb1077-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-8" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
+<span id="cb1077-9"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-9" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t5l ,</span>
+<span id="cb1077-10"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-10" tabindex="-1"></a>        <span class="at">design =</span> <span class="fu">subset</span>( des , year <span class="sc">&lt;=</span> <span class="dv">1999</span> ) , </span>
+<span id="cb1077-11"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-11" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial</span>
+<span id="cb1077-12"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-12" tabindex="-1"></a>    )</span>
+<span id="cb1077-13"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-13" tabindex="-1"></a></span>
+<span id="cb1077-14"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-14" tabindex="-1"></a><span class="fu">summary</span>( pre_91_99 )</span>
+<span id="cb1077-15"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-15" tabindex="-1"></a></span>
+<span id="cb1077-16"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-16" tabindex="-1"></a><span class="co"># confirm 1991-1999 trend coefficient matches published estimates</span></span>
+<span id="cb1077-17"><a href="trend-analysis-of-complex-survey-data-2.html#cb1077-17" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( pre_91_99<span class="sc">$</span>coefficients[<span class="st">&#39;t5l&#39;</span>] , <span class="dv">5</span> ) <span class="sc">==</span> .<span class="dv">03704</span> )</span></code></pre></div>
+<p>This reproduces the calculations behind the sentence on <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6">pdf page 6 of the original document</a>: <strong>In this example, T5L_L had a p-value=0.52261 and beta=0.03704. Therefore, there was “no significant change in the prevalence of ever smoking a cigarette during 1991-1999.”</strong></p>
+<p>Then move on to 1999, 2001, 2003, 2005, 2007, 2009, and 2011, the seven year-points after (and including) 1999:</p>
+<div class="sourceCode" id="cb1078"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1078-1"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-1" tabindex="-1"></a><span class="co"># calculate a seven-timepoint linear contrast vector</span></span>
+<span id="cb1078-2"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-2" tabindex="-1"></a>c7l <span class="ot">&lt;-</span> <span class="fu">contr.poly</span>( <span class="dv">7</span> )[ , <span class="dv">1</span> ]</span>
+<span id="cb1078-3"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-3" tabindex="-1"></a></span>
+<span id="cb1078-4"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-4" tabindex="-1"></a><span class="co"># tack the seven-timepoint linear contrast vectors onto the current survey design object</span></span>
+<span id="cb1078-5"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-5" tabindex="-1"></a>des <span class="ot">&lt;-</span> <span class="fu">update</span>( des , <span class="at">t7l =</span> c7l[ <span class="fu">match</span>( year , <span class="fu">seq</span>( <span class="dv">1999</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) ) ] )</span>
+<span id="cb1078-6"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-6" tabindex="-1"></a></span>
+<span id="cb1078-7"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-7" tabindex="-1"></a>post_99_11 <span class="ot">&lt;-</span></span>
+<span id="cb1078-8"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-8" tabindex="-1"></a>    <span class="fu">svyglm</span>(</span>
+<span id="cb1078-9"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-9" tabindex="-1"></a>        ever_smoked <span class="sc">~</span> sex <span class="sc">+</span> race4 <span class="sc">+</span> grade <span class="sc">+</span> t7l ,</span>
+<span id="cb1078-10"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-10" tabindex="-1"></a>        <span class="at">design =</span> <span class="fu">subset</span>( des , year <span class="sc">&gt;=</span> <span class="dv">1999</span> ) , </span>
+<span id="cb1078-11"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-11" tabindex="-1"></a>        <span class="at">family =</span> quasibinomial</span>
+<span id="cb1078-12"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-12" tabindex="-1"></a>    )</span>
+<span id="cb1078-13"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-13" tabindex="-1"></a>    </span>
+<span id="cb1078-14"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-14" tabindex="-1"></a><span class="fu">summary</span>( post_99_11 )</span>
+<span id="cb1078-15"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-15" tabindex="-1"></a></span>
+<span id="cb1078-16"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-16" tabindex="-1"></a><span class="co"># confirm 1999-2011 trend coefficient matches published estimates</span></span>
+<span id="cb1078-17"><a href="trend-analysis-of-complex-survey-data-2.html#cb1078-17" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( post_99_11<span class="sc">$</span>coefficients[<span class="st">&#39;t7l&#39;</span>] , <span class="dv">5</span> ) <span class="sc">==</span> <span class="sc">-</span><span class="fl">0.99165</span> )</span></code></pre></div>
+<p>This reproduces the calculations behind the sentence on <a href="https://www.cdc.gov/healthyschools/data/yrbs/pdf/yrbs_conducting_trend_analyses.pdf#page=6">pdf page 6 of the original document</a>: <strong>In this example, T7L_R had a p-value&lt;0.0001 and beta=-0.99165. Therefore, there was a “significant linear decrease in the prevalence of ever smoking a cigarette during 1999-2011.”</strong></p>
 
 </div>
 </div>
@@ -1382,8 +1210,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="national-financial-capability-study-nfcs.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="national-health-interview-survey-nhis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="trends-in-international-mathematics-and-science-study-timss.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="youth-risk-behavior-surveillance-system-yrbss.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -1404,7 +1232,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ajdamico/asdfree/edit/master/metadata/nhanes.txt",
+"link": "https://github.com/ajdamico/asdfree/edit/master/trendy.Rmd",
 "text": "Edit"
 },
 "history": {
