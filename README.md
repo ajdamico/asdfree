@@ -5,7 +5,7 @@ american-time-use-survey-atus: <p><a href="https://github.com/asdfree/atus/actio
 area-health-resources-files-ahrf: <p><a href="https://github.com/asdfree/ahrf/actions"><img src="https://github.com/asdfree/ahrf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 behavioral-risk-factor-surveillance-system-brfss: <p><a href="https://github.com/asdfree/brfss/actions"><img src="https://github.com/asdfree/brfss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 consumer-expenditure-survey-ces: <p><a href="https://github.com/asdfree/ces/actions"><img src="https://github.com/asdfree/ces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-2023 07 09-brightgreen' alt='Local Testing Badge'></p>
+european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-2023 09 06-brightgreen' alt='Local Testing Badge'></p>
 exame-nacional-de-desempenho-de-estudantes-enade: <p><a href="https://github.com/asdfree/enade/actions"><img src="https://github.com/asdfree/enade/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 fda-adverse-event-reporting-system-faers: <p><a href="https://github.com/asdfree/faers/actions"><img src="https://github.com/asdfree/faers/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 general-social-survey-gss: <p><a href="https://github.com/asdfree/gss/actions"><img src="https://github.com/asdfree/gss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
@@ -34,7 +34,6 @@ survey-of-business-owners-sbo: <p><a href="https://github.com/asdfree/sbo/action
 survey-of-consumer-finances-scf: <p><a href="https://github.com/asdfree/scf/actions"><img src="https://github.com/asdfree/scf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 survey-of-income-and-program-participation-sipp: <p><a href="https://github.com/asdfree/sipp/actions"><img src="https://github.com/asdfree/sipp/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 trend-analysis-of-complex-survey-data-1: <p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
-trend-analysis-of-complex-survey-data-2: <p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 trend-analysis-of-complex-survey-data: <p><a href="https://github.com/asdfree/trendy/actions"><img src="https://github.com/asdfree/trendy/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 trends-in-international-mathematics-and-science-study-timss: <p><a href="https://github.com/asdfree/timss/actions"><img src="https://github.com/asdfree/timss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 youth-risk-behavior-surveillance-system-yrbss: <p><a href="https://github.com/asdfree/yrbss/actions"><img src="https://github.com/asdfree/yrbss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
