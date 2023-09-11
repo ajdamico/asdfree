@@ -1,0 +1,304 @@
+# Exame Nacional do Ensino Medio (ENEM) {-}
+
+<a href="https://github.com/asdfree/enem/actions"><img src="https://github.com/asdfree/enem/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The Exame Nacional do Ensino Medio (ENEM) contains the standardized test results of most Brazilian high school students.
+
+* An annual table with one row per student.
+
+* 
+
+* Updated annually since 1998.
+
+* Maintained by the Brazil's [Instituto Nacional de Estudos e Pesquisas Educacionais Anisio Teixeira (INEP)](http://www.inep.gov.br/)
+
+---
+
+Please skim before you begin:
+
+1. 
+
+2. 
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Exame Nacional do Ensino Medio)
+
+```{r}
+#
+#
+#
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and unzip the 2022 file:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+library(archive)
+
+tf <- tempfile()
+
+this_url <-	"https://download.inep.gov.br/microdados/microdados_enem_2022.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+archive_extract( tf , dir = tempdir() )
+```
+
+Import the 2022 file:
+
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+enem_fns <- list.files( tempdir() , recursive = TRUE , full.names = TRUE )
+
+enem_fn <- grep( "MICRODADOS_ENEM_([0-9][0-9][0-9][0-9])\.csv$" , enem_fns , value = TRUE )
+
+enem_tbl <- read_csv2( enem_fn )
+
+enem_df <- data.frame( enem_tbl )
+
+names( enem_df ) <- tolower( names( enem_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# enem_fn <- file.path( path.expand( "~" ) , "ENEM" , "this_file.rds" )
+# saveRDS( enem_df , file = enem_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# enem_df <- readRDS( enem_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+enem_df <- 
+	transform( 
+		enem_df , 
+		
+		# qual foi o tempo gasto por voce para concluir a prova?
+		less_than_two_hours = as.numeric( co_rs_i9 %in% c( 'A' , 'B' ) ) ,
+		
+		administrative_category =
+			factor(
+				co_categad ,
+				levels = c( 1:5 , 7 ) ,
+				labels = c( '1. Pública Federal' , '2. Pública Estadual' , 
+				'3. Pública Municipal' , '4. Privada com fins lucrativos' , 
+				'5. Privada sem fins lucrativos' , '7. Especial' )
+			) ,
+
+		state_name = 
+			factor( 
+				co_uf_curso , 
+				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
+				"Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+				"Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+				"Bahia" , "Minas Gerais" , "Espirito Santo" , 
+				"Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+				"Santa Catarina" , "Rio Grande do Sul" , 
+				"Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+				"Distrito Federal" )
+			)
+
+	)
+	
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( enem_df )
+
+table( enem_df[ , "fathers_education" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( enem_df[ , "nota_mt" ] )
+
+tapply(
+	enem_df[ , "nota_mt" ] ,
+	enem_df[ , "fathers_education" ] ,
+	mean 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( enem_df[ , "uf_residencia" ] ) )
+
+prop.table(
+	table( enem_df[ , c( "uf_residencia" , "fathers_education" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( enem_df[ , "nota_mt" ] )
+
+tapply(
+	enem_df[ , "nota_mt" ] ,
+	enem_df[ , "fathers_education" ] ,
+	sum 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( enem_df[ , "nota_mt" ] , 0.5 )
+
+tapply(
+	enem_df[ , "nota_mt" ] ,
+	enem_df[ , "fathers_education" ] ,
+	quantile ,
+	0.5 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to took mathematics exam:
+```{r eval = FALSE , results = "hide" }
+sub_enem_df <- subset( enem_df , in_presenca_mt = 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_enem_df[ , "nota_mt" ] )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( enem_df[ , "nota_mt" ] )
+
+tapply(
+	enem_df[ , "nota_mt" ] ,
+	enem_df[ , "fathers_education" ] ,
+	var 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( nota_mt ~ female , enem_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( enem_df[ , c( "female" , "uf_residencia" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		nota_mt ~ female + uf_residencia , 
+		data = enem_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+
+---
+
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for ENEM users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+enem_tbl <- as_tibble( enem_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+enem_tbl %>%
+	summarize( mean = mean( nota_mt ) )
+
+enem_tbl %>%
+	group_by( fathers_education ) %>%
+	summarize( mean = mean( nota_mt ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for ENEM users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+enem_dt <- data.table( enem_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+enem_dt[ , mean( nota_mt ) ]
+
+enem_dt[ , mean( nota_mt ) , by = fathers_education ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for ENEM users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'enem' , enem_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( nota_mt ) FROM enem' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		fathers_education ,
+		AVG( nota_mt )
+	FROM
+		enem
+	GROUP BY
+		fathers_education'
+)
+```

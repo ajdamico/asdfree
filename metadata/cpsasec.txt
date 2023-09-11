@@ -1,5 +1,7 @@
 chapter_title: Current Population Survey - Annual Social and Economic Supplement
 
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
 The March Current Population Survey Annual Social and Economic Supplement has supplied the statistics for the US Census Bureau's report on income, poverty, and health insurance coverage since 1948.
 ~~~
@@ -12,7 +14,85 @@ publication_period: * Released annually since 1998.
 
 administrative_organization: * Administered jointly by the [US Census Bureau](http://www.census.gov/) and the [Bureau of Labor Statistics](http://www.bls.gov/).
 
+~~~{reading_block}
+Please skim before you begin:
 
+1.
+
+2.
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# jobs robbed by robot
+# luddite rebellion looming
+# blue, due to red pill
+```
+~~~
+
+
+
+~~~{download_and_import_block}
+
+Download and import the Alabama household file:
+
+(switch `sas_hal` to `sas_hak` for Alaska or `sas_hus` for the entire country)
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+tf_household <- tempfile()
+
+this_url_household <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_hal.zip"
+
+download.file( this_url_household , tf_household , mode = 'wb' )
+
+unzipped_files_household <- unzip( tf_household , exdir = tempdir() )
+
+chapter_tag_sas_household <-
+	grep( '\\\\.sas7bdat$' , unzipped_files_household , value = TRUE )
+
+chapter_tag_df_household <- read_sas( chapter_tag_sas_household )
+
+names( chapter_tag_df_household ) <- tolower( names( chapter_tag_df_household ) )
+```
+
+Download and import the Alabama person file:
+
+(switch `sas_pal` to `sas_pak` for Alaska or `sas_pus` for the entire country)
+```{r eval = FALSE , results = "hide" }
+tf_person <- tempfile()
+
+this_url_person <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_pal.zip"
+
+download.file( this_url_person , tf_person , mode = 'wb' )
+
+unzipped_files_person <- unzip( tf_person , exdir = tempdir() )
+
+chapter_tag_sas_person <-
+	grep( '\\\\.sas7bdat$' , unzipped_files_person , value = TRUE )
+
+chapter_tag_df_person <- read_sas( chapter_tag_sas_person )
+
+names( chapter_tag_df_person ) <- tolower( names( chapter_tag_df_person ) )
+```
+
+
+Remove overlapping column and merge household + person files:
+```{r eval = FALSE , results = "hide" }
+
+chapter_tag_df_household[ , 'rt' ] <- NULL
+
+chapter_tag_df_person[ , 'rt' ] <- NULL
+
+chapter_tag_df <- merge( chapter_tag_df_household , chapter_tag_df_person )
+	
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_df_person ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
 
 
 
@@ -103,6 +183,15 @@ subset_definition: a_age %in% 18:64
 subset_definition_description: persons aged 18-64
 binary_variable: male
 
+
+
+~~~{intermission_block}
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+~~~
+
+
+needs_srvyr_block: yes
+
 ~~~{convey_block}
 ## Poverty and Inequality Estimation with `convey` \\ {-}
 
@@ -131,11 +220,5 @@ svygini( ~ htotval , sub_chapter_tag_design )
 ```
 
 ~~~
-
-
-
-needs_actions_build_status_line: yes
-
-
 
 
