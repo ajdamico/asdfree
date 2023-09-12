@@ -34,63 +34,56 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-Download and import the Alabama household file:
+Download and unzip the 2023 file:
 
-(switch `sas_hal` to `sas_hak` for Alaska or `sas_hus` for the entire country)
+```{r eval = FALSE , results = "hide" }
+library(httr)
+
+tf <- tempfile()
+
+this_url <-	"https://www2.census.gov/programs-surveys/cps/datasets/2023/march/asecpub23sas.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+```
+
+Import all four files:
+
 ```{r eval = FALSE , results = "hide" }
 library(haven)
 
-tf_household <- tempfile()
+four_tbl <- lapply( unzipped_files , read_sas )
 
-this_url_household <-
-	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_hal.zip"
+four_df <- lapply( four_tbl , data.frame )
 
-download.file( this_url_household , tf_household , mode = 'wb' )
+four_df <- lapply( four_df , function( w ){ names( w ) <- tolower( names( w ) ) ; w } )
 
-unzipped_files_household <- unzip( tf_household , exdir = tempdir() )
-
-chapter_tag_sas_household <-
-	grep( '\\\\.sas7bdat$' , unzipped_files_household , value = TRUE )
-
-chapter_tag_df_household <- read_sas( chapter_tag_sas_household )
-
-names( chapter_tag_df_household ) <- tolower( names( chapter_tag_df_household ) )
+household_df <- four_df[[ grep( 'hhpub' , basename( unzipped_files ) ) ]]
+family_df <- four_df[[ grep( 'ffpub' , basename( unzipped_files ) ) ]]
+person_df <- four_df[[ grep( 'pppub' , basename( unzipped_files ) ) ]]
+repwgts_df <- four_df[[ grep( 'repwgt' , basename( unzipped_files ) ) ]]
 ```
 
-Download and import the Alabama person file:
-
-(switch `sas_pal` to `sas_pak` for Alaska or `sas_pus` for the entire country)
+Divide weights:
 ```{r eval = FALSE , results = "hide" }
-tf_person <- tempfile()
-
-this_url_person <-
-	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_pal.zip"
-
-download.file( this_url_person , tf_person , mode = 'wb' )
-
-unzipped_files_person <- unzip( tf_person , exdir = tempdir() )
-
-chapter_tag_sas_person <-
-	grep( '\\\\.sas7bdat$' , unzipped_files_person , value = TRUE )
-
-chapter_tag_df_person <- read_sas( chapter_tag_sas_person )
-
-names( chapter_tag_df_person ) <- tolower( names( chapter_tag_df_person ) )
+household_df[ , 'hsup_wgt' ] <- household_df[ , 'hsup_wgt' ] / 100
+family_df[ , 'fsup_wgt' ] <- family_df[ , 'fsup_wgt' ] / 100
+for ( j in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) person_df[ , j ] <- person_df[ , j ] / 100
 ```
 
+Merge these four files:
 
-Remove overlapping column and merge household + person files:
 ```{r eval = FALSE , results = "hide" }
+names( family_df )[ names( family_df ) == 'fh_seq' ] <- 'h_seq'
+names( person_df )[ names( person_df ) == 'ph_seq' ] <- 'h_seq'
+names( person_df )[ names( person_df ) == 'phf_seq' ] <- 'ffpos'
 
-chapter_tag_df_household[ , 'rt' ] <- NULL
+hh_fm_df <- merge( household_df , family_df )
+hh_fm_pr_df <- merge( hh_fm_df , person_df )
+chapter_tag_df <- merge( hh_fm_pr_df , repwgts_df )
 
-chapter_tag_df_person[ , 'rt' ] <- NULL
-
-chapter_tag_df <- merge( chapter_tag_df_household , chapter_tag_df_person )
-	
-stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_df_person ) )
-
-chapter_tag_df[ , 'one' ] <- 1
+stopifnot( nrow( chapter_tag_df ) == nrow( person_df ) )
 ```
 ~~~
 
@@ -99,17 +92,8 @@ chapter_tag_df[ , 'one' ] <- 1
 
 
 ~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
 library(survey)
-
-chapter_tag_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CPSASEC" , "2016 cps asec.rds" ) )
-
-variables_to_keep <-
-	c( 'a_maritl' , 'gestfips' , 'a_sex' , 'ptotval' , 'moop' , 'a_age' , 'htotval' , 
-	'one' , 'a_exprrp' , 'marsupwt' , 
-	grep( "pwwgt" , names( chapter_tag_df ) , value = TRUE ) )
-	
-chapter_tag_df <- chapter_tag_df[ variables_to_keep ] ; gc()
 	
 chapter_tag_design <-
 	svrepdesign(
@@ -121,6 +105,7 @@ chapter_tag_design <-
 		combined.weights = TRUE ,
 		mse = TRUE
 	)
+```
 ~~~
 
 
@@ -128,6 +113,8 @@ chapter_tag_design <-
 chapter_tag_design <- 
 	update( 
 		chapter_tag_design , 
+
+		one = 1 ,
 
 		a_maritl = 
 			factor( 
