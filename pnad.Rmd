@@ -1,6 +1,6 @@
-# Pesquisa Nacional por Amostra de Domicilios - Continua (PNADC) {-}
+# Pesquisa Nacional por Amostra de Domicilios (PNAD) {-}
 
-<a href="https://github.com/asdfree/pnadc/actions"><img src="https://github.com/asdfree/pnadc/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+<a href="https://github.com/asdfree/pnad/actions"><img src="https://github.com/asdfree/pnad/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
 Brazil's principal labor force survey, measuring education, employment, income, housing characteristics.
 
@@ -20,7 +20,7 @@ Please skim before you begin:
 
 2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Pesquisa_Nacional_por_Amostra_de_Domic%C3%ADlios)
 
-3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Pesquisa Nacional por Amostra de Domicilios - Continua)
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Pesquisa Nacional por Amostra de Domicilios)
 
 ```{r}
 # mineiro data
@@ -112,7 +112,7 @@ Import the latest quarterly file:
 ```{r eval = FALSE , results = "hide" }
 library(readr)
 
-pnadc_tbl <-
+pnad_tbl <-
 	read_fwf(
 		this_tf ,
 		fwf_widths( 
@@ -123,11 +123,11 @@ pnadc_tbl <-
 			paste0( ifelse( sas_df[ , 'character' ] , "c" , "d" ) , collapse = '' )
 	)
 
-pnadc_df <- data.frame( pnadc_tbl )
+pnad_df <- data.frame( pnad_tbl )
 
-names( pnadc_df ) <- tolower( names( pnadc_df ) )
+names( pnad_df ) <- tolower( names( pnad_df ) )
 
-pnadc_df[ , 'one' ] <- 1
+pnad_df[ , 'one' ] <- 1
 ```
 
 ### Save locally \ {-}
@@ -135,14 +135,14 @@ pnadc_df[ , 'one' ] <- 1
 Save the object at any point:
 
 ```{r eval = FALSE , results = "hide" }
-# pnadc_fn <- file.path( path.expand( "~" ) , "PNADC" , "this_file.rds" )
-# saveRDS( pnadc_df , file = pnadc_fn , compress = FALSE )
+# pnad_fn <- file.path( path.expand( "~" ) , "PNAD" , "this_file.rds" )
+# saveRDS( pnad_df , file = pnad_fn , compress = FALSE )
 ```
 
 Load the same object:
 
 ```{r eval = FALSE , results = "hide" }
-# pnadc_df <- readRDS( pnadc_fn )
+# pnad_df <- readRDS( pnad_fn )
 ```
 
 ### Survey Design Definition {-}
@@ -151,9 +151,9 @@ Construct a complex sample survey design:
 ```{r eval = FALSE , results = "hide" }
 library(survey)
 
-pnadc_design <-
+pnad_design <-
 	svrepdesign(
-		data = pnadc_df ,
+		data = pnad_df ,
 		weight = ~ v1028 ,
 		type = 'bootstrap' ,
 		repweights = 'v1028[0-9]+' ,
@@ -166,11 +166,11 @@ pnadc_design <-
 
 Add new columns to the data set:
 ```{r eval = FALSE , results = "hide" }
-pnadc_design <- 
+pnad_design <- 
 
 	update( 
 
-		pnadc_design , 
+		pnad_design , 
 
 		uf_name =
 		
@@ -235,57 +235,57 @@ pnadc_design <-
 
 Count the unweighted number of records in the survey sample, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-sum( weights( pnadc_design , "sampling" ) != 0 )
+sum( weights( pnad_design , "sampling" ) != 0 )
 
-svyby( ~ one , ~ uf_name , pnadc_design , unwtd.count )
+svyby( ~ one , ~ uf_name , pnad_design , unwtd.count )
 ```
 
 ### Weighted Counts {-}
 Count the weighted size of the generalizable population, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ one , pnadc_design )
+svytotal( ~ one , pnad_design )
 
-svyby( ~ one , ~ uf_name , pnadc_design , svytotal )
+svyby( ~ one , ~ uf_name , pnad_design , svytotal )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ vd4020n , pnadc_design , na.rm = TRUE )
+svymean( ~ vd4020n , pnad_design , na.rm = TRUE )
 
-svyby( ~ vd4020n , ~ uf_name , pnadc_design , svymean , na.rm = TRUE )
+svyby( ~ vd4020n , ~ uf_name , pnad_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ age_categories , pnadc_design )
+svymean( ~ age_categories , pnad_design )
 
-svyby( ~ age_categories , ~ uf_name , pnadc_design , svymean )
+svyby( ~ age_categories , ~ uf_name , pnad_design , svymean )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ vd4020n , pnadc_design , na.rm = TRUE )
+svytotal( ~ vd4020n , pnad_design , na.rm = TRUE )
 
-svyby( ~ vd4020n , ~ uf_name , pnadc_design , svytotal , na.rm = TRUE )
+svyby( ~ vd4020n , ~ uf_name , pnad_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ age_categories , pnadc_design )
+svytotal( ~ age_categories , pnad_design )
 
-svyby( ~ age_categories , ~ uf_name , pnadc_design , svytotal )
+svyby( ~ age_categories , ~ uf_name , pnad_design , svytotal )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svyquantile( ~ vd4020n , pnadc_design , 0.5 , na.rm = TRUE )
+svyquantile( ~ vd4020n , pnad_design , 0.5 , na.rm = TRUE )
 
 svyby( 
 	~ vd4020n , 
 	~ uf_name , 
-	pnadc_design , 
+	pnad_design , 
 	svyquantile , 
 	0.5 ,
 	ci = TRUE , na.rm = TRUE
@@ -297,7 +297,7 @@ Estimate a ratio:
 svyratio( 
 	numerator = ~ ocup_c , 
 	denominator = ~ pea_c , 
-	pnadc_design ,
+	pnad_design ,
 	na.rm = TRUE
 )
 ```
@@ -306,18 +306,18 @@ svyratio(
 
 Restrict the survey design to employed persons:
 ```{r eval = FALSE , results = "hide" }
-sub_pnadc_design <- subset( pnadc_design , ocup_c == 1 )
+sub_pnad_design <- subset( pnad_design , ocup_c == 1 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ vd4020n , sub_pnadc_design , na.rm = TRUE )
+svymean( ~ vd4020n , sub_pnad_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-this_result <- svymean( ~ vd4020n , pnadc_design , na.rm = TRUE )
+this_result <- svymean( ~ vd4020n , pnad_design , na.rm = TRUE )
 
 coef( this_result )
 SE( this_result )
@@ -328,7 +328,7 @@ grouped_result <-
 	svyby( 
 		~ vd4020n , 
 		~ uf_name , 
-		pnadc_design , 
+		pnad_design , 
 		svymean ,
 		na.rm = TRUE 
 	)
@@ -341,26 +341,26 @@ cv( grouped_result )
 
 Calculate the degrees of freedom of any survey design object:
 ```{r eval = FALSE , results = "hide" }
-degf( pnadc_design )
+degf( pnad_design )
 ```
 
 Calculate the complex sample survey-adjusted variance of any statistic:
 ```{r eval = FALSE , results = "hide" }
-svyvar( ~ vd4020n , pnadc_design , na.rm = TRUE )
+svyvar( ~ vd4020n , pnad_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
 ```{r eval = FALSE , results = "hide" }
 # SRS without replacement
-svymean( ~ vd4020n , pnadc_design , na.rm = TRUE , deff = TRUE )
+svymean( ~ vd4020n , pnad_design , na.rm = TRUE , deff = TRUE )
 
 # SRS with replacement
-svymean( ~ vd4020n , pnadc_design , na.rm = TRUE , deff = "replace" )
+svymean( ~ vd4020n , pnad_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
 ```{r eval = FALSE , results = "hide" }
-svyciprop( ~ male , pnadc_design ,
+svyciprop( ~ male , pnad_design ,
 	method = "likelihood" )
 ```
 
@@ -368,14 +368,14 @@ svyciprop( ~ male , pnadc_design ,
 
 Perform a design-based t-test:
 ```{r eval = FALSE , results = "hide" }
-svyttest( vd4020n ~ male , pnadc_design )
+svyttest( vd4020n ~ male , pnad_design )
 ```
 
 Perform a chi-squared test of association for survey data:
 ```{r eval = FALSE , results = "hide" }
 svychisq( 
 	~ male + age_categories , 
-	pnadc_design 
+	pnad_design 
 )
 ```
 
@@ -384,7 +384,7 @@ Perform a survey-weighted generalized linear model:
 glm_result <- 
 	svyglm( 
 		vd4020n ~ male + age_categories , 
-		pnadc_design 
+		pnad_design 
 	)
 
 summary( glm_result )
@@ -403,28 +403,28 @@ summary( glm_result )
 This example matches statistics and coefficients of variation from [Tabela 4092 - Pessoas de 14 anos ou mais de idade, por condição em relação à força de trabalho e condição de ocupação](https://sidra.ibge.gov.br/tabela/4092):
 
 ```{r eval = FALSE , results = "hide" }
-nationwide_adult_population <- svytotal( ~ pia , pnadc_design , na.rm = TRUE )
+nationwide_adult_population <- svytotal( ~ pia , pnad_design , na.rm = TRUE )
 	
 stopifnot( round( coef( nationwide_adult_population ) / 1000000 , 3 ) == 174.228 )
 stopifnot( round( cv( nationwide_adult_population ) / 1000000 , 3 ) == 0 )
 	
-nationwide_labor_force <- svytotal( ~ pea_c , pnadc_design , na.rm = TRUE )
+nationwide_labor_force <- svytotal( ~ pea_c , pnad_design , na.rm = TRUE )
 
 stopifnot( round( coef( nationwide_labor_force ) / 1000000 , 3 ) == 107.257 )
 stopifnot( round( cv( nationwide_labor_force ) * 100 , 1 ) == 0.2 )
 	
-nationwide_employed <- svytotal( ~ ocup_c , pnadc_design , na.rm = TRUE )
+nationwide_employed <- svytotal( ~ ocup_c , pnad_design , na.rm = TRUE )
 
 stopifnot( round( coef( nationwide_employed ) / 1000000 , 3 ) == 97.825 )
 stopifnot( round( cv( nationwide_employed ) * 100 , 1 ) == 0.2 )
 	
-nationwide_unemployed <- svytotal( ~ desocup30 , pnadc_design , na.rm = TRUE )
+nationwide_unemployed <- svytotal( ~ desocup30 , pnad_design , na.rm = TRUE )
 
 stopifnot( round( coef( nationwide_unemployed ) / 1000000 , 3 ) == 9.432 )
 stopifnot( round( cv( nationwide_unemployed ) * 100 , 1 ) == 1.2 )
 	
 nationwide_not_in_labor_force <-
-	svytotal( ~ as.numeric( pia & !pea_c ) , pnadc_design , na.rm = TRUE )
+	svytotal( ~ as.numeric( pia & !pea_c ) , pnad_design , na.rm = TRUE )
 
 stopifnot( round( coef( nationwide_not_in_labor_force ) / 1000000 , 3 ) == 66.972 )
 stopifnot( round( cv( nationwide_not_in_labor_force ) * 100 , 1 ) == 0.3 )
@@ -436,31 +436,31 @@ stopifnot( round( cv( nationwide_not_in_labor_force ) * 100 , 1 ) == 0.3 )
 
 ## Poverty and Inequality Estimation with `convey` \ {-}
 
-The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for PNADC users, this code calculates the gini coefficient on complex sample survey data:
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for PNAD users, this code calculates the gini coefficient on complex sample survey data:
 
 ```{r eval = FALSE , results = "hide" }
 library(convey)
-pnadc_design <- convey_prep( pnadc_design )
+pnad_design <- convey_prep( pnad_design )
 
-svygini( ~ vd4020n , pnadc_design , na.rm = TRUE )
+svygini( ~ vd4020n , pnad_design , na.rm = TRUE )
 ```
 
 ---
 
 ## Analysis Examples with `srvyr` \ {-}
 
-The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for PNADC users, this code replicates previously-presented examples:
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for PNAD users, this code replicates previously-presented examples:
 
 ```{r eval = FALSE , results = "hide" }
 library(srvyr)
-pnadc_srvyr_design <- as_survey( pnadc_design )
+pnad_srvyr_design <- as_survey( pnad_design )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-pnadc_srvyr_design %>%
+pnad_srvyr_design %>%
 	summarize( mean = survey_mean( vd4020n , na.rm = TRUE ) )
 
-pnadc_srvyr_design %>%
+pnad_srvyr_design %>%
 	group_by( uf_name ) %>%
 	summarize( mean = survey_mean( vd4020n , na.rm = TRUE ) )
 ```
