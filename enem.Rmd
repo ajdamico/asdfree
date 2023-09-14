@@ -2,7 +2,7 @@
 
 <a href="https://github.com/asdfree/enem/actions"><img src="https://github.com/asdfree/enem/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-The Exame Nacional do Ensino Medio (ENEM) contains the standardized test results of most Brazilian high school students.
+Brazil's student aptitude test, used to assess high school completion and university admission.
 
 * An annual table with one row per student.
 
@@ -10,7 +10,7 @@ The Exame Nacional do Ensino Medio (ENEM) contains the standardized test results
 
 * Updated annually since 1998.
 
-* Maintained by the Brazil's [Instituto Nacional de Estudos e Pesquisas Educacionais Anisio Teixeira (INEP)](http://www.inep.gov.br/)
+* Maintained by Brazil's [Instituto Nacional de Estudos e Pesquisas Educacionais Anisio Teixeira](http://www.inep.gov.br/)
 
 ---
 
@@ -18,7 +18,7 @@ Please skim before you begin:
 
 1. 
 
-2. 
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Exame_Nacional_do_Ensino_M%C3%A9dio)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Exame Nacional do Ensino Medio)
 
@@ -86,21 +86,18 @@ enem_df <-
 	transform( 
 		enem_df , 
 		
-		# qual foi o tempo gasto por voce para concluir a prova?
-		less_than_two_hours = as.numeric( co_rs_i9 %in% c( 'A' , 'B' ) ) ,
+		domestic_worker = as.numeric( q007 %in% c( 'B' , 'C' , 'D' ) ) ,
 		
 		administrative_category =
 			factor(
-				co_categad ,
-				levels = c( 1:5 , 7 ) ,
-				labels = c( '1. Pública Federal' , '2. Pública Estadual' , 
-				'3. Pública Municipal' , '4. Privada com fins lucrativos' , 
-				'5. Privada sem fins lucrativos' , '7. Especial' )
+				tp_dependencia_adm_esc ,
+				levels = 1:4 ,
+				labels = c( 'Federal' , 'Estadual' , 'Municipal' , 'Privada' )
 			) ,
 
 		state_name = 
 			factor( 
-				co_uf_curso , 
+				co_uf_esc , 
 				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
 				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
 				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
@@ -127,50 +124,50 @@ Count the unweighted number of records in the table, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 nrow( enem_df )
 
-table( enem_df[ , "fathers_education" ] , useNA = "always" )
+table( enem_df[ , "administrative_category" ] , useNA = "always" )
 ```
 
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-mean( enem_df[ , "nota_mt" ] )
+mean( enem_df[ , "nu_nota_mt" ] )
 
 tapply(
-	enem_df[ , "nota_mt" ] ,
-	enem_df[ , "fathers_education" ] ,
+	enem_df[ , "nu_nota_mt" ] ,
+	enem_df[ , "administrative_category" ] ,
 	mean 
 )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-prop.table( table( enem_df[ , "uf_residencia" ] ) )
+prop.table( table( enem_df[ , "state_name" ] ) )
 
 prop.table(
-	table( enem_df[ , c( "uf_residencia" , "fathers_education" ) ] ) ,
+	table( enem_df[ , c( "state_name" , "administrative_category" ) ] ) ,
 	margin = 2
 )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-sum( enem_df[ , "nota_mt" ] )
+sum( enem_df[ , "nu_nota_mt" ] )
 
 tapply(
-	enem_df[ , "nota_mt" ] ,
-	enem_df[ , "fathers_education" ] ,
+	enem_df[ , "nu_nota_mt" ] ,
+	enem_df[ , "administrative_category" ] ,
 	sum 
 )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-quantile( enem_df[ , "nota_mt" ] , 0.5 )
+quantile( enem_df[ , "nu_nota_mt" ] , 0.5 )
 
 tapply(
-	enem_df[ , "nota_mt" ] ,
-	enem_df[ , "fathers_education" ] ,
+	enem_df[ , "nu_nota_mt" ] ,
+	enem_df[ , "administrative_category" ] ,
 	quantile ,
 	0.5 
 )
@@ -178,24 +175,24 @@ tapply(
 
 ### Subsetting {-}
 
-Limit your `data.frame` to took mathematics exam:
+Limit your `data.frame` to mother graduated from high school:
 ```{r eval = FALSE , results = "hide" }
-sub_enem_df <- subset( enem_df , in_presenca_mt = 1 )
+sub_enem_df <- subset( enem_df , q0002 %in% c( 'E' , 'F' , 'G' ) )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-mean( sub_enem_df[ , "nota_mt" ] )
+mean( sub_enem_df[ , "nu_nota_mt" ] )
 ```
 
 ### Measures of Uncertainty {-}
 
 Calculate the variance, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-var( enem_df[ , "nota_mt" ] )
+var( enem_df[ , "nu_nota_mt" ] )
 
 tapply(
-	enem_df[ , "nota_mt" ] ,
-	enem_df[ , "fathers_education" ] ,
+	enem_df[ , "nu_nota_mt" ] ,
+	enem_df[ , "administrative_category" ] ,
 	var 
 )
 ```
@@ -204,12 +201,12 @@ tapply(
 
 Perform a t-test:
 ```{r eval = FALSE , results = "hide" }
-t.test( nota_mt ~ female , enem_df )
+t.test( nu_nota_mt ~ domestic_worker , enem_df )
 ```
 
 Perform a chi-squared test of association:
 ```{r eval = FALSE , results = "hide" }
-this_table <- table( enem_df[ , c( "female" , "uf_residencia" ) ] )
+this_table <- table( enem_df[ , c( "domestic_worker" , "state_name" ) ] )
 
 chisq.test( this_table )
 ```
@@ -218,7 +215,7 @@ Perform a generalized linear model:
 ```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	glm( 
-		nota_mt ~ female + uf_residencia , 
+		nu_nota_mt ~ domestic_worker + state_name , 
 		data = enem_df
 	)
 
@@ -234,9 +231,10 @@ summary( glm_result )
 ---
 
 ## Replication Example {-}
+This example matches the registration counts in the [Sinopse ENEM 2022 Excel table](https://download.inep.gov.br/informacoes_estatisticas/sinopses_estatisticas/sinopses_enem/2022/sinopse_enem_2022.zip):
 
 ```{r eval = FALSE , results = "hide" }
-
+stopifnot( nrow( enem_df ) == 3476105 )
 ```
 
 ---
@@ -252,11 +250,11 @@ enem_tbl <- as_tibble( enem_df )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 enem_tbl %>%
-	summarize( mean = mean( nota_mt ) )
+	summarize( mean = mean( nu_nota_mt ) )
 
 enem_tbl %>%
-	group_by( fathers_education ) %>%
-	summarize( mean = mean( nota_mt ) )
+	group_by( administrative_category ) %>%
+	summarize( mean = mean( nu_nota_mt ) )
 ```
 
 ---
@@ -271,9 +269,9 @@ enem_dt <- data.table( enem_df )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = 'hide' }
-enem_dt[ , mean( nota_mt ) ]
+enem_dt[ , mean( nu_nota_mt ) ]
 
-enem_dt[ , mean( nota_mt ) , by = fathers_education ]
+enem_dt[ , mean( nu_nota_mt ) , by = administrative_category ]
 ```
 
 ---
@@ -289,16 +287,16 @@ dbWriteTable( con , 'enem' , enem_df )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = 'hide' }
-dbGetQuery( con , 'SELECT AVG( nota_mt ) FROM enem' )
+dbGetQuery( con , 'SELECT AVG( nu_nota_mt ) FROM enem' )
 
 dbGetQuery(
 	con ,
 	'SELECT
-		fathers_education ,
-		AVG( nota_mt )
+		administrative_category ,
+		AVG( nu_nota_mt )
 	FROM
 		enem
 	GROUP BY
-		fathers_education'
+		administrative_category'
 )
 ```

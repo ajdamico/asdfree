@@ -5,24 +5,24 @@ needs_actions_build_status_line: yes
 
 
 ~~~{dataset_introduction}
-The Exame Nacional do Ensino Medio (ENEM) contains the standardized test results of most Brazilian high school students.
+The national student aptitude test, used to assess high school completion and university admission.
 ~~~
+
 table_structure: * An annual table with one row per student.
 
 publication_period: * Updated annually since 1998.
 
-generalizable_population: * 
-
-administrative_organization: * Maintained by the Brazil's [Instituto Nacional de Estudos e Pesquisas Educacionais Anisio Teixeira (INEP)](http://www.inep.gov.br/)
+administrative_organization: * Maintained by Brazil's [Instituto Nacional de Estudos e Pesquisas Educacionais Anisio Teixeira](http://www.inep.gov.br/)
 
 
 
 ~~~{reading_block}
 Please skim before you begin:
 
-1. 
+1. `Leia_Me_Enem` included in each [annual zipped file](https://download.inep.gov.br/microdados/microdados_enem_2022.zip)
 
-2. 
+
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Exame_Nacional_do_Ensino_M%C3%A9dio)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
 
@@ -76,21 +76,18 @@ chapter_tag_df <-
 	transform( 
 		chapter_tag_df , 
 		
-		# qual foi o tempo gasto por voce para concluir a prova?
-		less_than_two_hours = as.numeric( co_rs_i9 %in% c( 'A' , 'B' ) ) ,
+		domestic_worker = as.numeric( q007 %in% c( 'B' , 'C' , 'D' ) ) ,
 		
 		administrative_category =
 			factor(
-				co_categad ,
-				levels = c( 1:5 , 7 ) ,
-				labels = c( '1. Pública Federal' , '2. Pública Estadual' , 
-				'3. Pública Municipal' , '4. Privada com fins lucrativos' , 
-				'5. Privada sem fins lucrativos' , '7. Especial' )
+				tp_dependencia_adm_esc ,
+				levels = 1:4 ,
+				labels = c( 'Federal' , 'Estadual' , 'Municipal' , 'Privada' )
 			) ,
 
 		state_name = 
 			factor( 
-				co_uf_curso , 
+				co_uf_esc , 
 				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
 				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
 				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
@@ -111,12 +108,12 @@ chapter_tag_df <-
 
 
 
-group_by_variable: fathers_education
-linear_variable: nota_mt
-categorical_variable: uf_residencia
-subset_definition: in_presenca_mt = 1
-subset_definition_description: took mathematics exam
-binary_variable: female
+group_by_variable: administrative_category
+linear_variable: nu_nota_mt
+categorical_variable: state_name
+subset_definition: q0002 %in% c( 'E' , 'F' , 'G' )
+subset_definition_description: mother graduated from high school
+binary_variable: domestic_worker
 
 
 
@@ -135,9 +132,10 @@ needs_duckdb_block: yes
 
 ~~~{replication_example_block}
 ## Replication Example {-}
+This example matches the registration counts in the [Sinopse ENEM 2022 Excel table](https://download.inep.gov.br/informacoes_estatisticas/sinopses_estatisticas/sinopses_enem/2022/sinopse_enem_2022.zip):
 
 ```{r eval = FALSE , results = "hide" }
-
+stopifnot( nrow( chapter_tag_df ) ==  3476105 )
 ```
 
 ~~~
