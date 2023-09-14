@@ -1,25 +1,25 @@
-chapter_title: Current Population Survey - Annual Social and Economic Supplement
+chapter_title: Current Population Survey
 
 needs_actions_build_status_line: yes
 
 ~~~{dataset_introduction}
-The March Current Population Survey Annual Social and Economic Supplement has supplied the statistics for the US Census Bureau's report on income, poverty, and health insurance coverage since 1948.
+The principal labor force survey, providing income, poverty, and health insurance coverage estimates.
 ~~~
 
 table_structure: * One table with one row per sampled household, a second table with one row per family within each sampled household, and a third table with one row per individual within each of those families.
 
-generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional population of the United States
+generalizable_population: * A complex sample designed to generalize to the civilian non-institutional population of the US.
 
-publication_period: * Released annually since 1998.
+publication_period: * Released annually since 1998, linkable to the [Basic Monthly](https://www.census.gov/data/datasets/time-series/demo/cps/cps-basic.html) releases.
 
 administrative_organization: * Administered jointly by the [US Census Bureau](http://www.census.gov/) and the [Bureau of Labor Statistics](http://www.bls.gov/).
 
 ~~~{reading_block}
 Please skim before you begin:
 
-1.
+1. [Current Population Survey 2023 Annual Social and Economic (ASEC) Supplement](https://www2.census.gov/programs-surveys/cps/techdocs/cpsmar23.pdf)
 
-2.
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Current_Population_Survey)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
 
@@ -66,6 +66,7 @@ repwgts_df <- four_df[[ grep( 'repwgt' , basename( unzipped_files ) ) ]]
 ```
 
 Divide weights:
+
 ```{r eval = FALSE , results = "hide" }
 household_df[ , 'hsup_wgt' ] <- household_df[ , 'hsup_wgt' ] / 100
 family_df[ , 'fsup_wgt' ] <- family_df[ , 'fsup_wgt' ] / 100
@@ -188,13 +189,9 @@ The R `convey` library estimates measures of income concentration, poverty, ineq
 library(convey)
 chapter_tag_design <- convey_prep( chapter_tag_design )
 
-sub_chapter_tag_design <- 
-	subset( 
-		chapter_tag_design , 
-		a_exprrp %in% 1:2
-	)
+chapter_tag_household_design <- subset( chapter_tag_design , a_exprrp %in% 1:2 )
 
-svygini( ~ htotval , sub_chapter_tag_design )
+svygini( ~ htotval , chapter_tag_household_design )
 ```
 ~~~
 
@@ -202,7 +199,24 @@ svygini( ~ htotval , sub_chapter_tag_design )
 ~~~{replication_example_block}
 ## Replication Example {-}
 
+This example matches the count and share of individuals with health insurance in [Table H-01](https://www2.census.gov/programs-surveys/cps/tables/hi/2023/h_01.xlsx):
+
 ```{r eval = FALSE , results = "hide" }
+count_covered <- svytotal( ~ as.numeric( cov == 1 ) , chapter_tag_design )
+
+stopifnot( round( coef( count_covered ) , -5 ) == 304000000 )
+
+stopifnot(
+	round( coef( count_covered ) - confint( count_covered , level = 0.9 )[1] , -3 ) == 746000
+)
+
+share_covered <- svymean( ~ as.numeric( cov == 1 ) , subset( chapter_tag_design , cov > 0 ) )
+
+stopifnot( round( coef( share_covered ) , 3 ) == 0.921 )
+
+stopifnot(
+	round( coef( share_covered ) - confint( share_covered , level = 0.9 )[1] , 3 ) == 0.002
+)
 
 ```
 
