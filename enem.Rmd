@@ -2,11 +2,9 @@
 
 <a href="https://github.com/asdfree/enem/actions"><img src="https://github.com/asdfree/enem/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
 
-Brazil's student aptitude test, used to assess high school completion and university admission.
+The national student aptitude test, used to assess high school completion and university admission.
 
-* An annual table with one row per student.
-
-* 
+* An annual table with one row per test-taking student, a second table of study habit questionnaire respondents
 
 * Updated annually since 1998.
 
@@ -16,7 +14,7 @@ Brazil's student aptitude test, used to assess high school completion and univer
 
 Please skim before you begin:
 
-1. 
+1. `Leia_Me_Enem` included in each [annual zipped file](https://download.inep.gov.br/microdados/microdados_enem_2022.zip)
 
 2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Exame_Nacional_do_Ensino_M%C3%A9dio)
 
@@ -131,12 +129,13 @@ table( enem_df[ , "administrative_category" ] , useNA = "always" )
 
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-mean( enem_df[ , "nu_nota_mt" ] )
+mean( enem_df[ , "nu_nota_mt" ] , na.rm = TRUE )
 
 tapply(
 	enem_df[ , "nu_nota_mt" ] ,
 	enem_df[ , "administrative_category" ] ,
-	mean 
+	mean ,
+	na.rm = TRUE 
 )
 ```
 
@@ -152,24 +151,26 @@ prop.table(
 
 Calculate the sum of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-sum( enem_df[ , "nu_nota_mt" ] )
+sum( enem_df[ , "nu_nota_mt" ] , na.rm = TRUE )
 
 tapply(
 	enem_df[ , "nu_nota_mt" ] ,
 	enem_df[ , "administrative_category" ] ,
-	sum 
+	sum ,
+	na.rm = TRUE 
 )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-quantile( enem_df[ , "nu_nota_mt" ] , 0.5 )
+quantile( enem_df[ , "nu_nota_mt" ] , 0.5 , na.rm = TRUE )
 
 tapply(
 	enem_df[ , "nu_nota_mt" ] ,
 	enem_df[ , "administrative_category" ] ,
 	quantile ,
-	0.5 
+	0.5 ,
+	na.rm = TRUE 
 )
 ```
 
@@ -181,19 +182,20 @@ sub_enem_df <- subset( enem_df , q0002 %in% c( 'E' , 'F' , 'G' ) )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }
-mean( sub_enem_df[ , "nu_nota_mt" ] )
+mean( sub_enem_df[ , "nu_nota_mt" ] , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Calculate the variance, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-var( enem_df[ , "nu_nota_mt" ] )
+var( enem_df[ , "nu_nota_mt" ] , na.rm = TRUE )
 
 tapply(
 	enem_df[ , "nu_nota_mt" ] ,
 	enem_df[ , "administrative_category" ] ,
-	var 
+	var ,
+	na.rm = TRUE 
 )
 ```
 
@@ -250,11 +252,11 @@ enem_tbl <- as_tibble( enem_df )
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
 enem_tbl %>%
-	summarize( mean = mean( nu_nota_mt ) )
+	summarize( mean = mean( nu_nota_mt , na.rm = TRUE ) )
 
 enem_tbl %>%
 	group_by( administrative_category ) %>%
-	summarize( mean = mean( nu_nota_mt ) )
+	summarize( mean = mean( nu_nota_mt , na.rm = TRUE ) )
 ```
 
 ---
@@ -269,9 +271,9 @@ enem_dt <- data.table( enem_df )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
 ```{r eval = FALSE , results = 'hide' }
-enem_dt[ , mean( nu_nota_mt ) ]
+enem_dt[ , mean( nu_nota_mt , na.rm = TRUE ) ]
 
-enem_dt[ , mean( nu_nota_mt ) , by = administrative_category ]
+enem_dt[ , mean( nu_nota_mt , na.rm = TRUE ) , by = administrative_category ]
 ```
 
 ---
