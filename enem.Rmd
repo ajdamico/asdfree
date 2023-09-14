@@ -276,29 +276,4 @@ enem_dt[ , mean( nu_nota_mt , na.rm = TRUE ) ]
 enem_dt[ , mean( nu_nota_mt , na.rm = TRUE ) , by = administrative_category ]
 ```
 
----
 
-## Analysis Examples with `duckdb` \ {-}
-
-The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for ENEM users, this code replicates previously-presented examples:
-
-```{r eval = FALSE , results = 'hide' }
-library(duckdb)
-con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
-dbWriteTable( con , 'enem' , enem_df )
-```
-Calculate the mean (average) of a linear variable, overall and by groups:
-```{r eval = FALSE , results = 'hide' }
-dbGetQuery( con , 'SELECT AVG( nu_nota_mt ) FROM enem' )
-
-dbGetQuery(
-	con ,
-	'SELECT
-		administrative_category ,
-		AVG( nu_nota_mt )
-	FROM
-		enem
-	GROUP BY
-		administrative_category'
-)
-```
