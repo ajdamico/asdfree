@@ -1,4 +1,4 @@
-commit_memo <- "'scf draft'"
+commit_memo <- "'bls rcurl'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 

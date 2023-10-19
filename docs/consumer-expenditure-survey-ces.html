@@ -992,13 +992,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="download-import-preparation-6" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="consumer-expenditure-survey-ces.html#download-import-preparation-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download both the prior and current year of interview microdata:</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="consumer-expenditure-survey-ces.html#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="consumer-expenditure-survey-ces.html#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RCurl)</span>
 <span id="cb170-2"><a href="consumer-expenditure-survey-ces.html#cb170-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb170-3"><a href="consumer-expenditure-survey-ces.html#cb170-3" aria-hidden="true" tabindex="-1"></a>tf_prior_year <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb170-4"><a href="consumer-expenditure-survey-ces.html#cb170-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb170-5"><a href="consumer-expenditure-survey-ces.html#cb170-5" aria-hidden="true" tabindex="-1"></a>this_url_prior_year <span class="ot">&lt;-</span> <span class="st">&quot;https://www.bls.gov/cex/pumd/data/stata/intrvw20.zip&quot;</span></span>
 <span id="cb170-6"><a href="consumer-expenditure-survey-ces.html#cb170-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb170-7"><a href="consumer-expenditure-survey-ces.html#cb170-7" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url_prior_year , tf_prior_year , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb170-7"><a href="consumer-expenditure-survey-ces.html#cb170-7" aria-hidden="true" tabindex="-1"></a><span class="fu">writeBin</span>( <span class="fu">getBinaryURL</span>( this_url_prior_year ) , tf_prior_year )</span>
 <span id="cb170-8"><a href="consumer-expenditure-survey-ces.html#cb170-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb170-9"><a href="consumer-expenditure-survey-ces.html#cb170-9" aria-hidden="true" tabindex="-1"></a>unzipped_files_prior_year <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf_prior_year , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb170-10"><a href="consumer-expenditure-survey-ces.html#cb170-10" aria-hidden="true" tabindex="-1"></a></span>
@@ -1006,31 +1006,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb170-12"><a href="consumer-expenditure-survey-ces.html#cb170-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb170-13"><a href="consumer-expenditure-survey-ces.html#cb170-13" aria-hidden="true" tabindex="-1"></a>this_url_current_year <span class="ot">&lt;-</span> <span class="st">&quot;https://www.bls.gov/cex/pumd/data/stata/intrvw21.zip&quot;</span></span>
 <span id="cb170-14"><a href="consumer-expenditure-survey-ces.html#cb170-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb170-15"><a href="consumer-expenditure-survey-ces.html#cb170-15" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( this_url_current_year , tf_current_year , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb170-15"><a href="consumer-expenditure-survey-ces.html#cb170-15" aria-hidden="true" tabindex="-1"></a><span class="fu">writeBin</span>( <span class="fu">getBinaryURL</span>( this_url_current_year ) , tf_current_year )</span>
 <span id="cb170-16"><a href="consumer-expenditure-survey-ces.html#cb170-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb170-17"><a href="consumer-expenditure-survey-ces.html#cb170-17" aria-hidden="true" tabindex="-1"></a>unzipped_files_current_year <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf_current_year , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb170-18"><a href="consumer-expenditure-survey-ces.html#cb170-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb170-19"><a href="consumer-expenditure-survey-ces.html#cb170-19" aria-hidden="true" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">c</span>( unzipped_files_current_year , unzipped_files_prior_year )</span></code></pre></div>
 <p>Import and stack all 2021 quarterly files plus 2022’s first quarter:</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="consumer-expenditure-survey-ces.html#cb171-1" aria-hidden="true" tabindex="-1"></a>fmli_files <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&quot;fmli2[1-2]&quot;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="consumer-expenditure-survey-ces.html#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
 <span id="cb171-2"><a href="consumer-expenditure-survey-ces.html#cb171-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-3"><a href="consumer-expenditure-survey-ces.html#cb171-3" aria-hidden="true" tabindex="-1"></a>fmli_tbls <span class="ot">&lt;-</span> <span class="fu">lapply</span>( fmli_files , read_dta )</span>
+<span id="cb171-3"><a href="consumer-expenditure-survey-ces.html#cb171-3" aria-hidden="true" tabindex="-1"></a>fmli_files <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&quot;fmli2[1-2]&quot;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb171-4"><a href="consumer-expenditure-survey-ces.html#cb171-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-5"><a href="consumer-expenditure-survey-ces.html#cb171-5" aria-hidden="true" tabindex="-1"></a>fmli_dfs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( fmli_tbls , data.frame )</span>
+<span id="cb171-5"><a href="consumer-expenditure-survey-ces.html#cb171-5" aria-hidden="true" tabindex="-1"></a>fmli_tbls <span class="ot">&lt;-</span> <span class="fu">lapply</span>( fmli_files , read_dta )</span>
 <span id="cb171-6"><a href="consumer-expenditure-survey-ces.html#cb171-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-7"><a href="consumer-expenditure-survey-ces.html#cb171-7" aria-hidden="true" tabindex="-1"></a>fmli_dfs <span class="ot">&lt;-</span> </span>
-<span id="cb171-8"><a href="consumer-expenditure-survey-ces.html#cb171-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>( </span>
-<span id="cb171-9"><a href="consumer-expenditure-survey-ces.html#cb171-9" aria-hidden="true" tabindex="-1"></a>        fmli_dfs , </span>
-<span id="cb171-10"><a href="consumer-expenditure-survey-ces.html#cb171-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>( w ){ <span class="fu">names</span>( w ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( w ) ) ; w }</span>
-<span id="cb171-11"><a href="consumer-expenditure-survey-ces.html#cb171-11" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb171-12"><a href="consumer-expenditure-survey-ces.html#cb171-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-13"><a href="consumer-expenditure-survey-ces.html#cb171-13" aria-hidden="true" tabindex="-1"></a>fmli_cols <span class="ot">&lt;-</span> <span class="fu">lapply</span>( fmli_dfs , names )</span>
+<span id="cb171-7"><a href="consumer-expenditure-survey-ces.html#cb171-7" aria-hidden="true" tabindex="-1"></a>fmli_dfs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( fmli_tbls , data.frame )</span>
+<span id="cb171-8"><a href="consumer-expenditure-survey-ces.html#cb171-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-9"><a href="consumer-expenditure-survey-ces.html#cb171-9" aria-hidden="true" tabindex="-1"></a>fmli_dfs <span class="ot">&lt;-</span> </span>
+<span id="cb171-10"><a href="consumer-expenditure-survey-ces.html#cb171-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>( </span>
+<span id="cb171-11"><a href="consumer-expenditure-survey-ces.html#cb171-11" aria-hidden="true" tabindex="-1"></a>        fmli_dfs , </span>
+<span id="cb171-12"><a href="consumer-expenditure-survey-ces.html#cb171-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>( w ){ <span class="fu">names</span>( w ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( w ) ) ; w }</span>
+<span id="cb171-13"><a href="consumer-expenditure-survey-ces.html#cb171-13" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb171-14"><a href="consumer-expenditure-survey-ces.html#cb171-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-15"><a href="consumer-expenditure-survey-ces.html#cb171-15" aria-hidden="true" tabindex="-1"></a>intersecting_cols <span class="ot">&lt;-</span> <span class="fu">Reduce</span>( intersect , fmli_cols )</span>
+<span id="cb171-15"><a href="consumer-expenditure-survey-ces.html#cb171-15" aria-hidden="true" tabindex="-1"></a>fmli_cols <span class="ot">&lt;-</span> <span class="fu">lapply</span>( fmli_dfs , names )</span>
 <span id="cb171-16"><a href="consumer-expenditure-survey-ces.html#cb171-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-17"><a href="consumer-expenditure-survey-ces.html#cb171-17" aria-hidden="true" tabindex="-1"></a>fmli_dfs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( fmli_dfs , <span class="cf">function</span>( w ) w[ intersecting_cols ] )</span>
+<span id="cb171-17"><a href="consumer-expenditure-survey-ces.html#cb171-17" aria-hidden="true" tabindex="-1"></a>intersecting_cols <span class="ot">&lt;-</span> <span class="fu">Reduce</span>( intersect , fmli_cols )</span>
 <span id="cb171-18"><a href="consumer-expenditure-survey-ces.html#cb171-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb171-19"><a href="consumer-expenditure-survey-ces.html#cb171-19" aria-hidden="true" tabindex="-1"></a>ces_df <span class="ot">&lt;-</span> <span class="fu">do.call</span>( rbind , fmli_dfs )</span></code></pre></div>
+<span id="cb171-19"><a href="consumer-expenditure-survey-ces.html#cb171-19" aria-hidden="true" tabindex="-1"></a>fmli_dfs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( fmli_dfs , <span class="cf">function</span>( w ) w[ intersecting_cols ] )</span>
+<span id="cb171-20"><a href="consumer-expenditure-survey-ces.html#cb171-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-21"><a href="consumer-expenditure-survey-ces.html#cb171-21" aria-hidden="true" tabindex="-1"></a>ces_df <span class="ot">&lt;-</span> <span class="fu">do.call</span>( rbind , fmli_dfs )</span></code></pre></div>
 <p>Scale the weight columns based on the number of months in 2021:</p>
 <div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="consumer-expenditure-survey-ces.html#cb172-1" aria-hidden="true" tabindex="-1"></a>ces_df[ , <span class="fu">c</span>( <span class="st">&#39;qintrvyr&#39;</span> , <span class="st">&#39;qintrvmo&#39;</span> ) ] <span class="ot">&lt;-</span></span>
 <span id="cb172-2"><a href="consumer-expenditure-survey-ces.html#cb172-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sapply</span>( ces_df[ , <span class="fu">c</span>( <span class="st">&#39;qintrvyr&#39;</span> , <span class="st">&#39;qintrvmo&#39;</span> ) ] , as.numeric )</span>

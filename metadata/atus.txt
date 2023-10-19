@@ -43,14 +43,15 @@ Please skim before you begin:
 Define a function to download, unzip, and import each comma-separated value dat file:
 
 ```{r message = FALSE , eval = FALSE }
+library(RCurl)
 
 atus_csv_import <-
 	function( this_url ){
 		
 		this_tf <- tempfile()
 		
-		download.file( this_url , this_tf , mode = 'wb' )
-		
+		writeBin( getBinaryURL( this_url ) , this_tf )
+
 		unzipped_files <- unzip( this_tf , exdir = tempdir() )
 		
 		this_dat <- grep( '\\\\.dat$' , unzipped_files , value = TRUE )
