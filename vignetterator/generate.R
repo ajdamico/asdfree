@@ -1,4 +1,4 @@
-commit_memo <- "'bls rcurl'"
+commit_memo <- "'ces update'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
