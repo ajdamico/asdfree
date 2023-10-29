@@ -1,4 +1,4 @@
-commit_memo <- "'ces update'"
+commit_memo <- "'count'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
