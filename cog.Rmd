@@ -1,0 +1,374 @@
+# Census of Governments (COG) {-}
+
+<a href="https://github.com/asdfree/cog/actions"><img src="https://github.com/asdfree/cog/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+* 
+
+*
+
+* 
+
+*
+
+---
+
+Please skim before you begin:
+
+1.
+
+2.
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Census of Governments)
+
+```{r}
+# city hall marriage
+# schools cops with fire water
+# fed mail invite lost
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download, import, and stack the government units listing file:
+```{r eval = FALSE , results = "hide" }
+library(readxl)
+
+tf_gus <- tempfile()
+
+gus_url <- "https://www2.census.gov/programs-surveys/gus/datasets/2022/govt_units_2022.ZIP"
+
+download.file( gus_url , tf_gus , mode = 'wb' )
+
+unzipped_files_gus <- unzip( tf_gus , exdir = tempdir() )
+
+xlsx_gus_fn <- grep( "\\.xlsx$" , unzipped_files_gus , value = TRUE )
+
+xlsx_sheets <- excel_sheets( xlsx_gus_fn )
+
+# read all sheets into a list of tibbles
+gus_tbl_list <- lapply( xlsx_sheets , function( w ) read_excel( xlsx_gus_fn , sheet = w ) )
+
+# convert all tibbles to data.frame objects
+gus_df_list <- lapply( gus_tbl_list , data.frame )
+
+# lowercase all column names
+gus_df_list <-
+	lapply( 
+		gus_df_list , 
+		function( w ){ names( w ) <- tolower( names( w ) ) ; w } 
+	)
+
+# add the excel tab source to each data.frame
+for( i in seq( xlsx_sheets ) ) gus_df_list[[ i ]][ , 'source_tab' ] <- xlsx_sheets[ i ]
+
+# columns in all tables
+column_intersect <- Reduce( intersect , lapply( gus_df_list , names ) )
+
+# columns in some but not all tables
+column_union <- unique( unlist( lapply( gus_df_list , names ) ) )
+
+# these columns will be discarded by stacking
+unique( unlist( lapply( lapply( gus_df_list , names ) , function( w ) column_union[ !column_union %in% w ] ) ) )
+
+# stack all excel sheets, keeping only the columns that all tables have in common
+gus_df <-
+	Reduce( rbind , lapply( gus_df_list , function( w ) w[ column_intersect ] ) )
+```
+
+Download and import the survey of public employment & payroll file, with one record per function (not per unit):
+```{r eval = FALSE , results = "hide" }
+tf_apes <- tempfile()
+
+apes_url <- "https://www2.census.gov/programs-surveys/apes/datasets/2022/2022%20COG-E%20Individual%20Unit%20Files.zip"
+
+download.file( apes_url , tf_apes , mode = 'wb' )
+
+unzipped_files_apes <- unzip( tf_apes , exdir = tempdir() )
+
+xlsx_apes_fn <- grep( "\\.xlsx$" , unzipped_files_apes , value = TRUE )
+
+apes_tbl <- read_excel( xlsx_apes_fn )
+
+apes_df <- data.frame( apes_tbl )
+
+names( apes_df ) <- tolower( names( apes_df ) )
+```
+
+Review the non-matches between these two tables then merge:
+```{r eval = FALSE , results = "hide" }
+# all DEP School Districts and a third of Special Districts are not in the apes_df
+table(
+	gus_df[ , 'census_id_gidid' ] %in% apes_df[ , 'individual.unit.id' ] ,
+	gus_df[ , 'source_tab' ] ,
+	useNA = 'always'
+)
+
+# state governments are not in the gus_df
+table(
+	apes_df[ , 'individual.unit.id' ] %in% gus_df[ , 'census_id_gidid' ] ,
+	apes_df[ , 'type.of.government' ] ,
+	useNA = 'always'
+)
+
+# check for overlapping field names
+( overlapping_names <- intersect( names( apes_df ) , names( gus_df ) ) )
+
+# rename the state column in `gus_df` to state abbreviation
+names( gus_df )[ names( gus_df ) == 'state' ] <- 'stateab'
+
+cog_df <-
+	merge(
+		apes_df ,
+		gus_df ,
+		by.x = 'individual.unit.id' ,
+		by.y = 'census_id_gidid' ,
+		all.x = TRUE
+	)
+
+stopifnot( nrow( cog_df ) == nrow( apes_df ) )
+```
+
+which half:
+```{r eval = FALSE , results = "hide" }
+tapply( cog_df$full.time.employees , grepl('Total',cog_df$government.function),sum)
+# FALSE TRUE 
+# 14944806 14944806 
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# cog_fn <- file.path( path.expand( "~" ) , "COG" , "this_file.rds" )
+# saveRDS( cog_df , file = cog_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# cog_df <- readRDS( cog_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+cog_df <- 
+	transform( 
+		cog_df , 
+		
+		cbsa_indicator_code = 
+			factor( 
+				as.numeric( f1406720 ) , 
+				levels = 0:2 ,
+				labels = c( "not metro" , "metro" , "micro" ) 
+			) ,
+			
+		mhi_2020 = f1322620 ,
+		
+		whole_county_hpsa_2022 = as.numeric( f0978722 ) == 1 ,
+		
+		census_region = 
+			factor( 
+				as.numeric( f04439 ) , 
+				levels = 1:4 ,
+				labels = c( "northeast" , "midwest" , "south" , "west" ) 
+			)
+
+	)
+	
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( cog_df )
+
+table( cog_df[ , "cbsa_indicator_code" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( cog_df[ , "mhi_2020" ] , na.rm = TRUE )
+
+tapply(
+	cog_df[ , "mhi_2020" ] ,
+	cog_df[ , "cbsa_indicator_code" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( cog_df[ , "census_region" ] ) )
+
+prop.table(
+	table( cog_df[ , c( "census_region" , "cbsa_indicator_code" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( cog_df[ , "mhi_2020" ] , na.rm = TRUE )
+
+tapply(
+	cog_df[ , "mhi_2020" ] ,
+	cog_df[ , "cbsa_indicator_code" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( cog_df[ , "mhi_2020" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	cog_df[ , "mhi_2020" ] ,
+	cog_df[ , "cbsa_indicator_code" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to California:
+```{r eval = FALSE , results = "hide" }
+sub_cog_df <- subset( cog_df , f12424 == "CA" )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_cog_df[ , "mhi_2020" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( cog_df[ , "mhi_2020" ] , na.rm = TRUE )
+
+tapply(
+	cog_df[ , "mhi_2020" ] ,
+	cog_df[ , "cbsa_indicator_code" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( mhi_2020 ~ whole_county_hpsa_2022 , cog_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( cog_df[ , c( "whole_county_hpsa_2022" , "census_region" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		mhi_2020 ~ whole_county_hpsa_2022 + census_region , 
+		data = cog_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Intermish {-}
+
+<center>https://en.wikipedia.org/wiki/Lorem_ipsum</center>
+
+---
+
+## Replication Example {-}
+
+Match the record count in https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( cog_df ) == 3232 )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for COG users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+cog_tbl <- as_tibble( cog_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+cog_tbl %>%
+	summarize( mean = mean( mhi_2020 , na.rm = TRUE ) )
+
+cog_tbl %>%
+	group_by( cbsa_indicator_code ) %>%
+	summarize( mean = mean( mhi_2020 , na.rm = TRUE ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for COG users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+cog_dt <- data.table( cog_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+cog_dt[ , mean( mhi_2020 , na.rm = TRUE ) ]
+
+cog_dt[ , mean( mhi_2020 , na.rm = TRUE ) , by = cbsa_indicator_code ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for COG users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'cog' , cog_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( mhi_2020 ) FROM cog' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		cbsa_indicator_code ,
+		AVG( mhi_2020 )
+	FROM
+		cog
+	GROUP BY
+		cbsa_indicator_code'
+)
+```

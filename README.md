@@ -4,6 +4,7 @@ american-housing-survey-ahs: <p><a href="https://github.com/asdfree/ahs/actions"
 american-time-use-survey-atus: <p><a href="https://github.com/asdfree/atus/actions"><img src="https://github.com/asdfree/atus/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 area-health-resources-files-ahrf: <p><a href="https://github.com/asdfree/ahrf/actions"><img src="https://github.com/asdfree/ahrf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 behavioral-risk-factor-surveillance-system-brfss: <p><a href="https://github.com/asdfree/brfss/actions"><img src="https://github.com/asdfree/brfss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+census-of-governments-cog: <p><a href="https://github.com/asdfree/cog/actions"><img src="https://github.com/asdfree/cog/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 consumer-expenditure-survey-ces: <p><a href="https://github.com/asdfree/ces/actions"><img src="https://github.com/asdfree/ces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 current-population-survey-cps: <p><a href="https://github.com/asdfree/cps/actions"><img src="https://github.com/asdfree/cps/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-2023 06 16-brightgreen' alt='Local Testing Badge'></p>
