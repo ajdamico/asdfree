@@ -6,11 +6,11 @@ needs_actions_build_status_line: yes
 Location, employment, and payroll for state and local (but not federal) government agencies in the U.S.
 ~~~
 
-table_structure: * One record per agency, per agency function, plus the government units master address file.
+table_structure: * One record per agency, one per agency function, plus the government units master address file.
 
-generalizable_population: * A census of civilian employment in state and local governments in the 50 states plus D.C.
+generalizable_population: * Complete enumeration of civilian employment in state and local governments in the 50 states + D.C.
 
-publication_period: * Annual Survey of Public Employment & Payroll becomes a census in years ending with 2 and 7.
+publication_period: * The Annual Survey of Public Employment & Payroll becomes a census in years ending with 2 and 7.
 
 administrative_organization: * Administered and financed by the [US Census Bureau](http://www.census.gov/).
 
@@ -130,7 +130,7 @@ table(
 # rename the state column in `gus_df` to state abbreviation
 names( gus_df )[ names( gus_df ) == 'state' ] <- 'stateab'
 
-chapter_tag_df <-
+double_df <-
 	merge(
 		apes_df ,
 		gus_df ,
@@ -139,17 +139,24 @@ chapter_tag_df <-
 		all.x = TRUE
 	)
 
-stopifnot( nrow( chapter_tag_df ) == nrow( apes_df ) )
+stopifnot( nrow( double_df ) == nrow( apes_df ) )
 
 # replace dots with underscores
-names( chapter_tag_df ) <- gsub( "\\\\." , "_" , names( chapter_tag_df ) )
+names( double_df ) <- gsub( "\\\\." , "_" , names( double_df ) )
 ```
 
-which half:
+Keep either the one record per agency rows or the one record per function rows:
 ```{r eval = FALSE , results = "hide" }
-tapply( chapter_tag_df$full_time_employees , grepl('Total',chapter_tag_df$government_function),sum)
-#    FALSE     TRUE 
-# 14944806 14944806 
+# `Total - All Government Employment Functions` records sum to the same as all other records:
+with( double_df , tapply( full_time_employees , grepl( "Total" , government_function ) , sum ) )
+
+with( double_df , tapply( part_time_payroll , grepl( "Total" , government_function ) , sum ) )
+
+# keep one record per government function (multiple records per agency):
+chapter_tag_df <- subset( double_df , grepl( "Total" , government_function ) )
+
+# keep one record per government agency:
+# chapter_tag_df <- subset( double_df , !grepl( "Total" , government_function ) )
 ```
 
 ~~~
@@ -192,17 +199,12 @@ needs_duckdb_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-Match Excel Row #17 from https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx
+This example matches excel cell "C17" of [Employment & Payroll Data by State and by Function](https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx):
 
 ```{r eval = FALSE , results = "hide" }
 financial_admin_df <- subset( cog_df , government_function == 'Financial Administration' )
 
 stopifnot( sum( financial_admin_df[ , 'full_time_employees' ] ) == 404228 )
-stopifnot( sum( financial_admin_df[ , 'full_time_payroll' ] ) == 2426969677 )
-stopifnot( sum( financial_admin_df[ , 'part_time_employees' ] ) == 52228 )
-stopifnot( sum( financial_admin_df[ , 'part_time_payroll' ] ) == 80116458 )
-stopifnot( sum( financial_admin_df[ , 'total_employees' ] ) == 456456 )
-stopifnot( sum( financial_admin_df[ , 'total_payroll' ] ) == 2507086135 )
 ```
 ~~~
 

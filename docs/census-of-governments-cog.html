@@ -994,9 +994,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><a href="https://github.com/asdfree/cog/actions"><img src="https://github.com/asdfree/cog/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 <p>Location, employment, and payroll for state and local (but not federal) government agencies in the U.S.</p>
 <ul>
-<li><p>One record per agency, per agency function, plus the government units master address file.</p></li>
-<li><p>A census of civilian employment in state and local governments in the 50 states plus D.C.</p></li>
-<li><p>Annual Survey of Public Employment &amp; Payroll becomes a census in years ending with 2 and 7.</p></li>
+<li><p>One record per agency, one per agency function, plus the government units master address file.</p></li>
+<li><p>Complete enumeration of civilian employment in state and local governments in the 50 states + D.C.</p></li>
+<li><p>The Annual Survey of Public Employment &amp; Payroll becomes a census in years ending with 2 and 7.</p></li>
 <li><p>Administered and financed by the <a href="http://www.census.gov/">US Census Bureau</a>.</p></li>
 </ul>
 <hr />
@@ -1102,7 +1102,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb201-18"><a href="census-of-governments-cog.html#cb201-18" aria-hidden="true" tabindex="-1"></a><span class="co"># rename the state column in `gus_df` to state abbreviation</span></span>
 <span id="cb201-19"><a href="census-of-governments-cog.html#cb201-19" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( gus_df )[ <span class="fu">names</span>( gus_df ) <span class="sc">==</span> <span class="st">&#39;state&#39;</span> ] <span class="ot">&lt;-</span> <span class="st">&#39;stateab&#39;</span></span>
 <span id="cb201-20"><a href="census-of-governments-cog.html#cb201-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb201-21"><a href="census-of-governments-cog.html#cb201-21" aria-hidden="true" tabindex="-1"></a>cog_df <span class="ot">&lt;-</span></span>
+<span id="cb201-21"><a href="census-of-governments-cog.html#cb201-21" aria-hidden="true" tabindex="-1"></a>double_df <span class="ot">&lt;-</span></span>
 <span id="cb201-22"><a href="census-of-governments-cog.html#cb201-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">merge</span>(</span>
 <span id="cb201-23"><a href="census-of-governments-cog.html#cb201-23" aria-hidden="true" tabindex="-1"></a>        apes_df ,</span>
 <span id="cb201-24"><a href="census-of-governments-cog.html#cb201-24" aria-hidden="true" tabindex="-1"></a>        gus_df ,</span>
@@ -1111,14 +1111,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb201-27"><a href="census-of-governments-cog.html#cb201-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">all.x =</span> <span class="cn">TRUE</span></span>
 <span id="cb201-28"><a href="census-of-governments-cog.html#cb201-28" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb201-29"><a href="census-of-governments-cog.html#cb201-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb201-30"><a href="census-of-governments-cog.html#cb201-30" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( cog_df ) <span class="sc">==</span> <span class="fu">nrow</span>( apes_df ) )</span>
+<span id="cb201-30"><a href="census-of-governments-cog.html#cb201-30" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( double_df ) <span class="sc">==</span> <span class="fu">nrow</span>( apes_df ) )</span>
 <span id="cb201-31"><a href="census-of-governments-cog.html#cb201-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb201-32"><a href="census-of-governments-cog.html#cb201-32" aria-hidden="true" tabindex="-1"></a><span class="co"># replace dots with underscores</span></span>
-<span id="cb201-33"><a href="census-of-governments-cog.html#cb201-33" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( cog_df ) <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span> , <span class="st">&quot;_&quot;</span> , <span class="fu">names</span>( cog_df ) )</span></code></pre></div>
-<p>which half:</p>
-<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="census-of-governments-cog.html#cb202-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>( cog_df<span class="sc">$</span>full_time_employees , <span class="fu">grepl</span>(<span class="st">&#39;Total&#39;</span>,cog_df<span class="sc">$</span>government_function),sum)</span>
-<span id="cb202-2"><a href="census-of-governments-cog.html#cb202-2" aria-hidden="true" tabindex="-1"></a><span class="co"># FALSE TRUE </span></span>
-<span id="cb202-3"><a href="census-of-governments-cog.html#cb202-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 14944806 14944806 </span></span></code></pre></div>
+<span id="cb201-33"><a href="census-of-governments-cog.html#cb201-33" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( double_df ) <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span> , <span class="st">&quot;_&quot;</span> , <span class="fu">names</span>( double_df ) )</span></code></pre></div>
+<p>Keep either the one record per agency rows or the one record per function rows:</p>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="census-of-governments-cog.html#cb202-1" aria-hidden="true" tabindex="-1"></a><span class="co"># `Total - All Government Employment Functions` records sum to the same as all other records:</span></span>
+<span id="cb202-2"><a href="census-of-governments-cog.html#cb202-2" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>( double_df , <span class="fu">tapply</span>( full_time_employees , <span class="fu">grepl</span>( <span class="st">&quot;Total&quot;</span> , government_function ) , sum ) )</span>
+<span id="cb202-3"><a href="census-of-governments-cog.html#cb202-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb202-4"><a href="census-of-governments-cog.html#cb202-4" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>( double_df , <span class="fu">tapply</span>( part_time_payroll , <span class="fu">grepl</span>( <span class="st">&quot;Total&quot;</span> , government_function ) , sum ) )</span>
+<span id="cb202-5"><a href="census-of-governments-cog.html#cb202-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb202-6"><a href="census-of-governments-cog.html#cb202-6" aria-hidden="true" tabindex="-1"></a><span class="co"># keep one record per government function (multiple records per agency):</span></span>
+<span id="cb202-7"><a href="census-of-governments-cog.html#cb202-7" aria-hidden="true" tabindex="-1"></a>cog_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( double_df , <span class="fu">grepl</span>( <span class="st">&quot;Total&quot;</span> , government_function ) )</span>
+<span id="cb202-8"><a href="census-of-governments-cog.html#cb202-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb202-9"><a href="census-of-governments-cog.html#cb202-9" aria-hidden="true" tabindex="-1"></a><span class="co"># keep one record per government agency:</span></span>
+<span id="cb202-10"><a href="census-of-governments-cog.html#cb202-10" aria-hidden="true" tabindex="-1"></a><span class="co"># cog_df &lt;- subset( double_df , !grepl( &quot;Total&quot; , government_function ) )</span></span></code></pre></div>
 <div id="save-locally-6" class="section level3 unnumbered hasAnchor">
 <h3>Save locally  <a href="census-of-governments-cog.html#save-locally-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
@@ -1235,15 +1242,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-6" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="census-of-governments-cog.html#replication-example-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Match Excel Row #17 from <a href="https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx" class="uri">https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx</a></p>
+<p>This example matches excel cell “C17” of <a href="https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx">Employment &amp; Payroll Data by State and by Function</a>:</p>
 <div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="census-of-governments-cog.html#cb217-1" aria-hidden="true" tabindex="-1"></a>financial_admin_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( cog_df , government_function <span class="sc">==</span> <span class="st">&#39;Financial Administration&#39;</span> )</span>
 <span id="cb217-2"><a href="census-of-governments-cog.html#cb217-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb217-3"><a href="census-of-governments-cog.html#cb217-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;full_time_employees&#39;</span> ] ) <span class="sc">==</span> <span class="dv">404228</span> )</span>
-<span id="cb217-4"><a href="census-of-governments-cog.html#cb217-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;full_time_payroll&#39;</span> ] ) <span class="sc">==</span> <span class="dv">2426969677</span> )</span>
-<span id="cb217-5"><a href="census-of-governments-cog.html#cb217-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;part_time_employees&#39;</span> ] ) <span class="sc">==</span> <span class="dv">52228</span> )</span>
-<span id="cb217-6"><a href="census-of-governments-cog.html#cb217-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;part_time_payroll&#39;</span> ] ) <span class="sc">==</span> <span class="dv">80116458</span> )</span>
-<span id="cb217-7"><a href="census-of-governments-cog.html#cb217-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;total_employees&#39;</span> ] ) <span class="sc">==</span> <span class="dv">456456</span> )</span>
-<span id="cb217-8"><a href="census-of-governments-cog.html#cb217-8" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;total_payroll&#39;</span> ] ) <span class="sc">==</span> <span class="dv">2507086135</span> )</span></code></pre></div>
+<span id="cb217-3"><a href="census-of-governments-cog.html#cb217-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;full_time_employees&#39;</span> ] ) <span class="sc">==</span> <span class="dv">404228</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-dplyr-1" class="section level2 unnumbered hasAnchor">
