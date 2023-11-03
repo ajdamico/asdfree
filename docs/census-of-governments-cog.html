@@ -992,18 +992,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="census-of-governments-cog" class="section level1 unnumbered hasAnchor">
 <h1>Census of Governments (COG)<a href="census-of-governments-cog.html#census-of-governments-cog" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/asdfree/cog/actions"><img src="https://github.com/asdfree/cog/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+<p>Location, employment, and payroll for state and local (but not federal) government agencies in the U.S.</p>
 <ul>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
+<li><p>One record per agency, per agency function, plus the government units master address file.</p></li>
+<li><p>A census of civilian employment in state and local governments in the 50 states plus D.C.</p></li>
+<li><p>Annual Survey of Public Employment &amp; Payroll becomes a Census in years ending with 2 and 7.</p></li>
+<li><p>Administered and financed by the <a href="http://www.census.gov/">US Census Bureau</a>.</p></li>
 </ul>
 <hr />
 <p>Please skim before you begin:</p>
 <ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Census%20of%20Governments">artificial intelligence-generated limericks</a></li>
+<li><p><a href="https://www2.census.gov/programs-surveys/apes/technical-documentation/methodology/22_methodology.pdf">2022 Census of Governments, Survey of Public Employment &amp; Payroll Methodology</a></p></li>
+<li><p><a href="https://www.census.gov/programs-surveys/gus/technical-documentation/methodology.html">Government Units Survey Methodology</a></p></li>
+<li><p>This human-composed haiku or a bouquet of <a href="https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Census%20of%20Governments">artificial intelligence-generated limericks</a></p></li>
 </ol>
 <div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="census-of-governments-cog.html#cb198-1" aria-hidden="true" tabindex="-1"></a><span class="co"># city hall marriage</span></span>
 <span id="cb198-2"><a href="census-of-governments-cog.html#cb198-2" aria-hidden="true" tabindex="-1"></a><span class="co"># schools cops with fire water</span></span>
@@ -1049,27 +1050,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb199-35"><a href="census-of-governments-cog.html#cb199-35" aria-hidden="true" tabindex="-1"></a>column_union <span class="ot">&lt;-</span> <span class="fu">unique</span>( <span class="fu">unlist</span>( <span class="fu">lapply</span>( gus_df_list , names ) ) )</span>
 <span id="cb199-36"><a href="census-of-governments-cog.html#cb199-36" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb199-37"><a href="census-of-governments-cog.html#cb199-37" aria-hidden="true" tabindex="-1"></a><span class="co"># these columns will be discarded by stacking</span></span>
-<span id="cb199-38"><a href="census-of-governments-cog.html#cb199-38" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>( <span class="fu">unlist</span>( <span class="fu">lapply</span>( <span class="fu">lapply</span>( gus_df_list , names ) , <span class="cf">function</span>( w ) column_union[ <span class="sc">!</span>column_union <span class="sc">%in%</span> w ] ) ) )</span>
-<span id="cb199-39"><a href="census-of-governments-cog.html#cb199-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb199-40"><a href="census-of-governments-cog.html#cb199-40" aria-hidden="true" tabindex="-1"></a><span class="co"># stack all excel sheets, keeping only the columns that all tables have in common</span></span>
-<span id="cb199-41"><a href="census-of-governments-cog.html#cb199-41" aria-hidden="true" tabindex="-1"></a>gus_df <span class="ot">&lt;-</span></span>
-<span id="cb199-42"><a href="census-of-governments-cog.html#cb199-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Reduce</span>( rbind , <span class="fu">lapply</span>( gus_df_list , <span class="cf">function</span>( w ) w[ column_intersect ] ) )</span></code></pre></div>
+<span id="cb199-38"><a href="census-of-governments-cog.html#cb199-38" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(</span>
+<span id="cb199-39"><a href="census-of-governments-cog.html#cb199-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unlist</span>(</span>
+<span id="cb199-40"><a href="census-of-governments-cog.html#cb199-40" aria-hidden="true" tabindex="-1"></a>        <span class="fu">lapply</span>(</span>
+<span id="cb199-41"><a href="census-of-governments-cog.html#cb199-41" aria-hidden="true" tabindex="-1"></a>            <span class="fu">lapply</span>( gus_df_list , names ) , </span>
+<span id="cb199-42"><a href="census-of-governments-cog.html#cb199-42" aria-hidden="true" tabindex="-1"></a>            <span class="cf">function</span>( w ) column_union[ <span class="sc">!</span>column_union <span class="sc">%in%</span> w ]</span>
+<span id="cb199-43"><a href="census-of-governments-cog.html#cb199-43" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb199-44"><a href="census-of-governments-cog.html#cb199-44" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb199-45"><a href="census-of-governments-cog.html#cb199-45" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb199-46"><a href="census-of-governments-cog.html#cb199-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-47"><a href="census-of-governments-cog.html#cb199-47" aria-hidden="true" tabindex="-1"></a><span class="co"># stack all excel sheets, keeping only the columns that all tables have in common</span></span>
+<span id="cb199-48"><a href="census-of-governments-cog.html#cb199-48" aria-hidden="true" tabindex="-1"></a>gus_df <span class="ot">&lt;-</span> <span class="fu">Reduce</span>( rbind , <span class="fu">lapply</span>( gus_df_list , <span class="cf">function</span>( w ) w[ column_intersect ] ) )</span></code></pre></div>
 <p>Download and import the survey of public employment &amp; payroll file, with one record per function (not per unit):</p>
 <div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="census-of-governments-cog.html#cb200-1" aria-hidden="true" tabindex="-1"></a>tf_apes <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb200-2"><a href="census-of-governments-cog.html#cb200-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-3"><a href="census-of-governments-cog.html#cb200-3" aria-hidden="true" tabindex="-1"></a>apes_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www2.census.gov/programs-surveys/apes/datasets/2022/2022%20COG-E%20Individual%20Unit%20Files.zip&quot;</span></span>
-<span id="cb200-4"><a href="census-of-governments-cog.html#cb200-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-5"><a href="census-of-governments-cog.html#cb200-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( apes_url , tf_apes , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb200-6"><a href="census-of-governments-cog.html#cb200-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-7"><a href="census-of-governments-cog.html#cb200-7" aria-hidden="true" tabindex="-1"></a>unzipped_files_apes <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf_apes , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb200-3"><a href="census-of-governments-cog.html#cb200-3" aria-hidden="true" tabindex="-1"></a>apes_url <span class="ot">&lt;-</span></span>
+<span id="cb200-4"><a href="census-of-governments-cog.html#cb200-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(</span>
+<span id="cb200-5"><a href="census-of-governments-cog.html#cb200-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;https://www2.census.gov/programs-surveys/apes/datasets/&quot;</span> ,</span>
+<span id="cb200-6"><a href="census-of-governments-cog.html#cb200-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;2022/2022%20COG-E%20Individual%20Unit%20Files.zip&quot;</span></span>
+<span id="cb200-7"><a href="census-of-governments-cog.html#cb200-7" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb200-8"><a href="census-of-governments-cog.html#cb200-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-9"><a href="census-of-governments-cog.html#cb200-9" aria-hidden="true" tabindex="-1"></a>xlsx_apes_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.xlsx$&quot;</span> , unzipped_files_apes , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb200-9"><a href="census-of-governments-cog.html#cb200-9" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>( apes_url , tf_apes , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
 <span id="cb200-10"><a href="census-of-governments-cog.html#cb200-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-11"><a href="census-of-governments-cog.html#cb200-11" aria-hidden="true" tabindex="-1"></a>apes_tbl <span class="ot">&lt;-</span> <span class="fu">read_excel</span>( xlsx_apes_fn )</span>
+<span id="cb200-11"><a href="census-of-governments-cog.html#cb200-11" aria-hidden="true" tabindex="-1"></a>unzipped_files_apes <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf_apes , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb200-12"><a href="census-of-governments-cog.html#cb200-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-13"><a href="census-of-governments-cog.html#cb200-13" aria-hidden="true" tabindex="-1"></a>apes_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( apes_tbl )</span>
+<span id="cb200-13"><a href="census-of-governments-cog.html#cb200-13" aria-hidden="true" tabindex="-1"></a>xlsx_apes_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.xlsx$&quot;</span> , unzipped_files_apes , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb200-14"><a href="census-of-governments-cog.html#cb200-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-15"><a href="census-of-governments-cog.html#cb200-15" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( apes_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( apes_df ) )</span></code></pre></div>
+<span id="cb200-15"><a href="census-of-governments-cog.html#cb200-15" aria-hidden="true" tabindex="-1"></a>apes_tbl <span class="ot">&lt;-</span> <span class="fu">read_excel</span>( xlsx_apes_fn )</span>
+<span id="cb200-16"><a href="census-of-governments-cog.html#cb200-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb200-17"><a href="census-of-governments-cog.html#cb200-17" aria-hidden="true" tabindex="-1"></a>apes_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( apes_tbl )</span>
+<span id="cb200-18"><a href="census-of-governments-cog.html#cb200-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb200-19"><a href="census-of-governments-cog.html#cb200-19" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( apes_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( apes_df ) )</span></code></pre></div>
 <p>Review the non-matches between these two tables then merge:</p>
 <div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="census-of-governments-cog.html#cb201-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all DEP School Districts and a third of Special Districts are not in the apes_df</span></span>
 <span id="cb201-2"><a href="census-of-governments-cog.html#cb201-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(</span>
@@ -1100,7 +1111,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb201-27"><a href="census-of-governments-cog.html#cb201-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">all.x =</span> <span class="cn">TRUE</span></span>
 <span id="cb201-28"><a href="census-of-governments-cog.html#cb201-28" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb201-29"><a href="census-of-governments-cog.html#cb201-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb201-30"><a href="census-of-governments-cog.html#cb201-30" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( cog_df ) <span class="sc">==</span> <span class="fu">nrow</span>( apes_df ) )</span></code></pre></div>
+<span id="cb201-30"><a href="census-of-governments-cog.html#cb201-30" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( cog_df ) <span class="sc">==</span> <span class="fu">nrow</span>( apes_df ) )</span>
+<span id="cb201-31"><a href="census-of-governments-cog.html#cb201-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb201-32"><a href="census-of-governments-cog.html#cb201-32" aria-hidden="true" tabindex="-1"></a><span class="co"># replace dots with underscores</span></span>
+<span id="cb201-33"><a href="census-of-governments-cog.html#cb201-33" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( cog_df ) <span class="ot">&lt;-</span> <span class="fu">gsub</span>( <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span> , <span class="st">&quot;_&quot;</span> , <span class="fu">names</span>( cog_df ) )</span></code></pre></div>
 <p>which half:</p>
 <div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="census-of-governments-cog.html#cb202-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>( cog_df<span class="sc">$</span>full.time.employees , <span class="fu">grepl</span>(<span class="st">&#39;Total&#39;</span>,cog_df<span class="sc">$</span>government.function),sum)</span>
 <span id="cb202-2"><a href="census-of-governments-cog.html#cb202-2" aria-hidden="true" tabindex="-1"></a><span class="co"># FALSE TRUE </span></span>
@@ -1120,25 +1134,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb205-2"><a href="census-of-governments-cog.html#cb205-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transform</span>( </span>
 <span id="cb205-3"><a href="census-of-governments-cog.html#cb205-3" aria-hidden="true" tabindex="-1"></a>        cog_df , </span>
 <span id="cb205-4"><a href="census-of-governments-cog.html#cb205-4" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb205-5"><a href="census-of-governments-cog.html#cb205-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">cbsa_indicator_code =</span> </span>
-<span id="cb205-6"><a href="census-of-governments-cog.html#cb205-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb205-7"><a href="census-of-governments-cog.html#cb205-7" aria-hidden="true" tabindex="-1"></a>                <span class="fu">as.numeric</span>( f1406720 ) , </span>
-<span id="cb205-8"><a href="census-of-governments-cog.html#cb205-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span> ,</span>
-<span id="cb205-9"><a href="census-of-governments-cog.html#cb205-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;not metro&quot;</span> , <span class="st">&quot;metro&quot;</span> , <span class="st">&quot;micro&quot;</span> ) </span>
-<span id="cb205-10"><a href="census-of-governments-cog.html#cb205-10" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
-<span id="cb205-11"><a href="census-of-governments-cog.html#cb205-11" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb205-12"><a href="census-of-governments-cog.html#cb205-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">mhi_2020 =</span> f1322620 ,</span>
-<span id="cb205-13"><a href="census-of-governments-cog.html#cb205-13" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb205-14"><a href="census-of-governments-cog.html#cb205-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">whole_county_hpsa_2022 =</span> <span class="fu">as.numeric</span>( f0978722 ) <span class="sc">==</span> <span class="dv">1</span> ,</span>
-<span id="cb205-15"><a href="census-of-governments-cog.html#cb205-15" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb205-16"><a href="census-of-governments-cog.html#cb205-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">census_region =</span> </span>
-<span id="cb205-17"><a href="census-of-governments-cog.html#cb205-17" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( </span>
-<span id="cb205-18"><a href="census-of-governments-cog.html#cb205-18" aria-hidden="true" tabindex="-1"></a>                <span class="fu">as.numeric</span>( f04439 ) , </span>
-<span id="cb205-19"><a href="census-of-governments-cog.html#cb205-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ,</span>
-<span id="cb205-20"><a href="census-of-governments-cog.html#cb205-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;northeast&quot;</span> , <span class="st">&quot;midwest&quot;</span> , <span class="st">&quot;south&quot;</span> , <span class="st">&quot;west&quot;</span> ) </span>
-<span id="cb205-21"><a href="census-of-governments-cog.html#cb205-21" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb205-22"><a href="census-of-governments-cog.html#cb205-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb205-23"><a href="census-of-governments-cog.html#cb205-23" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<span id="cb205-5"><a href="census-of-governments-cog.html#cb205-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">one =</span> <span class="dv">1</span> ,</span>
+<span id="cb205-6"><a href="census-of-governments-cog.html#cb205-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb205-7"><a href="census-of-governments-cog.html#cb205-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">total_payroll =</span> full_time_payroll <span class="sc">+</span> part_time_payroll ,</span>
+<span id="cb205-8"><a href="census-of-governments-cog.html#cb205-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb205-9"><a href="census-of-governments-cog.html#cb205-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">total_employees =</span> full_time_employees <span class="sc">+</span> part_time_employees ,</span>
+<span id="cb205-10"><a href="census-of-governments-cog.html#cb205-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb205-11"><a href="census-of-governments-cog.html#cb205-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">any_full_time_employees =</span> full_time_employees <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb205-12"><a href="census-of-governments-cog.html#cb205-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb205-13"><a href="census-of-governments-cog.html#cb205-13" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1149,77 +1153,73 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Count the unweighted number of records in the table, overall and by groups:</p>
 <div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="census-of-governments-cog.html#cb206-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>( cog_df )</span>
 <span id="cb206-2"><a href="census-of-governments-cog.html#cb206-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb206-3"><a href="census-of-governments-cog.html#cb206-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>( cog_df[ , <span class="st">&quot;cbsa_indicator_code&quot;</span> ] , <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span> )</span></code></pre></div>
+<span id="cb206-3"><a href="census-of-governments-cog.html#cb206-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>( cog_df[ , <span class="st">&quot;type_of_government&quot;</span> ] , <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span> )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-6" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="census-of-governments-cog.html#descriptive-statistics-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="census-of-governments-cog.html#cb207-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="census-of-governments-cog.html#cb207-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] )</span>
 <span id="cb207-2"><a href="census-of-governments-cog.html#cb207-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb207-3"><a href="census-of-governments-cog.html#cb207-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb207-4"><a href="census-of-governments-cog.html#cb207-4" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] ,</span>
-<span id="cb207-5"><a href="census-of-governments-cog.html#cb207-5" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;cbsa_indicator_code&quot;</span> ] ,</span>
-<span id="cb207-6"><a href="census-of-governments-cog.html#cb207-6" aria-hidden="true" tabindex="-1"></a>    mean ,</span>
-<span id="cb207-7"><a href="census-of-governments-cog.html#cb207-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb207-8"><a href="census-of-governments-cog.html#cb207-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb207-4"><a href="census-of-governments-cog.html#cb207-4" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] ,</span>
+<span id="cb207-5"><a href="census-of-governments-cog.html#cb207-5" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;type_of_government&quot;</span> ] ,</span>
+<span id="cb207-6"><a href="census-of-governments-cog.html#cb207-6" aria-hidden="true" tabindex="-1"></a>    mean </span>
+<span id="cb207-7"><a href="census-of-governments-cog.html#cb207-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
 <div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="census-of-governments-cog.html#cb208-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>( <span class="fu">table</span>( cog_df[ , <span class="st">&quot;census_region&quot;</span> ] ) )</span>
 <span id="cb208-2"><a href="census-of-governments-cog.html#cb208-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb208-3"><a href="census-of-governments-cog.html#cb208-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(</span>
-<span id="cb208-4"><a href="census-of-governments-cog.html#cb208-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">table</span>( cog_df[ , <span class="fu">c</span>( <span class="st">&quot;census_region&quot;</span> , <span class="st">&quot;cbsa_indicator_code&quot;</span> ) ] ) ,</span>
+<span id="cb208-4"><a href="census-of-governments-cog.html#cb208-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">table</span>( cog_df[ , <span class="fu">c</span>( <span class="st">&quot;census_region&quot;</span> , <span class="st">&quot;type_of_government&quot;</span> ) ] ) ,</span>
 <span id="cb208-5"><a href="census-of-governments-cog.html#cb208-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">margin =</span> <span class="dv">2</span></span>
 <span id="cb208-6"><a href="census-of-governments-cog.html#cb208-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="census-of-governments-cog.html#cb209-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="census-of-governments-cog.html#cb209-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] )</span>
 <span id="cb209-2"><a href="census-of-governments-cog.html#cb209-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb209-3"><a href="census-of-governments-cog.html#cb209-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb209-4"><a href="census-of-governments-cog.html#cb209-4" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] ,</span>
-<span id="cb209-5"><a href="census-of-governments-cog.html#cb209-5" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;cbsa_indicator_code&quot;</span> ] ,</span>
-<span id="cb209-6"><a href="census-of-governments-cog.html#cb209-6" aria-hidden="true" tabindex="-1"></a>    sum ,</span>
-<span id="cb209-7"><a href="census-of-governments-cog.html#cb209-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb209-8"><a href="census-of-governments-cog.html#cb209-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb209-4"><a href="census-of-governments-cog.html#cb209-4" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] ,</span>
+<span id="cb209-5"><a href="census-of-governments-cog.html#cb209-5" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;type_of_government&quot;</span> ] ,</span>
+<span id="cb209-6"><a href="census-of-governments-cog.html#cb209-6" aria-hidden="true" tabindex="-1"></a>    sum </span>
+<span id="cb209-7"><a href="census-of-governments-cog.html#cb209-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="census-of-governments-cog.html#cb210-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>( cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] , <span class="fl">0.5</span> , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="census-of-governments-cog.html#cb210-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>( cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] , <span class="fl">0.5</span> )</span>
 <span id="cb210-2"><a href="census-of-governments-cog.html#cb210-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb210-3"><a href="census-of-governments-cog.html#cb210-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb210-4"><a href="census-of-governments-cog.html#cb210-4" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] ,</span>
-<span id="cb210-5"><a href="census-of-governments-cog.html#cb210-5" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;cbsa_indicator_code&quot;</span> ] ,</span>
+<span id="cb210-4"><a href="census-of-governments-cog.html#cb210-4" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] ,</span>
+<span id="cb210-5"><a href="census-of-governments-cog.html#cb210-5" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;type_of_government&quot;</span> ] ,</span>
 <span id="cb210-6"><a href="census-of-governments-cog.html#cb210-6" aria-hidden="true" tabindex="-1"></a>    quantile ,</span>
-<span id="cb210-7"><a href="census-of-governments-cog.html#cb210-7" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> ,</span>
-<span id="cb210-8"><a href="census-of-governments-cog.html#cb210-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb210-9"><a href="census-of-governments-cog.html#cb210-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb210-7"><a href="census-of-governments-cog.html#cb210-7" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> </span>
+<span id="cb210-8"><a href="census-of-governments-cog.html#cb210-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting-6" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="census-of-governments-cog.html#subsetting-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Limit your <code>data.frame</code> to California:</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="census-of-governments-cog.html#cb211-1" aria-hidden="true" tabindex="-1"></a>sub_cog_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( cog_df , f12424 <span class="sc">==</span> <span class="st">&quot;CA&quot;</span> )</span></code></pre></div>
+<p>Limit your <code>data.frame</code> to Elementary, Secondary, Higher, and Other Educational Government Agencies:</p>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="census-of-governments-cog.html#cb211-1" aria-hidden="true" tabindex="-1"></a>sub_cog_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( cog_df , <span class="fu">grepl</span>( <span class="st">&#39;Education&#39;</span> , government_function ) )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="census-of-governments-cog.html#cb212-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( sub_cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="census-of-governments-cog.html#cb212-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( sub_cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-6" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="census-of-governments-cog.html#measures-of-uncertainty-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the variance, overall and by groups:</p>
-<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="census-of-governments-cog.html#cb213-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>( cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="census-of-governments-cog.html#cb213-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>( cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] )</span>
 <span id="cb213-2"><a href="census-of-governments-cog.html#cb213-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb213-3"><a href="census-of-governments-cog.html#cb213-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb213-4"><a href="census-of-governments-cog.html#cb213-4" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;mhi_2020&quot;</span> ] ,</span>
-<span id="cb213-5"><a href="census-of-governments-cog.html#cb213-5" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;cbsa_indicator_code&quot;</span> ] ,</span>
-<span id="cb213-6"><a href="census-of-governments-cog.html#cb213-6" aria-hidden="true" tabindex="-1"></a>    var ,</span>
-<span id="cb213-7"><a href="census-of-governments-cog.html#cb213-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span> </span>
-<span id="cb213-8"><a href="census-of-governments-cog.html#cb213-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb213-4"><a href="census-of-governments-cog.html#cb213-4" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;full_time_employees&quot;</span> ] ,</span>
+<span id="cb213-5"><a href="census-of-governments-cog.html#cb213-5" aria-hidden="true" tabindex="-1"></a>    cog_df[ , <span class="st">&quot;type_of_government&quot;</span> ] ,</span>
+<span id="cb213-6"><a href="census-of-governments-cog.html#cb213-6" aria-hidden="true" tabindex="-1"></a>    var </span>
+<span id="cb213-7"><a href="census-of-governments-cog.html#cb213-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-6" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="census-of-governments-cog.html#regression-models-and-tests-of-association-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a t-test:</p>
-<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="census-of-governments-cog.html#cb214-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>( mhi_2020 <span class="sc">~</span> whole_county_hpsa_2022 , cog_df )</span></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="census-of-governments-cog.html#cb214-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>( full_time_employees <span class="sc">~</span> any_full_time_employees , cog_df )</span></code></pre></div>
 <p>Perform a chi-squared test of association:</p>
-<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="census-of-governments-cog.html#cb215-1" aria-hidden="true" tabindex="-1"></a>this_table <span class="ot">&lt;-</span> <span class="fu">table</span>( cog_df[ , <span class="fu">c</span>( <span class="st">&quot;whole_county_hpsa_2022&quot;</span> , <span class="st">&quot;census_region&quot;</span> ) ] )</span>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="census-of-governments-cog.html#cb215-1" aria-hidden="true" tabindex="-1"></a>this_table <span class="ot">&lt;-</span> <span class="fu">table</span>( cog_df[ , <span class="fu">c</span>( <span class="st">&quot;any_full_time_employees&quot;</span> , <span class="st">&quot;census_region&quot;</span> ) ] )</span>
 <span id="cb215-2"><a href="census-of-governments-cog.html#cb215-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb215-3"><a href="census-of-governments-cog.html#cb215-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>( this_table )</span></code></pre></div>
 <p>Perform a generalized linear model:</p>
 <div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="census-of-governments-cog.html#cb216-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
 <span id="cb216-2"><a href="census-of-governments-cog.html#cb216-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glm</span>( </span>
-<span id="cb216-3"><a href="census-of-governments-cog.html#cb216-3" aria-hidden="true" tabindex="-1"></a>        mhi_2020 <span class="sc">~</span> whole_county_hpsa_2022 <span class="sc">+</span> census_region , </span>
+<span id="cb216-3"><a href="census-of-governments-cog.html#cb216-3" aria-hidden="true" tabindex="-1"></a>        full_time_employees <span class="sc">~</span> any_full_time_employees <span class="sc">+</span> census_region , </span>
 <span id="cb216-4"><a href="census-of-governments-cog.html#cb216-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> cog_df</span>
 <span id="cb216-5"><a href="census-of-governments-cog.html#cb216-5" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb216-6"><a href="census-of-governments-cog.html#cb216-6" aria-hidden="true" tabindex="-1"></a></span>
@@ -1236,8 +1236,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-6" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="census-of-governments-cog.html#replication-example-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Match the record count in <a href="https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx" class="uri">https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx</a></p>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="census-of-governments-cog.html#cb217-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( cog_df ) <span class="sc">==</span> <span class="dv">3232</span> )</span></code></pre></div>
+<p>Match Excel Row #17 from <a href="https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx" class="uri">https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx</a></p>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="census-of-governments-cog.html#cb217-1" aria-hidden="true" tabindex="-1"></a>financial_admin_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( cog_df , government_function <span class="sc">==</span> <span class="st">&#39;Financial Administration&#39;</span> )</span>
+<span id="cb217-2"><a href="census-of-governments-cog.html#cb217-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb217-3"><a href="census-of-governments-cog.html#cb217-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;full_time_employees&#39;</span> ] ) <span class="sc">==</span> <span class="dv">404228</span> )</span>
+<span id="cb217-4"><a href="census-of-governments-cog.html#cb217-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;full_time_payroll&#39;</span> ] ) <span class="sc">==</span> <span class="dv">2426969677</span> )</span>
+<span id="cb217-5"><a href="census-of-governments-cog.html#cb217-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;part_time_employees&#39;</span> ] ) <span class="sc">==</span> <span class="dv">52228</span> )</span>
+<span id="cb217-6"><a href="census-of-governments-cog.html#cb217-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;part_time_payroll&#39;</span> ] ) <span class="sc">==</span> <span class="dv">80116458</span> )</span>
+<span id="cb217-7"><a href="census-of-governments-cog.html#cb217-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;total_employees&#39;</span> ] ) <span class="sc">==</span> <span class="dv">456456</span> )</span>
+<span id="cb217-8"><a href="census-of-governments-cog.html#cb217-8" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">sum</span>( financial_admin_df[ , <span class="st">&#39;total_payroll&#39;</span> ] ) <span class="sc">==</span> <span class="dv">2507086135</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-dplyr-1" class="section level2 unnumbered hasAnchor">
@@ -1247,11 +1254,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb218-2"><a href="census-of-governments-cog.html#cb218-2" aria-hidden="true" tabindex="-1"></a>cog_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>( cog_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
 <div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="census-of-governments-cog.html#cb219-1" aria-hidden="true" tabindex="-1"></a>cog_tbl <span class="sc">%&gt;%</span></span>
-<span id="cb219-2"><a href="census-of-governments-cog.html#cb219-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( mhi_2020 , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span>
+<span id="cb219-2"><a href="census-of-governments-cog.html#cb219-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( full_time_employees ) )</span>
 <span id="cb219-3"><a href="census-of-governments-cog.html#cb219-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb219-4"><a href="census-of-governments-cog.html#cb219-4" aria-hidden="true" tabindex="-1"></a>cog_tbl <span class="sc">%&gt;%</span></span>
-<span id="cb219-5"><a href="census-of-governments-cog.html#cb219-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( cbsa_indicator_code ) <span class="sc">%&gt;%</span></span>
-<span id="cb219-6"><a href="census-of-governments-cog.html#cb219-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( mhi_2020 , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) )</span></code></pre></div>
+<span id="cb219-5"><a href="census-of-governments-cog.html#cb219-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( type_of_government ) <span class="sc">%&gt;%</span></span>
+<span id="cb219-6"><a href="census-of-governments-cog.html#cb219-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( full_time_employees ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-data.table-1" class="section level2 unnumbered hasAnchor">
@@ -1260,9 +1267,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="census-of-governments-cog.html#cb220-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
 <span id="cb220-2"><a href="census-of-governments-cog.html#cb220-2" aria-hidden="true" tabindex="-1"></a>cog_dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>( cog_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="census-of-governments-cog.html#cb221-1" aria-hidden="true" tabindex="-1"></a>cog_dt[ , <span class="fu">mean</span>( mhi_2020 , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) ]</span>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="census-of-governments-cog.html#cb221-1" aria-hidden="true" tabindex="-1"></a>cog_dt[ , <span class="fu">mean</span>( full_time_employees ) ]</span>
 <span id="cb221-2"><a href="census-of-governments-cog.html#cb221-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb221-3"><a href="census-of-governments-cog.html#cb221-3" aria-hidden="true" tabindex="-1"></a>cog_dt[ , <span class="fu">mean</span>( mhi_2020 , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) , by <span class="ot">=</span> cbsa_indicator_code ]</span></code></pre></div>
+<span id="cb221-3"><a href="census-of-governments-cog.html#cb221-3" aria-hidden="true" tabindex="-1"></a>cog_dt[ , <span class="fu">mean</span>( full_time_employees ) , by <span class="ot">=</span> type_of_government ]</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-duckdb-1" class="section level2 unnumbered hasAnchor">
@@ -1272,17 +1279,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb222-2"><a href="census-of-governments-cog.html#cb222-2" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>( duckdb<span class="sc">::</span><span class="fu">duckdb</span>() , <span class="at">dbdir =</span> <span class="st">&#39;my-db.duckdb&#39;</span> )</span>
 <span id="cb222-3"><a href="census-of-governments-cog.html#cb222-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>( con , <span class="st">&#39;cog&#39;</span> , cog_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="census-of-governments-cog.html#cb223-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>( con , <span class="st">&#39;SELECT AVG( mhi_2020 ) FROM cog&#39;</span> )</span>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="census-of-governments-cog.html#cb223-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>( con , <span class="st">&#39;SELECT AVG( full_time_employees ) FROM cog&#39;</span> )</span>
 <span id="cb223-2"><a href="census-of-governments-cog.html#cb223-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb223-3"><a href="census-of-governments-cog.html#cb223-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(</span>
 <span id="cb223-4"><a href="census-of-governments-cog.html#cb223-4" aria-hidden="true" tabindex="-1"></a>    con ,</span>
 <span id="cb223-5"><a href="census-of-governments-cog.html#cb223-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;SELECT</span></span>
-<span id="cb223-6"><a href="census-of-governments-cog.html#cb223-6" aria-hidden="true" tabindex="-1"></a><span class="st">        cbsa_indicator_code ,</span></span>
-<span id="cb223-7"><a href="census-of-governments-cog.html#cb223-7" aria-hidden="true" tabindex="-1"></a><span class="st">        AVG( mhi_2020 )</span></span>
+<span id="cb223-6"><a href="census-of-governments-cog.html#cb223-6" aria-hidden="true" tabindex="-1"></a><span class="st">        type_of_government ,</span></span>
+<span id="cb223-7"><a href="census-of-governments-cog.html#cb223-7" aria-hidden="true" tabindex="-1"></a><span class="st">        AVG( full_time_employees )</span></span>
 <span id="cb223-8"><a href="census-of-governments-cog.html#cb223-8" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM</span></span>
 <span id="cb223-9"><a href="census-of-governments-cog.html#cb223-9" aria-hidden="true" tabindex="-1"></a><span class="st">        cog</span></span>
 <span id="cb223-10"><a href="census-of-governments-cog.html#cb223-10" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY</span></span>
-<span id="cb223-11"><a href="census-of-governments-cog.html#cb223-11" aria-hidden="true" tabindex="-1"></a><span class="st">        cbsa_indicator_code&#39;</span></span>
+<span id="cb223-11"><a href="census-of-governments-cog.html#cb223-11" aria-hidden="true" tabindex="-1"></a><span class="st">        type_of_government&#39;</span></span>
 <span id="cb223-12"><a href="census-of-governments-cog.html#cb223-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 
 </div>

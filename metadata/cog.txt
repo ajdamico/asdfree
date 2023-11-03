@@ -3,24 +3,24 @@ chapter_title: Census of Governments
 needs_actions_build_status_line: yes
 
 ~~~{dataset_introduction}
-
+Location, employment, and payroll for state and local (but not federal) government agencies in the U.S.
 ~~~
 
-table_structure: * 
+table_structure: * One record per agency, per agency function, plus the government units master address file.
 
-generalizable_population: *
+generalizable_population: * A census of civilian employment in state and local governments in the 50 states plus D.C.
 
-publication_period: * 
+publication_period: * Annual Survey of Public Employment & Payroll becomes a census in years ending with 2 and 7.
 
-administrative_organization: *
+administrative_organization: * Administered and financed by the [US Census Bureau](http://www.census.gov/).
 
 
 ~~~{reading_block}
 Please skim before you begin:
 
-1.
+1. [2022 Census of Governments, Survey of Public Employment & Payroll Methodology](https://www2.census.gov/programs-surveys/apes/technical-documentation/methodology/22_methodology.pdf)
 
-2.
+2. [Government Units Survey Methodology](https://www.census.gov/programs-surveys/gus/technical-documentation/methodology.html)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
 
@@ -72,18 +72,28 @@ column_intersect <- Reduce( intersect , lapply( gus_df_list , names ) )
 column_union <- unique( unlist( lapply( gus_df_list , names ) ) )
 
 # these columns will be discarded by stacking
-unique( unlist( lapply( lapply( gus_df_list , names ) , function( w ) column_union[ !column_union %in% w ] ) ) )
+unique(
+	unlist(
+		lapply(
+			lapply( gus_df_list , names ) , 
+			function( w ) column_union[ !column_union %in% w ]
+		)
+	)
+)
 
 # stack all excel sheets, keeping only the columns that all tables have in common
-gus_df <-
-	Reduce( rbind , lapply( gus_df_list , function( w ) w[ column_intersect ] ) )
+gus_df <- Reduce( rbind , lapply( gus_df_list , function( w ) w[ column_intersect ] ) )
 ```
 
 Download and import the survey of public employment & payroll file, with one record per function (not per unit):
 ```{r eval = FALSE , results = "hide" }
 tf_apes <- tempfile()
 
-apes_url <- "https://www2.census.gov/programs-surveys/apes/datasets/2022/2022%20COG-E%20Individual%20Unit%20Files.zip"
+apes_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/apes/datasets/" ,
+		"2022/2022%20COG-E%20Individual%20Unit%20Files.zip"
+	)
 
 download.file( apes_url , tf_apes , mode = 'wb' )
 
@@ -130,6 +140,9 @@ chapter_tag_df <-
 	)
 
 stopifnot( nrow( chapter_tag_df ) == nrow( apes_df ) )
+
+# replace dots with underscores
+names( chapter_tag_df ) <- gsub( "\\\\." , "_" , names( chapter_tag_df ) )
 ```
 
 which half:
@@ -147,35 +160,23 @@ chapter_tag_df <-
 	transform( 
 		chapter_tag_df , 
 		
-		cbsa_indicator_code = 
-			factor( 
-				as.numeric( f1406720 ) , 
-				levels = 0:2 ,
-				labels = c( "not metro" , "metro" , "micro" ) 
-			) ,
-			
-		mhi_2020 = f1322620 ,
+		one = 1 ,
 		
-		whole_county_hpsa_2022 = as.numeric( f0978722 ) == 1 ,
+		total_payroll = full_time_payroll + part_time_payroll ,
 		
-		census_region = 
-			factor( 
-				as.numeric( f04439 ) , 
-				levels = 1:4 ,
-				labels = c( "northeast" , "midwest" , "south" , "west" ) 
-			)
+		total_employees = full_time_employees + part_time_employees ,
 
+		any_full_time_employees = full_time_employees > 0
+		
 	)
-	
 ~~~
 
-group_by_variable: cbsa_indicator_code
-linear_variable: mhi_2020
-linear_narm: , na.rm = TRUE
+group_by_variable: type_of_government
+linear_variable: full_time_employees
 categorical_variable: census_region
-subset_definition: f12424 == "CA"
-subset_definition_description: California
-binary_variable: whole_county_hpsa_2022
+subset_definition: grepl( 'Education' , government_function )
+subset_definition_description: Elementary, Secondary, Higher, and Other Educational Government Agencies
+binary_variable: any_full_time_employees
 
 
 ~~~{intermission_block}
@@ -192,9 +193,19 @@ needs_duckdb_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-Match the record count in https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx
+Match Excel Row #17 from https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx
 
 ```{r eval = FALSE , results = "hide" }
-stopifnot( nrow( chapter_tag_df ) == 3232 )
+financial_admin_df <- subset( cog_df , government_function == 'Financial Administration' )
+
+stopifnot( sum( financial_admin_df[ , 'full_time_employees' ] ) == 404228 )
+stopifnot( sum( financial_admin_df[ , 'full_time_payroll' ] ) == 2426969677 )
+stopifnot( sum( financial_admin_df[ , 'part_time_employees' ] ) == 52228 )
+stopifnot( sum( financial_admin_df[ , 'part_time_payroll' ] ) == 80116458 )
+stopifnot( sum( financial_admin_df[ , 'total_employees' ] ) == 456456 )
+stopifnot( sum( financial_admin_df[ , 'total_payroll' ] ) == 2507086135 )
 ```
 ~~~
+
+
+
