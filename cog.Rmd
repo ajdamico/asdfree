@@ -8,7 +8,7 @@ Location, employment, and payroll for state and local (but not federal) governme
 
 * A census of civilian employment in state and local governments in the 50 states plus D.C.
 
-* Annual Survey of Public Employment & Payroll becomes a Census in years ending with 2 and 7.
+* Annual Survey of Public Employment & Payroll becomes a census in years ending with 2 and 7.
 
 * Administered and financed by the [US Census Bureau](http://www.census.gov/).
 
@@ -23,9 +23,9 @@ Please skim before you begin:
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Census of Governments)
 
 ```{r}
-# city hall marriage
-# schools cops with fire water
-# fed mail invite lost
+# courthouse steps wedding
+# schools police fire water
+# no fed mail invite
 ```
 
 ---
@@ -64,13 +64,13 @@ gus_df_list <-
 # add the excel tab source to each data.frame
 for( i in seq( xlsx_sheets ) ) gus_df_list[[ i ]][ , 'source_tab' ] <- xlsx_sheets[ i ]
 
-# columns in all tables
+# determine which columns are in all tables
 column_intersect <- Reduce( intersect , lapply( gus_df_list , names ) )
 
-# columns in some but not all tables
+# determine which columns are in some but not all tables
 column_union <- unique( unlist( lapply( gus_df_list , names ) ) )
 
-# these columns will be discarded by stacking
+# these columns will be discarded by stacking:
 unique(
 	unlist(
 		lapply(
@@ -84,7 +84,7 @@ unique(
 gus_df <- Reduce( rbind , lapply( gus_df_list , function( w ) w[ column_intersect ] ) )
 ```
 
-Download and import the survey of public employment & payroll file, with one record per function (not per unit):
+Download and import the survey of public employment & payroll, one record per function (not per unit):
 ```{r eval = FALSE , results = "hide" }
 tf_apes <- tempfile()
 
@@ -107,23 +107,23 @@ apes_df <- data.frame( apes_tbl )
 names( apes_df ) <- tolower( names( apes_df ) )
 ```
 
-Review the non-matches between these two tables then merge:
+Review the non-matching records between these two tables, then merge:
 ```{r eval = FALSE , results = "hide" }
-# all DEP School Districts and a third of Special Districts are not in the apes_df
+# all DEP School Districts and a third of Special Districts are not in the `apes_df`
 table(
 	gus_df[ , 'census_id_gidid' ] %in% apes_df[ , 'individual.unit.id' ] ,
 	gus_df[ , 'source_tab' ] ,
 	useNA = 'always'
 )
 
-# state governments are not in the gus_df
+# state governments are not in the `gus_df`
 table(
 	apes_df[ , 'individual.unit.id' ] %in% gus_df[ , 'census_id_gidid' ] ,
 	apes_df[ , 'type.of.government' ] ,
 	useNA = 'always'
 )
 
-# check for overlapping field names
+# check for overlapping field names:
 ( overlapping_names <- intersect( names( apes_df ) , names( gus_df ) ) )
 
 # rename the state column in `gus_df` to state abbreviation
@@ -146,7 +146,7 @@ names( cog_df ) <- gsub( "\\." , "_" , names( cog_df ) )
 
 which half:
 ```{r eval = FALSE , results = "hide" }
-tapply( cog_df$full.time.employees , grepl('Total',cog_df$government.function),sum)
+tapply( cog_df$full_time_employees , grepl('Total',cog_df$government_function),sum)
 # FALSE TRUE 
 # 14944806 14944806 
 ```
@@ -181,7 +181,6 @@ cog_df <-
 		total_employees = full_time_employees + part_time_employees ,
 
 		any_full_time_employees = full_time_employees > 0
-		
 	)
 ```
 
