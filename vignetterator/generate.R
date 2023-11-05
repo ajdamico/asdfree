@@ -1,4 +1,4 @@
-commit_memo <- "'pnadc fix'"
+commit_memo <- "'shrug emoji'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
