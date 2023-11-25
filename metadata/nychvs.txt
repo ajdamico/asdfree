@@ -1,0 +1,172 @@
+chapter_title: New York City Housing and Vacancy Survey
+
+needs_actions_build_status_line: yes
+
+~~~{dataset_introduction}
+The New York City Housing and Vacancy Survey (NYCHVS) covers the city-wide rental vacancy rate and other characteristics like neighborhood housing stock.
+~~~
+
+table_structure: * One table with one record per occupied housing unit, a second table with one record per person inside each occupied housing unit, and a third table with one record per unoccupied housing unit.
+
+generalizable_population: * A complex sample survey designed to generalize to all occupied and unoccupied housing units in the five boroughs of New York City.
+
+publication_period: * Released more or less triennially since 1991.
+
+administrative_organization: * Funded by the [New York City Department of Housing Preservation and Development](www.nyc.gov/hpd) and conducted by the [United States Census Bureau](http://www.census.gov/).
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Public Use File User Guide and Codebook](https://www2.census.gov/programs-surveys/nychvs/technical-documentation/record-layouts/2021/2021_NYCHVS_PUF_User_Guide_and_Codebook.pdf)
+
+2. [Sample Design, Weighting, and Error Estimation](https://www2.census.gov/programs-surveys/nychvs/technical-documentation/source-and-accuracy/2021_NYCHVS_Sample_Design_Weighting_and_Error_Estimation.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# all i want is a
+# room somewhere / with clawfoot tub
+# and a frigidaire
+```
+~~~
+
+~~~{download_and_import_block}
+
+Define a function to download and import each comma-separated value file:
+```{r eval = FALSE , results = "hide" }
+nychvs_csv_import <-
+	function( this_url ){
+		
+		tf <- tempfile()
+		
+		download.file( this_url , tf , mode = 'wb' )
+		
+		this_df <- read.csv( tf )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+```
+	
+
+Download and import the all units, occupied units, person, and vacant units tables:
+
+```{r eval = FALSE , results = "hide" }
+all_units_df <- nychvs_csv_import( "https://www2.census.gov/programs-surveys/nychvs/datasets/2021/microdata/allunits_puf_21.csv" )
+
+occupied_units_df <- nychvs_csv_import( "https://www2.census.gov/programs-surveys/nychvs/datasets/2021/microdata/occupied_puf_21.csv" )
+
+person_df <- nychvs_csv_import( "https://www2.census.gov/programs-surveys/nychvs/datasets/2021/microdata/person_puf_21.csv" )
+
+vacant_units_df <- nychvs_csv_import( "https://www2.census.gov/programs-surveys/nychvs/datasets/2021/microdata/vacant_puf_21.csv" )
+
+stopifnot( nrow( all_units_df ) == nrow( occupied_units_df ) + nrow( vacant_units_df ) )
+```
+
+Merge the information stored in the all units table onto both the occupied and vacant unit tables:
+
+```{r eval = FALSE , results = "hide" }
+before_nrow <- nrow( occupied_units_df )
+
+occupied_units_df <- merge( all_units_df , occupied_units_df )
+
+stopifnot( nrow( occupied_units_df ) == before_nrow )
+
+before_nrow <- nrow( vacant_units_df )
+
+vacant_units_df <- merge( all_units_df , vacant_units_df )
+
+stopifnot( nrow( vacant_units_df ) == before_nrow )
+
+
+
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_df_person ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
+
+
+~~~{analysis_examples_survey_design}
+```{r message = FALSE , eval = FALSE }
+library(survey)
+
+chapter_tag_design <-
+	svrepdesign(
+		weight = ~fw ,
+		repweights = 'fw[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = chapter_tag_df
+	)
+```
+~~~
+
+
+
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		home_owners = as.numeric( sc115 == 1 ) ,
+
+		yearly_household_income = ifelse( uf42 == 9999999 , 0 , as.numeric( uf42 ) ) ,
+		
+		gross_monthly_rent = ifelse( uf17 == 99999 , NA , as.numeric( uf17 ) ) ,
+		
+		borough =
+			factor( boro , levels = 1:5 , labels =
+				c( 'Bronx' , 'Brooklyn' , 'Manhattan' , 
+				'Queens' , 'Staten Island' )
+			) ,
+			
+		householder_sex = factor( hhr2 , labels = c( 'male' , 'female' ) )
+			
+	)
+~~~
+
+group_by_variable: borough
+
+categorical_variable: householder_sex
+
+linear_variable: yearly_household_income
+linear_variable_description: household income
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: gross_monthly_rent
+ratio_estimation_denominator: yearly_household_income
+ratio_narm: , na.rm = TRUE
+
+subset_definition: boro == 3
+subset_definition_description: Manhattan
+
+binary_variable: home_owners
+
+~~~{intermission_block}
+
+~~~
+
+
+needs_srvyr_block: yes
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+

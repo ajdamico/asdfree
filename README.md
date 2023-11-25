@@ -25,6 +25,7 @@ national-plan-and-provider-enumeration-system-nppes: <p><a href="https://github.
 national-survey-of-childrens-health-nsch: <p><a href="https://github.com/asdfree/nsch/actions"><img src="https://github.com/asdfree/nsch/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-survey-of-family-growth-nsfg: <p><a href="https://github.com/asdfree/nsfg/actions"><img src="https://github.com/asdfree/nsfg/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 national-survey-on-drug-use-and-health-nsduh: <p><a href="https://github.com/asdfree/nsduh/actions"><img src="https://github.com/asdfree/nsduh/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+new-york-city-housing-and-vacancy-survey-nychvs: <p><a href="https://github.com/asdfree/nychvs/actions"><img src="https://github.com/asdfree/nychvs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 pesquisa-de-orcamentos-familiares-pof: <p><a href="https://github.com/asdfree/pof/actions"><img src="https://github.com/asdfree/pof/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 pesquisa-nacional-de-saude-pns: <p><a href="https://github.com/asdfree/pns/actions"><img src="https://github.com/asdfree/pns/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 pesquisa-nacional-por-amostra-de-domicilios-pnad: <p><a href="https://github.com/asdfree/pnad/actions"><img src="https://github.com/asdfree/pnad/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
