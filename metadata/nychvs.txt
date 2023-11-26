@@ -70,7 +70,7 @@ vacant_units_df <-
 stopifnot( nrow( all_units_df ) == nrow( occupied_units_df ) + nrow( vacant_units_df ) )
 ```
 
-Merge the information stored in the all units table onto both the occupied and vacant unit tables:
+Merge the information stored in the all units table onto both the occupied and vacant unit tables, then the information (not related to weighting) from the occupied unit table onto the person table:
 
 ```{r eval = FALSE , results = "hide" }
 before_nrow <- nrow( occupied_units_df )
@@ -85,21 +85,31 @@ vacant_units_df <- merge( all_units_df , vacant_units_df )
 
 stopifnot( nrow( vacant_units_df ) == before_nrow )
 
+before_nrow <- nrow( person_df )
 
+weighting_variables <- grep( "^fw([0-9]+)?$" , names( occupied_units_df ) , value = TRUE )
 
-stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_df_person ) )
+person_df <-
+	merge(
+		occupied_units_df[ setdiff( names( occupied_units_df ) , weighting_variables ) ] ,
+		person_df
+	)
 
-chapter_tag_df[ , 'one' ] <- 1
+stopifnot( nrow( person_df ) == before_nrow )
+
+all_units_df[ , 'one' ] <- occupied_units_df[ , 'one' ] <-
+	vacant_units_df[ , 'one' ] <- person_df[ , 'one' ] <- 1
 ```
 ~~~
 
 
 
 ~~~{analysis_examples_survey_design}
+Construct four designs representing four different levels of analysis:
 ```{r message = FALSE , eval = FALSE }
 library(survey)
 
-chapter_tag_design <-
+all_units_design <-
 	svrepdesign(
 		weight = ~fw ,
 		repweights = 'fw[0-9]+' ,
@@ -107,8 +117,45 @@ chapter_tag_design <-
 		rscales = rep( 1 , 80 ) ,
 		mse = TRUE ,
 		type = 'JK1' ,
-		data = chapter_tag_df
+		data = all_units_df
 	)
+	
+occupied_units_design <-
+	svrepdesign(
+		weight = ~fw ,
+		repweights = 'fw[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = occupied_units_df
+	)
+	
+vacant_units_design <-
+	svrepdesign(
+		weight = ~fw ,
+		repweights = 'fw[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = vacant_units_df
+	)
+	
+person_design <-
+	svrepdesign(
+		weight = ~pw ,
+		repweights = 'pw[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = person_df
+	)
+
+
+chapter_tag_design <-
+	occupied_units_design
 ```
 ~~~
 
@@ -123,11 +170,11 @@ chapter_tag_design <-
 		
 		one = 1 ,
 		
-		home_owners = as.numeric( sc115 == 1 ) ,
+		home_owners = as.numeric( tenure == 2 ) ,
 
-		yearly_household_income = ifelse( uf42 == 9999999 , 0 , as.numeric( uf42 ) ) ,
+		yearly_household_income = hhinc_rec1 ,
 		
-		gross_monthly_rent = ifelse( uf17 == 99999 , NA , as.numeric( uf17 ) ) ,
+		rent_amount = ifelse( rent_amount == -2 , NA , rent_amount ) ,
 		
 		borough =
 			factor( boro , levels = 1:5 , labels =
@@ -135,21 +182,21 @@ chapter_tag_design <-
 				'Queens' , 'Staten Island' )
 			) ,
 			
-		householder_sex = factor( hhr2 , labels = c( 'male' , 'female' ) )
+		food_insecurity = factor( foodinsecure , levels = 1:3 , labels = c( 'not insecure' , 'insecure' , 'very insecure' ) )
 			
 	)
 ~~~
 
 group_by_variable: borough
 
-categorical_variable: householder_sex
+categorical_variable: food_insecurity
 
-linear_variable: yearly_household_income
+linear_variable: hhinc_rec1
 linear_variable_description: household income
 linear_narm: , na.rm = TRUE
 
-ratio_estimation_numerator: gross_monthly_rent
-ratio_estimation_denominator: yearly_household_income
+ratio_estimation_numerator: rent_amount
+ratio_estimation_denominator: hhinc_rec1
 ratio_narm: , na.rm = TRUE
 
 subset_definition: boro == 3
