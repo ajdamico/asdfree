@@ -70,7 +70,7 @@ vacant_units_df <-
 stopifnot( nrow( all_units_df ) == nrow( occupied_units_df ) + nrow( vacant_units_df ) )
 ```
 
-Merge the information stored in the all units table onto both the occupied and vacant unit tables, then the information (not related to weighting) from the occupied unit table onto the person table:
+Merge the information stored in the all units table onto both the occupied and vacant unit tables, then merge the information (not related to weighting) from the occupied unit table onto the person table:
 
 ```{r eval = FALSE , results = "hide" }
 before_nrow <- nrow( occupied_units_df )
@@ -89,11 +89,16 @@ before_nrow <- nrow( person_df )
 
 weighting_variables <- grep( "^fw([0-9]+)?$" , names( occupied_units_df ) , value = TRUE )
 
-person_df <- merge( occupied_units_df[ setdiff( names( occupied_units_df ) , weighting_variables ) ] , person_df )
+person_df <-
+	merge(
+		occupied_units_df[ setdiff( names( occupied_units_df ) , weighting_variables ) ] ,
+		person_df
+	)
 
 stopifnot( nrow( person_df ) == before_nrow )
 
-all_units_df[ , 'one' ] <- occupied_units_df[ , 'one' ] <- vacant_units_df[ , 'one' ] <- person_df[ , 'one' ] <- 1
+all_units_df[ , 'one' ] <- occupied_units_df[ , 'one' ] <-
+	vacant_units_df[ , 'one' ] <- person_df[ , 'one' ] <- 1
 ```
 
 ### Save locally \ {-}
@@ -225,9 +230,9 @@ svyby( ~ hhinc_rec1 , ~ borough , nychvs_design , svymean , na.rm = TRUE )
 
 Calculate the distribution of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svymean( ~ food_insecurity , nychvs_design )
+svymean( ~ food_insecurity , nychvs_design , na.rm = TRUE )
 
-svyby( ~ food_insecurity , ~ borough , nychvs_design , svymean )
+svyby( ~ food_insecurity , ~ borough , nychvs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
@@ -239,9 +244,9 @@ svyby( ~ hhinc_rec1 , ~ borough , nychvs_design , svytotal , na.rm = TRUE )
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~ food_insecurity , nychvs_design )
+svytotal( ~ food_insecurity , nychvs_design , na.rm = TRUE )
 
-svyby( ~ food_insecurity , ~ borough , nychvs_design , svytotal )
+svyby( ~ food_insecurity , ~ borough , nychvs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
@@ -270,9 +275,9 @@ svyratio(
 
 ### Subsetting {-}
 
-Restrict the survey design to Manhattan:
+Restrict the survey design to Rent burdened (more than 30% of income paid toward rent alone):
 ```{r eval = FALSE , results = "hide" }
-sub_nychvs_design <- subset( nychvs_design , boro == 3 )
+sub_nychvs_design <- subset( nychvs_design , rentburden_cat %in% 1:2 )
 ```
 Calculate the mean (average) of this subset:
 ```{r eval = FALSE , results = "hide" }

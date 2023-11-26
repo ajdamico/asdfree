@@ -70,7 +70,7 @@ vacant_units_df <-
 stopifnot( nrow( all_units_df ) == nrow( occupied_units_df ) + nrow( vacant_units_df ) )
 ```
 
-Merge the information stored in the all units table onto both the occupied and vacant unit tables, then the information (not related to weighting) from the occupied unit table onto the person table:
+Merge the information stored in the all units table onto both the occupied and vacant unit tables, then merge the information (not related to weighting) from the occupied unit table onto the person table:
 
 ```{r eval = FALSE , results = "hide" }
 before_nrow <- nrow( occupied_units_df )
@@ -182,7 +182,13 @@ chapter_tag_design <-
 				'Queens' , 'Staten Island' )
 			) ,
 			
-		food_insecurity = factor( foodinsecure , levels = 1:3 , labels = c( 'not insecure' , 'insecure' , 'very insecure' ) )
+		food_insecurity = 
+			factor( 
+				foodinsecure , 
+				levels = 1:3 , 
+				labels = 
+					c( 'not insecure' , 'insecure' , 'very insecure' )
+			)
 			
 	)
 ~~~
@@ -190,6 +196,7 @@ chapter_tag_design <-
 group_by_variable: borough
 
 categorical_variable: food_insecurity
+categorical_narm: , na.rm = TRUE
 
 linear_variable: hhinc_rec1
 linear_variable_description: household income
@@ -199,13 +206,17 @@ ratio_estimation_numerator: rent_amount
 ratio_estimation_denominator: hhinc_rec1
 ratio_narm: , na.rm = TRUE
 
-subset_definition: boro == 3
-subset_definition_description: Manhattan
+subset_definition: rentburden_cat %in% 1:2
+subset_definition_description: rent burdened units (more than 30% of income paid toward rent alone)
 
 binary_variable: home_owners
 
 ~~~{intermission_block}
-
+<center>
+<img src="https://4.bp.blogspot.com/-4_Hiz8r577M/W8yh4TlMuxI/AAAAAAABa_g/W0NCYviOy-Muz7pEYr9VStnlrF5BDyY5ACLcBGAs/s1600/20181020_213520.jpg">
+<p>
+<i><b>the author as budget daft punk</b></i>
+</center>
 ~~~
 
 
