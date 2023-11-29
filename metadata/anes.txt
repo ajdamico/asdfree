@@ -1,0 +1,319 @@
+chapter_title: American National Election Studies
+
+needs_local_build_status_line: yes
+
+~~~{dataset_introduction}
+The American National Election Studies (ANES) collects information on political belief and behavior from eligible voters in the United States.
+~~~
+
+table_structure: * Most tables contain one row per sampled eligible voter.
+
+generalizable_population: * A complex sample survey designed to generalize to eligible voters in the United States.
+
+publication_period: * Time series studies released biennially.
+
+administrative_organization: * Administered by a consortium of universities and funded by the [National Science Foundation](https://www.nsf.gov).
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [ANES 2020 Time Series Study Full Release: User Guide and Codebook](https://electionstudies.org/wp-content/uploads/2022/02/anes_timeseries_2020_userguidecodebook_20220210.pdf)
+
+2. [How to Analyze ANES Survey Data](https://electionstudies.org/wp-content/uploads/2018/04/nes012492.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# chez sacrificed queen
+# quadrennial bloodless coup
+# knight churchill's least worst
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Define a function to import a stata file as a data.frame:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+anes_import_dta <-
+	function( this_fn ){
+		
+		this_tbl <- read_dta( this_fn )
+		
+		this_tbl <- zap_labels( this_tbl )
+		
+		this_df <- data.frame( this_tbl )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+```
+
+1. Register for the ANES Data Center at https://electionstudies.org/.
+
+2. Choose `2020 Time Series Study`
+
+3. Download the `STATA` version of the February 10, 2022 file:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+chapter_tag_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes_timeseries_2020_stata_20220210.dta"
+	)
+
+chapter_tag_df <- anes_import_dta( chapter_tag_fn )
+```
+
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+chapter_tag_design <-
+	svydesign(
+		ids = ~ v200010c ,
+		strata = ~ v200010d ,
+		weights = ~ v200010a ,
+		data = subset( chapter_tag_df , v200010a > 0 ) ,
+		nest = TRUE
+	)
+```
+
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		democratic_party_rating = ifelse( v201156 %in% 0:100 , v201156 , NA ) ,
+
+		republican_party_rating = ifelse( v201157 %in% 0:100 , v201157 , NA ) ,
+		
+		primary_voter = ifelse( v201020 %in% 1:2 , as.numeric( v201020 == 1 ) , NA ) ,
+
+		think_gov_spend_least =
+			factor( v201645 , levels = 1:4 , labels =
+				c( 'foreign aid (correct)' , 'medicare' , 'national defense' , 'social security' )
+			) ,
+		
+		undoc_kids =
+			factor( v201423x , levels = 1:6 , labels =
+				c( 'should sent back - favor a great deal' ,
+					'should sent back - favor a moderate amount' ,
+					'should sent back - favor a little' ,
+					'should allow to stay - favor a little' ,
+					'should allow to stay - favor a moderate amount' ,
+					'should allow to stay - favor a great deal' )
+			)
+
+	)
+~~~
+
+group_by_variable: undoc_kids
+
+categorical_variable: think_gov_spend_least
+categorical_narm: , na.rm = TRUE
+
+linear_variable: republican_party_rating
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: republican_party_rating
+ratio_estimation_denominator: democratic_party_rating
+ratio_narm: , na.rm = TRUE
+
+subset_definition: v201231x == 4
+subset_definition_description: party id: independent
+
+binary_variable: primary_voter
+binary_narm: , na.rm = TRUE
+
+
+
+
+
+
+~~~{intermission_block}
+<center>
+<img src="http://4.bp.blogspot.com/-uAZOgrbmKFY/UJM93hPjaoI/AAAAAAAAYF8/q3-VM4qAzF4/s1600/IMG_2268.JPG">
+<p>
+<i><b>the author as speaker boehner</b></i>
+</center>
+~~~
+
+
+needs_srvyr_block: yes
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches statistics and standard errors in the Age rows of the `ANES respondents (weighted)` column of `Table 1A` from [Guide to Using Weights and Sample Design Indicators with ESS Data](https://electionstudies.org/wp-content/uploads/2022/03/DeBell-Maisel-Benchmark-Report-for-the-ANES-2016-Time-Series-Study.pdf#page=4):
+
+1. Choose `2016 Time Series Study`.
+
+2. Download the `DTA` version of the September 4, 2019 file
+
+3. Download the `DTA` version of the `Methodology File December 10, 2018`
+
+```{r eval = FALSE , results = "hide" }
+anes2016_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes_timeseries_2016.dta"
+	)
+
+anes2016_df <- anes_import_dta( anes2016_fn )
+
+method2016_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes_timeseries_2016_methodology_dta.dta" 
+	)
+
+method2016_df <- anes_import_dta( method2016_fn )
+
+before_nrow <- nrow( anes2016_df )
+anes2016_df <- merge( anes2016_df , method2016_df , by = 'v160001' )
+stopifnot( nrow( anes2016_df ) == before_nrow )
+
+anes2016_df[ , 'age_categories' ] <- 
+	factor(
+		findInterval(
+			anes2016_df[ , 'v161267' ] , 
+			c( 18 , seq( 30 , 70 , 10 ) ) 
+		) ,
+		levels = 1:6 ,
+		labels = c( '18-29' , '30-39' , '40-49' , '50-59' , '60-69' , '70 or older' )
+	)
+
+anes2016_design <-
+	svrepdesign(
+		data = subset( anes2016_df , v160101f > 0 ) ,
+		weights = ~ v160101f ,
+		repweights = 'weight_ftf_rkwt([0-9]+)' ,
+		type = 'JK1' ,
+		scale = 32 / 33 
+	)
+
+( results <- svymean( ~ age_categories , anes2016_design , na.rm = TRUE ) )
+
+published_results <- c( 0.21 , 0.158 , 0.156 , 0.2 , 0.147 , 0.129 )
+
+published_standard_errors <- c( 0.0091 , 0.009 , 0.0094 , 0.0122 , 0.0069 , 0.0083 )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_results ) )
+
+stopifnot( all( round( SE( results ) , 4 ) == published_standard_errors ) )
+```
+
+
+
+
+This example matches statistics and standard errors in the Age rows of the `Design-consistent, with published strata` column of `Table 1` from [How to Analyze ANES Survey Data](https://electionstudies.org/wp-content/uploads/2018/04/nes012492.pdf#page=25):
+
+1. Choose `2004 Time Series Study`4
+
+2. Download the `DTA` version of the Full Release August 16, 2005 file
+
+3. Choose `2006 Pilot Study`
+
+4. Download the `DTA` version of the April 26, 2007 file
+
+```{r eval = FALSE , results = "hide" }
+anes2004_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes2004TS.dta"
+	)
+
+anes2004_df <- anes_import_dta( anes2004_fn )
+
+pilot2006_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes2006pilot.dta" 
+	)
+
+pilot2006_df <- anes_import_dta( pilot2006_fn )
+
+before_nrow <- nrow( pilot2006_df )
+pilot2006_df <- merge( pilot2006_df , anes2004_df , by.x = 'v06p001' , by.y = 'v040001' )
+stopifnot( nrow( pilot2006_df ) == before_nrow )
+
+	
+pilot2006_df[ , 'age_categories' ] <- 
+	factor(
+		findInterval(
+			pilot2006_df[ , 'v043250' ] , 
+			c( 18 , seq( 30 , 70 , 10 ) ) 
+		) ,
+		levels = 1:6 ,
+		labels = c( '18-29' , '30-39' , '40-49' , '50-59' , '60-69' , '70 or older' )
+	)
+
+pilot2006_design <-
+	svydesign( 
+		id = ~v06p007b , 
+		strata = ~v06p007a , 
+		data = pilot2006_df , 
+		weights = ~v06p002 , 
+		nest = TRUE 
+	)
+
+( results <- svymean( ~ age_categories , pilot2006_design , na.rm = TRUE ) )
+
+published_results <- c( 0.207 , 0.162 , 0.218 , 0.175 , 0.111 , 0.126 )
+
+published_standard_errors <- c( 0.0251 , 0.024 , 0.022 , 0.0149 , 0.0125 , 0.0287 )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_results ) )
+
+stopifnot( all( round( SE( results ) , 4 ) == published_standard_errors ) )
+```
+
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
