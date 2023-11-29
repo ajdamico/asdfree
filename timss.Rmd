@@ -80,7 +80,7 @@ timss_MIcombine <-
 
 Download and unzip the 2019 fourth grade international database:
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(httr)
 
 tf <- tempfile()
@@ -94,7 +94,7 @@ unzipped_files <- unzip( tf , exdir = tempdir() )
 
 Import and stack each of the student context data files for **Albania through Canada**:
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 # limit unzipped files to those starting with `asg` followed by three letters followed by `m7`
@@ -147,7 +147,7 @@ Construct a multiply-imputed, complex sample survey design:
 
 From among possibly plausible values, determine all columns that are multiply-imputed plausible values:
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 # identify all columns ending with `01` thru `05`
 ppv <- grep( "(.*)0[1-5]$" , names( timss_df ) , value = TRUE )
 
@@ -167,14 +167,14 @@ pv_columns <-
 ```
 
 Extract those multiply-imputed columns into a separate data.frame, then remove them from the source:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 pv_wide_df <- timss_df[ c( 'idcntry' , 'idstud' , pv_columns ) ]
 
 timss_df[ pv_columns ] <- NULL
 ```
 
 Reshape these columns from one record per student to one record per student per implicate:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 pv_long_df <- 
 	reshape( 
 		pv_wide_df , 
@@ -188,7 +188,7 @@ names( pv_long_df ) <- gsub( "01$" , "" , names( pv_long_df ) )
 ```
 
 Merge the columns from the source data.frame onto the one record per student per implicate data.frame:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 timss_long_df <- merge( timss_df , pv_long_df )
 
 timss_long_df <- timss_long_df[ with( timss_long_df , order( idcntry , idstud ) ) , ]
@@ -199,13 +199,13 @@ stopifnot( nrow( timss_long_df ) / 5 == nrow( timss_df ) )
 ```
 
 Divide the five plausible value implicates into a list with five data.frames based on the implicate number:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 timss_list <- split( timss_long_df , timss_long_df[ , 'implicate' ] )
 ```
 
 Construct a replicate weights table following the estimation technique described in [Methods Chapter 14](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html):
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 weights_df <- timss_df[ c( 'jkrep' , 'jkzone' ) ]
 
 for( j in 1:75 ){
@@ -222,7 +222,7 @@ weights_df[ c( 'jkrep' , 'jkzone' ) ] <- NULL
 ```
 
 Define the design:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(survey)
 library(mitools)
 

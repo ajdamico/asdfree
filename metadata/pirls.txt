@@ -105,7 +105,7 @@ MIcombine <-
 
 Download and unzip the 2021 fourth grade international database:
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(httr)
 
 tf <- tempfile()
@@ -119,7 +119,7 @@ unzipped_files <- unzip( tf , exdir = tempdir() )
 
 Import and stack each of the student context data files for **Abu Dhabi through Bulgaria**:
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 # limit unzipped files to those starting with `asg` followed by three letters followed by `r5`
@@ -171,7 +171,7 @@ chapter_tag_df <- chapter_tag_df[ with( chapter_tag_df , order( idcntry , idstud
 
 From among possibly plausible values, determine all columns that are multiply-imputed plausible values:
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 # identify all columns ending with `01` thru `05`
 ppv <- grep( "(.*)0[1-5]$" , names( chapter_tag_df ) , value = TRUE )
 
@@ -191,14 +191,14 @@ pv_columns <-
 ```
 
 Extract those multiply-imputed columns into a separate data.frame, then remove them from the source:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 pv_wide_df <- chapter_tag_df[ c( 'idcntry' , 'idstud' , pv_columns ) ]
 
 chapter_tag_df[ pv_columns ] <- NULL
 ```
 
 Reshape these columns from one record per student to one record per student per implicate:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 pv_long_df <- 
 	reshape( 
 		pv_wide_df , 
@@ -214,7 +214,7 @@ names( pv_long_df ) <- gsub( "01$" , "" , names( pv_long_df ) )
 
 
 Merge the columns from the source data.frame onto the one record per student per implicate data.frame:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 chapter_tag_long_df <- merge( chapter_tag_df , pv_long_df )
 
 chapter_tag_long_df <- chapter_tag_long_df[ with( chapter_tag_long_df , order( idcntry , idstud ) ) , ]
@@ -226,13 +226,13 @@ stopifnot( nrow( chapter_tag_long_df ) / 5 == nrow( chapter_tag_df ) )
 
 
 Divide the five plausible value implicates into a list with five data.frames based on the implicate number:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 chapter_tag_list <- split( chapter_tag_long_df , chapter_tag_long_df[ , 'implicate' ] )
 ```
 
 Construct a replicate weights table following the estimation technique described in [Methods Chapter 13](https://pirls2021.org/methods/chapter-13):
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 weights_df <- chapter_tag_df[ c( 'jkrep' , 'jkzone' ) ]
 
 for( j in 1:75 ){
@@ -250,7 +250,7 @@ weights_df[ c( 'jkrep' , 'jkzone' ) ] <- NULL
 
 
 Define the design:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(survey)
 library(mitools)
 

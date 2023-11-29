@@ -1,4 +1,4 @@
-commit_memo <- "'anes'"
+commit_memo <- "'message = FALSE to results = hide'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 

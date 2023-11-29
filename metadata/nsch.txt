@@ -40,7 +40,7 @@ Please skim before you begin:
 
 Define a function to download, unzip, and import each comma-separated value file:
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 nsch_stata_import <-
@@ -69,7 +69,7 @@ nsch_stata_import <-
 
 Download and import the sample adult interview and imputed income files:
 
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 nsch_screener_url <-
 	"https://www2.census.gov/programs-surveys/nsch/datasets/2021/nsch_2021_screener_Stata.zip"
 
@@ -86,7 +86,7 @@ chapter_tag_df <- nsch_stata_import( nsch_topical_url )
 ~~~{analysis_examples_survey_design}
 
 Remove the fpl columns from the main data.frame:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 fpl_columns <- grep( '^fpl_i[0-9]' , names( chapter_tag_df ) , value = TRUE )
 
 fpl_wide_df <- chapter_tag_df[ c( 'hhid' , fpl_columns ) ]
@@ -95,7 +95,7 @@ chapter_tag_df[ fpl_columns ] <- NULL
 ```
 
 Reshape the fpl columns from wide to long:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 fpl_long_df <- 
 	reshape( 
 		fpl_wide_df , 
@@ -110,7 +110,7 @@ names( fpl_long_df )[ ncol( fpl_long_df ) ] <- 'fpl'
 
 
 Merge the fpl table with multiple records per child onto the main table:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 chapter_tag_long_df <- merge( chapter_tag_df , fpl_long_df )
 
 stopifnot( nrow( chapter_tag_long_df ) == nrow( fpl_long_df ) )
@@ -119,12 +119,12 @@ stopifnot( nrow( chapter_tag_long_df ) / length( fpl_columns ) == nrow( chapter_
 ```
 
 Reshape the imputed income data.frame into a list based on the implicate number:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 chapter_tag_list <- split( chapter_tag_long_df , chapter_tag_long_df[ , 'implicate' ] )
 ```
 
 Define the design:
-```{r message = FALSE , eval = FALSE }
+```{r eval = FALSE , results = "hide" }
 library(survey)
 library(mitools)
 
