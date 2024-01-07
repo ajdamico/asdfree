@@ -1,4 +1,4 @@
-commit_memo <- "'test'"
+commit_memo <- "'re-run ci'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
