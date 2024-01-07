@@ -1,0 +1,312 @@
+# General Social Survey (GSS) {-}
+
+<a href="https://github.com/asdfree/gss/actions"><img src="https://github.com/asdfree/gss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+A historical record of the concerns, experiences, attitudes, and practices of residents of the United States. 
+
+* Both cross-sectional and panel tables with one row per sampled respondent.
+
+* A complex sample survey generalizing to non-institutionalized adults (18+) in the United States.
+
+* Updated biennially since 1972.
+
+* Funded by [National Science Foundation](http://www.nsf.gov/), administered by the [National Opinion Research Center](http://www.norc.org/).
+
+---
+
+Please skim before you begin:
+
+1. [DOCUMENTATION AND PUBLIC USE FILE CODEBOOK (Release 1)](https://gss.norc.org/Documents/codebook/GSS%202022%20Codebook.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/General_Social_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20General Social Survey)
+
+```{r}
+# chat about who will
+# be allowed marriage, children.
+# first date questionnaire
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the 1972-2022 cumulative data file:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+zip_tf <- tempfile()
+
+zip_url <- "https://gss.norc.org/Documents/sas/GSS_sas.zip"
+	
+download.file( zip_url , zip_tf , mode = 'wb' )
+
+unzipped_files <- unzip( zip_tf , exdir = tempdir() )
+
+gss_tbl <- read_sas( grep( '\\.sas7bdat$' , unzipped_files , value = TRUE ) )
+
+gss_df <- data.frame( gss_tbl )
+
+names( gss_df ) <- tolower( names( gss_df ) )
+
+gss_df[ , 'one' ] <- 1
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# gss_fn <- file.path( path.expand( "~" ) , "GSS" , "this_file.rds" )
+# saveRDS( gss_df , file = gss_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# gss_df <- readRDS( gss_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+gss_design <- 
+	svydesign( 
+		~ vpsu , 
+		strata = ~ interaction( year , vstrat ) , 
+		data = subset( gss_df , year >= 1975 ) , 
+		weights = ~ wtsscomp , 
+		nest = TRUE 
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+gss_design <- 
+	update( 
+		gss_design , 
+
+		polviews = 
+			factor( polviews , levels = 1:7 ,
+				labels = c( "Extremely liberal" , "Liberal" ,
+				"Slightly liberal" , "Moderate, middle of the road" ,
+				"Slightly conservative" , "Conservative" ,
+				"Extremely conservative" )
+			) ,
+		
+		born_in_usa = as.numeric( born == 1 ) ,
+		
+		race = factor( race , levels = 1:3 , labels = c( "white" , "black" , "other" ) ) ,
+		
+		region = 
+			factor( region , levels = 1:9 ,
+				labels = c( "New England" , "Middle Atlantic" ,
+					"East North Central" , "West North Central" ,
+					"South Atlantic" , "East South Central" ,
+					"West South Central" , "Mountain" , "Pacific" )
+			)
+
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( gss_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ region , gss_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , gss_design )
+
+svyby( ~ one , ~ region , gss_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ age , gss_design , na.rm = TRUE )
+
+svyby( ~ age , ~ region , gss_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ race , gss_design , na.rm = TRUE )
+
+svyby( ~ race , ~ region , gss_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ age , gss_design , na.rm = TRUE )
+
+svyby( ~ age , ~ region , gss_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ race , gss_design , na.rm = TRUE )
+
+svyby( ~ race , ~ region , gss_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ age , gss_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ age , 
+	~ region , 
+	gss_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ adults , 
+	denominator = ~ hompop , 
+	gss_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to females:
+```{r eval = FALSE , results = "hide" }
+sub_gss_design <- subset( gss_design , sex == 2 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ age , sub_gss_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ age , gss_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ age , 
+		~ region , 
+		gss_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( gss_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ age , gss_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ age , gss_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ age , gss_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ born_in_usa , gss_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( age ~ born_in_usa , gss_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ born_in_usa + race , 
+	gss_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		age ~ born_in_usa + race , 
+		gss_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+Match the unweighted record count on [PDF page 10](https://gss.norc.org/Documents/codebook/GSS%202022%20Codebook.pdf#page=10) of the Public Use File codebook:
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( subset( gss_design , year == 2022 ) ) == 3544 )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for GSS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+gss_srvyr_design <- as_survey( gss_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+gss_srvyr_design %>%
+	summarize( mean = survey_mean( age , na.rm = TRUE ) )
+
+gss_srvyr_design %>%
+	group_by( region ) %>%
+	summarize( mean = survey_mean( age , na.rm = TRUE ) )
+```
+
+

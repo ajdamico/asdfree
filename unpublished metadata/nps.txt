@@ -1,0 +1,90 @@
+chapter_title: National Survey of OAA Participants
+
+~~~{dataset_introduction}
+The National Survey of OAA Participants measures program satisfaction with state agency community services for American seniors.
+~~~
+
+table_structure: * One table with one row per sampled senior respondent.
+
+generalizable_population: * A complex sample survey designed to generalize to non-institutionalized beneficiaries of Area Agencies on Aging (AAA) within the United States.
+
+publication_period: * Released annually since 2003.
+
+administrative_organization: * Administered by the [U.S. Administration on Aging](http://www.aoa.gov/).
+
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_df <- 
+	readRDS( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+			"2015 transportation.rds" ) )
+
+chapter_tag_design <- 
+	svrepdesign( 
+		data = chapter_tag_df , 
+		repweights = "pstotwgt[0-9]" , 
+		weights = ~ pstotwgt , 
+		type = "Fay" , 
+		rho = 0.29986 , 
+		mse = TRUE
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		age_category =
+			factor( agec , levels = 2:5 , labels =
+			c( "60-64" , "65-74" , "75-84" , "85+" ) ) ,
+		
+		gender = factor( gender , labels = c( "male" , "female" ) ) ,
+		
+		trip_this_week = as.numeric( trdays %in% 1:2 )
+
+	)
+~~~
+
+group_by_variable: age_category
+
+categorical_variable: gender
+
+linear_variable: adlaoa6p
+linear_variable_description: number of limitations with activities of daily living
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: adlaoa6p
+ratio_estimation_denominator: iadlaoa7
+ratio_narm: , na.rm = TRUE
+
+subset_definition: livealone == 1
+subset_definition_description: beneficiaries who live alone
+
+binary_variable: trip_this_week
+binary_variable_description: most recent trip within the past week
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
+
+needs_actions_build_status_line: yes

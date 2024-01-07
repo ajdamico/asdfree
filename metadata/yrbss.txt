@@ -1,7 +1,9 @@
 chapter_title: Youth Risk Behavior Surveillance System
 
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
-The Youth Risk Behavior Surveillance System is the high school edition of the Behavioral Risk Factor Surveillance System (BRFSS), a scientific study of good kids who do bad things.
+The high school edition of the Behavioral Risk Factor Surveillance System (BRFSS).
 ~~~
 
 table_structure: * One table with one row per sampled youth respondent.
@@ -13,14 +15,91 @@ publication_period: * Released biennially since 1993.
 administrative_organization: * Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
 
 
-needs_catalog_block: yes
-catalog_subset_description: # 2015 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2015 )
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Methodology of the Youth Risk Behavior Surveillance System](https://www.cdc.gov/mmwr/pdf/rr/rr6201.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Youth_Risk_Behavior_Surveillance_System)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# maladolescence
+# epidemiology
+# sex, drugs, rock and roll
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Load the `SAScii` library to interpret a SAS input program, and also re-arrange the SAS input program:
+```{r eval = FALSE , results = "hide" }
+library(SAScii)
+
+sas_url <-
+	"https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/2019XXH-SAS-Input-Program.sas"
+
+sas_text <- tolower( readLines( sas_url ) )
+
+# find the (out of numerical order)
+# `site` location variable's position
+# within the SAS input program
+site_location <- which( sas_text == '@1 site $3.' )
+
+# find the start field's position
+# within the SAS input program
+input_location <- which( sas_text == "input" )
+
+# create a vector from 1 to the length of the text file
+sas_length <- seq( length( sas_text ) )
+
+# remove the site_location
+sas_length <- sas_length[ -site_location ]
+
+# re-insert the site variable's location
+# immediately after the starting position
+sas_reorder <- 
+	c( 
+		sas_length[ seq( input_location ) ] , 
+		site_location , 
+		sas_length[ seq( input_location + 1 , length( sas_length ) ) ] 
+	)
+
+# re-order the sas text file
+sas_text <- sas_text[ sas_reorder ]
+
+sas_tf <- tempfile()
+
+writeLines( sas_text , sas_tf )
+```
+
+
+Download and import the national file:
+```{r eval = FALSE , results = "hide" }
+dat_tf <- tempfile()
+
+dat_url <-
+	"https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/XXH2019_YRBS_Data.dat"
+	
+download.file( dat_url , dat_tf , mode = 'wb' )
+
+chapter_tag_df <- read.SAScii( dat_tf , sas_tf )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
+
+
 
 ~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
 library(survey)
-
-chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015 main.rds" ) )
 
 chapter_tag_design <- 
 	svydesign( 
@@ -30,6 +109,7 @@ chapter_tag_design <-
 		weights = ~ weight , 
 		nest = TRUE 
 	)
+```
 ~~~
 
 ~~~{variable_recoding_block}
@@ -37,15 +117,15 @@ chapter_tag_design <-
 	update( 
 		chapter_tag_design , 
 		q2 = q2 ,
-		never_rarely_wore_bike_helmet = as.numeric( qn8 == 1 ) ,
-		ever_smoked_marijuana = as.numeric( qn47 == 1 ) ,
-		ever_tried_to_quit_cigarettes = as.numeric( q36 > 2 ) ,
-		smoked_cigarettes_past_year = as.numeric( q36 > 1 )
+		never_rarely_wore_seat_belt = as.numeric( qn8 == 1 ) ,
+		ever_used_marijuana = as.numeric( qn45 == 1 ) ,
+		tried_to_quit_tobacco_past_year = as.numeric( q39 == 2 ) ,
+		used_tobacco_past_year = as.numeric( q39 > 1 )
 	)
 ~~~
 
-group_by_variable: ever_smoked_marijuana
-group_by_variable_description: ever smoked marijuana
+group_by_variable: ever_used_marijuana
+group_by_variable_description: ever used marijuana
 
 categorical_variable: q2
 categorical_variable_description: sex (1=female, 2=male)
@@ -55,43 +135,64 @@ linear_variable: bmipct
 linear_variable_description: average body mass index percentile within the respondent's age and sex cohort
 linear_narm: , na.rm = TRUE
 
-ratio_estimation_numerator: ever_tried_to_quit_cigarettes
-ratio_estimation_denominator: smoked_cigarettes_past_year
+ratio_estimation_numerator: tried_to_quit_tobacco_past_year
+ratio_estimation_denominator: used_tobacco_past_year
 ratio_narm: , na.rm = TRUE
 
-subset_definition: qn41 == 1
+subset_definition: qn40 > 1
 subset_definition_description: youths who ever drank alcohol
 
-binary_variable: never_rarely_wore_bike_helmet
-binary_variable_description: never or rarely wore a bicycle helmet
+binary_variable: never_rarely_wore_seat_belt
+binary_variable_description: never or rarely wore a seat belt
 binary_narm: , na.rm = TRUE
+
 
 needs_srvyr_block: yes
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
-This snippet replicates the "never/rarely wore bicycle helmet" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2015/2015_yrbs_analysis_software.pdf#page=29).
+This example matches statistics, standard errors, and confidence intervals from the "never/rarely wore seat belt" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2019/2019_yrbs_analysis_software.pdf#page=29):
 
 ```{r eval = FALSE , results = "hide" }
 
-unwtd.count( ~ never_rarely_wore_bike_helmet , yrbss_design )
+unwtd_count_result <-
+	unwtd.count( ~ never_rarely_wore_seat_belt , chapter_tag_design )
 
-svytotal( ~ one , subset( yrbss_design , !is.na( never_rarely_wore_bike_helmet ) ) )
- 
-svymean( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE )
+stopifnot( coef( unwtd_count_result ) == 11149 )
 
-svyciprop( ~ never_rarely_wore_bike_helmet , yrbss_design , na.rm = TRUE , method = "beta" )
+wtd_n_result <-
+	svytotal( 
+		~ one , 
+		subset(
+			chapter_tag_design , 
+			!is.na( never_rarely_wore_seat_belt ) 
+		)
+	)
 
+stopifnot( round( coef( wtd_n_result ) , 0 ) == 12132 )
+
+share_result <-
+	svymean(
+		~ never_rarely_wore_seat_belt ,
+		chapter_tag_design ,
+		na.rm = TRUE 
+	)
+
+stopifnot( round( coef( share_result ) , 4 ) == .0654 )
+
+stopifnot( round( SE( share_result ) , 4 ) == .0065 )
+
+ci_result <-
+	svyciprop(
+		~ never_rarely_wore_seat_belt ,
+		chapter_tag_design , 
+		na.rm = TRUE ,
+		method = "beta"
+	)
+
+stopifnot( round( confint( ci_result  )[1] , 4 ) == 0.0529 )
+
+stopifnot( round( confint( ci_result  )[2] , 2 ) == 0.08 )
 ```
-
 ~~~
-
-
-
-
-
-
-needs_travis_build_status_line: yes

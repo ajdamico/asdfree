@@ -1,0 +1,526 @@
+# National Health and Nutrition Examination Survey (NHANES) {-}
+
+<a href="https://github.com/asdfree/nhanes/actions"><img src="https://github.com/asdfree/nhanes/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+Doctors and dentists accompany survey interviewers in a [mobile medical center](https://blogs.cdc.gov/nchs/2013/01/30/217/) that travels the country. While survey researchers read the questionnaires, medical professionals administer laboratory tests and conduct a full medical examination. The blood work and in-person check-up allow epidemiologists to answer questions like, "how many people have diabetes but don't know they have diabetes?"
+
+* Many tables containing information from the various examinations, generally one row per respondent.
+
+* A complex sample survey designed to generalize to the civilian non-institutionalized U.S. population.
+
+* Released biennially since 1999-2000.
+
+* Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [About the National Health and Nutrition Examination Survey](https://www.cdc.gov/nchs/nhanes/about_nhanes.htm)
+
+2. [NHANES Tutorials](https://wwwn.cdc.gov/nchs/nhanes/tutorials/default.aspx)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National Health and Nutrition Examination Survey)
+
+```{r}
+# doctor, dentist, labs
+# mobile examination
+#vanlife interviews
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the demographics (demo) and total cholesterol laboratory (tchol) data:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+nhanes_2015_2016_demo_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DEMO_I.XPT"
+
+nhanes_2017_2018_demo_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DEMO_J.XPT"
+
+nhanes_2015_2016_tchol_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/TCHOL_I.XPT"
+	
+nhanes_2017_2018_tchol_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/TCHOL_J.XPT"
+	
+
+nhanes_2015_2016_demo_tbl <- read_xpt( nhanes_2015_2016_demo_url )
+nhanes_2017_2018_demo_tbl <- read_xpt( nhanes_2017_2018_demo_url )
+nhanes_2015_2016_tchol_tbl <- read_xpt( nhanes_2015_2016_tchol_url )
+nhanes_2017_2018_tchol_tbl <- read_xpt( nhanes_2017_2018_tchol_url )
+
+nhanes_2015_2016_demo_df <- data.frame( nhanes_2015_2016_demo_tbl )
+nhanes_2017_2018_demo_df <- data.frame( nhanes_2017_2018_demo_tbl )
+nhanes_2015_2016_tchol_df <- data.frame( nhanes_2015_2016_tchol_tbl )
+nhanes_2017_2018_tchol_df <- data.frame( nhanes_2017_2018_tchol_tbl )
+```
+
+Specify which variables to keep from both the demo and tchol data files, then stack the four years:
+```{r eval = FALSE , results = "hide" }
+demo_vars <-
+	c( 
+		 # unique person identifier (merge variable)
+		"SEQN" ,
+
+		# the two-year interviewed + MEC examined weight
+		"WTMEC2YR" , 	
+		# note that this is a special weight for only
+		# individuals who took the mobile examination center (MEC) exam
+		# there is one other weight available - WTINT2YR - 
+		# that should be used when MEC variables are not part of the analysis
+		
+		# interviewed only or interviewed + MEC
+		"RIDSTATR" ,
+		
+		# primary sampling unit varaible, used in complex design
+		"SDMVPSU" ,
+		
+		# strata variable, used in complex design
+		"SDMVSTRA" ,
+		
+		# race / ethnicity
+		"RIDRETH3" ,
+
+		# age
+		"RIDAGEYR" ,
+		
+		# gender
+		"RIAGENDR" ,
+		
+		# pregnant at interview
+		"RIDEXPRG"
+	)
+
+nhanes_2015_2018_demo_df <-
+	rbind(
+		nhanes_2015_2016_demo_df[ , demo_vars ] ,
+		nhanes_2017_2018_demo_df[ , demo_vars ]
+	)
+	
+
+tchol_vars <-
+	c( 
+		# unique person identifier (merge variable)
+		"SEQN" ,
+		
+		# laboratory total cholesterol variable
+		# https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/TCHOL_J.htm
+		"LBXTC" 		
+
+	)
+
+nhanes_2015_2018_tchol_df <-
+	rbind(
+		nhanes_2015_2016_tchol_df[ , tchol_vars ] ,
+		nhanes_2017_2018_tchol_df[ , tchol_vars ]
+	)
+```
+
+Merge the two pooled datasets, limit the data.frame to mobile examination component respondents:
+```{r eval = FALSE , results = "hide" }
+nhanes_full_df <-
+	merge(
+		nhanes_2015_2018_demo_df ,
+		nhanes_2015_2018_tchol_df ,
+		all = TRUE
+	)
+
+names( nhanes_full_df ) <- tolower( names( nhanes_full_df ) )
+	
+nhanes_df <- subset( nhanes_full_df , ridstatr %in% 2 )
+```
+
+Scale the mobile examination component two-year weight to generalize to the pooled, four year period:
+```{r eval = FALSE , results = "hide" }
+nhanes_df[ , 'wtmec4yr' ] <- nhanes_df[ , 'wtmec2yr' ] / 2
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# nhanes_fn <- file.path( path.expand( "~" ) , "NHANES" , "this_file.rds" )
+# saveRDS( nhanes_df , file = nhanes_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# nhanes_df <- readRDS( nhanes_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+nhanes_design <- 
+	svydesign(
+		id = ~ sdmvpsu , 
+		strata = ~ sdmvstra ,
+		nest = TRUE ,
+		weights = ~ wtmec4yr ,
+		data = nhanes_df
+	)
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+nhanes_design <-
+
+	update(
+
+		nhanes_design ,
+
+		one = 1 ,
+
+		# define high total cholesterol as 1 if mg/dL is at or above 240 and zero otherwise.
+		hi_tchol = ifelse( lbxtc >= 240 , 1 , 0 ) ,
+		
+		gender = factor( riagendr , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+		
+		age_categories =
+			factor(	
+				1 + findInterval( ridageyr , c( 20 , 40 , 60 ) ) , 
+				levels = 1:4 , 
+				labels = c( "0-19" , "20-39" , "40-59" , "60+" )
+			) ,
+
+		# recode the ridreth3 variable as:
+		# mexican american and other hispanic -> 4
+		# non-hispanic white -> 1
+		# non-hispanic black -> 2
+		# non-hispanic asian -> 3
+		# other race including multi-racial -> 5
+		race_ethnicity =
+			factor( 
+				c( 4 , 4 , 1 , 2 , NA , 3 , 5 )[ ridreth3 ] ,
+				levels = 1:5 ,
+				labels = c( 'nh white' , 'nh black' , 'nh asian' , 'hispanic' , 'other' )
+			) ,
+			
+		pregnant_at_interview = 
+			ifelse( ridexprg %in% 1:2 , as.numeric( ridexprg == 1 ) , NA )
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( nhanes_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ race_ethnicity , nhanes_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , nhanes_design )
+
+svyby( ~ one , ~ race_ethnicity , nhanes_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ lbxtc , nhanes_design , na.rm = TRUE )
+
+svyby( ~ lbxtc , ~ race_ethnicity , nhanes_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ riagendr , nhanes_design )
+
+svyby( ~ riagendr , ~ race_ethnicity , nhanes_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ lbxtc , nhanes_design , na.rm = TRUE )
+
+svyby( ~ lbxtc , ~ race_ethnicity , nhanes_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ riagendr , nhanes_design )
+
+svyby( ~ riagendr , ~ race_ethnicity , nhanes_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ lbxtc , nhanes_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ lbxtc , 
+	~ race_ethnicity , 
+	nhanes_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ lbxtc , 
+	denominator = ~ ridageyr , 
+	nhanes_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to respondents aged 60 or older:
+```{r eval = FALSE , results = "hide" }
+sub_nhanes_design <- subset( nhanes_design , age_categories == "60+" )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ lbxtc , sub_nhanes_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ lbxtc , nhanes_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ lbxtc , 
+		~ race_ethnicity , 
+		nhanes_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( nhanes_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ lbxtc , nhanes_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ lbxtc , nhanes_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ lbxtc , nhanes_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ pregnant_at_interview , nhanes_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( lbxtc ~ pregnant_at_interview , nhanes_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ pregnant_at_interview + riagendr , 
+	nhanes_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		lbxtc ~ pregnant_at_interview + riagendr , 
+		nhanes_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Direct Method of Age-Adjustment Replication Example {-}
+
+This example matches the total cholesterol statistics and standard errors in [Table 1](https://www.cdc.gov/nchs/data/databriefs/db363-tables-508.pdf#page=1) from [Data Brief 363](https://www.cdc.gov/nchs/products/databriefs/db363.htm):
+
+Match the crude estimates in the footnote and also in the unadjusted age categories:
+```{r eval = FALSE , results = "hide" }
+crude_overall <-
+	svymean( ~ hi_tchol , subset( nhanes_design , ridageyr >= 20 ) , na.rm = TRUE )
+
+stopifnot( round( coef( crude_overall ) , 3 ) == 0.115 )
+
+crude_by_gender <-
+	svyby( 
+		~ hi_tchol , 
+		~ gender , 
+		subset( nhanes_design , ridageyr >= 20 ) , 
+		svymean , 
+		na.rm = TRUE 
+	)
+	
+stopifnot( round( coef( crude_by_gender )[ 1 ] , 3 ) == 0.103 )
+stopifnot( round( coef( crude_by_gender )[ 2 ] , 3 ) == 0.126 )
+
+crude_by_age <-
+	svyby(
+		~ hi_tchol , 
+		~ age_categories , 
+		subset( nhanes_design , ridageyr >= 20 ) , 
+		svymean , 
+		na.rm = TRUE 
+	)
+	
+stopifnot( round( coef( crude_by_age )[ 1 ] , 3 ) == 0.075 )
+stopifnot( round( coef( crude_by_age )[ 2 ] , 3 ) == 0.157 )
+stopifnot( round( coef( crude_by_age )[ 3 ] , 3 ) == 0.114 )
+
+stopifnot( round( SE( crude_by_age )[ 1 ] , 3 ) == 0.005 )
+stopifnot( round( SE( crude_by_age )[ 2 ] , 3 ) == 0.011 )
+stopifnot( round( SE( crude_by_age )[ 3 ] , 3 ) == 0.008 )
+```
+
+Sum up [2000 Census totals](https://seer.cancer.gov/seerstat/tutorials/aarates/step3.html) based on the age groupings specified in footnote:
+```{r eval = FALSE , results = "hide" }
+pop_by_age <- 
+	data.frame( 
+		age_categories = c( "0-19" , "20-39" , "40-59" , "60+" ) ,
+		Freq = c( 78782657 , 77670618 , 72816615 , 45363752 ) 
+	) 	
+```
+
+Create a design with the nationwide population stratified to the above census counts:
+```{r eval = FALSE , results = "hide" }
+nhanes_age_adjusted <-
+	postStratify( 
+		subset( nhanes_design , !is.na( hi_tchol ) ) , 
+		~ age_categories , 
+		pop_by_age 
+	)
+```
+
+Match the overall adjusted estimates:
+```{r eval = FALSE , results = "hide" }
+results_overall <-
+	svymean( ~ hi_tchol , subset( nhanes_age_adjusted , ridageyr >= 20 ) , na.rm = TRUE )
+
+stopifnot( round( coef( results_overall ) , 3 ) == 0.114 )
+
+stopifnot( round( SE( results_overall ) , 3 ) == 0.006 )
+```
+
+Create a design stratified to census counts broken out by gender, then match those estimates:
+```{r eval = FALSE , results = "hide" }
+nhanes_by_gender <-
+	svystandardize(
+		nhanes_design , 
+		by = ~ age_categories , 		# stratification variable
+		over = ~ gender ,				# break out variable
+		population = pop_by_age , 		# data.frame containing census populations
+		excluding.missing = ~ hi_tchol 	# analysis variable of interest
+	)
+
+results_by_gender <-
+	svyby( 
+		~ hi_tchol , 
+		~ gender , 
+		subset( nhanes_by_gender , ridageyr >= 20 ) ,
+		svymean , 
+		na.rm=TRUE
+	)
+
+stopifnot( round( coef( results_by_gender )[ 1 ] , 3 ) == 0.105 )
+stopifnot( round( coef( results_by_gender )[ 2 ] , 3 ) == 0.121 )
+
+stopifnot( round( SE( results_by_gender )[ 1 ] , 3 ) == 0.007 )
+stopifnot( round( SE( results_by_gender )[ 2 ] , 3 ) == 0.008 )
+```
+
+Create a design stratified to census counts broken out by race/ethnicity, then match those estimates:
+```{r eval = FALSE , results = "hide" }
+nhanes_by_race <-
+	svystandardize(
+		nhanes_design , 
+		by = ~ age_categories , 		# stratification variable
+		over = ~ race_ethnicity ,		# break out variable
+		population = pop_by_age , 		# data.frame containing census populations
+		excluding.missing = ~ hi_tchol 	# analysis variable of interest
+	)
+
+results_by_race_ethnicity <-
+	svyby( 
+		~ hi_tchol , 
+		~ race_ethnicity , 
+		design = subset( nhanes_by_race , ridageyr >= 20 ) ,
+		svymean , 
+		na.rm=TRUE
+	)
+
+stopifnot( round( coef( results_by_race_ethnicity )[ 1 ] , 3 ) == 0.117 )
+stopifnot( round( coef( results_by_race_ethnicity )[ 2 ] , 3 ) == 0.100 )
+stopifnot( round( coef( results_by_race_ethnicity )[ 3 ] , 3 ) == 0.116 )
+stopifnot( round( coef( results_by_race_ethnicity )[ 4 ] , 3 ) == 0.109 )
+
+stopifnot( round( SE( results_by_race_ethnicity )[ 1 ] , 3 ) == 0.007 )
+stopifnot( round( SE( results_by_race_ethnicity )[ 2 ] , 3 ) == 0.009 )
+stopifnot( round( SE( results_by_race_ethnicity )[ 3 ] , 3 ) == 0.011 )	
+stopifnot( round( SE( results_by_race_ethnicity )[ 4 ] , 3 ) == 0.009 )	
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NHANES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nhanes_srvyr_design <- as_survey( nhanes_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nhanes_srvyr_design %>%
+	summarize( mean = survey_mean( lbxtc , na.rm = TRUE ) )
+
+nhanes_srvyr_design %>%
+	group_by( race_ethnicity ) %>%
+	summarize( mean = survey_mean( lbxtc , na.rm = TRUE ) )
+```
+
+

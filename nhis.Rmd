@@ -1,0 +1,363 @@
+# National Health Interview Survey (NHIS) {-}
+
+<a href="https://github.com/asdfree/nhis/actions"><img src="https://github.com/asdfree/nhis/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+America's most detailed household survey of health status and medical experience.
+
+* One table with one row per sampled adult (18+) within each sampled household, one table with one row per sample child (when available, same family not required), multiply-imputed income tables.
+
+* A complex sample survey designed to generalize to the U.S. civilian non-institutionalized population.
+
+* Released annually since 1963, the most recent major re-design in 2019.
+
+* Conducted by the [National Center for Health Statistics](https://www.cdc.gov/nchs/) at the [Centers for Disease Control](http://www.cdc.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [2021 Survey Description](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2021/srvydesc-508.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/National_Health_Interview_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National Health Interview Survey)
+
+```{r}
+# excellent health poor
+# wealth. "sup, doc?" bugs, daft bills, free
+# laughs best medicine
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Define a function to download, unzip, and import each comma-separated value file:
+
+```{r eval = FALSE , results = "hide" }
+nhis_csv_import <-
+	function( this_url ){
+		
+		this_tf <- tempfile()
+		
+		download.file( this_url , this_tf , mode = 'wb' )
+		
+		unzipped_files <- unzip( this_tf , exdir = tempdir() )
+		
+		this_csv <- grep( '\\.csv$' , unzipped_files , value = TRUE )
+		
+		this_df <- read.csv( this_csv )
+		
+		file.remove( c( this_tf , unzipped_files ) )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+```
+
+Download and import the sample adult interview and imputed income files:
+
+```{r eval = FALSE , results = "hide" }
+nhis_df <-
+	nhis_csv_import( 
+		"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adult21csv.zip" 
+	)
+
+imputed_income_df <- 
+	nhis_csv_import( 
+		"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adultinc21csv.zip" 
+	)
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# nhis_fn <- file.path( path.expand( "~" ) , "NHIS" , "this_file.rds" )
+# saveRDS( nhis_df , file = nhis_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# nhis_df <- readRDS( nhis_fn )
+```
+
+### Survey Design Definition {-}
+Construct a multiply-imputed, complex sample survey design:
+
+Reshape the imputed income data.frame into a list based on the implicate number:
+```{r eval = FALSE , results = "hide" }
+imputed_income_list <- split( imputed_income_df , imputed_income_df[ , 'impnum_a' ] )
+```
+
+Remove overlapping columns except the merge variable:
+```{r eval = FALSE , results = "hide" }
+variables_to_remove <-
+	setdiff( intersect( names( nhis_df ) , names( imputed_income_df ) ) , 'hhx' )
+
+nhis_df <- nhis_df[ , !( names( nhis_df ) %in% variables_to_remove ) ]
+```
+
+Merge each implicate onto the sample adult table:
+```{r eval = FALSE , results = "hide" }
+nhis_list <-
+	lapply( imputed_income_list ,
+		function( w ){
+			this_df <- merge( nhis_df , w )
+			stopifnot( nrow( this_df ) == nrow( nhis_df ) )
+			this_df
+		} )
+```
+
+Define the design:
+```{r eval = FALSE , results = "hide" }
+library(survey)
+library(mitools)
+
+nhis_design <- 
+	svydesign( 
+		id = ~ ppsu , 
+		strata = ~ pstrat ,
+		nest = TRUE ,
+		weights = ~ wtfa_a ,
+		data = imputationList( nhis_list )
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+nhis_design <- 
+	update( 
+		nhis_design , 
+		
+		one = 1 ,
+		
+		poverty_category =
+			factor( 
+				findInterval( povrattc_a , c( 1 , 2 , 4 ) ) ,
+				labels = 
+					c( "below poverty" , "100-199%" , "200-399%" , "400%+" )
+			) ,
+			
+		fair_or_poor_reported_health = 
+			ifelse( phstat_a %in% 1:5 , as.numeric( phstat_a >= 4 ) , NA ) ,
+			
+		sex_a = factor( sex_a , levels = 1:2 , labels = c( "male" , "female" ) ) ,
+		
+		annual_premium_first_plan = ifelse( hicostr1_a > 40000 , NA , hicostr1_a )
+
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design , svyby( ~ one , ~ one , unwtd.count ) ) )
+
+MIcombine( with( nhis_design , svyby( ~ one , ~ poverty_category , unwtd.count ) ) )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design , svytotal( ~ one ) ) )
+
+MIcombine( with( nhis_design ,
+	svyby( ~ one , ~ poverty_category , svytotal )
+) )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design , svymean( ~ agep_a ) ) )
+
+MIcombine( with( nhis_design ,
+	svyby( ~ agep_a , ~ poverty_category , svymean )
+) )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design , svymean( ~ sex_a ) ) )
+
+MIcombine( with( nhis_design ,
+	svyby( ~ sex_a , ~ poverty_category , svymean )
+) )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design , svytotal( ~ agep_a ) ) )
+
+MIcombine( with( nhis_design ,
+	svyby( ~ agep_a , ~ poverty_category , svytotal )
+) )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design , svytotal( ~ sex_a ) ) )
+
+MIcombine( with( nhis_design ,
+	svyby( ~ sex_a , ~ poverty_category , svytotal )
+) )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design ,
+	svyquantile(
+		~ agep_a ,
+		0.5 , se = TRUE 
+) ) )
+
+MIcombine( with( nhis_design ,
+	svyby(
+		~ agep_a , ~ poverty_category , svyquantile ,
+		0.5 , se = TRUE ,
+		ci = TRUE 
+) ) )
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design ,
+	svyratio( numerator = ~ annual_premium_first_plan , denominator = ~ agep_a , na.rm = TRUE )
+) )
+```
+
+### Subsetting {-}
+
+Restrict the survey design to uninsured:
+```{r eval = FALSE , results = "hide" }
+sub_nhis_design <- subset( nhis_design , notcov_a == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( sub_nhis_design , svymean( ~ agep_a ) ) )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <-
+	MIcombine( with( nhis_design ,
+		svymean( ~ agep_a )
+	) )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	MIcombine( with( nhis_design ,
+		svyby( ~ agep_a , ~ poverty_category , svymean )
+	) )
+
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( nhis_design$designs[[1]] )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+MIcombine( with( nhis_design , svyvar( ~ agep_a ) ) )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+MIcombine( with( nhis_design ,
+	svymean( ~ agep_a , deff = TRUE )
+) )
+
+# SRS with replacement
+MIcombine( with( nhis_design ,
+	svymean( ~ agep_a , deff = "replace" )
+) )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+# MIsvyciprop( ~ fair_or_poor_reported_health , nhis_design ,
+# 	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+# MIsvyttest( agep_a ~ fair_or_poor_reported_health , nhis_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+# MIsvychisq( ~ fair_or_poor_reported_health + sex_a , nhis_design )
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	MIcombine( with( nhis_design ,
+		svyglm( agep_a ~ fair_or_poor_reported_health + sex_a )
+	) )
+	
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics and standard errors within 0.01% from [Figure 3](https://www.cdc.gov/nchs/data/databriefs/db470-tables.pdf#3) of this [Characteristics of Adults Aged 18–64 Who Did Not Take Medication as Prescribed to Reduce Costs](https://www.cdc.gov/nchs/products/databriefs/db470.htm) Data Brief:
+
+```{r eval = FALSE , results = "hide" }
+results <-
+	MIcombine( 
+		with(
+			subset( nhis_design , agep_a < 65 ) , 
+			svyby(
+				~ as.numeric( rxsk12m_a == 1 | rxls12m_a == 1 | rxdl12m_a == 1 ) , 
+				~ poverty_category , 
+				svymean , 
+				na.rm = TRUE 
+			) 
+		)
+	)
+
+stopifnot(
+	all(
+		as.numeric( round( coef( results ) , 3 ) ) == c( 0.145 , 0.138 , 0.099 , 0.039 )
+	) 
+)
+
+stopifnot(
+	all( 
+		as.numeric( round( SE( results ) , 5 ) ) - c( 0.0126 , 0.0098 , 0.0062 , 0.0031 ) < 0.0001
+	) 
+)
+
+```
+
+

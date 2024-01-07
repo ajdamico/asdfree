@@ -1,40 +1,81 @@
 chapter_title: American Housing Survey
 
+needs_actions_build_status_line: yes -windows -linux
+
+
+
 ~~~{dataset_introduction}
-The American Housing Survey tracks housing structures across the United States.
+The nationwide assessment of housing stock, with information on physical condition and neighborhood, costs of financing and maintenance, owner and renter characteristics, and changes over time.
 ~~~
 
-table_structure: * A collection of tables, most with one row per housing unit.
+table_structure: * Nationally-representative and metropolitan flat files with one row per household, plus relational files.
 
-generalizable_population: * A complex sample survey designed to generalize to both occupied and vacant housing units across the United States and also for about twenty-five metropolitan areas.
+generalizable_population: * A complex sample survey of occupied and vacant housing units designed to generalize to all structures in the United States, both nationally and also for about [thirty-five metropolitan areas](https://www.census.gov/content/dam/Census/programs-surveys/ahs/tech-documentation/AHS%20Metropolitan%20Area%20Oversample%20Histories%202015%20and%20Beyond.pdf).
 
-publication_period: * Released more or less biennially since 1973.
+publication_period: * Released more or less biennially since 1973, with longitudinal samples redrawn in 1985 and 2015.
 
-administrative_organization: * Sponsored by [the Department of Housing and Urban Development (HUD)](https://www.hud.gov/) and conducted by the [U.S. Census Bureau](https://www.census.gov/).
+administrative_organization: * Sponsored by [the Department of Housing and Urban Development](https://www.hud.gov/), run by the [Census Bureau](https://www.census.gov/).
 
-needs_catalog_block: yes
-catalog_subset_description: # 2013 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2013 )
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Getting Started with the Public Use File: 2015 and Beyond](https://www.census.gov/content/dam/Census/programs-surveys/ahs/tech-documentation/2015/Getting%20Started%20with%20the%20AHS%20PUF%202015%20and%20Beyond.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/American_Housing_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+```{r}
+# real estate supply
+# half bath addition, raised roof
+# vent, rent too damn high
+```
+~~~
+
+
+
+~~~{download_and_import_block}
+
+Download and import the national 2021 flat file:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+library(httr)
+
+tf <- tempfile()
+
+this_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/ahs/" ,
+		"2021/AHS%202021%20National%20PUF%20v1.0%20Flat%20SAS.zip"
+	)
+
+GET( this_url , write_disk( tf ) , progress() )
+
+chapter_tag_tbl <- read_sas( tf )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+~~~
+
+
 
 ~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
 library(survey)
-
-chapter_tag_df <- 
-	readRDS( 
-		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
-			"2013/national_v1.2/newhouse_repwgt.rds" 
-		) 
-	)
 
 chapter_tag_design <- 
 	svrepdesign(
-		weights = ~ wgt90geo ,
-		repweights = "repwgt[1-9]" ,
+		weights = ~ weight ,
+		repweights = "repweight[1-9]" ,
 		type = "Fay" ,
 		rho = ( 1 - 1 / sqrt( 4 ) ) ,
 		mse = TRUE ,
 		data = chapter_tag_df
 	)
+```
 ~~~
 
 ~~~{variable_recoding_block}
@@ -42,9 +83,11 @@ chapter_tag_design <-
 	update( 
 		chapter_tag_design , 
 
+		one = 1 ,
+
 		tenure = 
 			factor( 
-				ifelse( is.na( tenure ) , 4 , tenure ) , 
+				ifelse( tenure %in% c( -6 , 'N' ) , 4 , tenure ) , 
 				levels = 1:4 , 
 				labels = 
 					c( 'Owned or being bought' ,
@@ -53,20 +96,16 @@ chapter_tag_design <-
 					'Not occupied' )
 			) ,
 			
-			
 		lotsize =
 			factor( 
-				1 + findInterval( lot ,
-					c( 5500 , 11000 , 22000 , 
-					44000 , 220000 , 440000 ) ) , 
+				lotsize , 
 				levels = 1:7 ,
 				labels = c( "Less then 1/8 acre" , 
 				"1/8 up to 1/4 acre" , "1/4 up to 1/2 acre" ,
 				"1/2 up to 1 acre" , "1 up to 5 acres" , 
 				"5 up to 10 acres" , "10 acres or more" ) ) ,
 				
-				
-		below_poverty = as.numeric( poor < 100 )
+		below_poverty = as.numeric( perpovlvl < 100 )
 				
 	)
 ~~~
@@ -76,10 +115,10 @@ group_by_variable: tenure
 categorical_variable: lotsize
 categorical_narm: , na.rm = TRUE
 
-linear_variable: rooms
+linear_variable: totrooms
 linear_narm: , na.rm = TRUE
 
-ratio_estimation_numerator: rooms
+ratio_estimation_numerator: totrooms
 ratio_estimation_denominator: rent
 ratio_narm: , na.rm = TRUE
 
@@ -93,50 +132,21 @@ binary_narm: , na.rm = TRUE
 needs_srvyr_block: yes
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
-The example below matches statistics and standard errors from this table pulled from the US Census Bureau's [Quick Guide to Estimating Variance Using Replicate Weights](https://www.census.gov/content/dam/Census/programs-surveys/ahs/tech-documentation/2015/Quick%20Guide%20to%20Estimating%20Variance%20Using%20Replicate%20Weights%202009%20to%20Current.pdf):
-
-`r knitr::include_graphics("images/ahs2013.png")`
-	
-	
-Compute the statistics and standard errors for monthly housing costs by owner/renter status of the unit:
+This example matches the estimate and margin of error of the `Total` row of the `General Housing` tab from the [AHS 2021 Table Specifications and PUF Estimates for User Verification](https://www2.census.gov/programs-surveys/ahs/2021/2021%20AHS%20Table%20Specifications%20and%20PUF%20Estimates%20for%20User%20Verification.xlsx):
 
 ```{r eval = FALSE , results = "hide" }
-means <- c( 1241.8890 , 972.6051 , 170.0121 )
-std_err <- c( 7.3613 , 5.6956 , 6.1586 )
-ci_lb <- c( 1227.3511 , 961.3569 , 157.8495 )
-ci_ub <- c( 1256.4270 , 983.8532 , 182.1747 )
+result <- svytotal( ~ as.numeric( intstatus == 1 ) , chapter_tag_design )
 
-results <- 
-	svyby( 
-		~ zsmhc , 
-		~ tenure , 
-		chapter_tag_design , 
-		svymean , 
-		na.rm = TRUE , 
-		na.rm.all = TRUE 
-	)
+stopifnot( round( coef( result ) / 1000 , 0 ) == 128504 )
 
-ci_res <- 
-	confint( results , df = degf( chapter_tag_design ) + 1 )
+ci_results <- confint( result , level = 0.9 )
 
-stopifnot( all( round( coef( results ) , 4 ) == means ) )
-
-stopifnot( all( round( SE( results ) , 4 ) == std_err ) )
-
-stopifnot( all( round( ci_res[ , 1 ] , 4 ) == ci_lb ) )
-
-stopifnot( all( round( ci_res[ , 2 ] , 4 ) == ci_ub ) )
+stopifnot( round( ( ci_results[ 2 ] - coef( result ) ) / 1000 , 0 ) == 388 )
 ```
 
 ~~~
 
 
-needs_travis_build_status_line: yes
 
-sample_setup_breaks: 6
-
-broken_sample_test_condition: any( chapter_tag_cat$year == 2013 )

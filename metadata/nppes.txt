@@ -1,27 +1,69 @@
 chapter_title: National Plan and Provider Enumeration System
 
+needs_actions_build_status_line: yes -linux -windows
+
 ~~~{dataset_introduction}
-The National Plan and Provider Enumeration System (NPPES) contains information about every medical provider, insurance plan, and clearinghouse actively operating in the United States healthcare industry.
+The registry of every medical practitioner actively operating in the United States healthcare industry.
 ~~~
+
 table_structure: * A single large table with one row per enumerated health care provider.
 
-generalizable_population: * A census of individuals and organizations who bill for medical services in the United States.
+generalizable_population: * A census of individuals and organizations that bill for medical services in the United States.
 
-publication_period: * Updated monthly with new providers.
+publication_period: * Updated weekly with new providers.
 
 administrative_organization: * Maintained by the United States [Centers for Medicare & Medicaid Services (CMS)](http://www.cms.gov/)
 
-~~~{analysis_examples_loading_block}
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [NPI: What You Need To Know](https://www.cms.gov/Outreach-and-Education/Medicare-Learning-Network-MLN/MLNProducts/Downloads/NPI-What-You-Need-To-Know.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/National_Provider_Identifier)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# how many doctors
+# ranked sergeant, last name pepper
+# practice in the states?
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Download and import the national file:
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+tf <- tempfile()
+
+npi_datapage <-
+	readLines( "http://download.cms.gov/nppes/NPI_Files.html" )
+
+latest_files <- grep( 'NPPES_Data_Dissemination_' , npi_datapage , value = TRUE )
+
+latest_files <- latest_files[ !grepl( 'Weekly Update' , latest_files ) ]
+
+this_url <-
+	paste0(
+		"http://download.cms.gov/nppes/",
+		gsub( "(.*)(NPPES_Data_Dissemination_.*\\\\.zip)(.*)$", "\\\\2", latest_files )
+	)
+
+download.file( this_url , tf , mode = 'wb' )
+
+npi_files <- unzip( tf , exdir = tempdir() )
+
 npi_filepath <-
 	grep(
 		"npidata_pfile_20050523-([0-9]+)\\\\.csv" ,
-		list.files(
-			file.path( path.expand( "~" ) , "NPPES" ) ,
-			full.names = TRUE
-		) ,
+		npi_files ,
 		value = TRUE
 	)
-	
+
 column_names <-
 	names( 
 		read.csv( 
@@ -48,19 +90,21 @@ stopifnot( all( columns_to_import %in% column_names ) )
 columns_to_import <-
 	columns_to_import[ order( match( columns_to_import , column_names ) ) ]
 
+chapter_tag_tbl <-
+	readr::read_csv( 
+		npi_filepath , 
+		col_names = columns_to_import , 
+		col_types = 
+			paste0( 
+				ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
+				collapse = "" 
+			) ,
+		skip = 1
+	) 
+
 chapter_tag_df <- 
-	data.frame( 
-		readr::read_csv( 
-			npi_filepath , 
-			col_names = columns_to_import , 
-			col_types = 
-				paste0( 
-					ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
-					collapse = "" 
-				) ,
-			skip = 1
-		) 
-	)
+	data.frame( chapter_tag_tbl )
+```
 ~~~
 
 
@@ -71,7 +115,10 @@ chapter_tag_df <-
 		
 		individual = as.numeric( entity_type_code ) ,
 		
-		provider_enumeration_year = as.numeric( substr( provider_enumeration_date , 7 , 10 ) )
+		provider_enumeration_year =
+			as.numeric( substr( provider_enumeration_date , 7 , 10 ) ) ,
+		
+		state_name = provider_business_practice_location_address_state_name
 		
 	)
 ~~~
@@ -80,15 +127,16 @@ group_by_variable: provider_gender_code
 linear_variable: provider_enumeration_year
 linear_narm: , na.rm = TRUE
 categorical_variable: is_sole_proprietor
-subset_definition: provider_business_practice_location_address_state_name = 'CA'
+subset_definition: state_name = 'CA'
 subset_definition_description: California
 binary_variable: individual
+
+
+
+
+
 needs_dplyr_block: yes
-
-needs_7za_install: yes
-
-
+needs_datatable_block: yes
+needs_duckdb_block: yes
 
 
-
-needs_travis_build_status_line: yes

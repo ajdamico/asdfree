@@ -1,0 +1,314 @@
+# National Plan and Provider Enumeration System (NPPES) {-}
+
+<a href="https://github.com/asdfree/nppes/actions"><img src="https://github.com/asdfree/nppes/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The registry of every medical practitioner actively operating in the United States healthcare industry.
+
+* A single large table with one row per enumerated health care provider.
+
+* A census of individuals and organizations that bill for medical services in the United States.
+
+* Updated weekly with new providers.
+
+* Maintained by the United States [Centers for Medicare & Medicaid Services (CMS)](http://www.cms.gov/)
+
+---
+
+Please skim before you begin:
+
+1. [NPI: What You Need To Know](https://www.cms.gov/Outreach-and-Education/Medicare-Learning-Network-MLN/MLNProducts/Downloads/NPI-What-You-Need-To-Know.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/National_Provider_Identifier)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National Plan and Provider Enumeration System)
+
+```{r}
+# how many doctors
+# ranked sergeant, last name pepper
+# practice in the states?
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the national file:
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+tf <- tempfile()
+
+npi_datapage <-
+	readLines( "http://download.cms.gov/nppes/NPI_Files.html" )
+
+latest_files <- grep( 'NPPES_Data_Dissemination_' , npi_datapage , value = TRUE )
+
+latest_files <- latest_files[ !grepl( 'Weekly Update' , latest_files ) ]
+
+this_url <-
+	paste0(
+		"http://download.cms.gov/nppes/",
+		gsub( "(.*)(NPPES_Data_Dissemination_.*\\.zip)(.*)$", "\\2", latest_files )
+	)
+
+download.file( this_url , tf , mode = 'wb' )
+
+npi_files <- unzip( tf , exdir = tempdir() )
+
+npi_filepath <-
+	grep(
+		"npidata_pfile_20050523-([0-9]+)\\.csv" ,
+		npi_files ,
+		value = TRUE
+	)
+
+column_names <-
+	names( 
+		read.csv( 
+			npi_filepath , 
+			nrow = 1 )[ FALSE , , ] 
+	)
+
+column_names <- gsub( "\\." , "_" , tolower( column_names ) )
+
+column_types <-
+	ifelse( 
+		grepl( "code" , column_names ) & 
+		!grepl( "country|state|gender|taxonomy|postal" , column_names ) , 
+		'n' , 'c' 
+	)
+
+columns_to_import <-
+	c( "entity_type_code" , "provider_gender_code" , "provider_enumeration_date" ,
+	"is_sole_proprietor" , "provider_business_practice_location_address_state_name" )
+
+stopifnot( all( columns_to_import %in% column_names ) )
+
+# readr::read_csv() columns must match their order in the csv file
+columns_to_import <-
+	columns_to_import[ order( match( columns_to_import , column_names ) ) ]
+
+nppes_tbl <-
+	readr::read_csv( 
+		npi_filepath , 
+		col_names = columns_to_import , 
+		col_types = 
+			paste0( 
+				ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
+				collapse = "" 
+			) ,
+		skip = 1
+	) 
+
+nppes_df <- 
+	data.frame( nppes_tbl )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# nppes_fn <- file.path( path.expand( "~" ) , "NPPES" , "this_file.rds" )
+# saveRDS( nppes_df , file = nppes_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# nppes_df <- readRDS( nppes_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+nppes_df <- 
+	transform( 
+		nppes_df , 
+		
+		individual = as.numeric( entity_type_code ) ,
+		
+		provider_enumeration_year =
+			as.numeric( substr( provider_enumeration_date , 7 , 10 ) ) ,
+		
+		state_name = provider_business_practice_location_address_state_name
+		
+	)
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( nppes_df )
+
+table( nppes_df[ , "provider_gender_code" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( nppes_df[ , "provider_enumeration_year" ] , na.rm = TRUE )
+
+tapply(
+	nppes_df[ , "provider_enumeration_year" ] ,
+	nppes_df[ , "provider_gender_code" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( nppes_df[ , "is_sole_proprietor" ] ) )
+
+prop.table(
+	table( nppes_df[ , c( "is_sole_proprietor" , "provider_gender_code" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( nppes_df[ , "provider_enumeration_year" ] , na.rm = TRUE )
+
+tapply(
+	nppes_df[ , "provider_enumeration_year" ] ,
+	nppes_df[ , "provider_gender_code" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( nppes_df[ , "provider_enumeration_year" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	nppes_df[ , "provider_enumeration_year" ] ,
+	nppes_df[ , "provider_gender_code" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to California:
+```{r eval = FALSE , results = "hide" }
+sub_nppes_df <- subset( nppes_df , state_name = 'CA' )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_nppes_df[ , "provider_enumeration_year" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( nppes_df[ , "provider_enumeration_year" ] , na.rm = TRUE )
+
+tapply(
+	nppes_df[ , "provider_enumeration_year" ] ,
+	nppes_df[ , "provider_gender_code" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( provider_enumeration_year ~ individual , nppes_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( nppes_df[ , c( "individual" , "is_sole_proprietor" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		provider_enumeration_year ~ individual + is_sole_proprietor , 
+		data = nppes_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for NPPES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+nppes_tbl <- as_tibble( nppes_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nppes_tbl %>%
+	summarize( mean = mean( provider_enumeration_year , na.rm = TRUE ) )
+
+nppes_tbl %>%
+	group_by( provider_gender_code ) %>%
+	summarize( mean = mean( provider_enumeration_year , na.rm = TRUE ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for NPPES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+nppes_dt <- data.table( nppes_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+nppes_dt[ , mean( provider_enumeration_year , na.rm = TRUE ) ]
+
+nppes_dt[ , mean( provider_enumeration_year , na.rm = TRUE ) , by = provider_gender_code ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for NPPES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'nppes' , nppes_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( provider_enumeration_year ) FROM nppes' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		provider_gender_code ,
+		AVG( provider_enumeration_year )
+	FROM
+		nppes
+	GROUP BY
+		provider_gender_code'
+)
+```

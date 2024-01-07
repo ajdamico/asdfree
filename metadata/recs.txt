@@ -1,0 +1,205 @@
+chapter_title: Residential Energy Consumption Survey
+
+needs_actions_build_status_line: yes
+
+~~~{dataset_introduction}
+A periodic study conducted to provide detailed information about energy usage in U.S. homes.
+~~~
+
+table_structure: * One table with one row per sampled housing unit.
+
+generalizable_population: * A complex sample survey designed to generalize to U.S. homes occupied as primary residences.
+
+publication_period: * Released approximately every five years since 1979.
+
+administrative_organization: * Prepared by the [Energy Information Administration](https://www.eia.gov/), with help from [IMG-Crown](https://www.imgcrown.com/) and [RTI International](https://www.rti.org/).
+
+
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Annual Energy Outlook 2023](https://www.eia.gov/outlooks/aeo/narrative/)
+
+2. [Household Characteristics Technical Documentation Summary](https://www.eia.gov/consumption/residential/data/2020/pdf/2020%20RECS_Methodology%20Report.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# housing code dogma
+# even satan ceased sweat since
+# eighth sin: central air
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Download and import the most recent sas file:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+sas_tf <- tempfile()
+
+sas_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v2.zip"
+
+download.file( sas_url , sas_tf , mode = 'wb' )
+
+chapter_tag_tbl <- read_sas( sas_tf )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+chapter_tag_design <-
+	svrepdesign(
+		data = chapter_tag_df ,
+		weight = ~ nweight ,
+		repweights = 'nweight[1-9]+' ,
+		type = 'JK1' ,
+		combined.weights = TRUE ,
+		scale = 59 / 60 ,
+		mse = TRUE
+	)
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	
+	update( 
+		
+		chapter_tag_design , 
+		
+		main_heating_fuel = 
+			factor(
+				fuelheat ,
+				levels = c( -2 , 5 , 1 , 2 , 3 , 7 , 99 ) ,
+				labels = 
+					c(
+						'Not applicable' , 
+						'Electricity' , 
+						'Natural gas from underground pipes' , 
+						'Propane (bottled gas)' , 
+						'Fuel oil' , 
+						'Wood or pellets' , 
+						'Other' 
+					)
+			) ,
+
+		rooftype =
+			factor(
+				rooftype ,
+				levels = c( -2 , 1:6 , 99 ) ,
+				labels =
+					c(
+						'Not applicable' ,
+						'Ceramic or clay tiles' ,
+						'Wood shingles/shakes' ,
+						'Metal' ,
+						'Slate or synthetic slate' ,
+						'Shingles (composition or asphalt)' ,
+						'Concrete tiles' ,
+						'Other'
+					)
+			) ,
+			
+		swimpool_binary =
+			ifelse( swimpool %in% 0:1 , swimpool , NA )
+			
+	)
+~~~
+
+group_by_variable: main_heating_fuel
+
+categorical_variable: rooftype
+
+linear_variable: totsqft_en
+linear_variable_description: total energy-consuming area (square footage) of the housing unit
+
+ratio_estimation_numerator: totcsqft
+ratio_estimation_denominator: totsqft_en
+
+subset_definition: nummeal == 1
+subset_definition_description: households that cook three or more hot meals per day
+
+binary_variable: swimpool_binary
+binary_variable_description: has swimming pool
+binary_narm: , na.rm = TRUE
+
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches the statistic, standard error, and relative standard error shown on PDF page 8 of [Using the microdata file to compute estimates and relative standard errors (RSEs)](https://www.eia.gov/consumption/residential/data/2020/pdf/microdata-guide.pdf)
+
+
+
+
+```{r eval = FALSE , results = "hide" }
+sas_v1_tf <- tempfile()
+
+sas_v1_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v1.zip"
+
+download.file( sas_v1_url , sas_v1_tf , mode = 'wb' )
+
+chapter_tag_v1_tbl <- read_sas( sas_v1_tf )
+
+chapter_tag_v1_df <- data.frame( chapter_tag_v1_tbl )
+
+names( chapter_tag_v1_df ) <- tolower( names( chapter_tag_v1_df ) )
+
+chapter_tag_v1_design <-
+	svrepdesign(
+		data = chapter_tag_v1_df ,
+		weight = ~ nweight ,
+		repweights = 'nweight[1-9]+' ,
+		type = 'JK1' ,
+		combined.weights = TRUE ,
+		scale = 59 / 60 ,
+		mse = TRUE
+	)
+
+chapter_tag_v1_design <- 
+	update( 
+
+		chapter_tag_v1_design , 
+
+		natural_gas_mainspace_heat = as.numeric( fuelheat == 1 )
+		
+	)
+	
+result <-
+	svytotal( 
+		~ natural_gas_mainspace_heat , 
+		chapter_tag_v1_design 
+	)
+
+stopifnot( round( coef( result ) , 0 ) == 56245389 )
+stopifnot( round( SE( result ) , 0 ) == 545591 )
+stopifnot( round( 100 * SE( result ) / coef( result ) , 2 ) == 0.97 )
+```
+
+~~~
+
+
+
+
+

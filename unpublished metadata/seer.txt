@@ -1,0 +1,79 @@
+chapter_title: Surveillance Epidemiology and End Results
+
+password_parameters: , \\\\n\\\\tyour_username = "username" , \\\\n\\\\tyour_password = "password"
+
+
+~~~{dataset_introduction}
+The Surveillance Epidemiology and End Results (SEER) aggregates person-level information for more than a quarter of cancer incidence in the United States.
+~~~
+
+table_structure: * A series of both individual- and population-level tables, grouped by site of cancer diagnosis.
+
+generalizable_population: * A registry covering various geographies across the US population, standardized by SEER*Stat to produce nationally-representative estimates.
+
+publication_period: * Updated every spring based on the previous November's submission of data.
+
+administrative_organization: * Maintained by the United States [National Cancer Institute (NCI)](http://www.cancer.gov/)
+
+
+~~~{analysis_examples_loading_block}
+available_files <-
+	list.files( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
+		recursive = TRUE , 
+		full.names = TRUE 
+	)
+
+chapter_tag_df <- 
+	readRDS( grep( "incidence(.*)yr1973(.*)LYMYLEUK" , available_files , value = TRUE ) )
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		survival_months = ifelse( srv_time_mon == 9999 , NA , as.numeric( srv_time_mon ) ) ,
+		
+		female = as.numeric( sex == 2 ) ,
+		
+		race_ethnicity =
+			ifelse( race1v == 99 , "unknown" ,
+			ifelse( nhiade > 0 , "hispanic" , 
+			ifelse( race1v == 1 , "white non-hispanic" ,
+			ifelse( race1v == 2 , "black non-hispanic" , 
+				"other non-hispanic" ) ) ) ) ,
+		
+		marital_status_at_dx =
+			factor( 
+				as.numeric( mar_stat ) , 
+				levels = c( 1:6 , 9 ) ,
+				labels =
+					c(
+						"single (never married)" ,
+						"married" ,
+						"separated" ,
+						"divorced" ,
+						"widowed" ,
+						"unmarried or domestic partner or unregistered" ,
+						"unknown"
+					)
+			)
+	)
+~~~
+
+group_by_variable: race_ethnicity
+linear_variable: survival_months
+linear_narm: , na.rm = TRUE
+categorical_variable: marital_status_at_dx
+subset_definition: rept_src == 1
+subset_definition_description: inpatient hospital reporting source
+binary_variable: female
+needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
+
+
+
+needs_actions_build_status_line: yes
+

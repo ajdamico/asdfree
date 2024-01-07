@@ -1,80 +1,137 @@
 chapter_title: Exame Nacional do Ensino Medio
-authorship_line: *Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+
+needs_actions_build_status_line: yes -windows -linux
+
 
 ~~~{dataset_introduction}
-The Exame Nacional do Ensino Medio (ENEM) contains the standardized test results of most Brazilian high school students.
+The national student aptitude test, used to assess high school completion and university admission.
 ~~~
-table_structure: * An annual table with one row per student.
+
+table_structure: * One table with one row per test-taking student, a second of study habit questionnaire respondents.
 
 publication_period: * Updated annually since 1998.
 
-administrative_organization: * Maintained by the Brazil's [Instituto Nacional de Estudos e Pesquisas Educacionais Anisio Teixeira (INEP)](http://www.inep.gov.br/)
+administrative_organization: * Maintained by Brazil's [Instituto Nacional de Estudos e Pesquisas Educacionais Anisio Teixeira](http://www.inep.gov.br/)
 
-needs_catalog_block: yes
-catalog_subset_description: # 2015 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2015 )
 
-~~~{analysis_examples_loading_block}
-library(DBI)
-dbdir <- file.path( path.expand( "~" ) , "CHAPTER_TAG" , "SQLite.db" )
-db <- dbConnect( RSQLite::SQLite() , dbdir )
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. `Leia_Me_Enem` included in each [annual zipped file](https://download.inep.gov.br/microdados/microdados_enem_2022.zip)
+
+
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Exame_Nacional_do_Ensino_M%C3%A9dio)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# graduation stage
+# shake hands, toss cap, unroll scroll,
+# mais um exame?
+```
 ~~~
 
-sql_tablename: microdados_enem_2015
+
+
+~~~{download_and_import_block}
+
+Download and unzip the 2022 file:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+library(archive)
+
+tf <- tempfile()
+
+this_url <-	"https://download.inep.gov.br/microdados/microdados_enem_2022.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+archive_extract( tf , dir = tempdir() )
+```
+
+Import the 2022 file:
+
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+chapter_tag_fns <- list.files( tempdir() , recursive = TRUE , full.names = TRUE )
+
+
+chapter_tag_fn <- grep( "MICRODADOS_ENEM_([0-9][0-9][0-9][0-9])\\\\.csv$" , chapter_tag_fns , value = TRUE )
+
+chapter_tag_tbl <- read_csv2( chapter_tag_fn )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+~~~
+
 
 ~~~{variable_recoding_block}
-dbSendQuery( db , "ALTER TABLE sql_tablename ADD COLUMN female INTEGER" )
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		domestic_worker = as.numeric( q007 %in% c( 'B' , 'C' , 'D' ) ) ,
+		
+		administrative_category =
+			factor(
+				tp_dependencia_adm_esc ,
+				levels = 1:4 ,
+				labels = c( 'Federal' , 'Estadual' , 'Municipal' , 'Privada' )
+			) ,
 
-dbSendQuery( db , 
-	"UPDATE sql_tablename 
-	SET female = 
-		CASE WHEN tp_sexo = 2 THEN 1 ELSE 0 END" 
-)
+		state_name = 
+			factor( 
+				co_uf_esc , 
+				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
+				"Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+				"Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+				"Bahia" , "Minas Gerais" , "Espirito Santo" , 
+				"Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+				"Santa Catarina" , "Rio Grande do Sul" , 
+				"Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+				"Distrito Federal" )
+			)
 
-dbSendQuery( db , "ALTER TABLE sql_tablename ADD COLUMN fathers_education INTEGER" )
-
-dbSendQuery( db , 
-	"UPDATE sql_tablename 
-	SET fathers_education = 
-		CASE WHEN q001 = 1 THEN '01 - nao estudou'
-			WHEN q001 = 2 THEN '02 - 1 a 4 serie'
-			WHEN q001 = 3 THEN '03 - 5 a 8 serie'
-			WHEN q001 = 4 THEN '04 - ensino medio incompleto'
-			WHEN q001 = 5 THEN '05 - ensino medio'
-			WHEN q001 = 6 THEN '06 - ensino superior incompleto'
-			WHEN q001 = 7 THEN '07 - ensino superior'
-			WHEN q001 = 8 THEN '08 - pos-graduacao'
-			WHEN q001 = 9 THEN '09 - nao estudou' ELSE NULL END" 
-)
+	)
+	
 ~~~
 
-group_by_variable: fathers_education
-linear_variable: nota_mt
-categorical_variable: uf_residencia
-subset_definition: in_presenca_mt = 1
-subset_definition_description: took mathematics exam
-binary_variable: female
+
+
+
+
+group_by_variable: administrative_category
+linear_variable: nu_nota_mt
+linear_narm: , na.rm = TRUE
+categorical_variable: state_name
+subset_definition: q002 %in% c( 'E' , 'F' , 'G' )
+subset_definition_description: mother graduated from high school
+binary_variable: domestic_worker
+
+
+
+
 needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: no
 
-
-
-dependencies: library(readxl)
 
 
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
+This example matches the registration counts in the [Sinopse ENEM 2022 Excel table](https://download.inep.gov.br/informacoes_estatisticas/sinopses_estatisticas/sinopses_enem/2022/sinopse_enem_2022.zip):
 
 ```{r eval = FALSE , results = "hide" }
-dbGetQuery( db , "SELECT COUNT(*) FROM sql_tablename" )
+stopifnot( nrow( chapter_tag_df ) ==  3476105 )
 ```
 
 ~~~
-
-
-needs_travis_build_status_line: yes
-
-needs_7za_install: yes
-

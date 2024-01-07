@@ -1,57 +1,215 @@
-chapter_title: Social Security Administration Public Use Microdata
+chapter_title: Social Security Public-Use Data Files
+
+needs_actions_build_status_line: yes -linux -windows
 
 ~~~{dataset_introduction}
-Research extracts provided by the Social Security Administration.
+Microdata from administrative sources like the Master Beneficiary Record, Supplemental Security Record.
 ~~~
 
 table_structure: * Tables contain either one record per person or one record per person per year.
 
-generalizable_population: * The entire population of either social security number holders (most of the country) or social security recipients (just beneficiaries).  One-percent samples should be multiplied by 100 to get accurate nationwide count statistics, five-percent samples by 20.
+generalizable_population: * A systematic sample of either social security number holders (most americans) or program recipients (current beneficiaries).  Multiply 1% samples by 100 to get weighted statistics, 5% samples by 20.
 
-publication_period: * No expected release timeline.
+publication_period: * [No expected release timeline](https://www.ssa.gov/policy/pub_schedule.html).
 
-administrative_organization: * Released by the United States [Social Security Administration (SSA)](http://www.ssa.gov/).
+administrative_organization: * Released by the [Office of Research, Evaluation, and Statistics](https://www.ssa.gov/policy/index.html), US [Social Security Administration](http://www.ssa.gov/).
 
-catalog_subset_description: # december 2001 supplemental security income 5% sample
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , grepl( "ssr_data\\.zip$" , full_url ) )
 
-~~~{analysis_examples_loading_block}
-chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "ssr_data/SSIPUF.rds" ) )
+~~~{reading_block}
+Please skim before you begin:
+
+1. [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html)
+
+2. [Comparing Earnings Estimates from the 2006 Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# annual earnings.
+# for pensioner payouts, see
+# the '04 extract
+```
 ~~~
+
+
+~~~{download_and_import_block}
+
+Download and import the 1951-2006 one percent files with one record per person and per person-year:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+library(httr)
+
+tf <- tempfile()
+
+chapter_tag_url <- "https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip"
+
+GET( chapter_tag_url , write_disk( tf ) , progress() )
+
+chapter_tag_files <- unzip( tf , exdir = tempdir() )
+
+chapter_tag_fn <- grep( 'demographic' , chapter_tag_files , value = TRUE )
+
+annual_fn <- grep( 'annual' , chapter_tag_files , value = TRUE )
+
+chapter_tag_tbl <- read_sas( chapter_tag_fn )
+
+annual_tbl <- read_sas( annual_fn )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+annual_df <- data.frame( annual_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+names( annual_df ) <- tolower( names( annual_df ) )
+```
+
+
+Sum up 1951-1952 and 1953-2006 earnings, and also 1953-2006 credits, copying the naming convention:
+```{r eval = FALSE , results = "hide" }
+summed_earnings_5152 <-
+	with( 
+		subset( annual_df , year_earn %in% 1951:1952 ) , 
+		aggregate( annual_earnings , list( id ) , sum )
+	)
+	
+names( summed_earnings_5152 ) <- c( 'id' , 'tot_cov_earn5152' )
+
+summed_earnings_5306 <-
+	with( 
+		subset( annual_df , year_earn > 1952 ) , 
+		aggregate( annual_earnings , list( id ) , sum )
+	)
+	
+names( summed_earnings_5306 ) <- c( 'id' , 'tot_cov_earn5306' )
+
+summed_quarters_5306 <-
+	with( 
+		subset( annual_df , year_earn > 1952 ) , 
+		aggregate( annual_qtrs , list( id ) , sum )
+	)
+
+names( summed_quarters_5306 ) <- c( 'id' , 'qc5306' )
+```
+
+Isolate a single year of earnings:
+```{r eval = FALSE , results = "hide" }
+earnings_2006 <- annual_df[ annual_df[ , 'year_earn' ] == 2006 , c( 'id' , 'annual_earnings' ) ]
+
+names( earnings_2006 ) <- c( 'id' , 'tot_cov_earn06' )
+```
+
+Merge each new column on to the person-level table, then add zeroes to person-years without earnings:
+```{r eval = FALSE , results = "hide" }
+stopifnot( all( !is.na( chapter_tag_df ) ) )
+
+before_nrow <- nrow( chapter_tag_df )
+
+chapter_tag_df <- merge( chapter_tag_df , summed_earnings_5152 , all.x = TRUE )
+
+chapter_tag_df <- merge( chapter_tag_df , summed_earnings_5306 , all.x = TRUE )
+
+chapter_tag_df <- merge( chapter_tag_df , summed_quarters_5306 , all.x = TRUE )
+
+chapter_tag_df <- merge( chapter_tag_df , earnings_2006 , all.x = TRUE )
+
+chapter_tag_df[ is.na( chapter_tag_df ) ] <- 0
+
+stopifnot( nrow( chapter_tag_df ) == before_nrow )
+
+```
+~~~
+
 
 ~~~{variable_recoding_block}
 chapter_tag_df <- 
 	transform( 
-		chapter_tag_df , 
+		chapter_tag_df ,
+
+		decade_of_birth = floor( yob / 10 ) * 10 ,
 		
-		mental_disorder = as.numeric( diag %in% 1:2 ) ,
+		sex = factor( sex , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
 		
-		program_eligibility =
-			factor( 
-				prel , 
-				
-				levels = 0:5 , 
-				
+		tot_cov_earn3706 = ( tot_cov_earn3750 + tot_cov_earn5152 + tot_cov_earn5306 ) ,
+		
+		qc3706 = ( qc3750 + qc5152 + qc5306 ) ,
+		
+		any_earnings_2006 = ( tot_cov_earn06 > 0 ) ,
+		
+		earnings_periods =
+			factor(
+				ifelse( ( tot_cov_earn5152 + tot_cov_earn5306 > 0 ) & tot_cov_earn3750 > 0 , 1 ,
+				ifelse( tot_cov_earn5152 > 0 | tot_cov_earn5306 > 0 , 2 ,
+				ifelse( tot_cov_earn3750 > 0 , 3 , 4 ) ) ) ,
+				levels = 1:4 ,
 				labels =
-					c( "Unspecified" ,
-					"Aged individual" ,
-					"Aged spouse" ,
-					"Disabled or blind individual" ,
-					"Disabled or blind spouse" ,
-					"Disabled or blind child" )
-			)
-			
+					c( 'Earnings in both periods' , 'Earnings during 1951-2006 only' ,
+						'Earnings during 1937-1950 only' , 'No earnings' ) )
 	)
-	
 ~~~
 
-group_by_variable: stat
-linear_variable: fpmt
-categorical_variable: program_eligibility
-subset_definition: sex == "F"
-subset_definition_description: females
-binary_variable: mental_disorder
+group_by_variable: sex
+linear_variable: tot_cov_earn3706
+categorical_variable: decade_of_birth
+subset_definition: qc3706 >= 40
+subset_definition_description: individuals with at least forty lifetime credits
+binary_variable: any_earnings_2006
+
+
+
+
 needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
 
 
-needs_travis_build_status_line: yes
+
+
+
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches statistics in [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html):
+
+Chart 5. Percentage distribution of individuals in EPUF, by capped Social Security taxable earnings status: 
+```{r eval = FALSE , results = "hide" }
+chart_five_results <- prop.table( table( chapter_tag_df[ , 'earnings_periods' ] ) )
+chart_five_results <- round( 100 * chart_five_results )
+
+stopifnot( chart_five_results[ 'Earnings in both periods' ] == 16 )
+stopifnot( chart_five_results[ 'Earnings during 1951-2006 only' ] == 55 )
+stopifnot( chart_five_results[ 'Earnings during 1937-1950 only' ] == 4 )
+stopifnot( chart_five_results[ 'No earnings' ] == 25 )
+```
+
+Table 4. Average and median Social Security taxable earnings in EPUF, by sex, 1951–2006 (in dollars):
+```{r eval = FALSE , results = "hide" }
+nonzero_2006_earners <- chapter_tag_df[ chapter_tag_df[ , 'tot_cov_earn06' ] > 0 , 'tot_cov_earn06' ]
+stopifnot( round( mean( nonzero_2006_earners ) , 0 ) == 30953 )
+stopifnot( round( quantile( nonzero_2006_earners )[ 3 ] , 0 ) == 24000 )
+```
+
+Table A1. Number and percentage distribution of individuals with Social Security taxable earnings records in EPUF, by sex, 1951–2006:
+```{r eval = FALSE , results = "hide" }
+nonzero_2006_earners <- chapter_tag_df[ chapter_tag_df[ , 'tot_cov_earn06' ] > 0 ,  ]
+stopifnot( round( mean( nonzero_2006_earners[ , 'tot_cov_earn06' ] ) , 0 ) == 30953 )
+stopifnot( round( quantile( nonzero_2006_earners[ , 'tot_cov_earn06' ] )[ 3 ] , 0 ) == 24000 )
+```
+
+This example matches statistics in [Comparing Earnings Estimates from the 2006 Earnings Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html):
+
+Table 4. Comparing Supplement and EPUF estimates: Number of all, male, and female workers with any earnings during the year, 1951–2006:
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( round( nrow( nonzero_2006_earners ) * 100 , -3 ) == 156280000 )
+earners_in_2006_by_sex <- table( nonzero_2006_earners[ , 'sex' ] ) * 100
+stopifnot( round( earners_in_2006_by_sex[ 'male' ] , -3 ) == 81576000 )
+stopifnot( round( earners_in_2006_by_sex[ 'female' ] , -3 ) == 74681000 )
+```
+
+~~~
+
+
+

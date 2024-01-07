@@ -1,72 +1,207 @@
 chapter_title: Consumer Expenditure Survey
 
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
-The Consumer Expenditure Survey (CES) is the authoritative data source to understand how Americans spend money.  Participating households keep a running diary about every purchase over fifteen months.  Those diaries are then summed up into precise expenditure categories.
+A household budget survey designed to guide major economic indicators like the Consumer Price Index.
 ~~~
 
-table_structure: * One table of survey responses per quarter with one row per sampled household (consumer unit).  Additional tables containing one record per expenditure
 
-generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional population of the United States.
+table_structure: * One table of survey responses per quarter with one row per sampled household (consumer unit).  Additional tables containing one record per expenditure.
+
+generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional U.S. population.
 
 publication_period: * Released annually since 1996.
 
 administrative_organization: * Administered by the [Bureau of Labor Statistics](http://www.bls.gov/).
 
-needs_catalog_block: yes
-catalog_subset_description: # 2016 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 )
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Consumer Expenditure Surveys Public Use Microdata Getting Started Guide](https://www.bls.gov/cex/pumd-getting-started-guide.htm)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Consumer_Expenditure_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# price indices and
+# you spent how much on beans, jack?
+# pocketbook issues
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Download both the prior and current year of interview microdata:
+```{r eval = FALSE , results = "hide" }
+library(RCurl)
+
+tf_prior_year <- tempfile()
+
+this_url_prior_year <- "https://www.bls.gov/cex/pumd/data/stata/intrvw21.zip"
+
+writeBin( getBinaryURL( this_url_prior_year ) , tf_prior_year )
+
+unzipped_files_prior_year <- unzip( tf_prior_year , exdir = tempdir() )
+
+tf_current_year <- tempfile()
+
+this_url_current_year <- "https://www.bls.gov/cex/pumd/data/stata/intrvw22.zip"
+
+writeBin( getBinaryURL( this_url_current_year ) , tf_current_year )
+
+unzipped_files_current_year <- unzip( tf_current_year , exdir = tempdir() )
+
+unzipped_files <- c( unzipped_files_current_year , unzipped_files_prior_year )
+```
+
+
+
+
+
+Import and stack all 2022 quarterly files plus 2023's first quarter:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+fmli_files <- grep( "fmli2[2-3]" , unzipped_files , value = TRUE )
+
+fmli_tbls <- lapply( fmli_files , read_dta )
+
+fmli_dfs <- lapply( fmli_tbls , data.frame )
+
+fmli_dfs <- 
+	lapply( 
+		fmli_dfs , 
+		function( w ){ names( w ) <- tolower( names( w ) ) ; w }
+	)
+
+fmli_cols <- lapply( fmli_dfs , names )
+
+intersecting_cols <- Reduce( intersect , fmli_cols )
+
+fmli_dfs <- lapply( fmli_dfs , function( w ) w[ intersecting_cols ] )
+
+chapter_tag_df <- do.call( rbind , fmli_dfs )
+```
+
+
+Scale the weight columns based on the number of months in 2022:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_df[ , c( 'qintrvyr' , 'qintrvmo' ) ] <-
+	sapply( chapter_tag_df[ , c( 'qintrvyr' , 'qintrvmo' ) ] , as.numeric )
+
+weight_columns <- grep( 'wt' , names( chapter_tag_df ) , value = TRUE )
+
+
+chapter_tag_df <-
+	transform(
+		chapter_tag_df ,
+		mo_scope =
+			ifelse( qintrvyr %in% 2022 & qintrvmo %in% 1:3 , qintrvmo - 1 ,
+			ifelse( qintrvyr %in% 2023 , 4 - qintrvmo , 3 ) )
+	)
+
+
+for ( this_column in weight_columns ){
+	chapter_tag_df[ is.na( chapter_tag_df[ , this_column ] ) , this_column ] <- 0
+	
+	chapter_tag_df[ , paste0( 'popwt_' , this_column ) ] <-
+		( chapter_tag_df[ , this_column ] * chapter_tag_df[ , 'mo_scope' ] / 12 )	
+	
+}
+```
+
+
+Combine previous quarter and current quarter variables into a single variable:
+```{r eval = FALSE , results = "hide" }
+
+expenditure_variables <- 
+	gsub( "pq$" , "" , grep( "pq$" , names( chapter_tag_df ) , value = TRUE ) )
+
+# confirm that for every variable ending in pq,
+# there's the same variable ending in cq
+stopifnot( all( paste0( expenditure_variables , 'cq' ) %in% names( chapter_tag_df ) ) )
+
+# confirm none of the variables without the pq or cq suffix exist
+if( any( expenditure_variables %in% names( chapter_tag_df ) ) ) stop( "variable conflict" )
+
+for( this_column in expenditure_variables ){
+
+	chapter_tag_df[ , this_column ] <-
+		rowSums( chapter_tag_df[ , paste0( this_column , c( 'pq' , 'cq' ) ) ] , na.rm = TRUE )
+	
+	# annualize the quarterly spending
+	chapter_tag_df[ , this_column ] <- 4 * chapter_tag_df[ , this_column ]
+	
+	chapter_tag_df[ is.na( chapter_tag_df[ , this_column ] ) , this_column ] <- 0
+
+}
+```
+
+
+Append any interview survey UCC found at https://www.bls.gov/cex/ce_source_integrate.xlsx:
+
+```{r eval = FALSE , results = "hide" }
+ucc_exp <- c( "450110" , "450210" )
+
+mtbi_files <- grep( "mtbi2[2-3]" , unzipped_files , value = TRUE )
+
+mtbi_tbls <- lapply( mtbi_files , read_dta )
+
+mtbi_dfs <- lapply( mtbi_tbls , data.frame )
+
+mtbi_dfs <- 
+	lapply( 
+		mtbi_dfs , 
+		function( w ){ names( w ) <- tolower( names( w ) ) ; w }
+	)
+
+mtbi_dfs <- lapply( mtbi_dfs , function( w ) w[ c( 'newid' , 'cost' , 'ucc' , 'ref_yr' ) ] )
+
+mtbi_df <- do.call( rbind , mtbi_dfs )
+
+mtbi_df <- subset( mtbi_df , ( ref_yr %in% 2022 ) & ( ucc %in% ucc_exp ) )
+
+mtbi_agg <- aggregate( cost ~ newid , data = mtbi_df , sum )
+
+names( mtbi_agg ) <- c( 'newid' , 'new_car_truck_exp' )
+
+before_nrow <- nrow( chapter_tag_df )
+
+chapter_tag_df <-
+	merge(
+		chapter_tag_df ,
+		mtbi_agg ,
+		all.x = TRUE
+	)
+
+stopifnot( nrow( chapter_tag_df ) == before_nrow )
+
+chapter_tag_df[ is.na( chapter_tag_df[ , 'new_car_truck_exp' ] ) , 'new_car_truck_exp' ] <- 0
+```
+~~~
+
+
 
 ~~~{analysis_examples_survey_design}
+Separate the `chapter_tag_df` data.frame into five implicates, each differing from the others only in the multiply-imputed variables:
+```{r eval = FALSE , results = "hide" }
 library(survey)
 library(mitools)
 
-# read in the five quarters of family data files (fmli)
-
-fmli161x <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016/fmli161x.rds" ) )
-fmli162 <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016/fmli162.rds" ) )
-fmli163 <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016/fmli163.rds" ) )
-fmli164 <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016/fmli164.rds" ) )
-fmli171 <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016/fmli171.rds" ) )
-
-fmli161x$qtr <- 1
-fmli162$qtr <- 2
-fmli163$qtr <- 3
-fmli164$qtr <- 4
-fmli171$qtr <- 5
-
-fmli171 <- fmli171[ , names( fmli161x ) ]
-
-fmly <- rbind( fmli161x , fmli162 , fmli163 , fmli164 , fmli171 )
-
-rm( fmli161x , fmli162 , fmli163 , fmli164 , fmli171 )
-
-wtrep <- c( paste0( "wtrep" , stringr::str_pad( 1:44 , 2 , pad = "0" ) ) , "finlwt21" )
-
-for ( i in wtrep ) fmly[ is.na( fmly[ , i ] ) , i ] <- 0
-
-# create a new variable in the fmly data table called 'totalexp'
-# that contains the sum of the total expenditure from the current and previous quarters
-fmly$totalexp <- rowSums( fmly[ , c( "totexppq" , "totexpcq" ) ] , na.rm = TRUE )
-
-# immediately convert missing values (NA) to zeroes
-fmly[ is.na( fmly$totalexp ) , "totalexp" ] <- 0
-
-# annualize the total expenditure by multiplying the total expenditure by four,
-# creating a new variable 'annexp' in the fmly data table
-fmly <- transform( fmly , annexp = totalexp * 4 )
-
-# add a column of ones
-fmly$one <- 1
-
 # create a vector containing all of the multiply-imputed variables
 # (leaving the numbers off the end)
-mi_vars <- gsub( "5$" , "" , grep( "[a-z]5$" , names( fmly ) , value = TRUE ) )
+mi_vars <- gsub( "5$" , "" , grep( "[a-z]5$" , names( chapter_tag_df ) , value = TRUE ) )
 
 # loop through each of the five variables..
 for ( i in 1:5 ){
 
-	# copy the 'fmly' table over to a new temporary data frame 'x'
-	x <- fmly
+	# copy the 'chapter_tag_df' table over to a new temporary data frame 'x'
+	x <- chapter_tag_df
 
 	# loop through each of the multiply-imputed variables..
 	for ( j in mi_vars ){
@@ -80,67 +215,84 @@ for ( i in 1:5 ){
 
 	}
 	
-	# save the current table in the sqlite database as 'imp1' 'imp2' etc.
 	assign( paste0( 'imp' , i ) , x )
 
-	# remove the temporary table
-	rm( x )
-	
 }
 
-	
-# containing the five multiply-imputed data tables - imp1 through imp5
+
 chapter_tag_design <- 
 	svrepdesign( 
-		weights = ~finlwt21 , 
-		repweights = "wtrep[0-9]+" , 
+		weights = ~ finlwt21 , 
+		repweights = "^wtrep[0-9][0-9]$" , 
 		data = imputationList( list( imp1 , imp2 , imp3 , imp4 , imp5 ) ) , 
 		type = "BRR" ,
 		combined.weights = TRUE ,
 		mse = TRUE
 	)
-
-rm( imp1 , imp2 , imp3 , imp4 , imp5 )
+```
 ~~~
+
 
 ~~~{variable_recoding_block}
 chapter_tag_design <- 
 	update( 
 		chapter_tag_design , 
 		
-		any_food_stamp = as.numeric( jfs_amtmi > 0 )
+		one = 1 ,
+		
+		any_food_stamp = as.numeric( jfs_amtmi > 0 ) ,
+		
+		bls_urbn = factor( bls_urbn , levels = 1:2 , labels = c( 'urban' , 'rural' ) ) ,
+		
+		sex_ref = factor( sex_ref , levels = 1:2 , labels = c( 'male' , 'female' ) )
 		
 	)
 ~~~
 
 group_by_variable: bls_urbn
-linear_variable: annexp
+linear_variable: totexp
 categorical_variable: sex_ref
-ratio_estimation_numerator: annexp
+ratio_estimation_numerator: totexp
 ratio_estimation_denominator: fincbtxmi
 subset_definition: state == '06'
 subset_definition_description: california residents
 binary_variable: any_food_stamp
 
 
+
+
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
-
+This example matches the _number of consumer units_ and the _Cars and trucks, new_ rows of [Table R-1](https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2022.pdf):
 ```{r eval = FALSE , results = "hide" }
+result <-
+	MIcombine( with( chapter_tag_design , svytotal( ~ as.numeric( popwt_finlwt21 / finlwt21 ) ) ) )
 
+stopifnot( round( coef( result ) , -3 ) == 134090000 )
 
+results <- 
+	sapply( 
+		weight_columns , 
+		function( this_column ){
+			sum( chapter_tag_df[ , 'new_car_truck_exp' ] * chapter_tag_df[ , this_column ] ) / 
+			sum( chapter_tag_df[ , paste0( 'popwt_' , this_column ) ] )
+		}
+	)
+
+stopifnot( round( results[1] , 2 ) == 2195.30 )
+
+standard_error <- sqrt( ( 1 / 44 ) * sum( ( results[-1] - results[1] )^2 ) )
+
+stopifnot( round( standard_error , 2 ) == 174.02 )
+
+# note the minor differences
+MIcombine( with( chapter_tag_design , svymean( ~ cartkn ) ) )
 ```
 ~~~
 
 
-dependencies: library(readxl)
 
 
 
-needs_travis_build_status_line: yes
 
-sample_setup_breaks: 3
 
-broken_sample_test_condition: any( chapter_tag_cat$year == 2016 )

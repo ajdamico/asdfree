@@ -1,0 +1,63 @@
+chapter_title: Home Mortgage Disclosure Act
+
+
+~~~{dataset_introduction}
+Responding to discriminatory lending practices, the United States Congress mandated that financial organizations originating home mortgages report some basic operational statistics.  The Home Mortgage Disclosure Act (HMDA) increased the transparency of home-lending activity across the country.
+~~~
+table_structure: * A loan application record (LAR) table with one record per public loan application, with secondary tables containing both private loan applications (PMIC) and one record per institution tables (INS).
+
+generalizable_population: * A public compilation of [more than ninety percent](http://www.huduser.gov/portal/periodicals/ushmc/spring11/USHMC_1q11.pdf#page=6) of all Federal Housing Authority (FHA) loans in the United States.
+
+publication_period: * Updated every September with a new year of microdata.  Data prior to 2006 require a special order from the [United States National Archives](https://www.ffiec.gov/hmda/nationalarchives.htm).
+
+administrative_organization: * Maintained by the United States [Federal Financial Institutions Examination Council (FEIEC)](https://www.ffiec.gov/)
+
+~~~{analysis_examples_loading_block}
+library(DBI)
+dbdir <- file.path( path.expand( "~" ) , "CHAPTER_TAG" , "SQLite.db" )
+db <- dbConnect( RSQLite::SQLite() , dbdir )
+~~~
+
+sql_tablename: hmda_2015
+
+~~~{variable_recoding_block}
+dbSendQuery( db , "ALTER TABLE sql_tablename ADD COLUMN multifamily_home INTEGER" )
+
+dbSendQuery( db , 
+	"UPDATE sql_tablename 
+	SET multifamily_home = 
+		CASE WHEN ( propertytype = 3 ) THEN 1 ELSE 0 END" 
+)
+~~~
+
+group_by_variable: loanpurpose
+linear_variable: loanamount
+categorical_variable: actiontype
+subset_definition: race = 5 AND ethnicity = 2
+subset_definition_description: non-Hispanic White persons
+binary_variable: multifamily_home
+needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
+
+
+
+
+
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT COUNT(*) FROM sql_tablename" )
+```
+
+~~~
+
+
+needs_actions_build_status_line: yes
+
+
+
+

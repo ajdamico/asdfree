@@ -1,73 +1,216 @@
-chapter_title: Pesquisa Nacional por Amostra de Domicilios
-authorship_line: *Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+chapter_title: Survey of Income and Program Participation
+
+
+needs_actions_build_status_line: yes
+
 
 ~~~{dataset_introduction}
-Brazil's previous principal household survey, the Pesquisa Nacional por Amostra de Domicilios (PNAD) measures general education, labor, income, and housing characteristics of the population.
+The primary longitudinal assessment of income fluctuation, labor force participation, social programs.
 ~~~
 
-table_structure: * One table with one row per sampled household and a second table with one row per individual within each sampled household.
 
-generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional population of Brazil, although the rural north was not included prior to 2004.
-
-publication_period: * Released annually since 2001 except for years ending in zero, when the decennial census takes its place.
-
-administrative_organization: * Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+table_structure: * Annual tables with one record per month per person per sampled household, time period weights.
 
 
-needs_catalog_block: yes
-catalog_subset_description: # 2011 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 )
+generalizable_population: * A complex sample generalizing to the U.S. civilian non-institutionalized across varying time periods.
+
+publication_period: * Multi-year panels since 1980s, its current and now permanent [four year rotation](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf#page=15) beginning in 2018.
+
+administrative_organization: * Administered and financed by the [US Census Bureau](http://www.census.gov/).
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [2022 Survey of Income and Program Participation Users' Guide](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf)
+
+2. [2022 Data User Notes](https://www.census.gov/programs-surveys/sipp/tech-documentation/user-notes/2022-usernotes.html)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# federal programs
+# poverty oversample
+# monthly dynamics
+```
+~~~
+
+
+
+
+
+~~~{download_and_import_block}
+Determine which variables from the main table to import:
+```{r eval = FALSE , results = "hide" }
+variables_to_keep <-
+	c( 'ssuid' , 'pnum' , 'monthcode' , 'spanel' , 'swave' , 'erelrpe' , 
+	'tlivqtr' , 'wpfinwgt' , 'rmesr' , 'thcyincpov' , 'tfcyincpov' ,
+	'tehc_st' , 'rhicovann' , 'rfpov' , 'thnetworth' , 'tftotinc' )
+```
+
+Download and import the latest main file:
+```{r eval = FALSE , results = "hide" }
+library(httr)
+library(data.table)
+
+main_tf <- tempfile()
+
+main_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/sipp/" ,
+		"data/datasets/2022/pu2022_csv.zip"
+	)
+
+GET( main_url , write_disk( main_tf ) , progress() )
+
+main_csv <- unzip( main_tf , exdir = tempdir() )
+
+chapter_tag_main_dt <- fread( main_csv , sep = "|" , select = toupper( variables_to_keep ) )
+
+chapter_tag_main_df <- data.frame( chapter_tag_main_dt )
+
+names( chapter_tag_main_df ) <- tolower( names( chapter_tag_main_df ) )
+
+
+```
+
+Download and import the appropriate replicate weights file:
+```{r eval = FALSE , results = "hide" }
+rw_tf <- tempfile()
+
+rw_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/sipp/" ,
+		"data/datasets/2022/rw2022_csv.zip"
+	)
+
+GET( rw_url , write_disk( rw_tf ) , progress() )
+
+rw_csv <- unzip( rw_tf , exdir = tempdir() )
+
+chapter_tag_rw_dt <- fread( rw_csv , sep = "|" )
+
+
+chapter_tag_rw_df <- data.frame( chapter_tag_rw_dt )
+
+names( chapter_tag_rw_df ) <- tolower( names( chapter_tag_rw_df ) )
+```
+
+Limit both files to December records for a point-in-time estimate, then merge:
+```{r eval = FALSE , results = "hide" }
+
+chapter_tag_df <-
+	merge(
+		chapter_tag_main_df[ chapter_tag_main_df[ , 'monthcode' ] %in% 12 , ] ,
+		chapter_tag_rw_df[ chapter_tag_rw_df[ , 'monthcode' ] %in% 12 , ] ,
+		by = c( 'ssuid' , 'pnum' , 'monthcode' , 'spanel' , 'swave' )
+	)
+	
+stopifnot( nrow( chapter_tag_df ) == sum( chapter_tag_rw_df[ , 'monthcode' ] %in% 12 ) )
+```
+~~~
+
+
 
 
 ~~~{analysis_examples_survey_design}
-library(DBI)
-library(RSQLite)
+```{r eval = FALSE , results = "hide" }
 library(survey)
 
-options( survey.lonely.psu = "adjust" )
-
-prestratified_design <-
-	svydesign(
-		id = ~v4618 ,
-		strata = ~v4617 ,
-		data = chapter_tag_cat[ 1 , "db_tablename" ] ,
-		weights = ~pre_wgt ,
-		nest = TRUE ,
-		dbtype = "SQLite" ,
-		dbname = chapter_tag_cat[ 1 , "dbfile" ]
-	)
-	
 chapter_tag_design <- 
-	lodown:::pnad_postStratify( 
-		design = prestratified_design ,
-		strata.col = 'v4609' ,
-		oldwgt = 'pre_wgt'
-	)
+	svrepdesign(
+			data = chapter_tag_df ,
+			weights = ~ wpfinwgt ,
+			repweights = "repwgt([1-9]+)" ,
+			type = "Fay" ,
+			rho = 0.5
+		)
+	
+```
 ~~~
-
 
 ~~~{variable_recoding_block}
+rmesr_values <-
+	c( 
+		"With a job entire month, worked all weeks",
+		"With a job all month, absent from work without pay 1+ weeks, absence not due to layoff",
+		"With a job all month, absent from work without pay 1+ weeks, absence due to layoff",
+		"With a job at least 1 but not all weeks, no time on layoff and no time looking for work",
+		"With a job at least 1 but not all weeks, some weeks on layoff or looking for work",
+		"No job all month, on layoff or looking for work all weeks",
+		"No job all month, at least one but not all weeks on layoff or looking for work",
+		"No job all month, no time on layoff and no time looking for work"
+	)
+
+
 chapter_tag_design <- 
+	
 	update( 
+		
 		chapter_tag_design , 
-		age_categories = factor( 1 + findInterval( v8005 , seq( 5 , 60 , 5 ) ) ) ,
-		male = as.numeric( v0302 == 2 ) ,
-		teenagers = as.numeric( v8005 > 12 & v8005 < 20 ) ,
-		started_working_before_thirteen = as.numeric( v9892 < 13 )
+		
+		one = 1 ,
+		
+		employment_status = factor( rmesr , levels = 1:8 , labels = rmesr_values ) ,
+			
+		household_below_poverty = as.numeric( thcyincpov < 1 ) ,
+		
+		family_below_poverty = as.numeric( tfcyincpov < 1 ) ,
+		
+		state_name =
+			
+			factor(
+				
+				as.numeric( tehc_st ) ,
+				
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L, 60L, 61L) ,
+		
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming", "Puerto Rico",
+					"Foreign Country")
+			)
+			
 	)
 ~~~
 
+group_by_variable: state_name
 
-group_by_variable: region
-linear_variable: v4720
+categorical_variable: employment_status
+categorical_narm: , na.rm = TRUE
+
+linear_variable: tftotinc
+linear_variable_description: sum of monthly earnings and income
 linear_narm: , na.rm = TRUE
-categorical_variable: age_categories
-ratio_estimation_numerator: started_working_before_thirteen
-ratio_estimation_denominator: teenagers
+
+ratio_estimation_numerator: tftotinc
+ratio_estimation_denominator: rfpov
 ratio_narm: , na.rm = TRUE
-subset_definition: v4011 == 1
-subset_definition_description: married persons
-binary_variable: male
+
+subset_definition: rhicovann == 1
+subset_definition_description: individuals ever covered by health insurance during the year
+
+binary_variable: family_below_poverty
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
 
 ~~~{convey_block}
 ## Poverty and Inequality Estimation with `convey` \\ {-}
@@ -78,29 +221,62 @@ The R `convey` library estimates measures of income concentration, poverty, ineq
 library(convey)
 chapter_tag_design <- convey_prep( chapter_tag_design )
 
-sub_chapter_tag_design <- 
-	subset( 
-		chapter_tag_design , 
-		!is.na( v4720 ) & v4720 != 0 & v8005 >= 15
-	)
-
-svygini( ~ v4720 , sub_chapter_tag_design , na.rm = TRUE )
+svygini( ~ tftotinc , chapter_tag_design , na.rm = TRUE )
 ```
 ~~~
-
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
+This example matches statistics and standard errors from the [Wealth and Asset Ownership for Households, by Type of Asset and Selected Characteristics: 2021](https://www2.census.gov/programs-surveys/demo/tables/wealth/2021/wealth-asset-ownership/Wealth_tables_dy2021.xlsx):
+
+Restrict the design to permanent residence-based householders to match the count in Table 4:
+
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~one , chapter_tag_design )
-svytotal( ~factor( v0302 ) , chapter_tag_design )
-cv( svytotal( ~factor( v0302 ) , chapter_tag_design ) )
+chapter_tag_household_design <- subset( sipp_design , erelrpe %in% 1:2 & tlivqtr %in% 1:2 )
+
+stopifnot( round( coef( svytotal( ~ one , chapter_tag_household_design ) ) / 1000 , -2 ) == 132700 )
+```
+	
+	
+Compute Household Net Worth distribution and standard errors across the Total row of Tables 4 and 4A:
+
+
+```{r eval = FALSE , results = "hide" }
+chapter_tag_household_design <-
+	update(
+		chapter_tag_household_design ,
+		thnetworth_category =
+			factor(
+				findInterval( 
+					thnetworth , 
+					c( 1 , 5000 , 10000 , 25000 , 50000 , 100000 , 250000 , 500000 ) 
+				) ,
+				levels = 0:8 ,
+				labels = c( "Zero or Negative" , "$1 to $4,999" , "$5,000 to $9,999" , 
+				"$10,000 to $24,999" , "$25,000 to $49,999" , "$50,000 to $99,999" , 
+				"$100,000 to $249,999" , "$250,000 to $499,999" , "$500,000 or over" )
+			)
+	)
+
+results <- svymean( ~ thnetworth_category , chapter_tag_household_design )
+
+stopifnot( 
+	all.equal( as.numeric( round( coef( results ) * 100 , 1 ) ) , 
+	c( 11.3 , 6.9 , 3.5 , 5.9 , 6.4 , 8.2 , 15.3 , 13.9 , 28.7 ) ) 
+)
+
+stopifnot(
+	all.equal( as.numeric( round( SE( results ) * 100 , 1 ) ) ,
+	c( 0.3 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.3 , 0.3 , 0.3 ) )
+)
+
+
 ```
 
 ~~~
 
 
-needs_travis_build_status_line: yes
+
+
+

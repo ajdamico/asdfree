@@ -1,0 +1,465 @@
+# Pesquisa de Orcamentos Familiares (POF) {-}
+
+<a href="https://github.com/asdfree/pof/actions"><img src="https://github.com/asdfree/pof/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+Brazil's household budget survey designed to guide major economic indicators like the Contas nacionais.
+
+* Various tables with one record per sampled household, resident, job, expenditure.
+
+* A complex sample survey designed to generalize to the civilian population of Brazil.
+
+* Released at irregular intervals, 2002-2003, 2008-2009, and 2017-2018 microdata available.
+
+* Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
+
+---
+
+Please skim before you begin:
+
+1. [Pesquisa de Orçamentos Familiares 2017-2018 Perfil das despesas no Brasil](https://biblioteca.ibge.gov.br/visualizacao/livros/liv101761.pdf)
+
+2. [Conceitos e métodos](https://www.ibge.gov.br/estatisticas/sociais/saude/24786-pesquisa-de-orcamentos-familiares-2.html?=&t=conceitos-e-metodos)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Pesquisa de Orcamentos Familiares)
+
+```{r}
+# shopping na praia
+# roupa, comida, pede
+# tres havaianas
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download the dictionary files:
+
+```{r eval = FALSE , results = "hide" }
+library(archive)
+
+dictionary_tf <- tempfile()
+
+dictionary_url <-
+	paste0(
+		"https://ftp.ibge.gov.br/Orcamentos_Familiares/" ,
+		"Pesquisa_de_Orcamentos_Familiares_2017_2018/Microdados/Documentacao_20230713.zip"
+	)
+
+download.file( dictionary_url , dictionary_tf , mode = 'wb' )
+
+dictionary_files <- archive_extract( dictionary_tf , dir = tempdir() )
+```
+
+Import the household variable dictionary:
+
+```{r eval = FALSE , results = "hide" }
+library(readxl)
+
+dictionary_fn <- file.path( tempdir() , "Dicionários de váriaveis.xls" )
+
+domicilio_dictionary_tbl <- read_excel( dictionary_fn , sheet = "Domicílio" , skip = 3 )
+
+domicilio_dictionary_df <- data.frame( domicilio_dictionary_tbl )
+
+names( domicilio_dictionary_df ) <-
+	c( 'position' , 'length' , 'decimals' , 'column_name' , 'description' , 'variable_labels' )
+
+domicilio_dictionary_df[ c( 'position' , 'length' , 'decimals' ) ] <-
+	sapply( domicilio_dictionary_df[ c( 'position' , 'length' , 'decimals' ) ] , as.integer )
+
+domicilio_dictionary_df <- subset( domicilio_dictionary_df , !is.na( position ) )
+```
+
+Import the resident variable dictionary:
+
+```{r eval = FALSE , results = "hide" }
+morador_dictionary_tbl <- read_excel( dictionary_fn , sheet = "Morador" , skip = 3 )
+
+morador_dictionary_df <- data.frame( morador_dictionary_tbl )
+
+names( morador_dictionary_df ) <-
+	c( 'position' , 'length' , 'decimals' , 'column_name' , 'description' , 'variable_labels' )
+
+morador_dictionary_df[ c( 'position' , 'length' , 'decimals' ) ] <-
+	sapply( morador_dictionary_df[ c( 'position' , 'length' , 'decimals' ) ] , as.integer )
+
+morador_dictionary_df <- subset( morador_dictionary_df , !is.na( position ) )
+```
+
+Import the post-stratification totals:
+```{r eval = FALSE , results = "hide" }
+
+post_stratification_fn <- file.path( tempdir() , "Pos_estratos_totais.xlsx" )
+
+post_stratification_tbl <- read_excel( post_stratification_fn , skip = 5 )
+	
+post_stratification_df <- data.frame( post_stratification_tbl )
+
+names( post_stratification_df ) <-
+	c( 'estrato_pof' , 'pos_estrato' , 'total_pessoas' , 'uf' , 'cod_upa' )
+```
+
+Download the full dataset:
+
+```{r eval = FALSE , results = "hide" }
+this_tf <- tempfile()
+
+this_url <-
+	paste0(
+		"https://ftp.ibge.gov.br/Orcamentos_Familiares/" ,
+		"Pesquisa_de_Orcamentos_Familiares_2017_2018/Microdados/Dados_20230713.zip"
+	)
+
+download.file( this_url , this_tf , mode = 'wb' )
+
+unzipped_files <- unzip( this_tf , exdir = tempdir() )
+```
+
+Import the household table:
+
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+domicilio_fn <- grep( 'DOMICILIO\\.txt$' , unzipped_files , value = TRUE )
+
+domicilio_tbl <-
+	read_fwf(
+		domicilio_fn ,
+		fwf_widths( 
+			widths = domicilio_dictionary_df[ , 'length' ] , 
+			col_names = domicilio_dictionary_df[ , 'column_name' ] 
+		)
+	)
+
+domicilio_df <- data.frame( domicilio_tbl )
+
+names( domicilio_df ) <- tolower( names( domicilio_df ) )
+
+```
+
+Import the resident table:
+
+```{r eval = FALSE , results = "hide" }
+morador_fn <- grep( 'MORADOR\\.txt$' , unzipped_files , value = TRUE )
+
+morador_tbl <-
+	read_fwf(
+		morador_fn ,
+		fwf_widths( 
+			widths = morador_dictionary_df[ , 'length' ] , 
+			col_names = morador_dictionary_df[ , 'column_name' ] 
+		)
+	)
+
+morador_df <- data.frame( morador_tbl )
+
+names( morador_df ) <- tolower( names( morador_df ) )
+
+```
+
+Merge one household-level variable and also the post-stratification info onto the person-level table:
+
+```{r eval = FALSE , results = "hide" }
+dom_mor_df <- merge( domicilio_df[ c( 'cod_upa' , 'num_dom' , 'v6199' ) ] , morador_df )
+
+pof_df <- merge( dom_mor_df , post_stratification_df )
+
+stopifnot( nrow( pof_df ) == nrow( morador_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# pof_fn <- file.path( path.expand( "~" ) , "POF" , "this_file.rds" )
+# saveRDS( pof_df , file = pof_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# pof_df <- readRDS( pof_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+pre_stratified_design <- 
+	svydesign(
+		id = ~ cod_upa , 
+		strata = ~ estrato_pof ,
+		weights = ~ peso ,
+		data = pof_df ,
+		nest = TRUE
+	)
+
+population_totals <- 
+	aggregate( peso_final ~ pos_estrato , data = pof_df , sum )
+	
+names( population_totals ) <- c( 'pos_estrato' , 'Freq' )
+
+pof_design <-
+	postStratify(
+		pre_stratified_design , 
+		~ pos_estrato , 
+		population_totals
+	)
+
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+
+pof_design <-
+	update(
+		pof_design ,
+		
+		one = 1 ,
+		
+		food_security =
+			factor( 
+				v6199 , 
+				levels = 1:4 , 
+				labels = c( 'food secure' , 'mild' , 'moderate' , 'severe' ) 
+			) ,
+	
+		age_categories =
+			factor( 
+				1 + findInterval( v0403 , 
+					c( 20 , 25 , 30 , 35 , 45 , 55 , 65 , 75 ) ) ,
+				levels = 1:9 , 
+				labels =
+					c( "under 20" , "20-24" , "25-29" , "30-34" , "35-44" , 
+					"45-54" , "55-64" , "65-74" , "75+" )
+			) ,
+		
+		sex = factor( v0404 , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+		
+		urban = as.numeric( tipo_situacao_reg == 1 )
+
+	)
+
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( pof_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ sex , pof_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , pof_design )
+
+svyby( ~ one , ~ sex , pof_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ renda_total , pof_design )
+
+svyby( ~ renda_total , ~ sex , pof_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ age_categories , pof_design )
+
+svyby( ~ age_categories , ~ sex , pof_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ renda_total , pof_design )
+
+svyby( ~ renda_total , ~ sex , pof_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ age_categories , pof_design )
+
+svyby( ~ age_categories , ~ sex , pof_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ renda_total , pof_design , 0.5 )
+
+svyby( 
+	~ renda_total , 
+	~ sex , 
+	pof_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ renda_total , 
+	denominator = ~ anos_estudo , 
+	pof_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to credit card holders:
+```{r eval = FALSE , results = "hide" }
+sub_pof_design <- subset( pof_design , v0409 > 0 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ renda_total , sub_pof_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ renda_total , pof_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ renda_total , 
+		~ sex , 
+		pof_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( pof_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ renda_total , pof_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ renda_total , pof_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ renda_total , pof_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ urban , pof_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( renda_total ~ urban , pof_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ urban + age_categories , 
+	pof_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		renda_total ~ urban + age_categories , 
+		pof_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+This example matches the 2017-2018 person-level food security estimates from [Tabela 3](
+https://biblioteca.ibge.gov.br/visualizacao/livros/liv101749.pdf#page=32):
+
+```{r eval = FALSE , results = "hide" }
+person_level_food_security <- svymean( ~ food_security , pof_design , na.rm = TRUE )
+	
+stopifnot(
+	all.equal(
+		round( coef( person_level_food_security ) , 2 ) , 
+		c( 0.59 , 0.27 , 0.09 , 0.05 ) , 
+		check.attributes = FALSE 
+	)
+)
+```
+
+---
+
+## Poverty and Inequality Estimation with `convey` \ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for POF users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+pof_design <- convey_prep( pof_design )
+
+svygini( ~ renda_total , pof_design , na.rm = TRUE )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for POF users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+pof_srvyr_design <- as_survey( pof_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+pof_srvyr_design %>%
+	summarize( mean = survey_mean( renda_total ) )
+
+pof_srvyr_design %>%
+	group_by( sex ) %>%
+	summarize( mean = survey_mean( renda_total ) )
+```
+
+

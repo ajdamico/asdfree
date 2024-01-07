@@ -1,0 +1,376 @@
+# Social Security Public-Use Data Files (SSA) {-}
+
+<a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+Microdata from administrative sources like the Master Beneficiary Record, Supplemental Security Record.
+
+* Tables contain either one record per person or one record per person per year.
+
+* A systematic sample of either social security number holders (most americans) or program recipients (current beneficiaries). Multiply 1% samples by 100 to get weighted statistics, 5% samples by 20.
+
+* [No expected release timeline](https://www.ssa.gov/policy/pub_schedule.html).
+
+* Released by the [Office of Research, Evaluation, and Statistics](https://www.ssa.gov/policy/index.html), US [Social Security Administration](http://www.ssa.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html)
+
+2. [Comparing Earnings Estimates from the 2006 Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Social Security Public-Use Data Files)
+
+```{r}
+# annual earnings.
+# for pensioner payouts, see
+# the '04 extract
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the 1951-2006 one percent files with one record per person and per person-year:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+library(httr)
+
+tf <- tempfile()
+
+ssa_url <- "https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip"
+
+GET( ssa_url , write_disk( tf ) , progress() )
+
+ssa_files <- unzip( tf , exdir = tempdir() )
+
+ssa_fn <- grep( 'demographic' , ssa_files , value = TRUE )
+
+annual_fn <- grep( 'annual' , ssa_files , value = TRUE )
+
+ssa_tbl <- read_sas( ssa_fn )
+
+annual_tbl <- read_sas( annual_fn )
+
+ssa_df <- data.frame( ssa_tbl )
+
+annual_df <- data.frame( annual_tbl )
+
+names( ssa_df ) <- tolower( names( ssa_df ) )
+
+names( annual_df ) <- tolower( names( annual_df ) )
+```
+
+Sum up 1951-1952 and 1953-2006 earnings, and also 1953-2006 credits, copying the naming convention:
+```{r eval = FALSE , results = "hide" }
+summed_earnings_5152 <-
+	with( 
+		subset( annual_df , year_earn %in% 1951:1952 ) , 
+		aggregate( annual_earnings , list( id ) , sum )
+	)
+	
+names( summed_earnings_5152 ) <- c( 'id' , 'tot_cov_earn5152' )
+
+summed_earnings_5306 <-
+	with( 
+		subset( annual_df , year_earn > 1952 ) , 
+		aggregate( annual_earnings , list( id ) , sum )
+	)
+	
+names( summed_earnings_5306 ) <- c( 'id' , 'tot_cov_earn5306' )
+
+summed_quarters_5306 <-
+	with( 
+		subset( annual_df , year_earn > 1952 ) , 
+		aggregate( annual_qtrs , list( id ) , sum )
+	)
+
+names( summed_quarters_5306 ) <- c( 'id' , 'qc5306' )
+```
+
+Isolate a single year of earnings:
+```{r eval = FALSE , results = "hide" }
+earnings_2006 <- annual_df[ annual_df[ , 'year_earn' ] == 2006 , c( 'id' , 'annual_earnings' ) ]
+
+names( earnings_2006 ) <- c( 'id' , 'tot_cov_earn06' )
+```
+
+Merge each new column on to the person-level table, then add zeroes to person-years without earnings:
+```{r eval = FALSE , results = "hide" }
+stopifnot( all( !is.na( ssa_df ) ) )
+
+before_nrow <- nrow( ssa_df )
+
+ssa_df <- merge( ssa_df , summed_earnings_5152 , all.x = TRUE )
+
+ssa_df <- merge( ssa_df , summed_earnings_5306 , all.x = TRUE )
+
+ssa_df <- merge( ssa_df , summed_quarters_5306 , all.x = TRUE )
+
+ssa_df <- merge( ssa_df , earnings_2006 , all.x = TRUE )
+
+ssa_df[ is.na( ssa_df ) ] <- 0
+
+stopifnot( nrow( ssa_df ) == before_nrow )
+
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# ssa_fn <- file.path( path.expand( "~" ) , "SSA" , "this_file.rds" )
+# saveRDS( ssa_df , file = ssa_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# ssa_df <- readRDS( ssa_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+ssa_df <- 
+	transform( 
+		ssa_df ,
+
+		decade_of_birth = floor( yob / 10 ) * 10 ,
+		
+		sex = factor( sex , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+		
+		tot_cov_earn3706 = ( tot_cov_earn3750 + tot_cov_earn5152 + tot_cov_earn5306 ) ,
+		
+		qc3706 = ( qc3750 + qc5152 + qc5306 ) ,
+		
+		any_earnings_2006 = ( tot_cov_earn06 > 0 ) ,
+		
+		earnings_periods =
+			factor(
+				ifelse( ( tot_cov_earn5152 + tot_cov_earn5306 > 0 ) & tot_cov_earn3750 > 0 , 1 ,
+				ifelse( tot_cov_earn5152 > 0 | tot_cov_earn5306 > 0 , 2 ,
+				ifelse( tot_cov_earn3750 > 0 , 3 , 4 ) ) ) ,
+				levels = 1:4 ,
+				labels =
+					c( 'Earnings in both periods' , 'Earnings during 1951-2006 only' ,
+						'Earnings during 1937-1950 only' , 'No earnings' ) )
+	)
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( ssa_df )
+
+table( ssa_df[ , "sex" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( ssa_df[ , "tot_cov_earn3706" ] )
+
+tapply(
+	ssa_df[ , "tot_cov_earn3706" ] ,
+	ssa_df[ , "sex" ] ,
+	mean 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( ssa_df[ , "decade_of_birth" ] ) )
+
+prop.table(
+	table( ssa_df[ , c( "decade_of_birth" , "sex" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( ssa_df[ , "tot_cov_earn3706" ] )
+
+tapply(
+	ssa_df[ , "tot_cov_earn3706" ] ,
+	ssa_df[ , "sex" ] ,
+	sum 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( ssa_df[ , "tot_cov_earn3706" ] , 0.5 )
+
+tapply(
+	ssa_df[ , "tot_cov_earn3706" ] ,
+	ssa_df[ , "sex" ] ,
+	quantile ,
+	0.5 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to individuals with at least forty lifetime credits:
+```{r eval = FALSE , results = "hide" }
+sub_ssa_df <- subset( ssa_df , qc3706 >= 40 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_ssa_df[ , "tot_cov_earn3706" ] )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( ssa_df[ , "tot_cov_earn3706" ] )
+
+tapply(
+	ssa_df[ , "tot_cov_earn3706" ] ,
+	ssa_df[ , "sex" ] ,
+	var 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( tot_cov_earn3706 ~ any_earnings_2006 , ssa_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( ssa_df[ , c( "any_earnings_2006" , "decade_of_birth" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		tot_cov_earn3706 ~ any_earnings_2006 + decade_of_birth , 
+		data = ssa_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics in [The 2006 Earnings Public-Use Microdata File: An Introduction](https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html):
+
+Chart 5. Percentage distribution of individuals in EPUF, by capped Social Security taxable earnings status: 
+```{r eval = FALSE , results = "hide" }
+chart_five_results <- prop.table( table( ssa_df[ , 'earnings_periods' ] ) )
+chart_five_results <- round( 100 * chart_five_results )
+
+stopifnot( chart_five_results[ 'Earnings in both periods' ] == 16 )
+stopifnot( chart_five_results[ 'Earnings during 1951-2006 only' ] == 55 )
+stopifnot( chart_five_results[ 'Earnings during 1937-1950 only' ] == 4 )
+stopifnot( chart_five_results[ 'No earnings' ] == 25 )
+```
+
+Table 4. Average and median Social Security taxable earnings in EPUF, by sex, 1951–2006 (in dollars):
+```{r eval = FALSE , results = "hide" }
+nonzero_2006_earners <- ssa_df[ ssa_df[ , 'tot_cov_earn06' ] > 0 , 'tot_cov_earn06' ]
+stopifnot( round( mean( nonzero_2006_earners ) , 0 ) == 30953 )
+stopifnot( round( quantile( nonzero_2006_earners )[ 3 ] , 0 ) == 24000 )
+```
+
+Table A1. Number and percentage distribution of individuals with Social Security taxable earnings records in EPUF, by sex, 1951–2006:
+```{r eval = FALSE , results = "hide" }
+nonzero_2006_earners <- ssa_df[ ssa_df[ , 'tot_cov_earn06' ] > 0 , ]
+stopifnot( round( mean( nonzero_2006_earners[ , 'tot_cov_earn06' ] ) , 0 ) == 30953 )
+stopifnot( round( quantile( nonzero_2006_earners[ , 'tot_cov_earn06' ] )[ 3 ] , 0 ) == 24000 )
+```
+
+This example matches statistics in [Comparing Earnings Estimates from the 2006 Earnings Public-Use File and the Annual Statistical Supplement](https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html):
+
+Table 4. Comparing Supplement and EPUF estimates: Number of all, male, and female workers with any earnings during the year, 1951–2006:
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( round( nrow( nonzero_2006_earners ) * 100 , -3 ) == 156280000 )
+earners_in_2006_by_sex <- table( nonzero_2006_earners[ , 'sex' ] ) * 100
+stopifnot( round( earners_in_2006_by_sex[ 'male' ] , -3 ) == 81576000 )
+stopifnot( round( earners_in_2006_by_sex[ 'female' ] , -3 ) == 74681000 )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for SSA users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+ssa_tbl <- as_tibble( ssa_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+ssa_tbl %>%
+	summarize( mean = mean( tot_cov_earn3706 ) )
+
+ssa_tbl %>%
+	group_by( sex ) %>%
+	summarize( mean = mean( tot_cov_earn3706 ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for SSA users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+ssa_dt <- data.table( ssa_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+ssa_dt[ , mean( tot_cov_earn3706 ) ]
+
+ssa_dt[ , mean( tot_cov_earn3706 ) , by = sex ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for SSA users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'ssa' , ssa_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( tot_cov_earn3706 ) FROM ssa' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		sex ,
+		AVG( tot_cov_earn3706 )
+	FROM
+		ssa
+	GROUP BY
+		sex'
+)
+```

@@ -1,77 +1,209 @@
 chapter_title: National Health and Nutrition Examination Survey
 
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
-The National Health and Nutrition Examination Survey (NHANES) is this fascinating survey where doctors and dentists accompany survey interviewers in a little mobile medical center that drives around the country.  While the survey methodologists interview people, the medical professionals administer laboratory tests and conduct a thorough physical examination.  The blood work and medical exam allow researchers to answer tough questions like, "how many people have diabetes but don't know they have diabetes?"
+Doctors and dentists accompany survey interviewers in a [mobile medical center](https://blogs.cdc.gov/nchs/2013/01/30/217/) that travels the country.  While survey researchers read the questionnaires, medical professionals administer laboratory tests and conduct a full medical examination.  The blood work and in-person check-up allow epidemiologists to answer questions like, "how many people have diabetes but don't know they have diabetes?"
 ~~~
 
-table_structure: * Many tables containing information gathered from the various examinations, generally with one row per individual respondent.
+table_structure: * Many tables containing information from the various examinations, generally one row per respondent.
 
-generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutionalized population of the United States.
+generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutionalized U.S. population.
 
 publication_period: * Released biennially since 1999-2000.
 
 administrative_organization: * Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
 
 
+~~~{reading_block}
+Please skim before you begin:
 
-needs_catalog_block: yes
-catalog_subset_description: # 2015-2016 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , years == "2015-2016" )
+1. [About the National Health and Nutrition Examination Survey](https://www.cdc.gov/nchs/nhanes/about_nhanes.htm)
+
+2. [NHANES Tutorials](https://wwwn.cdc.gov/nchs/nhanes/tutorials/default.aspx)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# doctor, dentist, labs
+# mobile examination
+#vanlife interviews
+```
+~~~
+
+
+
+~~~{download_and_import_block}
+
+Download and import the demographics (demo) and total cholesterol laboratory (tchol) data:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+chapter_tag_2015_2016_demo_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DEMO_I.XPT"
+
+chapter_tag_2017_2018_demo_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DEMO_J.XPT"
+
+chapter_tag_2015_2016_tchol_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/TCHOL_I.XPT"
+	
+chapter_tag_2017_2018_tchol_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/TCHOL_J.XPT"
+	
+
+chapter_tag_2015_2016_demo_tbl <- read_xpt( chapter_tag_2015_2016_demo_url )
+chapter_tag_2017_2018_demo_tbl <- read_xpt( chapter_tag_2017_2018_demo_url )
+chapter_tag_2015_2016_tchol_tbl <- read_xpt( chapter_tag_2015_2016_tchol_url )
+chapter_tag_2017_2018_tchol_tbl <- read_xpt( chapter_tag_2017_2018_tchol_url )
+
+chapter_tag_2015_2016_demo_df <- data.frame( chapter_tag_2015_2016_demo_tbl )
+chapter_tag_2017_2018_demo_df <- data.frame( chapter_tag_2017_2018_demo_tbl )
+chapter_tag_2015_2016_tchol_df <- data.frame( chapter_tag_2015_2016_tchol_tbl )
+chapter_tag_2017_2018_tchol_df <- data.frame( chapter_tag_2017_2018_tchol_tbl )
+```
+
+Specify which variables to keep from both the demo and tchol data files, then stack the four years:
+```{r eval = FALSE , results = "hide" }
+demo_vars <-
+	c( 
+		 # unique person identifier (merge variable)
+		"SEQN" ,
+
+		# the two-year interviewed + MEC examined weight
+		"WTMEC2YR" , 	
+		# note that this is a special weight for only
+		# individuals who took the mobile examination center (MEC) exam
+		# there is one other weight available - WTINT2YR - 
+		# that should be used when MEC variables are not part of the analysis
+		
+		# interviewed only or interviewed + MEC
+		"RIDSTATR" ,
+		
+		# primary sampling unit varaible, used in complex design
+		"SDMVPSU" ,
+		
+		# strata variable, used in complex design
+		"SDMVSTRA" ,
+		
+		# race / ethnicity
+		"RIDRETH3" ,
+
+		# age
+		"RIDAGEYR" ,
+		
+		# gender
+		"RIAGENDR" ,
+		
+		# pregnant at interview
+		"RIDEXPRG"
+	)
+
+
+chapter_tag_2015_2018_demo_df <-
+	rbind(
+		chapter_tag_2015_2016_demo_df[ , demo_vars ] ,
+		chapter_tag_2017_2018_demo_df[ , demo_vars ]
+	)
+	
+
+tchol_vars <-
+	c( 
+		# unique person identifier (merge variable)
+		"SEQN" ,
+		
+		# laboratory total cholesterol variable
+		# https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/TCHOL_J.htm
+		"LBXTC" 		
+
+	)
+
+chapter_tag_2015_2018_tchol_df <-
+	rbind(
+		chapter_tag_2015_2016_tchol_df[ , tchol_vars ] ,
+		chapter_tag_2017_2018_tchol_df[ , tchol_vars ]
+	)
+```
+
+
+Merge the two pooled datasets, limit the data.frame to mobile examination component respondents:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_full_df <-
+	merge(
+		chapter_tag_2015_2018_demo_df ,
+		chapter_tag_2015_2018_tchol_df ,
+		all = TRUE
+	)
+
+names( chapter_tag_full_df ) <- tolower( names( chapter_tag_full_df ) )
+	
+chapter_tag_df <- subset( chapter_tag_full_df , ridstatr %in% 2 )
+```
+
+Scale the mobile examination component two-year weight to generalize to the pooled, four year period:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_df[ , 'wtmec4yr' ] <- chapter_tag_df[ , 'wtmec2yr' ] / 2
+```
+
+~~~
+
+
 
 ~~~{analysis_examples_survey_design}
-options( survey.lonely.psu = "adjust" )
-
+```{r eval = FALSE , results = "hide" }
 library(survey)
-
-chapter_tag_demo_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015-2016/demo_i.rds" ) )
-
-chapter_tag_tchol_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015-2016/tchol_i.rds" ) )
-
-chapter_tag_df <- merge( chapter_tag_demo_df , chapter_tag_tchol_df , all = TRUE )
-
-stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_demo_df ) )
-
-# keep only individuals who took the "mobile examination center" component
-chapter_tag_df <- subset( chapter_tag_df , ridstatr %in% 2 )
 
 chapter_tag_design <- 
 	svydesign(
-		id = ~sdmvpsu , 
-		strata = ~sdmvstra ,
+		id = ~ sdmvpsu , 
+		strata = ~ sdmvstra ,
 		nest = TRUE ,
-		weights = ~wtmec2yr ,
+		weights = ~ wtmec4yr ,
 		data = chapter_tag_df
+	)
+
+```
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <-
+
+	update(
+
+		chapter_tag_design ,
+
+		one = 1 ,
+
+		# define high total cholesterol as 1 if mg/dL is at or above 240 and zero otherwise.
+		hi_tchol = ifelse( lbxtc >= 240 , 1 , 0 ) ,
+		
+		gender = factor( riagendr , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+		
+		age_categories =
+			factor(	
+				1 + findInterval( ridageyr , c( 20 , 40 , 60 ) ) , 
+				levels = 1:4 , 
+				labels = c( "0-19" , "20-39" , "40-59" , "60+" )
+			) ,
+
+
+		# recode the ridreth3 variable as:
+		# mexican american and other hispanic -> 4
+		# non-hispanic white -> 1
+		# non-hispanic black -> 2
+		# non-hispanic asian -> 3
+		# other race including multi-racial -> 5
+		race_ethnicity =
+			factor( 
+				c( 4 , 4 , 1 , 2 , NA , 3 , 5 )[ ridreth3 ] ,
+				levels = 1:5 ,
+				labels = c( 'nh white' , 'nh black' , 'nh asian' , 'hispanic' , 'other' )
+			) ,
+			
+		pregnant_at_interview = 
+			ifelse( ridexprg %in% 1:2 , as.numeric( ridexprg == 1 ) , NA )
 	)
 ~~~
 
-~~~{variable_recoding_block}
-chapter_tag_design <- 
-	update( 
-		chapter_tag_design , 
-		
-		one = 1 ,
-		
-		pregnant_at_interview = 
-			ifelse( ridexprg %in% 1:2 , as.numeric( ridexprg == 1 ) , NA ) ,
-		
-		race_ethnicity = 
-			factor( 
-				c( 3 , 3 , 1 , 2 , 4 )[ ridreth1 ] ,
-				levels = 1:4 , 
-				labels = 
-					c( 'non-hispanic white' , 'non-hispanic black' , 
-						'hispanic' , 'other' )
-			) ,
-		
-		age_category =
-			factor(
-				findInterval( ridageyr , c( 20 , 40 , 60 ) ) ,
-				labels = c( "0-19" , "20-39" , "40-59" , "60+" )
-			)
-	)
-~~~
+
+
 
 group_by_variable: race_ethnicity
 group_by_variable_description: race/ethnicity
@@ -87,46 +219,149 @@ ratio_estimation_numerator: lbxtc
 ratio_estimation_denominator: ridageyr
 ratio_narm: , na.rm = TRUE
 
-subset_definition: age_category == "60+"
+subset_definition: age_categories == "60+"
 subset_definition_description: respondents aged 60 or older
 
 binary_variable: pregnant_at_interview
 binary_narm: , na.rm = TRUE
 
+
 needs_srvyr_block: yes
 
+
 ~~~{replication_example_block}
----
+## Direct Method of Age-Adjustment Replication Example {-}
 
-## Replication Example {-}
+This example matches the total cholesterol statistics and standard errors in [Table 1](https://www.cdc.gov/nchs/data/databriefs/db363-tables-508.pdf#page=1) from [Data Brief 363](https://www.cdc.gov/nchs/products/databriefs/db363.htm):
 
+Match the crude estimates in the footnote and also in the unadjusted age categories:
 ```{r eval = FALSE , results = "hide" }
+crude_overall <-
+	svymean( ~ hi_tchol , subset( chapter_tag_design , ridageyr >= 20 ) , na.rm = TRUE )
 
+stopifnot( round( coef( crude_overall ) , 3 ) == 0.115 )
+
+crude_by_gender <-
+	svyby( 
+		~ hi_tchol , 
+		~ gender , 
+		subset( chapter_tag_design , ridageyr >= 20 ) , 
+		svymean , 
+		na.rm = TRUE 
+	)
+	
+stopifnot( round( coef( crude_by_gender )[ 1 ] , 3 ) == 0.103 )
+stopifnot( round( coef( crude_by_gender )[ 2 ] , 3 ) == 0.126 )
+
+crude_by_age <-
+	svyby(
+		~ hi_tchol , 
+		~ age_categories , 
+		subset( chapter_tag_design , ridageyr >= 20 ) , 
+		svymean , 
+		na.rm = TRUE 
+	)
+	
+stopifnot( round( coef( crude_by_age )[ 1 ] , 3 ) == 0.075 )
+stopifnot( round( coef( crude_by_age )[ 2 ] , 3 ) == 0.157 )
+stopifnot( round( coef( crude_by_age )[ 3 ] , 3 ) == 0.114 )
+
+stopifnot( round( SE( crude_by_age )[ 1 ] , 3 ) == 0.005 )
+stopifnot( round( SE( crude_by_age )[ 2 ] , 3 ) == 0.011 )
+stopifnot( round( SE( crude_by_age )[ 3 ] , 3 ) == 0.008 )
+```
+
+
+Sum up [2000 Census totals](https://seer.cancer.gov/seerstat/tutorials/aarates/step3.html) based on the age groupings specified in footnote:
+```{r eval = FALSE , results = "hide" }
+pop_by_age <- 
+	data.frame( 
+		age_categories = c( "0-19" , "20-39" , "40-59" , "60+" ) ,
+		Freq = c( 78782657 , 77670618 , 72816615 , 45363752 ) 
+	) 	
+```
+
+Create a design with the nationwide population stratified to the above census counts:
+```{r eval = FALSE , results = "hide" }
+nhanes_age_adjusted <-
+	postStratify( 
+		subset( chapter_tag_design , !is.na( hi_tchol ) ) , 
+		~ age_categories , 
+		pop_by_age 
+	)
+```
+
+Match the overall adjusted estimates:
+```{r eval = FALSE , results = "hide" }
+results_overall <-
+	svymean( ~ hi_tchol , subset( nhanes_age_adjusted , ridageyr >= 20 ) , na.rm = TRUE )
+
+stopifnot( round( coef( results_overall ) , 3 ) == 0.114 )
+
+stopifnot( round( SE( results_overall ) , 3 ) == 0.006 )
+```
+
+
+Create a design stratified to census counts broken out by gender, then match those estimates:
+```{r eval = FALSE , results = "hide" }
+nhanes_by_gender <-
+	svystandardize(
+		chapter_tag_design , 
+		by = ~ age_categories , 		# stratification variable
+		over = ~ gender ,				# break out variable
+		population = pop_by_age , 		# data.frame containing census populations
+		excluding.missing = ~ hi_tchol 	# analysis variable of interest
+	)
+
+results_by_gender <-
+	svyby( 
+		~ hi_tchol , 
+		~ gender , 
+		subset( nhanes_by_gender , ridageyr >= 20 ) ,
+		svymean , 
+		na.rm=TRUE
+	)
+
+stopifnot( round( coef( results_by_gender )[ 1 ] , 3 ) == 0.105 )
+stopifnot( round( coef( results_by_gender )[ 2 ] , 3 ) == 0.121 )
+
+stopifnot( round( SE( results_by_gender )[ 1 ] , 3 ) == 0.007 )
+stopifnot( round( SE( results_by_gender )[ 2 ] , 3 ) == 0.008 )
+```
+
+
+Create a design stratified to census counts broken out by race/ethnicity, then match those estimates:
+```{r eval = FALSE , results = "hide" }
+nhanes_by_race <-
+	svystandardize(
+		chapter_tag_design , 
+		by = ~ age_categories , 		# stratification variable
+		over = ~ race_ethnicity ,		# break out variable
+		population = pop_by_age , 		# data.frame containing census populations
+		excluding.missing = ~ hi_tchol 	# analysis variable of interest
+	)
+
+results_by_race_ethnicity <-
+	svyby( 
+		~ hi_tchol , 
+		~ race_ethnicity , 
+		design = subset( nhanes_by_race , ridageyr >= 20 ) ,
+		svymean , 
+		na.rm=TRUE
+	)
+
+stopifnot( round( coef( results_by_race_ethnicity )[ 1 ] , 3 ) == 0.117 )
+stopifnot( round( coef( results_by_race_ethnicity )[ 2 ] , 3 ) == 0.100 )
+stopifnot( round( coef( results_by_race_ethnicity )[ 3 ] , 3 ) == 0.116 )
+stopifnot( round( coef( results_by_race_ethnicity )[ 4 ] , 3 ) == 0.109 )
+
+stopifnot( round( SE( results_by_race_ethnicity )[ 1 ] , 3 ) == 0.007 )
+stopifnot( round( SE( results_by_race_ethnicity )[ 2 ] , 3 ) == 0.009 )
+stopifnot( round( SE( results_by_race_ethnicity )[ 3 ] , 3 ) == 0.011 )	
+stopifnot( round( SE( results_by_race_ethnicity )[ 4 ] , 3 ) == 0.009 )	
 ```
 
 ~~~
 
 
 
-needs_travis_build_status_line: yes
-
-sample_setup_breaks: 10
-
-broken_sample_test_condition: any( chapter_tag_cat$years == "2015-2016" )
-
-~~~{sample_setup_block}
-this_sample_break <- Sys.getenv( "this_sample_break" )
-
-library(lodown)
-
-chapter_tag_cat <-
-	get_catalog( "chapter_tag" ,
-		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
-
-# skip the two physical activity files because ci fails for some undetermined reason
-chapter_tag_cat <- subset( chapter_tag_cat , !grepl( "paxraw" , output_filename ) )
-
-chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
-
-chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
-~~~

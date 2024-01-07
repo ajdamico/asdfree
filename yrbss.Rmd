@@ -1,0 +1,369 @@
+# Youth Risk Behavior Surveillance System (YRBSS) {-}
+
+<a href="https://github.com/asdfree/yrbss/actions"><img src="https://github.com/asdfree/yrbss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The high school edition of the Behavioral Risk Factor Surveillance System (BRFSS).
+
+* One table with one row per sampled youth respondent.
+
+* A complex sample survey designed to generalize to all public and private school students in grades 9-12 in the United States.
+
+* Released biennially since 1993.
+
+* Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [Methodology of the Youth Risk Behavior Surveillance System](https://www.cdc.gov/mmwr/pdf/rr/rr6201.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Youth_Risk_Behavior_Surveillance_System)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Youth Risk Behavior Surveillance System)
+
+```{r}
+# maladolescence
+# epidemiology
+# sex, drugs, rock and roll
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Load the `SAScii` library to interpret a SAS input program, and also re-arrange the SAS input program:
+```{r eval = FALSE , results = "hide" }
+library(SAScii)
+
+sas_url <-
+	"https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/2019XXH-SAS-Input-Program.sas"
+
+sas_text <- tolower( readLines( sas_url ) )
+
+# find the (out of numerical order)
+# `site` location variable's position
+# within the SAS input program
+site_location <- which( sas_text == '@1 site $3.' )
+
+# find the start field's position
+# within the SAS input program
+input_location <- which( sas_text == "input" )
+
+# create a vector from 1 to the length of the text file
+sas_length <- seq( length( sas_text ) )
+
+# remove the site_location
+sas_length <- sas_length[ -site_location ]
+
+# re-insert the site variable's location
+# immediately after the starting position
+sas_reorder <- 
+	c( 
+		sas_length[ seq( input_location ) ] , 
+		site_location , 
+		sas_length[ seq( input_location + 1 , length( sas_length ) ) ] 
+	)
+
+# re-order the sas text file
+sas_text <- sas_text[ sas_reorder ]
+
+sas_tf <- tempfile()
+
+writeLines( sas_text , sas_tf )
+```
+
+Download and import the national file:
+```{r eval = FALSE , results = "hide" }
+dat_tf <- tempfile()
+
+dat_url <-
+	"https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/XXH2019_YRBS_Data.dat"
+	
+download.file( dat_url , dat_tf , mode = 'wb' )
+
+yrbss_df <- read.SAScii( dat_tf , sas_tf )
+
+names( yrbss_df ) <- tolower( names( yrbss_df ) )
+
+yrbss_df[ , 'one' ] <- 1
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# yrbss_fn <- file.path( path.expand( "~" ) , "YRBSS" , "this_file.rds" )
+# saveRDS( yrbss_df , file = yrbss_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# yrbss_df <- readRDS( yrbss_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+yrbss_design <- 
+	svydesign( 
+		~ psu , 
+		strata = ~ stratum , 
+		data = yrbss_df , 
+		weights = ~ weight , 
+		nest = TRUE 
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+yrbss_design <- 
+	update( 
+		yrbss_design , 
+		q2 = q2 ,
+		never_rarely_wore_seat_belt = as.numeric( qn8 == 1 ) ,
+		ever_used_marijuana = as.numeric( qn45 == 1 ) ,
+		tried_to_quit_tobacco_past_year = as.numeric( q39 == 2 ) ,
+		used_tobacco_past_year = as.numeric( q39 > 1 )
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( yrbss_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ ever_used_marijuana , yrbss_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , yrbss_design )
+
+svyby( ~ one , ~ ever_used_marijuana , yrbss_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ bmipct , yrbss_design , na.rm = TRUE )
+
+svyby( ~ bmipct , ~ ever_used_marijuana , yrbss_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ q2 , yrbss_design , na.rm = TRUE )
+
+svyby( ~ q2 , ~ ever_used_marijuana , yrbss_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ bmipct , yrbss_design , na.rm = TRUE )
+
+svyby( ~ bmipct , ~ ever_used_marijuana , yrbss_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ q2 , yrbss_design , na.rm = TRUE )
+
+svyby( ~ q2 , ~ ever_used_marijuana , yrbss_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ bmipct , yrbss_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ bmipct , 
+	~ ever_used_marijuana , 
+	yrbss_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ tried_to_quit_tobacco_past_year , 
+	denominator = ~ used_tobacco_past_year , 
+	yrbss_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to youths who ever drank alcohol:
+```{r eval = FALSE , results = "hide" }
+sub_yrbss_design <- subset( yrbss_design , qn40 > 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ bmipct , sub_yrbss_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ bmipct , yrbss_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ bmipct , 
+		~ ever_used_marijuana , 
+		yrbss_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( yrbss_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ bmipct , yrbss_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ bmipct , yrbss_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ bmipct , yrbss_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ never_rarely_wore_seat_belt , yrbss_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( bmipct ~ never_rarely_wore_seat_belt , yrbss_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ never_rarely_wore_seat_belt + q2 , 
+	yrbss_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		bmipct ~ never_rarely_wore_seat_belt + q2 , 
+		yrbss_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics, standard errors, and confidence intervals from the "never/rarely wore seat belt" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2019/2019_yrbs_analysis_software.pdf#page=29):
+
+```{r eval = FALSE , results = "hide" }
+
+unwtd_count_result <-
+	unwtd.count( ~ never_rarely_wore_seat_belt , yrbss_design )
+
+stopifnot( coef( unwtd_count_result ) == 11149 )
+
+wtd_n_result <-
+	svytotal( 
+		~ one , 
+		subset(
+			yrbss_design , 
+			!is.na( never_rarely_wore_seat_belt ) 
+		)
+	)
+
+stopifnot( round( coef( wtd_n_result ) , 0 ) == 12132 )
+
+share_result <-
+	svymean(
+		~ never_rarely_wore_seat_belt ,
+		yrbss_design ,
+		na.rm = TRUE 
+	)
+
+stopifnot( round( coef( share_result ) , 4 ) == .0654 )
+
+stopifnot( round( SE( share_result ) , 4 ) == .0065 )
+
+ci_result <-
+	svyciprop(
+		~ never_rarely_wore_seat_belt ,
+		yrbss_design , 
+		na.rm = TRUE ,
+		method = "beta"
+	)
+
+stopifnot( round( confint( ci_result )[1] , 4 ) == 0.0529 )
+
+stopifnot( round( confint( ci_result )[2] , 2 ) == 0.08 )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for YRBSS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+yrbss_srvyr_design <- as_survey( yrbss_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+yrbss_srvyr_design %>%
+	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
+
+yrbss_srvyr_design %>%
+	group_by( ever_used_marijuana ) %>%
+	summarize( mean = survey_mean( bmipct , na.rm = TRUE ) )
+```
+
+

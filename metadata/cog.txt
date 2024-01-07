@@ -1,0 +1,209 @@
+chapter_title: Census of Governments
+
+needs_actions_build_status_line: yes
+
+~~~{dataset_introduction}
+Location, employment, and payroll for state and local (but not federal) government agencies in the U.S.
+~~~
+
+table_structure: * One record per agency, one per agency function, plus the government units master address file.
+
+generalizable_population: * Complete enumeration of civilian employment in state and local governments in the 50 states + D.C.
+
+publication_period: * The Annual Survey of Public Employment & Payroll becomes a census in years ending with 2 and 7.
+
+administrative_organization: * Administered and financed by the [US Census Bureau](http://www.census.gov/).
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [2022 Census of Governments, Survey of Public Employment & Payroll Methodology](https://www2.census.gov/programs-surveys/apes/technical-documentation/methodology/22_methodology.pdf)
+
+2. [Government Units Survey Methodology](https://www.census.gov/programs-surveys/gus/technical-documentation/methodology.html)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# courthouse steps wedding
+# schools police fire water
+# no fed mail invite
+```
+~~~
+
+~~~{download_and_import_block}
+
+Download, import, and stack the government units listing file:
+```{r eval = FALSE , results = "hide" }
+library(readxl)
+
+tf_gus <- tempfile()
+
+gus_url <- "https://www2.census.gov/programs-surveys/gus/datasets/2022/govt_units_2022.ZIP"
+
+download.file( gus_url , tf_gus , mode = 'wb' )
+
+unzipped_files_gus <- unzip( tf_gus , exdir = tempdir() )
+
+xlsx_gus_fn <- grep( "\\\\.xlsx$" , unzipped_files_gus , value = TRUE )
+
+xlsx_sheets <- excel_sheets( xlsx_gus_fn )
+
+# read all sheets into a list of tibbles
+gus_tbl_list <- lapply( xlsx_sheets , function( w ) read_excel( xlsx_gus_fn , sheet = w ) )
+
+# convert all tibbles to data.frame objects
+gus_df_list <- lapply( gus_tbl_list , data.frame )
+
+# lowercase all column names
+gus_df_list <-
+	lapply( 
+		gus_df_list , 
+		function( w ){ names( w ) <- tolower( names( w ) ) ; w } 
+	)
+
+# add the excel tab source to each data.frame
+for( i in seq( xlsx_sheets ) ) gus_df_list[[ i ]][ , 'source_tab' ] <- xlsx_sheets[ i ]
+
+# determine which columns are in all tables
+column_intersect <- Reduce( intersect , lapply( gus_df_list , names ) )
+
+# determine which columns are in some but not all tables
+column_union <- unique( unlist( lapply( gus_df_list , names ) ) )
+
+# these columns will be discarded by stacking:
+unique(
+	unlist(
+		lapply(
+			lapply( gus_df_list , names ) , 
+			function( w ) column_union[ !column_union %in% w ]
+		)
+	)
+)
+
+# stack all excel sheets, keeping only the columns that all tables have in common
+gus_df <- Reduce( rbind , lapply( gus_df_list , function( w ) w[ column_intersect ] ) )
+```
+
+Download and import the survey of public employment & payroll, one record per function (not per unit):
+```{r eval = FALSE , results = "hide" }
+tf_apes <- tempfile()
+
+apes_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/apes/datasets/" ,
+		"2022/2022%20COG-E%20Individual%20Unit%20Files.zip"
+	)
+
+download.file( apes_url , tf_apes , mode = 'wb' )
+
+unzipped_files_apes <- unzip( tf_apes , exdir = tempdir() )
+
+xlsx_apes_fn <- grep( "\\\\.xlsx$" , unzipped_files_apes , value = TRUE )
+
+apes_tbl <- read_excel( xlsx_apes_fn )
+
+apes_df <- data.frame( apes_tbl )
+
+names( apes_df ) <- tolower( names( apes_df ) )
+```
+
+Review the non-matching records between these two tables, then merge:
+```{r eval = FALSE , results = "hide" }
+# all DEP School Districts and a third of Special Districts are not in the `apes_df`
+table(
+	gus_df[ , 'census_id_gidid' ] %in% apes_df[ , 'individual.unit.id' ] ,
+	gus_df[ , 'source_tab' ] ,
+	useNA = 'always'
+)
+
+# state governments are not in the `gus_df`
+table(
+	apes_df[ , 'individual.unit.id' ] %in% gus_df[ , 'census_id_gidid' ] ,
+	apes_df[ , 'type.of.government' ] ,
+	useNA = 'always'
+)
+
+# check for overlapping field names:
+( overlapping_names <- intersect( names( apes_df ) , names( gus_df ) ) )
+
+# rename the state column in `gus_df` to state abbreviation
+names( gus_df )[ names( gus_df ) == 'state' ] <- 'stateab'
+
+double_df <-
+	merge(
+		apes_df ,
+		gus_df ,
+		by.x = 'individual.unit.id' ,
+		by.y = 'census_id_gidid' ,
+		all.x = TRUE
+	)
+
+stopifnot( nrow( double_df ) == nrow( apes_df ) )
+
+# replace dots with underscores
+names( double_df ) <- gsub( "\\\\." , "_" , names( double_df ) )
+```
+
+Keep either the one record per agency rows or the one record per function rows:
+```{r eval = FALSE , results = "hide" }
+# `Total - All Government Employment Functions` records sum to the same as all other records:
+with( double_df , tapply( full_time_employees , grepl( "Total" , government_function ) , sum ) )
+
+with( double_df , tapply( part_time_payroll , grepl( "Total" , government_function ) , sum ) )
+
+# keep one record per government function (multiple records per agency):
+chapter_tag_df <- subset( double_df , !grepl( "Total" , government_function ) )
+
+# keep one record per government agency:
+# chapter_tag_df <- subset( double_df , grepl( "Total" , government_function ) )
+```
+
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_df <- 
+	transform( 
+		chapter_tag_df , 
+		
+		one = 1 ,
+		
+		total_payroll = full_time_payroll + part_time_payroll ,
+		
+		total_employees = full_time_employees + part_time_employees ,
+
+		any_full_time_employees = full_time_employees > 0
+	)
+~~~
+
+group_by_variable: type_of_government
+linear_variable: full_time_employees
+categorical_variable: census_region
+subset_definition: grepl( 'Education' , government_function )
+subset_definition_description: Elementary, Secondary, Higher, and Other Educational Government Agencies
+binary_variable: any_full_time_employees
+
+
+
+
+needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
+
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches excel cell "C17" of [Employment & Payroll Data by State and by Function](https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx):
+
+```{r eval = FALSE , results = "hide" }
+financial_admin_df <- subset( cog_df , government_function == 'Financial Administration' )
+
+stopifnot( sum( financial_admin_df[ , 'full_time_employees' ] ) == 404228 )
+```
+~~~
+
+
+

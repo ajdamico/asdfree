@@ -1,124 +1,123 @@
 chapter_title: National Health Interview Survey
 
+
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
-The National Health Interview Survey (NHIS) is America's most detailed household survey of health status and medical experience.
+America's most detailed household survey of health status and medical experience.
 ~~~
 
-table_structure: * A main table with one row for each person within each sampled household, mergeable other tables like the sample child table with a more detailed questionnaire for only one child (when available) within each sampled household.
+table_structure: * One table with one row per sampled adult (18+) within each sampled household, one table with one row per sample child (when available, same family not required), multiply-imputed income tables.
 
-generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutionalized population of the United States.
+generalizable_population: * A complex sample survey designed to generalize to the U.S. civilian non-institutionalized population.
 
-publication_period: * Released annually since 1963, the most recent major re-design in 1997.
+publication_period: * Released annually since 1963, the most recent major re-design in 2019.
 
-administrative_organization: * Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
+administrative_organization: * Conducted by the [National Center for Health Statistics](https://www.cdc.gov/nchs/) at the [Centers for Disease Control](http://www.cdc.gov/).
 
 
 
-needs_catalog_block: yes
-catalog_subset_description: # 2016 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 )
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [2021 Survey Description](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2021/srvydesc-508.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/National_Health_Interview_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# excellent health poor
+# wealth. "sup, doc?" bugs, daft bills, free
+# laughs best medicine
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Define a function to download, unzip, and import each comma-separated value file:
+
+```{r eval = FALSE , results = "hide" }
+nhis_csv_import <-
+	function( this_url ){
+		
+		this_tf <- tempfile()
+		
+		download.file( this_url , this_tf , mode = 'wb' )
+		
+		unzipped_files <- unzip( this_tf , exdir = tempdir() )
+		
+		this_csv <- grep( '\\\\.csv$' , unzipped_files , value = TRUE )
+		
+		this_df <- read.csv( this_csv )
+		
+		file.remove( c( this_tf , unzipped_files ) )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+```
+
+Download and import the sample adult interview and imputed income files:
+
+```{r eval = FALSE , results = "hide" }
+chapter_tag_df <-
+	nhis_csv_import( 
+		"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adult21csv.zip" 
+	)
+
+imputed_income_df <- 
+	nhis_csv_import( 
+		"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adultinc21csv.zip" 
+	)
+```
+~~~
+
 
 ~~~{analysis_examples_survey_design}
-options( survey.lonely.psu = "adjust" )
 
+Reshape the imputed income data.frame into a list based on the implicate number:
+```{r eval = FALSE , results = "hide" }
+imputed_income_list <- split( imputed_income_df , imputed_income_df[ , 'impnum_a' ] )
+```
+
+Remove overlapping columns except the merge variable:
+```{r eval = FALSE , results = "hide" }
+variables_to_remove <-
+	setdiff( intersect( names( chapter_tag_df ) , names( imputed_income_df ) ) , 'hhx' )
+
+chapter_tag_df <- chapter_tag_df[ , !( names( chapter_tag_df ) %in% variables_to_remove ) ]
+```
+
+Merge each implicate onto the sample adult table:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_list <-
+	lapply( imputed_income_list ,
+		function( w ){
+			this_df <- merge( chapter_tag_df , w )
+			stopifnot( nrow( this_df ) == nrow( chapter_tag_df ) )
+			this_df
+		} )
+```
+
+Define the design:
+```{r eval = FALSE , results = "hide" }
 library(survey)
 library(mitools)
 
-chapter_tag_personsx_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016/personsx.rds" ) )
-
-chapter_tag_income_list <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016/incmimp.rds" ) )
-
-merge_variables <- c( "hhx" , "fmx" , "fpx" )
-
-chapter_tag_personsx_df[ merge_variables ] <- 
-	sapply( chapter_tag_personsx_df[ merge_variables ] , as.numeric )
-
-inc_vars_to_keep <- 
-	c( 
-		merge_variables , 
-		setdiff( 
-			names( chapter_tag_income_list[[ 1 ]] ) , 
-			names( chapter_tag_personsx_df )
-		)
-	)
-
-# personsx variables to keep
-vars_to_keep <- 
-	c( merge_variables , "ppsu" , "pstrat" , "wtfa" ,
-		'phstat' , 'sex' , 'hospno' , 'age_p' , 'hinotmyr' , 'notcov' )
-
-chapter_tag_personsx_df <- chapter_tag_personsx_df[ vars_to_keep ]
-	
-chapter_tag_personsx_list <-
-	lapply( chapter_tag_income_list ,
-		function( w ){
-			w <- w[ inc_vars_to_keep ]
-			w[ merge_variables ] <- sapply( w[ merge_variables ] , as.numeric )
-			result <- merge( chapter_tag_personsx_df , w )
-			stopifnot( nrow( result ) == nrow( chapter_tag_personsx_df ) )
-			result
-		} )
-
-# personsx design		
 chapter_tag_design <- 
 	svydesign( 
-		id = ~ppsu , 
-		strata = ~pstrat ,
+		id = ~ ppsu , 
+		strata = ~ pstrat ,
 		nest = TRUE ,
-		weights = ~wtfa ,
-		data = imputationList( chapter_tag_personsx_list )
+		weights = ~ wtfa_a ,
+		data = imputationList( chapter_tag_list )
 	)
-
-rm( chapter_tag_personsx_list ) ; gc()
-
-chapter_tag_samadult_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016/samadult.rds" ) )
-
-chapter_tag_samadult_df[ merge_variables ] <- 
-	sapply( chapter_tag_samadult_df[ merge_variables ] , as.numeric )
-
-
-samadult_vars_to_keep <- 
-	c( 
-		merge_variables , 
-		setdiff( 
-			names( chapter_tag_samadult_df ) , 
-			names( chapter_tag_personsx_df ) 
-		) 
-	)
-
-chapter_tag_personsx_samadult_df <-
-	merge( chapter_tag_personsx_df , chapter_tag_samadult_df[ samadult_vars_to_keep ] )
-
-stopifnot( nrow( chapter_tag_personsx_samadult_df ) == nrow( chapter_tag_samadult_df ) )
-
-rm( chapter_tag_personsx_df , chapter_tag_samadult_df ) ; gc()
-
-chapter_tag_samadult_list <-
-	lapply( chapter_tag_income_list ,
-		function( w ){
-			w <- w[ inc_vars_to_keep ]
-			w[ merge_variables ] <- sapply( w[ merge_variables ] , as.numeric )
-			result <- merge( chapter_tag_personsx_samadult_df , w )
-			stopifnot( nrow( result ) == nrow( chapter_tag_personsx_samadult_df ) )
-			result
-		} )
-
-rm( chapter_tag_income_list , chapter_tag_personsx_samadult_df ) ; gc()
-
-# sample adult design (commented out)
-# chapter_tag_samadult_design <- 
-	# svydesign( 
-		# id = ~ppsu , 
-		# strata = ~pstrat ,
-		# nest = TRUE ,
-		# weights = ~wtfa_sa ,
-		# data = imputationList( chapter_tag_samadult_list )
-	# )
-	
-rm( chapter_tag_samadult_list ) ; gc()
+```
 ~~~
 
 ~~~{variable_recoding_block}
@@ -130,17 +129,17 @@ chapter_tag_design <-
 		
 		poverty_category =
 			factor( 
-				findInterval( povrati3 , 1:4 ) ,
+				findInterval( povrattc_a , c( 1 , 2 , 4 ) ) ,
 				labels = 
-					c( "below poverty" , "100-199%" , "200-299%" , "300-399%" , "400%+" )
+					c( "below poverty" , "100-199%" , "200-399%" , "400%+" )
 			) ,
 			
 		fair_or_poor_reported_health = 
-			ifelse( phstat %in% 1:5 , as.numeric( phstat >= 4 ) , NA ) ,
+			ifelse( phstat_a %in% 1:5 , as.numeric( phstat_a >= 4 ) , NA ) ,
 			
-		sex = factor( sex , labels = c( "male" , "female" ) ) ,
+		sex_a = factor( sex_a , levels = 1:2 , labels = c( "male" , "female" ) ) ,
 		
-		hospno = ifelse( hospno > 366 , NA , hospno )
+		annual_premium_first_plan = ifelse( hicostr1_a > 40000 , NA , hicostr1_a )
 
 	)
 ~~~
@@ -148,17 +147,17 @@ chapter_tag_design <-
 group_by_variable: poverty_category
 group_by_variable_description: poverty categories
 
-categorical_variable: sex
+categorical_variable: sex_a
 categorical_variable_description: sex (1=male, 2=female)
 
-linear_variable: age_p
+linear_variable: agep_a
 linear_variable_description: age
 
-ratio_estimation_numerator: hinotmyr
-ratio_estimation_denominator: hospno
+ratio_estimation_numerator: annual_premium_first_plan
+ratio_estimation_denominator: agep_a
 ratio_narm: , na.rm = TRUE
 
-subset_definition: notcov == 1
+subset_definition: notcov_a == 1
 subset_definition_description: uninsured
 
 binary_variable: fair_or_poor_reported_health
@@ -166,12 +165,38 @@ binary_variable_description: fair or poor self-reported health status
 binary_narm: , na.rm = TRUE
 
 
-~~~{replication_example_block}
----
+needs_srvyr_block: no
 
+~~~{replication_example_block}
 ## Replication Example {-}
 
+This example matches statistics and standard errors within 0.01% from [Figure 3](https://www.cdc.gov/nchs/data/databriefs/db470-tables.pdf#3) of this [Characteristics of Adults Aged 18–64 Who Did Not Take Medication as Prescribed to Reduce Costs](https://www.cdc.gov/nchs/products/databriefs/db470.htm) Data Brief:
+
 ```{r eval = FALSE , results = "hide" }
+results <-
+	MIcombine( 
+		with(
+			subset( chapter_tag_design , agep_a < 65 ) , 
+			svyby(
+				~ as.numeric( rxsk12m_a == 1 | rxls12m_a == 1 | rxdl12m_a == 1 ) , 
+				~ poverty_category , 
+				svymean , 
+				na.rm = TRUE 
+			) 
+		)
+	)
+
+stopifnot(
+	all(
+		as.numeric( round( coef( results ) , 3 ) ) == c( 0.145 , 0.138 , 0.099 , 0.039 )
+	) 
+)
+
+stopifnot(
+	all( 
+		as.numeric( round( SE( results ) , 5 ) ) - c( 0.0126 , 0.0098 , 0.0062 , 0.0031 ) < 0.0001
+	) 
+)
 
 
 ```
@@ -182,8 +207,4 @@ binary_narm: , na.rm = TRUE
 
 
 
-needs_travis_build_status_line: yes
 
-sample_setup_breaks: 4
-
-broken_sample_test_condition: any( chapter_tag_cat$year == 2016 )

@@ -1,0 +1,298 @@
+# Public Libraries Survey (PLS) {-}
+
+<a href="https://github.com/asdfree/pls/actions"><img src="https://github.com/asdfree/pls/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+A comprehensive compilation of administrative information on all public libraries in the United States.
+
+* Two tables, with one record per library system and one record per library building or bookmobile.
+
+* Released annually since 1992.
+
+* Conducted by the [Institute of Museum and Library Services (IMLS)](https://www.imls.gov/), collected by the [Census Bureau](http://www.census.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [Data File Documentation and User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf)
+
+2. `README FY #### PLS PUD.txt` included in each [zipped file](https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Public Libraries Survey)
+
+```{r}
+# census, not survey.
+# dewey decimal index
+# finger to lips shush
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the most recent administrative entity csv file:
+```{r eval = FALSE , results = "hide" }
+this_tf <- tempfile()
+
+csv_url <- "https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip"
+
+download.file( csv_url , this_tf, mode = 'wb' )
+
+unzipped_files <- unzip( this_tf , exdir = tempdir() )
+		
+administrative_entity_csv_fn <-
+	unzipped_files[ grepl( 'AE(.*)csv$' , basename( unzipped_files ) ) ]
+
+pls_df <- read.csv( administrative_entity_csv_fn )
+
+names( pls_df ) <- tolower( names( pls_df ) )
+
+pls_df[ , 'one' ] <- 1
+```
+
+Recode missing values as described in the readme included with each zipped file:
+```{r eval = FALSE , results = "hide" }
+for( this_col in names( pls_df ) ){
+
+	if( class( pls_df[ , this_col ] ) == 'character' ){
+	
+		pls_df[ pls_df[ , this_col ] %in% 'M' , this_col ] <- NA
+		
+	}
+	
+	if( 
+		( class( pls_df[ , this_col ] ) == 'numeric' ) | 
+		( this_col %in% c( 'phone' , 'startdat' , 'enddate' ) ) 
+	){
+	
+		pls_df[ pls_df[ , this_col ] %in% c( -1 , -3 , -4 , -9 ) , this_col ] <- NA
+		
+	}
+	
+}
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# pls_fn <- file.path( path.expand( "~" ) , "PLS" , "this_file.rds" )
+# saveRDS( pls_df , file = pls_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# pls_df <- readRDS( pls_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+pls_df <- 
+	transform( 
+		pls_df , 
+		
+		c_relatn = 
+			factor( c_relatn , levels = c( "HQ" , "ME" , "NO" ) ,
+				c( "HQ-Headquarters of a federation or cooperative" ,
+				"ME-Member of a federation or cooperative" ,
+				"NO-Not a member of a federation or cooperative" )
+			) ,
+			
+		more_than_one_librarian = as.numeric( libraria > 1 )
+				
+	)	
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( pls_df )
+
+table( pls_df[ , "stabr" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( pls_df[ , "popu_lsa" ] , na.rm = TRUE )
+
+tapply(
+	pls_df[ , "popu_lsa" ] ,
+	pls_df[ , "stabr" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( pls_df[ , "c_relatn" ] ) )
+
+prop.table(
+	table( pls_df[ , c( "c_relatn" , "stabr" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( pls_df[ , "popu_lsa" ] , na.rm = TRUE )
+
+tapply(
+	pls_df[ , "popu_lsa" ] ,
+	pls_df[ , "stabr" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( pls_df[ , "popu_lsa" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	pls_df[ , "popu_lsa" ] ,
+	pls_df[ , "stabr" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to more than one million annual visits:
+```{r eval = FALSE , results = "hide" }
+sub_pls_df <- subset( pls_df , visits > 1000000 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_pls_df[ , "popu_lsa" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( pls_df[ , "popu_lsa" ] , na.rm = TRUE )
+
+tapply(
+	pls_df[ , "popu_lsa" ] ,
+	pls_df[ , "stabr" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( popu_lsa ~ more_than_one_librarian , pls_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( pls_df[ , c( "more_than_one_librarian" , "c_relatn" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		popu_lsa ~ more_than_one_librarian + c_relatn , 
+		data = pls_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+This example matches Interlibrary Relationship Frequencies on [PDF page 169 of the User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf#page=169):
+
+```{r eval = FALSE , results = "hide" }
+# remove closed and temporarily closed libraries
+results <- table( pls_df[ !( pls_df[ , 'statstru' ] %in% c( 3 , 23 ) ) , 'c_relatn' ] )
+
+stopifnot( results[ "HQ-Headquarters of a federation or cooperative" ] == 112 )
+stopifnot( results[ "ME-Member of a federation or cooperative" ] == 6859 )
+stopifnot( results[ "NO-Not a member of a federation or cooperative" ] == 2236 )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for PLS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+pls_tbl <- as_tibble( pls_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+pls_tbl %>%
+	summarize( mean = mean( popu_lsa , na.rm = TRUE ) )
+
+pls_tbl %>%
+	group_by( stabr ) %>%
+	summarize( mean = mean( popu_lsa , na.rm = TRUE ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for PLS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+pls_dt <- data.table( pls_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+pls_dt[ , mean( popu_lsa , na.rm = TRUE ) ]
+
+pls_dt[ , mean( popu_lsa , na.rm = TRUE ) , by = stabr ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for PLS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'pls' , pls_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( popu_lsa ) FROM pls' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		stabr ,
+		AVG( popu_lsa )
+	FROM
+		pls
+	GROUP BY
+		stabr'
+)
+```

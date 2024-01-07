@@ -1,0 +1,273 @@
+# Exame Nacional do Ensino Medio (ENEM) {-}
+
+<a href="https://github.com/asdfree/enem/actions"><img src="https://github.com/asdfree/enem/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The national student aptitude test, used to assess high school completion and university admission.
+
+* One table with one row per test-taking student, a second of study habit questionnaire respondents.
+
+* Updated annually since 1998.
+
+* Maintained by Brazil's [Instituto Nacional de Estudos e Pesquisas Educacionais Anisio Teixeira](http://www.inep.gov.br/)
+
+---
+
+Please skim before you begin:
+
+1. `Leia_Me_Enem` included in each [annual zipped file](https://download.inep.gov.br/microdados/microdados_enem_2022.zip)
+
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Exame_Nacional_do_Ensino_M%C3%A9dio)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Exame Nacional do Ensino Medio)
+
+```{r}
+# graduation stage
+# shake hands, toss cap, unroll scroll,
+# mais um exame?
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and unzip the 2022 file:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+library(archive)
+
+tf <- tempfile()
+
+this_url <-	"https://download.inep.gov.br/microdados/microdados_enem_2022.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+archive_extract( tf , dir = tempdir() )
+```
+
+Import the 2022 file:
+
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+enem_fns <- list.files( tempdir() , recursive = TRUE , full.names = TRUE )
+
+enem_fn <- grep( "MICRODADOS_ENEM_([0-9][0-9][0-9][0-9])\\.csv$" , enem_fns , value = TRUE )
+
+enem_tbl <- read_csv2( enem_fn )
+
+enem_df <- data.frame( enem_tbl )
+
+names( enem_df ) <- tolower( names( enem_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# enem_fn <- file.path( path.expand( "~" ) , "ENEM" , "this_file.rds" )
+# saveRDS( enem_df , file = enem_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# enem_df <- readRDS( enem_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+enem_df <- 
+	transform( 
+		enem_df , 
+		
+		domestic_worker = as.numeric( q007 %in% c( 'B' , 'C' , 'D' ) ) ,
+		
+		administrative_category =
+			factor(
+				tp_dependencia_adm_esc ,
+				levels = 1:4 ,
+				labels = c( 'Federal' , 'Estadual' , 'Municipal' , 'Privada' )
+			) ,
+
+		state_name = 
+			factor( 
+				co_uf_esc , 
+				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
+				"Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+				"Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+				"Bahia" , "Minas Gerais" , "Espirito Santo" , 
+				"Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+				"Santa Catarina" , "Rio Grande do Sul" , 
+				"Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+				"Distrito Federal" )
+			)
+
+	)
+	
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( enem_df )
+
+table( enem_df[ , "administrative_category" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( enem_df[ , "nu_nota_mt" ] , na.rm = TRUE )
+
+tapply(
+	enem_df[ , "nu_nota_mt" ] ,
+	enem_df[ , "administrative_category" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( enem_df[ , "state_name" ] ) )
+
+prop.table(
+	table( enem_df[ , c( "state_name" , "administrative_category" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( enem_df[ , "nu_nota_mt" ] , na.rm = TRUE )
+
+tapply(
+	enem_df[ , "nu_nota_mt" ] ,
+	enem_df[ , "administrative_category" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( enem_df[ , "nu_nota_mt" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	enem_df[ , "nu_nota_mt" ] ,
+	enem_df[ , "administrative_category" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to mother graduated from high school:
+```{r eval = FALSE , results = "hide" }
+sub_enem_df <- subset( enem_df , q002 %in% c( 'E' , 'F' , 'G' ) )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_enem_df[ , "nu_nota_mt" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( enem_df[ , "nu_nota_mt" ] , na.rm = TRUE )
+
+tapply(
+	enem_df[ , "nu_nota_mt" ] ,
+	enem_df[ , "administrative_category" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( nu_nota_mt ~ domestic_worker , enem_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( enem_df[ , c( "domestic_worker" , "state_name" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		nu_nota_mt ~ domestic_worker + state_name , 
+		data = enem_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+This example matches the registration counts in the [Sinopse ENEM 2022 Excel table](https://download.inep.gov.br/informacoes_estatisticas/sinopses_estatisticas/sinopses_enem/2022/sinopse_enem_2022.zip):
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( enem_df ) == 3476105 )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for ENEM users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+enem_tbl <- as_tibble( enem_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+enem_tbl %>%
+	summarize( mean = mean( nu_nota_mt , na.rm = TRUE ) )
+
+enem_tbl %>%
+	group_by( administrative_category ) %>%
+	summarize( mean = mean( nu_nota_mt , na.rm = TRUE ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for ENEM users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+enem_dt <- data.table( enem_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+enem_dt[ , mean( nu_nota_mt , na.rm = TRUE ) ]
+
+enem_dt[ , mean( nu_nota_mt , na.rm = TRUE ) , by = administrative_category ]
+```
+
+

@@ -1,0 +1,376 @@
+# Census of Governments (COG) {-}
+
+<a href="https://github.com/asdfree/cog/actions"><img src="https://github.com/asdfree/cog/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+Location, employment, and payroll for state and local (but not federal) government agencies in the U.S.
+
+* One record per agency, one per agency function, plus the government units master address file.
+
+* Complete enumeration of civilian employment in state and local governments in the 50 states + D.C.
+
+* The Annual Survey of Public Employment & Payroll becomes a census in years ending with 2 and 7.
+
+* Administered and financed by the [US Census Bureau](http://www.census.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [2022 Census of Governments, Survey of Public Employment & Payroll Methodology](https://www2.census.gov/programs-surveys/apes/technical-documentation/methodology/22_methodology.pdf)
+
+2. [Government Units Survey Methodology](https://www.census.gov/programs-surveys/gus/technical-documentation/methodology.html)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Census of Governments)
+
+```{r}
+# courthouse steps wedding
+# schools police fire water
+# no fed mail invite
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download, import, and stack the government units listing file:
+```{r eval = FALSE , results = "hide" }
+library(readxl)
+
+tf_gus <- tempfile()
+
+gus_url <- "https://www2.census.gov/programs-surveys/gus/datasets/2022/govt_units_2022.ZIP"
+
+download.file( gus_url , tf_gus , mode = 'wb' )
+
+unzipped_files_gus <- unzip( tf_gus , exdir = tempdir() )
+
+xlsx_gus_fn <- grep( "\\.xlsx$" , unzipped_files_gus , value = TRUE )
+
+xlsx_sheets <- excel_sheets( xlsx_gus_fn )
+
+# read all sheets into a list of tibbles
+gus_tbl_list <- lapply( xlsx_sheets , function( w ) read_excel( xlsx_gus_fn , sheet = w ) )
+
+# convert all tibbles to data.frame objects
+gus_df_list <- lapply( gus_tbl_list , data.frame )
+
+# lowercase all column names
+gus_df_list <-
+	lapply( 
+		gus_df_list , 
+		function( w ){ names( w ) <- tolower( names( w ) ) ; w } 
+	)
+
+# add the excel tab source to each data.frame
+for( i in seq( xlsx_sheets ) ) gus_df_list[[ i ]][ , 'source_tab' ] <- xlsx_sheets[ i ]
+
+# determine which columns are in all tables
+column_intersect <- Reduce( intersect , lapply( gus_df_list , names ) )
+
+# determine which columns are in some but not all tables
+column_union <- unique( unlist( lapply( gus_df_list , names ) ) )
+
+# these columns will be discarded by stacking:
+unique(
+	unlist(
+		lapply(
+			lapply( gus_df_list , names ) , 
+			function( w ) column_union[ !column_union %in% w ]
+		)
+	)
+)
+
+# stack all excel sheets, keeping only the columns that all tables have in common
+gus_df <- Reduce( rbind , lapply( gus_df_list , function( w ) w[ column_intersect ] ) )
+```
+
+Download and import the survey of public employment & payroll, one record per function (not per unit):
+```{r eval = FALSE , results = "hide" }
+tf_apes <- tempfile()
+
+apes_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/apes/datasets/" ,
+		"2022/2022%20COG-E%20Individual%20Unit%20Files.zip"
+	)
+
+download.file( apes_url , tf_apes , mode = 'wb' )
+
+unzipped_files_apes <- unzip( tf_apes , exdir = tempdir() )
+
+xlsx_apes_fn <- grep( "\\.xlsx$" , unzipped_files_apes , value = TRUE )
+
+apes_tbl <- read_excel( xlsx_apes_fn )
+
+apes_df <- data.frame( apes_tbl )
+
+names( apes_df ) <- tolower( names( apes_df ) )
+```
+
+Review the non-matching records between these two tables, then merge:
+```{r eval = FALSE , results = "hide" }
+# all DEP School Districts and a third of Special Districts are not in the `apes_df`
+table(
+	gus_df[ , 'census_id_gidid' ] %in% apes_df[ , 'individual.unit.id' ] ,
+	gus_df[ , 'source_tab' ] ,
+	useNA = 'always'
+)
+
+# state governments are not in the `gus_df`
+table(
+	apes_df[ , 'individual.unit.id' ] %in% gus_df[ , 'census_id_gidid' ] ,
+	apes_df[ , 'type.of.government' ] ,
+	useNA = 'always'
+)
+
+# check for overlapping field names:
+( overlapping_names <- intersect( names( apes_df ) , names( gus_df ) ) )
+
+# rename the state column in `gus_df` to state abbreviation
+names( gus_df )[ names( gus_df ) == 'state' ] <- 'stateab'
+
+double_df <-
+	merge(
+		apes_df ,
+		gus_df ,
+		by.x = 'individual.unit.id' ,
+		by.y = 'census_id_gidid' ,
+		all.x = TRUE
+	)
+
+stopifnot( nrow( double_df ) == nrow( apes_df ) )
+
+# replace dots with underscores
+names( double_df ) <- gsub( "\\." , "_" , names( double_df ) )
+```
+
+Keep either the one record per agency rows or the one record per function rows:
+```{r eval = FALSE , results = "hide" }
+# `Total - All Government Employment Functions` records sum to the same as all other records:
+with( double_df , tapply( full_time_employees , grepl( "Total" , government_function ) , sum ) )
+
+with( double_df , tapply( part_time_payroll , grepl( "Total" , government_function ) , sum ) )
+
+# keep one record per government function (multiple records per agency):
+cog_df <- subset( double_df , !grepl( "Total" , government_function ) )
+
+# keep one record per government agency:
+# cog_df <- subset( double_df , grepl( "Total" , government_function ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# cog_fn <- file.path( path.expand( "~" ) , "COG" , "this_file.rds" )
+# saveRDS( cog_df , file = cog_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# cog_df <- readRDS( cog_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+cog_df <- 
+	transform( 
+		cog_df , 
+		
+		one = 1 ,
+		
+		total_payroll = full_time_payroll + part_time_payroll ,
+		
+		total_employees = full_time_employees + part_time_employees ,
+
+		any_full_time_employees = full_time_employees > 0
+	)
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( cog_df )
+
+table( cog_df[ , "type_of_government" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( cog_df[ , "full_time_employees" ] )
+
+tapply(
+	cog_df[ , "full_time_employees" ] ,
+	cog_df[ , "type_of_government" ] ,
+	mean 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( cog_df[ , "census_region" ] ) )
+
+prop.table(
+	table( cog_df[ , c( "census_region" , "type_of_government" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( cog_df[ , "full_time_employees" ] )
+
+tapply(
+	cog_df[ , "full_time_employees" ] ,
+	cog_df[ , "type_of_government" ] ,
+	sum 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( cog_df[ , "full_time_employees" ] , 0.5 )
+
+tapply(
+	cog_df[ , "full_time_employees" ] ,
+	cog_df[ , "type_of_government" ] ,
+	quantile ,
+	0.5 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to Elementary, Secondary, Higher, and Other Educational Government Agencies:
+```{r eval = FALSE , results = "hide" }
+sub_cog_df <- subset( cog_df , grepl( 'Education' , government_function ) )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_cog_df[ , "full_time_employees" ] )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( cog_df[ , "full_time_employees" ] )
+
+tapply(
+	cog_df[ , "full_time_employees" ] ,
+	cog_df[ , "type_of_government" ] ,
+	var 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( full_time_employees ~ any_full_time_employees , cog_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( cog_df[ , c( "any_full_time_employees" , "census_region" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		full_time_employees ~ any_full_time_employees + census_region , 
+		data = cog_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches excel cell "C17" of [Employment & Payroll Data by State and by Function](https://www2.census.gov/programs-surveys/apes/datasets/2022/2022_state_and_local.xlsx):
+
+```{r eval = FALSE , results = "hide" }
+financial_admin_df <- subset( cog_df , government_function == 'Financial Administration' )
+
+stopifnot( sum( financial_admin_df[ , 'full_time_employees' ] ) == 404228 )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for COG users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+cog_tbl <- as_tibble( cog_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+cog_tbl %>%
+	summarize( mean = mean( full_time_employees ) )
+
+cog_tbl %>%
+	group_by( type_of_government ) %>%
+	summarize( mean = mean( full_time_employees ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for COG users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+cog_dt <- data.table( cog_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+cog_dt[ , mean( full_time_employees ) ]
+
+cog_dt[ , mean( full_time_employees ) , by = type_of_government ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for COG users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'cog' , cog_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( full_time_employees ) FROM cog' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		type_of_government ,
+		AVG( full_time_employees )
+	FROM
+		cog
+	GROUP BY
+		type_of_government'
+)
+```

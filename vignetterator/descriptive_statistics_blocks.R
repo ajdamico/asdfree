@@ -32,7 +32,7 @@ Calculate the median (50th percentile) of a linear variable, overall and by grou
 ```{r eval = FALSE , results = "hide" }
 MIcombine( with( chapter_tag_design ,\n\tsvyquantile(\n\t\t~ linear_variable ,\n\t\t0.5 , se = TRUE linear_narm \n) ) )
 
-MIcombine( with( chapter_tag_design ,\n\tsvyby(\n\t\t~ linear_variable , ~ group_by_variable , svyquantile ,\n\t\t0.5 , se = TRUE ,\n\t\tkeep.var = TRUE , ci = TRUE linear_narm\n) ) )
+MIcombine( with( chapter_tag_design ,\n\tsvyby(\n\t\t~ linear_variable , ~ group_by_variable , svyquantile ,\n\t\t0.5 , se = TRUE ,\n\t\tci = TRUE linear_narm\n) ) )
 ```
 
 Estimate a ratio:
@@ -81,8 +81,7 @@ svyby(
 	chapter_tag_design , 
 	svyquantile , 
 	0.5 ,
-	ci = TRUE ,
-	keep.var = TRUE linear_narm
+	ci = TRUE linear_narm
 )
 ```
 

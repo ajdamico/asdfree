@@ -1,0 +1,367 @@
+# Residential Energy Consumption Survey (RECS) {-}
+
+<a href="https://github.com/asdfree/recs/actions"><img src="https://github.com/asdfree/recs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+A periodic study conducted to provide detailed information about energy usage in U.S. homes.
+
+* One table with one row per sampled housing unit.
+
+* A complex sample survey designed to generalize to U.S. homes occupied as primary residences.
+
+* Released approximately every five years since 1979.
+
+* Prepared by the [Energy Information Administration](https://www.eia.gov/), with help from [IMG-Crown](https://www.imgcrown.com/) and [RTI International](https://www.rti.org/).
+
+---
+
+Please skim before you begin:
+
+1. [Annual Energy Outlook 2023](https://www.eia.gov/outlooks/aeo/narrative/)
+
+2. [Household Characteristics Technical Documentation Summary](https://www.eia.gov/consumption/residential/data/2020/pdf/2020%20RECS_Methodology%20Report.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Residential Energy Consumption Survey)
+
+```{r}
+# housing code dogma
+# even satan ceased sweat since
+# eighth sin: central air
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the most recent sas file:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+sas_tf <- tempfile()
+
+sas_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v2.zip"
+
+download.file( sas_url , sas_tf , mode = 'wb' )
+
+recs_tbl <- read_sas( sas_tf )
+
+recs_df <- data.frame( recs_tbl )
+
+names( recs_df ) <- tolower( names( recs_df ) )
+
+recs_df[ , 'one' ] <- 1
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# recs_fn <- file.path( path.expand( "~" ) , "RECS" , "this_file.rds" )
+# saveRDS( recs_df , file = recs_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# recs_df <- readRDS( recs_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+recs_design <-
+	svrepdesign(
+		data = recs_df ,
+		weight = ~ nweight ,
+		repweights = 'nweight[1-9]+' ,
+		type = 'JK1' ,
+		combined.weights = TRUE ,
+		scale = 59 / 60 ,
+		mse = TRUE
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+recs_design <- 
+	
+	update( 
+		
+		recs_design , 
+		
+		main_heating_fuel = 
+			factor(
+				fuelheat ,
+				levels = c( -2 , 5 , 1 , 2 , 3 , 7 , 99 ) ,
+				labels = 
+					c(
+						'Not applicable' , 
+						'Electricity' , 
+						'Natural gas from underground pipes' , 
+						'Propane (bottled gas)' , 
+						'Fuel oil' , 
+						'Wood or pellets' , 
+						'Other' 
+					)
+			) ,
+
+		rooftype =
+			factor(
+				rooftype ,
+				levels = c( -2 , 1:6 , 99 ) ,
+				labels =
+					c(
+						'Not applicable' ,
+						'Ceramic or clay tiles' ,
+						'Wood shingles/shakes' ,
+						'Metal' ,
+						'Slate or synthetic slate' ,
+						'Shingles (composition or asphalt)' ,
+						'Concrete tiles' ,
+						'Other'
+					)
+			) ,
+			
+		swimpool_binary =
+			ifelse( swimpool %in% 0:1 , swimpool , NA )
+			
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( recs_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ main_heating_fuel , recs_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , recs_design )
+
+svyby( ~ one , ~ main_heating_fuel , recs_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ totsqft_en , recs_design )
+
+svyby( ~ totsqft_en , ~ main_heating_fuel , recs_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ rooftype , recs_design )
+
+svyby( ~ rooftype , ~ main_heating_fuel , recs_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ totsqft_en , recs_design )
+
+svyby( ~ totsqft_en , ~ main_heating_fuel , recs_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ rooftype , recs_design )
+
+svyby( ~ rooftype , ~ main_heating_fuel , recs_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ totsqft_en , recs_design , 0.5 )
+
+svyby( 
+	~ totsqft_en , 
+	~ main_heating_fuel , 
+	recs_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ totcsqft , 
+	denominator = ~ totsqft_en , 
+	recs_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to households that cook three or more hot meals per day:
+```{r eval = FALSE , results = "hide" }
+sub_recs_design <- subset( recs_design , nummeal == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ totsqft_en , sub_recs_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ totsqft_en , recs_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ totsqft_en , 
+		~ main_heating_fuel , 
+		recs_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( recs_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ totsqft_en , recs_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ totsqft_en , recs_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ totsqft_en , recs_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ swimpool_binary , recs_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( totsqft_en ~ swimpool_binary , recs_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ swimpool_binary + rooftype , 
+	recs_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		totsqft_en ~ swimpool_binary + rooftype , 
+		recs_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the statistic, standard error, and relative standard error shown on PDF page 8 of [Using the microdata file to compute estimates and relative standard errors (RSEs)](https://www.eia.gov/consumption/residential/data/2020/pdf/microdata-guide.pdf)
+
+```{r eval = FALSE , results = "hide" }
+sas_v1_tf <- tempfile()
+
+sas_v1_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v1.zip"
+
+download.file( sas_v1_url , sas_v1_tf , mode = 'wb' )
+
+recs_v1_tbl <- read_sas( sas_v1_tf )
+
+recs_v1_df <- data.frame( recs_v1_tbl )
+
+names( recs_v1_df ) <- tolower( names( recs_v1_df ) )
+
+recs_v1_design <-
+	svrepdesign(
+		data = recs_v1_df ,
+		weight = ~ nweight ,
+		repweights = 'nweight[1-9]+' ,
+		type = 'JK1' ,
+		combined.weights = TRUE ,
+		scale = 59 / 60 ,
+		mse = TRUE
+	)
+
+recs_v1_design <- 
+	update( 
+
+		recs_v1_design , 
+
+		natural_gas_mainspace_heat = as.numeric( fuelheat == 1 )
+		
+	)
+	
+result <-
+	svytotal( 
+		~ natural_gas_mainspace_heat , 
+		recs_v1_design 
+	)
+
+stopifnot( round( coef( result ) , 0 ) == 56245389 )
+stopifnot( round( SE( result ) , 0 ) == 545591 )
+stopifnot( round( 100 * SE( result ) / coef( result ) , 2 ) == 0.97 )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for RECS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+recs_srvyr_design <- as_survey( recs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+recs_srvyr_design %>%
+	summarize( mean = survey_mean( totsqft_en ) )
+
+recs_srvyr_design %>%
+	group_by( main_heating_fuel ) %>%
+	summarize( mean = survey_mean( totsqft_en ) )
+```
+
+

@@ -1,0 +1,440 @@
+# Survey of Income and Program Participation (SIPP) {-}
+
+<a href="https://github.com/asdfree/sipp/actions"><img src="https://github.com/asdfree/sipp/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The primary longitudinal assessment of income fluctuation, labor force participation, social programs.
+
+* Annual tables with one record per month per person per sampled household, time period weights.
+
+* A complex sample generalizing to the U.S. civilian non-institutionalized across varying time periods.
+
+* Multi-year panels since 1980s, its current and now permanent [four year rotation](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf#page=15) beginning in 2018.
+
+* Administered and financed by the [US Census Bureau](http://www.census.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [2022 Survey of Income and Program Participation Users' Guide](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf)
+
+2. [2022 Data User Notes](https://www.census.gov/programs-surveys/sipp/tech-documentation/user-notes/2022-usernotes.html)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Survey of Income and Program Participation)
+
+```{r}
+# federal programs
+# poverty oversample
+# monthly dynamics
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Determine which variables from the main table to import:
+```{r eval = FALSE , results = "hide" }
+variables_to_keep <-
+	c( 'ssuid' , 'pnum' , 'monthcode' , 'spanel' , 'swave' , 'erelrpe' , 
+	'tlivqtr' , 'wpfinwgt' , 'rmesr' , 'thcyincpov' , 'tfcyincpov' ,
+	'tehc_st' , 'rhicovann' , 'rfpov' , 'thnetworth' , 'tftotinc' )
+```
+
+Download and import the latest main file:
+```{r eval = FALSE , results = "hide" }
+library(httr)
+library(data.table)
+
+main_tf <- tempfile()
+
+main_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/sipp/" ,
+		"data/datasets/2022/pu2022_csv.zip"
+	)
+
+GET( main_url , write_disk( main_tf ) , progress() )
+
+main_csv <- unzip( main_tf , exdir = tempdir() )
+
+sipp_main_dt <- fread( main_csv , sep = "|" , select = toupper( variables_to_keep ) )
+
+sipp_main_df <- data.frame( sipp_main_dt )
+
+names( sipp_main_df ) <- tolower( names( sipp_main_df ) )
+
+```
+
+Download and import the appropriate replicate weights file:
+```{r eval = FALSE , results = "hide" }
+rw_tf <- tempfile()
+
+rw_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/sipp/" ,
+		"data/datasets/2022/rw2022_csv.zip"
+	)
+
+GET( rw_url , write_disk( rw_tf ) , progress() )
+
+rw_csv <- unzip( rw_tf , exdir = tempdir() )
+
+sipp_rw_dt <- fread( rw_csv , sep = "|" )
+
+sipp_rw_df <- data.frame( sipp_rw_dt )
+
+names( sipp_rw_df ) <- tolower( names( sipp_rw_df ) )
+```
+
+Limit both files to December records for a point-in-time estimate, then merge:
+```{r eval = FALSE , results = "hide" }
+
+sipp_df <-
+	merge(
+		sipp_main_df[ sipp_main_df[ , 'monthcode' ] %in% 12 , ] ,
+		sipp_rw_df[ sipp_rw_df[ , 'monthcode' ] %in% 12 , ] ,
+		by = c( 'ssuid' , 'pnum' , 'monthcode' , 'spanel' , 'swave' )
+	)
+	
+stopifnot( nrow( sipp_df ) == sum( sipp_rw_df[ , 'monthcode' ] %in% 12 ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# sipp_fn <- file.path( path.expand( "~" ) , "SIPP" , "this_file.rds" )
+# saveRDS( sipp_df , file = sipp_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# sipp_df <- readRDS( sipp_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+sipp_design <- 
+	svrepdesign(
+			data = sipp_df ,
+			weights = ~ wpfinwgt ,
+			repweights = "repwgt([1-9]+)" ,
+			type = "Fay" ,
+			rho = 0.5
+		)
+	
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+rmesr_values <-
+	c( 
+		"With a job entire month, worked all weeks",
+		"With a job all month, absent from work without pay 1+ weeks, absence not due to layoff",
+		"With a job all month, absent from work without pay 1+ weeks, absence due to layoff",
+		"With a job at least 1 but not all weeks, no time on layoff and no time looking for work",
+		"With a job at least 1 but not all weeks, some weeks on layoff or looking for work",
+		"No job all month, on layoff or looking for work all weeks",
+		"No job all month, at least one but not all weeks on layoff or looking for work",
+		"No job all month, no time on layoff and no time looking for work"
+	)
+
+sipp_design <- 
+	
+	update( 
+		
+		sipp_design , 
+		
+		one = 1 ,
+		
+		employment_status = factor( rmesr , levels = 1:8 , labels = rmesr_values ) ,
+			
+		household_below_poverty = as.numeric( thcyincpov < 1 ) ,
+		
+		family_below_poverty = as.numeric( tfcyincpov < 1 ) ,
+		
+		state_name =
+			
+			factor(
+				
+				as.numeric( tehc_st ) ,
+				
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L, 60L, 61L) ,
+		
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming", "Puerto Rico",
+					"Foreign Country")
+			)
+			
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( sipp_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ state_name , sipp_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , sipp_design )
+
+svyby( ~ one , ~ state_name , sipp_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ tftotinc , sipp_design , na.rm = TRUE )
+
+svyby( ~ tftotinc , ~ state_name , sipp_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ employment_status , sipp_design , na.rm = TRUE )
+
+svyby( ~ employment_status , ~ state_name , sipp_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ tftotinc , sipp_design , na.rm = TRUE )
+
+svyby( ~ tftotinc , ~ state_name , sipp_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ employment_status , sipp_design , na.rm = TRUE )
+
+svyby( ~ employment_status , ~ state_name , sipp_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ tftotinc , sipp_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ tftotinc , 
+	~ state_name , 
+	sipp_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ tftotinc , 
+	denominator = ~ rfpov , 
+	sipp_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to individuals ever covered by health insurance during the year:
+```{r eval = FALSE , results = "hide" }
+sub_sipp_design <- subset( sipp_design , rhicovann == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ tftotinc , sub_sipp_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ tftotinc , sipp_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ tftotinc , 
+		~ state_name , 
+		sipp_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( sipp_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ tftotinc , sipp_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ tftotinc , sipp_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ tftotinc , sipp_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ family_below_poverty , sipp_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( tftotinc ~ family_below_poverty , sipp_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ family_below_poverty + employment_status , 
+	sipp_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		tftotinc ~ family_below_poverty + employment_status , 
+		sipp_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics and standard errors from the [Wealth and Asset Ownership for Households, by Type of Asset and Selected Characteristics: 2021](https://www2.census.gov/programs-surveys/demo/tables/wealth/2021/wealth-asset-ownership/Wealth_tables_dy2021.xlsx):
+
+Restrict the design to permanent residence-based householders to match the count in Table 4:
+
+```{r eval = FALSE , results = "hide" }
+sipp_household_design <- subset( sipp_design , erelrpe %in% 1:2 & tlivqtr %in% 1:2 )
+
+stopifnot( round( coef( svytotal( ~ one , sipp_household_design ) ) / 1000 , -2 ) == 132700 )
+```
+	
+Compute Household Net Worth distribution and standard errors across the Total row of Tables 4 and 4A:
+
+```{r eval = FALSE , results = "hide" }
+sipp_household_design <-
+	update(
+		sipp_household_design ,
+		thnetworth_category =
+			factor(
+				findInterval( 
+					thnetworth , 
+					c( 1 , 5000 , 10000 , 25000 , 50000 , 100000 , 250000 , 500000 ) 
+				) ,
+				levels = 0:8 ,
+				labels = c( "Zero or Negative" , "$1 to $4,999" , "$5,000 to $9,999" , 
+				"$10,000 to $24,999" , "$25,000 to $49,999" , "$50,000 to $99,999" , 
+				"$100,000 to $249,999" , "$250,000 to $499,999" , "$500,000 or over" )
+			)
+	)
+
+results <- svymean( ~ thnetworth_category , sipp_household_design )
+
+stopifnot( 
+	all.equal( as.numeric( round( coef( results ) * 100 , 1 ) ) , 
+	c( 11.3 , 6.9 , 3.5 , 5.9 , 6.4 , 8.2 , 15.3 , 13.9 , 28.7 ) ) 
+)
+
+stopifnot(
+	all.equal( as.numeric( round( SE( results ) * 100 , 1 ) ) ,
+	c( 0.3 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.3 , 0.3 , 0.3 ) )
+)
+
+```
+
+---
+
+## Poverty and Inequality Estimation with `convey` \ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for SIPP users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+sipp_design <- convey_prep( sipp_design )
+
+svygini( ~ tftotinc , sipp_design , na.rm = TRUE )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for SIPP users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+sipp_srvyr_design <- as_survey( sipp_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sipp_srvyr_design %>%
+	summarize( mean = survey_mean( tftotinc , na.rm = TRUE ) )
+
+sipp_srvyr_design %>%
+	group_by( state_name ) %>%
+	summarize( mean = survey_mean( tftotinc , na.rm = TRUE ) )
+```
+
+

@@ -1,12 +1,15 @@
 chapter_title: Medical Expenditure Panel Survey
 
+
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
-The Medical Expenditure Panel Survey's Household Component (MEPS-HC) captures person-level medical expenditures by payor and type of service with more detail than any other publicly-available data set.
+The Household Component captures person-level spending across service categories, coverage types.
 ~~~
 
-table_structure: * The annual consolidated file contains one row per individual within each sampled household.  Other available mergeable tables contain one record per medical event, one record per job, one record per insurance held.
+table_structure: * The consolidated file contains one row per individual within each sampled household, other tables contain one record per event (like prescription fills, hospitalizations), per job, per insurance policy.
 
-generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutionalized population of the United States.
+generalizable_population: * A complex sample survey designed to generalize to the U.S. civilian non-institutionalized population.
 
 publication_period: * Released annually since 1996.
 
@@ -14,41 +17,95 @@ administrative_organization: * Administered by the [Agency for Healthcare Resear
 
 
 
-needs_catalog_block: yes
-catalog_subset_description: # 2015 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2015 )
 
-~~~{analysis_examples_survey_design}
-library(survey)
 
-chapter_tag_cons_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
-		"2015/full year consolidated.rds" ) )
+~~~{reading_block}
+Please skim before you begin:
 
-chapter_tag_brr <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
-		"meps 1996-2015 replicates for variance estimation.rds" ) )
+1. [MEPS HC-224 2020 Full Year Consolidated Data File](https://meps.ahrq.gov/data_stats/download_data/pufs/h224/h224doc.shtml)
 
-chapter_tag_brr <- 
-	chapter_tag_brr[ , 
-		c( "dupersid" , "panel" , 
-			names( chapter_tag_brr )[ !( names( chapter_tag_brr ) %in% names( chapter_tag_cons_df ) ) ] 
-		)
-	]
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Medical_Expenditure_Panel_Survey)
 
-chapter_tag_df <- merge( chapter_tag_cons_df , chapter_tag_brr )
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# king dumpty's horsemen
+# ahrq stitches payors, bills, claims
+# fractured health system
+```
+~~~
+
+
+
+
+~~~{download_and_import_block}
+
+Define a function to download, unzip, and import each sas file:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+meps_sas_import <-
+	function( this_url ){
+		
+		this_tf <- tempfile()
+		
+		download.file( this_url , this_tf , mode = 'wb' )
+		
+		this_tbl <- read_sas( this_tf )
+
+		this_df <- data.frame( this_tbl )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+```	
+
+Download and import the consolidated file and the replicate weights file:
+
+```{r eval = FALSE , results = "hide" }
+chapter_tag_cons_df <-
+	meps_sas_import( "https://meps.ahrq.gov/data_files/pufs/h224/h224v9.zip" )
+
+chapter_tag_brr_df <-
+	meps_sas_import( "https://meps.ahrq.gov/mepsweb/data_files/pufs/h036brr/h36brr20v9.zip" )
+```
+
+
+Merge the consolidated file with the replicate weights:
+
+```{r eval = FALSE , results = "hide" }
+chapter_tag_df <- merge( chapter_tag_cons_df , chapter_tag_brr_df )
 
 stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_cons_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+
+
+
+
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
+library(survey)
 
 chapter_tag_design <-
 	svrepdesign(
 		data = chapter_tag_df ,
-		weights = ~ perwt15f ,
+		weights = ~ perwt20f ,
 		type = "BRR" ,
 		combined.weights = FALSE ,
 		repweights = "brr[1-9]+" ,
 		mse = TRUE
 	)
+```
 ~~~
 
 ~~~{variable_recoding_block}
@@ -58,38 +115,69 @@ chapter_tag_design <-
 		
 		one = 1 ,
 		
-		insured_december_31st = ifelse( ins15x %in% 1:2 , as.numeric( ins15x == 1 ) , NA )
+		insured_december_31st = ifelse( ins20x %in% 1:2 , as.numeric( ins20x == 1 ) , NA )
 		
 	)
 ~~~
 
-group_by_variable: region15
+group_by_variable: region20
 group_by_variable_description: Census Region
 
 categorical_variable: sex
 categorical_variable_description: sex (1=male, 2=female)
 
-linear_variable: totexp15
+linear_variable: totexp20
 linear_variable_description: total medical expenditure during the year
 
-ratio_estimation_numerator: totmcd15
-ratio_estimation_denominator: totexp15
+ratio_estimation_numerator: totmcd20
+ratio_estimation_denominator: totexp20
 
 subset_definition: agelast >= 65
 subset_definition_description: seniors
 
 binary_variable: insured_december_31st
-binary_variable_description: insured December 31st, 2015
+binary_variable_description: insured December 31st, 2020
 binary_narm: , na.rm = TRUE
+
+
+
+
 
 needs_srvyr_block: yes
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
+This example matches the statistic and standard error shown under [Analysis of the Total Population](https://meps.ahrq.gov/mepsweb/survey_comp/standard_errors.jsp):
+
+
 ```{r eval = FALSE , results = "hide" }
+library(foreign)
+
+xport_2002_tf <- tempfile()
+
+xport_2002_url <- "https://meps.ahrq.gov/data_files/pufs/h70ssp.zip"
+
+download.file( xport_2002_url , xport_2002_tf , mode = 'wb' )
+
+unzipped_2002_xport <- unzip( xport_2002_tf , exdir = tempdir() )
+
+chapter_tag_2002_df <- read.xport( unzipped_2002_xport )
+
+names( chapter_tag_2002_df ) <- tolower( names( chapter_tag_2002_df ) )
+
+chapter_tag_2002_design <-
+	svydesign(
+		~ varpsu ,
+		strata = ~ varstr ,
+		weights = ~ perwt02f ,
+		data = chapter_tag_2002_df ,
+		nest = TRUE
+	)
+			
+result <- svymean( ~ totexp02 , chapter_tag_2002_design )
+stopifnot( round( coef( result ) , 2 ) == 2813.24 )
+stopifnot( round( SE( result ) , 2 ) == 58.99 )
 
 ```
 
@@ -97,8 +185,5 @@ needs_srvyr_block: yes
 
 
 
-needs_travis_build_status_line: yes
 
-sample_setup_breaks: 2
 
-broken_sample_test_condition: any( grepl( 2015 , chapter_tag_cat$year ) )

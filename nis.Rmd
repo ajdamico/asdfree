@@ -1,0 +1,357 @@
+# National Immunization Survey (NIS) {-}
+
+<a href="https://github.com/asdfree/nis/actions"><img src="https://github.com/asdfree/nis/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The vaccination coverage rate tracker for national, state, and selected local areas.
+
+* One table with one row per sampled toddler.
+
+* A complex sample survey designed to generalize to children aged 19-35 months in the United States.
+
+* Released annually since 1995, plus an adolescent (13-17 years) sample since 2008.
+
+* Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [About NIS](https://www.cdc.gov/vaccines/imz-managers/nis/about.html)
+
+2. [National Immunization Survey-Child: A User's Guide for the 2021 Public-Use Data File](https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National Immunization Survey)
+
+```{r}
+# i hear babies cry
+# protesting lungs of iron
+# a wonderful world
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download the fixed-width file:
+```{r eval = FALSE , results = "hide" }
+dat_tf <- tempfile()
+
+dat_url <- "https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.DAT"
+
+download.file( dat_url , dat_tf , mode = 'wb' )
+```
+
+Edit then execute the import script provided by the CDC:
+```{r eval = FALSE , results = "hide" }
+library(Hmisc)
+
+r_tf <- tempfile()
+
+r_script_url <- "https://ftp.cdc.gov/pub/Vaccines_NIS/NISPUF21.R"
+
+r_input_lines <- readLines( r_script_url )
+
+# do not let the script do the save()
+r_input_lines <- gsub( "^save\\(" , "# save(" , r_input_lines )
+
+# redirect the path to the flat file to the local save location of `dat_tf`
+r_input_lines <- gsub( '\\"path\\-to\\-file\\/(.*)\\.DAT\\"' , "dat_tf" , r_input_lines )
+
+# save the edited script locally
+writeLines( r_input_lines , r_tf )
+
+# run the edited script
+source( r_tf , echo = TRUE )
+
+# rename the resultant data.frame object
+nis_df <- NISPUF21
+
+names( nis_df ) <- tolower( names( nis_df ) )
+
+nis_df[ , 'one' ] <- 1
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# nis_fn <- file.path( path.expand( "~" ) , "NIS" , "this_file.rds" )
+# saveRDS( nis_df , file = nis_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# nis_df <- readRDS( nis_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+nis_design <- 
+	svydesign(
+		id = ~ seqnumhh , 
+		strata = ~ stratum , 
+		weights = ~ provwt_c , 
+		data = subset( nis_df , provwt_c > 0 ) 
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+nis_design <- 
+	
+	update( 
+		
+		nis_design , 
+		
+		first_fed_formula =
+			ifelse( bf_formr20 %in% 888 , NA , bf_formr20 ) ,
+		
+		dtap_3p =
+
+			as.numeric(
+
+				( p_numdah >= 3 ) |
+				( p_numdhi >= 3 ) |
+				( p_numdih >= 3 ) |
+				( p_numdta >= 3 ) |
+				( p_numdtp >= 3 )
+
+			) ,
+		
+		dtap_4p =
+
+			as.numeric(
+
+				( p_numdah >= 4 ) |
+				( p_numdhi >= 4 ) |
+				( p_numdih >= 4 ) |
+				( p_numdta >= 4 ) |
+				( p_numdtp >= 4 )
+
+			)
+			
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( nis_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ state , nis_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , nis_design )
+
+svyby( ~ one , ~ state , nis_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ first_fed_formula , nis_design , na.rm = TRUE )
+
+svyby( ~ first_fed_formula , ~ state , nis_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ sex , nis_design , na.rm = TRUE )
+
+svyby( ~ sex , ~ state , nis_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ first_fed_formula , nis_design , na.rm = TRUE )
+
+svyby( ~ first_fed_formula , ~ state , nis_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ sex , nis_design , na.rm = TRUE )
+
+svyby( ~ sex , ~ state , nis_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ first_fed_formula , nis_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ first_fed_formula , 
+	~ state , 
+	nis_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ bf_exclr06 , 
+	denominator = ~ bf_endr06 , 
+	nis_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to toddlers up to date on polio shots:
+```{r eval = FALSE , results = "hide" }
+sub_nis_design <- subset( nis_design , p_utdpol == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ first_fed_formula , sub_nis_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ first_fed_formula , nis_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ first_fed_formula , 
+		~ state , 
+		nis_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( nis_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ first_fed_formula , nis_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ first_fed_formula , nis_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ first_fed_formula , nis_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ dtap_3p , nis_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( first_fed_formula ~ dtap_3p , nis_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ dtap_3p + sex , 
+	nis_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		first_fed_formula ~ dtap_3p + sex , 
+		nis_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the statistics and standard errors from [Data User's Guide Table 4](https://www.cdc.gov/vaccines/imz-managers/nis/downloads/NIS-PUF21-DUG.pdf#page=35):
+
+```{r eval = FALSE , results = "hide" }
+
+results <-
+	svyby( 
+		~ p_utd431h314_rout_s , 
+		~ raceethk , 
+		nis_design , 
+		svymean
+	)
+
+coefficients <- results[ , "p_utd431h314_rout_sUTD" , drop = FALSE ]
+
+standard_errors <- results[ , "se.p_utd431h314_rout_sUTD" , drop = FALSE ]
+
+stopifnot( round( coefficients[ "HISPANIC" , ] , 3 ) == .711 )
+stopifnot( round( coefficients[ "NON-HISPANIC WHITE ONLY" , ] , 3 ) == .742 )
+stopifnot( round( coefficients[ "NON-HISPANIC BLACK ONLY" , ] , 3 ) == .647 )
+stopifnot( round( standard_errors[ "HISPANIC" , ] , 3 ) == .015 )
+stopifnot( round( standard_errors[ "NON-HISPANIC WHITE ONLY" , ] , 3 ) == .009 )
+stopifnot( round( standard_errors[ "NON-HISPANIC BLACK ONLY" , ] , 3 ) == .022 )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NIS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nis_srvyr_design <- as_survey( nis_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nis_srvyr_design %>%
+	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
+
+nis_srvyr_design %>%
+	group_by( state ) %>%
+	summarize( mean = survey_mean( first_fed_formula , na.rm = TRUE ) )
+```
+
+

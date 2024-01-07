@@ -1,10 +1,12 @@
 chapter_title: American Community Survey
 
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
 The US Census Bureau's annual replacement for the long-form decennial census.
 ~~~
 
-table_structure: * One table with one row per household and a second table with one row per individual within each household.
+table_structure: * Two tables per state, the first with one row per household and the second with one row per individual.
 
 generalizable_population: * The civilian population of the United States.
 
@@ -12,32 +14,91 @@ publication_period: * Released annually since 2005.
 
 administrative_organization: * Administered and financed by the [US Census Bureau](http://www.census.gov/).
 
-needs_catalog_block: yes
-catalog_subset_description: # 2016 alabama single-year only. remove ` & stateab == 'al'` for a nationwide table
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' & stateab == 'al' )
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Guidance for Data Users](https://www.census.gov/programs-surveys/acs/guidance.html)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/American_Community_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# one percent sample
+# the decennial census
+# in miniature
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Download and import the Alabama household file:
+
+(switch `sas_hal` to `sas_hak` for Alaska or `sas_hus` for the entire country)
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+tf_household <- tempfile()
+
+this_url_household <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_hal.zip"
+
+download.file( this_url_household , tf_household , mode = 'wb' )
+
+unzipped_files_household <- unzip( tf_household , exdir = tempdir() )
+
+chapter_tag_sas_household <-
+	grep( '\\\\.sas7bdat$' , unzipped_files_household , value = TRUE )
+
+chapter_tag_df_household <- read_sas( chapter_tag_sas_household )
+
+names( chapter_tag_df_household ) <- tolower( names( chapter_tag_df_household ) )
+```
+
+Download and import the Alabama person file:
+
+(switch `sas_pal` to `sas_pak` for Alaska or `sas_pus` for the entire country)
+```{r eval = FALSE , results = "hide" }
+tf_person <- tempfile()
+
+this_url_person <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_pal.zip"
+
+download.file( this_url_person , tf_person , mode = 'wb' )
+
+unzipped_files_person <- unzip( tf_person , exdir = tempdir() )
+
+chapter_tag_sas_person <-
+	grep( '\\\\.sas7bdat$' , unzipped_files_person , value = TRUE )
+
+chapter_tag_df_person <- read_sas( chapter_tag_sas_person )
+
+names( chapter_tag_df_person ) <- tolower( names( chapter_tag_df_person ) )
+```
+
+
+Remove overlapping column and merge household + person files:
+```{r eval = FALSE , results = "hide" }
+
+chapter_tag_df_household[ , 'rt' ] <- NULL
+
+chapter_tag_df_person[ , 'rt' ] <- NULL
+
+chapter_tag_df <- merge( chapter_tag_df_household , chapter_tag_df_person )
+	
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_df_person ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
 
 
 ~~~{analysis_examples_survey_design}
-# # alternative subsets:
-
-# # nationwide merged table including puerto rico
-# chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' )
-# chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
-
-# # nationwide merged table excluding puerto rico
-# chapter_tag_cat <- subset( chapter_tag_cat , year == 2016 & time_period == '1-Year' & stateab != 'pr' )
-# chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
-
+```{r eval = FALSE , results = "hide" }
 library(survey)
 
-chapter_tag_df <- 
-	readRDS( 
-		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
-			"acs2016_1yr.rds" ) 
-	)
-
-# because of the catalog subset above
-# the `merged.rds` file is alabama only
 chapter_tag_design <-
 	svrepdesign(
 		weight = ~pwgtp ,
@@ -48,6 +109,7 @@ chapter_tag_design <-
 		type = 'JK1' ,
 		data = chapter_tag_df
 	)
+```
 ~~~
 
 
@@ -56,8 +118,6 @@ chapter_tag_design <-
 	update(
 		
 		chapter_tag_design ,
-		
-		relp = as.numeric( relp ) ,
 		
 		state_name =
 			factor(
@@ -118,7 +178,9 @@ subset_definition: agep >= 65
 subset_definition_description: senior citizens
 binary_variable: married
 
-needs_7za_install: yes
+
+needs_srvyr_block: yes
+
 
 
 ~~~{convey_block}
@@ -137,18 +199,14 @@ svygini( ~ hincp , chapter_tag_design , na.rm = TRUE )
 
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
-The example below matches statistics, standard errors, and margin of errors from this table pulled from the [tallies of 2016 PUMS](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_16.lst):
-
-`r knitr::include_graphics("images/pums_estimates_16.png")`
+This example matches statistics, standard errors, and margin of errors from the [2021 PUMS tallies](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_21.csv):
 
 Match the sum of the weights:
 
 ```{r eval = FALSE , results = "hide" }
-stopifnot( round( coef( svytotal( ~ one , chapter_tag_design ) ) , 0 ) == 4863300 )
+stopifnot( round( coef( svytotal( ~ one , chapter_tag_design ) ) , 0 ) == 5039877 )
 ```
 	
 	
@@ -156,16 +214,16 @@ Compute the population by age:
 
 ```{r eval = FALSE , results = "hide" }
 pums_estimate <- 
-	c( 285681 , 314701 , 300814 , 334318 , 327896 , 629329 , 599719 , 644212 , 
-	342205 , 300254 , 464893 , 231293 , 87985 )
+	c(288139L, 299245L, 336727L, 334606L, 327102L, 635004L, 641405L, 
+	615709L, 335431L, 341926L, 538367L, 265742L, 80474L)
 
 pums_standard_error <- 
-	c( 2888 , 5168 , 5009 , 3673 , 3521 , 4825 , 4088 , 
-	4398 , 5329 , 5389 , 1938 , 3214 , 2950 )
+	c(2727L, 5368L, 6067L, 4082L, 4485L, 5716L, 4420L, 3706L, 4836L, 
+	5100L, 2158L, 3363L, 3186L)
 
 pums_margin_of_error <- 
-	c( 4751 , 8501 , 8240 , 6043 , 5792 , 7937 , 6725 , 
-	7234 , 8767 , 8865 , 3188 , 5287 , 4853 )
+	c(4486L, 8830L, 9981L, 6715L, 7378L, 9402L, 7271L, 6096L, 7956L, 
+	8389L, 3550L, 5532L, 5240L)
 
 results <-
 	svytotal( 
@@ -204,33 +262,4 @@ stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
 
 
 
-
-needs_travis_build_status_line: yes
-
-sample_setup_breaks: 13
-
-broken_sample_test_condition: any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 & chapter_tag_cat$time_period == '1-Year' )
-
-~~~{sample_setup_block}
-this_sample_break <- Sys.getenv( "this_sample_break" )
-
-library(lodown)
-
-chapter_tag_cat <-
-	get_catalog( "chapter_tag" ,
-		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
-
-# alabama one-year and all wyoming only
-chapter_tag_cat <- subset( chapter_tag_cat , ( stateab == 'al' & time_period == '1-Year' ) | stateab == 'wy' )
-
-chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
-
-# for alabama 2016, toss out other nearby states
-if( any( chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 ) ){
-	chapter_tag_cat <- chapter_tag_cat[ chapter_tag_cat$stateab == 'al' & chapter_tag_cat$year == 2016 , ]
-}
-
-chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
-
-~~~
 

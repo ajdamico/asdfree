@@ -1,22 +1,92 @@
 chapter_title: Public Libraries Survey
 
+
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
-An annual census of public libraries in the United States.
+A comprehensive compilation of administrative information on all public libraries in the United States.
 ~~~
 
-table_structure: * One table with one row per state, a second table with one row per library system, and a third table with one row per library building or bookmobile.
+table_structure: * Two tables, with one record per library system and one record per library building or bookmobile.
 
 publication_period: * Released annually since 1992.
 
-administrative_organization: * Conducted by the [Institute of Museum and Library Services (IMLS)](https://www.imls.gov/) and collected by the [US Census Bureau](http://www.census.gov/).
-
-catalog_subset_description: # 2014 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2014 )
+administrative_organization: * Conducted by the [Institute of Museum and Library Services (IMLS)](https://www.imls.gov/), collected by the [Census Bureau](http://www.census.gov/).
 
 
-~~~{analysis_examples_loading_block}
-chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014/pls_fy_ae_puplda.rds" ) )
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Data File Documentation and User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf)
+
+2. `README FY #### PLS PUD.txt` included in each [zipped file](https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# census, not survey.
+# dewey decimal index
+# finger to lips shush
+```
 ~~~
+
+
+
+
+
+
+
+~~~{download_and_import_block}
+
+Download and import the most recent administrative entity csv file:
+```{r eval = FALSE , results = "hide" }
+this_tf <- tempfile()
+
+csv_url <- "https://www.imls.gov/sites/default/files/2023-06/pls_fy2021_csv.zip"
+
+download.file( csv_url , this_tf, mode = 'wb' )
+
+unzipped_files <- unzip( this_tf , exdir = tempdir() )
+		
+administrative_entity_csv_fn <-
+	unzipped_files[ grepl( 'AE(.*)csv$' , basename( unzipped_files ) ) ]
+
+chapter_tag_df <- read.csv( administrative_entity_csv_fn )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+
+
+Recode missing values as described in the readme included with each zipped file:
+```{r eval = FALSE , results = "hide" }
+for( this_col in names( chapter_tag_df ) ){
+
+	if( class( chapter_tag_df[ , this_col ] ) == 'character' ){
+	
+		chapter_tag_df[ chapter_tag_df[ , this_col ] %in% 'M' , this_col ] <- NA
+		
+	}
+	
+	if( 
+		( class( chapter_tag_df[ , this_col ] ) == 'numeric' ) | 
+		( this_col %in% c( 'phone' , 'startdat' , 'enddate' ) ) 
+	){
+	
+		chapter_tag_df[ chapter_tag_df[ , this_col ] %in% c( -1 , -3 , -4 , -9 ) , this_col ] <- NA
+		
+	}
+	
+}
+```
+~~~
+
+
+
 
 ~~~{variable_recoding_block}
 chapter_tag_df <- 
@@ -37,14 +107,32 @@ chapter_tag_df <-
 
 group_by_variable: stabr
 linear_variable: popu_lsa
+linear_narm: , na.rm = TRUE
 categorical_variable: c_relatn
 subset_definition: visits > 1000000
 subset_definition_description: more than one million annual visits
 binary_variable: more_than_one_librarian
+
+
+
 needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
 
 
 
 
+~~~{replication_example_block}
+## Replication Example {-}
+This example matches Interlibrary Relationship Frequencies on [PDF page 169 of the User's Guide](https://www.imls.gov/sites/default/files/2023-06/2021_pls_data_file_documentation.pdf#page=169):
 
-needs_travis_build_status_line: yes
+```{r eval = FALSE , results = "hide" }
+# remove closed and temporarily closed libraries
+results <- table( pls_df[ !( pls_df[ , 'statstru' ] %in% c( 3 , 23 ) ) , 'c_relatn' ] )
+
+stopifnot( results[ "HQ-Headquarters of a federation or cooperative" ] == 112 )
+stopifnot( results[ "ME-Member of a federation or cooperative" ] == 6859 )
+stopifnot( results[ "NO-Not a member of a federation or cooperative" ] == 2236 )
+```
+
+~~~

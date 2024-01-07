@@ -1,0 +1,431 @@
+# American Community Survey (ACS) {-}
+
+<a href="https://github.com/asdfree/acs/actions"><img src="https://github.com/asdfree/acs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The US Census Bureau's annual replacement for the long-form decennial census.
+
+* Two tables per state, the first with one row per household and the second with one row per individual.
+
+* The civilian population of the United States.
+
+* Released annually since 2005.
+
+* Administered and financed by the [US Census Bureau](http://www.census.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [Guidance for Data Users](https://www.census.gov/programs-surveys/acs/guidance.html)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/American_Community_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20American Community Survey)
+
+```{r}
+# one percent sample
+# the decennial census
+# in miniature
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the Alabama household file:
+
+(switch `sas_hal` to `sas_hak` for Alaska or `sas_hus` for the entire country)
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+tf_household <- tempfile()
+
+this_url_household <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_hal.zip"
+
+download.file( this_url_household , tf_household , mode = 'wb' )
+
+unzipped_files_household <- unzip( tf_household , exdir = tempdir() )
+
+acs_sas_household <-
+	grep( '\\.sas7bdat$' , unzipped_files_household , value = TRUE )
+
+acs_df_household <- read_sas( acs_sas_household )
+
+names( acs_df_household ) <- tolower( names( acs_df_household ) )
+```
+
+Download and import the Alabama person file:
+
+(switch `sas_pal` to `sas_pak` for Alaska or `sas_pus` for the entire country)
+```{r eval = FALSE , results = "hide" }
+tf_person <- tempfile()
+
+this_url_person <-
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_pal.zip"
+
+download.file( this_url_person , tf_person , mode = 'wb' )
+
+unzipped_files_person <- unzip( tf_person , exdir = tempdir() )
+
+acs_sas_person <-
+	grep( '\\.sas7bdat$' , unzipped_files_person , value = TRUE )
+
+acs_df_person <- read_sas( acs_sas_person )
+
+names( acs_df_person ) <- tolower( names( acs_df_person ) )
+```
+
+Remove overlapping column and merge household + person files:
+```{r eval = FALSE , results = "hide" }
+
+acs_df_household[ , 'rt' ] <- NULL
+
+acs_df_person[ , 'rt' ] <- NULL
+
+acs_df <- merge( acs_df_household , acs_df_person )
+	
+stopifnot( nrow( acs_df ) == nrow( acs_df_person ) )
+
+acs_df[ , 'one' ] <- 1
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# acs_fn <- file.path( path.expand( "~" ) , "ACS" , "this_file.rds" )
+# saveRDS( acs_df , file = acs_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# acs_df <- readRDS( acs_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+acs_design <-
+	svrepdesign(
+		weight = ~pwgtp ,
+		repweights = 'pwgtp[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = acs_df
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+acs_design <-
+	update(
+		
+		acs_design ,
+		
+		state_name =
+			factor(
+				as.numeric( st ) ,
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L, 72L) ,
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming", "Puerto Rico")
+			) ,
+		
+		cit =
+			factor( 
+				cit , 
+				levels = 1:5 , 
+				labels = 
+					c( 
+						'born in the u.s.' ,
+						'born in the territories' ,
+						'born abroad to american parents' ,
+						'naturalized citizen' ,
+						'non-citizen'
+					)
+			) ,
+		
+		poverty_level = as.numeric( povpip ) ,
+		
+		married = as.numeric( mar %in% 1 ) ,
+		
+		sex = factor( sex , labels = c( 'male' , 'female' ) )
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( acs_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ cit , acs_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , acs_design )
+
+svyby( ~ one , ~ cit , acs_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ poverty_level , acs_design , na.rm = TRUE )
+
+svyby( ~ poverty_level , ~ cit , acs_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ sex , acs_design )
+
+svyby( ~ sex , ~ cit , acs_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ poverty_level , acs_design , na.rm = TRUE )
+
+svyby( ~ poverty_level , ~ cit , acs_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ sex , acs_design )
+
+svyby( ~ sex , ~ cit , acs_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ poverty_level , acs_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ poverty_level , 
+	~ cit , 
+	acs_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ ssip , 
+	denominator = ~ pincp , 
+	acs_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to senior citizens:
+```{r eval = FALSE , results = "hide" }
+sub_acs_design <- subset( acs_design , agep >= 65 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ poverty_level , sub_acs_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ poverty_level , acs_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ poverty_level , 
+		~ cit , 
+		acs_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( acs_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ poverty_level , acs_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ poverty_level , acs_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ poverty_level , acs_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ married , acs_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( poverty_level ~ married , acs_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ married + sex , 
+	acs_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		poverty_level ~ married + sex , 
+		acs_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics, standard errors, and margin of errors from the [2021 PUMS tallies](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_21.csv):
+
+Match the sum of the weights:
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( round( coef( svytotal( ~ one , acs_design ) ) , 0 ) == 5039877 )
+```
+	
+Compute the population by age:
+
+```{r eval = FALSE , results = "hide" }
+pums_estimate <- 
+	c(288139L, 299245L, 336727L, 334606L, 327102L, 635004L, 641405L, 
+	615709L, 335431L, 341926L, 538367L, 265742L, 80474L)
+
+pums_standard_error <- 
+	c(2727L, 5368L, 6067L, 4082L, 4485L, 5716L, 4420L, 3706L, 4836L, 
+	5100L, 2158L, 3363L, 3186L)
+
+pums_margin_of_error <- 
+	c(4486L, 8830L, 9981L, 6715L, 7378L, 9402L, 7271L, 6096L, 7956L, 
+	8389L, 3550L, 5532L, 5240L)
+
+results <-
+	svytotal( 
+		~ as.numeric( agep %in% 0:4 ) +
+		as.numeric( agep %in% 5:9 ) +
+		as.numeric( agep %in% 10:14 ) +
+		as.numeric( agep %in% 15:19 ) +
+		as.numeric( agep %in% 20:24 ) +
+		as.numeric( agep %in% 25:34 ) +
+		as.numeric( agep %in% 35:44 ) +
+		as.numeric( agep %in% 45:54 ) +
+		as.numeric( agep %in% 55:59 ) +
+		as.numeric( agep %in% 60:64 ) +
+		as.numeric( agep %in% 65:74 ) +
+		as.numeric( agep %in% 75:84 ) +
+		as.numeric( agep %in% 85:100 ) , 
+		acs_design
+	)
+
+stopifnot( all( round( coef( results ) , 0 ) == pums_estimate ) )
+
+stopifnot( all( round( SE( results ) , 0 ) == pums_standard_error ) )
+
+stopifnot( all( round( SE( results ) * 1.645 , 0 ) == pums_margin_of_error ) )
+
+```
+
+---
+
+## Poverty and Inequality Estimation with `convey` \ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for ACS users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+acs_design <- convey_prep( acs_design )
+
+svygini( ~ hincp , acs_design , na.rm = TRUE )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ACS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+acs_srvyr_design <- as_survey( acs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+acs_srvyr_design %>%
+	summarize( mean = survey_mean( poverty_level , na.rm = TRUE ) )
+
+acs_srvyr_design %>%
+	group_by( cit ) %>%
+	summarize( mean = survey_mean( poverty_level , na.rm = TRUE ) )
+```
+
+

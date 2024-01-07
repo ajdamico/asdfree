@@ -1,0 +1,283 @@
+# Medical Large Claims Experience Study (MLCES) {-}
+
+<a href="https://github.com/asdfree/mlces/actions"><img src="https://github.com/asdfree/mlces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+A high quality dataset of medical claims from seven private health insurance companies.
+
+* One table with one row per individual with nonzero total paid charges.
+
+* A convenience sample of group (employer-sponsored) health insurers in the United States.
+
+* 1997 thru 1999 with no expected updates in the future.
+
+* Provided by the [Society of Actuaries (SOA)](http://www.soa.org/).
+
+---
+
+Please skim before you begin:
+
+1. [Group Medical Insurance Claims Database Collection and Analysis Report](https://www.soa.org/4937d6/globalassets/assets/files/research/exp-study/large_claims_report.pdf)
+
+2. [Claim Severities, Claim Relativities, and Age: Evidence from SOA Group Health Data](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1412243)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Medical Large Claims Experience Study)
+
+```{r}
+# skewed by black swan tails
+# means, medians sing adieu
+# claims distribution
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the 1999 medical claims file:
+
+```{r eval = FALSE , results = "hide" }
+tf <- tempfile()
+
+this_url <-	"https://www.soa.org/Files/Research/1999.zip"
+
+download.file( this_url , tf , mode = 'wb' )
+
+unzipped_file <- unzip( tf , exdir = tempdir() )
+
+mlces_df <- read.csv( unzipped_file )
+
+names( mlces_df ) <- tolower( names( mlces_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# mlces_fn <- file.path( path.expand( "~" ) , "MLCES" , "this_file.rds" )
+# saveRDS( mlces_df , file = mlces_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# mlces_df <- readRDS( mlces_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+mlces_df <- 
+	transform( 
+		mlces_df , 
+		
+		one = 1 ,
+		
+		claimant_relationship_to_policyholder =
+			ifelse( relation == "E" , "covered employee" ,
+			ifelse( relation == "S" , "spouse of covered employee" ,
+			ifelse( relation == "D" , "dependent of covered employee" , NA ) ) ) ,
+			
+		ppo_plan = as.numeric( ppo == 'Y' )
+	)
+	
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( mlces_df )
+
+table( mlces_df[ , "claimant_relationship_to_policyholder" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( mlces_df[ , "totpdchg" ] )
+
+tapply(
+	mlces_df[ , "totpdchg" ] ,
+	mlces_df[ , "claimant_relationship_to_policyholder" ] ,
+	mean 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( mlces_df[ , "patsex" ] ) )
+
+prop.table(
+	table( mlces_df[ , c( "patsex" , "claimant_relationship_to_policyholder" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( mlces_df[ , "totpdchg" ] )
+
+tapply(
+	mlces_df[ , "totpdchg" ] ,
+	mlces_df[ , "claimant_relationship_to_policyholder" ] ,
+	sum 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( mlces_df[ , "totpdchg" ] , 0.5 )
+
+tapply(
+	mlces_df[ , "totpdchg" ] ,
+	mlces_df[ , "claimant_relationship_to_policyholder" ] ,
+	quantile ,
+	0.5 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to persons under 18:
+```{r eval = FALSE , results = "hide" }
+sub_mlces_df <- subset( mlces_df , ( ( claimyr - patbrtyr ) < 18 ) )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_mlces_df[ , "totpdchg" ] )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( mlces_df[ , "totpdchg" ] )
+
+tapply(
+	mlces_df[ , "totpdchg" ] ,
+	mlces_df[ , "claimant_relationship_to_policyholder" ] ,
+	var 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( totpdchg ~ ppo_plan , mlces_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( mlces_df[ , c( "ppo_plan" , "patsex" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		totpdchg ~ ppo_plan + patsex , 
+		data = mlces_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics in Table II-A's 1999 row numbers 52 and 53 from the [Database](https://www.soa.org/4937cc/globalassets/assets/files/research/tables.zip):
+
+Match Claimants Exceeding Deductible:
+
+```{r eval = FALSE , results = "hide" }
+# $0 deductible
+stopifnot( nrow( mlces_df ) == 1591738 )
+
+# $1,000 deductible
+mlces_above_1000_df <- subset( mlces_df , totpdchg > 1000 )
+stopifnot( nrow( mlces_above_1000_df ) == 402550 )
+```
+
+Match the Excess Charges Above Deductible:
+
+```{r eval = FALSE , results = "hide" }
+# $0 deductible
+stopifnot( round( sum( mlces_df[ , 'totpdchg' ] ) , 0 ) == 2599356658 )
+
+# $1,000 deductible
+stopifnot( round( sum( mlces_above_1000_df[ , 'totpdchg' ] - 1000 ) , 0 ) == 1883768786 )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for MLCES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+mlces_tbl <- as_tibble( mlces_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mlces_tbl %>%
+	summarize( mean = mean( totpdchg ) )
+
+mlces_tbl %>%
+	group_by( claimant_relationship_to_policyholder ) %>%
+	summarize( mean = mean( totpdchg ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for MLCES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+mlces_dt <- data.table( mlces_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+mlces_dt[ , mean( totpdchg ) ]
+
+mlces_dt[ , mean( totpdchg ) , by = claimant_relationship_to_policyholder ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for MLCES users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'mlces' , mlces_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( totpdchg ) FROM mlces' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		claimant_relationship_to_policyholder ,
+		AVG( totpdchg )
+	FROM
+		mlces
+	GROUP BY
+		claimant_relationship_to_policyholder'
+)
+```

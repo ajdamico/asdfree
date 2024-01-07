@@ -1,0 +1,102 @@
+chapter_title: National Plan and Provider Enumeration System
+
+~~~{dataset_introduction}
+The National Plan and Provider Enumeration System (NPPES) contains information about every medical provider, insurance plan, and clearinghouse actively operating in the United States healthcare industry.
+~~~
+table_structure: * A single large table with one row per enumerated health care provider.
+
+generalizable_population: * A census of individuals and organizations who bill for medical services in the United States.
+
+publication_period: * Updated monthly with new providers.
+
+administrative_organization: * Maintained by the United States [Centers for Medicare & Medicaid Services (CMS)](http://www.cms.gov/)
+
+~~~{analysis_examples_loading_block}
+column_names <-
+	names( 
+		read.csv( 
+			file.path( path.expand( "~" ) , "SAEB" , "2015" , "escolas.csv" ) , 
+			nrow = 1 )[ FALSE , , ] 
+	)
+
+column_names <- gsub( "\\\\." , "_" , tolower( column_names ) )
+
+column_types <-
+	ifelse( 
+		SAScii::parse.SAScii(
+			file.path( path.expand( "~" ) , "SAEB" , "2015" , "import.sas" ) 
+		) , 
+		'n' , 'c' 
+	)
+
+columns_to_import <-
+	c( "entity_type_code" , "provider_gender_code" , "provider_enumeration_date" ,
+	"is_sole_proprietor" , "provider_business_practice_location_address_state_name" )
+
+stopifnot( all( columns_to_import %in% column_names ) )
+
+chapter_tag_df <- 
+	data.frame( 
+		readr::read_csv( 
+			file.path( path.expand( "~" ) , "SAEB" , 
+				"escolas.csv" ) , 
+			col_names = columns_to_import , 
+			col_types = 
+				paste0( 
+					ifelse( column_names %in% columns_to_import , column_types , '_' ) , 
+					collapse = "" 
+				) ,
+			skip = 1
+		) 
+	)
+~~~
+
+
+~~~{variable_recoding_block}
+dbSendQuery( db , "ALTER TABLE sql_tablename ADD COLUMN individual INTEGER" )
+
+dbSendQuery( db , 
+	"UPDATE sql_tablename 
+	SET individual = 
+		CASE WHEN entity_type_code = 1 THEN 1 ELSE 0 END" 
+)
+
+dbSendQuery( db , "ALTER TABLE sql_tablename ADD COLUMN provider_enumeration_year INTEGER" )
+
+dbSendQuery( db , 
+	"UPDATE sql_tablename 
+	SET provider_enumeration_year = 
+		CAST( SUBSTRING( provider_enumeration_date , 7 , 10 ) AS INTEGER )" 
+)
+~~~
+
+group_by_variable: provider_gender_code
+linear_variable: provider_enumeration_year
+categorical_variable: is_sole_proprietor
+subset_definition: provider_business_practice_location_address_state_name = 'CA'
+subset_definition_description: California
+binary_variable: individual
+needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
+
+
+
+
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+dbGetQuery( db , "SELECT COUNT(*) FROM sql_tablename" )
+```
+
+~~~
+
+
+needs_actions_build_status_line: yes
+
+
+
+

@@ -1,0 +1,309 @@
+# FDA Adverse Event Reporting System (FAERS) {-}
+
+<a href="https://github.com/asdfree/faers/actions"><img src="https://github.com/asdfree/faers/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The post-marketing safety surveillance program for drug and therapeutic biological products.
+
+* Multiple tables linked by `primaryid` including demographics, outcomes, drug start and end dates.
+
+* Voluntary reports from practitioners and patients, not representative, no verification of causality.
+
+* Published quarterly since 2004, file structure revisions at 2012Q4 and 2014Q3.
+
+* Maintained by the United States [Food and Drug Administration (FDA)](http://www.fda.gov/).
+
+---
+
+Please skim before you begin:
+
+1. `ASC_NTS.DOC` included in each [quarterly zipped file](https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip), especially the Entity Relationship Diagram
+
+2. [Questions and Answers on FDA's Adverse Event Reporting System (FAERS)](https://www.fda.gov/drugs/surveillance/questions-and-answers-fdas-adverse-event-reporting-system-faers)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20FDA Adverse Event Reporting System)
+
+```{r}
+# side effect guestbook
+# violet you're turning violet
+# vi'lent dose response
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download the quarterly file:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+
+tf <- tempfile()
+
+this_url <- "https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+```
+
+Define a function to import each text file:
+
+```{r eval = FALSE , results = "hide" }
+read_faers <-
+	function( this_fn ){
+		read.table( this_fn , sep = "$" , header = TRUE , comment.char = "" , quote = "" )
+	}
+```	
+
+Import multiple tables from the downloaded quarter of microdata:
+```{r eval = FALSE , results = "hide" }
+# one record per report
+faers_demo_df <- read_faers( grep( 'DEMO23Q1\\.txt$' , unzipped_files , value = TRUE ) )
+
+# one or more record per report
+faers_drug_df <- read_faers( grep( 'DRUG23Q1\\.txt$' , unzipped_files , value = TRUE ) )
+
+# zero or more records per report
+faers_outcome_df <- read_faers( grep( 'OUTC23Q1\\.txt$' , unzipped_files , value = TRUE ) )
+```
+
+Construct an analysis file limited to reported deaths:
+```{r eval = FALSE , results = "hide" }
+# limit the outcome file to deaths
+faers_deaths_df <- subset( faers_outcome_df , outc_cod == 'DE' )
+
+# merge demographics with each reported death
+faers_df <-	merge( faers_demo_df , faers_deaths_df )
+
+# confirm that the analysis file matches the number of death outcomes
+stopifnot( nrow( faers_deaths_df ) == nrow( faers_df ) )
+
+# confirm zero reports include multiple deaths from the same reported adverse event
+stopifnot( nrow( faers_df ) == length( unique( faers_df[ , 'primaryid' ] ) ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# faers_fn <- file.path( path.expand( "~" ) , "FAERS" , "this_file.rds" )
+# saveRDS( faers_df , file = faers_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# faers_df <- readRDS( faers_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+faers_df <- 
+	transform( 
+		faers_df , 
+		
+		physician_reported = as.numeric( occp_cod == "MD" ) ,
+		
+		reporter_country_categories = 
+			ifelse( reporter_country == 'US' , 'USA' ,
+			ifelse( reporter_country == 'COUNTRY NOT SPECIFIED' , 'missing' ,
+			ifelse( reporter_country == 'JP' , 'Japan' ,
+			ifelse( reporter_country == 'UK' , 'UK' ,
+			ifelse( reporter_country == 'CA' , 'Canada' ,
+			ifelse( reporter_country == 'FR' , 'France' ,
+				'Other' ) ) ) ) ) ) ,
+		
+		init_fda_year = as.numeric( substr( init_fda_dt , 1 , 4 ) )
+		
+	)
+	
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( faers_df )
+
+table( faers_df[ , "reporter_country_categories" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( faers_df[ , "init_fda_year" ] , na.rm = TRUE )
+
+tapply(
+	faers_df[ , "init_fda_year" ] ,
+	faers_df[ , "reporter_country_categories" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( faers_df[ , "sex" ] ) )
+
+prop.table(
+	table( faers_df[ , c( "sex" , "reporter_country_categories" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( faers_df[ , "init_fda_year" ] , na.rm = TRUE )
+
+tapply(
+	faers_df[ , "init_fda_year" ] ,
+	faers_df[ , "reporter_country_categories" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( faers_df[ , "init_fda_year" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	faers_df[ , "init_fda_year" ] ,
+	faers_df[ , "reporter_country_categories" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to elderly persons:
+```{r eval = FALSE , results = "hide" }
+sub_faers_df <- subset( faers_df , age_grp == "E" )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_faers_df[ , "init_fda_year" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( faers_df[ , "init_fda_year" ] , na.rm = TRUE )
+
+tapply(
+	faers_df[ , "init_fda_year" ] ,
+	faers_df[ , "reporter_country_categories" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( init_fda_year ~ physician_reported , faers_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( faers_df[ , c( "physician_reported" , "sex" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		init_fda_year ~ physician_reported + sex , 
+		data = faers_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the death frequency counts in the `OUTC23Q1.pdf` file in [the downloaded quarter](https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip):
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( faers_df ) == 37704 )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for FAERS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+faers_tbl <- as_tibble( faers_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+faers_tbl %>%
+	summarize( mean = mean( init_fda_year , na.rm = TRUE ) )
+
+faers_tbl %>%
+	group_by( reporter_country_categories ) %>%
+	summarize( mean = mean( init_fda_year , na.rm = TRUE ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for FAERS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+faers_dt <- data.table( faers_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+faers_dt[ , mean( init_fda_year , na.rm = TRUE ) ]
+
+faers_dt[ , mean( init_fda_year , na.rm = TRUE ) , by = reporter_country_categories ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for FAERS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'faers' , faers_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( init_fda_year ) FROM faers' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		reporter_country_categories ,
+		AVG( init_fda_year )
+	FROM
+		faers
+	GROUP BY
+		reporter_country_categories'
+)
+```

@@ -1,0 +1,312 @@
+# Structural Equation Models (SEM) with Complex Survey Data {-}
+ 
+ 
+```{r , echo = FALSE }
+most_recent_build_date <- gsub( "\\-" , " " , as.Date( file.info( "lavaanex.Rmd" )$mtime ) )
+
+lavaanex_badge <- paste0( '<img src="https://img.shields.io/badge/tested%20on%20my%20windows%20laptop:-' , most_recent_build_date , '-brightgreen" alt="Local Testing Badge">' )
+```
+
+`r lavaanex_badge`
+
+
+
+*Contributed by Dr. Daniel Oberski <<daniel.oberski@gmail.com>>*
+
+The R `lavaan.survey` package by [Dr. Daniel Oberski](http://daob.nl) fits structural equation models to complex survey microdata, described in his [JSS article](https://www.jstatsoft.org/article/view/v057i01).
+
+
+## Load the 2008 Wave of the European Social Survey German and Spanish Microdata {-}
+```{r , cache = TRUE }
+library(survey)
+library(lavaan.survey)	
+options( survey.lonely.psu = "adjust" )
+
+
+
+```
+
+Immediately pull the German files into the workspace:
+```{r eval = FALSE}
+# load Germany's round four main data file..
+ess4.de <- readRDS( file.path( path.expand( "~" ) , "ESS" , "2008/ESS4DE.rds" ) )
+
+# load Germany's round four sample design data file (sddf)..
+ess4.de.sddf <- readRDS( file.path( path.expand( "~" ) , "ESS" , "2008/ESS4_DE_SDDF.rds" ) )
+```
+
+The stratify variable is not literally equal to the actual strata but contains more information (which we don't need here).  Create a new variable that only uses the actual stratification namely, East v. West Germany, by using a regular expression / string substitution function to take the data.frame object's `stratify` variable, convert it to a character variable, search for a dash, and keep only the text before the dash.  Then, convert that resultant vector of ones and twos into a factor variable, labeled East versus West Germany.
+```{r eval = FALSE}
+ess4.de.sddf$stratify <- 
+	factor( gsub( "(\\d+)-.+" , "\\1" , as.character( ess4.de.sddf$stratify ) ) )
+
+levels(ess4.de.sddf$stratify) <- c("West Germany", "East Germany")
+```
+Check against [ESS documentation](www.europeansocialsurvey.org/docs/round4/survey/ESS4_data_documentation_report_e05_4.pdf#page=121) statement that "The number of sampling points is 109 in the West, and 59 in the East":
+
+```{r eval = FALSE}
+stopifnot(tapply(ess4.de.sddf$psu, 
+                 ess4.de.sddf$stratify, 
+                 function(x) length(unique(x))) == c(109, 59))
+```
+
+Merge these two files together, creating a single table:
+```{r eval = FALSE}
+ess4.de.m <- merge( ess4.de , ess4.de.sddf)
+
+stopifnot( 
+	nrow( ess4.de ) == nrow( ess4.de.m ) & 
+	nrow( ess4.de.sddf ) == nrow( ess4.de.m ) 
+)
+```
+
+Create a survey design object:
+```{r eval = FALSE}
+ess4.de.design <- 
+	svydesign(
+		ids = ~psu ,
+		strata = ~stratify ,
+		probs = ~prob ,
+		data = ess4.de.m
+	)
+```
+
+## Two-factor CFA of attitudes toward the welfare state {-}
+
+
+This analysis uses the model of the below article. Please see the article for more information.
+
+Roosma, F., Gelissen, J., & van Oorschot, W. (2013). The multidimensionality of welfare state attitudes: a European cross-national study. Social indicators research, 113(1), 235-255.
+
+Formulate the two-factor CFA using lavaan syntax:
+```{r eval = FALSE}
+model.cfa <-    
+	"range =~ gvjbevn + gvhlthc + gvslvol + gvslvue + gvcldcr + gvpdlwk
+	 goals =~ sbprvpv  +  sbeqsoc  +  sbcwkfm"
+```
+
+Fit the model using lavaan, accounting for possible nonnormality using the MLM estimator:
+```{r eval = FALSE}
+fit.cfa.ml <- 
+	lavaan(
+		model.cfa , 
+		data = ess4.de.m , 
+		estimator = "MLM" , 
+		int.ov.free = TRUE ,
+		auto.var = TRUE , 
+		auto.fix.first = TRUE , 
+		auto.cov.lv.x = TRUE
+	)
+```
+	
+Show some fit measure results, note the "scaling correction" which accounts for nonnormality:
+```{r eval = FALSE}
+fit.cfa.ml
+```
+
+
+Fit the two-factor model while taking the survey design into account:
+```{r eval = FALSE}
+fit.cfa.surv <- 
+	lavaan.survey(
+		fit.cfa.ml , 
+		survey.design = ess4.de.design
+	)
+```
+
+Show some fit measure results, "scaling correction" now accounts for both nonnormality and survey design.
+```{r eval = FALSE}
+fit.cfa.surv
+```
+
+Display parameter estimates and standard errors accounting for survey design:
+```{r eval = FALSE}
+summary( fit.cfa.surv , standardized = TRUE )
+```
+
+## Invariance testing on Schwarz human values while accounting for the survey design. {-}
+
+For more information on this analysis, see: Davidov, E., Schmidt, P., & Schwartz, S. H. (2008). "Bringing values back in: The adequacy of the European Social Survey to measure values in 20 countries". Public opinion quarterly, 72(3), 420-445.
+
+Test the measurement equivalence of Schwarz human values from round 4 of the ESS, comparing Germany with Spain. 
+
+First load the Spanish data so these can be merged:
+```{r eval = FALSE}
+# load Spain's round four main data file..
+ess4.es <- readRDS( file.path( path.expand( "~" ) , "ESS" , "2008/ESS4ES.rds" ) )
+
+# load Spain's round four sample design data file (sddf)..
+ess4.es.sddf <- readRDS( file.path( path.expand( "~" ) , "ESS" , "2008/ESS4_ES_SDDF.rds" ) )
+```
+
+Merge these two files together, creating a single table:
+```{r eval = FALSE}
+ess4.es.m <- merge( ess4.es , ess4.es.sddf)
+
+stopifnot( 
+	nrow( ess4.es ) == nrow( ess4.es.m ) & 
+	nrow( ess4.es.sddf ) == nrow( ess4.es.m ) 
+)
+```
+
+Make sure PSU names are unique between the two countries. Paste on a "de-" to the German PSUs, and by pasting an "es-" to the front of the Spanish PSUs.
+
+```{r eval = FALSE}
+ess4.de.m$psu <- paste( "de" , ess4.de.m$psu , sep="-" )
+ess4.es.m$psu <- paste( "es" , ess4.es.m$psu , sep="-" )
+```
+
+Stack the two countries into a single table, then construct a survey design:
+```{r eval = FALSE}
+ess4.m <- rbind( ess4.de.m , ess4.es.m )
+
+ess4.design <- 
+	svydesign(
+		ids = ~psu,
+		strata = ~stratify ,
+		probs = ~prob ,
+		data = ess4.m
+	)
+```
+
+Model based on Schwarz human value theory. Note that this is the basic starting model, not the final model used by Davidov et al. They merge certain values and allow cross-loadings:
+
+```{r eval = FALSE}
+free.values.model.syntax <- " 
+  Universalism =~ ipeqopt + ipudrst + impenv
+  Benevolence  =~ iphlppl + iplylfr
+
+  Tradition    =~ ipmodst + imptrad
+  Conformity   =~ ipfrule + ipbhprp 
+  Security     =~ impsafe + ipstrgv
+"
+```
+
+Fit two-group configural invariance model:
+```{r eval = FALSE}
+free.values.fit <- 
+	lavaan(
+		free.values.model.syntax , 
+		data = ess4.m , 
+		auto.cov.lv.x = TRUE , 
+		auto.fix.first = TRUE , 
+		auto.var = TRUE ,
+		int.ov.free = TRUE , 
+		estimator = "MLM" ,
+		group = "cntry"
+	)
+
+summary( free.values.fit , standardized = TRUE )
+```
+
+Fit a two-group metric invariance model:
+```{r eval = FALSE}
+free.values.fit.eq <- 
+	lavaan(
+		free.values.model.syntax , 
+		data = ess4.m , 
+		auto.cov.lv.x = TRUE , 
+		auto.fix.first = TRUE , 
+		auto.var = TRUE ,
+		int.ov.free = TRUE , 
+		estimator = "MLM" ,
+		group = "cntry" , 
+		group.equal = "loadings"
+	)
+
+summary( free.values.fit.eq , standardized = TRUE )
+```
+
+Metric invariance test (anova() would work here too, but not below):
+```{r eval = FALSE}
+lavTestLRT( free.values.fit , free.values.fit.eq , SB.classic = TRUE )
+```
+
+Compare chisquares of the survey and non-survey SEM analyses for the configural invariance model:
+```{r eval = FALSE}
+free.values.fit.surv <- lavaan.survey( free.values.fit , ess4.design )
+free.values.fit
+free.values.fit.surv
+```
+
+Compare chisquares of the survey and non-survey SEM analyses for the metric invariance model:
+```{r eval = FALSE}
+free.values.fit.eq.surv <- lavaan.survey( free.values.fit.eq , ess4.design )
+free.values.fit.eq
+free.values.fit.eq.surv
+```
+
+
+Perform metric invariance test accounting for the survey design:
+```{r eval = FALSE}
+lavTestLRT(free.values.fit.surv, free.values.fit.eq.surv, SB.classic = TRUE)
+```
+The two models are more dissimilar after survey design is accounted for.
+
+## An example with a Latent Variable Regression {-}
+
+See
+
+Davidov, E., Meuleman, B., Billiet, J., & Schmidt, P. (2008). Values and support for immigration: A cross-country comparison. European Sociological Review, 24(5), 583-599.
+
+The human values scale again, but this time:
+
+1. only two value dimensions are modeled.
+2. the two latent value dimensions are used to predict anti-immigration attitudes in the two countries.
+3. a test is performed on the difference between countries in latent regression coefficients.
+
+```{r eval = FALSE}
+reg.syntax <- "
+  SelfTranscendence =~ ipeqopt + ipudrst + impenv + iphlppl + iplylfr
+  Conservation =~ ipmodst + imptrad + ipfrule + ipbhprp + impsafe + ipstrgv
+
+  ALLOW =~ imdfetn + impcntr
+
+  ALLOW ~ SelfTranscendence + Conservation
+"
+
+reg.vals.fit <- 
+	lavaan(
+		reg.syntax , 
+		data = ess4.m , 
+		group = "cntry" ,
+		estimator = "MLM" ,
+		auto.cov.lv.x = TRUE , 
+		auto.fix.first = TRUE , 
+		auto.var = TRUE , 
+		int.ov.free = TRUE
+	)
+
+reg.vals.fit.eq <- 
+	lavaan( 
+		reg.syntax , 
+		data = ess4.m , 
+		group = "cntry" , 
+		group.equal = "regressions" ,
+		estimator = "MLM" ,
+		auto.cov.lv.x = TRUE , 
+		auto.fix.first = TRUE , 
+		auto.var = TRUE , 
+		int.ov.free = TRUE
+	)
+
+	
+summary( reg.vals.fit.eq , standardize = TRUE )
+```
+
+Test whether the relationship between values and anti-immigration attitudes is equal in Germany and Spain:
+```{r eval = FALSE}
+lavTestLRT( reg.vals.fit , reg.vals.fit.eq , SB.classic = TRUE)
+```
+
+
+Now do the same but accounting for the sampling design:
+```{r eval = FALSE}
+reg.vals.fit.surv <- lavaan.survey( reg.vals.fit , ess4.design )
+reg.vals.fit.eq.surv <- lavaan.survey( reg.vals.fit.eq , ess4.design )
+
+lavTestLRT(reg.vals.fit.surv, reg.vals.fit.eq.surv, SB.classic = TRUE)
+```
+
+The two models are less dissimilar after survey design is accounted for.
+

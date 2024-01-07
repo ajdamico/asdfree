@@ -1,30 +1,99 @@
 chapter_title: FDA Adverse Event Reporting System
 
+
+needs_actions_build_status_line: yes
+
+
+
 ~~~{dataset_introduction}
-The FDA Adverse Event Reporting System (FAERS) compiles all prescription drug-related side-effects reported by either physicians or patients in the United States.  Either party can make a (voluntary) submission to the FDA or the manufacturer (who then must report that event).  This is the post-marketing safety surveillance program for drug and therapeutic biological products.
+The post-marketing safety surveillance program for drug and therapeutic biological products.
 ~~~
 
-table_structure: * Multiple tables linkable by the `primaryid` field with patient demographics, drug/biologic information, patient outcomes, reporting source, drug start and end dates.
+table_structure: * Multiple tables linked by `primaryid` including demographics, outcomes, drug start and end dates.
 
-publication_period: * Published quarterly with the latest events reported to the FDA since 2004, with a revised system beginning in the fourth quarter of 2012.
+publication_period: * Published quarterly since 2004, file structure revisions at 2012Q4 and 2014Q3.
+
+generalizable_population: * Voluntary reports from practitioners and patients, not representative, no verification of causality.
 
 administrative_organization: * Maintained by the United States [Food and Drug Administration (FDA)](http://www.fda.gov/).
 
 
-~~~{analysis_examples_loading_block}
-chapter_tag_drug_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016 q4/drug16q4.rds" ) )
+~~~{reading_block}
+Please skim before you begin:
 
-chapter_tag_outcome_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016 q4/outc16q4.rds" ) )
+1. `ASC_NTS.DOC` included in each [quarterly zipped file](https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip), especially the Entity Relationship Diagram
 
-chapter_tag_demo_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016 q4/demo16q4.rds" ) )
+2. [Questions and Answers on FDA's Adverse Event Reporting System (FAERS)](https://www.fda.gov/drugs/surveillance/questions-and-answers-fdas-adverse-event-reporting-system-faers)
 
-chapter_tag_df <- merge( chapter_tag_drug_df , chapter_tag_outcome_df )
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
 
-chapter_tag_df <- merge( chapter_tag_df , chapter_tag_demo_df , all.x = TRUE )
+```{r}
+# side effect guestbook
+# violet you're turning violet
+# vi'lent dose response
+```
 ~~~
+
+
+
+~~~{download_and_import_block}
+
+Download the quarterly file:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+
+tf <- tempfile()
+
+this_url <- "https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+```
+
+Define a function to import each text file:
+
+```{r eval = FALSE , results = "hide" }
+read_faers <-
+	function( this_fn ){
+		read.table( this_fn , sep = "$" , header = TRUE , comment.char = "" , quote = "" )
+	}
+```	
+
+Import multiple tables from the downloaded quarter of microdata:
+```{r eval = FALSE , results = "hide" }
+# one record per report
+faers_demo_df <- read_faers( grep( 'DEMO23Q1\\\\.txt$' , unzipped_files , value = TRUE ) )
+
+# one or more record per report
+faers_drug_df <- read_faers( grep( 'DRUG23Q1\\\\.txt$' , unzipped_files , value = TRUE ) )
+
+# zero or more records per report
+faers_outcome_df <- read_faers( grep( 'OUTC23Q1\\\\.txt$' , unzipped_files , value = TRUE ) )
+```
+
+Construct an analysis file limited to reported deaths:
+```{r eval = FALSE , results = "hide" }
+# limit the outcome file to deaths
+faers_deaths_df <- subset( faers_outcome_df , outc_cod == 'DE' )
+
+# merge demographics with each reported death
+faers_df <-	merge( faers_demo_df , faers_deaths_df )
+
+# confirm that the analysis file matches the number of death outcomes
+stopifnot( nrow( faers_deaths_df ) == nrow( faers_df ) )
+
+# confirm zero reports include multiple deaths from the same reported adverse event
+stopifnot( nrow( faers_df ) == length( unique( faers_df[ , 'primaryid' ] ) ) )
+```
+
+
+
+
+~~~
+
+
 
 ~~~{variable_recoding_block}
 chapter_tag_df <- 
@@ -33,25 +102,45 @@ chapter_tag_df <-
 		
 		physician_reported = as.numeric( occp_cod == "MD" ) ,
 		
+		reporter_country_categories = 
+			ifelse( reporter_country == 'US' , 'USA' ,
+			ifelse( reporter_country == 'COUNTRY NOT SPECIFIED' , 'missing' ,
+			ifelse( reporter_country == 'JP' , 'Japan' ,
+			ifelse( reporter_country == 'UK' , 'UK' ,
+			ifelse( reporter_country == 'CA' , 'Canada' ,
+			ifelse( reporter_country == 'FR' , 'France' ,
+				'Other' ) ) ) ) ) ) ,
+		
 		init_fda_year = as.numeric( substr( init_fda_dt , 1 , 4 ) )
 		
 	)
 	
 ~~~
 
-group_by_variable: outc_code
+group_by_variable: reporter_country_categories
 linear_variable: init_fda_year
 linear_narm: , na.rm = TRUE
 categorical_variable: sex
 subset_definition: age_grp == "E"
 subset_definition_description: elderly persons
 binary_variable: physician_reported
+
+
+
+
 needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
 
 
 
-needs_travis_build_status_line: yes
 
-sample_setup_breaks: 7
+~~~{replication_example_block}
+## Replication Example {-}
 
-broken_sample_test_condition: any( chapter_tag_cat$year == 2016 & chapter_tag_cat$quarter == 4 )
+This example matches the death frequency counts in the `OUTC23Q1.pdf` file in [the downloaded quarter](https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip):
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( faers_df ) == 37704 )
+```
+~~~

@@ -1,0 +1,465 @@
+# National Household Travel Survey (NHTS) {-}
+
+<a href="https://github.com/asdfree/nhts/actions"><img src="https://github.com/asdfree/nhts/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The authoritative source on travel behavior, recording characteristics of people and vehicles of all modes.
+
+* Four core linkable tables, with one record per household, person, trip, and vehicle, respectively.
+
+* A complex sample survey designed to generalize to the civilian non-institutional U.S. population.
+
+* Released every five to eight years since 1969, with a 2022 release expected in late 2023.
+
+* Funded by the [Federal Highway Administration](https://highways.dot.gov/), with data collected by [Westat](https://www.westat.com/).
+
+---
+
+Please skim before you begin:
+
+1. [2017 NHTS Data User Guide](https://nhts.ornl.gov/assets/NHTS2017_UsersGuide_04232019_1.pdf)
+
+2. [2017 NHTS Weighting Report](https://nhts.ornl.gov/assets/2017%20NHTS%20Weighting%20Report.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National Household Travel Survey)
+
+```{r}
+# commuter patterns,
+# truckin'. what a long strange trip
+# who went when where why
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and unzip each of the main 2017 files:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+nhts_dl_uz <-
+	function( this_url ){
+	
+		tf <- tempfile()
+
+		download.file( this_url , tf , mode = 'wb' )
+
+		unzip( tf , exdir = tempdir() )
+	}
+	
+unzipped_survey_data <-
+	nhts_dl_uz( "https://nhts.ornl.gov/assets/2016/download/sas.zip" )
+
+unzipped_replicate_weights <-
+	nhts_dl_uz( "https://nhts.ornl.gov/assets/2016/download/Replicates.zip" )
+
+unzipped_trip_chains <-
+	nhts_dl_uz( "https://nhts.ornl.gov/assets/2016/download/TripChain/TripChain17.zip" )
+```
+
+Import the tables containing one record per household, person, trip, and vehicle:
+```{r eval = FALSE , results = "hide" }
+nhts_import <-
+	function( this_prefix , this_unzip ){
+		
+		this_sas7bdat <-
+			grep( 
+				paste0( this_prefix , "\\.sas7bdat$" ) , 
+				this_unzip , 
+				value = TRUE 
+			)
+		
+		this_tbl <- read_sas( this_sas7bdat )
+		
+		this_df <- data.frame( this_tbl )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+	
+hhpub_df <- nhts_import( "hhpub" , unzipped_survey_data )
+perpub_df <- nhts_import( "perpub" , unzipped_survey_data )
+trippub_df <- nhts_import( "trippub" , unzipped_survey_data )
+vehpub_df <- nhts_import( "vehpub" , unzipped_survey_data )
+
+hhwgt_df <- nhts_import( "hhwgt" , unzipped_replicate_weights )
+perwgt_df <- nhts_import( "perwgt" , unzipped_replicate_weights )
+```	
+
+Add a column of ones to three of those tables, then a column of non-missing mileage to the trips table:
+```{r eval = FALSE , results = "hide" }
+hhpub_df[ , 'one' ] <- 1
+
+perpub_df[ , 'one' ] <- 1
+
+trippub_df[ , 'one' ] <- 1
+
+trippub_df[ !( trippub_df[ , 'trpmiles' ] %in% -9 ) , 'tripmiles_no_nines' ] <-
+	trippub_df[ !( trippub_df[ , 'trpmiles' ] %in% -9 ) , 'trpmiles' ]
+```
+
+Sum the total trip count and mileage to the person-level, both overall and restricted to walking only:
+```{r eval = FALSE , results = "hide" }
+trips_per_person <- 
+	with( 
+		trippub_df , 
+		aggregate( 
+			cbind( one , tripmiles_no_nines ) , 
+			list( houseid , personid ) , 
+			sum , 
+			na.rm = TRUE 
+		) 
+	)
+
+names( trips_per_person ) <-
+	c( 'houseid' , 'personid' , 'trips_per_person' , 'miles_per_person' )
+
+walks_per_person <- 
+	with( 
+		subset( trippub_df , trptrans == '01' ) , 
+		aggregate( 
+			cbind( one , tripmiles_no_nines ) , 
+			list( houseid , personid ) , 
+			sum , 
+			na.rm = TRUE 
+		) 
+	)
+
+names( walks_per_person ) <-
+	c( 'houseid' , 'personid' , 'walks_per_person' , 'walk_miles_per_person' )
+```
+
+Merge these trip count and mileage values on to the person-level file, replacing non-matches with zero:
+```{r eval = FALSE , results = "hide" }
+nhts_df <- merge( perpub_df , trips_per_person , all.x = TRUE )
+nhts_df[ is.na( nhts_df[ , 'trips_per_person' ] ) , 'trips_per_person' ] <- 0
+nhts_df[ is.na( nhts_df[ , 'miles_per_person' ] ) , 'miles_per_person' ] <- 0
+
+nhts_df <- merge( nhts_df , walks_per_person , all.x = TRUE )
+nhts_df[ is.na( nhts_df[ , 'walks_per_person' ] ) , 'walks_per_person' ] <- 0
+nhts_df[ is.na( nhts_df[ , 'walk_miles_per_person' ] ) , 'walk_miles_per_person' ] <- 0
+
+stopifnot( nrow( nhts_df ) == nrow( perpub_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# nhts_fn <- file.path( path.expand( "~" ) , "NHTS" , "this_file.rds" )
+# saveRDS( nhts_df , file = nhts_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# nhts_df <- readRDS( nhts_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+Sort both the one record per household and household replicate weights tables, then define the design:
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+hhpub_df <- hhpub_df[ order( hhpub_df[ , 'houseid' ] ) , ]
+hhwgt_df <- hhwgt_df[ order( hhwgt_df[ , 'houseid' ] ) , ]
+
+hh_design <-
+	svrepdesign(
+		weight = ~ wthhfin ,
+		repweights =
+			hhwgt_df[ grep( 'wthhfin[0-9]' , names( hhwgt_df ) , value = TRUE ) ] ,
+		scale = 6 / 7 ,
+		rscales = 1 ,
+		type = 'JK1' ,
+		mse = TRUE ,
+		data = hhpub_df
+	)
+```
+
+Sort both the one record per person and person replicate weights tables, then define the design:
+```{r eval = FALSE , results = "hide" }
+nhts_df <- nhts_df[ do.call( order , nhts_df[ , c( 'houseid' , 'personid' ) ] ) , ]
+perwgt_df <- perwgt_df[ do.call( order , perwgt_df[ , c( 'houseid' , 'personid' ) ] ) , ]
+
+nhts_design <-
+	svrepdesign(
+		weight = ~ wtperfin ,
+		repweights =
+			perwgt_df[ grep( 'wtperfin[0-9]' , names( perwgt_df ) , value = TRUE ) ] ,
+		scale = 6 / 7 ,
+		rscales = rep( 1 , 98 ) ,
+		type = 'JK1' ,
+		mse = TRUE ,
+		data = nhts_df
+	)
+```
+
+Sort both the one record per trip and person replicate weights tables, then define the design:
+```{r eval = FALSE , results = "hide" }
+trippub_df <- trippub_df[ do.call( order , trippub_df[ , c( 'houseid' , 'personid' ) ] ) , ]
+perwgt_df <- perwgt_df[ do.call( order , perwgt_df[ , c( 'houseid' , 'personid' ) ] ) , ]
+
+trip_design <-
+	svrepdesign(
+		weight = ~ wttrdfin ,
+		repweights =
+			perwgt_df[ grep( 'wttrdfin[0-9]' , names( perwgt_df ) , value = TRUE ) ] ,
+		scale = 6 / 7 ,
+		rscales = 1 ,
+		type = 'JK1' ,
+		mse = TRUE ,
+		data = trippub_df
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+hh_design <-
+	update(
+		hh_design ,
+		hhsize_categories =
+			factor(
+				findInterval( hhsize , 1:4 ) ,
+				levels = 1:4 ,
+				labels = c( 1:3 , '4 or more' )
+			)
+	)
+	
+
+nhts_design <- 
+	update( 
+		nhts_design , 
+		
+		urban_area = as.numeric( urbrur == '01' )
+		
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( nhts_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ r_sex_imp , nhts_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , nhts_design )
+
+svyby( ~ one , ~ r_sex_imp , nhts_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ miles_per_person , nhts_design )
+
+svyby( ~ miles_per_person , ~ r_sex_imp , nhts_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ hhstate , nhts_design )
+
+svyby( ~ hhstate , ~ r_sex_imp , nhts_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ miles_per_person , nhts_design )
+
+svyby( ~ miles_per_person , ~ r_sex_imp , nhts_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ hhstate , nhts_design )
+
+svyby( ~ hhstate , ~ r_sex_imp , nhts_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ miles_per_person , nhts_design , 0.5 )
+
+svyby( 
+	~ miles_per_person , 
+	~ r_sex_imp , 
+	nhts_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ walk_miles_per_person , 
+	denominator = ~ miles_per_person , 
+	nhts_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to ever cyclists:
+```{r eval = FALSE , results = "hide" }
+sub_nhts_design <- subset( nhts_design , nbiketrp > 0 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ miles_per_person , sub_nhts_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ miles_per_person , nhts_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ miles_per_person , 
+		~ r_sex_imp , 
+		nhts_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( nhts_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ miles_per_person , nhts_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ miles_per_person , nhts_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ miles_per_person , nhts_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ urban_area , nhts_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( miles_per_person ~ urban_area , nhts_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ urban_area + hhstate , 
+	nhts_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		miles_per_person ~ urban_area + hhstate , 
+		nhts_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the 2017 rows from [Summary of Travel Trends](https://nhts.ornl.gov/assets/2017_nhts_summary_travel_trends.pdf#page=12) Table 1a:
+
+```{r eval = FALSE , results = "hide" }
+hhsize_counts <- svytotal( ~ hhsize_categories , hh_design )
+
+stopifnot(
+	all( round( coef( hhsize_counts ) / 1000 , 0 ) == c( 32952 , 40056 , 18521 , 26679 ) )
+)
+
+hhsize_ci <- confint( hhsize_counts , df = ncol( hh_design$repweights ) )
+
+hhsize_moe <- hhsize_ci[ , 2 ] - coef( hhsize_counts )
+
+stopifnot( all( round( hhsize_moe / 1000 , 0 ) == c( 0 , 0 , 97 , 97 ) ) )	
+```
+
+This example matches 2017 NHTS [Westat project co-author's](https://nhts.ornl.gov/assets/2017_nhts_summary_travel_trends.pdf#page=2) workshop [slide 38](https://rawgit.com/Westat-Transportation/summarizeNHTS/master/inst/tutorials/workshop/Workshop.html#(38)):
+
+```{r eval = FALSE , results = "hide" }
+unwtd_n <- with( nhts_df , tapply( trips_per_person , worker , sum ) )
+stopifnot( all( unwtd_n == c( 79295 , 28 , 497944 , 346305 ) ) )
+
+surveyed_n <- with( nhts_df , tapply( trips_per_person , worker , mean ) )
+stopifnot( all( round( surveyed_n , 2 ) == c( 2.84 , 1.65 , 3.88 , 3.21 ) ) )
+
+this_mean <- svyby( ~ trips_per_person , ~ worker , nhts_design , svymean )
+stopifnot( round( coef( this_mean ) , 2 ) == c( 2.78 , 1.28 , 3.77 , 3.01 ) )
+
+this_ci <- confint( this_mean , df = ncol( nhts_design$repweights ) )
+
+this_moe <- this_ci[ , 2 ] - coef( this_mean )
+
+stopifnot( all( round( this_moe , 2 ) == c( 0.06 , 2.21 , 0.03 , 0.06 ) ) )
+
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NHTS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nhts_srvyr_design <- as_survey( nhts_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nhts_srvyr_design %>%
+	summarize( mean = survey_mean( miles_per_person ) )
+
+nhts_srvyr_design %>%
+	group_by( r_sex_imp ) %>%
+	summarize( mean = survey_mean( miles_per_person ) )
+```
+
+

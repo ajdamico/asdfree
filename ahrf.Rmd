@@ -1,0 +1,284 @@
+# Area Health Resources Files (AHRF) {-}
+
+<a href="https://github.com/asdfree/ahrf/actions"><img src="https://github.com/asdfree/ahrf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+National, state, and county-level data on health care professions, health facilities, population characteristics, health workforce training, hospital utilization and expenditure, and the environment.
+
+* One table with one row per county and a second table with one row per state.
+
+* Replaced annually with the latest available county- and state-level statistics.
+
+* Compiled by the [Bureau of Health Workforce](https://bhw.hrsa.gov/) at the [Health Services and Resources Administration](http://www.hrsa.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [User Documentation for the County Area Health Resources File (AHRF) 2021-2022 Release](https://data.hrsa.gov/DataDownload/AHRF/AHRF%202021-2022_User_Tech.zip)
+
+2. [Frequently Asked Questions](https://data.hrsa.gov/faq)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Area Health Resources Files)
+
+```{r}
+# local aggregates
+# to spread merge join spline regress
+# like fresh buttered bread
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the most current county-level file:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+tf <- tempfile()
+
+ahrf_url <- "https://data.hrsa.gov//DataDownload/AHRF/AHRF_2021-2022_SAS.zip"
+
+download.file( ahrf_url , tf , mode = 'wb' )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+
+sas_fn <- grep( "\\.sas7bdat$" , unzipped_files , value = TRUE )
+
+ahrf_tbl <- read_sas( sas_fn )
+
+ahrf_df <- data.frame( ahrf_tbl )
+
+names( ahrf_df ) <- tolower( names( ahrf_df ) )
+
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# ahrf_fn <- file.path( path.expand( "~" ) , "AHRF" , "this_file.rds" )
+# saveRDS( ahrf_df , file = ahrf_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# ahrf_df <- readRDS( ahrf_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+ahrf_df <- 
+	transform( 
+		ahrf_df , 
+		
+		cbsa_indicator_code = 
+			factor( 
+				as.numeric( f1406720 ) , 
+				levels = 0:2 ,
+				labels = c( "not metro" , "metro" , "micro" ) 
+			) ,
+			
+		mhi_2020 = f1322620 ,
+		
+		whole_county_hpsa_2022 = as.numeric( f0978722 ) == 1 ,
+		
+		census_region = 
+			factor( 
+				as.numeric( f04439 ) , 
+				levels = 1:4 ,
+				labels = c( "northeast" , "midwest" , "south" , "west" ) 
+			)
+
+	)
+	
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( ahrf_df )
+
+table( ahrf_df[ , "cbsa_indicator_code" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( ahrf_df[ , "mhi_2020" ] , na.rm = TRUE )
+
+tapply(
+	ahrf_df[ , "mhi_2020" ] ,
+	ahrf_df[ , "cbsa_indicator_code" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( ahrf_df[ , "census_region" ] ) )
+
+prop.table(
+	table( ahrf_df[ , c( "census_region" , "cbsa_indicator_code" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( ahrf_df[ , "mhi_2020" ] , na.rm = TRUE )
+
+tapply(
+	ahrf_df[ , "mhi_2020" ] ,
+	ahrf_df[ , "cbsa_indicator_code" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( ahrf_df[ , "mhi_2020" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	ahrf_df[ , "mhi_2020" ] ,
+	ahrf_df[ , "cbsa_indicator_code" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to California:
+```{r eval = FALSE , results = "hide" }
+sub_ahrf_df <- subset( ahrf_df , f12424 == "CA" )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_ahrf_df[ , "mhi_2020" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( ahrf_df[ , "mhi_2020" ] , na.rm = TRUE )
+
+tapply(
+	ahrf_df[ , "mhi_2020" ] ,
+	ahrf_df[ , "cbsa_indicator_code" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( mhi_2020 ~ whole_county_hpsa_2022 , ahrf_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( ahrf_df[ , c( "whole_county_hpsa_2022" , "census_region" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		mhi_2020 ~ whole_county_hpsa_2022 + census_region , 
+		data = ahrf_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+Match the record count in row number 8,543 of `AHRF 2021-2022 Technical Documentation.xlsx`:
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( ahrf_df ) == 3232 )
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for AHRF users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+ahrf_tbl <- as_tibble( ahrf_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+ahrf_tbl %>%
+	summarize( mean = mean( mhi_2020 , na.rm = TRUE ) )
+
+ahrf_tbl %>%
+	group_by( cbsa_indicator_code ) %>%
+	summarize( mean = mean( mhi_2020 , na.rm = TRUE ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for AHRF users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+ahrf_dt <- data.table( ahrf_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+ahrf_dt[ , mean( mhi_2020 , na.rm = TRUE ) ]
+
+ahrf_dt[ , mean( mhi_2020 , na.rm = TRUE ) , by = cbsa_indicator_code ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for AHRF users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'ahrf' , ahrf_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( mhi_2020 ) FROM ahrf' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		cbsa_indicator_code ,
+		AVG( mhi_2020 )
+	FROM
+		ahrf
+	GROUP BY
+		cbsa_indicator_code'
+)
+```

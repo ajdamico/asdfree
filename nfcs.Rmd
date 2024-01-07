@@ -1,0 +1,379 @@
+# National Financial Capability Study (NFCS) {-}
+
+<a href="https://github.com/asdfree/nfcs/actions"><img src="https://github.com/asdfree/nfcs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+A study of financial knowledge and behavior, like making ends meet, planning ahead, managing assets.
+
+* One state-by-state survey table with one row per sampled respondent, a separate investor survey.
+
+* An online non-probability sample of U.S. adults (18+) calibrated to the American Community Survey.
+
+* Released triennially since 2009.
+
+* Funded by the [FINRA Investor Education Foundation](https://www.finrafoundation.org/) and conducted by [FGS Global](https://fgsglobal.com/).
+
+---
+
+Please skim before you begin:
+
+1. [2021 National Financial Capability Study: State-by-State Survey Methodology](https://finrafoundation.org/sites/finrafoundation/files/NFCS-2021-State-by-State-Methodology.pdf)
+
+2. [Financial Capability Insights: What the NFCS Reveals](https://www.finrafoundation.org/knowledge-we-gain-share/nfcs/other-research)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20National Financial Capability Study)
+
+```{r}
+# lady madonna
+# laid bank balance goose egg, loves
+# gold unrequited
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the latest state-by-state microdata:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+zip_tf <- tempfile()
+
+zip_url <- 
+	'https://finrafoundation.org/sites/finrafoundation/files/2021-SxS-Data-and-Data-Info.zip'
+
+download.file( zip_url , zip_tf , mode = 'wb' )
+
+unzipped_files <- unzip( zip_tf , exdir = tempdir() )
+
+stata_fn <- grep( "\\.dta$" , unzipped_files , value = TRUE )
+
+nfcs_tbl <- read_dta( stata_fn )
+
+nfcs_df <- data.frame( nfcs_tbl )
+
+names( nfcs_df ) <- tolower( names( nfcs_df ) )
+```
+
+Add a column of all ones, add labels to state names, add labels to the rainy day fund question:
+```{r eval = FALSE , results = "hide" }
+nfcs_df[ , 'one' ] <- 1
+
+nfcs_df[ , 'state_name' ] <-
+	factor(
+		nfcs_df[ , 'stateq' ] , 
+		levels = 1:51 , 
+		labels = sort( c( 'District of Columbia' , state.name ) ) 
+	)
+
+nfcs_df[ , 'rainy_day_fund' ] <-
+	factor(
+		nfcs_df[ , 'j5' ] ,
+		levels = c( 1 , 2 , 98 , 99 ) ,
+		labels = c( 'Yes' , 'No' , "Don't Know" , "Prefer not to say" )
+	)
+
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# nfcs_fn <- file.path( path.expand( "~" ) , "NFCS" , "this_file.rds" )
+# saveRDS( nfcs_df , file = nfcs_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# nfcs_df <- readRDS( nfcs_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+
+library(survey)
+
+nfcs_design <- svydesign( ~ 1 , data = nfcs_df , weights = ~ wgt_n2 )
+
+divison_design <- svydesign( ~ 1 , data = nfcs_df , weights = ~ wgt_d2 )
+
+state_design <- svydesign( ~ 1 , data = nfcs_df , weights = ~ wgt_s3 )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+nfcs_design <- 
+	update( 
+		nfcs_design ,
+		
+		satisfaction_w_finances =
+			ifelse( j1 > 10 , NA , j1 ) ,
+			
+		risk_taking =
+			ifelse( j2 > 10 , NA , j2 ) ,
+		
+		difficult_to_pay_bills =
+			factor(
+				j4 ,
+				levels = c( 1 , 2 , 3 , 98 , 99 ) ,
+				labels = 
+					c( 
+						'Very difficult' , 
+						'Somewhat difficult' , 
+						'Not at all difficult' , 
+						"Don't know" , 
+						'Prefer not to say' 
+					)
+			) ,
+				
+		spending_vs_income =
+			factor(
+				j3 ,
+				levels = c( 1 , 2 , 3 , 98 , 99 ) ,
+				labels = 
+					c( 
+						'Spending less than income' , 
+						'Spending more than income' , 
+						'Spending about equal to income' , 
+						"Don't know" , 
+						'Prefer not to say' 
+					)
+			) ,
+		
+		unpaid_medical_bills =
+			ifelse( g20 > 2 , NA , as.numeric( g20 == 1 ) )
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( nfcs_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ spending_vs_income , nfcs_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , nfcs_design )
+
+svyby( ~ one , ~ spending_vs_income , nfcs_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ satisfaction_w_finances , nfcs_design , na.rm = TRUE )
+
+svyby( ~ satisfaction_w_finances , ~ spending_vs_income , nfcs_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ difficult_to_pay_bills , nfcs_design )
+
+svyby( ~ difficult_to_pay_bills , ~ spending_vs_income , nfcs_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ satisfaction_w_finances , nfcs_design , na.rm = TRUE )
+
+svyby( ~ satisfaction_w_finances , ~ spending_vs_income , nfcs_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ difficult_to_pay_bills , nfcs_design )
+
+svyby( ~ difficult_to_pay_bills , ~ spending_vs_income , nfcs_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ satisfaction_w_finances , nfcs_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ satisfaction_w_finances , 
+	~ spending_vs_income , 
+	nfcs_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ satisfaction_w_finances , 
+	denominator = ~ risk_taking , 
+	nfcs_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to persons receiving pandemic-related stimulus payment:
+```{r eval = FALSE , results = "hide" }
+sub_nfcs_design <- subset( nfcs_design , j50 == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ satisfaction_w_finances , sub_nfcs_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ satisfaction_w_finances , nfcs_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ satisfaction_w_finances , 
+		~ spending_vs_income , 
+		nfcs_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( nfcs_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ satisfaction_w_finances , nfcs_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ satisfaction_w_finances , nfcs_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ satisfaction_w_finances , nfcs_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ unpaid_medical_bills , nfcs_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( satisfaction_w_finances ~ unpaid_medical_bills , nfcs_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ unpaid_medical_bills + difficult_to_pay_bills , 
+	nfcs_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		satisfaction_w_finances ~ unpaid_medical_bills + difficult_to_pay_bills , 
+		nfcs_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the unweighted count shown on [PDF page 4](https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=4):
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( nfcs_df ) == 27118 )
+```
+
+This example matches the [PDF page 7](https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7) estimate that _53% have three months of rainy day funds_:
+```{r eval = FALSE , results = "hide" }
+national_rainy_day <- svymean( ~ rainy_day_fund , nfcs_design )
+stopifnot( round( coef( national_rainy_day )[ 'rainy_day_fundYes' ] , 2 ) == 0.53 )
+```
+
+This example matches counts and rainy day estimates from [The Geography of Financial Capability](https://cdn.finra.org/nfcs/2021/geography.html):
+```{r eval = FALSE , results = "hide" }
+state_counts <-
+	svyby(
+		~ one ,
+		~ state_name ,
+		state_design ,
+		unwtd.count
+	)
+	
+stopifnot( state_counts[ 'California' , 'counts' ] == 1252 )
+stopifnot( state_counts[ 'Missouri' , 'counts' ] == 501 )
+stopifnot( state_counts[ 'Oregon' , 'counts' ] == 1261 )
+
+state_rainy_day <-
+	svyby(
+		~ rainy_day_fund ,
+		~ state_name ,
+		state_design ,
+		svymean
+	)
+	
+stopifnot( round( state_rainy_day[ 'California' , 'rainy_day_fundYes' ] , 2 ) == 0.57 )
+stopifnot( round( state_rainy_day[ 'Missouri' , 'rainy_day_fundYes' ] , 2 ) == 0.51 )
+stopifnot( round( state_rainy_day[ 'Oregon' , 'rainy_day_fundYes' ] , 2 ) == 0.52 )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NFCS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+nfcs_srvyr_design <- as_survey( nfcs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nfcs_srvyr_design %>%
+	summarize( mean = survey_mean( satisfaction_w_finances , na.rm = TRUE ) )
+
+nfcs_srvyr_design %>%
+	group_by( spending_vs_income ) %>%
+	summarize( mean = survey_mean( satisfaction_w_finances , na.rm = TRUE ) )
+```
+
+

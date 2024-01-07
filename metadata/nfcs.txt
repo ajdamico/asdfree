@@ -1,0 +1,213 @@
+chapter_title: National Financial Capability Study
+
+needs_actions_build_status_line: yes
+
+
+~~~{dataset_introduction}
+A study of financial knowledge and behavior, like making ends meet, planning ahead, managing assets.
+~~~
+
+table_structure: * One state-by-state survey table with one row per sampled respondent, a separate investor survey.
+
+generalizable_population: * An online non-probability sample of U.S. adults (18+) calibrated to the American Community Survey.
+
+publication_period: * Released triennially since 2009.
+
+administrative_organization: * Funded by the [FINRA Investor Education Foundation](https://www.finrafoundation.org/) and conducted by [FGS Global](https://fgsglobal.com/).
+
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [2021 National Financial Capability Study: State-by-State Survey Methodology](https://finrafoundation.org/sites/finrafoundation/files/NFCS-2021-State-by-State-Methodology.pdf)
+
+2. [Financial Capability Insights: What the NFCS Reveals](https://www.finrafoundation.org/knowledge-we-gain-share/nfcs/other-research)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# lady madonna
+# laid bank balance goose egg, loves
+# gold unrequited
+```
+
+~~~
+
+
+
+~~~{download_and_import_block}
+
+Download and import the latest state-by-state microdata:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+zip_tf <- tempfile()
+
+zip_url <- 
+	'https://finrafoundation.org/sites/finrafoundation/files/2021-SxS-Data-and-Data-Info.zip'
+
+download.file( zip_url , zip_tf , mode = 'wb' )
+
+unzipped_files <- unzip( zip_tf , exdir = tempdir() )
+
+stata_fn <- grep( "\\\\.dta$" , unzipped_files , value = TRUE )
+
+chapter_tag_tbl <- read_dta( stata_fn )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+
+Add a column of all ones, add labels to state names, add labels to the rainy day fund question:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_df[ , 'one' ] <- 1
+
+chapter_tag_df[ , 'state_name' ] <-
+	factor(
+		chapter_tag_df[ , 'stateq' ] , 
+		levels = 1:51 , 
+		labels = sort( c( 'District of Columbia' , state.name ) ) 
+	)
+
+chapter_tag_df[ , 'rainy_day_fund' ] <-
+	factor(
+		chapter_tag_df[ , 'j5' ] ,
+		levels = c( 1 , 2 , 98 , 99 ) ,
+		labels = c( 'Yes' , 'No' , "Don't Know" , "Prefer not to say" )
+	)
+
+```
+~~~
+
+
+
+
+~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
+
+library(survey)
+
+chapter_tag_design <- svydesign( ~ 1 , data = chapter_tag_df , weights = ~ wgt_n2 )
+
+divison_design <- svydesign( ~ 1 , data = chapter_tag_df , weights = ~ wgt_d2 )
+
+state_design <- svydesign( ~ 1 , data = chapter_tag_df , weights = ~ wgt_s3 )
+```
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design ,
+		
+		satisfaction_w_finances =
+			ifelse( j1 > 10 , NA , j1 ) ,
+			
+		risk_taking =
+			ifelse( j2 > 10 , NA , j2 ) ,
+		
+		difficult_to_pay_bills =
+			factor(
+				j4 ,
+				levels = c( 1 , 2 , 3 , 98 , 99 ) ,
+				labels = 
+					c( 
+						'Very difficult' , 
+						'Somewhat difficult' , 
+						'Not at all difficult' , 
+						"Don't know" , 
+						'Prefer not to say' 
+					)
+			) ,
+				
+		spending_vs_income =
+			factor(
+				j3 ,
+				levels = c( 1 , 2 , 3 , 98 , 99 ) ,
+				labels = 
+					c( 
+						'Spending less than income' , 
+						'Spending more than income' , 
+						'Spending about equal to income' , 
+						"Don't know" , 
+						'Prefer not to say' 
+					)
+			) ,
+		
+		unpaid_medical_bills =
+			ifelse( g20 > 2 , NA , as.numeric( g20 == 1 ) )
+	)
+~~~
+
+
+group_by_variable: spending_vs_income
+linear_variable: satisfaction_w_finances
+linear_narm: , na.rm = TRUE
+categorical_variable: difficult_to_pay_bills
+ratio_estimation_numerator: satisfaction_w_finances
+ratio_estimation_denominator: risk_taking
+ratio_narm: , na.rm = TRUE
+subset_definition: j50 == 1
+subset_definition_description: persons receiving pandemic-related stimulus payment
+binary_variable: unpaid_medical_bills
+binary_narm: , na.rm = TRUE
+
+
+
+
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches the unweighted count shown on [PDF page 4](https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=4):
+
+
+```{r eval = FALSE , results = "hide" }
+stopifnot( nrow( chapter_tag_df ) == 27118 )
+```
+
+This example matches the [PDF page 7](https://finrafoundation.org/sites/finrafoundation/files/NFCS-Report-Fifth-Edition-July-2022.pdf#page=7) estimate that _53% have three months of rainy day funds_:
+```{r eval = FALSE , results = "hide" }
+national_rainy_day <- svymean( ~ rainy_day_fund , chapter_tag_design )
+stopifnot( round( coef( national_rainy_day )[ 'rainy_day_fundYes' ] , 2 ) == 0.53 )
+```
+
+This example matches counts and rainy day estimates from [The Geography of Financial Capability](https://cdn.finra.org/nfcs/2021/geography.html):
+```{r eval = FALSE , results = "hide" }
+state_counts <-
+	svyby(
+		~ one ,
+		~ state_name ,
+		state_design ,
+		unwtd.count
+	)
+	
+stopifnot( state_counts[ 'California' , 'counts' ] == 1252 )
+stopifnot( state_counts[ 'Missouri' , 'counts' ] == 501 )
+stopifnot( state_counts[ 'Oregon' , 'counts' ] == 1261 )
+
+state_rainy_day <-
+	svyby(
+		~ rainy_day_fund ,
+		~ state_name ,
+		state_design ,
+		svymean
+	)
+	
+stopifnot( round( state_rainy_day[ 'California' , 'rainy_day_fundYes' ] , 2 ) == 0.57 )
+stopifnot( round( state_rainy_day[ 'Missouri' , 'rainy_day_fundYes' ] , 2 ) == 0.51 )
+stopifnot( round( state_rainy_day[ 'Oregon' , 'rainy_day_fundYes' ] , 2 ) == 0.52 )
+```
+
+~~~
+
+
+
+

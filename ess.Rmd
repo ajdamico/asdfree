@@ -1,0 +1,354 @@
+# European Social Survey (ESS) {-}
+
+```{r , echo = FALSE }
+
+most_recent_build_date <- gsub( "-" , " " , if( dir.exists( "_bookdown_files/" ) ) as.Date( file.info( "_bookdown_files/" )$ctime ) else Sys.Date() )
+
+ess_badge <- paste0( "<img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-" , most_recent_build_date , "-brightgreen' alt='Local Testing Badge'>" )
+
+```
+
+`r ess_badge`
+
+The barometer of political opinion and behavior across the continent.
+
+* One table per country with one row per sampled respondent.
+
+* A complex sample designed to generalize to residents aged 15 and older in participating nations.
+
+* Released biennially since 2002.
+
+* Headquartered at [City, University of London](http://www.city.ac.uk/) and governed by [a scientific team across Europe](http://www.europeansocialsurvey.org/about/structure_and_governance.html).
+
+---
+
+Please skim before you begin:
+
+1. [Findings from the European Social Survey](https://www.europeansocialsurvey.org/findings/)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/European_Social_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20European Social Survey)
+
+```{r}
+# pent up belief gauge
+# open border monarchists
+# survey for your thoughts
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+1. Register at the ESS Data Portal at https://ess-search.nsd.no/.
+
+2. Choose `ESS round 8 - 2016. Welfare attitudes, Attitudes to climate change`.
+
+3. Download the integrated file and also the sample design (SDDF) files as `SAV` (SPSS) files:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(foreign)
+
+ess_int_df <- 
+	read.spss( 
+		file.path( 
+			path.expand( "~" ) , 
+			"ESS8e02_2.sav" 
+		) ,
+		to.data.frame = TRUE ,
+		use.value.labels = FALSE
+	)
+
+ess_sddf_df <-
+	read.spss(
+		file.path(
+			path.expand( "~" ) ,
+			"ESS8SDDFe01_1.sav"
+		) ,
+		to.data.frame = TRUE ,
+		use.value.labels = FALSE
+	)
+	
+
+ess_df <-
+	merge( 
+		ess_int_df , 
+		ess_sddf_df , 
+		by = c( 'cntry' , 'idno' ) 
+	)
+
+stopifnot( nrow( ess_df ) == nrow( ess_int_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# ess_fn <- file.path( path.expand( "~" ) , "ESS" , "this_file.rds" )
+# saveRDS( ess_df , file = ess_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# ess_df <- readRDS( ess_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+ess_df[ , 'anweight' ] <-
+	ess_df[ , 'pspwght' ] *
+	ess_df[ , 'pweight' ] *
+	10000
+
+ess_design <- 
+	svydesign(
+		ids = ~psu ,
+		strata = ~stratum ,
+		weights = ~anweight ,
+		data = ess_df ,
+		nest = TRUE
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+ess_design <- 
+	update( 
+		ess_design , 
+		
+		one = 1 ,
+		
+		gndr = factor( gndr , labels = c( 'male' , 'female' ) ) ,
+		
+		netusoft =
+			factor(
+				netusoft ,
+				levels = 1:5 ,
+				labels = c( 'Never' , 'Only occasionally' ,
+					'A few times a week' , 'Most days' , 'Every day' )
+			) ,
+			
+		belonging_to_particular_religion = as.numeric( rlgblg == 1 )
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+sum( weights( ess_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ cntry , ess_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ one , ess_design )
+
+svyby( ~ one , ~ cntry , ess_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ ppltrst , ess_design , na.rm = TRUE )
+
+svyby( ~ ppltrst , ~ cntry , ess_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ gndr , ess_design , na.rm = TRUE )
+
+svyby( ~ gndr , ~ cntry , ess_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ ppltrst , ess_design , na.rm = TRUE )
+
+svyby( ~ ppltrst , ~ cntry , ess_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ gndr , ess_design , na.rm = TRUE )
+
+svyby( ~ gndr , ~ cntry , ess_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyquantile( ~ ppltrst , ess_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ ppltrst , 
+	~ cntry , 
+	ess_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ ppltrst , 
+	denominator = ~ pplfair , 
+	ess_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to voters:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+sub_ess_design <- subset( ess_design , vote == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ ppltrst , sub_ess_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+this_result <- svymean( ~ ppltrst , ess_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ ppltrst , 
+		~ cntry , 
+		ess_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+degf( ess_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyvar( ~ ppltrst , ess_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ ppltrst , ess_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ ppltrst , ess_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyciprop( ~ belonging_to_particular_religion , ess_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyttest( ppltrst ~ belonging_to_particular_religion , ess_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svychisq( 
+	~ belonging_to_particular_religion + gndr , 
+	ess_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		ppltrst ~ belonging_to_particular_religion + gndr , 
+		ess_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics and confidence intervals within 0.1% from the [Guide to Using Weights and Sample Design Indicators with ESS Data](https://stessrelpubprodwe.blob.core.windows.net/data/round10/survey/ESS_weighting_data_1_1.pdf#page=13):
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+published_proportions <- c( 0.166 , 0.055 , 0.085 , 0.115 , 0.578 )
+
+published_lb <- c( 0.146 , 0.045 , 0.072 , 0.099 , 0.550 )
+
+published_ub <- c( 0.188 , 0.068 , 0.100 , 0.134 , 0.605 )
+
+austrians <- subset( ess_design , cntry == 'AT' )
+
+( results <- svymean( ~ netusoft , austrians , na.rm = TRUE ) )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_proportions ) )
+
+( ci_results <- confint( results ) )
+
+stopifnot( all( abs( ci_results[ , 1 ] - published_lb ) < 0.0015 ) )
+
+stopifnot( all( abs( ci_results[ , 2 ] - published_ub ) < 0.0015 ) )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ESS users, this code replicates previously-presented examples:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(srvyr)
+ess_srvyr_design <- as_survey( ess_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+ess_srvyr_design %>%
+	summarize( mean = survey_mean( ppltrst , na.rm = TRUE ) )
+
+ess_srvyr_design %>%
+	group_by( cntry ) %>%
+	summarize( mean = survey_mean( ppltrst , na.rm = TRUE ) )
+```
+
+

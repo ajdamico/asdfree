@@ -1,0 +1,333 @@
+# Exame Nacional de Desempenho de Estudantes (ENADE) {-}
+
+<a href="https://github.com/asdfree/enade/actions"><img src="https://github.com/asdfree/enade/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The nationwide mandatory examination of college graduates.
+
+* One table with one row per individual undergraduate student in Brazil.
+
+* An enumeration of undergraduate students in Brazil.
+
+* Released annually since 2004.
+
+* Compiled by the [Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)](http://www.inep.gov.br/).
+
+---
+
+Please skim before you begin:
+
+1. [Cálculo da nota final do Exame Nacional de Desempenho dos Estudiantes](https://download.inep.gov.br/educacao_superior/enade/notas_tecnicas/2017/Nota_Tecnica_CGCQES_n12_2017_Calculo_da_nota_final_do_Enade.pdf)
+
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Exame_Nacional_de_Desempenho_de_Estudantes)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Exame Nacional de Desempenho de Estudantes)
+
+```{r}
+# undergraduates
+# sit for standardized testing
+# exit interview
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download, import, and merge two of the 2021 files:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+library(archive)
+
+tf <- tempfile()
+
+this_url <-	"https://download.inep.gov.br/microdados/microdados_enade_2021.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+archive_extract( tf , dir = tempdir() )
+
+read_enade_archive <-
+	function( this_regular_expression , this_directory ){
+		this_filename <- 
+			grep( 
+				this_regular_expression , 
+				list.files( 
+					this_directory ,
+					recursive = TRUE ,
+					full.names = TRUE 
+				) , 
+				value = TRUE 
+			)
+
+		this_df <-
+			read.table(
+				this_filename ,
+				header = TRUE ,
+				sep = ";" ,
+				na.strings = ""
+			)
+			
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+arq1_df <- read_enade_archive( 'arq1\\.txt$' , tempdir() )
+
+arq1_df <- unique( arq1_df[ c( 'co_curso' , 'co_uf_curso' , 'co_categad' , 'co_grupo' ) ] )
+
+arq3_df <- read_enade_archive( 'arq3\\.txt$' , tempdir() )
+
+enade_df <- merge( arq3_df , arq1_df )
+
+stopifnot( nrow( enade_df ) == nrow( arq3_df ) )
+
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# enade_fn <- file.path( path.expand( "~" ) , "ENADE" , "this_file.rds" )
+# saveRDS( enade_df , file = enade_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# enade_df <- readRDS( enade_fn )
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+enade_df <- 
+	transform( 
+		enade_df , 
+		
+		# qual foi o tempo gasto por voce para concluir a prova?
+		less_than_two_hours = as.numeric( co_rs_i9 %in% c( 'A' , 'B' ) ) ,
+		
+		administrative_category =
+			factor(
+				co_categad ,
+				levels = c( 1:5 , 7 ) ,
+				labels = c( '1. Pública Federal' , '2. Pública Estadual' , 
+				'3. Pública Municipal' , '4. Privada com fins lucrativos' , 
+				'5. Privada sem fins lucrativos' , '7. Especial' )
+			) ,
+
+		state_name = 
+			factor( 
+				co_uf_curso , 
+				levels = c( 11:17 , 21:29 , 31:33 , 35 , 41:43 , 50:53 ) ,
+				labels = c( "Rondonia" , "Acre" , "Amazonas" , 
+				"Roraima" , "Para" , "Amapa" , "Tocantins" , 
+				"Maranhao" , "Piaui" , "Ceara" , "Rio Grande do Norte" , 
+				"Paraiba" , "Pernambuco" , "Alagoas" , "Sergipe" , 
+				"Bahia" , "Minas Gerais" , "Espirito Santo" , 
+				"Rio de Janeiro" , "Sao Paulo" , "Parana" , 
+				"Santa Catarina" , "Rio Grande do Sul" , 
+				"Mato Grosso do Sul" , "Mato Grosso" , "Goias" , 
+				"Distrito Federal" )
+			)
+
+	)
+	
+```
+
+---
+
+## Analysis Examples with base R \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the table, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+nrow( enade_df )
+
+table( enade_df[ , "administrative_category" ] , useNA = "always" )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+mean( enade_df[ , "nt_obj_fg" ] , na.rm = TRUE )
+
+tapply(
+	enade_df[ , "nt_obj_fg" ] ,
+	enade_df[ , "administrative_category" ] ,
+	mean ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+prop.table( table( enade_df[ , "state_name" ] ) )
+
+prop.table(
+	table( enade_df[ , c( "state_name" , "administrative_category" ) ] ) ,
+	margin = 2
+)
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( enade_df[ , "nt_obj_fg" ] , na.rm = TRUE )
+
+tapply(
+	enade_df[ , "nt_obj_fg" ] ,
+	enade_df[ , "administrative_category" ] ,
+	sum ,
+	na.rm = TRUE 
+)
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+quantile( enade_df[ , "nt_obj_fg" ] , 0.5 , na.rm = TRUE )
+
+tapply(
+	enade_df[ , "nt_obj_fg" ] ,
+	enade_df[ , "administrative_category" ] ,
+	quantile ,
+	0.5 ,
+	na.rm = TRUE 
+)
+```
+
+### Subsetting {-}
+
+Limit your `data.frame` to students reporting that the general training section was easy or very easy:
+```{r eval = FALSE , results = "hide" }
+sub_enade_df <- subset( enade_df , co_rs_i1 %in% c( "A" , "B" ) )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+mean( sub_enade_df[ , "nt_obj_fg" ] , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Calculate the variance, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+var( enade_df[ , "nt_obj_fg" ] , na.rm = TRUE )
+
+tapply(
+	enade_df[ , "nt_obj_fg" ] ,
+	enade_df[ , "administrative_category" ] ,
+	var ,
+	na.rm = TRUE 
+)
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a t-test:
+```{r eval = FALSE , results = "hide" }
+t.test( nt_obj_fg ~ less_than_two_hours , enade_df )
+```
+
+Perform a chi-squared test of association:
+```{r eval = FALSE , results = "hide" }
+this_table <- table( enade_df[ , c( "less_than_two_hours" , "state_name" ) ] )
+
+chisq.test( this_table )
+```
+
+Perform a generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	glm( 
+		nt_obj_fg ~ less_than_two_hours + state_name , 
+		data = enade_df
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the tecnologia em gestão da tecnologia da informação test scores on PDF page 48 of [the 2021 final results document](https://download.inep.gov.br/enade/resultados/2021/apresentacao_resultados_finais.pdf#page=48):
+
+```{r eval = FALSE , results = "hide" }
+
+it_students <- subset( enade_df , co_grupo %in% 6409 )
+
+results <- sapply( it_students[ c( 'nt_fg' , 'nt_ce' , 'nt_ger' ) ] , mean , na.rm = TRUE )
+
+stopifnot( round( results[ 'nt_fg' ] , 1 ) == 30.4 )
+stopifnot( round( results[ 'nt_ce' ] , 1 ) == 38.2 )
+stopifnot( round( results[ 'nt_ger' ] , 1 ) == 36.3 )
+
+```
+
+---
+
+## Analysis Examples with `dplyr` \ {-}
+
+The R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax. [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation. [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features. As a starting point for ENADE users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(dplyr)
+enade_tbl <- as_tibble( enade_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+enade_tbl %>%
+	summarize( mean = mean( nt_obj_fg , na.rm = TRUE ) )
+
+enade_tbl %>%
+	group_by( administrative_category ) %>%
+	summarize( mean = mean( nt_obj_fg , na.rm = TRUE ) )
+```
+
+---
+
+## Analysis Examples with `data.table` \ {-}
+
+The R `data.table` library provides a high-performance version of base R's data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. [data.table](https://r-datatable.com) offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. [This vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) details the available features. As a starting point for ENADE users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(data.table)
+enade_dt <- data.table( enade_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+enade_dt[ , mean( nt_obj_fg , na.rm = TRUE ) ]
+
+enade_dt[ , mean( nt_obj_fg , na.rm = TRUE ) , by = administrative_category ]
+```
+
+---
+
+## Analysis Examples with `duckdb` \ {-}
+
+The R `duckdb` library provides an embedded analytical data management system with support for the Structured Query Language (SQL). [duckdb](https://duckdb.org) offers a simple, feature-rich, fast, and free SQL OLAP management system. [This vignette](https://duckdb.org/docs/api/r) details the available features. As a starting point for ENADE users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = 'hide' }
+library(duckdb)
+con <- dbConnect( duckdb::duckdb() , dbdir = 'my-db.duckdb' )
+dbWriteTable( con , 'enade' , enade_df )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = 'hide' }
+dbGetQuery( con , 'SELECT AVG( nt_obj_fg ) FROM enade' )
+
+dbGetQuery(
+	con ,
+	'SELECT
+		administrative_category ,
+		AVG( nt_obj_fg )
+	FROM
+		enade
+	GROUP BY
+		administrative_category'
+)
+```

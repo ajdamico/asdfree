@@ -1,0 +1,396 @@
+# Current Population Survey (CPS) {-}
+
+<a href="https://github.com/asdfree/cps/actions"><img src="https://github.com/asdfree/cps/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The principal labor force survey, providing income, poverty, and health insurance coverage estimates.
+
+* One table with one row per sampled household, a second table with one row per family within each sampled household, and a third table with one row per individual within each of those families.
+
+* A complex sample designed to generalize to the civilian non-institutional population of the US.
+
+* Released annually since 1998, linkable to the [Basic Monthly](https://www.census.gov/data/datasets/time-series/demo/cps/cps-basic.html) releases.
+
+* Administered jointly by the [US Census Bureau](http://www.census.gov/) and the [Bureau of Labor Statistics](http://www.bls.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [Current Population Survey 2023 Annual Social and Economic (ASEC) Supplement](https://www2.census.gov/programs-surveys/cps/techdocs/cpsmar23.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Current_Population_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Current Population Survey)
+
+```{r}
+# jobs robbed by robot
+# luddite rebellion looming
+# blue, due to red pill
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and unzip the 2023 file:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+
+tf <- tempfile()
+
+this_url <-	"https://www2.census.gov/programs-surveys/cps/datasets/2023/march/asecpub23sas.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+```
+
+Import all four files:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+four_tbl <- lapply( unzipped_files , read_sas )
+
+four_df <- lapply( four_tbl , data.frame )
+
+four_df <- lapply( four_df , function( w ){ names( w ) <- tolower( names( w ) ) ; w } )
+
+household_df <- four_df[[ grep( 'hhpub' , basename( unzipped_files ) ) ]]
+family_df <- four_df[[ grep( 'ffpub' , basename( unzipped_files ) ) ]]
+person_df <- four_df[[ grep( 'pppub' , basename( unzipped_files ) ) ]]
+repwgts_df <- four_df[[ grep( 'repwgt' , basename( unzipped_files ) ) ]]
+```
+
+Divide weights:
+
+```{r eval = FALSE , results = "hide" }
+household_df[ , 'hsup_wgt' ] <- household_df[ , 'hsup_wgt' ] / 100
+family_df[ , 'fsup_wgt' ] <- family_df[ , 'fsup_wgt' ] / 100
+for ( j in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) person_df[ , j ] <- person_df[ , j ] / 100
+```
+
+Merge these four files:
+
+```{r eval = FALSE , results = "hide" }
+names( family_df )[ names( family_df ) == 'fh_seq' ] <- 'h_seq'
+names( person_df )[ names( person_df ) == 'ph_seq' ] <- 'h_seq'
+names( person_df )[ names( person_df ) == 'phf_seq' ] <- 'ffpos'
+
+hh_fm_df <- merge( household_df , family_df )
+hh_fm_pr_df <- merge( hh_fm_df , person_df )
+cps_df <- merge( hh_fm_pr_df , repwgts_df )
+
+stopifnot( nrow( cps_df ) == nrow( person_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# cps_fn <- file.path( path.expand( "~" ) , "CPS" , "this_file.rds" )
+# saveRDS( cps_df , file = cps_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# cps_df <- readRDS( cps_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+	
+cps_design <-
+	svrepdesign(
+		weights = ~ marsupwt ,
+		repweights = "pwwgt[1-9]" ,
+		type = "Fay" ,
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		data = cps_df ,
+		combined.weights = TRUE ,
+		mse = TRUE
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+cps_design <- 
+	update( 
+		cps_design , 
+
+		one = 1 ,
+
+		a_maritl = 
+			factor( 
+				a_maritl , 
+				labels = 
+					c( 
+						"married - civilian spouse present" ,
+						"married - AF spouse present" ,
+						"married - spouse absent" ,
+						"widowed" ,
+						"divorced" , 
+						"separated" , 
+						"never married"
+					)
+			) ,
+			
+		state_name =
+			factor(
+				gestfips ,
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L) ,
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming")
+			) ,
+
+		male = as.numeric( a_sex == 1 )
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( cps_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ state_name , cps_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , cps_design )
+
+svyby( ~ one , ~ state_name , cps_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ ptotval , cps_design )
+
+svyby( ~ ptotval , ~ state_name , cps_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ a_maritl , cps_design )
+
+svyby( ~ a_maritl , ~ state_name , cps_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ ptotval , cps_design )
+
+svyby( ~ ptotval , ~ state_name , cps_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ a_maritl , cps_design )
+
+svyby( ~ a_maritl , ~ state_name , cps_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ ptotval , cps_design , 0.5 )
+
+svyby( 
+	~ ptotval , 
+	~ state_name , 
+	cps_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ moop , 
+	denominator = ~ ptotval , 
+	cps_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to persons aged 18-64:
+```{r eval = FALSE , results = "hide" }
+sub_cps_design <- subset( cps_design , a_age %in% 18:64 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ ptotval , sub_cps_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ ptotval , cps_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ ptotval , 
+		~ state_name , 
+		cps_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( cps_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ ptotval , cps_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ ptotval , cps_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ ptotval , cps_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ male , cps_design ,
+	method = "likelihood" )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( ptotval ~ male , cps_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ male + a_maritl , 
+	cps_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		ptotval ~ male + a_maritl , 
+		cps_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the count and share of individuals with health insurance in [Table H-01](https://www2.census.gov/programs-surveys/cps/tables/hi/2023/h_01.xlsx):
+
+```{r eval = FALSE , results = "hide" }
+count_covered <- svytotal( ~ as.numeric( cov == 1 ) , cps_design )
+
+stopifnot( round( coef( count_covered ) , -5 ) == 304000000 )
+
+stopifnot(
+	round( coef( count_covered ) - confint( count_covered , level = 0.9 )[1] , -3 ) == 746000
+)
+
+share_covered <- svymean( ~ as.numeric( cov == 1 ) , subset( cps_design , cov > 0 ) )
+
+stopifnot( round( coef( share_covered ) , 3 ) == 0.921 )
+
+stopifnot(
+	round( coef( share_covered ) - confint( share_covered , level = 0.9 )[1] , 3 ) == 0.002
+)
+
+```
+
+---
+
+## Poverty and Inequality Estimation with `convey` \ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing. [This textbook](https://guilhermejacob.github.io/context/) details the available features. As a starting point for CPS users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+cps_design <- convey_prep( cps_design )
+
+cps_household_design <- subset( cps_design , a_exprrp %in% 1:2 )
+
+svygini( ~ htotval , cps_household_design )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for CPS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+cps_srvyr_design <- as_survey( cps_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+cps_srvyr_design %>%
+	summarize( mean = survey_mean( ptotval ) )
+
+cps_srvyr_design %>%
+	group_by( state_name ) %>%
+	summarize( mean = survey_mean( ptotval ) )
+```
+
+

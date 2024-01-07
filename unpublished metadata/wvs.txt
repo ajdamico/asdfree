@@ -1,0 +1,103 @@
+chapter_title: World Values Survey
+
+~~~{dataset_introduction}
+The World Values Survey studies changing values and their impact on social and political life in almost one hundred nations.
+~~~
+
+table_structure: * One table per country per wave, with one row per sampled respondent.
+
+generalizable_population: * A complex sample survey designed to generalize the population aged eighteen and older in participating countries.
+
+publication_period: * Released about twice per decade since 1981.
+
+administrative_organization: * Administered as a confederacy, guided by a [scientific advisory committee](http://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=SAC) and funded by [consortium](http://www.worldvaluessurvey.org/WVSContents.jsp).
+
+
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_df <-
+	readRDS( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+			"wave 6/F00003106-WV6_Data_United_States_2011_spss_v_2016-01-01.rds" ) 
+	)
+
+# construct a fake survey design
+warning( "this survey design produces correct point estimates
+but incorrect standard errors." )
+chapter_tag_design <- 
+	svydesign( 
+		~ 1 , 
+		data = chapter_tag_df , 
+		weights = ~ v258
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		language_spoken_at_home =
+			factor( v247 , 
+				levels = c( 101 , 128 , 144 , 208 , 426 , 800 ) , 
+				labels = c( 'chinese' , 'english' , 'french' , 
+					'japanese' , 'spanish; castilian' , 'other' )
+			) ,
+
+		citizen = as.numeric( v246 == 1 ) ,
+		
+		task_creativity_1_10 = as.numeric( v232 ) ,
+		
+		work_independence_1_10 = as.numeric( v233 ) ,
+		
+		family_importance =
+			factor( v4 , 
+				labels = c( 'very' , 'rather' , 'not very' , 'not at all' ) 
+			)
+	)
+~~~
+
+group_by_variable: language_spoken_at_home
+
+categorical_variable: family_importance
+categorical_narm: , na.rm = TRUE
+
+linear_variable: task_creativity_1_10
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: task_creativity_1_10
+ratio_estimation_denominator: work_independence_1_10
+ratio_narm: , na.rm = TRUE
+
+subset_definition: v242 >= 65
+subset_definition_description: seniors
+
+binary_variable: citizen
+binary_narm: , na.rm = TRUE
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+needs_actions_build_status_line: yes
+
+
+
+

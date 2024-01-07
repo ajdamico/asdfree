@@ -1,26 +1,64 @@
 chapter_title: Medical Large Claims Experience Study
 
+needs_actions_build_status_line: yes
+
 ~~~{dataset_introduction}
-The Medical Large Claims Experience Study (MLCES) might be the best private health insurance claims data available to the public.  This data should be used to calibrate other data sets, and probably nothing more.
+A high quality dataset of medical claims from seven private health insurance companies.
 ~~~
 
 table_structure: * One table with one row per individual with nonzero total paid charges.
 
-generalizable_population: * A convenience sample of group (employer-sponsored) health insurance claims from seven private health insurers in the United States.
+generalizable_population: * A convenience sample of group (employer-sponsored) health insurers in the United States.
 
 publication_period: * 1997 thru 1999 with no expected updates in the future.
 
 administrative_organization: * Provided by the [Society of Actuaries (SOA)](http://www.soa.org/).
 
+~~~{reading_block}
+Please skim before you begin:
 
-~~~{analysis_examples_loading_block}
-chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "mlces1997.rds" ) )
+1. [Group Medical Insurance Claims Database Collection and Analysis Report](https://www.soa.org/4937d6/globalassets/assets/files/research/exp-study/large_claims_report.pdf)
+
+2. [Claim Severities, Claim Relativities, and Age: Evidence from SOA Group Health Data](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1412243)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# skewed by black swan tails
+# means, medians sing adieu
+# claims distribution
+```
 ~~~
+
+
+
+~~~{download_and_import_block}
+
+Download and import the 1999 medical claims file:
+
+```{r eval = FALSE , results = "hide" }
+tf <- tempfile()
+
+this_url <-	"https://www.soa.org/Files/Research/1999.zip"
+
+download.file( this_url , tf , mode = 'wb' )
+
+unzipped_file <- unzip( tf , exdir = tempdir() )
+
+chapter_tag_df <- read.csv( unzipped_file )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+~~~
+
+
 
 ~~~{variable_recoding_block}
 chapter_tag_df <- 
 	transform( 
 		chapter_tag_df , 
+		
+		one = 1 ,
 		
 		claimant_relationship_to_policyholder =
 			ifelse( relation == "E" , "covered employee" ,
@@ -38,8 +76,38 @@ categorical_variable: patsex
 subset_definition: ( ( claimyr - patbrtyr ) < 18 )
 subset_definition_description: persons under 18
 binary_variable: ppo_plan
+
+
+
 needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
 
 
+~~~{replication_example_block}
+## Replication Example {-}
 
-needs_travis_build_status_line: yes
+This example matches statistics in Table II-A's 1999 row numbers 52 and 53 from the [Database](https://www.soa.org/4937cc/globalassets/assets/files/research/tables.zip):
+
+Match Claimants Exceeding Deductible:
+
+```{r eval = FALSE , results = "hide" }
+# $0 deductible
+stopifnot( nrow( chapter_tag_df ) == 1591738 )
+
+# $1,000 deductible
+mlces_above_1000_df <- subset( chapter_tag_df , totpdchg > 1000 )
+stopifnot( nrow( mlces_above_1000_df ) == 402550 )
+```
+
+
+Match the Excess Charges Above Deductible:
+
+```{r eval = FALSE , results = "hide" }
+# $0 deductible
+stopifnot( round( sum( chapter_tag_df[ , 'totpdchg' ] ) , 0 ) == 2599356658 )
+
+# $1,000 deductible
+stopifnot( round( sum( mlces_above_1000_df[ , 'totpdchg' ] - 1000 ) , 0 ) == 1883768786 )
+```
+~~~

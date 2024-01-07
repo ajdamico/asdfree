@@ -1,37 +1,260 @@
 
 chapter_title: Trends in International Mathematics and Science Study
 
-catalog_subset_description: # 2015 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2015 )
+needs_actions_build_status_line: yes
 
-~~~{dataset_introduction}
-The Trends in International Mathematics and Science Study (TIMSS) tracks the math and science competency of fourth graders across about fifty nations.
+
+
+~~~{replacement_block}
+MIcombine
+timss_MIcombine
 ~~~
 
-table_structure: * A series of tables with one record per school (ACG), per student (ASG), per teacher (ATG), as well as files containing student achievement (ASA), home background (ASH), student-teacher linkage (AST), and within-country scoring reliability (ASR).
 
-generalizable_population: * A complex sample survey designed to generalize to the fourth-grade student population of participating countries.
+
+
+
+~~~{dataset_introduction}
+A comparative study of student achievement in math and science across more than 50 nations.
+~~~
+
+table_structure: * Grade-specific tables with one record per school, student, teacher, plus files containing student achievement, home background, student-teacher linkage, and within-country scoring reliability.
+
+generalizable_population: * A complex survey generalizing to fourth- and eighth-grade populations of participating countries.
 
 publication_period: * Released quadrennially since 1995.
 
-administrative_organization: * Funded by the [International Association for the Evaluation of Educational Achievement](https://www.iea.nl/) and compiled by the [Lynch School of Education at Boston College](http://www.bc.edu/bc-web/schools/lsoe.html).
+administrative_organization: * Funded by the [International Association for the Evaluation of Educational Achievement](https://www.iea.nl/), run at [BC](http://www.bc.edu/bc-web/schools/lsoe.html).
 
-needs_catalog_block: yes
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [TIMSS 2019 User Guide for the International Database, 2nd Edition](https://timss2019.org/international-database/downloads/TIMSS-2019-User-Guide-for-the-International-Database-2nd-Ed.pdf)
+
+2. [Methods and Procedures: TIMSS 2019 Technical Report](https://timssandpirls.bc.edu/timss2019/methods/pdf/TIMSS-2019-MP-Technical-Report.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# brando for stella,
+# gump's jenny, rock's adrian,
+# students toward math test
+```
+~~~
+
+
+
+~~~{definitions_block}
+## Function Definitions {-}
+
+This survey uses a multiply-imputed variance estimation technique described in [Methods Chapter 14](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html).  Most users do not need to study this function carefully.  Define a function specific to only this dataset:
+
+```{r eval = FALSE , results = "hide" }
+MIcombine <-
+	function (results, variances, call = sys.call(), df.complete = Inf, ...) {
+		m <- length(results)
+		oldcall <- attr(results, "call")
+		if (missing(variances)) {
+			variances <- suppressWarnings(lapply(results, vcov))
+			results <- lapply(results, coef)
+		}
+		vbar <- variances[[1]]
+		cbar <- results[[1]]
+		for (i in 2:m) {
+			cbar <- cbar + results[[i]]
+			vbar <- vbar + variances[[i]]
+		}
+		cbar <- cbar/m
+		vbar <- vbar/m
+
+		# MODIFICATION
+		# evar <- var(do.call("rbind", results))
+		evar <- sum( ( unlist( results ) - cbar )^2 / 4 )
+
+		
+		r <- (1 + 1/m) * evar/vbar
+		df <- (m - 1) * (1 + 1/r)^2
+		if (is.matrix(df)) df <- diag(df)
+		if (is.finite(df.complete)) {
+			dfobs <- ((df.complete + 1)/(df.complete + 3)) * df.complete *
+			vbar/(vbar + evar)
+			if (is.matrix(dfobs)) dfobs <- diag(dfobs)
+			df <- 1/(1/dfobs + 1/df)
+		}
+		if (is.matrix(r)) r <- diag(r)
+		rval <- list(coefficients = cbar, variance = vbar + evar *
+		(m + 1)/m, call = c(oldcall, call), nimp = m, df = df,
+		missinfo = (r + 2/(df + 3))/(r + 1))
+		class(rval) <- "MIresult"
+		rval
+	}
+```
+---
+~~~
+
+
+
+~~~{download_and_import_block}
+
+Download and unzip the 2019 fourth grade international database:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+
+tf <- tempfile()
+
+this_url <- "https://timss2019.org/international-database/downloads/T19_G4_SPSS%20Data.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+unzipped_files <- unzip( tf , exdir = tempdir() )
+```
+
+Import and stack each of the student context data files for **Albania through Canada**:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+# limit unzipped files to those starting with `asg` followed by three letters followed by `m7`
+asg_fns <- unzipped_files[ grepl( '^asg[a-z][a-z][a-z]m7' , basename( unzipped_files ) ) ]
+
+# further limit asg files to the first ten countries
+countries_thru_canada <- c("alb", "arm", "aus", "aut", "aze", "bhr", "bfl", "bih", "bgr", "can")
+
+fns_thru_canada <- paste0( paste0( '^asg' , countries_thru_canada , 'm7' ) , collapse = "|" )
+
+asg_alb_can_fns <- asg_fns[ grepl( fns_thru_canada , basename( asg_fns ) ) ]
+
+chapter_tag_df <- NULL
+
+for( spss_fn in asg_alb_can_fns ){
+
+	this_tbl <- read_spss( spss_fn )
+	
+	this_tbl <- zap_labels( this_tbl )
+	
+	this_df <- data.frame( this_tbl )
+	
+	names( this_df ) <- tolower( names( this_df ) )
+	
+	chapter_tag_df <- rbind( chapter_tag_df , this_df )
+	
+}
+
+# order the data.frame by unique student id
+chapter_tag_df <- chapter_tag_df[ with( chapter_tag_df , order( idcntry , idstud ) ) , ]
+```
+~~~
+
+
+
+
 
 ~~~{analysis_examples_survey_design}
+
+From among possibly plausible values, determine all columns that are multiply-imputed plausible values:
+
+```{r eval = FALSE , results = "hide" }
+# identify all columns ending with `01` thru `05`
+ppv <- grep( "(.*)0[1-5]$" , names( chapter_tag_df ) , value = TRUE )
+
+# remove those ending digits
+ppv_prefix <- gsub( "0[1-5]$" , "" , ppv )
+
+# identify each of the possibilities with exactly five matches (five implicates)
+pv <- names( table( ppv_prefix )[ table( ppv_prefix ) == 5 ] )
+
+# identify each of the `01` thru `05` plausible value columns
+pv_columns <-
+	grep( 
+		paste0( "^" , pv , "0[1-5]$" , collapse = "|" ) , 
+		names( chapter_tag_df ) , 
+		value = TRUE 
+	)
+```
+
+Extract those multiply-imputed columns into a separate data.frame, then remove them from the source:
+```{r eval = FALSE , results = "hide" }
+pv_wide_df <- chapter_tag_df[ c( 'idcntry' , 'idstud' , pv_columns ) ]
+
+chapter_tag_df[ pv_columns ] <- NULL
+```
+
+Reshape these columns from one record per student to one record per student per implicate:
+```{r eval = FALSE , results = "hide" }
+pv_long_df <- 
+	reshape( 
+		pv_wide_df , 
+		varying = lapply( paste0( pv , '0' ) , paste0 , 1:5 ) , 
+		direction = 'long' , 
+		timevar = 'implicate' , 
+		idvar = c( 'idcntry' , 'idstud' ) 
+	)
+
+
+names( pv_long_df ) <- gsub( "01$" , "" , names( pv_long_df ) )
+```
+
+
+Merge the columns from the source data.frame onto the one record per student per implicate data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_long_df <- merge( chapter_tag_df , pv_long_df )
+
+chapter_tag_long_df <- chapter_tag_long_df[ with( chapter_tag_long_df , order( idcntry , idstud ) ) , ]
+
+stopifnot( nrow( chapter_tag_long_df ) == nrow( pv_long_df ) )
+
+stopifnot( nrow( chapter_tag_long_df ) / 5 == nrow( chapter_tag_df ) )
+```
+
+
+Divide the five plausible value implicates into a list with five data.frames based on the implicate number:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_list <- split( chapter_tag_long_df , chapter_tag_long_df[ , 'implicate' ] )
+```
+
+Construct a replicate weights table following the estimation technique described in [Methods Chapter 14](https://timssandpirls.bc.edu/timss2019/methods/chapter-14.html):
+
+```{r eval = FALSE , results = "hide" }
+weights_df <- chapter_tag_df[ c( 'jkrep' , 'jkzone' ) ]
+
+for( j in 1:75 ){
+	for( i in 0:1 ){
+		weights_df[ weights_df[ , 'jkzone' ] != j , paste0( 'rw' , i , j ) ] <- 1
+		
+		weights_df[ weights_df[ , 'jkzone' ] == j , paste0( 'rw' , i , j ) ] <- 
+			2 * ( weights_df[ weights_df[ , 'jkzone' ] == j , 'jkrep' ] == i )
+	}
+}
+
+weights_df[ c( 'jkrep' , 'jkzone' ) ] <- NULL
+
+```
+
+
+Define the design:
+```{r eval = FALSE , results = "hide" }
 library(survey)
 library(mitools)
-library(RSQLite)
 
-# load the ASG (student background) + ASH (home background) merged design
-chapter_tag_design <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015/asg_design.rds" ) )
-
-design_weights <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2015/asg_weights.rds" ) )
-
-five_tablenames <- paste0( "asg_2015_" , 1:5 )
-
-chapter_tag_design <- lodown:::svyMDBdesign( chapter_tag_design )
+chapter_tag_design <- 
+	svrepdesign(
+		weights = ~totwgt ,
+		repweights = weights_df , 
+		data = imputationList( chapter_tag_list ) ,
+		type = "other" ,
+		scale = 0.5 ,
+		rscales = rep( 1 , 150 ) ,
+		combined.weights = FALSE ,
+		mse = TRUE
+	)
+```
 ~~~
+
+
 
 ~~~{variable_recoding_block}
 chapter_tag_design <- 
@@ -40,39 +263,130 @@ chapter_tag_design <-
 		
 		one = 1 ,
 		
-		idcntry = factor( idcntry ) ,
+		countries_thru_canada = 
 		
-		sex = factor( itsex , labels = c( "male" , "female" ) ) ,
+			factor( 
+			
+				as.numeric( idcntry ) ,
+				
+				levels = c(8L, 51L, 36L, 40L, 31L, 48L, 956L, 70L, 100L, 124L) ,
+
+				labels =
+					c("Albania", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahrain",
+					"Belgium (Flemish)", "Bosnia and Herzegovina", "Bulgaria", "Canada")
+				
+			) ,
 		
-		born_2005_or_later = as.numeric( itbirthy >= 2005 )
+		sex = factor( asbg01 , levels = 1:2 , labels = c( "female" , "male" ) ) ,
+		
+		born_in_country = ifelse( asbg07 %in% 1:2 , as.numeric( asbg07 == 1 ) , NA )
 
 	)
 ~~~
 
 group_by_variable: sex
 linear_variable: asmmat
-categorical_variable: idcntry
+linear_narm: , na.rm = TRUE
+categorical_variable: countries_thru_canada
 ratio_estimation_numerator: asssci
 ratio_estimation_denominator: asmmat
-subset_definition: idcntry %in% c( 36 , 40 , 31 , 957 )
+subset_definition: idcntry %in% c( 36 , 40 , 31 , 956 )
 subset_definition_description: Australia, Austria, Azerbaijan, Belgium (French)
-binary_variable: born_2001_or_later
+binary_variable: born_in_country
 binary_narm: , na.rm = TRUE
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
+
+This example matches the mean proficiency and standard error of the `Australia` row of the `Summary Statistics and Standard Errors for Proficiency in Overall Mathematics-Grade 4` table from the [Appendix 14A: Summary Statistics and Standard Errors for Proficiency in Grade 4 Mathematics](https://timss.bc.edu/timss2019/methods/pdf/T19_MP_Ch14-estimating-standard-errors.pdf#page=13):
+
 ```{r eval = FALSE , results = "hide" }
+australia_design <- subset( chapter_tag_design , countries_thru_canada %in% "Australia" )
+
+stopifnot( nrow( australia_design ) == 5890 )
+
+result <- MIcombine( with( australia_design , svymean( ~ asmmat ) ) )
+
+stopifnot( round( coef( result ) , 3 ) == 515.880 )
+
+stopifnot( round( SE( result ) , 3 ) == 2.776 )
+
+
+```
+
+
+This example matches the jackknife sampling, imputation, and total variances of the same row:
+
+```{r eval = FALSE , results = "hide" }
+australia_fn <- unzipped_files[ grepl( 'asgaus' , basename( unzipped_files ) ) ]
+australia_tbl <- read_spss( australia_fn )
+australia_tbl <- zap_labels( australia_tbl )
+australia_df <- data.frame( australia_tbl )
+names( australia_df ) <- tolower( names( australia_df ) )
+
+estimate <-
+	mean( c(
+		with( australia_df , weighted.mean( asmmat01 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat02 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat03 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat04 , totwgt ) ) ,
+		with( australia_df , weighted.mean( asmmat05 , totwgt ) )
+	) )
+
+stopifnot( round( estimate , 3 ) == 515.880 )
+
+
+for( k in 1:5 ){
+
+	this_variance <- 0
+	
+	for( j in 1:75 ){
+		for( i in 0:1 ){
+			this_variance <- 
+				this_variance + 
+				( 
+					weighted.mean( 
+						australia_df[ , paste0( 'asmmat0' , k ) ] , 
+						ifelse( 
+							j == australia_df[ , 'jkzone' ] , 
+							australia_df[ , 'totwgt' ] * 2 * ( australia_df[ , 'jkrep' ] == i ) , 
+							australia_df[ , 'totwgt' ] 
+						)
+					) -
+					weighted.mean( 
+						australia_df[ , paste0( 'asmmat0' , k ) ] , 
+						australia_df[ , 'totwgt' ]
+					)
+				)^2
+		}
+	}
+	
+	assign( paste0( 'v' , k ) , this_variance * 0.5 )
+
+}
+
+
+sampling_variance <- mean( c( v1 , v2 , v3 , v4 , v5 ) )
+stopifnot( round( sampling_variance , 3 ) == 7.397 )
+
+imputation_variance <-
+	( 6 / 5 ) * 
+	( 
+		( ( with( australia_df , weighted.mean( asmmat01 , totwgt ) ) - estimate )^2 / 4 ) +
+		( ( with( australia_df , weighted.mean( asmmat02 , totwgt ) ) - estimate )^2 / 4 ) +
+		( ( with( australia_df , weighted.mean( asmmat03 , totwgt ) ) - estimate )^2 / 4 ) +
+		( ( with( australia_df , weighted.mean( asmmat04 , totwgt ) ) - estimate )^2 / 4 ) +
+		( ( with( australia_df , weighted.mean( asmmat05 , totwgt ) ) - estimate )^2 / 4 ) 
+	)
+
+stopifnot( round( imputation_variance , 3 ) == 0.309 )
+
+stopifnot( round( sampling_variance + imputation_variance , 3 ) == 7.706 )
+
 
 
 ```
 ~~~
 
 
-needs_travis_build_status_line: yes
-
-sample_setup_breaks: 6
-
-broken_sample_test_condition: any( chapter_tag_cat$year == 2015 )

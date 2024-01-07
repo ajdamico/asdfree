@@ -1,0 +1,342 @@
+# Medical Expenditure Panel Survey (MEPS) {-}
+
+<a href="https://github.com/asdfree/meps/actions"><img src="https://github.com/asdfree/meps/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The Household Component captures person-level spending across service categories, coverage types.
+
+* The consolidated file contains one row per individual within each sampled household, other tables contain one record per event (like prescription fills, hospitalizations), per job, per insurance policy.
+
+* A complex sample survey designed to generalize to the U.S. civilian non-institutionalized population.
+
+* Released annually since 1996.
+
+* Administered by the [Agency for Healthcare Research and Quality](http://www.ahrq.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [MEPS HC-224 2020 Full Year Consolidated Data File](https://meps.ahrq.gov/data_stats/download_data/pufs/h224/h224doc.shtml)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/Medical_Expenditure_Panel_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Medical Expenditure Panel Survey)
+
+```{r}
+# king dumpty's horsemen
+# ahrq stitches payors, bills, claims
+# fractured health system
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Define a function to download, unzip, and import each sas file:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+meps_sas_import <-
+	function( this_url ){
+		
+		this_tf <- tempfile()
+		
+		download.file( this_url , this_tf , mode = 'wb' )
+		
+		this_tbl <- read_sas( this_tf )
+
+		this_df <- data.frame( this_tbl )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+```	
+
+Download and import the consolidated file and the replicate weights file:
+
+```{r eval = FALSE , results = "hide" }
+meps_cons_df <-
+	meps_sas_import( "https://meps.ahrq.gov/data_files/pufs/h224/h224v9.zip" )
+
+meps_brr_df <-
+	meps_sas_import( "https://meps.ahrq.gov/mepsweb/data_files/pufs/h036brr/h36brr20v9.zip" )
+```
+
+Merge the consolidated file with the replicate weights:
+
+```{r eval = FALSE , results = "hide" }
+meps_df <- merge( meps_cons_df , meps_brr_df )
+
+stopifnot( nrow( meps_df ) == nrow( meps_cons_df ) )
+
+meps_df[ , 'one' ] <- 1
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# meps_fn <- file.path( path.expand( "~" ) , "MEPS" , "this_file.rds" )
+# saveRDS( meps_df , file = meps_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# meps_df <- readRDS( meps_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+meps_design <-
+	svrepdesign(
+		data = meps_df ,
+		weights = ~ perwt20f ,
+		type = "BRR" ,
+		combined.weights = FALSE ,
+		repweights = "brr[1-9]+" ,
+		mse = TRUE
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+meps_design <- 
+	update( 
+		meps_design , 
+		
+		one = 1 ,
+		
+		insured_december_31st = ifelse( ins20x %in% 1:2 , as.numeric( ins20x == 1 ) , NA )
+		
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( meps_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ region20 , meps_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , meps_design )
+
+svyby( ~ one , ~ region20 , meps_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ totexp20 , meps_design )
+
+svyby( ~ totexp20 , ~ region20 , meps_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ sex , meps_design )
+
+svyby( ~ sex , ~ region20 , meps_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ totexp20 , meps_design )
+
+svyby( ~ totexp20 , ~ region20 , meps_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ sex , meps_design )
+
+svyby( ~ sex , ~ region20 , meps_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ totexp20 , meps_design , 0.5 )
+
+svyby( 
+	~ totexp20 , 
+	~ region20 , 
+	meps_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ totmcd20 , 
+	denominator = ~ totexp20 , 
+	meps_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to seniors:
+```{r eval = FALSE , results = "hide" }
+sub_meps_design <- subset( meps_design , agelast >= 65 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ totexp20 , sub_meps_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ totexp20 , meps_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ totexp20 , 
+		~ region20 , 
+		meps_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( meps_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ totexp20 , meps_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ totexp20 , meps_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ totexp20 , meps_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ insured_december_31st , meps_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( totexp20 ~ insured_december_31st , meps_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ insured_december_31st + sex , 
+	meps_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		totexp20 ~ insured_december_31st + sex , 
+		meps_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the statistic and standard error shown under [Analysis of the Total Population](https://meps.ahrq.gov/mepsweb/survey_comp/standard_errors.jsp):
+
+```{r eval = FALSE , results = "hide" }
+library(foreign)
+
+xport_2002_tf <- tempfile()
+
+xport_2002_url <- "https://meps.ahrq.gov/data_files/pufs/h70ssp.zip"
+
+download.file( xport_2002_url , xport_2002_tf , mode = 'wb' )
+
+unzipped_2002_xport <- unzip( xport_2002_tf , exdir = tempdir() )
+
+meps_2002_df <- read.xport( unzipped_2002_xport )
+
+names( meps_2002_df ) <- tolower( names( meps_2002_df ) )
+
+meps_2002_design <-
+	svydesign(
+		~ varpsu ,
+		strata = ~ varstr ,
+		weights = ~ perwt02f ,
+		data = meps_2002_df ,
+		nest = TRUE
+	)
+			
+result <- svymean( ~ totexp02 , meps_2002_design )
+stopifnot( round( coef( result ) , 2 ) == 2813.24 )
+stopifnot( round( SE( result ) , 2 ) == 58.99 )
+
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for MEPS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+meps_srvyr_design <- as_survey( meps_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+meps_srvyr_design %>%
+	summarize( mean = survey_mean( totexp20 ) )
+
+meps_srvyr_design %>%
+	group_by( region20 ) %>%
+	summarize( mean = survey_mean( totexp20 ) )
+```
+
+

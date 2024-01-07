@@ -1,0 +1,458 @@
+# American National Election Studies (ANES) {-}
+
+```{r , echo = FALSE }
+
+most_recent_build_date <- gsub( "-" , " " , if( dir.exists( "_bookdown_files/" ) ) as.Date( file.info( "_bookdown_files/" )$ctime ) else Sys.Date() )
+
+anes_badge <- paste0( "<img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-" , most_recent_build_date , "-brightgreen' alt='Local Testing Badge'>" )
+
+```
+
+`r anes_badge`
+
+A time series recording belief, public opinion, and political participation back to Dewey vs. Truman.
+
+* Most tables contain one row per sampled eligible voter, varying weights like pre- and post-election.
+
+* A complex sample generalizing to eligible voters in the U.S. with some panels to follow individuals.
+
+* Core studies released quadrennially (presidential elections), plus pilot studies (often at midterms).
+
+* Administered by a consortium of universities and funded by the [National Science Foundation](https://www.nsf.gov).
+
+---
+
+Please skim before you begin:
+
+1. [ANES 2020 Time Series Study Full Release: User Guide and Codebook](https://electionstudies.org/wp-content/uploads/2022/02/anes_timeseries_2020_userguidecodebook_20220210.pdf)
+
+2. [How to Analyze ANES Survey Data](https://electionstudies.org/wp-content/uploads/2018/04/nes012492.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20American National Election Studies)
+
+```{r}
+# chez sacrificed queen
+# quadrennial bloodless coup
+# knight churchill's least worst
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Define a function to import a stata file as a data.frame:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(haven)
+
+anes_import_dta <-
+	function( this_fn ){
+		
+		this_tbl <- read_dta( this_fn )
+		
+		this_tbl <- zap_labels( this_tbl )
+		
+		this_df <- data.frame( this_tbl )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+```
+
+1. Register for the ANES Data Center at https://electionstudies.org/
+
+2. Choose `2020 Time Series Study`
+
+3. Download the `STATA` version of the February 10, 2022 file:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(haven)
+
+anes_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes_timeseries_2020_stata_20220210.dta"
+	)
+
+anes_df <- anes_import_dta( anes_fn )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# anes_fn <- file.path( path.expand( "~" ) , "ANES" , "this_file.rds" )
+# saveRDS( anes_df , file = anes_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# anes_df <- readRDS( anes_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(survey)
+
+anes_design <-
+	svydesign(
+		ids = ~ v200010c ,
+		strata = ~ v200010d ,
+		weights = ~ v200010a ,
+		data = subset( anes_df , v200010a > 0 ) ,
+		nest = TRUE
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+anes_design <- 
+	update( 
+		anes_design , 
+		
+		one = 1 ,
+		
+		democratic_party_rating = ifelse( v201156 %in% 0:100 , v201156 , NA ) ,
+
+		republican_party_rating = ifelse( v201157 %in% 0:100 , v201157 , NA ) ,
+		
+		primary_voter = ifelse( v201020 %in% 1:2 , as.numeric( v201020 == 1 ) , NA ) ,
+
+		think_gov_spend_least =
+			factor( v201645 , levels = 1:4 , labels =
+				c( 'foreign aid (correct)' , 'medicare' , 'national defense' , 'social security' )
+			) ,
+		
+		undoc_kids =
+			factor( v201423x , levels = 1:6 , labels =
+				c( 'should sent back - favor a great deal' ,
+					'should sent back - favor a moderate amount' ,
+					'should sent back - favor a little' ,
+					'should allow to stay - favor a little' ,
+					'should allow to stay - favor a moderate amount' ,
+					'should allow to stay - favor a great deal' )
+			)
+
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+sum( weights( anes_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ undoc_kids , anes_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ one , anes_design )
+
+svyby( ~ one , ~ undoc_kids , anes_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ republican_party_rating , anes_design , na.rm = TRUE )
+
+svyby( ~ republican_party_rating , ~ undoc_kids , anes_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ think_gov_spend_least , anes_design , na.rm = TRUE )
+
+svyby( ~ think_gov_spend_least , ~ undoc_kids , anes_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ republican_party_rating , anes_design , na.rm = TRUE )
+
+svyby( ~ republican_party_rating , ~ undoc_kids , anes_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ think_gov_spend_least , anes_design , na.rm = TRUE )
+
+svyby( ~ think_gov_spend_least , ~ undoc_kids , anes_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyquantile( ~ republican_party_rating , anes_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ republican_party_rating , 
+	~ undoc_kids , 
+	anes_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ republican_party_rating , 
+	denominator = ~ democratic_party_rating , 
+	anes_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to party id: independent:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+sub_anes_design <- subset( anes_design , v201231x == 4 )
+```
+Calculate the mean (average) of this subset:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ republican_party_rating , sub_anes_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+this_result <- svymean( ~ republican_party_rating , anes_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ republican_party_rating , 
+		~ undoc_kids , 
+		anes_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+degf( anes_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyvar( ~ republican_party_rating , anes_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ republican_party_rating , anes_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ republican_party_rating , anes_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyciprop( ~ primary_voter , anes_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyttest( republican_party_rating ~ primary_voter , anes_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svychisq( 
+	~ primary_voter + think_gov_spend_least , 
+	anes_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		republican_party_rating ~ primary_voter + think_gov_spend_least , 
+		anes_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics and standard errors in the Age rows of the `ANES respondents (weighted)` column of `Table 1A` from [Benchmark and Attrition Report for the ANES 2016 Time Series Study](https://electionstudies.org/wp-content/uploads/2022/03/DeBell-Maisel-Benchmark-Report-for-the-ANES-2016-Time-Series-Study.pdf#page=4):
+
+1. Log in to the ANES Data Center at https://electionstudies.org/
+
+2. Choose `2016 Time Series Study`.
+
+3. Download the `DTA` version of the September 4, 2019 file
+
+4. Download the `DTA` version of the `Methodology File December 10, 2018`
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+anes2016_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes_timeseries_2016.dta"
+	)
+
+anes2016_df <- anes_import_dta( anes2016_fn )
+
+method2016_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes_timeseries_2016_methodology_dta.dta" 
+	)
+
+method2016_df <- anes_import_dta( method2016_fn )
+
+before_nrow <- nrow( anes2016_df )
+anes2016_df <- merge( anes2016_df , method2016_df , by = 'v160001' )
+stopifnot( nrow( anes2016_df ) == before_nrow )
+
+anes2016_df[ , 'age_categories' ] <- 
+	factor(
+		findInterval(
+			anes2016_df[ , 'v161267' ] , 
+			c( 18 , seq( 30 , 70 , 10 ) ) 
+		) ,
+		levels = 1:6 ,
+		labels = c( '18-29' , '30-39' , '40-49' , '50-59' , '60-69' , '70 or older' )
+	)
+
+anes2016_design <-
+	svrepdesign(
+		data = subset( anes2016_df , v160101f > 0 ) ,
+		weights = ~ v160101f ,
+		repweights = 'weight_ftf_rkwt([0-9]+)' ,
+		type = 'JK1' ,
+		scale = 32 / 33 
+	)
+
+( results <- svymean( ~ age_categories , anes2016_design , na.rm = TRUE ) )
+
+published_results <- c( 0.21 , 0.158 , 0.156 , 0.2 , 0.147 , 0.129 )
+
+published_standard_errors <- c( 0.0091 , 0.009 , 0.0094 , 0.0122 , 0.0069 , 0.0083 )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_results ) )
+
+stopifnot( all( round( SE( results ) , 4 ) == published_standard_errors ) )
+```
+
+This example matches statistics and standard errors in the Age rows of the `Design-consistent, with published strata` column of `Table 1` from [How to Analyze ANES Survey Data](https://electionstudies.org/wp-content/uploads/2018/04/nes012492.pdf#page=25):
+
+1. Log in to the ANES Data Center at https://electionstudies.org/
+
+2. Choose `2004 Time Series Study`4
+
+3. Download the `DTA` version of the Full Release August 16, 2005 file
+
+4. Choose `2006 Pilot Study`
+
+5. Download the `DTA` version of the April 26, 2007 file
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+anes2004_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes2004TS.dta"
+	)
+
+anes2004_df <- anes_import_dta( anes2004_fn )
+
+pilot2006_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"anes2006pilot.dta" 
+	)
+
+pilot2006_df <- anes_import_dta( pilot2006_fn )
+
+before_nrow <- nrow( pilot2006_df )
+pilot2006_df <- merge( pilot2006_df , anes2004_df , by.x = 'v06p001' , by.y = 'v040001' )
+stopifnot( nrow( pilot2006_df ) == before_nrow )
+
+	
+pilot2006_df[ , 'age_categories' ] <- 
+	factor(
+		findInterval(
+			pilot2006_df[ , 'v043250' ] , 
+			c( 18 , seq( 30 , 70 , 10 ) ) 
+		) ,
+		levels = 1:6 ,
+		labels = c( '18-29' , '30-39' , '40-49' , '50-59' , '60-69' , '70 or older' )
+	)
+
+pilot2006_design <-
+	svydesign( 
+		id = ~v06p007b , 
+		strata = ~v06p007a , 
+		data = pilot2006_df , 
+		weights = ~v06p002 , 
+		nest = TRUE 
+	)
+
+( results <- svymean( ~ age_categories , pilot2006_design , na.rm = TRUE ) )
+
+published_results <- c( 0.207 , 0.162 , 0.218 , 0.175 , 0.111 , 0.126 )
+
+published_standard_errors <- c( 0.0251 , 0.024 , 0.022 , 0.0149 , 0.0125 , 0.0287 )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_results ) )
+
+stopifnot( all( round( SE( results ) , 4 ) == published_standard_errors ) )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ANES users, this code replicates previously-presented examples:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(srvyr)
+anes_srvyr_design <- as_survey( anes_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+anes_srvyr_design %>%
+	summarize( mean = survey_mean( republican_party_rating , na.rm = TRUE ) )
+
+anes_srvyr_design %>%
+	group_by( undoc_kids ) %>%
+	summarize( mean = survey_mean( republican_party_rating , na.rm = TRUE ) )
+```
+
+

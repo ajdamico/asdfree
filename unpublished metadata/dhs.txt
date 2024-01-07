@@ -1,0 +1,139 @@
+chapter_title: Demographic and Health Surveys
+
+~~~{dataset_introduction}
+The Demographic and Health Surveys collect data on population, health, HIV, and nutrition in over 90 countries.
+~~~
+
+
+password_parameters: , \\\\n\\\\tyour_email = "email@address.com" , \\\\n\\\\tyour_password = "password" , \\\\n\\\\tyour_project = "project"
+
+
+table_structure: * Many tables, often with one row per male, per female, or per responding household.
+
+generalizable_population: * A complex sample survey designed to generalize to the residents of various countries.
+
+publication_period: * Many releases for different countries annually, since 1984.
+
+administrative_organization: * Administered by the [ICF International](http://www.icfi.com/) and funded by the [US Agency for International Development](http://www.usaid.gov/).
+
+
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+library(survey)
+
+chapter_tag_df <- 
+	readRDS( 
+		file.path( path.expand( "~" ) , "CHAPTER_TAG" , 
+		"Malawi/Standard DHS 2004/MWIR4EFL.rds" )
+	)
+
+# convert the weight column to a numeric type
+chapter_tag_df$weight <- as.numeric( chapter_tag_df$v005 )
+
+# paste the `sdist` and `v025` columns together
+# into a single strata variable
+chapter_tag_df$strata <- do.call( paste , chapter_tag_df[ , c( 'sdist' , 'v025' ) ] )
+# as shown at
+# http://userforum.dhsprogram.com/index.php?t=rview&goto=2154#msg_2154
+
+chapter_tag_design <- 
+	svydesign( 
+		~ v021 , 
+		strata = ~strata , 
+		data = chapter_tag_df , 
+		weights = ~weight
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		total_children_ever_born = v201 ,
+		
+		surviving_children = v201 - v206 - v207 ,
+		
+		urban_rural = factor( v025 , labels = c( 'urban' , 'rural' ) ) ,
+		
+		ethnicity =
+			factor( v131 , levels = c( 1:8 , 96 ) , labels =
+				c( "Chewa" , "Tumbuka" , "Lomwe" , "Tonga" , 
+				"Yao" , "Sena" , "Nkonde" , "Ngoni" , "Other" ) ) ,
+				
+		no_formal_education = as.numeric( v149 == 0 )
+		
+	)
+~~~
+
+group_by_variable: urban_rural
+
+categorical_variable: ethnicity
+categorical_narm: , na.rm = TRUE
+
+linear_variable: surviving_children
+
+ratio_estimation_numerator: surviving_children
+ratio_estimation_denominator: total_children_ever_born
+
+subset_definition: v447a %in% 40:49
+subset_definition_description: 40-49 year old females only
+
+binary_variable: no_formal_education
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
+
+
+
+
+needs_actions_build_status_line: yes
+
+
+
+
+
+~~~{download_and_import_block}
+this_sample_break <- Sys.getenv( "this_sample_break" )
+
+stop( "replace this with a simpler download example" )
+
+chapter_tag_cat <-
+	get_catalog( "chapter_tag" ,
+		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
+		your_email = my_email_address , 
+		your_password = my_password ,
+		your_project = my_project )
+
+
+# skip flat ascii, sas, and spss files
+chapter_tag_cat <- subset( chapter_tag_cat , !grepl( "fl\\.zip|sd\\.zip|sv\\.zip" , full_url , ignore.case = TRUE ) )
+
+# skip some large files
+chapter_tag_cat <- subset( chapter_tag_cat , !grepl( "ia[a-z]r7[0-9]|ia[a-z]r52|egir01|egkr01" , full_url , ignore.case = TRUE ) )
+
+chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat , 
+		your_email = my_email_address , 
+		your_password = my_password ,
+		your_project = my_project )
+~~~

@@ -1,54 +1,105 @@
 chapter_title: European Social Survey
-authorship_line: *Contributed by Dr. Daniel Oberski <<daniel.oberski@gmail.com>>*
 
-
-lodown_password_parameters: , \\\\n\\\\tyour_email = "email@address.com"
-get_catalog_password_parameters: , \\\\n\\\\t\\\\tyour_email = "email@address.com"
-
+needs_local_build_status_line: yes
 
 ~~~{dataset_introduction}
-The European Social Survey measures political opinion and behavior across the continent.
+The barometer of political opinion and behavior across the continent.
 ~~~
 
 table_structure: * One table per country with one row per sampled respondent.
 
-generalizable_population: * A complex sample survey designed to generalize to residents aged 15 and older in participating nations.
+generalizable_population: * A complex sample designed to generalize to residents aged 15 and older in participating nations.
 
 publication_period: * Released biennially since 2002.
 
 administrative_organization: * Headquartered at [City, University of London](http://www.city.ac.uk/) and governed by [a scientific team across Europe](http://www.europeansocialsurvey.org/about/structure_and_governance.html).
 
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Findings from the European Social Survey](https://www.europeansocialsurvey.org/findings/)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/European_Social_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# pent up belief gauge
+# open border monarchists
+# survey for your thoughts
+```
+~~~
 
 
-needs_catalog_block: yes
-catalog_subset_description: # 2014 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2014 )
+~~~{download_and_import_block}
 
-~~~{analysis_examples_survey_design}
-library(survey)
+1. Register at the ESS Data Portal at https://ess-search.nsd.no/.
 
-chapter_tag_be_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014/ESS7BE.rds" ) )
+2. Choose `ESS round 8 - 2016. Welfare attitudes, Attitudes to climate change`.
 
-chapter_tag_sddf_df <- 
-	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2014/ESS7SDDFe01_1.rds" ) )
+3. Download the integrated file and also the sample design (SDDF) files as `SAV` (SPSS) files:
+
+```{r eval = FALSE , results = "hide" }
+library(foreign)
+
+chapter_tag_int_df <- 
+	read.spss( 
+		file.path( 
+			path.expand( "~" ) , 
+			"ESS8e02_2.sav" 
+		) ,
+		to.data.frame = TRUE ,
+		use.value.labels = FALSE
+	)
+
+chapter_tag_sddf_df <-
+	read.spss(
+		file.path(
+			path.expand( "~" ) ,
+			"ESS8SDDFe01_1.sav"
+		) ,
+		to.data.frame = TRUE ,
+		use.value.labels = FALSE
+	)
+	
 
 chapter_tag_df <-
 	merge( 
-		chapter_tag_be_df , 
+		chapter_tag_int_df , 
 		chapter_tag_sddf_df , 
 		by = c( 'cntry' , 'idno' ) 
 	)
 
-stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_be_df ) )
+stopifnot( nrow( chapter_tag_df ) == nrow( chapter_tag_int_df ) )
+```
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+chapter_tag_df[ , 'anweight' ] <-
+	chapter_tag_df[ , 'pspwght' ] *
+	chapter_tag_df[ , 'pweight' ] *
+	10000
 
 chapter_tag_design <- 
 	svydesign(
 		ids = ~psu ,
-		strata = ~stratify ,
-		probs = ~prob ,
-		data = chapter_tag_df
+		strata = ~stratum ,
+		weights = ~anweight ,
+		data = chapter_tag_df ,
+		nest = TRUE
 	)
+```
+
 ~~~
 
 ~~~{variable_recoding_block}
@@ -58,97 +109,65 @@ chapter_tag_design <-
 		
 		one = 1 ,
 		
-		non_european_immigrants =
-			factor( impcntr ,
-				labels = c( 'Allow many to come and live here' , 
-				'Allow some' , 'Allow a few' , 'Allow none' )
-			) ,
+		gndr = factor( gndr , labels = c( 'male' , 'female' ) ) ,
 		
-		sex = factor( icgndra , labels = c( 'male' , 'female' ) ) ,
+		netusoft =
+			factor(
+				netusoft ,
+				levels = 1:5 ,
+				labels = c( 'Never' , 'Only occasionally' ,
+					'A few times a week' , 'Most days' , 'Every day' )
+			) ,
 			
-		more_than_one_hour_tv_daily = as.numeric( tvtot >= 3 )
+		belonging_to_particular_religion = as.numeric( rlgblg == 1 )
 	)
 ~~~
 
-group_by_variable: non_european_immigrants
+group_by_variable: cntry
 
-categorical_variable: sex
+categorical_variable: gndr
 categorical_narm: , na.rm = TRUE
 
 linear_variable: ppltrst
+linear_narm: , na.rm = TRUE
 linear_variable_description: Please tell me on a score of 0 to 10, where 0 means you can't be too careful and 10 means that most people can be trusted.
 
 ratio_estimation_numerator: ppltrst
 ratio_estimation_denominator: pplfair
-
+ratio_narm: , na.rm = TRUE
 
 subset_definition: vote == 1
 subset_definition_description: voters
 
-binary_variable: more_than_one_hour_tv_daily
+binary_variable: belonging_to_particular_religion
 binary_narm: , na.rm = TRUE
+
 
 needs_srvyr_block: yes
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
+This example matches statistics and confidence intervals within 0.1% from the [Guide to Using Weights and Sample Design Indicators with ESS Data](https://stessrelpubprodwe.blob.core.windows.net/data/round10/survey/ESS_weighting_data_1_1.pdf#page=13):
 
 ```{r eval = FALSE , results = "hide" }
+published_proportions <- c( 0.166 , 0.055 , 0.085 , 0.115 , 0.578 )
 
+published_lb <- c( 0.146 , 0.045 , 0.072 , 0.099 , 0.550 )
+
+published_ub <- c( 0.188 , 0.068 , 0.100 , 0.134 , 0.605 )
+
+austrians <- subset( chapter_tag_design , cntry == 'AT' )
+
+( results <- svymean( ~ netusoft , austrians , na.rm = TRUE ) )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_proportions ) )
+
+( ci_results <- confint( results ) )
+
+stopifnot( all( abs( ci_results[ , 1 ] - published_lb ) < 0.0015 ) )
+
+stopifnot( all( abs( ci_results[ , 2 ] - published_ub ) < 0.0015 ) )
 ```
-
 ~~~
 
-
-
-
-
-
-dependencies: library(memisc)
-
-
-
-~~~{machine_specific_replacements_block}
-machine_specific_replacements <- 
-	list( 
-		
-		# replace the folder path on macnix
-		c( 'path.expand( \"~\" ) , \"CHAPTER_TAG\"' , 'getwd()' ) ,
-		
-		# change other things in the script to be run
-		c( "hello" , "howdy" ) ,
-		
-		c( '"email@address.com"' , 'my_email_address' )
-		
-	)
-~~~
-
-~~~{environment_variables_block}
-my_email_address <- Sys.getenv( "my_email_address" )
-~~~
-
-
-needs_travis_build_status_line: yes
-
-sample_setup_breaks: 3
-
-broken_sample_test_condition: any( chapter_tag_cat$year == 2014 )
-
-~~~{sample_setup_block}
-this_sample_break <- Sys.getenv( "this_sample_break" )
-
-library(lodown)
-
-chapter_tag_cat <-
-	get_catalog( "chapter_tag" ,
-		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
-		your_email = "email@address.com" )
-
-chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
-
-chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat , 
-	your_email = "email@address.com" )
-~~~

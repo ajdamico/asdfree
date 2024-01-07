@@ -1,35 +1,142 @@
 chapter_title: National Survey of Children's Health
-authorship_line: *Contributed by Emily Wiegand <<erowewiegand@gmail.com>>*
+
+needs_actions_build_status_line: yes
+
 
 ~~~{dataset_introduction}
-The National Survey of Children's Health (NSCH) offers state-level estimates of children's health care and the family environment.
+Estimates of children's health care and family environments to inform reports like [Healthy People 2030](https://www.healthypeople.gov/).
 ~~~
 
-table_structure: * One row per sampled child under eighteen.
+table_structure: * One screener table with one row per eligible child (1+ rows per household), one topical table with the sampled child (only one row per household) from three stacked age-specific questionnaires.
 
-generalizable_population: * A complex sample survey designed to generalize to non-institutionalized children in the United States at the state-level.
+generalizable_population: * A complex sample survey designed to generalize to non-institutionalized U.S. children under 18.
 
-publication_period: * Released every four or five years since 2003.
+publication_period: * Released every four or five years since 2003, annually since 2016.
 
-administrative_organization: * Sponsored by the [Maternal and Child Health Bureau of the Health Resources and Services Administration](http://www.mchb.hrsa.gov/).
+administrative_organization: * Sponsored by the [Maternal and Child Health Bureau, Health Resources and Services Administration](http://www.mchb.hrsa.gov/).
 
-needs_catalog_block: yes
-catalog_subset_description: # 2012 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2012 )
+
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [2021 National Survey of Children's Health Methodology Report](https://www2.census.gov/programs-surveys/nsch/technical-documentation/methodology/2021-NSCH-Methodology-Report.pdf)
+
+2. [2021 National Survey of Children's Health Data Users Frequently Asked Questions (FAQs)](https://www2.census.gov/programs-surveys/nsch/technical-documentation/methodology/2021-NSCH-FAQs.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# "age but a number"
+# lied babe from crib.  "your nose grows"
+# cried gramps changing bib
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Define a function to download, unzip, and import each comma-separated value file:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+nsch_stata_import <-
+	function( this_url ){
+		
+		this_tf <- tempfile()
+		
+		download.file( this_url , this_tf , mode = 'wb' )
+		
+		unzipped_files <- unzip( this_tf , exdir = tempdir() )
+		
+		this_stata <- grep( '\\\\.dta$' , unzipped_files , value = TRUE )
+		
+		this_tbl <- read_stata( this_stata )
+		
+		this_df <- data.frame( this_tbl )
+		
+		file.remove( c( this_tf , unzipped_files ) )
+		
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+```
+
+Download and import the sample adult interview and imputed income files:
+
+```{r eval = FALSE , results = "hide" }
+nsch_screener_url <-
+	"https://www2.census.gov/programs-surveys/nsch/datasets/2021/nsch_2021_screener_Stata.zip"
+
+nsch_topical_url <-
+	"https://www2.census.gov/programs-surveys/nsch/datasets/2021/nsch_2021_topical_Stata.zip" 
+
+
+chapter_tag_screener_df <- nsch_stata_import( nsch_screener_url )
+
+chapter_tag_df <- nsch_stata_import( nsch_topical_url )
+```
+~~~
 
 ~~~{analysis_examples_survey_design}
+
+Remove the fpl columns from the main data.frame:
+```{r eval = FALSE , results = "hide" }
+fpl_columns <- grep( '^fpl_i[0-9]' , names( chapter_tag_df ) , value = TRUE )
+
+fpl_wide_df <- chapter_tag_df[ c( 'hhid' , fpl_columns ) ]
+
+chapter_tag_df[ fpl_columns ] <- NULL
+```
+
+Reshape the fpl columns from wide to long:
+```{r eval = FALSE , results = "hide" }
+fpl_long_df <- 
+	reshape( 
+		fpl_wide_df , 
+		varying = list( fpl_columns ) , 
+		direction = 'long' , 
+		timevar = 'implicate' , 
+		idvar = 'hhid' 
+	)
+	
+names( fpl_long_df )[ ncol( fpl_long_df ) ] <- 'fpl'
+```
+
+
+Merge the fpl table with multiple records per child onto the main table:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_long_df <- merge( chapter_tag_df , fpl_long_df )
+
+stopifnot( nrow( chapter_tag_long_df ) == nrow( fpl_long_df ) )
+
+stopifnot( nrow( chapter_tag_long_df ) / length( fpl_columns ) == nrow( chapter_tag_df ) )
+```
+
+Reshape the imputed income data.frame into a list based on the implicate number:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_list <- split( chapter_tag_long_df , chapter_tag_long_df[ , 'implicate' ] )
+```
+
+Define the design:
+```{r eval = FALSE , results = "hide" }
 library(survey)
 library(mitools)
-
-chapter_tag_imp <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2012 main.rds" ) )
 
 chapter_tag_design <- 
 	svydesign( 
 		id = ~ 1 , 
-		strata = ~ state + sample , 
-		weights = ~ nschwt , 
-		data = imputationList( chapter_tag_imp )
+		strata = ~ fipsst + stratum , 
+		weights = ~ fwc , 
+		data = imputationList( chapter_tag_list ) ,
+		nest = TRUE
 	)
+```
 ~~~
 
 ~~~{variable_recoding_block}
@@ -37,50 +144,98 @@ chapter_tag_design <-
 	update(
 		chapter_tag_design ,
 		
-		indicator_1_3 = ifelse( k6q40 > 1 , NA , k6q40 ) ,
+		one = 1 ,
+		
+		state_name =
+			factor(
+				fipsst ,
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L) ,
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming")
+			) ,
 
-		indicator_5_2 =
-			ifelse( k7q05r %in% 1:5 , 1 ,
-			ifelse( k7q05r %in% 0 , 0 , NA ) ) ,
-			
-		indicator_5_3 =
-			ifelse( k7q30 == 1 | k7q31 == 1 | k7q32 == 1 , 1 ,
-			ifelse( k7q30 == 0 | k7q31 == 0 | k7q32 == 0 , 0 , NA ) ) ,
-			
-		povcat = 
+		
+		overall_health =
 			factor( 
-				findInterval( povlevel_i , c( 1 , 2 , 6 , 8 ) ) ,
+				c( 1 , 1 , 2 , 3 , 3 )[ k2q01 ] , 
+				levels = 1:3 , 
+				labels = c( 'excellent or very good' , 'good' , 'fair or poor' ) 
+			) ,
+					
+		poverty_categories = 
+			factor( 
+				1 + findInterval( fpl , c( 100 , 200 , 400 ) ) ,
 				labels = 
 					c( "below poverty" , "100-199% fpl" , "200-399% fpl" , "400%+ fpl" )
 			) ,
 		
-		sex = factor( ifelse( sex %in% 1:2 , sex , NA ) , labels = c( "male" , "female" ) )
+		under_six_ever_breastfed =
+			as.numeric( k6q40 == 1 ) ,
+
+		sc_sex =
+			factor( ifelse( sc_sex %in% 1:2 , sc_sex , NA ) , labels = c( "male" , "female" ) )
 		
 	)
 ~~~
 
-group_by_variable: state
-linear_variable: ageyr_child
-categorical_variable: povcat
-ratio_estimation_numerator: k6q63
-ratio_estimation_denominator: totkids4
+group_by_variable: state_name
+linear_variable: sc_age_years
+categorical_variable: poverty_categories
+ratio_estimation_numerator: liveusa_yr
+ratio_estimation_denominator: sc_age_years
 ratio_narm , na.rm = TRUE
 subset_definition: agepos4 == 1
 subset_definition_description: only children
-binary_variable: indicator_5_2
+binary_variable: under_six_ever_breastfed
+
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
+**As noted in the bold red footnote of their published table, this technique is not correct and should not be used.  The [technical documents](https://www2.census.gov/programs-surveys/nsch/technical-documentation/methodology/NSCH-Analysis-with-Imputed-Data-Guide.pdf) recommend a method matching the `MIcombine` syntax shown above.**  Nonetheless, this code matches statistics and confidence intervals within 0.1% from the `Excellent or very good` column of [Indicator 1.1: In general, how would you describe this child's health?](https://www.childhealthdata.org/browse/survey/results?q=9238&r=1&g=1043):
+
+
 ```{r eval = FALSE , results = "hide" }
+results <-
+	svyby( 
+		~ as.numeric( overall_health == 'excellent or very good' ) ,
+		~ poverty_categories , 
+		chapter_tag_design$designs[[1]] , 
+		svymean , 
+		na.rm = TRUE 
+	)
 
+published_proportions <- c( 0.833 , 0.859 , 0.907 , 0.955 )
 
+published_lb <- c( 0.810 , 0.838 , 0.894 , 0.949 )
+
+published_ub <- c( 0.854 , 0.878 , 0.919 , 0.961 )
+
+stopifnot( all( round( coef( results ) , 3 ) == published_proportions ) )
+
+( ci_results <- confint( results ) )
+
+stopifnot( all( abs( ci_results[ , 1 ] - published_lb ) < 0.0015 ) )
+
+stopifnot( all( abs( ci_results[ , 2 ] - published_ub ) < 0.0015 ) )
 ```
 ~~~
 
 
-
-
-needs_travis_build_status_line: yes

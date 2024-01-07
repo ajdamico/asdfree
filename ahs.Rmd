@@ -1,0 +1,323 @@
+# American Housing Survey (AHS) {-}
+
+<a href="https://github.com/asdfree/ahs/actions"><img src="https://github.com/asdfree/ahs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The nationwide assessment of housing stock, with information on physical condition and neighborhood, costs of financing and maintenance, owner and renter characteristics, and changes over time.
+
+* Nationally-representative and metropolitan flat files with one row per household, plus relational files.
+
+* A complex sample survey of occupied and vacant housing units designed to generalize to all structures in the United States, both nationally and also for about [thirty-five metropolitan areas](https://www.census.gov/content/dam/Census/programs-surveys/ahs/tech-documentation/AHS%20Metropolitan%20Area%20Oversample%20Histories%202015%20and%20Beyond.pdf).
+
+* Released more or less biennially since 1973, with longitudinal samples redrawn in 1985 and 2015.
+
+* Sponsored by [the Department of Housing and Urban Development](https://www.hud.gov/), run by the [Census Bureau](https://www.census.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [Getting Started with the Public Use File: 2015 and Beyond](https://www.census.gov/content/dam/Census/programs-surveys/ahs/tech-documentation/2015/Getting%20Started%20with%20the%20AHS%20PUF%202015%20and%20Beyond.pdf)
+
+2. [Wikipedia Entry](https://en.wikipedia.org/wiki/American_Housing_Survey)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20American Housing Survey)
+```{r}
+# real estate supply
+# half bath addition, raised roof
+# vent, rent too damn high
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the national 2021 flat file:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+library(httr)
+
+tf <- tempfile()
+
+this_url <-
+	paste0(
+		"https://www2.census.gov/programs-surveys/ahs/" ,
+		"2021/AHS%202021%20National%20PUF%20v1.0%20Flat%20SAS.zip"
+	)
+
+GET( this_url , write_disk( tf ) , progress() )
+
+ahs_tbl <- read_sas( tf )
+
+ahs_df <- data.frame( ahs_tbl )
+
+names( ahs_df ) <- tolower( names( ahs_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# ahs_fn <- file.path( path.expand( "~" ) , "AHS" , "this_file.rds" )
+# saveRDS( ahs_df , file = ahs_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# ahs_df <- readRDS( ahs_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+ahs_design <- 
+	svrepdesign(
+		weights = ~ weight ,
+		repweights = "repweight[1-9]" ,
+		type = "Fay" ,
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		mse = TRUE ,
+		data = ahs_df
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+ahs_design <- 
+	update( 
+		ahs_design , 
+
+		one = 1 ,
+
+		tenure = 
+			factor( 
+				ifelse( tenure %in% c( -6 , 'N' ) , 4 , tenure ) , 
+				levels = 1:4 , 
+				labels = 
+					c( 'Owned or being bought' ,
+					'Rented for cash rent' ,
+					'Occupied without payment of cash rent' ,
+					'Not occupied' )
+			) ,
+			
+		lotsize =
+			factor( 
+				lotsize , 
+				levels = 1:7 ,
+				labels = c( "Less then 1/8 acre" , 
+				"1/8 up to 1/4 acre" , "1/4 up to 1/2 acre" ,
+				"1/2 up to 1 acre" , "1 up to 5 acres" , 
+				"5 up to 10 acres" , "10 acres or more" ) ) ,
+				
+		below_poverty = as.numeric( perpovlvl < 100 )
+				
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( ahs_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ tenure , ahs_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , ahs_design )
+
+svyby( ~ one , ~ tenure , ahs_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ totrooms , ahs_design , na.rm = TRUE )
+
+svyby( ~ totrooms , ~ tenure , ahs_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ lotsize , ahs_design , na.rm = TRUE )
+
+svyby( ~ lotsize , ~ tenure , ahs_design , svymean , na.rm = TRUE )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ totrooms , ahs_design , na.rm = TRUE )
+
+svyby( ~ totrooms , ~ tenure , ahs_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ lotsize , ahs_design , na.rm = TRUE )
+
+svyby( ~ lotsize , ~ tenure , ahs_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ totrooms , ahs_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ totrooms , 
+	~ tenure , 
+	ahs_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ totrooms , 
+	denominator = ~ rent , 
+	ahs_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to homes with a garage or carport:
+```{r eval = FALSE , results = "hide" }
+sub_ahs_design <- subset( ahs_design , garage == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ totrooms , sub_ahs_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ totrooms , ahs_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ totrooms , 
+		~ tenure , 
+		ahs_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( ahs_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ totrooms , ahs_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ totrooms , ahs_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ totrooms , ahs_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ below_poverty , ahs_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( totrooms ~ below_poverty , ahs_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ below_poverty + lotsize , 
+	ahs_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		totrooms ~ below_poverty + lotsize , 
+		ahs_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the estimate and margin of error of the `Total` row of the `General Housing` tab from the [AHS 2021 Table Specifications and PUF Estimates for User Verification](https://www2.census.gov/programs-surveys/ahs/2021/2021%20AHS%20Table%20Specifications%20and%20PUF%20Estimates%20for%20User%20Verification.xlsx):
+
+```{r eval = FALSE , results = "hide" }
+result <- svytotal( ~ as.numeric( intstatus == 1 ) , ahs_design )
+
+stopifnot( round( coef( result ) / 1000 , 0 ) == 128504 )
+
+ci_results <- confint( result , level = 0.9 )
+
+stopifnot( round( ( ci_results[ 2 ] - coef( result ) ) / 1000 , 0 ) == 388 )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for AHS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+ahs_srvyr_design <- as_survey( ahs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+ahs_srvyr_design %>%
+	summarize( mean = survey_mean( totrooms , na.rm = TRUE ) )
+
+ahs_srvyr_design %>%
+	group_by( tenure ) %>%
+	summarize( mean = survey_mean( totrooms , na.rm = TRUE ) )
+```
+
+

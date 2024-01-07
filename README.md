@@ -1,125 +1,43 @@
 # You can find the book at http://asdfree.com/
-acs: [![Build Status](https://travis-ci.org/asdfree/acs.svg?branch=master)](https://travis-ci.org/asdfree/acs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/acs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/acs)
-
-addhealth: [![Build Status](https://travis-ci.org/asdfree/addhealth.svg?branch=master)](https://travis-ci.org/asdfree/addhealth) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/addhealth?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/addhealth)
-
-ahrf: [![Build Status](https://travis-ci.org/asdfree/ahrf.svg?branch=master)](https://travis-ci.org/asdfree/ahrf) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ahrf?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ahrf)
-
-ahs: [![Build Status](https://travis-ci.org/asdfree/ahs.svg?branch=master)](https://travis-ci.org/asdfree/ahs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ahs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ahs)
-
-anes: [![Build Status](https://travis-ci.org/asdfree/anes.svg?branch=master)](https://travis-ci.org/asdfree/anes) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/anes?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/anes)
-
-atus: [![Build Status](https://travis-ci.org/asdfree/atus.svg?branch=master)](https://travis-ci.org/asdfree/atus) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/atus?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/atus)
-
-brfss: [![Build Status](https://travis-ci.org/asdfree/brfss.svg?branch=master)](https://travis-ci.org/asdfree/brfss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/brfss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/brfss)
-
-bsapuf: [![Build Status](https://travis-ci.org/asdfree/bsapuf.svg?branch=master)](https://travis-ci.org/asdfree/bsapuf) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/bsapuf?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/bsapuf)
-
-censo: [![Build Status](https://travis-ci.org/asdfree/censo.svg?branch=master)](https://travis-ci.org/asdfree/censo) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/censo?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/censo)
-
-ces: [![Build Status](https://travis-ci.org/asdfree/ces.svg?branch=master)](https://travis-ci.org/asdfree/ces) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ces?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ces)
-
-chis: [![Build Status](https://travis-ci.org/asdfree/chis.svg?branch=master)](https://travis-ci.org/asdfree/chis) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/chis?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/chis)
-
-confidentiality: [![Build Status](https://travis-ci.org/asdfree/confidentiality.svg?branch=master)](https://travis-ci.org/asdfree/confidentiality) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/confidentiality?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/confidentiality)
-
-cpsasec: [![Build Status](https://travis-ci.org/asdfree/cpsasec.svg?branch=master)](https://travis-ci.org/asdfree/cpsasec) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/cpsasec?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/cpsasec)
-
-cpsbasic: [![Build Status](https://travis-ci.org/asdfree/cpsbasic.svg?branch=master)](https://travis-ci.org/asdfree/cpsbasic) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/cpsbasic?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/cpsbasic)
-
-dhs: [![Build Status](https://travis-ci.org/asdfree/dhs.svg?branch=master)](https://travis-ci.org/asdfree/dhs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/dhs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/dhs)
-
-enade: [![Build Status](https://travis-ci.org/asdfree/enade.svg?branch=master)](https://travis-ci.org/asdfree/enade) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/enade?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/enade)
-
-enem: [![Build Status](https://travis-ci.org/asdfree/enem.svg?branch=master)](https://travis-ci.org/asdfree/enem) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/enem?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/enem)
-
-ess: [![Build Status](https://travis-ci.org/asdfree/ess.svg?branch=master)](https://travis-ci.org/asdfree/ess) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ess?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ess)
-
-faers: [![Build Status](https://travis-ci.org/asdfree/faers.svg?branch=master)](https://travis-ci.org/asdfree/faers) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/faers?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/faers)
-
-gss: [![Build Status](https://travis-ci.org/asdfree/gss.svg?branch=master)](https://travis-ci.org/asdfree/gss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/gss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/gss)
-
-hmda: [![Build Status](https://travis-ci.org/asdfree/hmda.svg?branch=master)](https://travis-ci.org/asdfree/hmda) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/hmda?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/hmda)
-
-hrs: [![Build Status](https://travis-ci.org/asdfree/hrs.svg?branch=master)](https://travis-ci.org/asdfree/hrs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/hrs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/hrs)
-
-lavaanex: [![Build Status](https://travis-ci.org/asdfree/lavaanex.svg?branch=master)](https://travis-ci.org/asdfree/lavaanex) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/lavaanex?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/lavaanex)
-
-meps: [![Build Status](https://travis-ci.org/asdfree/meps.svg?branch=master)](https://travis-ci.org/asdfree/meps) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/meps?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/meps)
-
-mlces: [![Build Status](https://travis-ci.org/asdfree/mlces.svg?branch=master)](https://travis-ci.org/asdfree/mlces) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/mlces?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/mlces)
-
-nbs: [![Build Status](https://travis-ci.org/asdfree/nbs.svg?branch=master)](https://travis-ci.org/asdfree/nbs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nbs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nbs)
-
-ncvs: [![Build Status](https://travis-ci.org/asdfree/ncvs.svg?branch=master)](https://travis-ci.org/asdfree/ncvs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ncvs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ncvs)
-
-nhanes: [![Build Status](https://travis-ci.org/asdfree/nhanes.svg?branch=master)](https://travis-ci.org/asdfree/nhanes) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nhanes?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nhanes)
-
-nhis: [![Build Status](https://travis-ci.org/asdfree/nhis.svg?branch=master)](https://travis-ci.org/asdfree/nhis) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nhis?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nhis)
-
-nhts: [![Build Status](https://travis-ci.org/asdfree/nhts.svg?branch=master)](https://travis-ci.org/asdfree/nhts) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nhts?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nhts)
-
-nis: [![Build Status](https://travis-ci.org/asdfree/nis.svg?branch=master)](https://travis-ci.org/asdfree/nis) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nis?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nis)
-
-nls: [![Build Status](https://travis-ci.org/asdfree/nls.svg?branch=master)](https://travis-ci.org/asdfree/nls) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nls?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nls)
-
-nppes: [![Build Status](https://travis-ci.org/asdfree/nppes.svg?branch=master)](https://travis-ci.org/asdfree/nppes) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nppes?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nppes)
-
-nps: [![Build Status](https://travis-ci.org/asdfree/nps.svg?branch=master)](https://travis-ci.org/asdfree/nps) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nps?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nps)
-
-nsch: [![Build Status](https://travis-ci.org/asdfree/nsch.svg?branch=master)](https://travis-ci.org/asdfree/nsch) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nsch?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nsch)
-
-nsduh: [![Build Status](https://travis-ci.org/asdfree/nsduh.svg?branch=master)](https://travis-ci.org/asdfree/nsduh) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nsduh?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nsduh)
-
-nsfg: [![Build Status](https://travis-ci.org/asdfree/nsfg.svg?branch=master)](https://travis-ci.org/asdfree/nsfg) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nsfg?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nsfg)
-
-nvss: [![Build Status](https://travis-ci.org/asdfree/nvss.svg?branch=master)](https://travis-ci.org/asdfree/nvss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nvss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nvss)
-
-nychvs: [![Build Status](https://travis-ci.org/asdfree/nychvs.svg?branch=master)](https://travis-ci.org/asdfree/nychvs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/nychvs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/nychvs)
-
-pew: [![Build Status](https://travis-ci.org/asdfree/pew.svg?branch=master)](https://travis-ci.org/asdfree/pew) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pew?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pew)
-
-piaac: [![Build Status](https://travis-ci.org/asdfree/piaac.svg?branch=master)](https://travis-ci.org/asdfree/piaac) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/piaac?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/piaac)
-
-pirls: [![Build Status](https://travis-ci.org/asdfree/pirls.svg?branch=master)](https://travis-ci.org/asdfree/pirls) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pirls?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pirls)
-
-pisa: [![Build Status](https://travis-ci.org/asdfree/pisa.svg?branch=master)](https://travis-ci.org/asdfree/pisa) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pisa?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pisa)
-
-pls: [![Build Status](https://travis-ci.org/asdfree/pls.svg?branch=master)](https://travis-ci.org/asdfree/pls) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pls?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pls)
-
-pme: [![Build Status](https://travis-ci.org/asdfree/pme.svg?branch=master)](https://travis-ci.org/asdfree/pme) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pme?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pme)
-
-pnad: [![Build Status](https://travis-ci.org/asdfree/pnad.svg?branch=master)](https://travis-ci.org/asdfree/pnad) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pnad?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pnad)
-
-pnadc: [![Build Status](https://travis-ci.org/asdfree/pnadc.svg?branch=master)](https://travis-ci.org/asdfree/pnadc) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pnadc?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pnadc)
-
-pns: [![Build Status](https://travis-ci.org/asdfree/pns.svg?branch=master)](https://travis-ci.org/asdfree/pns) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pns?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pns)
-
-pof: [![Build Status](https://travis-ci.org/asdfree/pof.svg?branch=master)](https://travis-ci.org/asdfree/pof) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/pof?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/pof)
-
-psid: [![Build Status](https://travis-ci.org/asdfree/psid.svg?branch=master)](https://travis-ci.org/asdfree/psid) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/psid?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/psid)
-
-saeb: [![Build Status](https://travis-ci.org/asdfree/saeb.svg?branch=master)](https://travis-ci.org/asdfree/saeb) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/saeb?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/saeb)
-
-sbo: [![Build Status](https://travis-ci.org/asdfree/sbo.svg?branch=master)](https://travis-ci.org/asdfree/sbo) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/sbo?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/sbo)
-
-scf: [![Build Status](https://travis-ci.org/asdfree/scf.svg?branch=master)](https://travis-ci.org/asdfree/scf) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/scf?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/scf)
-
-seer: [![Build Status](https://travis-ci.org/asdfree/seer.svg?branch=master)](https://travis-ci.org/asdfree/seer) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/seer?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/seer)
-
-share: [![Build Status](https://travis-ci.org/asdfree/share.svg?branch=master)](https://travis-ci.org/asdfree/share) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/share?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/share)
-
-sipp: [![Build Status](https://travis-ci.org/asdfree/sipp.svg?branch=master)](https://travis-ci.org/asdfree/sipp) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/sipp?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/sipp)
-
-ssa: [![Build Status](https://travis-ci.org/asdfree/ssa.svg?branch=master)](https://travis-ci.org/asdfree/ssa) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/ssa?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/ssa)
-
-timss: [![Build Status](https://travis-ci.org/asdfree/timss.svg?branch=master)](https://travis-ci.org/asdfree/timss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/timss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/timss)
-
-trendy: [![Build Status](https://travis-ci.org/asdfree/trendy.svg?branch=master)](https://travis-ci.org/asdfree/trendy) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/trendy?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/trendy)
-
-uspums: [![Build Status](https://travis-ci.org/asdfree/uspums.svg?branch=master)](https://travis-ci.org/asdfree/uspums) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/uspums?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/uspums)
-
-wvs: [![Build Status](https://travis-ci.org/asdfree/wvs.svg?branch=master)](https://travis-ci.org/asdfree/wvs) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/wvs?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/wvs)
-
-yrbss: [![Build Status](https://travis-ci.org/asdfree/yrbss.svg?branch=master)](https://travis-ci.org/asdfree/yrbss) [![Build status](https://ci.appveyor.com/api/projects/status/github/asdfree/yrbss?svg=TRUE)](https://ci.appveyor.com/project/ajdamico/yrbss)
-
+american-community-survey-acs: <p><a href="https://github.com/asdfree/acs/actions"><img src="https://github.com/asdfree/acs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+american-housing-survey-ahs: <p><a href="https://github.com/asdfree/ahs/actions"><img src="https://github.com/asdfree/ahs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+american-national-election-studies-anes: <p><img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-2023 09 14-brightgreen' alt='Local Testing Badge'></p>
+american-time-use-survey-atus: <p><a href="https://github.com/asdfree/atus/actions"><img src="https://github.com/asdfree/atus/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+area-health-resources-files-ahrf: <p><a href="https://github.com/asdfree/ahrf/actions"><img src="https://github.com/asdfree/ahrf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+behavioral-risk-factor-surveillance-system-brfss: <p><a href="https://github.com/asdfree/brfss/actions"><img src="https://github.com/asdfree/brfss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+census-of-governments-cog: <p><a href="https://github.com/asdfree/cog/actions"><img src="https://github.com/asdfree/cog/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+consumer-expenditure-survey-ces: <p><a href="https://github.com/asdfree/ces/actions"><img src="https://github.com/asdfree/ces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+current-population-survey-cps: <p><a href="https://github.com/asdfree/cps/actions"><img src="https://github.com/asdfree/cps/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+european-social-survey-ess: <p><img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-2023 09 14-brightgreen' alt='Local Testing Badge'></p>
+exame-nacional-de-desempenho-de-estudantes-enade: <p><a href="https://github.com/asdfree/enade/actions"><img src="https://github.com/asdfree/enade/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+exame-nacional-do-ensino-medio-enem: <p><a href="https://github.com/asdfree/enem/actions"><img src="https://github.com/asdfree/enem/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+fda-adverse-event-reporting-system-faers: <p><a href="https://github.com/asdfree/faers/actions"><img src="https://github.com/asdfree/faers/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+general-social-survey-gss: <p><a href="https://github.com/asdfree/gss/actions"><img src="https://github.com/asdfree/gss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+medical-expenditure-panel-survey-meps: <p><a href="https://github.com/asdfree/meps/actions"><img src="https://github.com/asdfree/meps/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+medical-large-claims-experience-study-mlces: <p><a href="https://github.com/asdfree/mlces/actions"><img src="https://github.com/asdfree/mlces/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+medicare-current-beneficiary-survey-mcbs: <p><a href="https://github.com/asdfree/mcbs/actions"><img src="https://github.com/asdfree/mcbs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-beneficiary-survey-nbs: <p><a href="https://github.com/asdfree/nbs/actions"><img src="https://github.com/asdfree/nbs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-financial-capability-study-nfcs: <p><a href="https://github.com/asdfree/nfcs/actions"><img src="https://github.com/asdfree/nfcs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-health-and-nutrition-examination-survey-nhanes: <p><a href="https://github.com/asdfree/nhanes/actions"><img src="https://github.com/asdfree/nhanes/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-health-interview-survey-nhis: <p><a href="https://github.com/asdfree/nhis/actions"><img src="https://github.com/asdfree/nhis/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-household-travel-survey-nhts: <p><a href="https://github.com/asdfree/nhts/actions"><img src="https://github.com/asdfree/nhts/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-immunization-survey-nis: <p><a href="https://github.com/asdfree/nis/actions"><img src="https://github.com/asdfree/nis/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-plan-and-provider-enumeration-system-nppes: <p><a href="https://github.com/asdfree/nppes/actions"><img src="https://github.com/asdfree/nppes/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-survey-of-childrens-health-nsch: <p><a href="https://github.com/asdfree/nsch/actions"><img src="https://github.com/asdfree/nsch/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-survey-of-family-growth-nsfg: <p><a href="https://github.com/asdfree/nsfg/actions"><img src="https://github.com/asdfree/nsfg/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+national-survey-on-drug-use-and-health-nsduh: <p><a href="https://github.com/asdfree/nsduh/actions"><img src="https://github.com/asdfree/nsduh/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+new-york-city-housing-and-vacancy-survey-nychvs: <p><a href="https://github.com/asdfree/nychvs/actions"><img src="https://github.com/asdfree/nychvs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+pesquisa-de-orcamentos-familiares-pof: <p><a href="https://github.com/asdfree/pof/actions"><img src="https://github.com/asdfree/pof/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+pesquisa-nacional-de-saude-pns: <p><a href="https://github.com/asdfree/pns/actions"><img src="https://github.com/asdfree/pns/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+pesquisa-nacional-por-amostra-de-domicilios-pnad: <p><a href="https://github.com/asdfree/pnad/actions"><img src="https://github.com/asdfree/pnad/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+programme-for-the-international-assessment-of-adult-competencies-piaac: <p><a href="https://github.com/asdfree/piaac/actions"><img src="https://github.com/asdfree/piaac/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+progress-in-international-reading-literacy-study-pirls: <p><a href="https://github.com/asdfree/pirls/actions"><img src="https://github.com/asdfree/pirls/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+public-libraries-survey-pls: <p><a href="https://github.com/asdfree/pls/actions"><img src="https://github.com/asdfree/pls/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+residential-energy-consumption-survey-recs: <p><a href="https://github.com/asdfree/recs/actions"><img src="https://github.com/asdfree/recs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+social-security-public-use-data-files-ssa: <p><a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+survey-of-business-owners-sbo: <p><a href="https://github.com/asdfree/sbo/actions"><img src="https://github.com/asdfree/sbo/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+survey-of-consumer-finances-scf: <p><a href="https://github.com/asdfree/scf/actions"><img src="https://github.com/asdfree/scf/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+survey-of-income-and-program-participation-sipp: <p><a href="https://github.com/asdfree/sipp/actions"><img src="https://github.com/asdfree/sipp/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+trend-analysis-of-complex-survey-data: <p><a href="https://github.com/asdfree/aaatrends/actions"><img src="https://github.com/asdfree/aaatrends/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+trends-in-international-mathematics-and-science-study-timss: <p><a href="https://github.com/asdfree/timss/actions"><img src="https://github.com/asdfree/timss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+youth-risk-behavior-surveillance-system-yrbss: <p><a href="https://github.com/asdfree/yrbss/actions"><img src="https://github.com/asdfree/yrbss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>

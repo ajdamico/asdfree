@@ -1,0 +1,183 @@
+chapter_title: Panel Study of Income Dynamics
+
+
+# sampling legacy
+# daddy's exclusive cohort
+# inherited wealth
+
+
+
+~~~{dataset_introduction}
+The Panel Study of Income Dynamics is the longest running longitudinal household survey in the world.
+~~~
+
+
+password_parameters: , \\\\n\\\\tyour_email = "email@address.com" , \\\\n\\\\tyour_password = "password"
+
+
+table_structure: * One cross-year individual with one record per respondent in participating household, many family data tables with one record per family per timepoint.
+
+generalizable_population: * A complex sample survey designed to generalize to residents of the United States.
+
+publication_period: * Released either annually or biennially since 1968.
+
+administrative_organization: * Administered by the [University of Michigan's Institute for Social Research](https://www.isr.umich.edu/home/) and funded by [consortium](https://psidonline.isr.umich.edu/Guide/Sponsorship.aspx).
+
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+# identify the cross-year individual filename
+cross_year_individual_rds <- 
+	grep( 
+		"cross-year individual" ,
+		list.files( 
+			file.path( path.expand( "~" ) , "CHAPTER_TAG" ) , 
+			recursive = TRUE , 
+			full.names = TRUE 
+		) ,
+		value = TRUE
+	)
+
+individual_df <- readRDS( cross_year_individual_rds )
+
+ind_variables_to_keep <-
+	c( 
+		'one' ,			# column with all ones
+		'er30001' , 	# 1968 interview number
+		'er30002' , 	# 1968 person number
+		'er31997' ,		# primary sampling unit variable
+		'er31996' ,		# stratification variable
+		'er33801' ,     # interview number, 2005
+		'er34301' ,     # interview number, 2015
+		'er32000' ,		# sex
+		'er34305' ,		# age in 2015
+		'er33813' ,		# employment status in 2005
+		'er34317' ,		# employment status in 2015
+		'er33848' ,		# 2005 longitudinal weight
+		'er34413'		# 2015 longitudinal weight
+	)
+
+	
+
+individual_df <- individual_df[ ind_variables_to_keep ] ; gc()
+
+family_2005_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "family files/2005.rds" ) )
+
+fam_2005_variables_to_keep <- 
+	c( 
+		'er25002' ,	# 2005 interview number
+		'er28037' 	# 2005 total family income
+		
+	)
+
+family_2005_df <- family_2005_df[ fam_2005_variables_to_keep ] ; gc()
+
+family_2015_df <- 
+	readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "family files/2015.rds" ) )
+
+fam_2015_variables_to_keep <-
+	c( 
+		'er60002' ,	# 2015 interview number
+		'er65349' 	# 2015 total family income
+	)
+
+
+family_2015_df <- family_2015_df[ fam_2015_variables_to_keep ] ; gc()
+
+ind_fam_2005 <- 
+	merge( 
+		individual_df , 
+		family_2005_df , 
+		by.x = 'er33801' , 
+		by.y = 'er25002' 
+	)
+
+ind_fam_2015 <- 
+	merge( 
+		individual_df , 
+		family_2015_df , 
+		by.x = 'er34301' , 
+		by.y = 'er60002' 
+	)
+
+chapter_tag_df <- merge( ind_fam_2005 , ind_fam_2015 , all = TRUE )
+
+chapter_tag_design <- 
+	svydesign( 
+		~ er31997 , 
+		strata = ~ er31996 , 
+		data = chapter_tag_df , 
+		weights = ~ er33848 , 
+		nest = TRUE 
+	)
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		employment_2005 =
+			factor( er33813 , levels = 1:8 ,
+				labels = c( 'working now' , 'only temporarily laid off' ,
+				'looking for work, unemployed' , 'retired' , 'permanently disabled' ,
+				'housewife; keeping house' , 'student' , 'other' )
+			) ,
+			
+		employed_in_2015 = 
+			factor( er34317 , levels = 1:8 ,
+				labels = c( 'working now' , 'only temporarily laid off' ,
+				'looking for work, unemployed' , 'retired' , 'permanently disabled' ,
+				'housewife; keeping house' , 'student' , 'other' )
+			) ,
+			
+		female = as.numeric( er32000 == 2 )
+
+	)
+~~~
+
+group_by_variable: employment_2005
+
+categorical_variable: employed_in_2015
+categorical_narm: , na.rm = TRUE
+
+linear_variable: er28037
+linear_variable_description: total family income in 2005
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: er28037
+ratio_estimation_denominator: er65349
+ratio_narm: , na.rm = TRUE
+
+subset_definition: er34305 >= 65
+subset_definition_description: senior in 2015
+
+binary_variable: female
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+```{r eval = FALSE , results = "hide" }
+
+```
+
+~~~
+
+
+
+
+
+
+needs_actions_build_status_line: yes
+
+

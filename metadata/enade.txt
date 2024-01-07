@@ -1,7 +1,9 @@
 chapter_title: Exame Nacional de Desempenho de Estudantes
 
+needs_actions_build_status_line: yes -windows -linux
+
 ~~~{dataset_introduction}
-The Exame Nacional de Desempenho de Estudantes (ENADE) evaluates the performance of undergraduate students in relation to the program content, skills and competences acquired in their training. The exam is mandatory and the student's regularity in the exam must be included in his or her school record.
+The nationwide mandatory examination of college graduates.
 ~~~
 
 table_structure: * One table with one row per individual undergraduate student in Brazil.
@@ -10,12 +12,82 @@ publication_period: * Released annually since 2004.
 
 generalizable_population: * An enumeration of undergraduate students in Brazil.
 
-administrative_organization: * Compiled by the Brazilian [Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)](http://www.inep.gov.br/).
+administrative_organization: * Compiled by the [Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)](http://www.inep.gov.br/).
 
+~~~{reading_block}
+Please skim before you begin:
 
-~~~{analysis_examples_loading_block}
-chapter_tag_df <- readRDS( file.path( path.expand( "~" ) , "CHAPTER_TAG" , "2016 main.rds" ) )
+1. [Cálculo da nota final do Exame Nacional de Desempenho dos Estudiantes](https://download.inep.gov.br/educacao_superior/enade/notas_tecnicas/2017/Nota_Tecnica_CGCQES_n12_2017_Calculo_da_nota_final_do_Enade.pdf)
+
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Exame_Nacional_de_Desempenho_de_Estudantes)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# undergraduates
+# sit for standardized testing
+# exit interview
+```
 ~~~
+
+
+
+~~~{download_and_import_block}
+
+Download, import, and merge two of the 2021 files:
+
+```{r eval = FALSE , results = "hide" }
+library(httr)
+library(archive)
+
+tf <- tempfile()
+
+this_url <-	"https://download.inep.gov.br/microdados/microdados_enade_2021.zip"
+
+GET( this_url , write_disk( tf ) , progress() )
+
+archive_extract( tf , dir = tempdir() )
+
+
+read_enade_archive <-
+	function( this_regular_expression , this_directory ){
+		this_filename <- 
+			grep( 
+				this_regular_expression , 
+				list.files( 
+					this_directory ,
+					recursive = TRUE ,
+					full.names = TRUE 
+				) , 
+				value = TRUE 
+			)
+
+		this_df <-
+			read.table(
+				this_filename ,
+				header = TRUE ,
+				sep = ";" ,
+				na.strings = ""
+			)
+			
+		names( this_df ) <- tolower( names( this_df ) )
+		
+		this_df
+	}
+
+arq1_df <- read_enade_archive( 'arq1\\\\.txt$' , tempdir() )
+
+arq1_df <- unique( arq1_df[ c( 'co_curso' , 'co_uf_curso' , 'co_categad' , 'co_grupo' ) ] )
+
+arq3_df <- read_enade_archive( 'arq3\\\\.txt$' , tempdir() )
+
+chapter_tag_df <- merge( arq3_df , arq1_df )
+
+stopifnot( nrow( chapter_tag_df ) == nrow( arq3_df ) )
+
+```
+~~~
+
 
 ~~~{variable_recoding_block}
 chapter_tag_df <- 
@@ -23,8 +95,16 @@ chapter_tag_df <-
 		chapter_tag_df , 
 		
 		# qual foi o tempo gasto por voce para concluir a prova?
-		less_than_two_hours = as.numeric( qp_i9 %in% c( 'A' , 'B' ) ) ,
+		less_than_two_hours = as.numeric( co_rs_i9 %in% c( 'A' , 'B' ) ) ,
 		
+		administrative_category =
+			factor(
+				co_categad ,
+				levels = c( 1:5 , 7 ) ,
+				labels = c( '1. Pública Federal' , '2. Pública Estadual' , 
+				'3. Pública Municipal' , '4. Privada com fins lucrativos' , 
+				'5. Privada sem fins lucrativos' , '7. Especial' )
+			) ,
 
 		state_name = 
 			factor( 
@@ -45,21 +125,41 @@ chapter_tag_df <-
 	
 ~~~
 
-group_by_variable: tp_sexo
+group_by_variable: administrative_category
 linear_variable: nt_obj_fg
 linear_narm: , na.rm = TRUE
 categorical_variable: state_name
-subset_definition: qp_i1 %in% c( "A" , "B" )
-subset_definition_description: Students reporting that the general training section of the test was easy or very easy
+subset_definition: co_rs_i1 %in% c( "A" , "B" )
+subset_definition_description: students reporting that the general training section was easy or very easy
 binary_variable: less_than_two_hours
+
+
+
 needs_dplyr_block: yes
+needs_datatable_block: yes
+needs_duckdb_block: yes
 
 
-needs_travis_build_status_line: yes
+~~~{replication_example_block}
+## Replication Example {-}
 
-sample_setup_breaks: 2
+This example matches the tecnologia em gestão da tecnologia da informação test scores on PDF page 48 of [the 2021 final results document](https://download.inep.gov.br/enade/resultados/2021/apresentacao_resultados_finais.pdf#page=48):
 
-broken_sample_test_condition: any( chapter_tag_cat$year == 2016 )
+```{r eval = FALSE , results = "hide" }
 
-needs_7za_install: yes
+it_students <- subset( chapter_tag_df , co_grupo %in% 6409 )
+
+results <- sapply( it_students[ c( 'nt_fg' , 'nt_ce' , 'nt_ger' ) ] , mean , na.rm = TRUE )
+
+stopifnot( round( results[ 'nt_fg' ] , 1 ) == 30.4 )
+stopifnot( round( results[ 'nt_ce' ] , 1 ) == 38.2 )
+stopifnot( round( results[ 'nt_ger' ] , 1 ) == 36.3 )
+
+```
+~~~
+
+
+
+
+
 

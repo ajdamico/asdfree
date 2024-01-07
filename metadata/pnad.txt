@@ -1,81 +1,261 @@
 chapter_title: Pesquisa Nacional por Amostra de Domicilios
-authorship_line: *Contributed by Dr. Djalma Pessoa <<pessoad@gmail.com>>*
+
+needs_actions_build_status_line: yes -windows -linux
 
 ~~~{dataset_introduction}
-Brazil's previous principal household survey, the Pesquisa Nacional por Amostra de Domicilios (PNAD) measures general education, labor, income, and housing characteristics of the population.
+Brazil's principal labor force survey, measuring education, employment, income, housing characteristics.
 ~~~
 
-table_structure: * One table with one row per sampled household and a second table with one row per individual within each sampled household.
+table_structure: * One consolidated table with one row per individual within each sampled household.
 
-generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional population of Brazil, although the rural north was not included prior to 2004.
+generalizable_population: * A complex sample survey designed to generalize to the civilian non-institutional population of Brazil.
 
-publication_period: * Released annually since 2001 except for years ending in zero, when the decennial census takes its place.
+publication_period: * Released quarterly since 2012, with microdata available both quarterly and annually.
 
 administrative_organization: * Administered by the [Instituto Brasileiro de Geografia e Estatistica](http://www.ibge.gov.br/).
 
 
-needs_catalog_block: yes
-catalog_subset_description: # 2011 only
-catalog_subset: chapter_tag_cat <- subset( chapter_tag_cat , year == 2011 )
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Conceitos e métodos](https://www.ibge.gov.br/estatisticas/sociais/trabalho/17270-pnad-continua.html?=&t=conceitos-e-metodos)
+
+2. [Wikipedia Entry](https://pt.wikipedia.org/wiki/Pesquisa_Nacional_por_Amostra_de_Domic%C3%ADlios)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# mineiro data
+# love verdade gave to me
+# twelve karaoke..
+```
+~~~
+
+
+
+
+~~~{download_and_import_block}
+
+Download and import the dictionary file:
+
+```{r eval = FALSE , results = "hide" }
+dictionary_tf <- tempfile()
+
+dictionary_url <-
+	paste0(
+		"https://ftp.ibge.gov.br/Trabalho_e_Rendimento/" ,
+		"Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/" ,
+		"Trimestral/Microdados/Documentacao/Dicionario_e_input_20221031.zip"
+	)
+
+download.file( dictionary_url , dictionary_tf , mode = 'wb' )
+
+dictionary_files <- unzip( dictionary_tf , exdir = tempdir() )
+
+sas_fn <- grep( '\\\\.sas$' , dictionary_files , value = TRUE )
+
+sas_lines <- readLines( sas_fn , encoding = 'latin1' )
+```
+
+Determine fixed-width file positions from the SAS import script:
+
+```{r eval = FALSE , results = "hide" }
+sas_start <- grep( '@0001' , sas_lines )
+
+sas_end <- grep( ';' , sas_lines )
+
+sas_end <- sas_end[ sas_end > sas_start ][ 1 ]
+
+sas_lines <- sas_lines[ seq( sas_start , sas_end - 1 ) ]
+
+# remove SAS comments
+sas_lines <- gsub( "\\\\/\\\\*(.*)" , "" , sas_lines )
+
+# remove multiple spaces and spaces at the end of each string
+sas_lines <- gsub( "( +)" , " " , sas_lines )
+sas_lines <- gsub( " $" , "" , sas_lines )
+
+sas_df <- 
+	read.table( 
+		textConnection( sas_lines ) , 
+		sep = ' ' , 
+		col.names = c( 'position' , 'column_name' , 'length' ) ,
+		header = FALSE 
+	)
+
+sas_df[ , 'character' ] <- grepl( '\\\\$' , sas_df[ , 'length' ] )
+
+sas_df[ , 'position' ] <- as.integer( gsub( "\\\\@" , "" , sas_df[ , 'position' ] ) )
+
+sas_df[ , 'length' ] <- as.integer( gsub( "\\\\$" , "" , sas_df[ , 'length' ] ) )
+
+stopifnot( 
+	sum( sas_df[ , 'length' ] ) == 
+	( sas_df[ nrow( sas_df ) , 'position' ] + sas_df[ nrow( sas_df ) , 'length' ] - 1 ) 
+)
+
+```
+
+Download the latest quarterly file:
+
+```{r eval = FALSE , results = "hide" }
+this_tf <- tempfile()
+
+this_url <-
+	paste0(
+		"https://ftp.ibge.gov.br/Trabalho_e_Rendimento/" ,
+		"Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/" ,
+		"Trimestral/Microdados/2023/PNADC_012023.zip"
+	)
+
+download.file( this_url , this_tf , mode = 'wb' )
+```
+
+Import the latest quarterly file:
+
+```{r eval = FALSE , results = "hide" }
+library(readr)
+
+chapter_tag_tbl <-
+	read_fwf(
+		this_tf ,
+		fwf_widths( 
+			widths = sas_df[ , 'length' ] , 
+			col_names = sas_df[ , 'column_name' ] 
+		) ,
+		col_types = 
+			paste0( ifelse( sas_df[ , 'character' ] , "c" , "d" ) , collapse = '' )
+	)
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+
+
+
+~~~
+
+
+
+
 
 
 ~~~{analysis_examples_survey_design}
-options( survey.lonely.psu = "adjust" )
-
+```{r eval = FALSE , results = "hide" }
 library(survey)
 
-chapter_tag_df <- readRDS( chapter_tag_cat[ 1 , 'output_filename' ] )
 
-pop_types <- 
-	data.frame( 
-		v4609 = unique( chapter_tag_df$v4609 ) , 
-		Freq = unique( chapter_tag_df$v4609 )
-	)
-
-prestratified_design <-
-	svydesign(
-		id = ~ v4618 ,
-		strata = ~ v4617 ,
+chapter_tag_design <-
+	svrepdesign(
 		data = chapter_tag_df ,
-		weights = ~ pre_wgt ,
-		nest = TRUE
+		weight = ~ v1028 ,
+		type = 'bootstrap' ,
+		repweights = 'v1028[0-9]+' ,
+		mse = TRUE ,
 	)
-	
-rm( chapter_tag_df ) ; gc()
 
-chapter_tag_design <- 
-	postStratify( 
-		design = prestratified_design ,
-		strata = ~ v4609 ,
-		population = pop_types
-	)
-	
-rm( prestratified_design ) ; gc()
+```
 ~~~
 
 
 ~~~{variable_recoding_block}
+chapter_tag_design <-
+	update(
+	
+		chapter_tag_design ,
+		
+		pia = as.numeric( v2009 >= 14 )
+	
+	)
+
+chapter_tag_design <-
+	update(
+	
+		chapter_tag_design ,
+		
+		ocup_c = ifelse( pia == 1 , as.numeric( vd4002 %in% 1 ) , NA ) ,
+
+		desocup30 = ifelse( pia == 1 , as.numeric( vd4002 %in% 2 ) , NA )
+	)
+
 chapter_tag_design <- 
+
 	update( 
+
 		chapter_tag_design , 
-		age_categories = factor( 1 + findInterval( v8005 , seq( 5 , 60 , 5 ) ) ) ,
-		male = as.numeric( v0302 == 2 ) ,
-		teenagers = as.numeric( v8005 > 12 & v8005 < 20 ) ,
-		started_working_before_thirteen = as.numeric( v9892 < 13 )
+
+		uf_name =
+		
+			factor(
+			
+				as.numeric( uf ) ,
+				
+				levels = 
+					c(11L, 12L, 13L, 14L, 15L, 16L, 17L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 31L, 32L, 33L, 35L, 41L, 42L, 43L, 50L, 51L, 
+					52L, 53L) ,
+					
+				labels =
+					c("Rondonia", "Acre", "Amazonas", "Roraima", "Para", "Amapa", 
+					"Tocantins", "Maranhao", "Piaui", "Ceara", "Rio Grande do Norte", 
+					"Paraiba", "Pernambuco", "Alagoas", "Sergipe", "Bahia", "Minas Gerais", 
+					"Espirito Santo", "Rio de Janeiro", "Sao Paulo", "Parana", "Santa Catarina", 
+					"Rio Grande do Sul", "Mato Grosso do Sul", "Mato Grosso", "Goias", 
+					"Distrito Federal")
+					
+			) ,
+
+		age_categories = factor( 1 + findInterval( v2009 , seq( 5 , 60 , 5 ) ) ) ,
+
+		male = as.numeric( v2007 == 1 ) ,
+
+		region = substr( uf , 1 , 1 ) ,
+
+		# calculate usual income from main job
+		# (rendimento habitual do trabalho principal)
+		vd4016n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4016 , NA ) ,
+
+		# calculate effective income from main job
+		# (rendimento efetivo do trabalho principal) 
+		vd4017n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4017 , NA ) ,
+
+		# calculate usual income from all jobs
+		# (variavel rendimento habitual de todos os trabalhos)
+		vd4019n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4019 , NA ) ,
+
+		# calculate effective income from all jobs
+		# (rendimento efetivo do todos os trabalhos) 
+		vd4020n = ifelse( pia %in% 1 & vd4015 %in% 1 , vd4020 , NA ) ,
+
+		# determine the potential labor force
+		pea_c = as.numeric( ocup_c == 1 | desocup30 == 1 )
+		
 	)
 ~~~
 
 
-group_by_variable: region
-linear_variable: v4720
+group_by_variable: uf_name
+linear_variable: vd4020n
 linear_narm: , na.rm = TRUE
 categorical_variable: age_categories
-ratio_estimation_numerator: started_working_before_thirteen
-ratio_estimation_denominator: teenagers
+ratio_estimation_numerator: ocup_c
+ratio_estimation_denominator: pea_c
 ratio_narm: , na.rm = TRUE
-subset_definition: v4011 == 1
-subset_definition_description: married persons
+subset_definition: ocup_c == 1
+subset_definition_description: employed persons
 binary_variable: male
+
+
+
+
+
+
+needs_srvyr_block: yes
+
+
 
 ~~~{convey_block}
 ## Poverty and Inequality Estimation with `convey` \\ {-}
@@ -86,50 +266,44 @@ The R `convey` library estimates measures of income concentration, poverty, ineq
 library(convey)
 chapter_tag_design <- convey_prep( chapter_tag_design )
 
-sub_chapter_tag_design <- 
-	subset( 
-		chapter_tag_design , 
-		!is.na( v4720 ) & v4720 != 0 & v8005 >= 15
-	)
-
-svygini( ~ v4720 , sub_chapter_tag_design , na.rm = TRUE )
+svygini( ~ vd4020n , chapter_tag_design , na.rm = TRUE )
 ```
 ~~~
 
 
 ~~~{replication_example_block}
----
-
 ## Replication Example {-}
 
+This example matches statistics and coefficients of variation from [Tabela 4092 - Pessoas de 14 anos ou mais de idade, por condição em relação à força de trabalho e condição de ocupação](https://sidra.ibge.gov.br/tabela/4092):
+
 ```{r eval = FALSE , results = "hide" }
-svytotal( ~one , chapter_tag_design )
-svytotal( ~factor( v0302 ) , chapter_tag_design )
-cv( svytotal( ~factor( v0302 ) , chapter_tag_design ) )
+nationwide_adult_population <- svytotal( ~ pia , chapter_tag_design , na.rm = TRUE )
+	
+stopifnot( round( coef( nationwide_adult_population ) / 1000000 , 3 ) == 174.228 )
+stopifnot( round( cv( nationwide_adult_population ) / 1000000 , 3 ) == 0 )
+	
+nationwide_labor_force <- svytotal( ~ pea_c , chapter_tag_design , na.rm = TRUE )
+
+stopifnot( round( coef( nationwide_labor_force ) / 1000000 , 3 ) == 107.257 )
+stopifnot( round( cv( nationwide_labor_force ) * 100 , 1 ) == 0.2 )
+	
+nationwide_employed <- svytotal( ~ ocup_c , chapter_tag_design , na.rm = TRUE )
+
+stopifnot( round( coef( nationwide_employed ) / 1000000 , 3 ) == 97.825 )
+stopifnot( round( cv( nationwide_employed ) * 100 , 1 ) == 0.2 )
+	
+nationwide_unemployed <- svytotal( ~ desocup30 , chapter_tag_design , na.rm = TRUE )
+
+stopifnot( round( coef( nationwide_unemployed ) / 1000000 , 3 ) == 9.432 )
+stopifnot( round( cv( nationwide_unemployed ) * 100 , 1 ) == 1.2 )
+	
+nationwide_not_in_labor_force <-
+	svytotal( ~ as.numeric( pia & !pea_c ) , chapter_tag_design , na.rm = TRUE )
+
+stopifnot( round( coef( nationwide_not_in_labor_force ) / 1000000 , 3 ) == 66.972 )
+stopifnot( round( cv( nationwide_not_in_labor_force ) * 100 , 1 ) == 0.3 )
+	
+
 ```
 
-~~~
-
-
-needs_travis_build_status_line: yes
-
-sample_setup_breaks: 15
-
-broken_sample_test_condition: any( chapter_tag_cat$year == 2011 )
-
-~~~{sample_setup_block}
-this_sample_break <- Sys.getenv( "this_sample_break" )
-
-library(lodown)
-
-chapter_tag_cat <-
-	get_catalog( "chapter_tag" ,
-		output_dir = file.path( path.expand( "~" ) , "CHAPTER_TAG" ) )
-
-# skip 2008 because it doesn't fit
-chapter_tag_cat <- subset( chapter_tag_cat , year != 2008 )
-
-chapter_tag_cat <- chapter_tag_cat[ split( seq( nrow( chapter_tag_cat ) ) , 1 + sort( seq( nrow( chapter_tag_cat ) ) %% sample_setup_breaks ) )[[ this_sample_break ]] , ]
-
-chapter_tag_cat <- lodown( "chapter_tag" , chapter_tag_cat )
 ~~~
