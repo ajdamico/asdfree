@@ -1013,27 +1013,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="download-import-preparation-5" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="american-time-use-survey-atus.html#download-import-preparation-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Define a function to download, unzip, and import each comma-separated value dat file:</p>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="american-time-use-survey-atus.html#cb131-1" tabindex="-1"></a><span class="fu">library</span>(RCurl)</span>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="american-time-use-survey-atus.html#cb131-1" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
 <span id="cb131-2"><a href="american-time-use-survey-atus.html#cb131-2" tabindex="-1"></a></span>
 <span id="cb131-3"><a href="american-time-use-survey-atus.html#cb131-3" tabindex="-1"></a>atus_csv_import <span class="ot">&lt;-</span></span>
 <span id="cb131-4"><a href="american-time-use-survey-atus.html#cb131-4" tabindex="-1"></a>    <span class="cf">function</span>( this_url ){</span>
 <span id="cb131-5"><a href="american-time-use-survey-atus.html#cb131-5" tabindex="-1"></a>        </span>
 <span id="cb131-6"><a href="american-time-use-survey-atus.html#cb131-6" tabindex="-1"></a>        this_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb131-7"><a href="american-time-use-survey-atus.html#cb131-7" tabindex="-1"></a>        </span>
-<span id="cb131-8"><a href="american-time-use-survey-atus.html#cb131-8" tabindex="-1"></a>        <span class="fu">writeBin</span>( <span class="fu">getBinaryURL</span>( this_url ) , this_tf )</span>
-<span id="cb131-9"><a href="american-time-use-survey-atus.html#cb131-9" tabindex="-1"></a></span>
-<span id="cb131-10"><a href="american-time-use-survey-atus.html#cb131-10" tabindex="-1"></a>        unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb131-11"><a href="american-time-use-survey-atus.html#cb131-11" tabindex="-1"></a>        </span>
-<span id="cb131-12"><a href="american-time-use-survey-atus.html#cb131-12" tabindex="-1"></a>        this_dat <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.dat$&#39;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb131-8"><a href="american-time-use-survey-atus.html#cb131-8" tabindex="-1"></a>        this_dl <span class="ot">&lt;-</span> <span class="fu">GET</span>( this_url , <span class="fu">user_agent</span>( <span class="st">&quot;email@address.com&quot;</span>) )</span>
+<span id="cb131-9"><a href="american-time-use-survey-atus.html#cb131-9" tabindex="-1"></a>        </span>
+<span id="cb131-10"><a href="american-time-use-survey-atus.html#cb131-10" tabindex="-1"></a>        <span class="fu">writeBin</span>( <span class="fu">content</span>( this_dl ) , this_tf )</span>
+<span id="cb131-11"><a href="american-time-use-survey-atus.html#cb131-11" tabindex="-1"></a></span>
+<span id="cb131-12"><a href="american-time-use-survey-atus.html#cb131-12" tabindex="-1"></a>        unzipped_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( this_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb131-13"><a href="american-time-use-survey-atus.html#cb131-13" tabindex="-1"></a>        </span>
-<span id="cb131-14"><a href="american-time-use-survey-atus.html#cb131-14" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( this_dat )</span>
+<span id="cb131-14"><a href="american-time-use-survey-atus.html#cb131-14" tabindex="-1"></a>        this_dat <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.dat$&#39;</span> , unzipped_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb131-15"><a href="american-time-use-survey-atus.html#cb131-15" tabindex="-1"></a>        </span>
-<span id="cb131-16"><a href="american-time-use-survey-atus.html#cb131-16" tabindex="-1"></a>        <span class="fu">file.remove</span>( <span class="fu">c</span>( this_tf , unzipped_files ) )</span>
+<span id="cb131-16"><a href="american-time-use-survey-atus.html#cb131-16" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>( this_dat )</span>
 <span id="cb131-17"><a href="american-time-use-survey-atus.html#cb131-17" tabindex="-1"></a>        </span>
-<span id="cb131-18"><a href="american-time-use-survey-atus.html#cb131-18" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
+<span id="cb131-18"><a href="american-time-use-survey-atus.html#cb131-18" tabindex="-1"></a>        <span class="fu">file.remove</span>( <span class="fu">c</span>( this_tf , unzipped_files ) )</span>
 <span id="cb131-19"><a href="american-time-use-survey-atus.html#cb131-19" tabindex="-1"></a>        </span>
-<span id="cb131-20"><a href="american-time-use-survey-atus.html#cb131-20" tabindex="-1"></a>        this_df</span>
-<span id="cb131-21"><a href="american-time-use-survey-atus.html#cb131-21" tabindex="-1"></a>    }</span></code></pre></div>
+<span id="cb131-20"><a href="american-time-use-survey-atus.html#cb131-20" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
+<span id="cb131-21"><a href="american-time-use-survey-atus.html#cb131-21" tabindex="-1"></a>        </span>
+<span id="cb131-22"><a href="american-time-use-survey-atus.html#cb131-22" tabindex="-1"></a>        this_df</span>
+<span id="cb131-23"><a href="american-time-use-survey-atus.html#cb131-23" tabindex="-1"></a>    }</span></code></pre></div>
 <p>Download and import the activity, respondent, roster, and weights tables:</p>
 <div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="american-time-use-survey-atus.html#cb132-1" tabindex="-1"></a>act_df <span class="ot">&lt;-</span> <span class="fu">atus_csv_import</span>( <span class="st">&quot;https://www.bls.gov/tus/datafiles/atusact-2021.zip&quot;</span> )</span>
 <span id="cb132-2"><a href="american-time-use-survey-atus.html#cb132-2" tabindex="-1"></a></span>

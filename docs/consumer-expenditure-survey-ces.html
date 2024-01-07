@@ -1013,25 +1013,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="download-import-preparation-7" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="consumer-expenditure-survey-ces.html#download-import-preparation-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download both the prior and current year of interview microdata:</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="consumer-expenditure-survey-ces.html#cb199-1" tabindex="-1"></a><span class="fu">library</span>(RCurl)</span>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="consumer-expenditure-survey-ces.html#cb199-1" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
 <span id="cb199-2"><a href="consumer-expenditure-survey-ces.html#cb199-2" tabindex="-1"></a></span>
 <span id="cb199-3"><a href="consumer-expenditure-survey-ces.html#cb199-3" tabindex="-1"></a>tf_prior_year <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb199-4"><a href="consumer-expenditure-survey-ces.html#cb199-4" tabindex="-1"></a></span>
 <span id="cb199-5"><a href="consumer-expenditure-survey-ces.html#cb199-5" tabindex="-1"></a>this_url_prior_year <span class="ot">&lt;-</span> <span class="st">&quot;https://www.bls.gov/cex/pumd/data/stata/intrvw21.zip&quot;</span></span>
 <span id="cb199-6"><a href="consumer-expenditure-survey-ces.html#cb199-6" tabindex="-1"></a></span>
-<span id="cb199-7"><a href="consumer-expenditure-survey-ces.html#cb199-7" tabindex="-1"></a><span class="fu">writeBin</span>( <span class="fu">getBinaryURL</span>( this_url_prior_year ) , tf_prior_year )</span>
+<span id="cb199-7"><a href="consumer-expenditure-survey-ces.html#cb199-7" tabindex="-1"></a>dl_prior_year <span class="ot">&lt;-</span> <span class="fu">GET</span>( this_url_prior_year , <span class="fu">user_agent</span>( <span class="st">&quot;email@address.com&quot;</span> ) )</span>
 <span id="cb199-8"><a href="consumer-expenditure-survey-ces.html#cb199-8" tabindex="-1"></a></span>
-<span id="cb199-9"><a href="consumer-expenditure-survey-ces.html#cb199-9" tabindex="-1"></a>unzipped_files_prior_year <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf_prior_year , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb199-9"><a href="consumer-expenditure-survey-ces.html#cb199-9" tabindex="-1"></a><span class="fu">writeBin</span>( <span class="fu">content</span>( dl_prior_year ) , tf_prior_year )</span>
 <span id="cb199-10"><a href="consumer-expenditure-survey-ces.html#cb199-10" tabindex="-1"></a></span>
-<span id="cb199-11"><a href="consumer-expenditure-survey-ces.html#cb199-11" tabindex="-1"></a>tf_current_year <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb199-11"><a href="consumer-expenditure-survey-ces.html#cb199-11" tabindex="-1"></a>unzipped_files_prior_year <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf_prior_year , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb199-12"><a href="consumer-expenditure-survey-ces.html#cb199-12" tabindex="-1"></a></span>
-<span id="cb199-13"><a href="consumer-expenditure-survey-ces.html#cb199-13" tabindex="-1"></a>this_url_current_year <span class="ot">&lt;-</span> <span class="st">&quot;https://www.bls.gov/cex/pumd/data/stata/intrvw22.zip&quot;</span></span>
+<span id="cb199-13"><a href="consumer-expenditure-survey-ces.html#cb199-13" tabindex="-1"></a>tf_current_year <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb199-14"><a href="consumer-expenditure-survey-ces.html#cb199-14" tabindex="-1"></a></span>
-<span id="cb199-15"><a href="consumer-expenditure-survey-ces.html#cb199-15" tabindex="-1"></a><span class="fu">writeBin</span>( <span class="fu">getBinaryURL</span>( this_url_current_year ) , tf_current_year )</span>
+<span id="cb199-15"><a href="consumer-expenditure-survey-ces.html#cb199-15" tabindex="-1"></a>this_url_current_year <span class="ot">&lt;-</span> <span class="st">&quot;https://www.bls.gov/cex/pumd/data/stata/intrvw22.zip&quot;</span></span>
 <span id="cb199-16"><a href="consumer-expenditure-survey-ces.html#cb199-16" tabindex="-1"></a></span>
-<span id="cb199-17"><a href="consumer-expenditure-survey-ces.html#cb199-17" tabindex="-1"></a>unzipped_files_current_year <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf_current_year , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb199-17"><a href="consumer-expenditure-survey-ces.html#cb199-17" tabindex="-1"></a>dl_current_year <span class="ot">&lt;-</span> <span class="fu">GET</span>( this_url_current_year , <span class="fu">user_agent</span>( <span class="st">&quot;email@address.com&quot;</span> ) )</span>
 <span id="cb199-18"><a href="consumer-expenditure-survey-ces.html#cb199-18" tabindex="-1"></a></span>
-<span id="cb199-19"><a href="consumer-expenditure-survey-ces.html#cb199-19" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">c</span>( unzipped_files_current_year , unzipped_files_prior_year )</span></code></pre></div>
+<span id="cb199-19"><a href="consumer-expenditure-survey-ces.html#cb199-19" tabindex="-1"></a><span class="fu">writeBin</span>( <span class="fu">content</span>( dl_current_year ) , tf_current_year )</span>
+<span id="cb199-20"><a href="consumer-expenditure-survey-ces.html#cb199-20" tabindex="-1"></a></span>
+<span id="cb199-21"><a href="consumer-expenditure-survey-ces.html#cb199-21" tabindex="-1"></a>unzipped_files_current_year <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf_current_year , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb199-22"><a href="consumer-expenditure-survey-ces.html#cb199-22" tabindex="-1"></a></span>
+<span id="cb199-23"><a href="consumer-expenditure-survey-ces.html#cb199-23" tabindex="-1"></a>unzipped_files <span class="ot">&lt;-</span> <span class="fu">c</span>( unzipped_files_current_year , unzipped_files_prior_year )</span></code></pre></div>
 <p>Import and stack all 2022 quarterly files plus 2023’s first quarter:</p>
 <div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="consumer-expenditure-survey-ces.html#cb200-1" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
 <span id="cb200-2"><a href="consumer-expenditure-survey-ces.html#cb200-2" tabindex="-1"></a></span>
