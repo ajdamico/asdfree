@@ -1,4 +1,4 @@
-commit_memo <- "'bls GET()'"
+commit_memo <- "'convey on cran'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
