@@ -1,4 +1,4 @@
-commit_memo <- "'convey on cran'"
+commit_memo <- "'fixes https://github.com/ajdamico/asdfree/issues/403'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
