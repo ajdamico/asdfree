@@ -1,4 +1,4 @@
-commit_memo <- "'brfss 2022'"
+commit_memo <- "'acs 2022'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -287,7 +287,7 @@ for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "c
 
 
 setwd( book_folder )
-clean_site( preview = FALSE )
+# clean_site( preview = FALSE )
 render_site(output_format = 'bookdown::gitbook', encoding = 'UTF-8')
 # render_site( encoding = 'UTF-8' )
 

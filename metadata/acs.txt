@@ -33,16 +33,15 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-Download and import the Alabama household file:
+Choose either the entire **United States** with `sas_hus.zip`, or use a state's abbreviation like `sas_hal.zip` for **Alabama** or `sas_hak.zip` for **Alaska**.  This imports the **Alabama** household file:
 
-(switch `sas_hal` to `sas_hak` for Alaska or `sas_hus` for the entire country)
 ```{r eval = FALSE , results = "hide" }
 library(haven)
 
 tf_household <- tempfile()
 
 this_url_household <-
-	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_hal.zip"
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2022/1-Year/sas_hal.zip"
 
 download.file( this_url_household , tf_household , mode = 'wb' )
 
@@ -56,14 +55,15 @@ chapter_tag_df_household <- read_sas( chapter_tag_sas_household )
 names( chapter_tag_df_household ) <- tolower( names( chapter_tag_df_household ) )
 ```
 
-Download and import the Alabama person file:
 
-(switch `sas_pal` to `sas_pak` for Alaska or `sas_pus` for the entire country)
+Choose either the entire **United States** with `sas_pus.zip`, or use a state's abbreviation like `sas_pal.zip` for **Alabama** or `sas_pak.zip` for **Alaska**.  This imports the **Alabama** person file:
+
+
 ```{r eval = FALSE , results = "hide" }
 tf_person <- tempfile()
 
 this_url_person <-
-	"https://www2.census.gov/programs-surveys/acs/data/pums/2021/1-Year/sas_pal.zip"
+	"https://www2.census.gov/programs-surveys/acs/data/pums/2022/1-Year/sas_pal.zip"
 
 download.file( this_url_person , tf_person , mode = 'wb' )
 
@@ -201,12 +201,12 @@ svygini( ~ hincp , chapter_tag_design , na.rm = TRUE )
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-This example matches statistics, standard errors, and margin of errors from the [2021 PUMS tallies](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_21.csv):
+This matches statistics, standard errors, and margin of errors from Alabama's [2022 PUMS tallies](https://www2.census.gov/programs-surveys/acs/tech_docs/pums/estimates/pums_estimates_22.csv):
 
 Match the sum of the weights:
 
 ```{r eval = FALSE , results = "hide" }
-stopifnot( round( coef( svytotal( ~ one , chapter_tag_design ) ) , 0 ) == 5039877 )
+stopifnot( round( coef( svytotal( ~ one , chapter_tag_design ) ) , 0 ) == 5074296 )
 ```
 	
 	
@@ -214,16 +214,17 @@ Compute the population by age:
 
 ```{r eval = FALSE , results = "hide" }
 pums_estimate <- 
-	c(288139L, 299245L, 336727L, 334606L, 327102L, 635004L, 641405L, 
-	615709L, 335431L, 341926L, 538367L, 265742L, 80474L)
+	c(277094L, 316627L, 319132L, 336759L, 350132L, 651975L, 633907L, 
+	616899L, 317765L, 341937L, 543576L, 284790L, 83703L)
 
 pums_standard_error <- 
-	c(2727L, 5368L, 6067L, 4082L, 4485L, 5716L, 4420L, 3706L, 4836L, 
-	5100L, 2158L, 3363L, 3186L)
+	c(2624L, 5197L, 5002L, 4112L, 3626L, 5047L, 4559L, 4538L, 5849L, 
+	5731L, 2061L, 3527L, 2896L)
 
 pums_margin_of_error <- 
-	c(4486L, 8830L, 9981L, 6715L, 7378L, 9402L, 7271L, 6096L, 7956L, 
-	8389L, 3550L, 5532L, 5240L)
+	c(4317L, 8550L, 8229L, 6764L, 5964L, 8302L, 7499L, 7465L, 9622L, 
+	9427L, 3390L, 5801L, 4765L)
+
 
 results <-
 	svytotal( 
