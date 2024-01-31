@@ -3,7 +3,6 @@ commit_memo <- "'hrs'"
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
 
-
 # non-survey, not database-backed (ahrf)
 # database-backed non-survey (nppes)
 # survey, not database-backed, not multiply imputed (yrbss)
