@@ -1,0 +1,186 @@
+chapter_title: Health and Retirement Study
+
+needs_local_build_status_line: yes
+
+~~~{dataset_introduction}
+This detailed longitudinal study of the elderly in the United States allows for findings such as, "Among community residents aged 55-64 years old in 1998, what share lived in nursing homes by 2020?"
+~~~
+
+table_structure: * Many tables from different timepoints, most with one row per sampled respondent and linkable.
+
+generalizable_population: * A complex sample survey designed to generalize to Americans aged 50+ at each interview point.
+
+publication_period: * Released biennially since 1992.
+
+administrative_organization: * Administered by the [University of Michigan's Institute for Social Research](http://isr.umich.edu/) with data management by the [RAND Corporation](http://www.rand.org/) and cross-national harmonization by the [University of Southern California](https://g2aging.org/).  Funded by the [National Institute on Aging](https://www.nia.nih.gov/) and the [Social Security Administration](https://www.ssa.gov/).
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Getting Started with the Health and Retirement Study](https://hrsonline.isr.umich.edu/sitedocs/dmgt/IntroUserGuide.pdf)
+
+2. [RAND HRS Longitudinal File 2020 (V1) Documentation](https://www.rand.org/content/dam/rand/www/external/labor/aging/dataprod/randhrs1992_2020v1.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# sankey diagram
+# comes alive at fifty five
+# till death?  you respond
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+1. Register at the HRS Data Portal at https://hrsdata.isr.umich.edu/user/register.
+
+2. Choose `RAND HRS Longitudinal File 2020 Latest release: Mar 2023 (V1)`.
+
+3. Download the STATA dataset `randhrs1992_2020v1_STATA.zip` dated 04/05/2023:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+chapter_tag_fn <- file.path( path.expand( "~" ) , "randhrs1992_2020v1.dta" )
+
+chapter_tag_tbl <- read_dta( chapter_tag_fn )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+This design generalizes to residents of the United States that were living in the community in 1996 (wave 3) and also still alive (and participating in the survey) as of 2020 (wave 15):
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+chapter_tag_design <- 
+	svydesign(
+		id = ~ raehsamp ,
+		strata = ~ raestrat ,
+		weights = ~ r3wtresp , 
+		nest = TRUE ,
+		data = subset( chapter_tag_df , r3wtresp > 0 & inw15 == 1 )
+	)
+```
+
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+
+		one = 1 ,
+		
+		working_in_1996 = r3work ,
+
+		working_in_2020 = r15work ,
+
+		marital_stat_1996 =
+			factor( r3mstat , levels = 1:8 , labels =
+				c( "Married" , "Married, spouse absent" ,
+				"Partnered" , "Separated" , "Divorced" ,
+				"Separated/divorced" , "Widowed" ,
+				"Never married" ) ) ,
+				
+		marital_stat_2020 =
+			factor( r15mstat , levels = 1:8 , labels =
+				c( "Married" , "Married, spouse absent" ,
+				"Partnered" , "Separated" , "Divorced" ,
+				"Separated/divorced" , "Widowed" ,
+				"Never married" ) )
+	)
+~~~
+
+
+group_by_variable: marital_stat_1996
+
+categorical_variable: marital_stat_2020
+categorical_narm: , na.rm = TRUE
+
+linear_variable: h15ahous
+linear_variable_description: value of primary residence in 2020
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: h4ahous
+ratio_estimation_denominator: h15ahous
+ratio_narm: , na.rm = TRUE
+
+subset_definition: working_in_1996 == 1
+
+binary_variable: working_in_2020
+binary_narm: , na.rm = TRUE
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches statistics and confidence intervals to four digits from the Gateway to Global Aging's [An Introduction to HRS, RAND HRS Longitudinal File, and Harmonized HRS](https://youtu.be/D409oUPXWUU?t=3201):
+
+1. Navigate to `Contributed Projects` at https://hrsdata.isr.umich.edu/data-products/contributed-projects.
+
+2. Choose `Gateway Harmonized HRS` Latest release: Aug 2023 Version D
+
+3. Download the STATA dataset `H_HRS_d_stata.zip` dated 09/12/2023
+
+```{r eval = FALSE , results = "hide" }
+harmonized_hrs_fn <- file.path( path.expand( "~" ) , "H_HRS_d.dta" )
+
+harmonized_hrs_tbl <- read_dta( harmonized_hrs_fn )
+
+harmonized_hrs_df <- data.frame( harmonized_hrs_tbl )
+
+names( harmonized_hrs_df ) <- tolower( names( harmonized_hrs_df ) )
+```
+
+
+Merge on cluster and strata variables from the RAND HRS Longitudinal file:
+
+```{r eval = FALSE , results = "hide" }	
+harmonized_hrs_rand_df <-
+	merge(
+		harmonized_hrs_df ,
+		chapter_tag_df[ c( 'hhid' , 'pn' , 'raestrat' , 'raehsamp' ) ] ,
+		by = c( 'hhid' , 'pn' )
+	)
+
+stopifnot( nrow( harmonized_hrs_rand_df ) == nrow( chapter_tag_df ) )
+```
+
+Limit the survey design to respondents answering at least two of the five different life satisfaction questions in the 2014 (wave 12) psychosocial leave-behind survey:
+
+```{r eval = FALSE , results = "hide" }
+h12sc_df <- subset( harmonized_hrs_rand_df , r12scwtresp > 0 & inw12sc == 1 )
+
+r12sc_design <-
+	svydesign(
+		~ raehsamp ,
+		strata = ~ raestrat ,
+		data = h12sc_df ,
+		weights = ~ r12scwtresp ,
+		nest = TRUE
+	)
+```
+
+Reproduce the coefficient, standard error, and confidence intervals presented at 53:20 of the tutorial:
+
+```{r eval = FALSE , results = "hide" }
+result <- svymean( ~ r12lsatsc , r12sc_design , na.rm = TRUE )
+
+stopifnot( round( coef( result ) , 4 ) == 4.9822 )
+stopifnot( round( SE( result ) , 4 ) == 0.0226 )
+stopifnot( round( confint( result , df = degf( r12sc_design ) ) , 4 ) == c( 4.9369 , 5.0276 ) )
+```
+~~~
+
