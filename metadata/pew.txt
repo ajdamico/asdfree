@@ -20,7 +20,7 @@ Please skim before you begin:
 
 1. 
 
-2. 
+2. Country Specific Methodology, for example the [2022 Global Attitudes Survey](https://www.pewresearch.org/methods/interactives/international-methodology/global-attitudes-survey/all-country/2022/)
 
 3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
 
@@ -36,16 +36,18 @@ Please skim before you begin:
 
 1. Register for a Pew Research Center at https://www.pewresearch.org/profile/registration/.
 
-2. Choose `RAND HRS Longitudinal File 2020 Latest release: Mar 2023 (V1)`.
+2. Choose `DOWNLOAD THIS DATASET` at https://www.pewresearch.org/global/dataset/spring-2022-survey-data/.
 
-3. Download the STATA dataset `randhrs1992_2020v1_STATA.zip` dated 04/05/2023:
+3. Download the SPSS dataset `Pew-Research-Center-Global-Attitudes-Spring-2022-Survey-Data.zip` dated 04/03/2023:
 
 ```{r eval = FALSE , results = "hide" }
 library(haven)
 
-chapter_tag_fn <- file.path( path.expand( "~" ) , "randhrs1992_2020v1.dta" )
+chapter_tag_fn <- file.path( path.expand( "~" ) , "Pew Research Center Global Attitudes Spring 2022 Dataset.sav" )
 
-chapter_tag_tbl <- read_dta( chapter_tag_fn )
+chapter_tag_tbl <- read_sav( chapter_tag_fn )
+
+chapter_tag_tbl <- zap_labels( chapter_tag_tbl )
 
 chapter_tag_df <- data.frame( chapter_tag_tbl )
 
@@ -58,17 +60,54 @@ names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
 
 
 ~~~{analysis_examples_survey_design}
-This design generalizes to residents of the United States that were living in the community in 1996 (wave 3) and also still alive (and participating in the survey) as of 2020 (wave 15):
+
+Collapse the country-specific cluster and strata columns into a single cluster and a single stratum variable:
 ```{r eval = FALSE , results = "hide" }
+# add the source variable name to each column
+# for( this_variable in grep( "^psu_|^stratum_" , names( chapter_tag_df ) , value = TRUE ) ){
+	# chapter_tag_df[ !is.na( chapter_tag_df[ , this_variable ] ) , this_variable ] <-
+		# paste( this_variable , chapter_tag_df[ !is.na( chapter_tag_df[ , this_variable ] ) , this_variable ] )
+# }
+
+# create the constructed psu and strata variables from among the non-missing country-specific columns
+chapter_tag_df[ , 'psu_constructed' ] <-
+	apply(
+		chapter_tag_df[ , grep( "^psu_" , names( chapter_tag_df ) ) ] , 
+		1 ,
+		function( w ) w[ which.min( is.na( w ) ) ]
+	)
+	
+chapter_tag_df[ , 'stratum_constructed' ] <-
+	apply(
+		chapter_tag_df[ , grep( "^stratum_" , names( chapter_tag_df ) ) ] , 
+		1 ,
+		function( w ) w[ which.min( is.na( w ) ) ]
+	)
+
+# for countries without clustering and strata variables, use the country identifier
+chapter_tag_df[ is.na( chapter_tag_df[ , 'psu_constructed' ] ) , 'psu_constructed' ] <- 0
+	# chapter_tag_df[ is.na( chapter_tag_df[ , 'psu_constructed' ] ) , 'country' ]
+
+chapter_tag_df[ is.na( chapter_tag_df[ , 'stratum_constructed' ] ) , 'stratum_constructed' ] <- 0
+	# chapter_tag_df[ is.na( chapter_tag_df[ , 'stratum_constructed' ] ) , 'country' ]
+```
+
+
+
+This design generalizes to residents of the United States that were living in the community in 1996 (wave 3) and also still alive (and participating in the survey) as of 2020 (wave 15):
+
+```{r eval = FALSE , results = "hide" }
+options( survey.lonely.psu = "adjust" )
+
 library(survey)
 
 chapter_tag_design <- 
 	svydesign(
-		id = ~ raehsamp ,
-		strata = ~ raestrat ,
-		weights = ~ r3wtresp , 
-		nest = TRUE ,
-		data = subset( chapter_tag_df , r3wtresp > 0 & inw15 == 1 )
+		id = ~ psu_constructed ,
+		strata = ~ interaction( country , stratum_constructed ) ,
+		data = chapter_tag_df ,
+		weights = ~ weight , 
+		nest = TRUE
 	)
 ```
 
@@ -127,64 +166,51 @@ needs_srvyr_block: yes
 ## Replication Example {-}
 
 
-https://medium.com/pew-research-center-decoded/how-to-analyze-pew-research-center-survey-data-in-r-f326df360713
-https://www.pewresearch.org/politics/dataset/april-2017-political-survey/
+This example matches statistics and standard errors to four digits from the Pew Research Center's [How to analyze Pew Research Center survey data in R](
+https://medium.com/pew-research-center-decoded/how-to-analyze-pew-research-center-survey-data-in-r-f326df360713):
 
-This example matches statistics and confidence intervals to four digits from the Gateway to Global Aging's [An Introduction to HRS, RAND HRS Longitudinal File, and Harmonized HRS](https://youtu.be/D409oUPXWUU?t=3201):
 
-1. Navigate to `Contributed Projects` at https://hrsdata.isr.umich.edu/data-products/contributed-projects.
+1. Choose `DOWNLOAD THIS DATASET` at https://www.pewresearch.org/politics/dataset/april-2017-political-survey/.
 
-2. Choose `Gateway Harmonized HRS` Latest release: Aug 2023 Version D
-
-3. Download the STATA dataset `H_HRS_d_stata.zip` dated 09/12/2023
+2. Download the SPSS dataset `Apr17-public-4.3-update.zip` dated 12/29/2017:
 
 ```{r eval = FALSE , results = "hide" }
-harmonized_hrs_fn <- file.path( path.expand( "~" ) , "H_HRS_d.dta" )
+political_survey_2017_fn <- file.path( path.expand( "~" ) , "Apr17 public.sav" )
 
-harmonized_hrs_tbl <- read_dta( harmonized_hrs_fn )
+political_survey_2017_tbl <- read_sav( political_survey_2017_fn )
 
-harmonized_hrs_df <- data.frame( harmonized_hrs_tbl )
+political_survey_2017_df <- data.frame( political_survey_2017_tbl )
 
-names( harmonized_hrs_df ) <- tolower( names( harmonized_hrs_df ) )
+names( political_survey_2017_df ) <- tolower( names( political_survey_2017_df ) )
 ```
 
-
-Merge on cluster and strata variables from the RAND HRS Longitudinal file:
-
-```{r eval = FALSE , results = "hide" }	
-harmonized_hrs_rand_df <-
-	merge(
-		harmonized_hrs_df ,
-		chapter_tag_df[ c( 'hhid' , 'pn' , 'raestrat' , 'raehsamp' ) ] ,
-		by = c( 'hhid' , 'pn' )
-	)
-
-stopifnot( nrow( harmonized_hrs_rand_df ) == nrow( chapter_tag_df ) )
-```
-
-Limit the survey design to respondents answering at least two of the five different life satisfaction questions in the 2014 (wave 12) psychosocial leave-behind survey:
+Construct a complex sample survey design:
 
 ```{r eval = FALSE , results = "hide" }
-h12sc_df <- subset( harmonized_hrs_rand_df , r12scwtresp > 0 & inw12sc == 1 )
-
-r12sc_design <-
+political_survey_2017_design <-
 	svydesign(
-		~ raehsamp ,
-		strata = ~ raestrat ,
-		data = h12sc_df ,
-		weights = ~ r12scwtresp ,
-		nest = TRUE
+		~ 0 ,
+		data = political_survey_2017_df ,
+		weights = ~ weight
 	)
 ```
 
-Reproduce the coefficient, standard error, and confidence intervals presented at 53:20 of the tutorial:
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }	
+political_survey_2017_design <-
+	update(
+		political_survey_2017_design ,
+		q1 = factor( q1 , levels = c( 1 , 2 , 9 ) , labels = c( 'Approve' , 'Disapprove' , 'DK/RF' ) )
+	)
+```
+
+Reproduce the coefficients and standard errors shown under `Estimating frequencies with survey weights`:
 
 ```{r eval = FALSE , results = "hide" }
-result <- svymean( ~ r12lsatsc , r12sc_design , na.rm = TRUE )
+result <- svymean( ~ q1 , political_survey_2017_design , na.rm = TRUE )
 
-stopifnot( round( coef( result ) , 4 ) == 4.9822 )
-stopifnot( round( SE( result ) , 4 ) == 0.0226 )
-stopifnot( round( confint( result , df = degf( r12sc_design ) ) , 4 ) == c( 4.9369 , 5.0276 ) )
+stopifnot( round( coef( result ) , 4 ) == c( 0.3940 , 0.5424 , 0.0636 ) )
+stopifnot( round( SE( result ) , 4 ) == c( 0.0144 , 0.0147 , 0.0078 ) )
 ```
 ~~~
 
