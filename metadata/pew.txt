@@ -2,15 +2,21 @@ chapter_title: Pew Research Center
 
 needs_local_build_status_line: yes
 
+~~~{replacement_block}
+	ci = TRUE , na.rm = TRUE
+	ci = TRUE , na.rm = TRUE , na.rm.all = TRUE
+~~~
+
+
 ~~~{dataset_introduction}
-The Pew Research Center releases its survey microdata on U.S. Politics & Policy, Journalism & Media, Internet, Science & Tech, Religion & Public Life, Hispanic Trends, Global Attitudes & Trends, and Social & Demographic Trends.
+Public opinion polling on U.S. Politics & Policy, Journalism & Media, Internet, Science & Tech, Religion & Public Life, Hispanic Trends, Global Attitudes & Trends, and Social & Demographic Trends.
 ~~~
 
 table_structure: * Generally one table per survey, with one row per sampled respondent.
 
-generalizable_population: * Complex sample surveys, often designed to generalize to the U.S. noninstitutionalized adult population or the adult populations of the nations surveyed.
+generalizable_population: * Complex samples generalizing to the noninstitutionalized adults in the nation(s) surveyed.
 
-publication_period: * Varying publication dates for both [American Trends Panel](https://www.pewresearch.org/our-methods/u-s-surveys/the-american-trends-panel/) surveys of the United States and also for [International Surveys](https://www.pewresearch.org/our-methods/international-surveys/).  [National Public Opinion Reference Survey](https://www.pewresearch.org/methods/2021/05/03/how-pew-research-center-uses-its-national-public-opinion-reference-survey-npors/) released annually since 2020
+publication_period: * Varying publication dates for both [American Trends Panel](https://www.pewresearch.org/our-methods/u-s-surveys/the-american-trends-panel/) surveys of the United States and also for [International Surveys](https://www.pewresearch.org/our-methods/international-surveys/).  [National Public Opinion Reference Survey](https://www.pewresearch.org/methods/2021/05/03/how-pew-research-center-uses-its-national-public-opinion-reference-survey-npors/) released annually since 2020.
 
 administrative_organization: * Administered by the [Pew Research Center](http://www.pewresearch.org/).
 
@@ -18,7 +24,7 @@ administrative_organization: * Administered by the [Pew Research Center](http://
 ~~~{reading_block}
 Please skim before you begin:
 
-1. 
+1. [U.S. Surveys](https://www.pewresearch.org/our-methods/u-s-surveys/)
 
 2. Country Specific Methodology, for example the [2022 Global Attitudes Survey](https://www.pewresearch.org/methods/interactives/international-methodology/global-attitudes-survey/all-country/2022/)
 
@@ -34,18 +40,26 @@ Please skim before you begin:
 
 ~~~{download_and_import_block}
 
-1. Register for a Pew Research Center at https://www.pewresearch.org/profile/registration/.
+1. Register for a Pew Research Center account at https://www.pewresearch.org/profile/registration/.
 
-2. Choose `DOWNLOAD THIS DATASET` at https://www.pewresearch.org/global/dataset/spring-2022-survey-data/.
+2. `DOWNLOAD THIS DATASET` at https://www.pewresearch.org/global/dataset/spring-2022-survey-data/.
 
-3. Download the SPSS dataset `Pew-Research-Center-Global-Attitudes-Spring-2022-Survey-Data.zip` dated 04/03/2023:
+3. Download the SPSS dataset `Pew-Research-Center-Global-Attitudes-Spring-2022-Survey-Data.zip`:
 
 ```{r eval = FALSE , results = "hide" }
 library(haven)
 
-chapter_tag_fn <- file.path( path.expand( "~" ) , "Pew Research Center Global Attitudes Spring 2022 Dataset.sav" )
+chapter_tag_fn <-
+	file.path( 
+		path.expand( "~" ) , 
+		"Pew Research Center Global Attitudes Spring 2022 Dataset.sav"
+	)
 
 chapter_tag_tbl <- read_sav( chapter_tag_fn )
+
+chapter_tag_label <- lapply( chapter_tag_tbl , function( w ) attributes( w )[['label']] )
+
+chapter_tag_labels <- lapply( chapter_tag_tbl , function( w ) attributes( w )[['labels']] )
 
 chapter_tag_tbl <- zap_labels( chapter_tag_tbl )
 
@@ -53,23 +67,12 @@ chapter_tag_df <- data.frame( chapter_tag_tbl )
 
 names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
 ```
-~~~
 
+Collapse country-specific cluster and strata variables into two all-country cluster and strata variables:
 
-
-
-
-~~~{analysis_examples_survey_design}
-
-Collapse the country-specific cluster and strata columns into a single cluster and a single stratum variable:
 ```{r eval = FALSE , results = "hide" }
-# add the source variable name to each column
-# for( this_variable in grep( "^psu_|^stratum_" , names( chapter_tag_df ) , value = TRUE ) ){
-	# chapter_tag_df[ !is.na( chapter_tag_df[ , this_variable ] ) , this_variable ] <-
-		# paste( this_variable , chapter_tag_df[ !is.na( chapter_tag_df[ , this_variable ] ) , this_variable ] )
-# }
-
-# create the constructed psu and strata variables from among the non-missing country-specific columns
+# create the constructed psu and strata variables from among the
+# non-missing country-specific columns
 chapter_tag_df[ , 'psu_constructed' ] <-
 	apply(
 		chapter_tag_df[ , grep( "^psu_" , names( chapter_tag_df ) ) ] , 
@@ -84,22 +87,28 @@ chapter_tag_df[ , 'stratum_constructed' ] <-
 		function( w ) w[ which.min( is.na( w ) ) ]
 	)
 
-# for countries without clustering and strata variables, use the country identifier
-chapter_tag_df[ is.na( chapter_tag_df[ , 'psu_constructed' ] ) , 'psu_constructed' ] <- 0
-	# chapter_tag_df[ is.na( chapter_tag_df[ , 'psu_constructed' ] ) , 'country' ]
+# for countries without clustering variables, give every record a unique identifier for the psu..
+chapter_tag_df[ is.na( chapter_tag_df[ , 'psu_constructed' ] ) , 'psu_constructed' ] <-
+	rownames( chapter_tag_df[ is.na( chapter_tag_df[ , 'psu_constructed' ] ) , ] )
 
+# ..and zeroes for the stratum
 chapter_tag_df[ is.na( chapter_tag_df[ , 'stratum_constructed' ] ) , 'stratum_constructed' ] <- 0
-	# chapter_tag_df[ is.na( chapter_tag_df[ , 'stratum_constructed' ] ) , 'country' ]
 ```
 
+~~~
 
 
-This design generalizes to residents of the United States that were living in the community in 1996 (wave 3) and also still alive (and participating in the survey) as of 2020 (wave 15):
+
+
+
+~~~{analysis_examples_survey_design}
+
+
 
 ```{r eval = FALSE , results = "hide" }
-options( survey.lonely.psu = "adjust" )
-
 library(survey)
+
+options( survey.lonely.psu = "adjust" )
 
 chapter_tag_design <- 
 	svydesign(
@@ -120,43 +129,51 @@ chapter_tag_design <-
 
 		one = 1 ,
 		
-		working_in_1996 = r3work ,
+		topcoded_respondent_age = ifelse( age >= 99 , NA , ifelse( age >= 97 , 97 , age ) ) ,
 
-		working_in_2020 = r15work ,
+		human_rights_priority_with_china =
+			ifelse( 
+				china_humanrights_priority > 2 , 
+				NA , 
+				as.numeric( china_humanrights_priority == 1 )
+			) ,
+		
+		favorable_unfavorable_one_to_four_us = ifelse( fav_us > 4 , NA , fav_us ) ,
+		
+		favorable_unfavorable_one_to_four_un = ifelse( fav_un > 4 , NA , fav_un ) ,
 
-		marital_stat_1996 =
-			factor( r3mstat , levels = 1:8 , labels =
-				c( "Married" , "Married, spouse absent" ,
-				"Partnered" , "Separated" , "Divorced" ,
-				"Separated/divorced" , "Widowed" ,
-				"Never married" ) ) ,
-				
-		marital_stat_2020 =
-			factor( r15mstat , levels = 1:8 , labels =
-				c( "Married" , "Married, spouse absent" ,
-				"Partnered" , "Separated" , "Divorced" ,
-				"Separated/divorced" , "Widowed" ,
-				"Never married" ) )
+		country_name =
+			factor( 
+				country , 
+				levels = as.integer( chapter_tag_labels[[ 'country' ]] ) , 
+				labels = names( chapter_tag_labels[['country']] )
+			) ,
+			
+		econ_sit = 
+			factor( 
+				econ_sit , 
+				levels = 1:4 , 
+				labels = c( 'Very good' , 'Somewhat good' , 'Somewhat bad' , 'Very bad' ) 
+			)
 	)
 ~~~
 
 
-group_by_variable: marital_stat_1996
+group_by_variable: country_name
 
-categorical_variable: marital_stat_2020
+categorical_variable: econ_sit
 categorical_narm: , na.rm = TRUE
 
-linear_variable: h15ahous
-linear_variable_description: value of primary residence in 2020
+linear_variable: topcoded_respondent_age
 linear_narm: , na.rm = TRUE
 
-ratio_estimation_numerator: h4ahous
-ratio_estimation_denominator: h15ahous
+ratio_estimation_numerator: favorable_unfavorable_one_to_four_un
+ratio_estimation_denominator: favorable_unfavorable_one_to_four_us
 ratio_narm: , na.rm = TRUE
 
-subset_definition: working_in_1996 == 1
+subset_definition: country_name == 'South Korea'
 
-binary_variable: working_in_2020
+binary_variable: human_rights_priority_with_china
 binary_narm: , na.rm = TRUE
 
 
@@ -165,12 +182,11 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-
-This example matches statistics and standard errors to four digits from the Pew Research Center's [How to analyze Pew Research Center survey data in R](
+This matches statistics and standard errors from [How to analyze Pew Research Center survey data in R](
 https://medium.com/pew-research-center-decoded/how-to-analyze-pew-research-center-survey-data-in-r-f326df360713):
 
 
-1. Choose `DOWNLOAD THIS DATASET` at https://www.pewresearch.org/politics/dataset/april-2017-political-survey/.
+1. `DOWNLOAD THIS DATASET` at https://www.pewresearch.org/politics/dataset/april-2017-political-survey/.
 
 2. Download the SPSS dataset `Apr17-public-4.3-update.zip` dated 12/29/2017:
 
@@ -200,11 +216,16 @@ Add new columns to the data set:
 political_survey_2017_design <-
 	update(
 		political_survey_2017_design ,
-		q1 = factor( q1 , levels = c( 1 , 2 , 9 ) , labels = c( 'Approve' , 'Disapprove' , 'DK/RF' ) )
+		q1 = 
+			factor( 
+				q1 , 
+				levels = c( 1 , 2 , 9 ) , 
+				labels = c( 'Approve' , 'Disapprove' , 'DK/RF' ) 
+			)
 	)
 ```
 
-Reproduce the coefficients and standard errors shown under `Estimating frequencies with survey weights`:
+Reproduce statistics and standard errors shown under `Estimating frequencies with survey weights`:
 
 ```{r eval = FALSE , results = "hide" }
 result <- svymean( ~ q1 , political_survey_2017_design , na.rm = TRUE )
