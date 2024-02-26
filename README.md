@@ -35,6 +35,7 @@ pew-research-center-pew: <p><img src='https://img.shields.io/badge/tested%20on%2
 programme-for-the-international-assessment-of-adult-competencies-piaac: <p><a href="https://github.com/asdfree/piaac/actions"><img src="https://github.com/asdfree/piaac/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 progress-in-international-reading-literacy-study-pirls: <p><a href="https://github.com/asdfree/pirls/actions"><img src="https://github.com/asdfree/pirls/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 public-libraries-survey-pls: <p><a href="https://github.com/asdfree/pls/actions"><img src="https://github.com/asdfree/pls/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
+rapid-surveys-system-rss: <p><a href="https://github.com/asdfree/rss/actions"><img src="https://github.com/asdfree/rss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 residential-energy-consumption-survey-recs: <p><a href="https://github.com/asdfree/recs/actions"><img src="https://github.com/asdfree/recs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 social-security-public-use-data-files-ssa: <p><a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 survey-of-business-owners-sbo: <p><a href="https://github.com/asdfree/sbo/actions"><img src="https://github.com/asdfree/sbo/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>

@@ -1,0 +1,311 @@
+# Rapid Surveys System (RSS) {-}
+
+<a href="https://github.com/asdfree/rss/actions"><img src="https://github.com/asdfree/rss/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>
+
+The standardized platform to answer time-sensitive questions about emerging and priority health issues.
+
+* One table with one row per [AmeriSpeak](https://amerispeak.norc.org/) or [KnowledgePanel](https://www.ipsos.com/en-us/solutions/public-affairs/knowledgepanel) panel respondent.
+
+* A complex survey designed to generalize to the civilian non-institutional adult population of the U.S.
+
+* Releases expected four times per year.
+
+* Conducted by the [National Center for Health Statistics](https://www.cdc.gov/nchs/) at the [Centers for Disease Control](http://www.cdc.gov/).
+
+---
+
+Please skim before you begin:
+
+1. [NCHS Rapid Surveys System (RSS): Round 1 Survey Description](https://www.cdc.gov/nchs/data/rss/survey-description.pdf)
+
+2. [Quality Profile, Rapid Surveys System Round 1](https://www.cdc.gov/nchs/data/rss/quality-profile.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Rapid Surveys System)
+
+```{r}
+# first response heroes
+# question design thru publish
+# time 'doxed by zeno
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+Download and import the first round:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+sas_url <- "https://www.cdc.gov/nchs/data/rss/rss1_puf_t1.sas7bdat"
+	
+rss_tbl <- read_sas( sas_url )
+
+rss_df <- data.frame( rss_tbl )
+
+names( rss_df ) <- tolower( names( rss_df ) )
+
+rss_df[ , 'one' ] <- 1
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r eval = FALSE , results = "hide" }
+# rss_fn <- file.path( path.expand( "~" ) , "RSS" , "this_file.rds" )
+# saveRDS( rss_df , file = rss_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r eval = FALSE , results = "hide" }
+# rss_df <- readRDS( rss_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r eval = FALSE , results = "hide" }
+options( survey.lonely.psu = "adjust" )
+
+library(survey)
+
+rss_design <- 
+	svydesign( 
+		~ p_psu , 
+		strata = ~ p_strata , 
+		data = rss_df , 
+		weights = ~ weight_m1 , 
+		nest = TRUE 
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r eval = FALSE , results = "hide" }
+rss_design <- 
+	
+	update( 
+		
+		rss_design , 
+		
+		how_often_use_cleaner_purifier =
+			factor(
+				ven_use ,
+				levels = c( -9:-6 , 0:3 ) ,
+				labels = 
+					c( "Don't Know" , "Question not asked" , "Explicit refusal/REF" , 
+					"Skipped/Implied refusal" , "Never" , "Rarely" , "Sometimes" , "Always" )
+			) ,
+		
+		has_health_insurance = ifelse( p_insur >= 0 , p_insur , NA ) ,
+		
+		metropolitan = 
+			factor( as.numeric( p_metro_r == 1 ) , levels = 0:1 , labels = c( 'No' , 'Yes' ) )
+		
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+sum( weights( rss_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ metropolitan , rss_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ one , rss_design )
+
+svyby( ~ one , ~ metropolitan , rss_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ p_hhsize_r , rss_design )
+
+svyby( ~ p_hhsize_r , ~ metropolitan , rss_design , svymean )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ how_often_use_cleaner_purifier , rss_design )
+
+svyby( ~ how_often_use_cleaner_purifier , ~ metropolitan , rss_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ p_hhsize_r , rss_design )
+
+svyby( ~ p_hhsize_r , ~ metropolitan , rss_design , svytotal )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svytotal( ~ how_often_use_cleaner_purifier , rss_design )
+
+svyby( ~ how_often_use_cleaner_purifier , ~ metropolitan , rss_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+svyquantile( ~ p_hhsize_r , rss_design , 0.5 )
+
+svyby( 
+	~ p_hhsize_r , 
+	~ metropolitan , 
+	rss_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE 
+)
+```
+
+Estimate a ratio:
+```{r eval = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ p_agec_r , 
+	denominator = ~ p_hhsize_r , 
+	rss_design 
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to adults that most of the time or always wear sunscreen:
+```{r eval = FALSE , results = "hide" }
+sub_rss_design <- subset( rss_design , sun_useface >= 3 )
+```
+Calculate the mean (average) of this subset:
+```{r eval = FALSE , results = "hide" }
+svymean( ~ p_hhsize_r , sub_rss_design )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+this_result <- svymean( ~ p_hhsize_r , rss_design )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ p_hhsize_r , 
+		~ metropolitan , 
+		rss_design , 
+		svymean 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r eval = FALSE , results = "hide" }
+degf( rss_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r eval = FALSE , results = "hide" }
+svyvar( ~ p_hhsize_r , rss_design )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r eval = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ p_hhsize_r , rss_design , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ p_hhsize_r , rss_design , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r eval = FALSE , results = "hide" }
+svyciprop( ~ has_health_insurance , rss_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r eval = FALSE , results = "hide" }
+svyttest( p_hhsize_r ~ has_health_insurance , rss_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r eval = FALSE , results = "hide" }
+svychisq( 
+	~ has_health_insurance + how_often_use_cleaner_purifier , 
+	rss_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r eval = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		p_hhsize_r ~ has_health_insurance + how_often_use_cleaner_purifier , 
+		rss_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches the statistic and confidence intervals from the "Ever uses a portable air cleaner or purifier in home" page of the [Air cleaners and purifiers dashboard](https://www.cdc.gov/nchs/rss/round1/air-purifiers.html):
+
+```{r eval = FALSE , results = "hide" }
+result <-
+	svymean(
+		~ how_often_use_cleaner_purifier ,
+		rss_design
+	)
+
+stopifnot( round( coef( result ) , 3 ) == .379 )
+
+stopifnot( round( confint( result )[1] , 3 ) == 0.366 )
+
+stopifnot( round( confint( result )[2] , 3 ) == 0.393 )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for RSS users, this code replicates previously-presented examples:
+
+```{r eval = FALSE , results = "hide" }
+library(srvyr)
+rss_srvyr_design <- as_survey( rss_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r eval = FALSE , results = "hide" }
+rss_srvyr_design %>%
+	summarize( mean = survey_mean( p_hhsize_r ) )
+
+rss_srvyr_design %>%
+	group_by( metropolitan ) %>%
+	summarize( mean = survey_mean( p_hhsize_r ) )
+```
+
+
