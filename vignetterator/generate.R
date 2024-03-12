@@ -1,6 +1,7 @@
-commit_memo <- "'rss'"
+commit_memo <- "'node 16 to node 20 & cache.lazy=F'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
+
 
 
 # non-survey, not database-backed (ahrf)
@@ -282,11 +283,11 @@ for ( i in seq_along( chapter_tag ) ){
 rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
 local_testing_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Local Testing Badge" , readLines( w ) ) ) )
 local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_files ] )
-for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE" , readLines( this_rmd ) ) , this_rmd )
+for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE , warning = FALSE , message = FALSE" , readLines( this_rmd ) ) , this_rmd )
 
 
 setwd( book_folder )
-# clean_site( preview = FALSE )
+clean_site( preview = FALSE )
 render_site(output_format = 'bookdown::gitbook', encoding = 'UTF-8')
 # render_site( encoding = 'UTF-8' )
 
@@ -400,7 +401,7 @@ for( this_ci_file in ci_rmd_files ){
 		r_yml <- grep( 'r\\.yml' , copied_files , value = TRUE )
 		if( skip_linux ) writeLines( gsub( "          - {os: ubuntu-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
 		if( skip_windows ) writeLines( gsub( "          - {os: windows-latest, r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
-		if( skip_mac ) writeLines( gsub( "          - {os: macOS-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
+		if( skip_mac ) writeLines( gsub( "          - {os: macos-latest,   r: 'release'}" , "" , readLines( r_yml ) , fixed = TRUE ) , r_yml )
 		
 		
 		for( this_file in copied_files ){

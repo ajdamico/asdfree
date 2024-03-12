@@ -46,7 +46,7 @@ Please skim before you begin:
 
 3. Download the SPSS dataset `Pew-Research-Center-Global-Attitudes-Spring-2022-Survey-Data.zip`:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 library(haven)
 
 pew_fn <-
@@ -70,7 +70,7 @@ names( pew_df ) <- tolower( names( pew_df ) )
 
 Collapse country-specific cluster and strata variables into two all-country cluster and strata variables:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 # create the constructed psu and strata variables from among the
 # non-missing country-specific columns
 pew_df[ , 'psu_constructed' ] <-
@@ -99,21 +99,21 @@ pew_df[ is.na( pew_df[ , 'stratum_constructed' ] ) , 'stratum_constructed' ] <- 
 
 Save the object at any point:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 # pew_fn <- file.path( path.expand( "~" ) , "PEW" , "this_file.rds" )
 # saveRDS( pew_df , file = pew_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 # pew_df <- readRDS( pew_fn )
 ```
 
 ### Survey Design Definition {-}
 Construct a complex sample survey design:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 library(survey)
 
 options( survey.lonely.psu = "adjust" )
@@ -131,7 +131,7 @@ pew_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 pew_design <- 
 	update( 
 		pew_design , 
@@ -174,7 +174,7 @@ pew_design <-
 ### Unweighted Counts {-}
 
 Count the unweighted number of records in the survey sample, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 sum( weights( pew_design , "sampling" ) != 0 )
 
 svyby( ~ one , ~ country_name , pew_design , unwtd.count )
@@ -182,7 +182,7 @@ svyby( ~ one , ~ country_name , pew_design , unwtd.count )
 
 ### Weighted Counts {-}
 Count the weighted size of the generalizable population, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svytotal( ~ one , pew_design )
 
 svyby( ~ one , ~ country_name , pew_design , svytotal )
@@ -191,35 +191,35 @@ svyby( ~ one , ~ country_name , pew_design , svytotal )
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svymean( ~ topcoded_respondent_age , pew_design , na.rm = TRUE )
 
 svyby( ~ topcoded_respondent_age , ~ country_name , pew_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svymean( ~ econ_sit , pew_design , na.rm = TRUE )
 
 svyby( ~ econ_sit , ~ country_name , pew_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svytotal( ~ topcoded_respondent_age , pew_design , na.rm = TRUE )
 
 svyby( ~ topcoded_respondent_age , ~ country_name , pew_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svytotal( ~ econ_sit , pew_design , na.rm = TRUE )
 
 svyby( ~ econ_sit , ~ country_name , pew_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyquantile( ~ topcoded_respondent_age , pew_design , 0.5 , na.rm = TRUE )
 
 svyby( 
@@ -233,7 +233,7 @@ svyby(
 ```
 
 Estimate a ratio:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyratio( 
 	numerator = ~ favorable_unfavorable_one_to_four_un , 
 	denominator = ~ favorable_unfavorable_one_to_four_us , 
@@ -245,18 +245,18 @@ svyratio(
 ### Subsetting {-}
 
 Restrict the survey design to :
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 sub_pew_design <- subset( pew_design , country_name == 'South Korea' )
 ```
 Calculate the mean (average) of this subset:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svymean( ~ topcoded_respondent_age , sub_pew_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 this_result <- svymean( ~ topcoded_respondent_age , pew_design , na.rm = TRUE )
 
 coef( this_result )
@@ -280,17 +280,17 @@ cv( grouped_result )
 ```
 
 Calculate the degrees of freedom of any survey design object:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 degf( pew_design )
 ```
 
 Calculate the complex sample survey-adjusted variance of any statistic:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyvar( ~ topcoded_respondent_age , pew_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 # SRS without replacement
 svymean( ~ topcoded_respondent_age , pew_design , na.rm = TRUE , deff = TRUE )
 
@@ -299,7 +299,7 @@ svymean( ~ topcoded_respondent_age , pew_design , na.rm = TRUE , deff = "replace
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyciprop( ~ human_rights_priority_with_china , pew_design ,
 	method = "likelihood" , na.rm = TRUE )
 ```
@@ -307,12 +307,12 @@ svyciprop( ~ human_rights_priority_with_china , pew_design ,
 ### Regression Models and Tests of Association {-}
 
 Perform a design-based t-test:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyttest( topcoded_respondent_age ~ human_rights_priority_with_china , pew_design )
 ```
 
 Perform a chi-squared test of association for survey data:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svychisq( 
 	~ human_rights_priority_with_china + econ_sit , 
 	pew_design 
@@ -320,7 +320,7 @@ svychisq(
 ```
 
 Perform a survey-weighted generalized linear model:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
 		topcoded_respondent_age ~ human_rights_priority_with_china + econ_sit , 
@@ -341,7 +341,7 @@ https://medium.com/pew-research-center-decoded/how-to-analyze-pew-research-cente
 
 2. Download the SPSS dataset `Apr17-public-4.3-update.zip` dated 12/29/2017:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 political_survey_2017_fn <- file.path( path.expand( "~" ) , "Apr17 public.sav" )
 
 political_survey_2017_tbl <- read_sav( political_survey_2017_fn )
@@ -353,7 +353,7 @@ names( political_survey_2017_df ) <- tolower( names( political_survey_2017_df ) 
 
 Construct a complex sample survey design:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 political_survey_2017_design <-
 	svydesign(
 		~ 0 ,
@@ -363,7 +363,7 @@ political_survey_2017_design <-
 ```
 
 Add new columns to the data set:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }	
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }	
 political_survey_2017_design <-
 	update(
 		political_survey_2017_design ,
@@ -378,7 +378,7 @@ political_survey_2017_design <-
 
 Reproduce statistics and standard errors shown under `Estimating frequencies with survey weights`:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 result <- svymean( ~ q1 , political_survey_2017_design , na.rm = TRUE )
 
 stopifnot( round( coef( result ) , 4 ) == c( 0.3940 , 0.5424 , 0.0636 ) )
@@ -391,12 +391,12 @@ stopifnot( round( SE( result ) , 4 ) == c( 0.0144 , 0.0147 , 0.0078 ) )
 
 The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for PEW users, this code replicates previously-presented examples:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 library(srvyr)
 pew_srvyr_design <- as_survey( pew_design )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 pew_srvyr_design %>%
 	summarize( mean = survey_mean( topcoded_respondent_age , na.rm = TRUE ) )
 

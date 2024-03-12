@@ -46,7 +46,7 @@ Please skim before you begin:
 
 3. Download the STATA dataset `randhrs1992_2020v1_STATA.zip` dated 04/05/2023:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 library(haven)
 
 hrs_fn <- file.path( path.expand( "~" ) , "randhrs1992_2020v1.dta" )
@@ -62,14 +62,14 @@ names( hrs_df ) <- tolower( names( hrs_df ) )
 
 Save the object at any point:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 # hrs_fn <- file.path( path.expand( "~" ) , "HRS" , "this_file.rds" )
 # saveRDS( hrs_df , file = hrs_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 # hrs_df <- readRDS( hrs_fn )
 ```
 
@@ -77,7 +77,7 @@ Load the same object:
 Construct a complex sample survey design:
 
 This design generalizes to residents of the United States that were living in the community in 1996 (wave 3) and also still alive (and participating in the survey) as of 2020 (wave 15):
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 library(survey)
 
 hrs_design <- 
@@ -93,7 +93,7 @@ hrs_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 hrs_design <- 
 	update( 
 		hrs_design , 
@@ -127,7 +127,7 @@ hrs_design <-
 ### Unweighted Counts {-}
 
 Count the unweighted number of records in the survey sample, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 sum( weights( hrs_design , "sampling" ) != 0 )
 
 svyby( ~ one , ~ marital_stat_1996 , hrs_design , unwtd.count )
@@ -135,7 +135,7 @@ svyby( ~ one , ~ marital_stat_1996 , hrs_design , unwtd.count )
 
 ### Weighted Counts {-}
 Count the weighted size of the generalizable population, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svytotal( ~ one , hrs_design )
 
 svyby( ~ one , ~ marital_stat_1996 , hrs_design , svytotal )
@@ -144,35 +144,35 @@ svyby( ~ one , ~ marital_stat_1996 , hrs_design , svytotal )
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svymean( ~ h15ahous , hrs_design , na.rm = TRUE )
 
 svyby( ~ h15ahous , ~ marital_stat_1996 , hrs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svymean( ~ marital_stat_2020 , hrs_design , na.rm = TRUE )
 
 svyby( ~ marital_stat_2020 , ~ marital_stat_1996 , hrs_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svytotal( ~ h15ahous , hrs_design , na.rm = TRUE )
 
 svyby( ~ h15ahous , ~ marital_stat_1996 , hrs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svytotal( ~ marital_stat_2020 , hrs_design , na.rm = TRUE )
 
 svyby( ~ marital_stat_2020 , ~ marital_stat_1996 , hrs_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyquantile( ~ h15ahous , hrs_design , 0.5 , na.rm = TRUE )
 
 svyby( 
@@ -186,7 +186,7 @@ svyby(
 ```
 
 Estimate a ratio:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyratio( 
 	numerator = ~ h4ahous , 
 	denominator = ~ h15ahous , 
@@ -198,18 +198,18 @@ svyratio(
 ### Subsetting {-}
 
 Restrict the survey design to :
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 sub_hrs_design <- subset( hrs_design , working_in_1996 == 1 )
 ```
 Calculate the mean (average) of this subset:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svymean( ~ h15ahous , sub_hrs_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 this_result <- svymean( ~ h15ahous , hrs_design , na.rm = TRUE )
 
 coef( this_result )
@@ -233,17 +233,17 @@ cv( grouped_result )
 ```
 
 Calculate the degrees of freedom of any survey design object:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 degf( hrs_design )
 ```
 
 Calculate the complex sample survey-adjusted variance of any statistic:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyvar( ~ h15ahous , hrs_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 # SRS without replacement
 svymean( ~ h15ahous , hrs_design , na.rm = TRUE , deff = TRUE )
 
@@ -252,7 +252,7 @@ svymean( ~ h15ahous , hrs_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyciprop( ~ working_in_2020 , hrs_design ,
 	method = "likelihood" , na.rm = TRUE )
 ```
@@ -260,12 +260,12 @@ svyciprop( ~ working_in_2020 , hrs_design ,
 ### Regression Models and Tests of Association {-}
 
 Perform a design-based t-test:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svyttest( h15ahous ~ working_in_2020 , hrs_design )
 ```
 
 Perform a chi-squared test of association for survey data:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 svychisq( 
 	~ working_in_2020 + marital_stat_2020 , 
 	hrs_design 
@@ -273,7 +273,7 @@ svychisq(
 ```
 
 Perform a survey-weighted generalized linear model:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
 		h15ahous ~ working_in_2020 + marital_stat_2020 , 
@@ -295,7 +295,7 @@ This example matches statistics and confidence intervals to four digits from the
 
 3. Download the STATA dataset `H_HRS_d_stata.zip` dated 09/12/2023
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 harmonized_hrs_fn <- file.path( path.expand( "~" ) , "H_HRS_d.dta" )
 
 harmonized_hrs_tbl <- read_dta( harmonized_hrs_fn )
@@ -307,7 +307,7 @@ names( harmonized_hrs_df ) <- tolower( names( harmonized_hrs_df ) )
 
 Merge on cluster and strata variables from the RAND HRS Longitudinal file:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }	
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }	
 harmonized_hrs_rand_df <-
 	merge(
 		harmonized_hrs_df ,
@@ -320,7 +320,7 @@ stopifnot( nrow( harmonized_hrs_rand_df ) == nrow( hrs_df ) )
 
 Limit the survey design to respondents answering at least two of the five different life satisfaction questions in the 2014 (wave 12) psychosocial leave-behind survey:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 h12sc_df <- subset( harmonized_hrs_rand_df , r12scwtresp > 0 & inw12sc == 1 )
 
 r12sc_design <-
@@ -335,7 +335,7 @@ r12sc_design <-
 
 Reproduce the coefficient, standard error, and confidence intervals presented at 53:20 of the tutorial:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 result <- svymean( ~ r12lsatsc , r12sc_design , na.rm = TRUE )
 
 stopifnot( round( coef( result ) , 4 ) == 4.9822 )
@@ -349,12 +349,12 @@ stopifnot( round( confint( result , df = degf( r12sc_design ) ) , 4 ) == c( 4.93
 
 The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for HRS users, this code replicates previously-presented examples:
 
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 library(srvyr)
 hrs_srvyr_design <- as_survey( hrs_design )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r cache = TRUE , cache.lazy = FALSE , warning = FALSE , message = FALSE , results = "hide" }
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 hrs_srvyr_design %>%
 	summarize( mean = survey_mean( h15ahous , na.rm = TRUE ) )
 
