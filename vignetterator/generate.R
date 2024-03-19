@@ -1,4 +1,4 @@
-commit_memo <- "'node 16 to node 20 & cache.lazy=F'"
+commit_memo <- "'vacs'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 

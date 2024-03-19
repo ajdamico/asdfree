@@ -1,0 +1,357 @@
+# Violence Against Children And Youth Surveys (VACS) {-}
+
+```{r , echo = FALSE }
+
+most_recent_build_date <- gsub( "-" , " " , if( dir.exists( "_bookdown_files/" ) ) as.Date( file.info( "_bookdown_files/" )$ctime ) else Sys.Date() )
+
+vacs_badge <- paste0( "<img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-" , most_recent_build_date , "-brightgreen' alt='Local Testing Badge'>" )
+
+```
+
+`r vacs_badge`
+
+The global surveillance system to track and monitor the burden of violence against children.
+
+* One table per country with one row per sampled respondent.
+
+* Nationally representative cross-sectional household surveys of children and youth ages 13–24.
+
+* No listed update frequency across the participating nations.
+
+* Led by the [Centers for Disease Control and Prevention](http://www.cdc.gov/), in partnership with [Together for Girls](https://www.togetherforgirls.org/en/partners).
+
+---
+
+Please skim before you begin:
+
+1. [Sampling design and methodology of the Violence Against Children and Youth Surveys](https://www.ncbi.nlm.nih.gov/pubmed/30472679)
+
+2. [Violence Against Children Surveys (VACS): Towards a global surveillance system](http://injuryprevention.bmj.com/content/22/Suppl_1/i17.long)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20Violence Against Children And Youth Surveys)
+
+```{r}
+# 
+# 
+# 
+```
+
+---
+
+## Download, Import, Preparation {-}
+
+1. Request public VACS data at https://www.togetherforgirls.org/en/analyzing-public-vacs-data.
+
+2. Select the Mozambique 2019 dataset and Stata option.
+
+3. Download and unzip the `Mozambique VACS Public Use Dataset` files:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(haven)
+
+vacs_tbl <- read_stata( file.path( path.expand( "~" ) , "mozambique_public use data.dta" ) )
+
+vacs_df <- data.frame( vacs_tbl )
+
+names( vacs_df ) <- tolower( names( vacs_df ) )
+```
+
+### Save locally \ {-}
+
+Save the object at any point:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# vacs_fn <- file.path( path.expand( "~" ) , "VACS" , "this_file.rds" )
+# saveRDS( vacs_df , file = vacs_fn , compress = FALSE )
+```
+
+Load the same object:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# vacs_df <- readRDS( vacs_fn )
+```
+
+### Survey Design Definition {-}
+Construct a complex sample survey design:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+vacs_design <- 
+	svydesign(
+		ids = ~cluster ,
+		strata = ~strata ,
+		weights = ~sampleweight ,
+		data = subset( vacs_df , sampleweight > 0 ) ,
+		nest = TRUE
+	)
+```
+
+### Variable Recoding {-}
+
+Add new columns to the data set:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+vacs_design <- 
+	update( 
+		vacs_design , 
+		
+		one = 1 ,
+				
+		age_sex_group =
+			factor( 
+				ifelse( agegrp == 1 , sex , sex + 2 ) , 
+				levels = 1:4 , 
+				labels = c( 'male 13-17' , 'female 13-17' , 'male 18-24' , 'female 18-24' ) 
+			) ,
+		
+		sex = factor( sex , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+		
+		agegrp = factor( agegrp , levels = 1:2 , labels = c( '13-17' , '18-24' ) ) ,
+		
+		ever_attended_school = ifelse( eversch %in% 1:2 , as.numeric( eversch == 1 ) , NA ) ,
+		
+		childhood_physical_violence = as.numeric( pv18 == 1 ) ,
+		
+		marry =
+			factor(
+				marry ,
+				levels = 1:3 ,
+				labels = 
+					c( 'Yes, ever married' , 'Yes, ever lived with a partner' , 
+					'No, never married or lived with a partner' )
+
+			) ,
+			
+		age_at_first_pregnancy = ifelse( prage < 98 , prage , NA ) ,
+			
+		age_at_first_cohabitation = ifelse( marage < 98 , marage , NA )
+	)
+```
+
+---
+
+## Analysis Examples with the `survey` library \ {-}
+
+### Unweighted Counts {-}
+
+Count the unweighted number of records in the survey sample, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+sum( weights( vacs_design , "sampling" ) != 0 )
+
+svyby( ~ one , ~ age_sex_group , vacs_design , unwtd.count )
+```
+
+### Weighted Counts {-}
+Count the weighted size of the generalizable population, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ one , vacs_design )
+
+svyby( ~ one , ~ age_sex_group , vacs_design , svytotal )
+```
+
+### Descriptive Statistics {-}
+
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ age_at_first_cohabitation , vacs_design , na.rm = TRUE )
+
+svyby( ~ age_at_first_cohabitation , ~ age_sex_group , vacs_design , svymean , na.rm = TRUE )
+```
+
+Calculate the distribution of a categorical variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ marry , vacs_design )
+
+svyby( ~ marry , ~ age_sex_group , vacs_design , svymean )
+```
+
+Calculate the sum of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ age_at_first_cohabitation , vacs_design , na.rm = TRUE )
+
+svyby( ~ age_at_first_cohabitation , ~ age_sex_group , vacs_design , svytotal , na.rm = TRUE )
+```
+
+Calculate the weighted sum of a categorical variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svytotal( ~ marry , vacs_design )
+
+svyby( ~ marry , ~ age_sex_group , vacs_design , svytotal )
+```
+
+Calculate the median (50th percentile) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyquantile( ~ age_at_first_cohabitation , vacs_design , 0.5 , na.rm = TRUE )
+
+svyby( 
+	~ age_at_first_cohabitation , 
+	~ age_sex_group , 
+	vacs_design , 
+	svyquantile , 
+	0.5 ,
+	ci = TRUE , na.rm = TRUE
+)
+```
+
+Estimate a ratio:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyratio( 
+	numerator = ~ age_at_first_pregnancy , 
+	denominator = ~ age_at_first_cohabitation , 
+	vacs_design ,
+	na.rm = TRUE
+)
+```
+
+### Subsetting {-}
+
+Restrict the survey design to :
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+sub_vacs_design <- subset( vacs_design , childhood_physical_violence == 1 )
+```
+Calculate the mean (average) of this subset:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svymean( ~ age_at_first_cohabitation , sub_vacs_design , na.rm = TRUE )
+```
+
+### Measures of Uncertainty {-}
+
+Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+this_result <- svymean( ~ age_at_first_cohabitation , vacs_design , na.rm = TRUE )
+
+coef( this_result )
+SE( this_result )
+confint( this_result )
+cv( this_result )
+
+grouped_result <-
+	svyby( 
+		~ age_at_first_cohabitation , 
+		~ age_sex_group , 
+		vacs_design , 
+		svymean ,
+		na.rm = TRUE 
+	)
+	
+coef( grouped_result )
+SE( grouped_result )
+confint( grouped_result )
+cv( grouped_result )
+```
+
+Calculate the degrees of freedom of any survey design object:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+degf( vacs_design )
+```
+
+Calculate the complex sample survey-adjusted variance of any statistic:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyvar( ~ age_at_first_cohabitation , vacs_design , na.rm = TRUE )
+```
+
+Include the complex sample design effect in the result for a specific statistic:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+# SRS without replacement
+svymean( ~ age_at_first_cohabitation , vacs_design , na.rm = TRUE , deff = TRUE )
+
+# SRS with replacement
+svymean( ~ age_at_first_cohabitation , vacs_design , na.rm = TRUE , deff = "replace" )
+```
+
+Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyciprop( ~ ever_attended_school , vacs_design ,
+	method = "likelihood" , na.rm = TRUE )
+```
+
+### Regression Models and Tests of Association {-}
+
+Perform a design-based t-test:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svyttest( age_at_first_cohabitation ~ ever_attended_school , vacs_design )
+```
+
+Perform a chi-squared test of association for survey data:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+svychisq( 
+	~ ever_attended_school + marry , 
+	vacs_design 
+)
+```
+
+Perform a survey-weighted generalized linear model:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+glm_result <- 
+	svyglm( 
+		age_at_first_cohabitation ~ ever_attended_school + marry , 
+		vacs_design 
+	)
+
+summary( glm_result )
+```
+
+---
+
+## Replication Example {-}
+
+This example matches statistics and confidence intervals within 0.1% from the Final Report of the [Mozambique Violence Against Children and Youth Survey (VACS), 2019](https://files.mutualcdn.com/tfg/assets/files/Mozambique-VACS-report.pdf), `Table 4.1.1. Prevalence of different types of sexual violence[1] before age 18, among 18-24-year-olds`:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+females_18_to_24_design <- subset( vacs_design , sex == 'female' & agegrp == '18-24' )
+
+# define a function to check unweighted N, prevalence, confidence interval for each estimate
+check_sv <- 
+	function( this_variable , this_design = females_18_to_24_design , N , prevalence , lb , ub ){
+	
+		this_formula <- as.formula( paste( "~ as.numeric(" , this_variable , "== 1 )" ) )
+	
+		stopifnot( coef( unwtd.count( this_formula , this_design ) ) == N )
+		
+		this_result <- svymean( this_formula , this_design , na.rm = TRUE )
+		
+		stopifnot( round( coef( this_result ) , 3 ) == prevalence )
+		
+		stopifnot( abs( confint( this_result )[1] - lb ) < 0.0015 )
+		
+		stopifnot( abs( confint( this_result )[2] - ub ) < 0.0015 )
+		
+		TRUE
+	}
+	
+# sexual touching in childhood
+check_sv( "sv1_only18" , N = 1232 , prevalence = 0.066 , lb = 0.039 , ub = 0.093 )
+
+# unwanted attempted sex in childhood
+check_sv( "sv2_only18" , N = 1232 , prevalence = 0.061 , lb = 0.035 , ub = 0.087 )
+
+# pressured or coerced sex in childhood
+check_sv( "sv4_only18" , N = 1221 , prevalence = 0.056 , lb = 0.035 , ub = 0.077 )
+
+# physically forced sex in childhood
+check_sv( "sv3_only18" , N = 1231 , prevalence = 0.035 , lb = 0.020 , ub = 0.051 )
+```
+
+---
+
+## Analysis Examples with `srvyr` \ {-}
+
+The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for VACS users, this code replicates previously-presented examples:
+
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+library(srvyr)
+vacs_srvyr_design <- as_survey( vacs_design )
+```
+Calculate the mean (average) of a linear variable, overall and by groups:
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+vacs_srvyr_design %>%
+	summarize( mean = survey_mean( age_at_first_cohabitation , na.rm = TRUE ) )
+
+vacs_srvyr_design %>%
+	group_by( age_sex_group ) %>%
+	summarize( mean = survey_mean( age_at_first_cohabitation , na.rm = TRUE ) )
+```
+
+

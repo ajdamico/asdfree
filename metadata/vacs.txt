@@ -1,0 +1,175 @@
+chapter_title: Violence Against Children And Youth Surveys
+
+needs_local_build_status_line: yes
+
+~~~{dataset_introduction}
+The global surveillance system to track and monitor the burden of violence against children.
+~~~
+
+table_structure: * One table per country with one row per sampled respondent.
+
+generalizable_population: * Nationally representative cross-sectional household surveys of children and youth ages 13–24.
+
+publication_period: * No listed update frequency across the participating nations.
+
+administrative_organization: * Led by the [Centers for Disease Control and Prevention](http://www.cdc.gov/), in partnership with [Together for Girls](https://www.togetherforgirls.org/en/partners).
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Sampling design and methodology of the Violence Against Children and Youth Surveys](https://www.ncbi.nlm.nih.gov/pubmed/30472679)
+
+2. [Violence Against Children Surveys (VACS): Towards a global surveillance system](http://injuryprevention.bmj.com/content/22/Suppl_1/i17.long)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# 
+# 
+# 
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+1. Request public VACS data at https://www.togetherforgirls.org/en/analyzing-public-vacs-data.
+
+2. Select the Mozambique 2019 dataset and Stata option.
+
+3. Download and unzip the `Mozambique VACS Public Use Dataset` files:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+chapter_tag_tbl <- read_stata( file.path( path.expand( "~" ) , "mozambique_public use data.dta" ) )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+chapter_tag_design <- 
+	svydesign(
+		ids = ~cluster ,
+		strata = ~strata ,
+		weights = ~sampleweight ,
+		data = subset( chapter_tag_df , sampleweight > 0 ) ,
+		nest = TRUE
+	)
+```
+
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+				
+		age_sex_group =
+			factor( 
+				ifelse( agegrp == 1 , sex , sex + 2 ) , 
+				levels = 1:4 , 
+				labels = c( 'male 13-17' , 'female 13-17' , 'male 18-24' , 'female 18-24' ) 
+			) ,
+		
+		sex = factor( sex , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+		
+		agegrp = factor( agegrp , levels = 1:2 , labels = c( '13-17' , '18-24' ) ) ,
+		
+		ever_attended_school = ifelse( eversch %in% 1:2 , as.numeric( eversch == 1 ) , NA ) ,
+		
+		childhood_physical_violence = as.numeric( pv18 == 1 ) ,
+		
+		marry =
+			factor(
+				marry ,
+				levels = 1:3 ,
+				labels = 
+					c( 'Yes, ever married' , 'Yes, ever lived with a partner' , 
+					'No, never married or lived with a partner' )
+
+			) ,
+			
+		age_at_first_pregnancy = ifelse( prage < 98 , prage , NA ) ,
+			
+		age_at_first_cohabitation = ifelse( marage < 98 , marage , NA )
+	)
+~~~
+
+group_by_variable: age_sex_group
+
+categorical_variable: marry
+
+linear_variable: age_at_first_cohabitation
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: age_at_first_pregnancy
+ratio_estimation_denominator: age_at_first_cohabitation
+ratio_narm: , na.rm = TRUE
+
+subset_definition: childhood_physical_violence == 1
+
+binary_variable: ever_attended_school
+binary_narm: , na.rm = TRUE
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches statistics and confidence intervals within 0.1% from the Final Report of the [Mozambique Violence Against Children and Youth Survey (VACS), 2019](https://files.mutualcdn.com/tfg/assets/files/Mozambique-VACS-report.pdf), `Table 4.1.1. Prevalence of different types of sexual violence[1] before age 18, among 18-24-year-olds`:
+
+
+```{r eval = FALSE , results = "hide" }
+females_18_to_24_design <- subset( chapter_tag_design , sex == 'female' & agegrp == '18-24' )
+
+# define a function to check unweighted N, prevalence, confidence interval for each estimate
+check_sv <- 
+	function( this_variable , this_design = females_18_to_24_design , N , prevalence , lb , ub ){
+	
+		this_formula <- as.formula( paste( "~ as.numeric(" , this_variable , "== 1 )" ) )
+	
+		stopifnot( coef( unwtd.count( this_formula , this_design ) ) == N )
+		
+		this_result <- svymean( this_formula , this_design , na.rm = TRUE )
+		
+		stopifnot( round( coef( this_result ) , 3 ) == prevalence )
+		
+		stopifnot( abs( confint( this_result )[1] - lb ) < 0.0015 )
+		
+		stopifnot( abs( confint( this_result )[2] - ub ) < 0.0015 )
+		
+		TRUE
+	}
+	
+# sexual touching in childhood
+check_sv( "sv1_only18" , N = 1232 , prevalence = 0.066 , lb = 0.039 , ub = 0.093 )
+
+# unwanted attempted sex in childhood
+check_sv( "sv2_only18" , N = 1232 , prevalence = 0.061 , lb = 0.035 , ub = 0.087 )
+
+# pressured or coerced sex in childhood
+check_sv( "sv4_only18" , N = 1221 , prevalence = 0.056 , lb = 0.035 , ub = 0.077 )
+
+# physically forced sex in childhood
+check_sv( "sv3_only18" , N = 1231 , prevalence = 0.035 , lb = 0.020 , ub = 0.051 )
+```
+~~~
+
