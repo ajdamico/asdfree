@@ -1,0 +1,450 @@
+chapter_title: National Crime Victimization Survey
+
+needs_local_build_status_line: yes
+
+~~~{dataset_introduction}
+The primary information source on victims of nonfatal personal crimes and household property crimes (especially those not reported to the police) and victim experience with the justice system.
+~~~
+
+
+table_structure: * Three main tables, the first with one row per sampled household per interview, the second with one row per person per interview, and the third with one row per incident reported across each sampled household's seven-interview, three-year period.
+
+generalizable_population: * A complex survey designed to generalize to civilian, non-institutional americans aged 12 and older.
+
+publication_period: * Released annually since its re-design (and rename) in 1992, the National Crime Survey dates back to the early 1970s.
+
+administrative_organization: * Sponsored by the [Bureau of Justics Statistics](http://www.bjs.gov/) and administered by the [US Census Bureau](http://www.census.gov/).
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [National Crime Victimization Survey, 2016: Technical Documentation](https://bjs.ojp.gov/sites/g/files/xyckuh236/files/media/document/ncvstd16.pdf)
+
+2. [A New Measure of Prevalence for the National Crime Victimization Survey](https://bjs.ojp.gov/document/nmpncvs.pdf)
+
+3. This human-composed haiku or a bouquet of [artificial intelligence-generated limericks](https://www.gnod.com/search/ai#q=write%20a%20limerick-style%20poem%20about%20the%20chapter_title)
+
+```{r}
+# saint peter's sports bar
+# evil deed instant replay
+# sinful thought jukebox
+```
+~~~
+
+
+
+~~~{download_and_import_block}
+
+Define a function to extract values stored in parentheses:
+
+```{r eval = FALSE , results = "hide" }
+chapter_tag_numeric_to_factor <- 
+	function( this_column ) as.numeric( gsub( "^\\(([0-9]+)\\) (.*)" , "\\1" , this_column ) )
+```
+
+
+
+
+1. Register for the National Archive of Criminal Justice Data at https://www.icpsr.umich.edu/web/NACJD/series/95
+
+2. Choose `National Crime Victimization Survey, Concatenated File, [United States], 1992-2022 (ICPSR 38604)`
+
+3. Download the `R` version of the September 18, 2023 file.
+
+Import the three main files:
+
+```{r eval = FALSE , results = "hide" }
+chapter_tag_household_df_name <-
+	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0001/38604-0001-Data.rda" ) )
+	
+chapter_tag_person_df_name <-
+	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0002/38604-0002-Data.rda" ) )
+
+chapter_tag_incident_df_name <-
+	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0003/38604-0003-Data.rda" ) )
+
+chapter_tag_household_df <- get( chapter_tag_household_df_name )
+chapter_tag_person_df <- get( chapter_tag_person_df_name )
+chapter_tag_incident_df <- get( chapter_tag_incident_df_name )
+
+names( chapter_tag_household_df ) <- tolower( names( chapter_tag_household_df ) )
+names( chapter_tag_person_df ) <- tolower( names( chapter_tag_person_df ) )
+names( chapter_tag_incident_df ) <- tolower( names( chapter_tag_incident_df ) )
+```
+
+
+Determine which variables from each table to retain:
+```{r eval = FALSE , results = "hide" }
+household_variables_to_keep <-
+	c( 'year' , 'yearq' , 'idhh' , 'wgthhcy' , 'v2002' , 'sc214a' , 
+	'v2026' , 'v2126a' , 'v2126b' , 'v2015' , 'v2017' , 'v2117' , 
+	'v2118' , 'v2125' , 'v2071' , 'v2072' , 'v2127b' , 'v2129' )
+
+person_variables_to_keep <-
+	c( 'year' , 'yearq' , 'v3018' , 'v3014' , 'sc214a' , 'v3023' , 
+	'v3023a' , 'v3024' , 'v3024a' , 'v2117' , 'v2118' , 'v3002' , 
+	'idhh' , 'idper' , 'wgtpercy' , 'v3015' )
+
+incident_variables_to_keep <-
+	c( 'year' , 'yearq' , 'v2117' , 'v2118' , 'v4529' , 'v4022' , 
+	paste0( 'v401' , 6:9 ) , 'v4399' , 'v4529' , 'v4049' , paste0( 'v405' , 0:8 ) , 
+	'v4060' , 'v4062' , paste0( 'v41' , 11:22 ) , 'v4064' , paste0( 'v41' , 27:37 ) , 
+	'v4467' , 'v4234' , 'v4245' , 'v4243' , 'v4241' , 'v4256' , 'v4258' , 'v4278' , 
+	'v4262' , paste0( 'v42' , 59:61 ) , 'v4269' , 'v4270' , 'v4268' , 'v4267' , 
+	'v4271' , 'v4266' , 'v4265' , 'wgtviccy' , 'idhh' , 'idper' , 'v4002' , 'v4288' , 
+	'v4290' , 'v4400' , 'v4437' , 'v4422' , 'v4024' )
+```
+
+
+Limit columns in each data.frame to those specified above and also to the period 1994-2022, excluding 2006:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_household_df <-
+	chapter_tag_household_df[ 
+		chapter_tag_household_df[ , 'year' ] %in% setdiff( 1994:2022 , 2006 ) , 
+		household_variables_to_keep
+	]
+
+chapter_tag_person_df <-
+	chapter_tag_person_df[ 
+		chapter_tag_person_df[ , 'year' ] %in% setdiff( 1994:2022 , 2006 ) , 
+		person_variables_to_keep
+	]
+
+chapter_tag_incident_df <-
+	chapter_tag_incident_df[
+		chapter_tag_incident_df[ , 'year' ] %in% setdiff( 1994:2022 , 2006 ) , 
+		incident_variables_to_keep
+	]
+```
+
+
+
+
+
+Recode identifiers to character class:
+```{r eval = FALSE , results = "hide" }
+
+chapter_tag_household_df[ , 'idhh' ] <- as.character( chapter_tag_household_df[ , 'idhh' ] )
+
+chapter_tag_person_df[ c( 'idhh' , 'idper' ) ] <-
+	sapply( chapter_tag_person_df[ c( 'idhh' , 'idper' ) ] , as.character )
+
+chapter_tag_incident_df[ c( 'idhh' , 'idper' ) ] <-
+	sapply( chapter_tag_incident_df[ c( 'idhh' , 'idper' ) ] , as.character )
+```
+
+Recode factor variables to numeric values:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_household_df[ sapply( chapter_tag_household_df , class ) == 'factor' ] <-
+	sapply( 
+		chapter_tag_household_df[ chapter_tag_household_df( hhld_df , class ) == 'factor' ] , 
+		chapter_tag_numeric_to_factor , 
+		simplify = FALSE 
+	)
+
+chapter_tag_person_df[ sapply( chapter_tag_person_df , class ) == 'factor' ] <-
+	sapply( 
+		chapter_tag_person_df[ sapply( chapter_tag_person_df , class ) == 'factor' ] , 
+		chapter_tag_numeric_to_factor ,
+		simplify = FALSE
+	)
+
+chapter_tag_incident_df[ sapply( chapter_tag_person_df , class ) == 'factor' ] <-
+	sapply( 
+		chapter_tag_incident_df[ sapply( chapter_tag_incident_df , class ) == 'factor' ] , 
+		chapter_tag_numeric_to_factor ,
+		simplify = FALSE
+	)
+```
+
+
+Add a year group variable to each data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_household_df[ , 'yr_grp' ] <-
+	findInterval( chapter_tag_household_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
+	
+chapter_tag_person_df[ , 'yr_grp' ] <-
+	findInterval( chapter_tag_person_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
+
+chapter_tag_incident_df[ , 'yr_grp' ] <-
+	findInterval( chapter_tag_incident_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
+```	
+
+Add a flag indicating whether each incident occurred inside the country:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_incident_df[ , 'exclude_outus' ] <-
+	chapter_tag_incident_df[ , 'v4022' ] %in% 1
+```
+
+
+
+Define violent crimes on the incident data.frame:
+```{r eval = FALSE , results = "hide" }
+# rape and sexual assault
+chapter_tag_incident_df[ , 'rsa' ] <- 
+	chapter_tag_incident_df[ , 'v4529' ] %in% c( 1:4 , 15 , 16 , 18 , 19 )
+
+# robbery
+chapter_tag_incident_df[ , 'rob' ] <- 
+	chapter_tag_incident_df[ , 'v4529' ] %in% 5:10
+
+# assault
+chapter_tag_incident_df[ , 'ast' ] <- 
+	chapter_tag_incident_df[ , 'v4529' ] %in% c( 11:14 , 17 , 20 )
+	
+# simple assault
+chapter_tag_incident_df[ , 'sast' ] <- 
+	chapter_tag_incident_df[ , 'v4529' ] %in% c( 14 , 17 , 20 )
+
+# aggravated assault
+chapter_tag_incident_df[ , 'aast' ] <- 
+	chapter_tag_incident_df[ , 'v4529' ] %in% 11:13
+
+# violent crime
+chapter_tag_incident_df[ , 'violent' ] <-
+	apply( chapter_tag_incident_df[ c( 'rsa' , 'rob' , 'ast' ) ] , 1 , any )
+
+# violent crime excluding simple assault
+chapter_tag_incident_df[ , 'sviolent' ] <-
+	apply( chapter_tag_incident_df[ , c( 'rsa' , 'rob' , 'aast' ) ] , 1 , any )
+```
+
+Define personal theft and then person-crime on the incident data.frame:
+```{r eval = FALSE , results = "hide" }	
+chapter_tag_incident_df[ , 'ptft' ] <- 
+	chapter_tag_incident_df[ , 'v4529' ] %in% 21:23
+
+chapter_tag_incident_df[ , 'personcrime' ] <-
+	apply( chapter_tag_incident_df[ , c( 'violent' , 'ptft' ) ] , 1 , any )
+```
+
+
+Define property crimes on the incident data.frame:
+```{r eval = FALSE , results = "hide" }
+
+chapter_tag_incident_df[ , 'hhburg' ] <-
+	chapter_tag_incident_df[ , 'v4529' ] %in% 31:33
+
+# completed theft with something taken
+chapter_tag_incident_df[ , 'burg_ct' ] <-
+		( chapter_tag_incident_df[ , 'v4529' ] %in% 31:33 ) &
+		( chapter_tag_incident_df[ , 'v4288' ] %in% 1 )
+
+# attempted theft
+chapter_tag_incident_df[ , 'burg_at' ] <-
+		( chapter_tag_incident_df[ , 'v4529' ] %in% 31:33 ) &
+		( chapter_tag_incident_df[ , 'v4290' ] %in% 1 )
+
+chapter_tag_incident_df[ , 'burg_ncat' ] <-
+		( chapter_tag_incident_df[ , 'v4529' ] %in% 31:33 ) &
+		( chapter_tag_incident_df[ , 'v4288' ] %in% 2 ) &
+		( chapter_tag_incident_df[ , 'v4290' ] %in% 2 )
+
+
+chapter_tag_incident_df[ , 'burgcats2' ] <- 0
+chapter_tag_incident_df[ chapter_tag_incident_df[ , 'burg_ncat' ] , 'burgcats2' ] <- 2
+chapter_tag_incident_df[ chapter_tag_incident_df[ , 'burg_ct' ] | chapter_tag_incident_df[ , 'burg_at' ] , 'burgcats2' ] <- 1
+	
+
+chapter_tag_incident_df[ , 'burg' ] <- 
+	chapter_tag_incident_df[ , 'burgcats2' ] %in% 1
+
+# trespassing
+chapter_tag_incident_df[ , 'tres' ] <- 
+	chapter_tag_incident_df[ , 'burgcats2' ] %in% 2
+
+# motor vehicle theft
+chapter_tag_incident_df[ , 'mvtft' ] <-
+	chapter_tag_incident_df[ , 'v4529' ] %in% 40:41
+
+# household theft
+chapter_tag_incident_df[ , 'hhtft' ] <-
+	chapter_tag_incident_df[ , 'v4529' ] %in% 54:59
+
+# property crime
+chapter_tag_incident_df[ , 'property' ] <-
+	apply( chapter_tag_incident_df[ c( 'hhburg' , 'mvtft' , 'hhtft' ) ] , 1 , any )
+```	
+
+
+
+
+
+
+
+
+
+
+
+
+Import all four files:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+four_tbl <- lapply( unzipped_files , read_sas )
+
+four_df <- lapply( four_tbl , data.frame )
+
+four_df <- lapply( four_df , function( w ){ names( w ) <- tolower( names( w ) ) ; w } )
+
+household_df <- four_df[[ grep( 'hhpub' , basename( unzipped_files ) ) ]]
+family_df <- four_df[[ grep( 'ffpub' , basename( unzipped_files ) ) ]]
+person_df <- four_df[[ grep( 'pppub' , basename( unzipped_files ) ) ]]
+repwgts_df <- four_df[[ grep( 'repwgt' , basename( unzipped_files ) ) ]]
+```
+
+Divide weights:
+
+```{r eval = FALSE , results = "hide" }
+household_df[ , 'hsup_wgt' ] <- household_df[ , 'hsup_wgt' ] / 100
+family_df[ , 'fsup_wgt' ] <- family_df[ , 'fsup_wgt' ] / 100
+for ( j in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) person_df[ , j ] <- person_df[ , j ] / 100
+```
+
+Merge these four files:
+
+```{r eval = FALSE , results = "hide" }
+names( family_df )[ names( family_df ) == 'fh_seq' ] <- 'h_seq'
+names( person_df )[ names( person_df ) == 'ph_seq' ] <- 'h_seq'
+names( person_df )[ names( person_df ) == 'phf_seq' ] <- 'ffpos'
+
+hh_fm_df <- merge( household_df , family_df )
+hh_fm_pr_df <- merge( hh_fm_df , person_df )
+chapter_tag_df <- merge( hh_fm_pr_df , repwgts_df )
+
+stopifnot( nrow( chapter_tag_df ) == nrow( person_df ) )
+```
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
+library(survey)
+	
+chapter_tag_design <-
+	svrepdesign(
+		weights = ~ marsupwt ,
+		repweights = "pwwgt[1-9]" ,
+		type = "Fay" ,
+		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+		data = chapter_tag_df ,
+		combined.weights = TRUE ,
+		mse = TRUE
+	)
+```
+~~~
+
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+
+		one = 1 ,
+
+		a_maritl = 
+			factor( 
+				a_maritl , 
+				labels = 
+					c( 
+						"married - civilian spouse present" ,
+						"married - AF spouse present" ,
+						"married - spouse absent" ,
+						"widowed" ,
+						"divorced" , 
+						"separated" , 
+						"never married"
+					)
+			) ,
+			
+		state_name =
+			factor(
+				gestfips ,
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L) ,
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming")
+			) ,
+
+		male = as.numeric( a_sex == 1 )
+	)
+~~~
+
+
+group_by_variable: state_name
+linear_variable: ptotval
+categorical_variable: a_maritl
+ratio_estimation_numerator: moop
+ratio_estimation_denominator: ptotval
+subset_definition: a_age %in% 18:64
+subset_definition_description: persons aged 18-64
+binary_variable: male
+
+
+
+
+needs_srvyr_block: yes
+
+~~~{convey_block}
+## Poverty and Inequality Estimation with `convey` \\ {-}
+
+The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
+
+```{r eval = FALSE , results = "hide" }
+library(convey)
+chapter_tag_design <- convey_prep( chapter_tag_design )
+
+chapter_tag_household_design <- subset( chapter_tag_design , a_exprrp %in% 1:2 )
+
+svygini( ~ htotval , chapter_tag_household_design )
+```
+~~~
+
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches the count and share of individuals with health insurance in [Table H-01](https://www2.census.gov/programs-surveys/cps/tables/hi/2023/h_01.xlsx):
+
+```{r eval = FALSE , results = "hide" }
+count_covered <- svytotal( ~ as.numeric( cov == 1 ) , chapter_tag_design )
+
+stopifnot( round( coef( count_covered ) , -5 ) == 304000000 )
+
+stopifnot(
+	round( coef( count_covered ) - confint( count_covered , level = 0.9 )[1] , -3 ) == 746000
+)
+
+share_covered <- svymean( ~ as.numeric( cov == 1 ) , subset( chapter_tag_design , cov > 0 ) )
+
+stopifnot( round( coef( share_covered ) , 3 ) == 0.921 )
+
+stopifnot(
+	round( coef( share_covered ) - confint( share_covered , level = 0.9 )[1] , 3 ) == 0.002
+)
+
+```
+
+~~~
+
+
