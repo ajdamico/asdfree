@@ -43,6 +43,27 @@ chapter_tag_numeric_to_factor <-
 ```
 
 
+Define a function to merge aggregated information onto main data.frame objects:
+```{r eval = FALSE , results = "hide" }
+left_join_zero_missings <-
+	function( left_df , right_df ){
+
+		final_df <-
+			merge(
+				left_df ,
+				right_df ,
+				all.x = TRUE
+			)
+			
+		stopifnot( nrow( final_df ) == nrow( left_df ) )
+
+		for( this_column in setdiff( names( right_df ) , names( left_df ) ) ) final_df[ is.na( final_df[ , this_column ] ) , this_column ] <- 0
+
+		final_df
+	}
+```
+
+
 
 
 1. Register for the National Archive of Criminal Justice Data at https://www.icpsr.umich.edu/web/NACJD/series/95
@@ -67,6 +88,10 @@ chapter_tag_household_df <- get( chapter_tag_household_df_name )
 chapter_tag_person_df <- get( chapter_tag_person_df_name )
 chapter_tag_incident_df <- get( chapter_tag_incident_df_name )
 
+rm( list = chapter_tag_household_df_name ) ; gc()
+rm( list = chapter_tag_person_df_name ) ; gc()
+rm( list = chapter_tag_incident_df_name ) ; gc()
+
 names( chapter_tag_household_df ) <- tolower( names( chapter_tag_household_df ) )
 names( chapter_tag_person_df ) <- tolower( names( chapter_tag_person_df ) )
 names( chapter_tag_incident_df ) <- tolower( names( chapter_tag_incident_df ) )
@@ -86,7 +111,7 @@ person_variables_to_keep <-
 	'idhh' , 'idper' , 'wgtpercy' , 'v3015' )
 
 incident_variables_to_keep <-
-	c( 'year' , 'yearq' , 'v2117' , 'v2118' , 'v4529' , 'v4022' , 
+	c( 'year' , 'yearq' , 'v2117' , 'v2118' , 'v4022' , 
 	paste0( 'v401' , 6:9 ) , 'v4399' , 'v4529' , 'v4049' , paste0( 'v405' , 0:8 ) , 
 	'v4060' , 'v4062' , paste0( 'v41' , 11:22 ) , 'v4064' , paste0( 'v41' , 27:37 ) , 
 	'v4467' , 'v4234' , 'v4245' , 'v4243' , 'v4241' , 'v4256' , 'v4258' , 'v4278' , 
@@ -123,7 +148,6 @@ chapter_tag_incident_df <-
 
 Recode identifiers to character class:
 ```{r eval = FALSE , results = "hide" }
-
 chapter_tag_household_df[ , 'idhh' ] <- as.character( chapter_tag_household_df[ , 'idhh' ] )
 
 chapter_tag_person_df[ c( 'idhh' , 'idper' ) ] <-
@@ -137,7 +161,7 @@ Recode factor variables to numeric values:
 ```{r eval = FALSE , results = "hide" }
 chapter_tag_household_df[ sapply( chapter_tag_household_df , class ) == 'factor' ] <-
 	sapply( 
-		chapter_tag_household_df[ chapter_tag_household_df( hhld_df , class ) == 'factor' ] , 
+		chapter_tag_household_df[ sapply( chapter_tag_household_df , class ) == 'factor' ] , 
 		chapter_tag_numeric_to_factor , 
 		simplify = FALSE 
 	)
@@ -149,13 +173,22 @@ chapter_tag_person_df[ sapply( chapter_tag_person_df , class ) == 'factor' ] <-
 		simplify = FALSE
 	)
 
-chapter_tag_incident_df[ sapply( chapter_tag_person_df , class ) == 'factor' ] <-
+chapter_tag_incident_df[ sapply( chapter_tag_incident_df , class ) == 'factor' ] <-
 	sapply( 
 		chapter_tag_incident_df[ sapply( chapter_tag_incident_df , class ) == 'factor' ] , 
 		chapter_tag_numeric_to_factor ,
 		simplify = FALSE
 	)
 ```
+
+Add a column of ones to each data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_household_df[ , 'one' ] <- 1
+	
+chapter_tag_person_df[ , 'one' ] <- 1
+
+chapter_tag_incident_df[ , 'one' ] <- 1
+```	
 
 
 Add a year group variable to each data.frame:
@@ -174,6 +207,21 @@ Add a flag indicating whether each incident occurred inside the country:
 ```{r eval = FALSE , results = "hide" }
 chapter_tag_incident_df[ , 'exclude_outus' ] <-
 	chapter_tag_incident_df[ , 'v4022' ] %in% 1
+```
+
+Add a half-year indicator to the incident data.frame:
+
+```{r eval = FALSE , results = "hide" }
+chapter_tag_incident_df <-
+	transform(
+		chapter_tag_incident_df ,
+		half_year =
+			ifelse( substr( yearq , 6 , 6 ) %in% c( '1' , '2' ) , 1 ,
+			ifelse( substr( yearq , 6 , 6 ) %in% c( '3' , '4' ) , 2 ,
+				NA ) )
+	)
+	
+stopifnot( all( chapter_tag_incident_df[ , 'half_year' ] %in% 1:2 ) )
 ```
 
 
@@ -221,7 +269,6 @@ chapter_tag_incident_df[ , 'personcrime' ] <-
 
 Define property crimes on the incident data.frame:
 ```{r eval = FALSE , results = "hide" }
-
 chapter_tag_incident_df[ , 'hhburg' ] <-
 	chapter_tag_incident_df[ , 'v4529' ] %in% 31:33
 
@@ -269,10 +316,283 @@ chapter_tag_incident_df[ , 'property' ] <-
 
 
 
+Define a series weight on the incident data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_incident_df[ , 'series' ] <- 2
+
+chapter_tag_incident_df[ 
+
+	chapter_tag_incident_df[ , 'v4017' ] %in% c( 1 , 8 ) |
+	chapter_tag_incident_df[ , 'v4018' ] %in% c( 2 , 8 ) |
+	chapter_tag_incident_df[ , 'v4019' ] %in% c( 1 , 8 )
+
+	, 'series' ] <- 1
+	 
+chapter_tag_incident_df[ , 'serieswgt' ] <- 1
+
+chapter_tag_incident_df[ !( chapter_tag_incident_df[ , 'v4016' ] %in% 997:998 ) , 'n10v4016' ] <-
+	pmin( chapter_tag_incident_df[ !( chapter_tag_incident_df[ , 'v4016' ] %in% 997:998 ) , 'v4016' ] , 10 )
+	 
+chapter_tag_incident_df[ chapter_tag_incident_df[ , 'series' ] == 2 , 'serieswgt' ] <-
+	chapter_tag_incident_df[ chapter_tag_incident_df[ , 'series' ] == 2 , 'n10v4016' ]
+
+chapter_tag_incident_df[ chapter_tag_incident_df[ , 'series' ] == 2 & is.na( chapter_tag_incident_df[ , 'n10v4016' ] ) , 'serieswgt' ] <- 6
+```
 
 
 
 
+Aggregate property-crimes to the household-interview level:
+```{r eval = FALSE , results = "hide" }
+summed_hh_crimes <-
+	aggregate(
+		cbind(
+			property * serieswgt ,
+			hhburg * serieswgt ,
+			mvtft * serieswgt ,
+			burg * serieswgt ,
+			tres * serieswgt
+		) ~ yearq + idhh + v4002 + wgtviccy ,
+		
+		data = subset( chapter_tag_incident_df , !exclude_outus & property ) ,
+		
+		sum
+	)
+
+names( summed_hh_crimes ) <-
+	c( 'yearq' , 'idhh' , 'v2002' , 'wgtviccy' , 'property' , 'hhburg' , 'mvtft' , 'burg' , 'tres' )
+```
+
+
+Merge aggregated property-crimes on to the household-interview data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_household_df <- left_join_zero_missings( chapter_tag_household_df , summed_hh_crimes )
+```
+
+
+
+Aggregate person-crimes to the person-interview level:
+```{r eval = FALSE , results = "hide" }
+summed_person_crimes <-
+	aggregate(
+		cbind(
+			violent * serieswgt ,
+			sviolent * serieswgt ,
+			rsa * serieswgt ,
+			rob * serieswgt ,
+			aast * serieswgt ,
+			sast * serieswgt ,
+			ptft * serieswgt
+		) ~ yearq + idhh + v4002 + idper + wgtviccy ,
+		
+		data = subset( chapter_tag_incident_df , !exclude_outus & personcrime ) ,
+		
+		sum
+	)
+	
+
+names( summed_person_crimes ) <-
+	c( 'yearq' , 'idhh' , 'v3002' , 'idper' , 'wgtviccy' , 'violent' , 'sviolent' , 'rsa' , 'rob' , 'aast' , 'sast' , 'ptft' )
+```
+
+
+Merge aggregated property-crimes on to the person-interview data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_person_crimes )
+```
+
+
+Aggregate violent crimes to the person-year level:
+```{r eval = FALSE , results = "hide" }
+summed_person_year_violent_crimes <-
+	aggregate(
+		violent * serieswgt ~ idhh + idper + year ,
+		data = subset( chapter_tag_incident_df , !exclude_outus & violent ) ,
+		sum
+	)
+
+names( summed_person_year_violent_crimes )[ ncol( summed_person_year_violent_crimes ) ] <- 'violent_year'
+```
+
+Merge aggregated person-year violent crime series weights on to the person-interview data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_person_year_violent_crimes )
+```
+
+
+Aggregate violent crimes to the person-half-year level, then reshape into a wide data.frame:
+```{r eval = FALSE , results = "hide" }
+summed_person_half_year_violent_crimes <-
+	aggregate(
+		wgtviccy ~ idhh + idper + year + half_year ,
+		data = subset( chapter_tag_incident_df , !exclude_outus & violent ) ,
+		mean
+	)
+
+first_half_violent_crimes <-
+	subset( summed_person_half_year_violent_crimes , half_year == 1 )
+	
+second_half_violent_crimes <-
+	subset( summed_person_half_year_violent_crimes , half_year == 2 )
+
+first_half_violent_crimes[ , 'half_year' ] <-
+	second_half_violent_crimes[ , 'half_year' ] <- NULL
+	
+names( first_half_violent_crimes )[ ncol( first_half_violent_crimes ) ] <- 'vwgt1'
+names( second_half_violent_crimes )[ ncol( second_half_violent_crimes ) ] <- 'vwgt2'
+
+wide_person_half_year_violent_crimes <-
+	merge(
+		first_half_violent_crimes ,
+		second_half_violent_crimes ,
+		all = TRUE
+	)
+```
+
+Merge both violent crime weights on to the person-interview data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , wide_person_half_year_violent_crimes )
+```
+
+
+Find the maximum incident victim weight among three half-year periods:
+```{r eval = FALSE , results = "hide" }
+maximum_half_violent_crimes <-
+	aggregate(
+		wgtviccy ~ idhh + idper + year + half_year + v4002 ,
+		data = subset( chapter_tag_incident_df , !exclude_outus & violent ) ,
+		max
+	)
+
+maximum_half_violent_crimes <-
+	maximum_half_violent_crimes[ do.call( order , maximum_half_violent_crimes[ c( 'idhh' , 'idper' , 'year' , 'half_year' ) ] ) , ]
+
+maximum_half_violent_crimes[ , 'byvar' ] <-
+	apply( maximum_half_violent_crimes[ c( 'idhh' , 'idper' , 'year' , 'half_year' ) ] , 1 , paste , collapse = ' ' )
+	
+	
+maximum_half_violent_crimes[ 1 , 'id' ] <- 1
+
+for( i in seq( 2 , nrow( maximum_half_violent_crimes ) ) ){
+
+	if( maximum_half_violent_crimes[ i , 'byvar' ] == maximum_half_violent_crimes[ i - 1 , 'byvar' ] ){
+	
+		maximum_half_violent_crimes[ i , 'id' ] <- maximum_half_violent_crimes[ i - 1 , 'id' ] + 1
+		
+	} else {
+	
+		maximum_half_violent_crimes[ i , 'id' ] <- 1
+		
+	}
+}
+
+maximum_half_violent_crimes[ , 'label' ] <- paste0( '_' , maximum_half_violent_crimes[ , 'half_year' ] , '_' , maximum_half_violent_crimes[ , 'id' ] )
+
+maximum_half_violent_crimes[ , 'byvar' ] <- NULL
+
+
+stopifnot( all( maximum_half_violent_crimes[ , 'label' ] %in% c( '_1_1' , '_2_1' , '_1_2' ) ) )
+
+h_1_1_df <-
+	maximum_half_violent_crimes[ 
+		maximum_half_violent_crimes[ , 'label' ] == '_1_1' , 
+		c( 'idhh' , 'idper' , 'year' , 'wgtviccy' )
+	]
+	
+names( h_1_1_df )[ ncol( h_1_1_df ) ] <- 'wgtviccy_1_1'
+	
+	
+h_2_1_df <-
+	maximum_half_violent_crimes[ 
+		maximum_half_violent_crimes[ , 'label' ] == '_2_1' , 
+		c( 'idhh' , 'idper' , 'year' , 'wgtviccy' )
+	]
+	
+names( h_2_1_df )[ ncol( h_2_1_df ) ] <- 'wgtviccy_2_1'
+	
+	
+h_1_2_df <-
+	maximum_half_violent_crimes[ 
+		maximum_half_violent_crimes[ , 'label' ] == '_1_2' , 
+		c( 'idhh' , 'idper' , 'year' , 'wgtviccy' )
+	]
+	
+names( h_1_2_df )[ ncol( h_1_2_df ) ] <- 'wgtviccy_1_2'
+
+three_half_df <-
+	Reduce( function( ... ) merge( ... , all = TRUE ) , list( h_1_1_df , h_2_1_df , h_1_2_df ) )
+```
+
+Merge these three half-year period weights on to the person-interview data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , three_half_df )
+```
+
+Aggregate interview counts to the person-year level:
+```{r eval = FALSE , results = "hide" }
+summed_person_year_interviews <-
+	aggregate(
+		one ~ idhh + idper + year ,
+		data = subset( chapter_tag_person_df , wgtpercy > 0 ) ,
+		sum
+	)
+
+names( summed_person_year_interviews )[ ncol( summed_person_year_interviews ) ] <- 'interview_count'
+```
+
+
+Merge interview_count on to the person-interview data.frame:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_person_year_interviews )
+```
+
+
+chapter_tag_person_df <-
+	transform(
+		chapter_tag_person_df ,
+		grp =
+			ifelse( violent_year == 0 , 1 ,
+			ifelse( interview_count == 1 & ( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) & wgtviccy > 0 , 2 ,
+			ifelse( interview_count == 2 & ( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) , 3 ,
+			ifelse( interview_count == 2 & ( vwgt1 > 0 ) & ( vwgt2 > 0 ) & ( wgtviccy > 0 ) , 4 ,
+			ifelse( interview_count == 3 & ( ( as.numeric( wgtviccy_1_1 > 0 ) + as.numeric( wgtviccy_2_1 > 0 ) + as.numeric( wgtviccy_1_2 > 0 ) ) == 1 ) , 5 ,
+			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & ( wgtviccy_1_2 > 0 ) , 6 ,
+			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & substr( yearq , 6 , 6 ) %in% 1:2 , 7 ,
+			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & substr( yearq , 6 , 6 ) %in% 3:4 , 8 , 9 ) ) ) ) ) ) ) ) )
+			
+
+# matches table 8
+# https://www.ojp.gov/pdffiles1/bjs/grants/308745.pdf#page=44
+with(subset(chapter_tag_person_df,year==2021),tapply(prev_wgt0,grp,sum))
+
+
+# everybody in group 9 has both a wgtviccy == 0 & wgtpercy == 0
+
+stopifnot( nrow( subset( chapter_tag_person_df , grp == 9 & wgtviccy > 0 ) ) == 0 )
+stopifnot( nrow( subset( chapter_tag_person_df , grp == 9 & wgtpercy > 0 ) ) == 0 )
+
+
+chapter_tag_person_df <-
+	transform(
+		chapter_tag_person_df ,
+		
+		prev_wgt0 =
+			ifelse( grp == 1 , wgtpercy ,
+			ifelse( grp == 2 , wgtviccy / 2 ,
+			ifelse( grp == 3 , pmax( vwgt1 , vwgt2 , na.rm = TRUE ) / 2 ,
+			ifelse( grp == 4 , wgtviccy / 2 ,
+			ifelse( grp == 5 , pmax( wgtviccy_1_1 , wgtviccy_1_2 , wgtviccy_2_1 , na.rm = TRUE ) / 2 ,
+			ifelse( grp == 6 , wgtviccy / 2 ,
+			ifelse( grp == 7 , wgtviccy_1_1 / 2 ,
+			ifelse( grp == 8 , wgtviccy_2_1 / 2 ,
+			ifelse( grp == 9 , 0 ,
+				NA ) ) ) ) ) ) ) ) ) )
+
+	
+
+
+stop( 'stopped here')
+	
 
 
 
