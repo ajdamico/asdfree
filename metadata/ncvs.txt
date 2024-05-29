@@ -546,11 +546,12 @@ Merge interview_count on to the person-interview data.frame:
 chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_person_year_interviews )
 ```
 
-
+Apply Interview/Incident Groups:
+```{r eval = FALSE , results = "hide" }
 chapter_tag_person_df <-
 	transform(
 		chapter_tag_person_df ,
-		grp =
+		interview_incident_groups =
 			ifelse( violent_year == 0 , 1 ,
 			ifelse( interview_count == 1 & ( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) & wgtviccy > 0 , 2 ,
 			ifelse( interview_count == 2 & ( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) , 3 ,
@@ -558,18 +559,15 @@ chapter_tag_person_df <-
 			ifelse( interview_count == 3 & ( ( as.numeric( wgtviccy_1_1 > 0 ) + as.numeric( wgtviccy_2_1 > 0 ) + as.numeric( wgtviccy_1_2 > 0 ) ) == 1 ) , 5 ,
 			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & ( wgtviccy_1_2 > 0 ) , 6 ,
 			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & substr( yearq , 6 , 6 ) %in% 1:2 , 7 ,
-			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & substr( yearq , 6 , 6 ) %in% 3:4 , 8 , 9 ) ) ) ) ) ) ) ) )
+			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & substr( yearq , 6 , 6 ) %in% 3:4 , 8 , 9 ) ) ) ) ) ) ) )
+	)
 			
 
-# matches table 8
-# https://www.ojp.gov/pdffiles1/bjs/grants/308745.pdf#page=44
-with(subset(chapter_tag_person_df,year==2021),tapply(prev_wgt0,grp,sum))
 
 
-# everybody in group 9 has both a wgtviccy == 0 & wgtpercy == 0
-
-stopifnot( nrow( subset( chapter_tag_person_df , grp == 9 & wgtviccy > 0 ) ) == 0 )
-stopifnot( nrow( subset( chapter_tag_person_df , grp == 9 & wgtpercy > 0 ) ) == 0 )
+# confirm all records in group 9 have both a wgtviccy == 0 & wgtpercy == 0
+stopifnot( nrow( subset( chapter_tag_person_df , interview_incident_groups == 9 & wgtviccy > 0 ) ) == 0 )
+stopifnot( nrow( subset( chapter_tag_person_df , interview_incident_groups == 9 & wgtpercy > 0 ) ) == 0 )
 
 
 chapter_tag_person_df <-
@@ -577,22 +575,124 @@ chapter_tag_person_df <-
 		chapter_tag_person_df ,
 		
 		prev_wgt0 =
-			ifelse( grp == 1 , wgtpercy ,
-			ifelse( grp == 2 , wgtviccy / 2 ,
-			ifelse( grp == 3 , pmax( vwgt1 , vwgt2 , na.rm = TRUE ) / 2 ,
-			ifelse( grp == 4 , wgtviccy / 2 ,
-			ifelse( grp == 5 , pmax( wgtviccy_1_1 , wgtviccy_1_2 , wgtviccy_2_1 , na.rm = TRUE ) / 2 ,
-			ifelse( grp == 6 , wgtviccy / 2 ,
-			ifelse( grp == 7 , wgtviccy_1_1 / 2 ,
-			ifelse( grp == 8 , wgtviccy_2_1 / 2 ,
-			ifelse( grp == 9 , 0 ,
+			ifelse( interview_incident_groups == 1 , wgtpercy ,
+			ifelse( interview_incident_groups == 2 , wgtviccy / 2 ,
+			ifelse( interview_incident_groups == 3 , pmax( vwgt1 , vwgt2 , na.rm = TRUE ) / 2 ,
+			ifelse( interview_incident_groups == 4 , wgtviccy / 2 ,
+			ifelse( interview_incident_groups == 5 , pmax( wgtviccy_1_1 , wgtviccy_1_2 , wgtviccy_2_1 , na.rm = TRUE ) / 2 ,
+			ifelse( interview_incident_groups == 6 , wgtviccy / 2 ,
+			ifelse( interview_incident_groups == 7 , wgtviccy_1_1 / 2 ,
+			ifelse( interview_incident_groups == 8 , wgtviccy_2_1 / 2 ,
+			ifelse( interview_incident_groups == 9 , 0 ,
 				NA ) ) ) ) ) ) ) ) ) )
 
-	
+# matches table 8
+# https://www.ojp.gov/pdffiles1/bjs/grants/308745.pdf#page=44
+```	
 
 
-stop( 'stopped here')
-	
+
+Aggregate `wgtviccy` and `prev_wgt0` sums to the year level, then merge:
+```{r eval = FALSE , results = "hide" }
+summed_year_weights <-
+	aggregate(
+		cbind( wgtviccy , prev_wgt0 ) ~ year ,
+		data = subset( chapter_tag_person_df , violent_year == 1 ) ,
+		sum
+	)
+
+names( summed_year_weights ) <- c( 'year' , 'vwgt_1v' , 'prev_1v' )
+
+chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_year_weights )
+```
+
+
+Calibrate so that the weight sums to `wgtviccy` for persons with exactly one victimization:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_person_df <-
+	transform(
+		chapter_tag_person_df ,
+
+		prev_wgt1 = 
+			ifelse( violent_year == 0 , prev_wgt0 ,
+			ifelse( violent_year > 0 & wgtpercy > 0 , 
+				prev_wgt0 * ( vwgt_1v / prev_1v ) , 0 ) )
+	)
+```
+
+
+Aggregate `wgtviccy` and `prev_wgt0` sums to the year level, then merge:
+```{r eval = FALSE , results = "hide" }
+summed_year_crimes <-
+	aggregate(
+		cbind( 
+			wgtpercy , 
+			ifelse( violent_year > 0 , prev_wgt1 , 0 ) , 
+			ifelse( violent_year == 0 , prev_wgt1 , 0 )
+		) ~ year ,
+		data = chapter_tag_person_df ,
+		sum
+	)
+
+names( summed_year_crimes ) <- c( 'year' , 'total_persons' , 'prev_with_crime' , 'prev_no_crime' )
+
+chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_year_crimes )
+```
+
+
+
+Calibrate so that the weight sums to `wgtpercy` for all persons:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_person_df <-
+	transform(
+		chapter_tag_person_df ,
+
+		prev_wgt =
+			ifelse( 
+				violent_year == 0 ,
+				prev_wgt1 * ( ( total_persons - prev_with_crime ) / prev_no_crime ) ,
+				prev_wgt1 
+			) ,
+				
+		victim = ( violent_year > 0 )
+	)
+```
+
+
+
+
+options(scipen=20)
+
+library(survey)
+
+options('survey.lonely.psu' = 'adjust')
+
+# replace missing clusters
+chapter_tag_person_df[ is.na( chapter_tag_person_df[ , 'v2118' ] ) , 'v2118' ] <- -1
+chapter_tag_person_df[ is.na( chapter_tag_person_df[ , 'v2117' ] ) , 'v2117' ] <- -1
+
+
+chapter_tag_design <-
+	svydesign( 
+		~ v2118 ,
+		strata = ~ interaction( yr_grp , v2117 ) ,
+		data = chapter_tag_person_df ,
+		weights = ~ prev_wgt ,
+		nest = TRUE
+	)
+
+
+
+svyby( 
+	~ as.numeric( victim ) , 
+	~ year , 
+	chapter_tag_design , 
+	svymean
+)
+
+
+
+
 
 
 
