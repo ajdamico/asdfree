@@ -1,6 +1,15 @@
-commit_memo <- "'gpl3'"
+commit_memo <- "'ncvs draft'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
+
+
+
+# test an individual script
+# chapter_tag <- 'ncvs'
+# source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\syntaxtractor.R" ) )
+# writeLines( syntaxtractor( 'ncvs' ) , this_tf <- tempfile() )
+# source( this_tf , echo = TRUE )
+
 
 
 
@@ -284,6 +293,13 @@ rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Gith
 local_testing_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Local Testing Badge" , readLines( w ) ) ) )
 local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_files ] )
 for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE , warning = FALSE , message = FALSE" , readLines( this_rmd ) ) , this_rmd )
+
+
+# replace eval = TRUE with FALSE just to see formatting
+# remove results = 'hide' to see with output
+# probably replace cache = TRUE with FALSE
+# stop( 'pre-render stop to test rmd only in rstudio' )
+
 
 
 setwd( book_folder )

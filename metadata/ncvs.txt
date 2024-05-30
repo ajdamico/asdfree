@@ -39,7 +39,7 @@ Define a function to extract values stored in parentheses:
 
 ```{r eval = FALSE , results = "hide" }
 chapter_tag_numeric_to_factor <- 
-	function( this_column ) as.numeric( gsub( "^\\(([0-9]+)\\) (.*)" , "\\1" , this_column ) )
+	function( this_column ) as.numeric( gsub( "^\\\\(([0-9]+)\\\\) (.*)" , "\\\\1" , this_column ) )
 ```
 
 
@@ -57,7 +57,11 @@ left_join_zero_missings <-
 			
 		stopifnot( nrow( final_df ) == nrow( left_df ) )
 
-		for( this_column in setdiff( names( right_df ) , names( left_df ) ) ) final_df[ is.na( final_df[ , this_column ] ) , this_column ] <- 0
+		for( this_column in setdiff( names( right_df ) , names( left_df ) ) ){
+			final_df[ is.na( final_df[ , this_column ] ) , this_column ] <- 0
+		}
+		
+		gc()
 
 		final_df
 	}
@@ -78,22 +82,22 @@ Import the three main files:
 chapter_tag_household_df_name <-
 	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0001/38604-0001-Data.rda" ) )
 	
-chapter_tag_person_df_name <-
+chapter_tag_df_name <-
 	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0002/38604-0002-Data.rda" ) )
 
 chapter_tag_incident_df_name <-
 	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0003/38604-0003-Data.rda" ) )
 
 chapter_tag_household_df <- get( chapter_tag_household_df_name )
-chapter_tag_person_df <- get( chapter_tag_person_df_name )
+chapter_tag_df <- get( chapter_tag_df_name )
 chapter_tag_incident_df <- get( chapter_tag_incident_df_name )
 
 rm( list = chapter_tag_household_df_name ) ; gc()
-rm( list = chapter_tag_person_df_name ) ; gc()
+rm( list = chapter_tag_df_name ) ; gc()
 rm( list = chapter_tag_incident_df_name ) ; gc()
 
 names( chapter_tag_household_df ) <- tolower( names( chapter_tag_household_df ) )
-names( chapter_tag_person_df ) <- tolower( names( chapter_tag_person_df ) )
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
 names( chapter_tag_incident_df ) <- tolower( names( chapter_tag_incident_df ) )
 ```
 
@@ -108,7 +112,7 @@ household_variables_to_keep <-
 person_variables_to_keep <-
 	c( 'year' , 'yearq' , 'v3018' , 'v3014' , 'sc214a' , 'v3023' , 
 	'v3023a' , 'v3024' , 'v3024a' , 'v2117' , 'v2118' , 'v3002' , 
-	'idhh' , 'idper' , 'wgtpercy' , 'v3015' )
+	'idhh' , 'idper' , 'wgtpercy' , 'v3015' , 'v3033' , 'v2026' )
 
 incident_variables_to_keep <-
 	c( 'year' , 'yearq' , 'v2117' , 'v2118' , 'v4022' , 
@@ -129,9 +133,9 @@ chapter_tag_household_df <-
 		household_variables_to_keep
 	]
 
-chapter_tag_person_df <-
-	chapter_tag_person_df[ 
-		chapter_tag_person_df[ , 'year' ] %in% setdiff( 1994:2022 , 2006 ) , 
+chapter_tag_df <-
+	chapter_tag_df[ 
+		chapter_tag_df[ , 'year' ] %in% setdiff( 1994:2022 , 2006 ) , 
 		person_variables_to_keep
 	]
 
@@ -150,8 +154,8 @@ Recode identifiers to character class:
 ```{r eval = FALSE , results = "hide" }
 chapter_tag_household_df[ , 'idhh' ] <- as.character( chapter_tag_household_df[ , 'idhh' ] )
 
-chapter_tag_person_df[ c( 'idhh' , 'idper' ) ] <-
-	sapply( chapter_tag_person_df[ c( 'idhh' , 'idper' ) ] , as.character )
+chapter_tag_df[ c( 'idhh' , 'idper' ) ] <-
+	sapply( chapter_tag_df[ c( 'idhh' , 'idper' ) ] , as.character )
 
 chapter_tag_incident_df[ c( 'idhh' , 'idper' ) ] <-
 	sapply( chapter_tag_incident_df[ c( 'idhh' , 'idper' ) ] , as.character )
@@ -166,9 +170,9 @@ chapter_tag_household_df[ sapply( chapter_tag_household_df , class ) == 'factor'
 		simplify = FALSE 
 	)
 
-chapter_tag_person_df[ sapply( chapter_tag_person_df , class ) == 'factor' ] <-
+chapter_tag_df[ sapply( chapter_tag_df , class ) == 'factor' ] <-
 	sapply( 
-		chapter_tag_person_df[ sapply( chapter_tag_person_df , class ) == 'factor' ] , 
+		chapter_tag_df[ sapply( chapter_tag_df , class ) == 'factor' ] , 
 		chapter_tag_numeric_to_factor ,
 		simplify = FALSE
 	)
@@ -185,7 +189,7 @@ Add a column of ones to each data.frame:
 ```{r eval = FALSE , results = "hide" }
 chapter_tag_household_df[ , 'one' ] <- 1
 	
-chapter_tag_person_df[ , 'one' ] <- 1
+chapter_tag_df[ , 'one' ] <- 1
 
 chapter_tag_incident_df[ , 'one' ] <- 1
 ```	
@@ -196,8 +200,8 @@ Add a year group variable to each data.frame:
 chapter_tag_household_df[ , 'yr_grp' ] <-
 	findInterval( chapter_tag_household_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
 	
-chapter_tag_person_df[ , 'yr_grp' ] <-
-	findInterval( chapter_tag_person_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
+chapter_tag_df[ , 'yr_grp' ] <-
+	findInterval( chapter_tag_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
 
 chapter_tag_incident_df[ , 'yr_grp' ] <-
 	findInterval( chapter_tag_incident_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
@@ -360,13 +364,16 @@ summed_hh_crimes <-
 	)
 
 names( summed_hh_crimes ) <-
-	c( 'yearq' , 'idhh' , 'v2002' , 'wgtviccy' , 'property' , 'hhburg' , 'mvtft' , 'burg' , 'tres' )
+	c( 'yearq' , 'idhh' , 'v2002' , 'wgtviccy' , 'property' , 'hhburg' , 
+	'mvtft' , 'burg' , 'tres' )
 ```
 
 
 Merge aggregated property-crimes on to the household-interview data.frame:
 ```{r eval = FALSE , results = "hide" }
 chapter_tag_household_df <- left_join_zero_missings( chapter_tag_household_df , summed_hh_crimes )
+
+rm( summed_hh_crimes ) ; gc()
 ```
 
 
@@ -392,13 +399,16 @@ summed_person_crimes <-
 	
 
 names( summed_person_crimes ) <-
-	c( 'yearq' , 'idhh' , 'v3002' , 'idper' , 'wgtviccy' , 'violent' , 'sviolent' , 'rsa' , 'rob' , 'aast' , 'sast' , 'ptft' )
+	c( 'yearq' , 'idhh' , 'v3002' , 'idper' , 'wgtviccy' , 'violent' , 
+	'sviolent' , 'rsa' , 'rob' , 'aast' , 'sast' , 'ptft' )
 ```
 
 
 Merge aggregated property-crimes on to the person-interview data.frame:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_person_crimes )
+chapter_tag_df <- left_join_zero_missings( chapter_tag_df , summed_person_crimes )
+
+rm( summed_person_crimes ) ; gc()
 ```
 
 
@@ -411,12 +421,15 @@ summed_person_year_violent_crimes <-
 		sum
 	)
 
-names( summed_person_year_violent_crimes )[ ncol( summed_person_year_violent_crimes ) ] <- 'violent_year'
+names( summed_person_year_violent_crimes )[ ncol( summed_person_year_violent_crimes ) ] <- 
+	'violent_year'
 ```
 
 Merge aggregated person-year violent crime series weights on to the person-interview data.frame:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_person_year_violent_crimes )
+chapter_tag_df <- left_join_zero_missings( chapter_tag_df , summed_person_year_violent_crimes )
+
+rm( summed_person_year_violent_crimes ) ; gc()
 ```
 
 
@@ -451,7 +464,9 @@ wide_person_half_year_violent_crimes <-
 
 Merge both violent crime weights on to the person-interview data.frame:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , wide_person_half_year_violent_crimes )
+chapter_tag_df <- left_join_zero_missings( chapter_tag_df , wide_person_half_year_violent_crimes )
+
+rm( wide_person_half_year_violent_crimes ) ; gc()
 ```
 
 
@@ -521,11 +536,15 @@ names( h_1_2_df )[ ncol( h_1_2_df ) ] <- 'wgtviccy_1_2'
 
 three_half_df <-
 	Reduce( function( ... ) merge( ... , all = TRUE ) , list( h_1_1_df , h_2_1_df , h_1_2_df ) )
+	
+rm( h_1_1_df , h_2_1_df , h_1_2_df ) ; gc()
 ```
 
 Merge these three half-year period weights on to the person-interview data.frame:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , three_half_df )
+chapter_tag_df <- left_join_zero_missings( chapter_tag_df , three_half_df )
+
+rm( three_half_df ) ; gc()
 ```
 
 Aggregate interview counts to the person-year level:
@@ -533,7 +552,7 @@ Aggregate interview counts to the person-year level:
 summed_person_year_interviews <-
 	aggregate(
 		one ~ idhh + idper + year ,
-		data = subset( chapter_tag_person_df , wgtpercy > 0 ) ,
+		data = subset( chapter_tag_df , wgtpercy > 0 ) ,
 		sum
 	)
 
@@ -543,14 +562,16 @@ names( summed_person_year_interviews )[ ncol( summed_person_year_interviews ) ] 
 
 Merge interview_count on to the person-interview data.frame:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_person_year_interviews )
+chapter_tag_df <- left_join_zero_missings( chapter_tag_df , summed_person_year_interviews )
+
+rm( summed_person_year_interviews ) ; gc()
 ```
 
 Apply Interview/Incident Groups:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_person_df <-
+chapter_tag_df <-
 	transform(
-		chapter_tag_person_df ,
+		chapter_tag_df ,
 		interview_incident_groups =
 			ifelse( violent_year == 0 , 1 ,
 			ifelse( interview_count == 1 & ( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) & wgtviccy > 0 , 2 ,
@@ -566,13 +587,13 @@ chapter_tag_person_df <-
 
 
 # confirm all records in group 9 have both a wgtviccy == 0 & wgtpercy == 0
-stopifnot( nrow( subset( chapter_tag_person_df , interview_incident_groups == 9 & wgtviccy > 0 ) ) == 0 )
-stopifnot( nrow( subset( chapter_tag_person_df , interview_incident_groups == 9 & wgtpercy > 0 ) ) == 0 )
+stopifnot( nrow( subset( chapter_tag_df , interview_incident_groups == 9 & wgtviccy > 0 ) ) == 0 )
+stopifnot( nrow( subset( chapter_tag_df , interview_incident_groups == 9 & wgtpercy > 0 ) ) == 0 )
 
 
-chapter_tag_person_df <-
+chapter_tag_df <-
 	transform(
-		chapter_tag_person_df ,
+		chapter_tag_df ,
 		
 		prev_wgt0 =
 			ifelse( interview_incident_groups == 1 , wgtpercy ,
@@ -597,21 +618,23 @@ Aggregate `wgtviccy` and `prev_wgt0` sums to the year level, then merge:
 summed_year_weights <-
 	aggregate(
 		cbind( wgtviccy , prev_wgt0 ) ~ year ,
-		data = subset( chapter_tag_person_df , violent_year == 1 ) ,
+		data = subset( chapter_tag_df , violent_year == 1 ) ,
 		sum
 	)
 
 names( summed_year_weights ) <- c( 'year' , 'vwgt_1v' , 'prev_1v' )
 
-chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_year_weights )
+chapter_tag_df <- left_join_zero_missings( chapter_tag_df , summed_year_weights )
+
+rm( summed_year_weights ) ; gc()
 ```
 
 
 Calibrate so that the weight sums to `wgtviccy` for persons with exactly one victimization:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_person_df <-
+chapter_tag_df <-
 	transform(
-		chapter_tag_person_df ,
+		chapter_tag_df ,
 
 		prev_wgt1 = 
 			ifelse( violent_year == 0 , prev_wgt0 ,
@@ -630,113 +653,33 @@ summed_year_crimes <-
 			ifelse( violent_year > 0 , prev_wgt1 , 0 ) , 
 			ifelse( violent_year == 0 , prev_wgt1 , 0 )
 		) ~ year ,
-		data = chapter_tag_person_df ,
+		data = chapter_tag_df ,
 		sum
 	)
 
 names( summed_year_crimes ) <- c( 'year' , 'total_persons' , 'prev_with_crime' , 'prev_no_crime' )
 
-chapter_tag_person_df <- left_join_zero_missings( chapter_tag_person_df , summed_year_crimes )
+chapter_tag_df <- left_join_zero_missings( chapter_tag_df , summed_year_crimes )
+
+rm( summed_year_crimes ) ; gc()
 ```
 
 
 
 Calibrate so that the weight sums to `wgtpercy` for all persons:
 ```{r eval = FALSE , results = "hide" }
-chapter_tag_person_df <-
+chapter_tag_df <-
 	transform(
-		chapter_tag_person_df ,
+		chapter_tag_df ,
 
 		prev_wgt =
 			ifelse( 
 				violent_year == 0 ,
 				prev_wgt1 * ( ( total_persons - prev_with_crime ) / prev_no_crime ) ,
 				prev_wgt1 
-			) ,
-				
-		victim = ( violent_year > 0 )
+			)
 	)
 ```
-
-
-
-
-options(scipen=20)
-
-library(survey)
-
-options('survey.lonely.psu' = 'adjust')
-
-# replace missing clusters
-chapter_tag_person_df[ is.na( chapter_tag_person_df[ , 'v2118' ] ) , 'v2118' ] <- -1
-chapter_tag_person_df[ is.na( chapter_tag_person_df[ , 'v2117' ] ) , 'v2117' ] <- -1
-
-
-chapter_tag_design <-
-	svydesign( 
-		~ v2118 ,
-		strata = ~ interaction( yr_grp , v2117 ) ,
-		data = chapter_tag_person_df ,
-		weights = ~ prev_wgt ,
-		nest = TRUE
-	)
-
-
-
-svyby( 
-	~ as.numeric( victim ) , 
-	~ year , 
-	chapter_tag_design , 
-	svymean
-)
-
-
-
-
-
-
-
-
-Import all four files:
-
-```{r eval = FALSE , results = "hide" }
-library(haven)
-
-four_tbl <- lapply( unzipped_files , read_sas )
-
-four_df <- lapply( four_tbl , data.frame )
-
-four_df <- lapply( four_df , function( w ){ names( w ) <- tolower( names( w ) ) ; w } )
-
-household_df <- four_df[[ grep( 'hhpub' , basename( unzipped_files ) ) ]]
-family_df <- four_df[[ grep( 'ffpub' , basename( unzipped_files ) ) ]]
-person_df <- four_df[[ grep( 'pppub' , basename( unzipped_files ) ) ]]
-repwgts_df <- four_df[[ grep( 'repwgt' , basename( unzipped_files ) ) ]]
-```
-
-Divide weights:
-
-```{r eval = FALSE , results = "hide" }
-household_df[ , 'hsup_wgt' ] <- household_df[ , 'hsup_wgt' ] / 100
-family_df[ , 'fsup_wgt' ] <- family_df[ , 'fsup_wgt' ] / 100
-for ( j in c( 'marsupwt' , 'a_ernlwt' , 'a_fnlwgt' ) ) person_df[ , j ] <- person_df[ , j ] / 100
-```
-
-Merge these four files:
-
-```{r eval = FALSE , results = "hide" }
-names( family_df )[ names( family_df ) == 'fh_seq' ] <- 'h_seq'
-names( person_df )[ names( person_df ) == 'ph_seq' ] <- 'h_seq'
-names( person_df )[ names( person_df ) == 'phf_seq' ] <- 'ffpos'
-
-hh_fm_df <- merge( household_df , family_df )
-hh_fm_pr_df <- merge( hh_fm_df , person_df )
-chapter_tag_df <- merge( hh_fm_pr_df , repwgts_df )
-
-stopifnot( nrow( chapter_tag_df ) == nrow( person_df ) )
-```
-~~~
-
 
 
 
@@ -745,15 +688,19 @@ stopifnot( nrow( chapter_tag_df ) == nrow( person_df ) )
 ```{r eval = FALSE , results = "hide" }
 library(survey)
 	
+options('survey.lonely.psu' = 'adjust')
+
+# replace missing clusters
+chapter_tag_df[ is.na( chapter_tag_df[ , 'v2118' ] ) , 'v2118' ] <- -1
+chapter_tag_df[ is.na( chapter_tag_df[ , 'v2117' ] ) , 'v2117' ] <- -1
+
 chapter_tag_design <-
-	svrepdesign(
-		weights = ~ marsupwt ,
-		repweights = "pwwgt[1-9]" ,
-		type = "Fay" ,
-		rho = ( 1 - 1 / sqrt( 4 ) ) ,
+	svydesign( 
+		~ v2118 ,
+		strata = ~ interaction( yr_grp , v2117 ) ,
 		data = chapter_tag_df ,
-		combined.weights = TRUE ,
-		mse = TRUE
+		weights = ~ prev_wgt ,
+		nest = TRUE
 	)
 ```
 ~~~
@@ -766,79 +713,47 @@ chapter_tag_design <-
 
 		one = 1 ,
 
-		a_maritl = 
-			factor( 
-				a_maritl , 
-				labels = 
-					c( 
-						"married - civilian spouse present" ,
-						"married - AF spouse present" ,
-						"married - spouse absent" ,
-						"widowed" ,
-						"divorced" , 
-						"separated" , 
-						"never married"
-					)
-			) ,
-			
-		state_name =
-			factor(
-				gestfips ,
-				levels = 
-					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
-					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
-					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
-					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
-					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
-					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
-					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
-					56L) ,
-				labels =
-					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
-					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
-					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
-					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
-					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
-					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
-					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
-					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
-					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
-					"Washington", "West Virginia", "Wisconsin", "Wyoming")
-			) ,
+		victim = as.numeric( violent_year > 0 ) ,
 
-		male = as.numeric( a_sex == 1 )
+		sex = factor( v3018 , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+			
+		linear_age = ifelse( v3014 == 99 , NA , v3014 ) ,
+		
+		times_moved_in_prior_five_years =
+			ifelse( v3033 == 99 , NA , v3033 ) ,
+		
+		current_marital_status =
+			factor( 
+				v3015 , 
+				levels = c( 1:5 , 8 ) , 
+				labels = c( 'married' , 'widowed' , 'divorced' , 'separated' , 'single' , 'residue' ) ) ,
+		
+		household_income_starting_2015q1 =
+			factor(
+				findInterval( sc214a , c( 1 , 9 , 13 , 16 , 18 ) ) ,
+				levels = 1:5 ,
+				labels = c( 'less than $25,000' , '$25,000 - $49,999' , '$50,000 - $99,999' , '$100,000 - $199,999' , '$200,000 or more' )
+			) ,
+		
+		household_income_75k = 
+			ifelse( v2026 == 98 , NA , as.numeric( v2026 %in% 14:18 ) )
 	)
 ~~~
 
 
-group_by_variable: state_name
-linear_variable: ptotval
-categorical_variable: a_maritl
-ratio_estimation_numerator: moop
-ratio_estimation_denominator: ptotval
-subset_definition: a_age %in% 18:64
-subset_definition_description: persons aged 18-64
-binary_variable: male
+group_by_variable: sex
+linear_variable: victim
+categorical_variable: current_marital_status
+ratio_estimation_numerator: times_moved_in_prior_five_years
+ratio_estimation_denominator: linear_age
+subset_definition: linear_age >= 65
+subset_definition_description: elderly americans
+binary_variable: household_income_75k
 
 
 
 
 needs_srvyr_block: yes
-
-~~~{convey_block}
-## Poverty and Inequality Estimation with `convey` \\ {-}
-
-The R `convey` library estimates measures of income concentration, poverty, inequality, and wellbeing.  [This textbook](https://guilhermejacob.github.io/context/) details the available features.  As a starting point for CHAPTER_TAG users, this code calculates the gini coefficient on complex sample survey data:
-
-```{r eval = FALSE , results = "hide" }
-library(convey)
-chapter_tag_design <- convey_prep( chapter_tag_design )
-
-chapter_tag_household_design <- subset( chapter_tag_design , a_exprrp %in% 1:2 )
-
-svygini( ~ htotval , chapter_tag_household_design )
-```
-~~~
 
 
 ~~~{replication_example_block}
@@ -847,24 +762,53 @@ svygini( ~ htotval , chapter_tag_household_design )
 This example matches the count and share of individuals with health insurance in [Table H-01](https://www2.census.gov/programs-surveys/cps/tables/hi/2023/h_01.xlsx):
 
 ```{r eval = FALSE , results = "hide" }
-count_covered <- svytotal( ~ as.numeric( cov == 1 ) , chapter_tag_design )
+new_prevalence_results <-
+	svyby( 
+		~ victim , 
+		~ year , 
+		chapter_tag_design , 
+		svymean
+	)
 
-stopifnot( round( coef( count_covered ) , -5 ) == 304000000 )
-
-stopifnot(
-	round( coef( count_covered ) - confint( count_covered , level = 0.9 )[1] , -3 ) == 746000
+# match new method (wgt_ovam) 1994 and 2022 estimates
+stopifnot( 
+	round( coef( new_prevalence_results )[ c( 1 , nrow( new_prevalence_results ) ) ] , 4 ) == c( 0.0442 , 0.0151 )
 )
 
-share_covered <- svymean( ~ as.numeric( cov == 1 ) , subset( chapter_tag_design , cov > 0 ) )
-
-stopifnot( round( coef( share_covered ) , 3 ) == 0.921 )
-
-stopifnot(
-	round( coef( share_covered ) - confint( share_covered , level = 0.9 )[1] , 3 ) == 0.002
+# match new method (wgt_ovam) 1994 and 2022 standard errors
+stopifnot( 
+	round( SE( new_prevalence_results )[ c( 1 , nrow( new_prevalence_results ) ) ] , 5 ) == c( 0.0010 , 0.00054 )
 )
 
+
+
+old_prevalence_design <-
+	svydesign( 
+		~ v2118 ,
+		strata = ~ interaction( yr_grp , v2117 ) ,
+		data = chapter_tag_df ,
+		weights = ~ wgtpercy ,
+		nest = TRUE
+	)
+
+old_prevalence_results <-
+	svyby(
+		~ as.numeric( violent_year > 0 ) ,
+		~ year ,
+		old_prevalence_design ,
+		svymean
+	)
+
+# match old method (wgtpercy) 1994 and 2022 estimates
+stopifnot( 
+	round( coef( old_prevalence_results )[ c( 1 , nrow( old_prevalence_results ) ) ] , 4 ) == c( 0.0328 , 0.0124 )
+)
+
+# match old method (wgtpercy) 1994 and 2022 standard errors
+stopifnot( 
+	round( SE( old_prevalence_results )[ c( 1 , nrow( old_prevalence_results ) ) ] , 5 ) == c( 0.00075 , 0.00042 )
+)
 ```
-
 ~~~
 
 
