@@ -12,13 +12,13 @@ ncvs_badge <- paste0( "<img src='https://img.shields.io/badge/tested%20on%20my%2
 
 `r ncvs_badge`
 
-The primary information source on victims of nonfatal personal crimes and household property crimes (especially those not reported to the police) and victim experience with the justice system.
+The primary information source on victims of nonfatal personal crimes and household property crimes (especially those not reported to the police) and also victim experience with the justice system.
 
-* Three main tables, the first with one row per sampled household per interview, the second with one row per person per interview, and the third with one row per incident reported across each sampled household's seven-interview, three-year period.
+* Three tables, the first one row per household per interview, the second one per person-interview, the third one per incident reported across each sampled household's seven-interview, three-year period.
 
 * A complex survey designed to generalize to civilian, non-institutional americans aged 12 and older.
 
-* Released annually since its re-design (and rename) in 1992, the National Crime Survey dates back to the early 1970s.
+* Released annually since 1992 re-design (and rename), National Crime Survey back to the early 1970s.
 
 * Sponsored by the [Bureau of Justics Statistics](http://www.bjs.gov/) and administered by the [US Census Bureau](http://www.census.gov/).
 
@@ -63,7 +63,9 @@ left_join_zero_missings <-
 			
 		stopifnot( nrow( final_df ) == nrow( left_df ) )
 
-		for( this_column in setdiff( names( right_df ) , names( left_df ) ) ) final_df[ is.na( final_df[ , this_column ] ) , this_column ] <- 0
+		for( this_column in setdiff( names( right_df ) , names( left_df ) ) ){
+			final_df[ is.na( final_df[ , this_column ] ) , this_column ] <- 0
+		}
 		
 		gc()
 
@@ -348,7 +350,8 @@ summed_hh_crimes <-
 	)
 
 names( summed_hh_crimes ) <-
-	c( 'yearq' , 'idhh' , 'v2002' , 'wgtviccy' , 'property' , 'hhburg' , 'mvtft' , 'burg' , 'tres' )
+	c( 'yearq' , 'idhh' , 'v2002' , 'wgtviccy' , 'property' , 'hhburg' , 
+	'mvtft' , 'burg' , 'tres' )
 ```
 
 Merge aggregated property-crimes on to the household-interview data.frame:
@@ -379,7 +382,8 @@ summed_person_crimes <-
 	
 
 names( summed_person_crimes ) <-
-	c( 'yearq' , 'idhh' , 'v3002' , 'idper' , 'wgtviccy' , 'violent' , 'sviolent' , 'rsa' , 'rob' , 'aast' , 'sast' , 'ptft' )
+	c( 'yearq' , 'idhh' , 'v3002' , 'idper' , 'wgtviccy' , 'violent' , 
+	'sviolent' , 'rsa' , 'rob' , 'aast' , 'sast' , 'ptft' )
 ```
 
 Merge aggregated property-crimes on to the person-interview data.frame:
@@ -398,7 +402,8 @@ summed_person_year_violent_crimes <-
 		sum
 	)
 
-names( summed_person_year_violent_crimes )[ ncol( summed_person_year_violent_crimes ) ] <- 'violent_year'
+names( summed_person_year_violent_crimes )[ ncol( summed_person_year_violent_crimes ) ] <- 
+	'violent_year'
 ```
 
 Merge aggregated person-year violent crime series weights on to the person-interview data.frame:
@@ -446,59 +451,74 @@ rm( wide_person_half_year_violent_crimes ) ; gc()
 
 Find the maximum incident victim weight among three half-year periods:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-maximum_half_violent_crimes <-
+max_half_v_crimes <-
 	aggregate(
 		wgtviccy ~ idhh + idper + year + half_year + v4002 ,
 		data = subset( ncvs_incident_df , !exclude_outus & violent ) ,
 		max
 	)
 
-maximum_half_violent_crimes <-
-	maximum_half_violent_crimes[ do.call( order , maximum_half_violent_crimes[ c( 'idhh' , 'idper' , 'year' , 'half_year' ) ] ) , ]
+max_half_v_crimes <-
+	max_half_v_crimes[ 
+		do.call( 
+			order , 
+			max_half_v_crimes[ c( 'idhh' , 'idper' , 'year' , 'half_year' ) ] ) , 
+	]
 
-maximum_half_violent_crimes[ , 'byvar' ] <-
-	apply( maximum_half_violent_crimes[ c( 'idhh' , 'idper' , 'year' , 'half_year' ) ] , 1 , paste , collapse = ' ' )
+max_half_v_crimes[ , 'byvar' ] <-
+	apply( 
+		max_half_v_crimes[ c( 'idhh' , 'idper' , 'year' , 'half_year' ) ] , 
+		1 , 
+		paste , 
+		collapse = ' ' 
+	)
 	
-maximum_half_violent_crimes[ 1 , 'id' ] <- 1
+max_half_v_crimes[ 1 , 'id' ] <- 1
 
-for( i in seq( 2 , nrow( maximum_half_violent_crimes ) ) ){
+for( i in seq( 2 , nrow( max_half_v_crimes ) ) ){
 
-	if( maximum_half_violent_crimes[ i , 'byvar' ] == maximum_half_violent_crimes[ i - 1 , 'byvar' ] ){
+	if( max_half_v_crimes[ i , 'byvar' ] == max_half_v_crimes[ i - 1 , 'byvar' ] ){
 	
-		maximum_half_violent_crimes[ i , 'id' ] <- maximum_half_violent_crimes[ i - 1 , 'id' ] + 1
+		max_half_v_crimes[ i , 'id' ] <- max_half_v_crimes[ i - 1 , 'id' ] + 1
 		
 	} else {
 	
-		maximum_half_violent_crimes[ i , 'id' ] <- 1
+		max_half_v_crimes[ i , 'id' ] <- 1
 		
 	}
 }
 
-maximum_half_violent_crimes[ , 'label' ] <- paste0( '_' , maximum_half_violent_crimes[ , 'half_year' ] , '_' , maximum_half_violent_crimes[ , 'id' ] )
+max_half_v_crimes[ , 'label' ] <- 
+	paste0( 
+		'_' , 
+		max_half_v_crimes[ , 'half_year' ] , 
+		'_' , 
+		max_half_v_crimes[ , 'id' ] 
+	)
 
-maximum_half_violent_crimes[ , 'byvar' ] <- NULL
+max_half_v_crimes[ , 'byvar' ] <- NULL
 
-stopifnot( all( maximum_half_violent_crimes[ , 'label' ] %in% c( '_1_1' , '_2_1' , '_1_2' ) ) )
+stopifnot( all( max_half_v_crimes[ , 'label' ] %in% c( '_1_1' , '_2_1' , '_1_2' ) ) )
 
 h_1_1_df <-
-	maximum_half_violent_crimes[ 
-		maximum_half_violent_crimes[ , 'label' ] == '_1_1' , 
+	max_half_v_crimes[ 
+		max_half_v_crimes[ , 'label' ] == '_1_1' , 
 		c( 'idhh' , 'idper' , 'year' , 'wgtviccy' )
 	]
 	
 names( h_1_1_df )[ ncol( h_1_1_df ) ] <- 'wgtviccy_1_1'
 	
 h_2_1_df <-
-	maximum_half_violent_crimes[ 
-		maximum_half_violent_crimes[ , 'label' ] == '_2_1' , 
+	max_half_v_crimes[ 
+		max_half_v_crimes[ , 'label' ] == '_2_1' , 
 		c( 'idhh' , 'idper' , 'year' , 'wgtviccy' )
 	]
 	
 names( h_2_1_df )[ ncol( h_2_1_df ) ] <- 'wgtviccy_2_1'
 	
 h_1_2_df <-
-	maximum_half_violent_crimes[ 
-		maximum_half_violent_crimes[ , 'label' ] == '_1_2' , 
+	max_half_v_crimes[ 
+		max_half_v_crimes[ , 'label' ] == '_1_2' , 
 		c( 'idhh' , 'idper' , 'year' , 'wgtviccy' )
 	]
 	
@@ -526,7 +546,8 @@ summed_person_year_interviews <-
 		sum
 	)
 
-names( summed_person_year_interviews )[ ncol( summed_person_year_interviews ) ] <- 'interview_count'
+names( summed_person_year_interviews )[ ncol( summed_person_year_interviews ) ] <- 
+	'interview_count'
 ```
 
 Merge interview_count on to the person-interview data.frame:
@@ -542,14 +563,54 @@ ncvs_df <-
 	transform(
 		ncvs_df ,
 		interview_incident_groups =
-			ifelse( violent_year == 0 , 1 ,
-			ifelse( interview_count == 1 & ( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) & wgtviccy > 0 , 2 ,
-			ifelse( interview_count == 2 & ( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) , 3 ,
-			ifelse( interview_count == 2 & ( vwgt1 > 0 ) & ( vwgt2 > 0 ) & ( wgtviccy > 0 ) , 4 ,
-			ifelse( interview_count == 3 & ( ( as.numeric( wgtviccy_1_1 > 0 ) + as.numeric( wgtviccy_2_1 > 0 ) + as.numeric( wgtviccy_1_2 > 0 ) ) == 1 ) , 5 ,
-			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & ( wgtviccy_1_2 > 0 ) , 6 ,
-			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & substr( yearq , 6 , 6 ) %in% 1:2 , 7 ,
-			ifelse( interview_count == 3 & ( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & substr( yearq , 6 , 6 ) %in% 3:4 , 8 , 9 ) ) ) ) ) ) ) )
+		
+			ifelse( violent_year == 0 , 
+				1 ,
+		
+			ifelse( 
+				interview_count == 1 & 
+				( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) & 
+				wgtviccy > 0 , 
+				2 ,
+			
+			ifelse( 
+				interview_count == 2 & 
+				( ( as.numeric( vwgt1 > 0 ) + as.numeric( vwgt2 > 0 ) ) == 1 ) , 
+				3 ,
+			
+			ifelse( 
+				interview_count == 2 & 
+				( vwgt1 > 0 ) & ( vwgt2 > 0 ) & ( wgtviccy > 0 ) , 
+				4 ,
+			
+			ifelse( 
+				interview_count == 3 & 
+				( ( 
+					as.numeric( wgtviccy_1_1 > 0 ) + 
+					as.numeric( wgtviccy_2_1 > 0 ) + 
+					as.numeric( wgtviccy_1_2 > 0 ) 
+				) == 1 ) , 
+				5 ,
+			
+			ifelse( 
+				interview_count == 3 & 
+				( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & ( wgtviccy_1_2 > 0 ) , 
+				6 ,
+			
+			ifelse( 
+				interview_count == 3 & 
+				( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & 
+				substr( yearq , 6 , 6 ) %in% 1:2 , 
+				7 ,
+				
+			ifelse( 
+				interview_count == 3 & 
+				( wgtviccy_1_1 > 0 ) & ( wgtviccy_2_1 > 0 ) & 
+				substr( yearq , 6 , 6 ) %in% 3:4 , 
+				8 , 
+				
+				9 
+			) ) ) ) ) ) ) )
 	)
 			
 
@@ -566,7 +627,8 @@ ncvs_df <-
 			ifelse( interview_incident_groups == 2 , wgtviccy / 2 ,
 			ifelse( interview_incident_groups == 3 , pmax( vwgt1 , vwgt2 , na.rm = TRUE ) / 2 ,
 			ifelse( interview_incident_groups == 4 , wgtviccy / 2 ,
-			ifelse( interview_incident_groups == 5 , pmax( wgtviccy_1_1 , wgtviccy_1_2 , wgtviccy_2_1 , na.rm = TRUE ) / 2 ,
+			ifelse( interview_incident_groups == 5 , 
+				pmax( wgtviccy_1_1 , wgtviccy_1_2 , wgtviccy_2_1 , na.rm = TRUE ) / 2 ,
 			ifelse( interview_incident_groups == 6 , wgtviccy / 2 ,
 			ifelse( interview_incident_groups == 7 , wgtviccy_1_1 / 2 ,
 			ifelse( interview_incident_groups == 8 , wgtviccy_2_1 / 2 ,
@@ -701,13 +763,17 @@ ncvs_design <-
 			factor( 
 				v3015 , 
 				levels = c( 1:5 , 8 ) , 
-				labels = c( 'married' , 'widowed' , 'divorced' , 'separated' , 'single' , 'residue' ) ) ,
+				labels = 
+					c( 'married' , 'widowed' , 'divorced' , 'separated' , 'single' , 'residue' )
+			) ,
 		
 		household_income_starting_2015q1 =
 			factor(
 				findInterval( sc214a , c( 1 , 9 , 13 , 16 , 18 ) ) ,
 				levels = 1:5 ,
-				labels = c( 'less than $25,000' , '$25,000 - $49,999' , '$50,000 - $99,999' , '$100,000 - $199,999' , '$200,000 or more' )
+				labels = 
+					c( 'less than $25,000' , '$25,000 - $49,999' , '$50,000 - $99,999' , 
+					'$100,000 - $199,999' , '$200,000 or more' )
 			) ,
 		
 		household_income_75k = 
@@ -880,7 +946,7 @@ summary( glm_result )
 
 ## Replication Example {-}
 
-This example matches the count and share of individuals with health insurance in [Table H-01](https://www2.census.gov/programs-surveys/cps/tables/hi/2023/h_01.xlsx):
+This example matches the 1994 and 2022 victimization rates and SEs in [Appendix Table 1](https://bjs.ojp.gov/document/nmpncvs.pdf#page=16):
 
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 new_prevalence_results <-
@@ -893,12 +959,14 @@ new_prevalence_results <-
 
 # match new method (wgt_ovam) 1994 and 2022 estimates
 stopifnot( 
-	round( coef( new_prevalence_results )[ c( 1 , nrow( new_prevalence_results ) ) ] , 4 ) == c( 0.0442 , 0.0151 )
+	round( coef( new_prevalence_results )[ c( 1 , nrow( new_prevalence_results ) ) ] , 4 ) == 
+	c( 0.0442 , 0.0151 )
 )
 
 # match new method (wgt_ovam) 1994 and 2022 standard errors
 stopifnot( 
-	round( SE( new_prevalence_results )[ c( 1 , nrow( new_prevalence_results ) ) ] , 5 ) == c( 0.0010 , 0.00054 )
+	round( SE( new_prevalence_results )[ c( 1 , nrow( new_prevalence_results ) ) ] , 5 ) == 
+	c( 0.0010 , 0.00054 )
 )
 
 old_prevalence_design <-
@@ -920,12 +988,14 @@ old_prevalence_results <-
 
 # match old method (wgtpercy) 1994 and 2022 estimates
 stopifnot( 
-	round( coef( old_prevalence_results )[ c( 1 , nrow( old_prevalence_results ) ) ] , 4 ) == c( 0.0328 , 0.0124 )
+	round( coef( old_prevalence_results )[ c( 1 , nrow( old_prevalence_results ) ) ] , 4 ) == 
+	c( 0.0328 , 0.0124 )
 )
 
 # match old method (wgtpercy) 1994 and 2022 standard errors
 stopifnot( 
-	round( SE( old_prevalence_results )[ c( 1 , nrow( old_prevalence_results ) ) ] , 5 ) == c( 0.00075 , 0.00042 )
+	round( SE( old_prevalence_results )[ c( 1 , nrow( old_prevalence_results ) ) ] , 5 ) == 
+	c( 0.00075 , 0.00042 )
 )
 ```
 
