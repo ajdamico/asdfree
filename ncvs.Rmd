@@ -18,7 +18,7 @@ The primary information source on victims of nonfatal personal crimes and househ
 
 * A complex survey designed to generalize to civilian, non-institutional americans aged 12 and older.
 
-* Released annually since its 1992 rename and re-design, related surveys dating to early 1970s.
+* Released annually since its 1992 rename and redesign, related surveys dating to the early 1970s.
 
 * Sponsored by the [Bureau of Justics Statistics](http://www.bjs.gov/) and administered by the [US Census Bureau](http://www.census.gov/).
 
@@ -85,22 +85,22 @@ Import the three main files:
 ncvs_household_df_name <-
 	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0001/38604-0001-Data.rda" ) )
 	
-ncvs_df_name <-
+ncvs_person_df_name <-
 	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0002/38604-0002-Data.rda" ) )
 
 ncvs_incident_df_name <-
 	load( file.path( path.expand( "~" ) , "ICPSR_38604/DS0003/38604-0003-Data.rda" ) )
 
 ncvs_household_df <- get( ncvs_household_df_name )
-ncvs_df <- get( ncvs_df_name )
+ncvs_person_df <- get( ncvs_person_df_name )
 ncvs_incident_df <- get( ncvs_incident_df_name )
 
 rm( list = ncvs_household_df_name ) ; gc()
-rm( list = ncvs_df_name ) ; gc()
+rm( list = ncvs_person_df_name ) ; gc()
 rm( list = ncvs_incident_df_name ) ; gc()
 
 names( ncvs_household_df ) <- tolower( names( ncvs_household_df ) )
-names( ncvs_df ) <- tolower( names( ncvs_df ) )
+names( ncvs_person_df ) <- tolower( names( ncvs_person_df ) )
 names( ncvs_incident_df ) <- tolower( names( ncvs_incident_df ) )
 ```
 
@@ -126,33 +126,34 @@ incident_variables_to_keep <-
 	'v4290' , 'v4400' , 'v4437' , 'v4422' , 'v4024' )
 ```
 
-Limit columns in each data.frame to those specified above, also to the period 1994-2022 excluding 2006:
+Limit columns in each data.frame to those specified above:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_household_df <-
-	ncvs_household_df[ 
-		ncvs_household_df[ , 'year' ] %in% setdiff( 1994:2022 , 2006 ) , 
-		household_variables_to_keep
-	]
+ncvs_household_df <- ncvs_household_df[ , household_variables_to_keep ]
 
-ncvs_df <-
-	ncvs_df[ 
-		ncvs_df[ , 'year' ] %in% setdiff( 1994:2022 , 2006 ) , 
-		person_variables_to_keep
-	]
+ncvs_person_df <- ncvs_person_df[ , person_variables_to_keep ]
 
-ncvs_incident_df <-
-	ncvs_incident_df[
-		ncvs_incident_df[ , 'year' ] %in% setdiff( 1994:2022 , 2006 ) , 
-		incident_variables_to_keep
-	]
+ncvs_incident_df <- ncvs_incident_df[ , incident_variables_to_keep ]
+
+gc()
+```
+
+**In this example, limit the 1993 - 2022 data.frame to only the first and last years for quicker processing:**
+```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+ncvs_household_df <- ncvs_household_df[ ncvs_household_df[ , 'year' ] %in% c( 1994 , 2022 ) , ]
+
+ncvs_person_df <- ncvs_person_df[ ncvs_person_df[ , 'year' ] %in% c( 1994 , 2022 ) , ]
+
+ncvs_incident_df <- ncvs_incident_df[ ncvs_incident_df[ , 'year' ] %in% c( 1994 , 2022 ) , ]
+
+gc()
 ```
 
 Recode identifiers to character class:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 ncvs_household_df[ , 'idhh' ] <- as.character( ncvs_household_df[ , 'idhh' ] )
 
-ncvs_df[ c( 'idhh' , 'idper' ) ] <-
-	sapply( ncvs_df[ c( 'idhh' , 'idper' ) ] , as.character )
+ncvs_person_df[ c( 'idhh' , 'idper' ) ] <-
+	sapply( ncvs_person_df[ c( 'idhh' , 'idper' ) ] , as.character )
 
 ncvs_incident_df[ c( 'idhh' , 'idper' ) ] <-
 	sapply( ncvs_incident_df[ c( 'idhh' , 'idper' ) ] , as.character )
@@ -167,9 +168,9 @@ ncvs_household_df[ sapply( ncvs_household_df , class ) == 'factor' ] <-
 		simplify = FALSE 
 	)
 
-ncvs_df[ sapply( ncvs_df , class ) == 'factor' ] <-
+ncvs_person_df[ sapply( ncvs_person_df , class ) == 'factor' ] <-
 	sapply( 
-		ncvs_df[ sapply( ncvs_df , class ) == 'factor' ] , 
+		ncvs_person_df[ sapply( ncvs_person_df , class ) == 'factor' ] , 
 		ncvs_numeric_to_factor ,
 		simplify = FALSE
 	)
@@ -186,7 +187,7 @@ Add a column of ones to each data.frame:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
 ncvs_household_df[ , 'one' ] <- 1
 	
-ncvs_df[ , 'one' ] <- 1
+ncvs_person_df[ , 'one' ] <- 1
 
 ncvs_incident_df[ , 'one' ] <- 1
 ```	
@@ -196,8 +197,8 @@ Add a year group variable to each data.frame:
 ncvs_household_df[ , 'yr_grp' ] <-
 	findInterval( ncvs_household_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
 	
-ncvs_df[ , 'yr_grp' ] <-
-	findInterval( ncvs_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
+ncvs_person_df[ , 'yr_grp' ] <-
+	findInterval( ncvs_person_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
 
 ncvs_incident_df[ , 'yr_grp' ] <-
 	findInterval( ncvs_incident_df[ , 'year' ] , c( 1992 , 1997 , 2006 , 2016 ) )
@@ -388,10 +389,12 @@ names( summed_person_crimes ) <-
 
 Merge aggregated property-crimes on to the person-interview data.frame:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_df <- left_join_zero_missings( ncvs_df , summed_person_crimes )
+ncvs_person_df <- left_join_zero_missings( ncvs_person_df , summed_person_crimes )
 
 rm( summed_person_crimes ) ; gc()
 ```
+
+**Starting here, the weight calculation prepares an adjustment for all violence combined with the variables `violent` and `violent_year`. To calculate the prevalence rate of a subset of person-crimes, starting at this point, replace these two values with variables like `rob` and `rob_year`.**
 
 Aggregate violent crimes to the person-year level:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
@@ -408,7 +411,7 @@ names( summed_person_year_violent_crimes )[ ncol( summed_person_year_violent_cri
 
 Merge aggregated person-year violent crime series weights on to the person-interview data.frame:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_df <- left_join_zero_missings( ncvs_df , summed_person_year_violent_crimes )
+ncvs_person_df <- left_join_zero_missings( ncvs_person_df , summed_person_year_violent_crimes )
 
 rm( summed_person_year_violent_crimes ) ; gc()
 ```
@@ -444,7 +447,7 @@ wide_person_half_year_violent_crimes <-
 
 Merge both violent crime weights on to the person-interview data.frame:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_df <- left_join_zero_missings( ncvs_df , wide_person_half_year_violent_crimes )
+ncvs_person_df <- left_join_zero_missings( ncvs_person_df , wide_person_half_year_violent_crimes )
 
 rm( wide_person_half_year_violent_crimes ) ; gc()
 ```
@@ -532,7 +535,7 @@ rm( h_1_1_df , h_2_1_df , h_1_2_df ) ; gc()
 
 Merge these three half-year period weights on to the person-interview data.frame:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_df <- left_join_zero_missings( ncvs_df , three_half_df )
+ncvs_person_df <- left_join_zero_missings( ncvs_person_df , three_half_df )
 
 rm( three_half_df ) ; gc()
 ```
@@ -542,7 +545,7 @@ Aggregate interview counts to the person-year level:
 summed_person_year_interviews <-
 	aggregate(
 		one ~ idhh + idper + year ,
-		data = subset( ncvs_df , wgtpercy > 0 ) ,
+		data = subset( ncvs_person_df , wgtpercy > 0 ) ,
 		sum
 	)
 
@@ -552,16 +555,16 @@ names( summed_person_year_interviews )[ ncol( summed_person_year_interviews ) ] 
 
 Merge interview_count on to the person-interview data.frame:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_df <- left_join_zero_missings( ncvs_df , summed_person_year_interviews )
+ncvs_person_df <- left_join_zero_missings( ncvs_person_df , summed_person_year_interviews )
 
 rm( summed_person_year_interviews ) ; gc()
 ```
 
 Apply Interview/Incident Groups:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_df <-
+ncvs_person_df <-
 	transform(
-		ncvs_df ,
+		ncvs_person_df ,
 		interview_incident_groups =
 		
 			ifelse( violent_year == 0 , 
@@ -615,12 +618,12 @@ ncvs_df <-
 			
 
 # confirm all records in group 9 have both a wgtviccy == 0 & wgtpercy == 0
-stopifnot( nrow( subset( ncvs_df , interview_incident_groups == 9 & wgtviccy > 0 ) ) == 0 )
-stopifnot( nrow( subset( ncvs_df , interview_incident_groups == 9 & wgtpercy > 0 ) ) == 0 )
+stopifnot( nrow( subset( ncvs_person_df , interview_incident_groups == 9 & wgtviccy > 0 ) ) == 0 )
+stopifnot( nrow( subset( ncvs_person_df , interview_incident_groups == 9 & wgtpercy > 0 ) ) == 0 )
 
-ncvs_df <-
+ncvs_person_df <-
 	transform(
-		ncvs_df ,
+		ncvs_person_df ,
 		
 		prev_wgt0 =
 			ifelse( interview_incident_groups == 1 , wgtpercy ,
@@ -644,22 +647,22 @@ Aggregate `wgtviccy` and `prev_wgt0` sums to the year level, then merge:
 summed_year_weights <-
 	aggregate(
 		cbind( wgtviccy , prev_wgt0 ) ~ year ,
-		data = subset( ncvs_df , violent_year == 1 ) ,
+		data = subset( ncvs_person_df , violent_year == 1 ) ,
 		sum
 	)
 
 names( summed_year_weights ) <- c( 'year' , 'vwgt_1v' , 'prev_1v' )
 
-ncvs_df <- left_join_zero_missings( ncvs_df , summed_year_weights )
+ncvs_person_df <- left_join_zero_missings( ncvs_person_df , summed_year_weights )
 
 rm( summed_year_weights ) ; gc()
 ```
 
 Calibrate so that the weight sums to `wgtviccy` for persons with exactly one victimization:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_df <-
+ncvs_person_df <-
 	transform(
-		ncvs_df ,
+		ncvs_person_df ,
 
 		prev_wgt1 = 
 			ifelse( violent_year == 0 , prev_wgt0 ,
@@ -677,22 +680,22 @@ summed_year_crimes <-
 			ifelse( violent_year > 0 , prev_wgt1 , 0 ) , 
 			ifelse( violent_year == 0 , prev_wgt1 , 0 )
 		) ~ year ,
-		data = ncvs_df ,
+		data = ncvs_person_df ,
 		sum
 	)
 
 names( summed_year_crimes ) <- c( 'year' , 'total_persons' , 'prev_with_crime' , 'prev_no_crime' )
 
-ncvs_df <- left_join_zero_missings( ncvs_df , summed_year_crimes )
+ncvs_person_df <- left_join_zero_missings( ncvs_person_df , summed_year_crimes )
 
 rm( summed_year_crimes ) ; gc()
 ```
 
 Calibrate so that the weight sums to `wgtpercy` for all persons:
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
-ncvs_df <-
+ncvs_person_df <-
 	transform(
-		ncvs_df ,
+		ncvs_person_df ,
 
 		prev_wgt =
 			ifelse( 
@@ -727,8 +730,11 @@ library(survey)
 options('survey.lonely.psu' = 'adjust')
 
 # replace missing clusters
-ncvs_df[ is.na( ncvs_df[ , 'v2118' ] ) , 'v2118' ] <- -1
-ncvs_df[ is.na( ncvs_df[ , 'v2117' ] ) , 'v2117' ] <- -1
+ncvs_person_df[ is.na( ncvs_person_df[ , 'v2118' ] ) , 'v2118' ] <- -1
+ncvs_person_df[ is.na( ncvs_person_df[ , 'v2117' ] ) , 'v2117' ] <- -1
+
+# subset this dataset to only 2022
+ncvs_df <- subset( ncvs_person_df , year == max( year ) )
 
 ncvs_design <-
 	svydesign( 
@@ -851,7 +857,8 @@ Estimate a ratio:
 svyratio( 
 	numerator = ~ times_moved_in_prior_five_years , 
 	denominator = ~ linear_age , 
-	ncvs_design 
+	ncvs_design ,
+	na.rm = TRUE
 )
 ```
 
@@ -949,11 +956,20 @@ summary( glm_result )
 This example matches the 1994 and 2022 victimization rates and SEs in [Appendix Table 1](https://bjs.ojp.gov/document/nmpncvs.pdf#page=16):
 
 ```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+new_prevalence_design <-
+	svydesign( 
+		~ v2118 ,
+		strata = ~ interaction( yr_grp , v2117 ) ,
+		data = ncvs_person_df ,
+		weights = ~ prev_wgt ,
+		nest = TRUE
+	)
+
 new_prevalence_results <-
 	svyby( 
-		~ victim , 
+		~ as.numeric( violent_year > 0 ) , 
 		~ year , 
-		ncvs_design , 
+		new_prevalence_design , 
 		svymean
 	)
 
@@ -973,7 +989,7 @@ old_prevalence_design <-
 	svydesign( 
 		~ v2118 ,
 		strata = ~ interaction( yr_grp , v2117 ) ,
-		data = ncvs_df ,
+		data = ncvs_person_df ,
 		weights = ~ wgtpercy ,
 		nest = TRUE
 	)
