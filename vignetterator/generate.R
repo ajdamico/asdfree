@@ -1,4 +1,4 @@
-commit_memo <- "'fixes #92'"
+commit_memo <- "'clear ram local builds'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -292,7 +292,27 @@ for ( i in seq_along( chapter_tag ) ){
 rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
 local_testing_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Local Testing Badge" , readLines( w ) ) ) )
 local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_files ] )
-for( this_rmd in local_testing_rmd_files ) writeLines( gsub( "eval = FALSE" , "cache = TRUE , warning = FALSE , message = FALSE" , readLines( this_rmd ) ) , this_rmd )
+
+
+
+for( this_rmd in local_testing_rmd_files ){
+
+	these_rmd_lines <- readLines( this_rmd )
+
+	# local builds need to be run locally
+	these_rmd_lines <- gsub( "eval = FALSE" , "cache = TRUE , warning = FALSE , message = FALSE" , these_rmd_lines )
+
+	# remove objects in memory created during the current local build
+	these_rmd_lines <- 
+		c( 
+			'```{r eval = TRUE , echo = FALSE , results = "hide" , warning = FALSE , message = FALSE }\nobjects_in_memory_for_local_build <- ls()\n```\n' , 
+			these_rmd_lines ,
+			'```{r eval = TRUE , echo = FALSE , results = "hide" , warning = FALSE , message = FALSE }\nrm( list = setdiff( ls() , objects_in_memory_for_local_build ) ) ; gc()\n```\n' 
+		)
+
+	writeLines( these_rmd_lines , this_rmd )
+}
+
 
 
 # replace eval = TRUE with FALSE just to see formatting
