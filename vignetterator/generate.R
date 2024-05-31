@@ -1,4 +1,4 @@
-commit_memo <- "'clear ram local builds'"
+commit_memo <- "'ncvs'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
