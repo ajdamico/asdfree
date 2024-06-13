@@ -1,20 +1,6 @@
-```{r eval = TRUE , echo = FALSE , results = "hide" , warning = FALSE , message = FALSE }
-objects_in_memory_for_local_build <- ls()
-```
-
 # American National Election Studies (ANES) {-}
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
-```{r , echo = FALSE }
-
-most_recent_build_date <- gsub( "-" , " " , if( dir.exists( "_bookdown_files/" ) ) as.Date( file.info( "_bookdown_files/" )$ctime ) else Sys.Date() )
-
-anes_badge <- paste0( "<img src='https://img.shields.io/badge/tested%20on%20my%20laptop:-" , most_recent_build_date , "-brightgreen' alt='Local Testing Badge'>" )
-
-```
-
-`r anes_badge`
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) <img src='https://img.shields.io/badge/Tested%20Locally-Windows%20Laptop-brightgreen' alt='Local Testing Badge'>
 
 A time series recording belief, public opinion, and political participation back to Dewey vs. Truman.
 
@@ -48,7 +34,7 @@ Please skim before you begin:
 
 Define a function to import a stata file as a data.frame:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 anes_import_dta <-
@@ -72,7 +58,7 @@ anes_import_dta <-
 
 3. Download the `STATA` version of the February 10, 2022 file:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 anes_fn <-
@@ -84,25 +70,25 @@ anes_fn <-
 anes_df <- anes_import_dta( anes_fn )
 ```
 
-### Save locally \ {-}
+### Save Locally \ {-}
 
 Save the object at any point:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 # anes_fn <- file.path( path.expand( "~" ) , "ANES" , "this_file.rds" )
 # saveRDS( anes_df , file = anes_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 # anes_df <- readRDS( anes_fn )
 ```
 
 ### Survey Design Definition {-}
 Construct a complex sample survey design:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 library(survey)
 
 anes_design <-
@@ -118,7 +104,7 @@ anes_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 anes_design <- 
 	update( 
 		anes_design , 
@@ -156,7 +142,7 @@ anes_design <-
 ### Unweighted Counts {-}
 
 Count the unweighted number of records in the survey sample, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 sum( weights( anes_design , "sampling" ) != 0 )
 
 svyby( ~ one , ~ undoc_kids , anes_design , unwtd.count )
@@ -164,7 +150,7 @@ svyby( ~ one , ~ undoc_kids , anes_design , unwtd.count )
 
 ### Weighted Counts {-}
 Count the weighted size of the generalizable population, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , anes_design )
 
 svyby( ~ one , ~ undoc_kids , anes_design , svytotal )
@@ -173,35 +159,35 @@ svyby( ~ one , ~ undoc_kids , anes_design , svytotal )
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svymean( ~ republican_party_rating , anes_design , na.rm = TRUE )
 
 svyby( ~ republican_party_rating , ~ undoc_kids , anes_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svymean( ~ think_gov_spend_least , anes_design , na.rm = TRUE )
 
 svyby( ~ think_gov_spend_least , ~ undoc_kids , anes_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svytotal( ~ republican_party_rating , anes_design , na.rm = TRUE )
 
 svyby( ~ republican_party_rating , ~ undoc_kids , anes_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svytotal( ~ think_gov_spend_least , anes_design , na.rm = TRUE )
 
 svyby( ~ think_gov_spend_least , ~ undoc_kids , anes_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyquantile( ~ republican_party_rating , anes_design , 0.5 , na.rm = TRUE )
 
 svyby( 
@@ -215,7 +201,7 @@ svyby(
 ```
 
 Estimate a ratio:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyratio( 
 	numerator = ~ republican_party_rating , 
 	denominator = ~ democratic_party_rating , 
@@ -227,18 +213,18 @@ svyratio(
 ### Subsetting {-}
 
 Restrict the survey design to party id: independent:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 sub_anes_design <- subset( anes_design , v201231x == 4 )
 ```
 Calculate the mean (average) of this subset:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svymean( ~ republican_party_rating , sub_anes_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 this_result <- svymean( ~ republican_party_rating , anes_design , na.rm = TRUE )
 
 coef( this_result )
@@ -262,17 +248,17 @@ cv( grouped_result )
 ```
 
 Calculate the degrees of freedom of any survey design object:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 degf( anes_design )
 ```
 
 Calculate the complex sample survey-adjusted variance of any statistic:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyvar( ~ republican_party_rating , anes_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 # SRS without replacement
 svymean( ~ republican_party_rating , anes_design , na.rm = TRUE , deff = TRUE )
 
@@ -281,7 +267,7 @@ svymean( ~ republican_party_rating , anes_design , na.rm = TRUE , deff = "replac
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyciprop( ~ primary_voter , anes_design ,
 	method = "likelihood" , na.rm = TRUE )
 ```
@@ -289,12 +275,12 @@ svyciprop( ~ primary_voter , anes_design ,
 ### Regression Models and Tests of Association {-}
 
 Perform a design-based t-test:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyttest( republican_party_rating ~ primary_voter , anes_design )
 ```
 
 Perform a chi-squared test of association for survey data:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svychisq( 
 	~ primary_voter + think_gov_spend_least , 
 	anes_design 
@@ -302,7 +288,7 @@ svychisq(
 ```
 
 Perform a survey-weighted generalized linear model:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
 		republican_party_rating ~ primary_voter + think_gov_spend_least , 
@@ -326,7 +312,7 @@ This example matches statistics and standard errors in the Age rows of the `ANES
 
 4. Download the `DTA` version of the `Methodology File December 10, 2018`
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 anes2016_fn <-
 	file.path( 
 		path.expand( "~" ) , 
@@ -389,7 +375,7 @@ This example matches statistics and standard errors in the Age rows of the `Desi
 
 5. Download the `DTA` version of the April 26, 2007 file
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 anes2004_fn <-
 	file.path( 
 		path.expand( "~" ) , 
@@ -447,12 +433,12 @@ stopifnot( all( round( SE( results ) , 4 ) == published_standard_errors ) )
 
 The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for ANES users, this code replicates previously-presented examples:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 library(srvyr)
 anes_srvyr_design <- as_survey( anes_design )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 anes_srvyr_design %>%
 	summarize( mean = survey_mean( republican_party_rating , na.rm = TRUE ) )
 
@@ -461,8 +447,4 @@ anes_srvyr_design %>%
 	summarize( mean = survey_mean( republican_party_rating , na.rm = TRUE ) )
 ```
 
-
-```{r eval = TRUE , echo = FALSE , results = "hide" , warning = FALSE , message = FALSE }
-rm( list = setdiff( ls() , objects_in_memory_for_local_build ) ) ; gc()
-```
 

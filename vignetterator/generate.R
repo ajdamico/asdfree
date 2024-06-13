@@ -1,4 +1,4 @@
-commit_memo <- "'haikus'"
+commit_memo <- "'skip local builds, badges on one line'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -13,13 +13,6 @@ commit_memo <- "'haikus'"
 
 
 
-# non-survey, not database-backed (ahrf)
-# database-backed non-survey (nppes)
-# survey, not database-backed, not multiply imputed (yrbss)
-# database-backed survey, not multiply imputed (pnad)
-# multiply-imputed survey, not database-backed (scf)
-# multiply-imputed, database-backed survey (pisa)
-
 
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\descriptive_statistics_blocks.R" ) )
 source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\measures_of_uncertainty_blocks.R" ) )
@@ -29,7 +22,7 @@ source( file.path( path.expand( "~" ) , "Github\\asdfree\\vignetterator\\syntaxt
 
 needs_actions_build_status_line <- '<a href="https://github.com/asdfree/chapter_tag/actions"><img src="https://github.com/asdfree/chapter_tag/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a>'
 
-needs_local_build_status_line <- '```{r , echo = FALSE }\n\nmost_recent_build_date <- gsub( "\\-" , " " , if( dir.exists( "_bookdown_files/" ) ) as.Date( file.info( "_bookdown_files/" )$ctime ) else Sys.Date() )\n\nchapter_tag_badge <- paste0( "<img src=\'https://img.shields.io/badge/tested%20on%20my%20laptop:-" , most_recent_build_date , "-brightgreen\' alt=\'Local Testing Badge\'>" )\n\n```\n\n`r chapter_tag_badge`\n\n'
+needs_local_build_status_line <- '<img src=\'https://img.shields.io/badge/Tested%20Locally-Windows%20Laptop-brightgreen\' alt=\'Local Testing Badge\'>'
 
 
 needs_dplyr_block <- '---\n\n## Analysis Examples with `dplyr` \\\\ {-}\n\nThe R `dplyr` library offers an alternative grammar of data manipulation to base R and SQL syntax.  [dplyr](https://github.com/tidyverse/dplyr/) offers many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, and the `tidyverse` style of non-standard evaluation.  [This vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html) details the available features.  As a starting point for CHAPTER_TAG users, this code replicates previously-presented examples:\n\n```{r eval = FALSE , results = "hide" }\nlibrary(dplyr)\ntbl_initiation_line\n```\nCalculate the mean (average) of a linear variable, overall and by groups:\n```{r eval = FALSE , results = "hide" }\nchapter_tag_tbl %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n\nchapter_tag_tbl %>%\n\tgroup_by( group_by_variable ) %>%\n\tsummarize( mean = mean( linear_variable linear_narm ) )\n```'
@@ -157,7 +150,7 @@ for ( i in seq_along( chapter_tag ) ){
 	if( is_db ){
 		stop( "revisit this" )
 	} else {
-		rmd_lines <- gsub( "^save_a_what_line" , '\n\n### Save locally \\\\ {-}\n\nSave the object at any point:\n\n```{r eval = FALSE , results = "hide" }\n# chapter_tag_fn <- file.path( path.expand( "~" ) , "CHAPTER_TAG" , "this_file.rds" )\n# saveRDS( chapter_tag_df , file = chapter_tag_fn , compress = FALSE )\n```\n\nLoad the same object:\n\n```{r eval = FALSE , results = "hide" }\n# chapter_tag_df <- readRDS( chapter_tag_fn )\n```' , rmd_lines )
+		rmd_lines <- gsub( "^save_a_what_line" , '\n\n### Save Locally \\\\ {-}\n\nSave the object at any point:\n\n```{r eval = FALSE , results = "hide" }\n# chapter_tag_fn <- file.path( path.expand( "~" ) , "CHAPTER_TAG" , "this_file.rds" )\n# saveRDS( chapter_tag_df , file = chapter_tag_fn , compress = FALSE )\n```\n\nLoad the same object:\n\n```{r eval = FALSE , results = "hide" }\n# chapter_tag_df <- readRDS( chapter_tag_fn )\n```' , rmd_lines )
 	}
 		
 	# standalone dataset, survey design, multiply-imputed survey design, database-backed survey design, or multiply-imputed database-backed survey design
@@ -292,6 +285,10 @@ for ( i in seq_along( chapter_tag ) ){
 rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/" ) , full.names = TRUE ) , value = TRUE )
 local_testing_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Local Testing Badge" , readLines( w ) ) ) )
 local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_files ] )
+
+
+# skip previously-tested local builds
+local_testing_rmd_files <- local_testing_rmd_files[ !( basename( local_testing_rmd_files ) %in% c( "anes.Rmd", "ess.Rmd", "hrs.Rmd", "ncvs.Rmd", "pew.Rmd", "vacs.Rmd" ) ) ]
 
 
 
