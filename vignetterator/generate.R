@@ -1,4 +1,4 @@
-commit_memo <- "'skip local builds, badges on one line'"
+commit_memo <- "'sipp 2023'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 

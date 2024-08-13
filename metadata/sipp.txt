@@ -14,7 +14,7 @@ table_structure: * Annual tables with one record per month per person per sample
 
 generalizable_population: * A complex sample generalizing to the U.S. civilian non-institutionalized across varying time periods.
 
-publication_period: * Multi-year panels since 1980s, its current and now permanent [four year rotation](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf#page=15) beginning in 2018.
+publication_period: * Multi-year panels since 1980s, its current and now permanent [four year rotation](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2023_SIPP_Users_Guide_JUL24.pdf#page=15) beginning in 2018.
 
 administrative_organization: * Administered and financed by the [US Census Bureau](http://www.census.gov/).
 
@@ -23,9 +23,9 @@ administrative_organization: * Administered and financed by the [US Census Burea
 ~~~{reading_block}
 Please skim before you begin:
 
-1. [2022 Survey of Income and Program Participation Users' Guide](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2022_SIPP_Users_Guide_JUN23.pdf)
+1. [2023 Survey of Income and Program Participation Users' Guide](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2023_SIPP_Users_Guide_JUL24.pdf)
 
-2. [2022 Data User Notes](https://www.census.gov/programs-surveys/sipp/tech-documentation/user-notes/2022-usernotes.html)
+2. [2023 Data User Notes](https://www.census.gov/programs-surveys/sipp/tech-documentation/user-notes/2023-usernotes.html)
 
 3. A haiku regarding this microdata:
 
@@ -59,7 +59,7 @@ main_tf <- tempfile()
 main_url <-
 	paste0(
 		"https://www2.census.gov/programs-surveys/sipp/" ,
-		"data/datasets/2022/pu2022_csv.zip"
+		"data/datasets/2023/pu2023_csv.zip"
 	)
 
 GET( main_url , write_disk( main_tf ) , progress() )
@@ -82,7 +82,7 @@ rw_tf <- tempfile()
 rw_url <-
 	paste0(
 		"https://www2.census.gov/programs-surveys/sipp/" ,
-		"data/datasets/2022/rw2022_csv.zip"
+		"data/datasets/2023/rw2023_csv.zip"
 	)
 
 GET( rw_url , write_disk( rw_tf ) , progress() )
@@ -228,14 +228,14 @@ svygini( ~ tftotinc , chapter_tag_design , na.rm = TRUE )
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-This example matches statistics and standard errors from the [Wealth and Asset Ownership for Households, by Type of Asset and Selected Characteristics: 2021](https://www2.census.gov/programs-surveys/demo/tables/wealth/2021/wealth-asset-ownership/Wealth_tables_dy2021.xlsx):
+This example matches statistics and standard errors from the [Wealth and Asset Ownership for Households, by Type of Asset and Selected Characteristics: 2022](https://www2.census.gov/programs-surveys/demo/tables/wealth/2022/wealth-asset-ownership/wealth_tables_dy2022.xlsx):
 
 Restrict the design to permanent residence-based householders to match the count in Table 4:
 
 ```{r eval = FALSE , results = "hide" }
 chapter_tag_household_design <- subset( sipp_design , erelrpe %in% 1:2 & tlivqtr %in% 1:2 )
 
-stopifnot( round( coef( svytotal( ~ one , chapter_tag_household_design ) ) / 1000 , -2 ) == 132700 )
+stopifnot( round( coef( svytotal( ~ one , chapter_tag_household_design ) ) / 1000 , -2 ) == 134100 )
 ```
 	
 	
@@ -263,8 +263,10 @@ results <- svymean( ~ thnetworth_category , chapter_tag_household_design )
 
 stopifnot( 
 	all.equal( as.numeric( round( coef( results ) * 100 , 1 ) ) , 
-	c( 11.3 , 6.9 , 3.5 , 5.9 , 6.4 , 8.2 , 15.3 , 13.9 , 28.7 ) ) 
+	c( 11.1 , 6.8 , 3.5 , 5.7 , 5.6 , 7.8 , 15.9 , 14.4 , 29.2 ) ) 
 )
+
+
 
 stopifnot(
 	all.equal( as.numeric( round( SE( results ) * 100 , 1 ) ) ,
