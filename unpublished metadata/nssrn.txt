@@ -4,7 +4,7 @@ https://data.hrsa.gov//DataDownload/DD_Files/Nursing_Workforce_2022_NSSRN_Dashbo
 
 nssrn_url <- "https://data.hrsa.gov/DataDownload/NSSRN/GeneralPUF22/2022_NSSRN_PUF_Stata_Package.zip"
 tf <- tempfile()
-
+# options(timeout=999)
 download.file( nssrn_url , tf , mode = 'wb' )
 nssrn_zip <- unzip( tf , exdir = tempdir() )
 nssrn_zip
@@ -62,4 +62,25 @@ nssrn_design <-
 svyby( ~ one , ~ age_groups , nssrn_design , unwtd.count )
 res <- svymean( ~ age_groups , nssrn_design )
 SE( res ) / coef( res )
+
+
+
+
+
+group_by_variable: age_groups
+
+categorical_variable: STATE
+
+linear_variable: pn_earn_puf
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: pn_earn_puf
+ratio_estimation_denominator: pn_hrs_wrk_puf
+ratio_narm: , na.rm = TRUE
+
+subset_definition: lc_np_cert %in% 1
+subset_definition_description: nurse practitioners
+
+binary_variable: rn_aprn
+
 
