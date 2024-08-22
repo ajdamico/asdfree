@@ -1,0 +1,66 @@
+
+library(haven)
+library(survey)
+
+options( survey.lonely.psu = "fail" )
+options( survey.lonely.psu = "adjust" )
+
+naws_tbl <- read_dta( "nawscrtdvars2db22_STATA.dta" )
+
+naws_df <- data.frame( naws_tbl )
+
+names( naws_df ) <- tolower( names( naws_df ) )
+
+naws_design <-
+	svydesign(
+		id = ~ cluster ,
+		strata = ~ interaction( fpc_region , cycle ) ,
+		data = naws_df ,
+		weights = ~ pwtycrd,
+		nest = TRUE
+	)
+
+naws_design <-
+	update(
+		naws_design ,
+		one = 1 ,
+		country_of_birth =
+			factor(
+				findInterval( a07 , c( 3 , 4 , 5 , 100 ) ) ,
+				levels = 0:4 ,
+				labels = c( 'us or pr' , 'mexico' , 'central america' , 'south america, carribean, asia, or other' , 'missing' )
+			) ,
+		gender = 
+			factor(
+				gender ,
+				levels = 0:1 ,
+				labels = c( 'male' , 'female' )
+			)
+	)
+	
+
+# 2019-2020 report
+# sub_design <- subset( naws_design , cs2  <= '2020-09-30' & cs2 > '2018-09-30')
+
+sub_design <- subset( naws_design , cs2 > '2020-09-30')
+
+svyby(~one,~country_of_birth,sub_design,unwtd.count)
+svymean(~country_of_birth,sub_design)
+svyby(~one,~gender,sub_design,unwtd.count)
+svymean(~gender,sub_design,na.rm=T)
+
+svymean( ~ waget1 , naws_design )
+
+		
+
+
+proc surveymeans data=naws.crtdvars total=naws.regioninfo;
+strata dmaregn cycle;
+cluster county_cluster;
+var waget1;
+weight pwtycrd
+
+
+egen super_strat = group(fpc_region cycle)
+svyset [pweight=pwtycrd],strata(super_strat) psu(cluster)
+svy: tabulate gender
