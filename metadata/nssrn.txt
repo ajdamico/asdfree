@@ -1,0 +1,186 @@
+chapter_title: National Sample Survey of Registered Nurses
+
+needs_actions_build_status_line: yes
+
+~~~{dataset_introduction}
+The employment, education, and demographics of the RN, NP, and APRN workforce in the United States.
+~~~
+
+table_structure: * One table with one row per surveyed registered nurse (RN) or nurse practitioner (NP).
+
+generalizable_population: * A complex sample designed to generalize to RNs and NPs at both state and national levels.
+
+publication_period: * Released every four to ten years since 1977.
+
+administrative_organization: * Administered by the [Health Services and Resources Administration](http://www.hrsa.gov/), in partnership with [Census](https://www.census.gov/).
+
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [2022 NSSRN Methodology Report](https://data.hrsa.gov/DataDownload/NSSRN/GeneralPUF22/Documentation.zip)
+
+2. [Frequently Asked Questions](https://www.census.gov/programs-surveys/nssrn/about/faq.html)
+
+3. A haiku regarding this microdata:
+
+```{r}
+# 
+# 
+# 
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+Download and import the state file:
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+chapter_tag_tf <- tempfile()
+
+chapter_tag_url <-
+	"https://data.hrsa.gov/DataDownload/NSSRN/GeneralPUF22/2022_NSSRN_PUF_Stata_Package.zip"
+	
+download.file( chapter_tag_url , chapter_tag_tf , mode = 'wb' )
+
+chapter_tag_files <- unzip( chapter_tag_tf , exdir = tempdir() )
+
+chapter_tag_dta <- grep( "\\\\.dta$" , chapter_tag_files , ignore.case = TRUE , value = TRUE )
+
+chapter_tag_tbl <- read_dta( chapter_tag_dta )
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+
+chapter_tag_df[ , 'one' ] <- 1
+```
+~~~
+
+
+
+
+~~~{analysis_examples_survey_design}
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+chapter_tag_design <- 
+	svrepdesign(
+		weight = ~rkrnwgta ,
+		repweights = 'rkrnwgta[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = chapter_tag_df
+	)
+```
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		# all advanced practice registered nurses
+		# (including nurse practitioners)
+		all_aprn = as.numeric( ed_lcrn == 2 ) ,
+		
+		age_group =
+			factor(
+				findInterval( age_gp_puf , c( 0 , 3 , 5 , 7 , 9 ) ) ,
+				levels = 1:5 ,
+				labels = 
+					c( 
+						'34 or younger' ,
+						'35 to 44' ,
+						'45 to 54' ,
+						'55 to 64' ,
+						'65 or older'
+					)
+			) ,
+			
+		primary_position_state =
+			factor(
+				as.numeric( pn_loc_code_puf ) ,
+				levels = 
+					c(1L, 2L, 4L, 5L, 6L, 8L, 9L, 10L, 
+					11L, 12L, 13L, 15L, 16L, 17L, 18L, 
+					19L, 20L, 21L, 22L, 23L, 24L, 25L, 
+					26L, 27L, 28L, 29L, 30L, 31L, 32L, 
+					33L, 34L, 35L, 36L, 37L, 38L, 39L, 
+					40L, 41L, 42L, 44L, 45L, 46L, 47L, 
+					48L, 49L, 50L, 51L, 53L, 54L, 55L, 
+					56L, 72L,
+					# note collapsed geographies from codebook
+					500L, 800L) ,
+				labels =
+					c("Alabama", "Alaska", "Arizona", "Arkansas", "California", 
+					"Colorado", "Connecticut", "Delaware", "District of Columbia", 
+					"Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+					"Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", 
+					"Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+					"Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+					"New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+					"Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", 
+					"South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", 
+					"Washington", "West Virginia", "Wisconsin", "Wyoming", "Puerto Rico",
+					# note collapsed geographies from codebook
+					"District of Columbia & Delaware", "Montana & Wyoming")
+			)
+	)
+~~~
+
+group_by_variable: age_group
+
+categorical_variable: primary_position_state
+categorical_narm: , na.rm = TRUE
+
+
+linear_variable: pn_earn_puf
+linear_variable_description: annual earnings from primary nursing position
+linear_narm: , na.rm = TRUE
+
+ratio_estimation_numerator: pn_earn_puf
+ratio_estimation_denominator: hrs_yr_puf
+ratio_narm: , na.rm = TRUE
+
+subset_definition: pn_lcreq_none == 2
+subset_definition_description: individuals working as RNs or APRNs (excluding RNs working as LPNs)
+
+binary_variable: all_aprn
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches statistics and relative standard errors from the "Demographics" tab of [Nursing Workforce 2022 NSSRN Dashboard Data](https://data.hrsa.gov//DataDownload/DD_Files/Nursing_Workforce_2022_NSSRN_Dashboard_Data.xlsx):
+
+```{r eval = FALSE , results = "hide" }
+
+unwtd_count_result <- svyby( ~ one , ~ age_group , chapter_tag_design , unwtd.count )
+
+# cells L398 thru L402
+stopifnot( coef( unwtd_count_result ) == c( 6693 , 12268 , 10804 , 10538 , 8811 ) )
+
+wtd_n_result <- svytotal( ~ age_group , chapter_tag_design )
+
+# cells J398 thru J402
+stopifnot( round( coef( wtd_n_result ) , 0 ) == c( 861060 , 1078187 , 935778 , 834939 , 639412 ) )
+
+share_result <- svymean( ~ age_group , chapter_tag_design )
+
+# cells K398 thru K402
+stopifnot( round( coef( share_result ) , 3 ) == c( 0.198 , 0.248 , 0.215 , 0.192 , 0.147 ) )
+
+# cells M398 thru M402
+stopifnot( 
+	round( SE( share_result ) / coef( share_result ) , 4 ) == 
+	c( 0.0206 , 0.0155 , 0.0192 , 0.0187 , 0.0125 )
+)
+```
+~~~

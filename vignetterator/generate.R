@@ -1,4 +1,4 @@
-commit_memo <- "'naws & nssrn saves'"
+commit_memo <- "'nssrn draft'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
