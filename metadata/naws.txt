@@ -1,0 +1,188 @@
+chapter_title: National Agricultural Workers Survey
+
+needs_local_build_status_line: yes
+
+~~~{dataset_introduction}
+The primary face-to-face interview of currently-employed crop workers in the United States, with detailed questions on demographics, occupational injury, health surveillance, and seasonal and migrant labor.
+~~~
+
+table_structure: * One cumulative table containing all interviews since 1989, with one row per sampled respondent.
+
+generalizable_population: * A complex sample designed to generalize to crop production workers employed by establishments engaged in Crop Production (NAICS 111) and Support Activities for Crop Production (NAICS 1151).
+
+publication_period: * Released biennially since 1989.
+
+administrative_organization: * Administered by the [Employment and Training Administration](https://www.dol.gov/agencies/eta), in partnership with [JBS International](https://www.jbsinternational.com/).
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [Findings from the National Agricultural Workers Survey (NAWS) 2021–2022: A Demographic and Employment Profile of United States Crop Workers](https://www.dol.gov/sites/dolgov/files/ETA/naws/pdfs/NAWS%20Research%20Report%2017.pdf)
+
+2. [Statistical Methods of the National Agricultural Workers Survey](https://www.dol.gov/sites/dolgov/files/ETA/naws/pdfs/NAWS_Statistical_Methods_AKA_Supporting_Statement_Part_B.pdf)
+
+3. A haiku regarding this microdata:
+
+```{r}
+# were i king, my court:
+# arcimboldo's vertumnus
+# jester juggling self
+```
+~~~
+
+
+~~~{download_and_import_block}
+
+The [public access dataset](https://www.dol.gov/agencies/eta/national-agricultural-workers-survey/data/files-sas) does not currently include [the variables needed](https://www.dol.gov/sites/dolgov/files/ETA/naws/pdfs/NAWS_Statistical_Methods_AKA_Supporting_Statement_Part_B.pdf#page=19) to get design-adjusted estimates.  Previous data releases contained [replicate weights](https://www.dol.gov/sites/dolgov/files/ETA/naws/pdfs/Intro_Analyzing_NAWSPAD.pdf#page=24); however, those have been discontinued.
+
+Although the PUF allows external researchers to match weighted shares, the [UCLA Statistical Consulting Group](https://stats.oarc.ucla.edu/r/seminars/survey-data-analysis-with-r/) cautions _ignoring the clustering will likely lead to standard errors that are underestimated, possibly leading to results that seem to be statistically significant, when in fact, they are not._
+
+In order for the Employment and Training Administration (ETA) to consider a request for offsite use of the restricted NAWS data file, send these items to the contact [listed here for inquiries about the survey](https://www.dol.gov/agencies/eta/national-agricultural-workers-survey/contact):
+
+1. A brief description of the research aims and how NAWS data will support the research;
+
+2. A statement as to why the NAWS public data file is insufficient to meet the research aims;
+
+3. A description of how and when the resulting findings will be disseminated; and
+
+4. A brief description of the analysis plan, so that NAWS staff may assess the suitability of the NAWS given the research aims and analysis plan.
+
+Upon receipt of this microdata, begin by loading the SAS file:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+chapter_tag_tbl <-
+	read_sas( 
+		file.path( 
+			path.expand( "~" ) ,
+			"nawscrtdvars2db22.sas7bdat"
+		)
+	)
+
+chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
+```
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+options( survey.lonely.psu = "adjust" )
+
+chapter_tag_design <-
+	svydesign(
+		id = ~ cluster ,
+		strata = ~ interaction( fpc_region , cycle ) ,
+		data = chapter_tag_df ,
+		weights = ~ pwtycrd,
+		nest = TRUE
+	)
+```
+
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <-
+	update(
+		chapter_tag_design ,
+		
+		one = 1 ,
+		
+		country_of_birth =
+			factor(
+				findInterval( a07 , c( 3 , 4 , 5 , 100 ) ) ,
+				levels = 0:4 ,
+				labels = 
+					c( 'us or pr' , 'mexico' , 'central america' , 
+					'south america, carribean, asia, or other' , 'missing' )
+			) ,
+		
+		gender = 
+			factor(
+				gender ,
+				levels = 0:1 ,
+				labels = c( 'male' , 'female' )
+			) ,
+			
+		interview_cohort =
+			factor(
+				findInterval( fy , seq( 1989 , 2021 , 2 ) ) ,
+				levels = seq_along( seq( 1989 , 2021 , 2 ) ) ,
+				labels = paste( seq( 1989 , 2021 , 2 ) , seq( 1990 , 2022 , 2 ) , sep = '-' )
+			) ,
+			
+		authorized_to_work =
+			ifelse( l01 < 9 , as.numeric( l01 < 5 ) , NA ) ,
+			
+		hours_worked_last_week_at_farm_job = d04
+	)
+	
+~~~
+
+group_by_variable: interview_cohort
+
+categorical_variable: country_of_birth
+categorical_narm: , na.rm = TRUE
+
+linear_variable: waget1
+linear_narm: , na.rm = TRUE
+linear_variable_description: Hourly wage for primary task
+
+ratio_estimation_numerator: hours_worked_last_week_at_farm_job
+ratio_estimation_denominator: numfempl
+ratio_narm: , na.rm = TRUE
+
+subset_definition: region12 == 'CA'
+subset_definition_description: California, the only standalone state with adequate sample
+
+binary_variable: authorized_to_work
+binary_narm: , na.rm = TRUE
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This example matches the unweighted counts and weighted percents of the gender rows shown on [PDF page 90 of the most current research report](https://www.dol.gov/sites/dolgov/files/ETA/naws/pdfs/NAWS%20Research%20Report%2017.pdf#page=90); however, the restricted-use dataset does not include information to implement a finite population correction (FPC).  Since a FPC always reduces the standard error, omitting it only makes results more conservative.  JBS International shared standard errors and coefficients of variation omitting the FPC, this exercise precisely matches those numbers as well:
+
+```{r eval = FALSE , results = "hide" }
+# less conservative
+options( survey.lonely.psu = "remove" )
+
+published_unweighted_counts <- c( 1823 , 775 )
+
+published_percentages <- c( 0.68 , 0.32 )
+
+unpublished_se <- c( 0.024 , 0.024 )
+
+unpublished_cv <- c( 0.04 , 0.08 )
+
+current_cohort <- subset( chapter_tag_design , interview_cohort == '2021-2022' )
+
+( unwtd_n <- svyby( ~ one , ~ gender , current_cohort , unwtd.count ) )
+
+stopifnot( all( coef( unwtd_n ) == published_unweighted_counts ) )
+
+( results <- svymean( ~ gender , current_cohort ) )
+
+stopifnot( all( round( coef( results ) , 2 ) == published_percentages ) )
+
+stopifnot( all( round( SE( results ) , 3 ) == unpublished_se ) )
+
+stopifnot( all( round( cv( results ) , 2 ) == unpublished_cv ) )
+
+# more conservative
+options( survey.lonely.psu = "adjust" )
+```
+~~~
+

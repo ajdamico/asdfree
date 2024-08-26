@@ -1,4 +1,4 @@
-commit_memo <- "'nssrn'"
+commit_memo <- "'naws'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -288,7 +288,7 @@ local_testing_rmd_files <- names( local_testing_rmd_files[ local_testing_rmd_fil
 
 
 # skip previously-tested local builds
-local_testing_rmd_files <- local_testing_rmd_files[ !( basename( local_testing_rmd_files ) %in% c( "anes.Rmd", "ess.Rmd", "hrs.Rmd", "ncvs.Rmd", "pew.Rmd", "vacs.Rmd" ) ) ]
+local_testing_rmd_files <- local_testing_rmd_files[ !( basename( local_testing_rmd_files ) %in% c( "anes.Rmd", "ess.Rmd", "hrs.Rmd", "naws.Rmd" , "ncvs.Rmd", "pew.Rmd", "vacs.Rmd" ) ) ]
 
 
 
