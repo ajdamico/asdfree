@@ -1,7 +1,3 @@
-```{r eval = TRUE , echo = FALSE , results = "hide" , warning = FALSE , message = FALSE }
-objects_in_memory_for_local_build <- ls()
-```
-
 # National Agricultural Workers Survey (NAWS) {-}
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) <img src='https://img.shields.io/badge/Tested%20Locally-Windows%20Laptop-brightgreen' alt='Local Testing Badge'>
@@ -52,7 +48,7 @@ In order for the Employment and Training Administration (ETA) to consider a requ
 
 Upon receipt of this microdata, begin by loading the SAS file:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 library(haven)
 
 naws_tbl <-
@@ -72,21 +68,21 @@ names( naws_df ) <- tolower( names( naws_df ) )
 
 Save the object at any point:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 # naws_fn <- file.path( path.expand( "~" ) , "NAWS" , "this_file.rds" )
 # saveRDS( naws_df , file = naws_fn , compress = FALSE )
 ```
 
 Load the same object:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 # naws_df <- readRDS( naws_fn )
 ```
 
 ### Survey Design Definition {-}
 Construct a complex sample survey design:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 library(survey)
 
 options( survey.lonely.psu = "adjust" )
@@ -104,7 +100,7 @@ naws_design <-
 ### Variable Recoding {-}
 
 Add new columns to the data set:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 naws_design <-
 	update(
 		naws_design ,
@@ -149,7 +145,7 @@ naws_design <-
 ### Unweighted Counts {-}
 
 Count the unweighted number of records in the survey sample, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 sum( weights( naws_design , "sampling" ) != 0 )
 
 svyby( ~ one , ~ interview_cohort , naws_design , unwtd.count )
@@ -157,7 +153,7 @@ svyby( ~ one , ~ interview_cohort , naws_design , unwtd.count )
 
 ### Weighted Counts {-}
 Count the weighted size of the generalizable population, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svytotal( ~ one , naws_design )
 
 svyby( ~ one , ~ interview_cohort , naws_design , svytotal )
@@ -166,35 +162,35 @@ svyby( ~ one , ~ interview_cohort , naws_design , svytotal )
 ### Descriptive Statistics {-}
 
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svymean( ~ waget1 , naws_design , na.rm = TRUE )
 
 svyby( ~ waget1 , ~ interview_cohort , naws_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the distribution of a categorical variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svymean( ~ country_of_birth , naws_design , na.rm = TRUE )
 
 svyby( ~ country_of_birth , ~ interview_cohort , naws_design , svymean , na.rm = TRUE )
 ```
 
 Calculate the sum of a linear variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svytotal( ~ waget1 , naws_design , na.rm = TRUE )
 
 svyby( ~ waget1 , ~ interview_cohort , naws_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the weighted sum of a categorical variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svytotal( ~ country_of_birth , naws_design , na.rm = TRUE )
 
 svyby( ~ country_of_birth , ~ interview_cohort , naws_design , svytotal , na.rm = TRUE )
 ```
 
 Calculate the median (50th percentile) of a linear variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyquantile( ~ waget1 , naws_design , 0.5 , na.rm = TRUE )
 
 svyby( 
@@ -208,7 +204,7 @@ svyby(
 ```
 
 Estimate a ratio:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyratio( 
 	numerator = ~ hours_worked_last_week_at_farm_job , 
 	denominator = ~ numfempl , 
@@ -220,18 +216,18 @@ svyratio(
 ### Subsetting {-}
 
 Restrict the survey design to California, the only standalone state with adequate sample:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 sub_naws_design <- subset( naws_design , region12 == 'CA' )
 ```
 Calculate the mean (average) of this subset:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svymean( ~ waget1 , sub_naws_design , na.rm = TRUE )
 ```
 
 ### Measures of Uncertainty {-}
 
 Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 this_result <- svymean( ~ waget1 , naws_design , na.rm = TRUE )
 
 coef( this_result )
@@ -255,17 +251,17 @@ cv( grouped_result )
 ```
 
 Calculate the degrees of freedom of any survey design object:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 degf( naws_design )
 ```
 
 Calculate the complex sample survey-adjusted variance of any statistic:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyvar( ~ waget1 , naws_design , na.rm = TRUE )
 ```
 
 Include the complex sample design effect in the result for a specific statistic:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 # SRS without replacement
 svymean( ~ waget1 , naws_design , na.rm = TRUE , deff = TRUE )
 
@@ -274,7 +270,7 @@ svymean( ~ waget1 , naws_design , na.rm = TRUE , deff = "replace" )
 ```
 
 Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See `?svyciprop` for alternatives:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyciprop( ~ authorized_to_work , naws_design ,
 	method = "likelihood" , na.rm = TRUE )
 ```
@@ -282,12 +278,12 @@ svyciprop( ~ authorized_to_work , naws_design ,
 ### Regression Models and Tests of Association {-}
 
 Perform a design-based t-test:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svyttest( waget1 ~ authorized_to_work , naws_design )
 ```
 
 Perform a chi-squared test of association for survey data:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 svychisq( 
 	~ authorized_to_work + country_of_birth , 
 	naws_design 
@@ -295,7 +291,7 @@ svychisq(
 ```
 
 Perform a survey-weighted generalized linear model:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 glm_result <- 
 	svyglm( 
 		waget1 ~ authorized_to_work + country_of_birth , 
@@ -311,7 +307,7 @@ summary( glm_result )
 
 This example matches the unweighted counts and weighted percents of the gender rows shown on [PDF page 90 of the most current research report](https://www.dol.gov/sites/dolgov/files/ETA/naws/pdfs/NAWS%20Research%20Report%2017.pdf#page=90); however, the restricted-use dataset does not include information to implement a finite population correction (FPC). Since a FPC always reduces the standard error, omitting it only makes results more conservative. JBS International shared standard errors and coefficients of variation omitting the FPC, this exercise precisely matches those numbers as well:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 # less conservative
 options( survey.lonely.psu = "remove" )
 
@@ -347,12 +343,12 @@ options( survey.lonely.psu = "adjust" )
 
 The R `srvyr` library calculates summary statistics from survey data, such as the mean, total or quantile using [dplyr](https://github.com/tidyverse/dplyr/)-like syntax. [srvyr](https://github.com/gergness/srvyr) allows for the use of many verbs, such as `summarize`, `group_by`, and `mutate`, the convenience of pipe-able functions, the `tidyverse` style of non-standard evaluation and more consistent return types than the `survey` package. [This vignette](https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html) details the available features. As a starting point for NAWS users, this code replicates previously-presented examples:
 
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 library(srvyr)
 naws_srvyr_design <- as_survey( naws_design )
 ```
 Calculate the mean (average) of a linear variable, overall and by groups:
-```{r cache = TRUE , warning = FALSE , message = FALSE , results = "hide" }
+```{r eval = FALSE , results = "hide" }
 naws_srvyr_design %>%
 	summarize( mean = survey_mean( waget1 , na.rm = TRUE ) )
 
@@ -361,8 +357,4 @@ naws_srvyr_design %>%
 	summarize( mean = survey_mean( waget1 , na.rm = TRUE ) )
 ```
 
-
-```{r eval = TRUE , echo = FALSE , results = "hide" , warning = FALSE , message = FALSE }
-rm( list = setdiff( ls() , objects_in_memory_for_local_build ) ) ; gc()
-```
 
