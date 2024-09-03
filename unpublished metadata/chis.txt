@@ -174,3 +174,76 @@ stopifnot(
 
 
 needs_actions_build_status_line: yes
+
+
+
+
+
+
+
+library(haven)
+library(survey)
+
+
+chis_zips <- list.files( chis_folder , full.names = TRUE )
+
+chis_stata_fun <-
+	function( zip_fn ){
+	
+		z <- unzip( zip_fn , exdir = tempdir() )
+		
+		w <- grep( "ADULT\\.|CHILD\\.|TEEN\\." , z , value = TRUE )
+		
+		v <- read_stata( w )
+		
+		u <- data.frame( v )
+		
+		names( u ) <- tolower( names( u ) )
+		
+		u
+	}
+
+chis_adult_df <- chis_stata_fun( chis_zips[1] )
+chis_child_df <- chis_stata_fun( chis_zips[2] )
+chis_teen_df <- chis_stata_fun( chis_zips[3] )
+
+ab1
+tb1_p1
+ca6
+
+chis_adult_df[ , 'tb1_p1' ] <- findInterval( chis_adult_df[ , 'ab1' ] , 1:4 )
+chis_child_df[ , 'tb1_p1' ] <- findInterval( chis_child_df[ , 'ca6' ] , 1:4 )
+
+
+kv <- c( 'tb1_p1' , paste0( 'rakedw' , 0:80 ) )
+
+chis_df <-
+	rbind(
+		chis_adult_df[ kv ] ,
+		chis_teen_df[ kv ] ,
+		chis_child_df[ kv ]
+	)
+
+
+
+chis_design <- svrepdesign(data = chis_df , weights = ~ rakedw0 , 
+                           repweights = "rakedw[1-9]" , 
+                           type = "other" , scale = 1 ,
+                           rscales = 1 , mse = TRUE)
+
+confint(svymean( ~ factor( tb1_p1 ) , chis_design ))
+
+chis_wrongdesign <- svydesign(~1,data = chis_df , weights = ~ rakedw0 )
+confint(svymean( ~ factor( tb1_p1 ) , chis_wrongdesign ))
+
+
+
+
+chis_adult_design <- svrepdesign(data = chis_adult_df , weights = ~ rakedw0 , 
+                           repweights = "rakedw[1-9]" , 
+                           type = "other" , scale = 1 ,
+                           rscales = 1 , mse = TRUE)
+
+svytotal( ~ factor( ab1 ) , chis_adult_design )
+
+confint( svymean( ~ factor( ab1 ) , chis_adult_design ) , df = degf( chis_adult_design ) )
