@@ -1,0 +1,274 @@
+chapter_title: California Health Interview Survey
+
+needs_local_build_status_line: yes
+
+
+~~~{dataset_introduction}
+California's National Health Interview Survey (NHIS), a healthcare survey for the nation's largest state.
+~~~
+
+table_structure: * One adult, one teenage (12-17), and one child table, each with one row per sampled respondent.
+
+generalizable_population: * A complex survey designed to generalize to the civilian non-institutionalized population of California.
+
+publication_period: * Released annually since 2011, and biennially since 2001.
+
+administrative_organization: * Administered by the [UCLA Center for Health Policy Research](http://healthpolicy.ucla.edu/).
+
+
+~~~{reading_block}
+Please skim before you begin:
+
+1. [CHIS 2021-2022 Methodology Report Series, Report 1: Sample Design DESIGN](https://healthpolicy.ucla.edu/sites/default/files/2023-09/chis_2021-2022_methodologyreport1_sampledesign_final_09112023.pdf)
+
+2. [CHIS 2021-2022 Methodology Report Series, Report 5: Weighting and Variance Estimation](https://healthpolicy.ucla.edu/sites/default/files/2023-09/chis_2021-2022_methodologyreport5_weighting_final_09192023.pdf)
+
+3. A haiku regarding this microdata:
+
+```{r}
+#
+#
+#
+```
+~~~
+
+
+
+~~~{definitions_block}
+## Function Definitions {-}
+
+
+Define a function to unzip and import each Stata file:
+
+```{r eval = FALSE , results = "hide" }
+library(haven)
+
+chapter_tag_import <-
+	function( this_fn ){
+		
+		these_files <- unzip( this_fn , exdir = tempdir() )
+
+		stata_fn <- grep( "ADULT\\\\.|CHILD\\\\.|TEEN\\\\." , these_files , value = TRUE )
+
+		this_tbl <- read_stata( stata_fn )
+
+		this_df <- data.frame( this_tbl )
+
+		names( this_df ) <- tolower( names( this_df ) )
+
+		# remove labelled classes
+		labelled_cols <- 
+			sapply( this_df , function( w ) class( w )[1] == 'haven_labelled' )
+
+		this_df[ labelled_cols ] <-
+			sapply( this_df[ labelled_cols ] , as.numeric )
+
+		this_df
+	}
+```	
+
+
+---
+~~~
+
+
+~~~{download_and_import_block}
+
+
+1. Register at the UCLA Center for Health Policy Research at https://healthpolicy.ucla.edu/user/register.
+
+2. Choose Year: `2022`, Age Group: `Adult` and `Teen` and `Child`, File Type: `Stata`.
+
+3. Download the 2022 Adult, Teen, and Child Stata files (version `Oct 2023`).
+
+
+
+Import the adult, teen, and child stata tables into `data.frame` objects:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_adult_df <- 
+	chapter_tag_import( file.path( path.expand( "~" ) , "adult_stata_2022.zip" ) )
+
+chapter_tag_teen_df <- 
+	chapter_tag_import( file.path( path.expand( "~" ) , "teen_stata_2022.zip" ) )
+
+chapter_tag_child_df <- 
+	chapter_tag_import( file.path( path.expand( "~" ) , "child_stata_2022.zip" ) )
+```
+
+Harmonize the general health condition variable across the three `data.frame` objects:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_adult_df[ , 'general_health' ] <-
+	c( 1 , 2 , 3 , 4 , 4 )[ chapter_tag_adult_df[ , 'ab1' ] ]
+
+chapter_tag_teen_df[ , 'general_health' ] <- chapter_tag_teen_df[ , 'tb1_p1' ]
+
+chapter_tag_child_df[ , 'general_health' ] <-
+	c( 1 , 2 , 3 , 4 , 4 )[ chapter_tag_child_df[ , 'ca6' ] ]
+```
+
+Add four age categories across the three `data.frame` objects:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_adult_df[ , 'age_categories' ] <-
+	ifelse( chapter_tag_adult_df[ , 'srage_p1' ] >= 65 , 4 , 3 )
+
+chapter_tag_teen_df[ , 'age_categories' ] <- 2
+
+chapter_tag_child_df[ , 'age_categories' ] <- 1
+```
+
+Harmonize the usual source of care variable across the three `data.frame` objects:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_adult_df[ , 'no_usual_source_of_care' ] <-
+	as.numeric( chapter_tag_adult_df[ , 'ah1v2' ] == 2 )
+
+chapter_tag_teen_df[ , 'no_usual_source_of_care' ] <-
+	as.numeric( chapter_tag_teen_df[ , 'tf1v2' ] == 2 )
+
+chapter_tag_child_df[ , 'no_usual_source_of_care' ] <-
+	as.numeric( chapter_tag_child_df[ , 'cd1v2' ] == 2 )
+```
+
+
+Add monthly fruit and vegetable counts to the adult `data.frame` object, blanking the other two:
+```{r eval = FALSE , results = "hide" }
+chapter_tag_adult_df[ , 'adult_fruits_past_month' ] <- chapter_tag_adult_df[ , 'ae2' ]
+
+chapter_tag_adult_df[ , 'adult_veggies_past_month' ] <- chapter_tag_adult_df[ , 'ae7' ]
+
+chapter_tag_teen_df[ , c( 'adult_fruits_past_month' , 'adult_veggies_past_month' ) ] <- NA
+
+chapter_tag_child_df[ , c( 'adult_fruits_past_month' , 'adult_veggies_past_month' ) ] <- NA
+```
+
+
+
+
+Specify which variables to keep in each of the `data.frame` objects, then stack them:
+```{r eval = FALSE , results = "hide" }
+variables_to_keep <-
+	c(
+		grep( '^rakedw' , names( chapter_tag_adult_df ) , value = TRUE ) ,
+		'general_health' , 'age_categories' , 'adult_fruits_past_month' , 
+		'adult_veggies_past_month' , 'srsex' , 'povll2_p1v2' , 'no_usual_source_of_care'
+	)
+
+chapter_tag_df <- 
+	rbind( 
+		chapter_tag_child_df[ variables_to_keep ] , 
+		chapter_tag_teen_df[ variables_to_keep ] , 
+		chapter_tag_adult_df[ variables_to_keep ] 
+	)
+```
+~~~
+
+
+
+
+
+~~~{analysis_examples_survey_design}
+
+```{r eval = FALSE , results = "hide" }
+library(survey)
+
+chapter_tag_design <-
+	svrepdesign(
+		data = chapter_tag_df , 
+		weights = ~ rakedw0 , 
+		repweights = "rakedw[1-9]" ,
+		type = "other" , 
+		scale = 1 ,
+		rscales = 1 , 
+		mse = TRUE
+	)
+```
+
+~~~
+
+~~~{variable_recoding_block}
+chapter_tag_design <- 
+	update( 
+		chapter_tag_design , 
+		
+		one = 1 ,
+		
+		gender = factor( srsex , levels = 1:2 , labels = c( 'male' , 'female' ) ) ,
+		
+		age_categories =
+			factor( 
+				age_categories , 
+				levels = 1:4 , 
+				labels = 
+					c( 'children under 12' , 'teens age 12-17' , 'adults age 18-64' , 'seniors' )
+			) ,
+		
+		general_health =
+			factor(
+				general_health ,
+				levels = 1:4 ,
+				labels = c( 'Excellent' , 'Very good' , 'Good' , 'Fair/Poor' )
+			)
+	)
+~~~
+
+group_by_variable: general_health
+
+categorical_variable: gender
+
+linear_variable: povll2_p1v2
+linear_variable_description: census poverty
+
+ratio_estimation_numerator: adult_fruits_past_month
+ratio_estimation_denominator: adult_veggies_past_month
+ratio_narm: , na.rm = TRUE
+
+subset_definition: age_categories == 'seniors'
+subset_definition_description: seniors
+
+binary_variable: no_usual_source_of_care
+
+
+
+
+needs_srvyr_block: yes
+
+~~~{replication_example_block}
+## Replication Example {-}
+
+This matches the proportions and counts from [AskCHIS](https://healthpolicy.ucla.edu/our-work/askchis).  The standard errors do not match precisely, but the team at UCLA confirmed [this survey design definition](https://healthpolicy.ucla.edu/sites/default/files/2023-10/sample-code-to-analyze-chis-data.pdf) to be correct, and that the minor standard error and confidence interval differences should not impact any analyses from a statistical perspective:
+
+```{r eval = FALSE , results = "hide" }
+
+chapter_tag_adult_design <-
+	svrepdesign(
+		data = chapter_tag_adult_df , 
+		weights = ~ rakedw0 , 
+		repweights = "rakedw[1-9]" ,
+		type = "other" , 
+		scale = 1 ,
+		rscales = 1 , 
+		mse = TRUE
+	)
+	
+chapter_tag_adult_design <-
+	update(
+		chapter_tag_adult_design ,
+		ab1 = 
+			factor( 
+				ab1 , 
+				levels = 1:5 , 
+				labels = c( 'Excellent' , 'Very good' , 'Good' , 'Fair' , 'Poor' )
+			)
+	)
+	
+this_proportion <- svymean( ~ ab1 , chapter_tag_adult_design )
+
+stopifnot( round( coef( this_proportion ) , 3 ) == c( 0.183 , 0.340 , 0.309 , 0.139 , 0.029 ) )
+
+this_count <- svytotal( ~ ab1 , chapter_tag_adult_design )
+
+stopifnot( 
+	round( coef( this_count ) , -3 ) == c( 5414000 , 10047000 , 9138000 , 4106000 , 855000 )
+)
+```
+~~~
+
