@@ -40,7 +40,7 @@ Load the `SAScii` library to interpret a SAS input program, and also re-arrange 
 library(SAScii)
 
 sas_url <-
-	"https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/2019XXH-SAS-Input-Program.sas"
+	"https://www.cdc.gov/yrbs/files/2023/2023XXH_SAS_Input_Program.sas"
 
 sas_text <- tolower( readLines( sas_url ) )
 
@@ -82,7 +82,7 @@ Download and import the national file:
 dat_tf <- tempfile()
 
 dat_url <-
-	"https://www.cdc.gov/healthyyouth/data/yrbs/files/2019/XXH2019_YRBS_Data.dat"
+	"https://www.cdc.gov/yrbs/files/2023/XXH2023_YRBS_Data.dat"
 	
 download.file( dat_url , dat_tf , mode = 'wb' )
 
@@ -116,11 +116,10 @@ chapter_tag_design <-
 chapter_tag_design <- 
 	update( 
 		chapter_tag_design , 
-		q2 = q2 ,
-		never_rarely_wore_seat_belt = as.numeric( qn8 == 1 ) ,
-		ever_used_marijuana = as.numeric( qn45 == 1 ) ,
-		tried_to_quit_tobacco_past_year = as.numeric( q39 == 2 ) ,
-		used_tobacco_past_year = as.numeric( q39 > 1 )
+		did_not_always_wear_seat_belt = as.numeric( qn8 == 1 ) ,
+		ever_used_marijuana = as.numeric( qn46 == 1 ) ,
+		tried_to_quit_tobacco_past_year = as.numeric( qn40 == 1 ) ,
+		used_tobacco_past_year = as.numeric( q40 > 1 )
 	)
 ~~~
 
@@ -142,8 +141,7 @@ ratio_narm: , na.rm = TRUE
 subset_definition: qn40 > 1
 subset_definition_description: youths who ever drank alcohol
 
-binary_variable: never_rarely_wore_seat_belt
-binary_variable_description: never or rarely wore a seat belt
+binary_variable: did_not_always_wear_seat_belt
 binary_narm: , na.rm = TRUE
 
 
@@ -152,47 +150,46 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-This example matches statistics, standard errors, and confidence intervals from the "never/rarely wore seat belt" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/healthyyouth/data/yrbs/pdf/2019/2019_yrbs_analysis_software.pdf#page=29):
+This example matches statistics, standard errors, and confidence intervals from the "did not always wear a seat belt" row of [PDF page 29 of this CDC analysis software document](https://www.cdc.gov/yrbs/media/pdf/2023/2023_YRBS_analysis_software.pdf#page=29):
 
 ```{r eval = FALSE , results = "hide" }
 
 unwtd_count_result <-
-	unwtd.count( ~ never_rarely_wore_seat_belt , chapter_tag_design )
+	unwtd.count( ~ did_not_always_wear_seat_belt , chapter_tag_design )
 
-stopifnot( coef( unwtd_count_result ) == 11149 )
+stopifnot( coef( unwtd_count_result ) == 15071 )
 
 wtd_n_result <-
 	svytotal( 
 		~ one , 
 		subset(
 			chapter_tag_design , 
-			!is.na( never_rarely_wore_seat_belt ) 
+			!is.na( did_not_always_wear_seat_belt ) 
 		)
 	)
 
-stopifnot( round( coef( wtd_n_result ) , 0 ) == 12132 )
+stopifnot( round( coef( wtd_n_result ) , 0 ) == 16917 )
 
 share_result <-
 	svymean(
-		~ never_rarely_wore_seat_belt ,
+		~ did_not_always_wear_seat_belt ,
 		chapter_tag_design ,
 		na.rm = TRUE 
 	)
 
-stopifnot( round( coef( share_result ) , 4 ) == .0654 )
+stopifnot( round( coef( share_result ) , 4 ) == .3958 )
 
-stopifnot( round( SE( share_result ) , 4 ) == .0065 )
+stopifnot( round( SE( share_result ) , 4 ) == .0172 )
 
 ci_result <-
 	svyciprop(
-		~ never_rarely_wore_seat_belt ,
+		~ did_not_always_wear_seat_belt ,
 		chapter_tag_design , 
-		na.rm = TRUE ,
-		method = "beta"
+		na.rm = TRUE
 	)
 
-stopifnot( round( confint( ci_result  )[1] , 4 ) == 0.0529 )
+stopifnot( round( confint( ci_result  )[1] , 4 ) == 0.3621 )
 
-stopifnot( round( confint( ci_result  )[2] , 2 ) == 0.08 )
+stopifnot( round( confint( ci_result  )[2] , 4 ) == 0.4304 )
 ```
 ~~~
