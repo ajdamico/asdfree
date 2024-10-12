@@ -1,4 +1,6 @@
-# You can find the book at http://asdfree.com/
+# You can read this book at http://asdfree.com/
+# You can contribute to this book by submitting new entries styled like https://github.com/ajdamico/asdfree/tree/master/metadata/
+
 american-community-survey-acs: <p><a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3" /></a> <a href="https://github.com/asdfree/acs/actions"><img src="https://github.com/asdfree/acs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 american-housing-survey-ahs: <p><a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3" /></a> <a href="https://github.com/asdfree/ahs/actions"><img src="https://github.com/asdfree/ahs/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a></p>
 american-national-election-studies-anes: <p><a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3" /></a> <img src='https://img.shields.io/badge/Tested%20Locally-Windows%20Laptop-brightgreen' alt='Local Testing Badge'></p>

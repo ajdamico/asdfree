@@ -1,4 +1,4 @@
-commit_memo <- "'run all ci repos'"
+commit_memo <- "'readme'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -512,7 +512,7 @@ for( this_ci_file in ci_rmd_files ){
 # collect all build status badges:
 readme_md_text <- 
 	c(
-		"# You can find the book at http://asdfree.com/" ,
+		"# You can read this book at http://asdfree.com/\n# You can contribute to this book by submitting new entries styled like https://github.com/ajdamico/asdfree/tree/master/metadata/\n" ,
 		unlist( 
 			lapply( 
 				grep( "\\html$" , list.files( file.path( path.expand( "~" ) , "Github/asdfree/docs" ) , full.names = TRUE ) , value = TRUE ) , 
