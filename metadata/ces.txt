@@ -42,7 +42,7 @@ library(httr)
 
 tf_prior_year <- tempfile()
 
-this_url_prior_year <- "https://www.bls.gov/cex/pumd/data/stata/intrvw21.zip"
+this_url_prior_year <- "https://www.bls.gov/cex/pumd/data/stata/intrvw22.zip"
 
 dl_prior_year <- GET( this_url_prior_year , user_agent( "email@address.com" ) )
 
@@ -52,7 +52,7 @@ unzipped_files_prior_year <- unzip( tf_prior_year , exdir = tempdir() )
 
 tf_current_year <- tempfile()
 
-this_url_current_year <- "https://www.bls.gov/cex/pumd/data/stata/intrvw22.zip"
+this_url_current_year <- "https://www.bls.gov/cex/pumd/data/stata/intrvw23.zip"
 
 dl_current_year <- GET( this_url_current_year , user_agent( "email@address.com" ) )
 
@@ -67,11 +67,11 @@ unzipped_files <- c( unzipped_files_current_year , unzipped_files_prior_year )
 
 
 
-Import and stack all 2022 quarterly files plus 2023's first quarter:
+Import and stack all 2023 quarterly files plus 2024's first quarter:
 ```{r eval = FALSE , results = "hide" }
 library(haven)
 
-fmli_files <- grep( "fmli2[2-3]" , unzipped_files , value = TRUE )
+fmli_files <- grep( "fmli2[3-4]" , unzipped_files , value = TRUE )
 
 fmli_tbls <- lapply( fmli_files , read_dta )
 
@@ -93,7 +93,7 @@ chapter_tag_df <- do.call( rbind , fmli_dfs )
 ```
 
 
-Scale the weight columns based on the number of months in 2022:
+Scale the weight columns based on the number of months in 2023:
 ```{r eval = FALSE , results = "hide" }
 chapter_tag_df[ , c( 'qintrvyr' , 'qintrvmo' ) ] <-
 	sapply( chapter_tag_df[ , c( 'qintrvyr' , 'qintrvmo' ) ] , as.numeric )
@@ -105,8 +105,8 @@ chapter_tag_df <-
 	transform(
 		chapter_tag_df ,
 		mo_scope =
-			ifelse( qintrvyr %in% 2022 & qintrvmo %in% 1:3 , qintrvmo - 1 ,
-			ifelse( qintrvyr %in% 2023 , 4 - qintrvmo , 3 ) )
+			ifelse( qintrvyr %in% 2023 & qintrvmo %in% 1:3 , qintrvmo - 1 ,
+			ifelse( qintrvyr %in% 2024 , 4 - qintrvmo , 3 ) )
 	)
 
 
@@ -152,7 +152,7 @@ Append any interview survey UCC found at https://www.bls.gov/cex/ce_source_integ
 ```{r eval = FALSE , results = "hide" }
 ucc_exp <- c( "450110" , "450210" )
 
-mtbi_files <- grep( "mtbi2[2-3]" , unzipped_files , value = TRUE )
+mtbi_files <- grep( "mtbi2[3-4]" , unzipped_files , value = TRUE )
 
 mtbi_tbls <- lapply( mtbi_files , read_dta )
 
@@ -168,7 +168,7 @@ mtbi_dfs <- lapply( mtbi_dfs , function( w ) w[ c( 'newid' , 'cost' , 'ucc' , 'r
 
 mtbi_df <- do.call( rbind , mtbi_dfs )
 
-mtbi_df <- subset( mtbi_df , ( ref_yr %in% 2022 ) & ( ucc %in% ucc_exp ) )
+mtbi_df <- subset( mtbi_df , ( ref_yr %in% 2023 ) & ( ucc %in% ucc_exp ) )
 
 mtbi_agg <- aggregate( cost ~ newid , data = mtbi_df , sum )
 
@@ -267,12 +267,12 @@ binary_variable: any_food_stamp
 
 ~~~{replication_example_block}
 ## Replication Example {-}
-This example matches the _number of consumer units_ and the _Cars and trucks, new_ rows of [Table R-1](https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2022.pdf):
+This example matches the _number of consumer units_ and the _Cars and trucks, new_ rows of [Table R-1](https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2023.xlsx):
 ```{r eval = FALSE , results = "hide" }
 result <-
 	MIcombine( with( chapter_tag_design , svytotal( ~ as.numeric( popwt_finlwt21 / finlwt21 ) ) ) )
 
-stopifnot( round( coef( result ) , -3 ) == 134090000 )
+stopifnot( round( coef( result ) , -3 ) == 134556000 )
 
 results <- 
 	sapply( 
@@ -283,11 +283,11 @@ results <-
 		}
 	)
 
-stopifnot( round( results[1] , 2 ) == 2195.30 )
+stopifnot( round( results[1] , 2 ) == 2896.03 )
 
 standard_error <- sqrt( ( 1 / 44 ) * sum( ( results[-1] - results[1] )^2 ) )
 
-stopifnot( round( standard_error , 2 ) == 174.02 )
+stopifnot( round( standard_error , 2 ) == 225.64 )
 
 # note the minor differences
 MIcombine( with( chapter_tag_design , svymean( ~ cartkn ) ) )
