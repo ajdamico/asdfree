@@ -1,4 +1,4 @@
-commit_memo <- "'nhts 2022'"
+commit_memo <- "'title'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
