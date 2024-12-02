@@ -64,7 +64,7 @@ One Haiku:
 
 ~~~{download_and_import_block}
 
-Download and import the national 2021 flat file:
+Download and import the national 2023 flat file:
 
 ```{r eval = FALSE , results = "hide" }
 library(haven)
@@ -75,7 +75,7 @@ tf <- tempfile()
 this_url <-
 	paste0(
 		"https://www2.census.gov/programs-surveys/ahs/" ,
-		"2021/AHS%202021%20National%20PUF%20v1.0%20Flat%20SAS.zip"
+		"2023/AHS%202023%20National%20PUF%20v1.0%20Flat%20SAS.zip"
 	)
 
 GET( this_url , write_disk( tf ) , progress() )
@@ -162,16 +162,16 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-This example matches the estimate and margin of error of the `Total` row of the `General Housing` tab from the [AHS 2021 Table Specifications and PUF Estimates for User Verification](https://www2.census.gov/programs-surveys/ahs/2021/2021%20AHS%20Table%20Specifications%20and%20PUF%20Estimates%20for%20User%20Verification.xlsx):
+This example matches the estimate and margin of error of the `Total` row of the `General Housing` tab from the [AHS 2023 Table Specifications and PUF Estimates for User Verification](https://www2.census.gov/programs-surveys/ahs/2023/AHS%202023%20Table%20Specifications%20and%20PUF%20Estimates%20for%20User%20Verification.xlsx):
 
 ```{r eval = FALSE , results = "hide" }
 result <- svytotal( ~ as.numeric( intstatus == 1 ) , chapter_tag_design )
 
-stopifnot( round( coef( result ) / 1000 , 0 ) == 128504 )
+stopifnot( round( coef( result ) / 1000 , 0 ) == 133231 )
 
 ci_results <- confint( result , level = 0.9 )
 
-stopifnot( round( ( ci_results[ 2 ] - coef( result ) ) / 1000 , 0 ) == 388 )
+stopifnot( round( ( ci_results[ 2 ] - coef( result ) ) / 1000 , 0 ) == 381 )
 ```
 
 ~~~
