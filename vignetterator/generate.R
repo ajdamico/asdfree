@@ -1,4 +1,4 @@
-commit_memo <- "'acs required reading example'"
+commit_memo <- "'ahs required reading example'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
