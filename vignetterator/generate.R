@@ -1,4 +1,4 @@
-commit_memo <- "'cps'"
+commit_memo <- "'ess'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
