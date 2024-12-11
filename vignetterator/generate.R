@@ -1,4 +1,4 @@
-commit_memo <- "'nhanes'"
+commit_memo <- "'logos and buttons'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -324,7 +324,7 @@ clean_site( preview = FALSE )
 render_site(output_format = 'bookdown::gitbook', encoding = 'UTF-8')
 # render_site( encoding = 'UTF-8' )
 
-# redirect "edit" buttons on metadata-driven pages #
+# redirect "edit", "view", and "history" buttons on metadata-driven pages #
 html_files <- 
 	grep( 
 		"html$" ,
@@ -335,35 +335,41 @@ html_files <-
 		) ,
 		value = TRUE
 	)
-	
-	
+
 for( this_metafile in metafiles ){
 
-	chapter_tag <- gsub( "\\.txt$" , "" , basename( this_metafile ) )
-	
-	link_line <-
-		paste0(
-			'"link": "https://github.com/ajdamico/asdfree/edit/master/' ,
-			chapter_tag ,
-			'.Rmd",'
-		)
-
-	html_file <- grep( paste0( '-' , chapter_tag , '.html$' ) , html_files , value = TRUE )
+	html_file <- grep( paste0( '-' , gsub( "\\.txt$" , "" , basename( this_metafile ) ) , '.html$' ) , html_files , value = TRUE )
 
 	html_lines <- readLines( html_file )
 
-	html_lines <-
-		gsub( 
-			link_line ,
-			paste0( '"link": "https://github.com/ajdamico/asdfree/edit/master/metadata/' , chapter_tag , '.txt",' ) ,
-			html_lines ,
-			fixed = TRUE
-		)
-		
+	for( ebc in c( 'edit' , 'blob' , 'commits' ) ){
+
+		chapter_tag <- gsub( "\\.txt$" , "" , basename( this_metafile ) )
+
+		link_line <-
+			paste0(
+				'"link": "https://github.com/ajdamico/asdfree/' ,
+				ebc , 
+				'/master/' ,
+				chapter_tag ,
+				'.Rmd",'
+			)
+
+		html_lines <-
+			gsub( 
+				link_line ,
+				paste0( '"link": "https://github.com/ajdamico/asdfree/' , ebc , '/master/metadata/' , chapter_tag , '.txt",' ) ,
+				html_lines ,
+				fixed = TRUE
+			)
+			
+	
+	}
+
 	writeLines( html_lines , html_file )
 	
 }
-# end of redirecting "edit" buttons on metadata-driven pages #
+# end of redirecting three buttons on metadata-driven pages #
 
 
 # delete the datasets folder
