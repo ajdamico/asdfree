@@ -1,6 +1,5 @@
 chapter_title: National Survey of Family Growth
 
-
 needs_actions_build_status_line: yes
 
 ~~~{dataset_introduction}
@@ -15,14 +14,41 @@ publication_period: * Released every couple of years since 1973.
 
 administrative_organization: * Administered by the [Centers for Disease Control and Prevention](http://www.cdc.gov/).
 
+
 ~~~{reading_block}
-Please skim before you begin:
+## Recommended Reading {-}
 
-1. [Sample Design Documentation](https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-Sample-Design-Documentation-508.pdf)
+Four Example Strengths & Limitations:
 
-2. [Wikipedia Entry](https://en.wikipedia.org/wiki/National_Survey_of_Family_Growth)
+✔️ [Detailed questions about fertility and relationship history](https://www.cdc.gov/nchs/data/nsfg/crqs/2022-2023-NSFG-CRQ-FemaleQuestionnaire.pdf#page=65)
 
-3. A haiku regarding this microdata:
+✔️ [Face-to-face fieldwork conducted by female interviewers](https://www.cdc.gov/nchs/nsfg/about_nsfg.htm#The)
+
+❌ [Abortions under-reported in demographic surveys](https://www.cdc.gov/nchs/data/nsfg/quexnotes/2022-2023-NSFG-TopicSpecificNotes.pdf)
+
+❌ [Sample sizes too small for state-level or single year estimates](https://www.cdc.gov/nchs/data/nsfg/guidefaqs/NSFG-2022-2023-FAQ.pdf#page=6)
+
+<br>
+
+Three Example Findings:
+
+1. [One out of five mothers with a college degree had a nonmarital first birth during 2015-2017](https://doi.org/10.1073/pnas.2109016118).
+
+2. [The rate of unintended pregnancy in the US declined substantially between 2008 and 2011](https://doi.org/10.1056/NEJMsa1506575).
+
+3. [During 2022–2023, 36% of females 15–49 received any family planning service in the past 12 months](https://www.cdc.gov/nchs/products/databriefs/db520.htm).
+
+<br>
+
+Two Methodology Documents:
+
+> [Public-Use Data File Documentation: 2022-2023 National Survey of Family Growth](https://www.cdc.gov/nchs/data/nsfg/guidefaqs/NSFG-2022-2023-UsersGuide-508.pdf)
+
+> [Wikipedia Entry](https://en.wikipedia.org/wiki/National_Survey_of_Family_Growth)
+
+<br>
+
+One Haiku:
 
 ```{r}
 # family structure
@@ -34,38 +60,21 @@ Please skim before you begin:
 
 
 
+
+
+
 ~~~{download_and_import_block}
 ```{r eval = FALSE , results = "hide" }
-library(SAScii)
-library(readr)
-
-dat_url <-
-	"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NSFG/2017_2019_FemRespData.dat"
+library(haven)
 
 sas_url <-
-	file.path( dirname( dat_url ) , "sas/2017_2019_FemRespSetup.sas" )
+	"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/NSFG/NSFG-2022-2023-FemRespPUFData.sas7bdat"
 	
-sas_positions <-
-	parse.SAScii( sas_url )
-
-sas_positions[ , 'varname' ] <-
-	tolower( sas_positions[ , 'varname' ] )
-
-sas_positions[ , 'column_types' ] <-
-		ifelse( sas_positions[ , 'char' ] , "c" , "d" )
-
-chapter_tag_tbl <-
-	read_fwf(
-		dat_url ,
-		fwf_widths( 
-			abs( sas_positions[ , 'width' ] ) , 
-			col_names = sas_positions[ , 'varname' ] 
-		) ,
-		col_types = paste0( sas_positions[ , 'column_types' ] , collapse = "" ) ,
-		na = c( "" , "." )
-	)
+chapter_tag_tbl <- read_sas( sas_url )
 	
 chapter_tag_df <- data.frame( chapter_tag_tbl )
+
+names( chapter_tag_df ) <- tolower( names( chapter_tag_df ) )
 ```
 ~~~
 
@@ -81,10 +90,10 @@ options( survey.lonely.psu = "adjust" )
 
 chapter_tag_design <- 
 	svydesign( 
-		id = ~ secu , 
-		strata = ~ sest , 
+		id = ~ vecl , 
+		strata = ~ vest , 
 		data = chapter_tag_df , 
-		weights = ~ wgt2017_2019 , 
+		weights = ~ wgt2022_2023 , 
 		nest = TRUE 
 	)
 ```
@@ -144,26 +153,26 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-This example matches the [Variance Estimates for Percentages using SAS (9.4) and STATA (14)](https://www.cdc.gov/nchs/data/nsfg/NSFG-2017-2019-VarEst-Ex1-508.pdf):
+This example matches the [Variance Estimates for Percentages using SAS (9.4) and STATA (18)](https://www.cdc.gov/nchs/data/nsfg/varest/2022-2023-NSFG-VarEst-all.pdf):
 
 Match the sum of the weights:
 
 ```{r eval = FALSE , results = "hide" }
 result <- svytotal( ~ one , chapter_tag_design )
 
-stopifnot( round( coef( result ) , 0 ) == 72671926 )
+stopifnot( round( coef( result ) , 0 ) == 74936918 )
 
-stopifnot( round( SE( result ) , 0 ) == 3521465 )
+stopifnot( round( SE( result ) , 0 ) == 2910451 )
 ```
 	
 Match row percentages of women currently using the pill by age:
 
 ```{r eval = FALSE , results = "hide" }
-row_percents <- c( 19.5112 , 23.7833 , 19.6916 , 15.2800 , 6.4965 , 6.5215 )
+row_percents <- c( 14.2348 , 18.9586 , 14.6057 , 10.1973 , 7.8114 , 6.8632 )
 
-std_err_row_percents <- c( 1.8670 , 2.1713 , 2.2773 , 1.7551 , 0.9895 , 1.0029 )
+std_err_row_percents <- c( 1.6792 , 2.0226 , 1.8889 , 1.3836 , 1.1050 , 0.7961 )
 
-results <- svyby( ~ birth_control_pill , ~ age_categories , nsfg_design , svymean )
+results <- svyby( ~ birth_control_pill , ~ age_categories , chapter_tag_design , svymean )
 
 stopifnot( all( round( coef( results ) * 100 , 4 ) == row_percents ) )
 
