@@ -1,4 +1,4 @@
-commit_memo <- "'logos and buttons'"
+commit_memo <- "'nis'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
