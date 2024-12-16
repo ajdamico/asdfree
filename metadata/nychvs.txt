@@ -15,13 +15,39 @@ publication_period: * Released more or less triennially since 1991.
 administrative_organization: * Funded by the [NYC Dept. of Housing Preservation & Development](www.nyc.gov/hpd), run by the [Census Bureau](http://www.census.gov/).
 
 ~~~{reading_block}
-Please skim before you begin:
+## Recommended Reading {-}
 
-1. [Public Use File User Guide and Codebook](https://www2.census.gov/programs-surveys/nychvs/technical-documentation/record-layouts/2021/2021_NYCHVS_PUF_User_Guide_and_Codebook.pdf)
+Four Example Strengths & Limitations:
 
-2. [Sample Design, Weighting, and Error Estimation](https://www2.census.gov/programs-surveys/nychvs/technical-documentation/source-and-accuracy/2021_NYCHVS_Sample_Design_Weighting_and_Error_Estimation.pdf)
+✔️ [About two-thirds of 2023 sampled units were also interviewed in 2021](https://www.nyc.gov/assets/hpd/downloads/pdfs/about/2023-nychvs-selected-initial-findings.pdf#page=97)
 
-3. A haiku regarding this microdata:
+✔️ [Additional questionnaire for units whose resident does not live there most of the time](https://www.nyc.gov/assets/hpd/downloads/pdfs/about/2023-nychvs-core-questionnaire.pdf#page=886)
+
+❌ [Some survey years contain as much as ~30% missing data for certain housing quality indicators](https://media.nyam.org/filer_public/42/36/4236a15a-e56e-4551-8a72-cccbd1171e7e/new_york_city_housing_and_vacancy_survey.pdf)
+
+❌ [Does not use administrative records to determine the status of tenant-based housing assistance](https://www.jstor.org/stable/20868592)
+
+<br>
+
+Three Example Findings:
+
+1. [Manhattan apartment vacancies reached 10% during 2021, the Bronx less than 1%](http://doi.org/10.3386/w30662).
+
+2. [New Yorkers paid a median rent of about $1,650 in 2023](https://www.nyc.gov/site/hpd/news/007-24/new-york-city-s-vacancy-rate-reaches-historic-low-1-4-percent-demanding-urgent-action-new).
+
+3. [Across 1991 and 2021, the number of private, unregulated units in NYC has doubled](https://www.nyc.gov/assets/hpd/downloads/pdfs/about/2022-hpd-nychvs-rgb-testimony.pdf#page=8).
+
+<br>
+
+Two Methodology Documents:
+
+> [Public Use File User Guide and Codebook](https://www.nyc.gov/assets/hpd/downloads/pdfs/about/2023-nychvs-puf-user-guide-codebook.pdf)
+
+> [Sample Design, Weighting, and Error Estimation](https://www.nyc.gov/assets/hpd/downloads/pdfs/about/2023-nychvs-sample-design-weighting-error-estimation.pdf)
+
+<br>
+
+One Haiku:
 
 ```{r}
 # all i want is a
@@ -61,19 +87,19 @@ nychvs_csv_import <-
 Download and import the all units, occupied units, person, and vacant units tables:
 
 ```{r eval = FALSE , results = "hide" }
-datasets_url <- "https://www2.census.gov/programs-surveys/nychvs/datasets/2021/microdata/"
+datasets_url <- "https://www.nyc.gov/assets/hpd/data/"
 
 all_units_df <-
-	nychvs_csv_import( paste0( datasets_url , "allunits_puf_21.csv" ) )
+	nychvs_csv_import( paste0( datasets_url , "allunits_puf_23.csv" ) )
 
 occupied_units_df <-
-	nychvs_csv_import( paste0( datasets_url , "occupied_puf_21.csv" ) )
+	nychvs_csv_import( paste0( datasets_url , "occupied_puf_23.csv" ) )
 
 person_df <-
-	nychvs_csv_import( paste0( datasets_url , "person_puf_21.csv" ) )
+	nychvs_csv_import( paste0( datasets_url , "person_puf_23.csv" ) )
 
 vacant_units_df <-
-	nychvs_csv_import( paste0( datasets_url , "vacant_puf_21.csv" ) )
+	nychvs_csv_import( paste0( datasets_url , "vacant_puf_23.csv" ) )
 
 stopifnot( nrow( all_units_df ) == nrow( occupied_units_df ) + nrow( vacant_units_df ) )
 ```
@@ -228,10 +254,35 @@ needs_srvyr_block: yes
 This example matches the estimate and standard error of the number of occupied housing units across the five boroughs [shown at minute 6:05](https://www.nyc.gov/assets/hpd/downloads/misc/gettingstartedwithnychvs_r_video.mp4):
 
 ```{r eval = FALSE , results = "hide" }
-result <- svytotal( ~ one , nychvs_design )
+occupied_units_2021_df <-
+	nychvs_csv_import( paste0( datasets_url , "occupied_puf_21.csv" ) )
+
+occupied_units_2021_df[ , 'one' ] <- 1
+
+nychvs_2021_design <-
+	svrepdesign(
+		weight = ~fw ,
+		repweights = 'fw[0-9]+' ,
+		scale = 4 / 80 ,
+		rscales = rep( 1 , 80 ) ,
+		mse = TRUE ,
+		type = 'JK1' ,
+		data = occupied_units_2021_df
+	)
+
+result <- svytotal( ~ one , nychvs_2021_design )
 stopifnot( round( coef( result ) , 0 ) == 3157105 )
 stopifnot( round( SE( result ) , 0 ) == 13439 )
 ```
+
+This example matches [Figure 6.3.2: R Output for Estimating Variance of a Mean](https://www.nyc.gov/assets/hpd/downloads/pdfs/about/2023-nychvs-guide-to-estimating-variances.pdf#page=52):
+
+```{r eval = FALSE , results = "hide" }
+result <- svymean( ~ grent , subset( nychvs_2021_design , grent > 0 & rent_amount != -2 ) )
+stopifnot( round( coef( result ) , 3 ) == 1726.739 )
+stopifnot( round( SE( result ) , 4 ) == 15.8292 )
+```
+
 ~~~
 
 
