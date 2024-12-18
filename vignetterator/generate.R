@@ -1,4 +1,4 @@
-commit_memo <- "'pew'"
+commit_memo <- "'acs and piaac'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
