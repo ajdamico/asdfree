@@ -60,13 +60,6 @@ gitbook.require(["gitbook", "lodash", "jQuery"], function(gitbook, _, $) {
         saveFontSettings();
     };
 
-    // Increase or decrease line spacing
-    function changeSpacing(e, inc = true) {
-        e.preventDefault();
-        inc ? fontState.spacing++ : (fontState.spacing > 10 && fontState.spacing--);
-        saveFontSettings();
-    }
-
     function update() {
         var $book = gitbook.state.$book;
 
@@ -81,9 +74,6 @@ gitbook.require(["gitbook", "lodash", "jQuery"], function(gitbook, _, $) {
             $book[0].className = $book[0].className.replace(/\bcolor-theme-\S+/g, '');
             $book.addClass("color-theme-"+fontState.theme);
         }
-        var lineHeight = fontState.spacing / 10;
-        $book.find('section').css('line-height', lineHeight);
-        $('.font-settings .spacing-reduce').prop('disabled', lineHeight <= 1);
     };
 
     function init(config) {
@@ -97,8 +87,7 @@ gitbook.require(["gitbook", "lodash", "jQuery"], function(gitbook, _, $) {
         fontState = gitbook.storage.get("fontState", {
             size: config.size || 2,
             family: FAMILY[config.family || "sans"],
-            theme: THEMES[config.theme || "white"],
-            spacing: config.spacing || 17,
+            theme: THEMES[config.theme || "white"]
         });
 
         update();
@@ -149,18 +138,6 @@ gitbook.require(["gitbook", "lodash", "jQuery"], function(gitbook, _, $) {
                     {
                         text: 'Night',
                         onClick: _.partial(changeColorTheme, 2)
-                    }
-                
-                ],
-                [
-                    {
-                    className: 'spacing-reduce',
-                    text: 'Spacing -',
-                    onClick: e => changeSpacing(e, false)
-                    },
-                    {
-                    text: 'Spacing +',
-                    onClick: changeSpacing
                     }
                 ]
             ]

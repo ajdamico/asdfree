@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Survey of Business Owners (SBO) | Analyze Survey Data for Free</title>
   <meta name="description" content="Survey of Business Owners (SBO) | Analyze Survey Data for Free" />
-  <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Survey of Business Owners (SBO) | Analyze Survey Data for Free" />
   <meta property="og:type" content="book" />
@@ -144,6 +144,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul style="text-align:left"><a href="https://www.eventbrite.com/e/1246441021649" style="color:white;">Baltimore MD: Apr 9th, 2025</a></ul>
 
 <ul style="text-align:left"><a href="https://www.eventbrite.com/e/1281119606229" style="color:white;">Boston MA: Apr 11th, 2025</a></ul>
+
+<ul style="text-align:left"><a href="https://www.eventbrite.com/e/1308708916599" style="color:white;">Chicago IL: May 19th, 2025</a></ul>
 
 </li>
 
@@ -1230,257 +1232,257 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><a href="https://www.census.gov/content/dam/Census/programs-surveys/abs/ABS/pro_data_users.jpg">Comparability to the Annual Business Survey (ABS), the Nonemployer Statistics by Demographics (NES-D) series, and the Annual Survey of Entrepreneurs (ASE) At a Glance</a></p></li>
 <li><p>A haiku regarding this microdata:</p></li>
 </ol>
-<div class="sourceCode" id="cb1234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1234-1"><a href="survey-of-business-owners-sbo.html#cb1234-1" tabindex="-1"></a><span class="co"># butchers, chandlers, baked</span></span>
-<span id="cb1234-2"><a href="survey-of-business-owners-sbo.html#cb1234-2" tabindex="-1"></a><span class="co"># sea shanty, filial pie</span></span>
-<span id="cb1234-3"><a href="survey-of-business-owners-sbo.html#cb1234-3" tabindex="-1"></a><span class="co"># call your mom and pop</span></span></code></pre></div>
+<div class="sourceCode" id="cb1234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1234-1"><a href="survey-of-business-owners-sbo.html#cb1234-1" aria-hidden="true" tabindex="-1"></a><span class="co"># butchers, chandlers, baked</span></span>
+<span id="cb1234-2"><a href="survey-of-business-owners-sbo.html#cb1234-2" aria-hidden="true" tabindex="-1"></a><span class="co"># sea shanty, filial pie</span></span>
+<span id="cb1234-3"><a href="survey-of-business-owners-sbo.html#cb1234-3" aria-hidden="true" tabindex="-1"></a><span class="co"># call your mom and pop</span></span></code></pre></div>
 <hr />
 <div id="function-definitions-10" class="section level2 unnumbered hasAnchor">
 <h2>Function Definitions<a href="survey-of-business-owners-sbo.html#function-definitions-10" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This survey uses a dual design variance estimation technique described in the <a href="https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=7">Data Users Guide</a>. Most users do not need to study these functions carefully. Define functions specific to only this dataset:</p>
-<div class="sourceCode" id="cb1235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1235-1"><a href="survey-of-business-owners-sbo.html#cb1235-1" tabindex="-1"></a>sbo_MIcombine <span class="ot">&lt;-</span></span>
-<span id="cb1235-2"><a href="survey-of-business-owners-sbo.html#cb1235-2" tabindex="-1"></a>    <span class="cf">function</span>( x , <span class="at">adjustment =</span> <span class="fl">1.992065</span> ){</span>
-<span id="cb1235-3"><a href="survey-of-business-owners-sbo.html#cb1235-3" tabindex="-1"></a>    </span>
-<span id="cb1235-4"><a href="survey-of-business-owners-sbo.html#cb1235-4" tabindex="-1"></a>        <span class="co"># pull the structure of a variance-covariance matrix</span></span>
-<span id="cb1235-5"><a href="survey-of-business-owners-sbo.html#cb1235-5" tabindex="-1"></a>        variance.shell <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>( <span class="fu">vcov</span>( x<span class="sc">$</span>var[[<span class="dv">1</span>]] ) )</span>
-<span id="cb1235-6"><a href="survey-of-business-owners-sbo.html#cb1235-6" tabindex="-1"></a>        </span>
-<span id="cb1235-7"><a href="survey-of-business-owners-sbo.html#cb1235-7" tabindex="-1"></a>        <span class="co"># initiate a function that will overwrite the diagonals.</span></span>
-<span id="cb1235-8"><a href="survey-of-business-owners-sbo.html#cb1235-8" tabindex="-1"></a>        diag.replacement <span class="ot">&lt;-</span> </span>
-<span id="cb1235-9"><a href="survey-of-business-owners-sbo.html#cb1235-9" tabindex="-1"></a>            <span class="cf">function</span>( z ){</span>
-<span id="cb1235-10"><a href="survey-of-business-owners-sbo.html#cb1235-10" tabindex="-1"></a>                <span class="fu">diag</span>( variance.shell ) <span class="ot">&lt;-</span> <span class="fu">coef</span>( z )</span>
-<span id="cb1235-11"><a href="survey-of-business-owners-sbo.html#cb1235-11" tabindex="-1"></a>                variance.shell</span>
-<span id="cb1235-12"><a href="survey-of-business-owners-sbo.html#cb1235-12" tabindex="-1"></a>            }</span>
-<span id="cb1235-13"><a href="survey-of-business-owners-sbo.html#cb1235-13" tabindex="-1"></a>            </span>
-<span id="cb1235-14"><a href="survey-of-business-owners-sbo.html#cb1235-14" tabindex="-1"></a>        <span class="co"># overwrite all the diagonals in the variance this_design object</span></span>
-<span id="cb1235-15"><a href="survey-of-business-owners-sbo.html#cb1235-15" tabindex="-1"></a>        coef.variances <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var , diag.replacement )</span>
-<span id="cb1235-16"><a href="survey-of-business-owners-sbo.html#cb1235-16" tabindex="-1"></a>    </span>
-<span id="cb1235-17"><a href="survey-of-business-owners-sbo.html#cb1235-17" tabindex="-1"></a>        <span class="co"># add then divide by ten</span></span>
-<span id="cb1235-18"><a href="survey-of-business-owners-sbo.html#cb1235-18" tabindex="-1"></a>        midpoint <span class="ot">&lt;-</span> <span class="fu">Reduce</span>( <span class="st">&#39;+&#39;</span> , coef.variances ) <span class="sc">/</span> <span class="dv">10</span></span>
-<span id="cb1235-19"><a href="survey-of-business-owners-sbo.html#cb1235-19" tabindex="-1"></a>    </span>
-<span id="cb1235-20"><a href="survey-of-business-owners-sbo.html#cb1235-20" tabindex="-1"></a>        <span class="co"># initiate another function that takes some object,</span></span>
-<span id="cb1235-21"><a href="survey-of-business-owners-sbo.html#cb1235-21" tabindex="-1"></a>        <span class="co"># subtracts the midpoint, squares it, divides by ninety</span></span>
-<span id="cb1235-22"><a href="survey-of-business-owners-sbo.html#cb1235-22" tabindex="-1"></a>        midpoint.var <span class="ot">&lt;-</span> <span class="cf">function</span>( z ){ <span class="dv">1</span><span class="sc">/</span><span class="dv">10</span> <span class="sc">*</span> ( ( midpoint <span class="sc">-</span> z )<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="dv">9</span> ) }</span>
-<span id="cb1235-23"><a href="survey-of-business-owners-sbo.html#cb1235-23" tabindex="-1"></a>    </span>
-<span id="cb1235-24"><a href="survey-of-business-owners-sbo.html#cb1235-24" tabindex="-1"></a>        <span class="co"># sum up all the differences into a single object</span></span>
-<span id="cb1235-25"><a href="survey-of-business-owners-sbo.html#cb1235-25" tabindex="-1"></a>        variance <span class="ot">&lt;-</span> <span class="fu">Reduce</span>( <span class="st">&#39;+&#39;</span> , <span class="fu">lapply</span>( coef.variances , midpoint.var ) )</span>
-<span id="cb1235-26"><a href="survey-of-business-owners-sbo.html#cb1235-26" tabindex="-1"></a>        </span>
-<span id="cb1235-27"><a href="survey-of-business-owners-sbo.html#cb1235-27" tabindex="-1"></a>        <span class="co"># adjust every number with the factor in the user guide</span></span>
-<span id="cb1235-28"><a href="survey-of-business-owners-sbo.html#cb1235-28" tabindex="-1"></a>        adj_var <span class="ot">&lt;-</span> adjustment <span class="sc">*</span> variance</span>
-<span id="cb1235-29"><a href="survey-of-business-owners-sbo.html#cb1235-29" tabindex="-1"></a></span>
-<span id="cb1235-30"><a href="survey-of-business-owners-sbo.html#cb1235-30" tabindex="-1"></a>        <span class="co"># construct a result that looks like other sbo_MIcombine methods</span></span>
-<span id="cb1235-31"><a href="survey-of-business-owners-sbo.html#cb1235-31" tabindex="-1"></a>        rval <span class="ot">&lt;-</span></span>
-<span id="cb1235-32"><a href="survey-of-business-owners-sbo.html#cb1235-32" tabindex="-1"></a>            <span class="fu">list</span>( </span>
-<span id="cb1235-33"><a href="survey-of-business-owners-sbo.html#cb1235-33" tabindex="-1"></a>                <span class="at">coefficients =</span> <span class="fu">coef</span>( x<span class="sc">$</span>coef ) ,</span>
-<span id="cb1235-34"><a href="survey-of-business-owners-sbo.html#cb1235-34" tabindex="-1"></a>                <span class="at">variance =</span> adj_var</span>
-<span id="cb1235-35"><a href="survey-of-business-owners-sbo.html#cb1235-35" tabindex="-1"></a>            )</span>
-<span id="cb1235-36"><a href="survey-of-business-owners-sbo.html#cb1235-36" tabindex="-1"></a>        </span>
-<span id="cb1235-37"><a href="survey-of-business-owners-sbo.html#cb1235-37" tabindex="-1"></a>        <span class="co"># call it an MIresult class, like other sbo_MIcombine results</span></span>
-<span id="cb1235-38"><a href="survey-of-business-owners-sbo.html#cb1235-38" tabindex="-1"></a>        <span class="fu">class</span>( rval ) <span class="ot">&lt;-</span> <span class="st">&#39;MIresult&#39;</span></span>
-<span id="cb1235-39"><a href="survey-of-business-owners-sbo.html#cb1235-39" tabindex="-1"></a>        </span>
-<span id="cb1235-40"><a href="survey-of-business-owners-sbo.html#cb1235-40" tabindex="-1"></a>        rval</span>
-<span id="cb1235-41"><a href="survey-of-business-owners-sbo.html#cb1235-41" tabindex="-1"></a>    }</span>
-<span id="cb1235-42"><a href="survey-of-business-owners-sbo.html#cb1235-42" tabindex="-1"></a></span>
-<span id="cb1235-43"><a href="survey-of-business-owners-sbo.html#cb1235-43" tabindex="-1"></a>sbo_with <span class="ot">&lt;-</span></span>
-<span id="cb1235-44"><a href="survey-of-business-owners-sbo.html#cb1235-44" tabindex="-1"></a>    <span class="cf">function</span> ( this_design , expr , ... ){</span>
-<span id="cb1235-45"><a href="survey-of-business-owners-sbo.html#cb1235-45" tabindex="-1"></a>    </span>
-<span id="cb1235-46"><a href="survey-of-business-owners-sbo.html#cb1235-46" tabindex="-1"></a>        pf <span class="ot">&lt;-</span> <span class="fu">parent.frame</span>()</span>
-<span id="cb1235-47"><a href="survey-of-business-owners-sbo.html#cb1235-47" tabindex="-1"></a>        </span>
-<span id="cb1235-48"><a href="survey-of-business-owners-sbo.html#cb1235-48" tabindex="-1"></a>        expr <span class="ot">&lt;-</span> <span class="fu">substitute</span>( expr )</span>
-<span id="cb1235-49"><a href="survey-of-business-owners-sbo.html#cb1235-49" tabindex="-1"></a>        </span>
-<span id="cb1235-50"><a href="survey-of-business-owners-sbo.html#cb1235-50" tabindex="-1"></a>        expr<span class="sc">$</span>design <span class="ot">&lt;-</span> <span class="fu">as.name</span>(<span class="st">&quot;.design&quot;</span>)</span>
-<span id="cb1235-51"><a href="survey-of-business-owners-sbo.html#cb1235-51" tabindex="-1"></a></span>
-<span id="cb1235-52"><a href="survey-of-business-owners-sbo.html#cb1235-52" tabindex="-1"></a>        <span class="co"># this pulls in means, medians, totals, etc.</span></span>
-<span id="cb1235-53"><a href="survey-of-business-owners-sbo.html#cb1235-53" tabindex="-1"></a>        <span class="co"># notice it uses this_design$coef</span></span>
-<span id="cb1235-54"><a href="survey-of-business-owners-sbo.html#cb1235-54" tabindex="-1"></a>        results <span class="ot">&lt;-</span> <span class="fu">eval</span>( expr , <span class="fu">list</span>( <span class="at">.design =</span> this_design<span class="sc">$</span>coef ) )</span>
-<span id="cb1235-55"><a href="survey-of-business-owners-sbo.html#cb1235-55" tabindex="-1"></a>        </span>
-<span id="cb1235-56"><a href="survey-of-business-owners-sbo.html#cb1235-56" tabindex="-1"></a>        <span class="co"># this is used to calculate the variance, adjusted variance, standard error</span></span>
-<span id="cb1235-57"><a href="survey-of-business-owners-sbo.html#cb1235-57" tabindex="-1"></a>        <span class="co"># notice it uses the this_design$var object</span></span>
-<span id="cb1235-58"><a href="survey-of-business-owners-sbo.html#cb1235-58" tabindex="-1"></a>        variances <span class="ot">&lt;-</span> </span>
-<span id="cb1235-59"><a href="survey-of-business-owners-sbo.html#cb1235-59" tabindex="-1"></a>            <span class="fu">lapply</span>( </span>
-<span id="cb1235-60"><a href="survey-of-business-owners-sbo.html#cb1235-60" tabindex="-1"></a>                this_design<span class="sc">$</span>var<span class="sc">$</span>designs , </span>
-<span id="cb1235-61"><a href="survey-of-business-owners-sbo.html#cb1235-61" tabindex="-1"></a>                <span class="cf">function</span>( .design ){ </span>
-<span id="cb1235-62"><a href="survey-of-business-owners-sbo.html#cb1235-62" tabindex="-1"></a>                    <span class="fu">eval</span>( expr , <span class="fu">list</span>( <span class="at">.design =</span> .design ) , <span class="at">enclos =</span> pf ) </span>
-<span id="cb1235-63"><a href="survey-of-business-owners-sbo.html#cb1235-63" tabindex="-1"></a>                } </span>
-<span id="cb1235-64"><a href="survey-of-business-owners-sbo.html#cb1235-64" tabindex="-1"></a>            )</span>
-<span id="cb1235-65"><a href="survey-of-business-owners-sbo.html#cb1235-65" tabindex="-1"></a>        </span>
-<span id="cb1235-66"><a href="survey-of-business-owners-sbo.html#cb1235-66" tabindex="-1"></a>        <span class="co"># combine both results..</span></span>
-<span id="cb1235-67"><a href="survey-of-business-owners-sbo.html#cb1235-67" tabindex="-1"></a>        rval <span class="ot">&lt;-</span> <span class="fu">list</span>( <span class="at">coef =</span> results , <span class="at">var =</span> variances )</span>
-<span id="cb1235-68"><a href="survey-of-business-owners-sbo.html#cb1235-68" tabindex="-1"></a>        </span>
-<span id="cb1235-69"><a href="survey-of-business-owners-sbo.html#cb1235-69" tabindex="-1"></a>        <span class="co"># ..into a brand new object class</span></span>
-<span id="cb1235-70"><a href="survey-of-business-owners-sbo.html#cb1235-70" tabindex="-1"></a>        <span class="fu">class</span>( rval ) <span class="ot">&lt;-</span> <span class="st">&#39;imputationResultList&#39;</span></span>
-<span id="cb1235-71"><a href="survey-of-business-owners-sbo.html#cb1235-71" tabindex="-1"></a>        </span>
-<span id="cb1235-72"><a href="survey-of-business-owners-sbo.html#cb1235-72" tabindex="-1"></a>        rval</span>
-<span id="cb1235-73"><a href="survey-of-business-owners-sbo.html#cb1235-73" tabindex="-1"></a>    }</span>
-<span id="cb1235-74"><a href="survey-of-business-owners-sbo.html#cb1235-74" tabindex="-1"></a></span>
-<span id="cb1235-75"><a href="survey-of-business-owners-sbo.html#cb1235-75" tabindex="-1"></a>sbo_subset <span class="ot">&lt;-</span></span>
-<span id="cb1235-76"><a href="survey-of-business-owners-sbo.html#cb1235-76" tabindex="-1"></a>    <span class="cf">function</span>( x , ... ){</span>
-<span id="cb1235-77"><a href="survey-of-business-owners-sbo.html#cb1235-77" tabindex="-1"></a>        </span>
-<span id="cb1235-78"><a href="survey-of-business-owners-sbo.html#cb1235-78" tabindex="-1"></a>        <span class="co"># subset the survey object</span></span>
-<span id="cb1235-79"><a href="survey-of-business-owners-sbo.html#cb1235-79" tabindex="-1"></a>        coef.sub <span class="ot">&lt;-</span> <span class="fu">subset</span>( x<span class="sc">$</span>coef , ... )</span>
-<span id="cb1235-80"><a href="survey-of-business-owners-sbo.html#cb1235-80" tabindex="-1"></a>        </span>
-<span id="cb1235-81"><a href="survey-of-business-owners-sbo.html#cb1235-81" tabindex="-1"></a>        <span class="co"># replicate `var.sub` so it&#39;s got all the same attributes as `x$var`</span></span>
-<span id="cb1235-82"><a href="survey-of-business-owners-sbo.html#cb1235-82" tabindex="-1"></a>        var.sub <span class="ot">&lt;-</span> x<span class="sc">$</span>var</span>
-<span id="cb1235-83"><a href="survey-of-business-owners-sbo.html#cb1235-83" tabindex="-1"></a>        </span>
-<span id="cb1235-84"><a href="survey-of-business-owners-sbo.html#cb1235-84" tabindex="-1"></a>        <span class="co"># but then overwrite the `designs` attribute with a subset</span></span>
-<span id="cb1235-85"><a href="survey-of-business-owners-sbo.html#cb1235-85" tabindex="-1"></a>        var.sub<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var<span class="sc">$</span>designs , subset , ... )</span>
-<span id="cb1235-86"><a href="survey-of-business-owners-sbo.html#cb1235-86" tabindex="-1"></a>        </span>
-<span id="cb1235-87"><a href="survey-of-business-owners-sbo.html#cb1235-87" tabindex="-1"></a>        <span class="co"># now re-create the `sbosvyimputationList` just as before..</span></span>
-<span id="cb1235-88"><a href="survey-of-business-owners-sbo.html#cb1235-88" tabindex="-1"></a>        sub.svy <span class="ot">&lt;-</span></span>
-<span id="cb1235-89"><a href="survey-of-business-owners-sbo.html#cb1235-89" tabindex="-1"></a>            <span class="fu">list</span>(</span>
-<span id="cb1235-90"><a href="survey-of-business-owners-sbo.html#cb1235-90" tabindex="-1"></a>                <span class="at">coef =</span> coef.sub ,</span>
-<span id="cb1235-91"><a href="survey-of-business-owners-sbo.html#cb1235-91" tabindex="-1"></a>                <span class="at">var =</span> var.sub</span>
-<span id="cb1235-92"><a href="survey-of-business-owners-sbo.html#cb1235-92" tabindex="-1"></a>            )</span>
-<span id="cb1235-93"><a href="survey-of-business-owners-sbo.html#cb1235-93" tabindex="-1"></a>        </span>
-<span id="cb1235-94"><a href="survey-of-business-owners-sbo.html#cb1235-94" tabindex="-1"></a>        <span class="co"># ..and give it the same class</span></span>
-<span id="cb1235-95"><a href="survey-of-business-owners-sbo.html#cb1235-95" tabindex="-1"></a>        sub.svy<span class="sc">$</span>call <span class="ot">&lt;-</span> <span class="fu">sys.call</span>(<span class="sc">-</span><span class="dv">1</span>)</span>
-<span id="cb1235-96"><a href="survey-of-business-owners-sbo.html#cb1235-96" tabindex="-1"></a></span>
-<span id="cb1235-97"><a href="survey-of-business-owners-sbo.html#cb1235-97" tabindex="-1"></a>        sub.svy</span>
-<span id="cb1235-98"><a href="survey-of-business-owners-sbo.html#cb1235-98" tabindex="-1"></a>    }</span>
-<span id="cb1235-99"><a href="survey-of-business-owners-sbo.html#cb1235-99" tabindex="-1"></a></span>
-<span id="cb1235-100"><a href="survey-of-business-owners-sbo.html#cb1235-100" tabindex="-1"></a>sbo_update <span class="ot">&lt;-</span></span>
-<span id="cb1235-101"><a href="survey-of-business-owners-sbo.html#cb1235-101" tabindex="-1"></a>    <span class="cf">function</span>( x , ... ){</span>
-<span id="cb1235-102"><a href="survey-of-business-owners-sbo.html#cb1235-102" tabindex="-1"></a>        </span>
-<span id="cb1235-103"><a href="survey-of-business-owners-sbo.html#cb1235-103" tabindex="-1"></a>        <span class="co"># update the survey object that&#39;s going to be used for</span></span>
-<span id="cb1235-104"><a href="survey-of-business-owners-sbo.html#cb1235-104" tabindex="-1"></a>        <span class="co"># means, medians, totals, etc.</span></span>
-<span id="cb1235-105"><a href="survey-of-business-owners-sbo.html#cb1235-105" tabindex="-1"></a>        coef.upd <span class="ot">&lt;-</span> <span class="fu">update</span>( x<span class="sc">$</span>coef , ... )</span>
-<span id="cb1235-106"><a href="survey-of-business-owners-sbo.html#cb1235-106" tabindex="-1"></a>        </span>
-<span id="cb1235-107"><a href="survey-of-business-owners-sbo.html#cb1235-107" tabindex="-1"></a>        <span class="co"># replicate `var.upd` so it&#39;s got all the same attributes as `x$var`</span></span>
-<span id="cb1235-108"><a href="survey-of-business-owners-sbo.html#cb1235-108" tabindex="-1"></a>        var.upd <span class="ot">&lt;-</span> x<span class="sc">$</span>var</span>
-<span id="cb1235-109"><a href="survey-of-business-owners-sbo.html#cb1235-109" tabindex="-1"></a>        </span>
-<span id="cb1235-110"><a href="survey-of-business-owners-sbo.html#cb1235-110" tabindex="-1"></a>        <span class="co"># but then overwrite the `designs` attribute with an update</span></span>
-<span id="cb1235-111"><a href="survey-of-business-owners-sbo.html#cb1235-111" tabindex="-1"></a>        var.upd<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var<span class="sc">$</span>designs , update , ... )</span>
-<span id="cb1235-112"><a href="survey-of-business-owners-sbo.html#cb1235-112" tabindex="-1"></a>        </span>
-<span id="cb1235-113"><a href="survey-of-business-owners-sbo.html#cb1235-113" tabindex="-1"></a>        <span class="co"># now re-create the `sbosvyimputationList` just as before</span></span>
-<span id="cb1235-114"><a href="survey-of-business-owners-sbo.html#cb1235-114" tabindex="-1"></a>        upd.svy <span class="ot">&lt;-</span></span>
-<span id="cb1235-115"><a href="survey-of-business-owners-sbo.html#cb1235-115" tabindex="-1"></a>            <span class="fu">list</span>(</span>
-<span id="cb1235-116"><a href="survey-of-business-owners-sbo.html#cb1235-116" tabindex="-1"></a>                <span class="at">coef =</span> coef.upd ,</span>
-<span id="cb1235-117"><a href="survey-of-business-owners-sbo.html#cb1235-117" tabindex="-1"></a>                <span class="at">var =</span> var.upd</span>
-<span id="cb1235-118"><a href="survey-of-business-owners-sbo.html#cb1235-118" tabindex="-1"></a>            )</span>
-<span id="cb1235-119"><a href="survey-of-business-owners-sbo.html#cb1235-119" tabindex="-1"></a>        </span>
-<span id="cb1235-120"><a href="survey-of-business-owners-sbo.html#cb1235-120" tabindex="-1"></a>        upd.svy</span>
-<span id="cb1235-121"><a href="survey-of-business-owners-sbo.html#cb1235-121" tabindex="-1"></a>    }</span>
-<span id="cb1235-122"><a href="survey-of-business-owners-sbo.html#cb1235-122" tabindex="-1"></a></span>
-<span id="cb1235-123"><a href="survey-of-business-owners-sbo.html#cb1235-123" tabindex="-1"></a>sbo_degf <span class="ot">&lt;-</span> <span class="cf">function</span>( x ) <span class="fu">degf</span>( x<span class="sc">$</span>coef )</span></code></pre></div>
+<div class="sourceCode" id="cb1235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1235-1"><a href="survey-of-business-owners-sbo.html#cb1235-1" aria-hidden="true" tabindex="-1"></a>sbo_MIcombine <span class="ot">&lt;-</span></span>
+<span id="cb1235-2"><a href="survey-of-business-owners-sbo.html#cb1235-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( x , <span class="at">adjustment =</span> <span class="fl">1.992065</span> ){</span>
+<span id="cb1235-3"><a href="survey-of-business-owners-sbo.html#cb1235-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1235-4"><a href="survey-of-business-owners-sbo.html#cb1235-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># pull the structure of a variance-covariance matrix</span></span>
+<span id="cb1235-5"><a href="survey-of-business-owners-sbo.html#cb1235-5" aria-hidden="true" tabindex="-1"></a>        variance.shell <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>( <span class="fu">vcov</span>( x<span class="sc">$</span>var[[<span class="dv">1</span>]] ) )</span>
+<span id="cb1235-6"><a href="survey-of-business-owners-sbo.html#cb1235-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-7"><a href="survey-of-business-owners-sbo.html#cb1235-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># initiate a function that will overwrite the diagonals.</span></span>
+<span id="cb1235-8"><a href="survey-of-business-owners-sbo.html#cb1235-8" aria-hidden="true" tabindex="-1"></a>        diag.replacement <span class="ot">&lt;-</span> </span>
+<span id="cb1235-9"><a href="survey-of-business-owners-sbo.html#cb1235-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">function</span>( z ){</span>
+<span id="cb1235-10"><a href="survey-of-business-owners-sbo.html#cb1235-10" aria-hidden="true" tabindex="-1"></a>                <span class="fu">diag</span>( variance.shell ) <span class="ot">&lt;-</span> <span class="fu">coef</span>( z )</span>
+<span id="cb1235-11"><a href="survey-of-business-owners-sbo.html#cb1235-11" aria-hidden="true" tabindex="-1"></a>                variance.shell</span>
+<span id="cb1235-12"><a href="survey-of-business-owners-sbo.html#cb1235-12" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb1235-13"><a href="survey-of-business-owners-sbo.html#cb1235-13" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1235-14"><a href="survey-of-business-owners-sbo.html#cb1235-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># overwrite all the diagonals in the variance this_design object</span></span>
+<span id="cb1235-15"><a href="survey-of-business-owners-sbo.html#cb1235-15" aria-hidden="true" tabindex="-1"></a>        coef.variances <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var , diag.replacement )</span>
+<span id="cb1235-16"><a href="survey-of-business-owners-sbo.html#cb1235-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1235-17"><a href="survey-of-business-owners-sbo.html#cb1235-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># add then divide by ten</span></span>
+<span id="cb1235-18"><a href="survey-of-business-owners-sbo.html#cb1235-18" aria-hidden="true" tabindex="-1"></a>        midpoint <span class="ot">&lt;-</span> <span class="fu">Reduce</span>( <span class="st">&#39;+&#39;</span> , coef.variances ) <span class="sc">/</span> <span class="dv">10</span></span>
+<span id="cb1235-19"><a href="survey-of-business-owners-sbo.html#cb1235-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1235-20"><a href="survey-of-business-owners-sbo.html#cb1235-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># initiate another function that takes some object,</span></span>
+<span id="cb1235-21"><a href="survey-of-business-owners-sbo.html#cb1235-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># subtracts the midpoint, squares it, divides by ninety</span></span>
+<span id="cb1235-22"><a href="survey-of-business-owners-sbo.html#cb1235-22" aria-hidden="true" tabindex="-1"></a>        midpoint.var <span class="ot">&lt;-</span> <span class="cf">function</span>( z ){ <span class="dv">1</span><span class="sc">/</span><span class="dv">10</span> <span class="sc">*</span> ( ( midpoint <span class="sc">-</span> z )<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="dv">9</span> ) }</span>
+<span id="cb1235-23"><a href="survey-of-business-owners-sbo.html#cb1235-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1235-24"><a href="survey-of-business-owners-sbo.html#cb1235-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># sum up all the differences into a single object</span></span>
+<span id="cb1235-25"><a href="survey-of-business-owners-sbo.html#cb1235-25" aria-hidden="true" tabindex="-1"></a>        variance <span class="ot">&lt;-</span> <span class="fu">Reduce</span>( <span class="st">&#39;+&#39;</span> , <span class="fu">lapply</span>( coef.variances , midpoint.var ) )</span>
+<span id="cb1235-26"><a href="survey-of-business-owners-sbo.html#cb1235-26" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-27"><a href="survey-of-business-owners-sbo.html#cb1235-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># adjust every number with the factor in the user guide</span></span>
+<span id="cb1235-28"><a href="survey-of-business-owners-sbo.html#cb1235-28" aria-hidden="true" tabindex="-1"></a>        adj_var <span class="ot">&lt;-</span> adjustment <span class="sc">*</span> variance</span>
+<span id="cb1235-29"><a href="survey-of-business-owners-sbo.html#cb1235-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1235-30"><a href="survey-of-business-owners-sbo.html#cb1235-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># construct a result that looks like other sbo_MIcombine methods</span></span>
+<span id="cb1235-31"><a href="survey-of-business-owners-sbo.html#cb1235-31" aria-hidden="true" tabindex="-1"></a>        rval <span class="ot">&lt;-</span></span>
+<span id="cb1235-32"><a href="survey-of-business-owners-sbo.html#cb1235-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>( </span>
+<span id="cb1235-33"><a href="survey-of-business-owners-sbo.html#cb1235-33" aria-hidden="true" tabindex="-1"></a>                <span class="at">coefficients =</span> <span class="fu">coef</span>( x<span class="sc">$</span>coef ) ,</span>
+<span id="cb1235-34"><a href="survey-of-business-owners-sbo.html#cb1235-34" aria-hidden="true" tabindex="-1"></a>                <span class="at">variance =</span> adj_var</span>
+<span id="cb1235-35"><a href="survey-of-business-owners-sbo.html#cb1235-35" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb1235-36"><a href="survey-of-business-owners-sbo.html#cb1235-36" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-37"><a href="survey-of-business-owners-sbo.html#cb1235-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># call it an MIresult class, like other sbo_MIcombine results</span></span>
+<span id="cb1235-38"><a href="survey-of-business-owners-sbo.html#cb1235-38" aria-hidden="true" tabindex="-1"></a>        <span class="fu">class</span>( rval ) <span class="ot">&lt;-</span> <span class="st">&#39;MIresult&#39;</span></span>
+<span id="cb1235-39"><a href="survey-of-business-owners-sbo.html#cb1235-39" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-40"><a href="survey-of-business-owners-sbo.html#cb1235-40" aria-hidden="true" tabindex="-1"></a>        rval</span>
+<span id="cb1235-41"><a href="survey-of-business-owners-sbo.html#cb1235-41" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1235-42"><a href="survey-of-business-owners-sbo.html#cb1235-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1235-43"><a href="survey-of-business-owners-sbo.html#cb1235-43" aria-hidden="true" tabindex="-1"></a>sbo_with <span class="ot">&lt;-</span></span>
+<span id="cb1235-44"><a href="survey-of-business-owners-sbo.html#cb1235-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span> ( this_design , expr , ... ){</span>
+<span id="cb1235-45"><a href="survey-of-business-owners-sbo.html#cb1235-45" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1235-46"><a href="survey-of-business-owners-sbo.html#cb1235-46" aria-hidden="true" tabindex="-1"></a>        pf <span class="ot">&lt;-</span> <span class="fu">parent.frame</span>()</span>
+<span id="cb1235-47"><a href="survey-of-business-owners-sbo.html#cb1235-47" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-48"><a href="survey-of-business-owners-sbo.html#cb1235-48" aria-hidden="true" tabindex="-1"></a>        expr <span class="ot">&lt;-</span> <span class="fu">substitute</span>( expr )</span>
+<span id="cb1235-49"><a href="survey-of-business-owners-sbo.html#cb1235-49" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-50"><a href="survey-of-business-owners-sbo.html#cb1235-50" aria-hidden="true" tabindex="-1"></a>        expr<span class="sc">$</span>design <span class="ot">&lt;-</span> <span class="fu">as.name</span>(<span class="st">&quot;.design&quot;</span>)</span>
+<span id="cb1235-51"><a href="survey-of-business-owners-sbo.html#cb1235-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1235-52"><a href="survey-of-business-owners-sbo.html#cb1235-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># this pulls in means, medians, totals, etc.</span></span>
+<span id="cb1235-53"><a href="survey-of-business-owners-sbo.html#cb1235-53" aria-hidden="true" tabindex="-1"></a>        <span class="co"># notice it uses this_design$coef</span></span>
+<span id="cb1235-54"><a href="survey-of-business-owners-sbo.html#cb1235-54" aria-hidden="true" tabindex="-1"></a>        results <span class="ot">&lt;-</span> <span class="fu">eval</span>( expr , <span class="fu">list</span>( <span class="at">.design =</span> this_design<span class="sc">$</span>coef ) )</span>
+<span id="cb1235-55"><a href="survey-of-business-owners-sbo.html#cb1235-55" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-56"><a href="survey-of-business-owners-sbo.html#cb1235-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># this is used to calculate the variance, adjusted variance, standard error</span></span>
+<span id="cb1235-57"><a href="survey-of-business-owners-sbo.html#cb1235-57" aria-hidden="true" tabindex="-1"></a>        <span class="co"># notice it uses the this_design$var object</span></span>
+<span id="cb1235-58"><a href="survey-of-business-owners-sbo.html#cb1235-58" aria-hidden="true" tabindex="-1"></a>        variances <span class="ot">&lt;-</span> </span>
+<span id="cb1235-59"><a href="survey-of-business-owners-sbo.html#cb1235-59" aria-hidden="true" tabindex="-1"></a>            <span class="fu">lapply</span>( </span>
+<span id="cb1235-60"><a href="survey-of-business-owners-sbo.html#cb1235-60" aria-hidden="true" tabindex="-1"></a>                this_design<span class="sc">$</span>var<span class="sc">$</span>designs , </span>
+<span id="cb1235-61"><a href="survey-of-business-owners-sbo.html#cb1235-61" aria-hidden="true" tabindex="-1"></a>                <span class="cf">function</span>( .design ){ </span>
+<span id="cb1235-62"><a href="survey-of-business-owners-sbo.html#cb1235-62" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">eval</span>( expr , <span class="fu">list</span>( <span class="at">.design =</span> .design ) , <span class="at">enclos =</span> pf ) </span>
+<span id="cb1235-63"><a href="survey-of-business-owners-sbo.html#cb1235-63" aria-hidden="true" tabindex="-1"></a>                } </span>
+<span id="cb1235-64"><a href="survey-of-business-owners-sbo.html#cb1235-64" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb1235-65"><a href="survey-of-business-owners-sbo.html#cb1235-65" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-66"><a href="survey-of-business-owners-sbo.html#cb1235-66" aria-hidden="true" tabindex="-1"></a>        <span class="co"># combine both results..</span></span>
+<span id="cb1235-67"><a href="survey-of-business-owners-sbo.html#cb1235-67" aria-hidden="true" tabindex="-1"></a>        rval <span class="ot">&lt;-</span> <span class="fu">list</span>( <span class="at">coef =</span> results , <span class="at">var =</span> variances )</span>
+<span id="cb1235-68"><a href="survey-of-business-owners-sbo.html#cb1235-68" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-69"><a href="survey-of-business-owners-sbo.html#cb1235-69" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ..into a brand new object class</span></span>
+<span id="cb1235-70"><a href="survey-of-business-owners-sbo.html#cb1235-70" aria-hidden="true" tabindex="-1"></a>        <span class="fu">class</span>( rval ) <span class="ot">&lt;-</span> <span class="st">&#39;imputationResultList&#39;</span></span>
+<span id="cb1235-71"><a href="survey-of-business-owners-sbo.html#cb1235-71" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-72"><a href="survey-of-business-owners-sbo.html#cb1235-72" aria-hidden="true" tabindex="-1"></a>        rval</span>
+<span id="cb1235-73"><a href="survey-of-business-owners-sbo.html#cb1235-73" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1235-74"><a href="survey-of-business-owners-sbo.html#cb1235-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1235-75"><a href="survey-of-business-owners-sbo.html#cb1235-75" aria-hidden="true" tabindex="-1"></a>sbo_subset <span class="ot">&lt;-</span></span>
+<span id="cb1235-76"><a href="survey-of-business-owners-sbo.html#cb1235-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( x , ... ){</span>
+<span id="cb1235-77"><a href="survey-of-business-owners-sbo.html#cb1235-77" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-78"><a href="survey-of-business-owners-sbo.html#cb1235-78" aria-hidden="true" tabindex="-1"></a>        <span class="co"># subset the survey object</span></span>
+<span id="cb1235-79"><a href="survey-of-business-owners-sbo.html#cb1235-79" aria-hidden="true" tabindex="-1"></a>        coef.sub <span class="ot">&lt;-</span> <span class="fu">subset</span>( x<span class="sc">$</span>coef , ... )</span>
+<span id="cb1235-80"><a href="survey-of-business-owners-sbo.html#cb1235-80" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-81"><a href="survey-of-business-owners-sbo.html#cb1235-81" aria-hidden="true" tabindex="-1"></a>        <span class="co"># replicate `var.sub` so it&#39;s got all the same attributes as `x$var`</span></span>
+<span id="cb1235-82"><a href="survey-of-business-owners-sbo.html#cb1235-82" aria-hidden="true" tabindex="-1"></a>        var.sub <span class="ot">&lt;-</span> x<span class="sc">$</span>var</span>
+<span id="cb1235-83"><a href="survey-of-business-owners-sbo.html#cb1235-83" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-84"><a href="survey-of-business-owners-sbo.html#cb1235-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># but then overwrite the `designs` attribute with a subset</span></span>
+<span id="cb1235-85"><a href="survey-of-business-owners-sbo.html#cb1235-85" aria-hidden="true" tabindex="-1"></a>        var.sub<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var<span class="sc">$</span>designs , subset , ... )</span>
+<span id="cb1235-86"><a href="survey-of-business-owners-sbo.html#cb1235-86" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-87"><a href="survey-of-business-owners-sbo.html#cb1235-87" aria-hidden="true" tabindex="-1"></a>        <span class="co"># now re-create the `sbosvyimputationList` just as before..</span></span>
+<span id="cb1235-88"><a href="survey-of-business-owners-sbo.html#cb1235-88" aria-hidden="true" tabindex="-1"></a>        sub.svy <span class="ot">&lt;-</span></span>
+<span id="cb1235-89"><a href="survey-of-business-owners-sbo.html#cb1235-89" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>(</span>
+<span id="cb1235-90"><a href="survey-of-business-owners-sbo.html#cb1235-90" aria-hidden="true" tabindex="-1"></a>                <span class="at">coef =</span> coef.sub ,</span>
+<span id="cb1235-91"><a href="survey-of-business-owners-sbo.html#cb1235-91" aria-hidden="true" tabindex="-1"></a>                <span class="at">var =</span> var.sub</span>
+<span id="cb1235-92"><a href="survey-of-business-owners-sbo.html#cb1235-92" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb1235-93"><a href="survey-of-business-owners-sbo.html#cb1235-93" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-94"><a href="survey-of-business-owners-sbo.html#cb1235-94" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ..and give it the same class</span></span>
+<span id="cb1235-95"><a href="survey-of-business-owners-sbo.html#cb1235-95" aria-hidden="true" tabindex="-1"></a>        sub.svy<span class="sc">$</span>call <span class="ot">&lt;-</span> <span class="fu">sys.call</span>(<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb1235-96"><a href="survey-of-business-owners-sbo.html#cb1235-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1235-97"><a href="survey-of-business-owners-sbo.html#cb1235-97" aria-hidden="true" tabindex="-1"></a>        sub.svy</span>
+<span id="cb1235-98"><a href="survey-of-business-owners-sbo.html#cb1235-98" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1235-99"><a href="survey-of-business-owners-sbo.html#cb1235-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1235-100"><a href="survey-of-business-owners-sbo.html#cb1235-100" aria-hidden="true" tabindex="-1"></a>sbo_update <span class="ot">&lt;-</span></span>
+<span id="cb1235-101"><a href="survey-of-business-owners-sbo.html#cb1235-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>( x , ... ){</span>
+<span id="cb1235-102"><a href="survey-of-business-owners-sbo.html#cb1235-102" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-103"><a href="survey-of-business-owners-sbo.html#cb1235-103" aria-hidden="true" tabindex="-1"></a>        <span class="co"># update the survey object that&#39;s going to be used for</span></span>
+<span id="cb1235-104"><a href="survey-of-business-owners-sbo.html#cb1235-104" aria-hidden="true" tabindex="-1"></a>        <span class="co"># means, medians, totals, etc.</span></span>
+<span id="cb1235-105"><a href="survey-of-business-owners-sbo.html#cb1235-105" aria-hidden="true" tabindex="-1"></a>        coef.upd <span class="ot">&lt;-</span> <span class="fu">update</span>( x<span class="sc">$</span>coef , ... )</span>
+<span id="cb1235-106"><a href="survey-of-business-owners-sbo.html#cb1235-106" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-107"><a href="survey-of-business-owners-sbo.html#cb1235-107" aria-hidden="true" tabindex="-1"></a>        <span class="co"># replicate `var.upd` so it&#39;s got all the same attributes as `x$var`</span></span>
+<span id="cb1235-108"><a href="survey-of-business-owners-sbo.html#cb1235-108" aria-hidden="true" tabindex="-1"></a>        var.upd <span class="ot">&lt;-</span> x<span class="sc">$</span>var</span>
+<span id="cb1235-109"><a href="survey-of-business-owners-sbo.html#cb1235-109" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-110"><a href="survey-of-business-owners-sbo.html#cb1235-110" aria-hidden="true" tabindex="-1"></a>        <span class="co"># but then overwrite the `designs` attribute with an update</span></span>
+<span id="cb1235-111"><a href="survey-of-business-owners-sbo.html#cb1235-111" aria-hidden="true" tabindex="-1"></a>        var.upd<span class="sc">$</span>designs <span class="ot">&lt;-</span> <span class="fu">lapply</span>( x<span class="sc">$</span>var<span class="sc">$</span>designs , update , ... )</span>
+<span id="cb1235-112"><a href="survey-of-business-owners-sbo.html#cb1235-112" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-113"><a href="survey-of-business-owners-sbo.html#cb1235-113" aria-hidden="true" tabindex="-1"></a>        <span class="co"># now re-create the `sbosvyimputationList` just as before</span></span>
+<span id="cb1235-114"><a href="survey-of-business-owners-sbo.html#cb1235-114" aria-hidden="true" tabindex="-1"></a>        upd.svy <span class="ot">&lt;-</span></span>
+<span id="cb1235-115"><a href="survey-of-business-owners-sbo.html#cb1235-115" aria-hidden="true" tabindex="-1"></a>            <span class="fu">list</span>(</span>
+<span id="cb1235-116"><a href="survey-of-business-owners-sbo.html#cb1235-116" aria-hidden="true" tabindex="-1"></a>                <span class="at">coef =</span> coef.upd ,</span>
+<span id="cb1235-117"><a href="survey-of-business-owners-sbo.html#cb1235-117" aria-hidden="true" tabindex="-1"></a>                <span class="at">var =</span> var.upd</span>
+<span id="cb1235-118"><a href="survey-of-business-owners-sbo.html#cb1235-118" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb1235-119"><a href="survey-of-business-owners-sbo.html#cb1235-119" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1235-120"><a href="survey-of-business-owners-sbo.html#cb1235-120" aria-hidden="true" tabindex="-1"></a>        upd.svy</span>
+<span id="cb1235-121"><a href="survey-of-business-owners-sbo.html#cb1235-121" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1235-122"><a href="survey-of-business-owners-sbo.html#cb1235-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1235-123"><a href="survey-of-business-owners-sbo.html#cb1235-123" aria-hidden="true" tabindex="-1"></a>sbo_degf <span class="ot">&lt;-</span> <span class="cf">function</span>( x ) <span class="fu">degf</span>( x<span class="sc">$</span>coef )</span></code></pre></div>
 <hr />
 </div>
 <div id="download-import-preparation-42" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="survey-of-business-owners-sbo.html#download-import-preparation-42" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download and import the file containing records for both coefficient estimates and variance estimation:</p>
-<div class="sourceCode" id="cb1236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1236-1"><a href="survey-of-business-owners-sbo.html#cb1236-1" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
-<span id="cb1236-2"><a href="survey-of-business-owners-sbo.html#cb1236-2" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb1236-3"><a href="survey-of-business-owners-sbo.html#cb1236-3" tabindex="-1"></a></span>
-<span id="cb1236-4"><a href="survey-of-business-owners-sbo.html#cb1236-4" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb1236-5"><a href="survey-of-business-owners-sbo.html#cb1236-5" tabindex="-1"></a></span>
-<span id="cb1236-6"><a href="survey-of-business-owners-sbo.html#cb1236-6" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www2.census.gov/programs-surveys/sbo/datasets/2007/pums_csv.zip&quot;</span></span>
-<span id="cb1236-7"><a href="survey-of-business-owners-sbo.html#cb1236-7" tabindex="-1"></a></span>
-<span id="cb1236-8"><a href="survey-of-business-owners-sbo.html#cb1236-8" tabindex="-1"></a><span class="fu">GET</span>( this_url , <span class="fu">write_disk</span>( tf ) , <span class="fu">progress</span>() )</span>
-<span id="cb1236-9"><a href="survey-of-business-owners-sbo.html#cb1236-9" tabindex="-1"></a></span>
-<span id="cb1236-10"><a href="survey-of-business-owners-sbo.html#cb1236-10" tabindex="-1"></a>sbo_tbl <span class="ot">&lt;-</span> <span class="fu">read_csv</span>( tf )</span>
-<span id="cb1236-11"><a href="survey-of-business-owners-sbo.html#cb1236-11" tabindex="-1"></a></span>
-<span id="cb1236-12"><a href="survey-of-business-owners-sbo.html#cb1236-12" tabindex="-1"></a>sbo_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( sbo_tbl )</span>
-<span id="cb1236-13"><a href="survey-of-business-owners-sbo.html#cb1236-13" tabindex="-1"></a></span>
-<span id="cb1236-14"><a href="survey-of-business-owners-sbo.html#cb1236-14" tabindex="-1"></a><span class="fu">names</span>( sbo_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( sbo_df ) )</span>
-<span id="cb1236-15"><a href="survey-of-business-owners-sbo.html#cb1236-15" tabindex="-1"></a></span>
-<span id="cb1236-16"><a href="survey-of-business-owners-sbo.html#cb1236-16" tabindex="-1"></a>sbo_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb1236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1236-1"><a href="survey-of-business-owners-sbo.html#cb1236-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb1236-2"><a href="survey-of-business-owners-sbo.html#cb1236-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1236-3"><a href="survey-of-business-owners-sbo.html#cb1236-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1236-4"><a href="survey-of-business-owners-sbo.html#cb1236-4" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb1236-5"><a href="survey-of-business-owners-sbo.html#cb1236-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1236-6"><a href="survey-of-business-owners-sbo.html#cb1236-6" aria-hidden="true" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www2.census.gov/programs-surveys/sbo/datasets/2007/pums_csv.zip&quot;</span></span>
+<span id="cb1236-7"><a href="survey-of-business-owners-sbo.html#cb1236-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1236-8"><a href="survey-of-business-owners-sbo.html#cb1236-8" aria-hidden="true" tabindex="-1"></a><span class="fu">GET</span>( this_url , <span class="fu">write_disk</span>( tf ) , <span class="fu">progress</span>() )</span>
+<span id="cb1236-9"><a href="survey-of-business-owners-sbo.html#cb1236-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1236-10"><a href="survey-of-business-owners-sbo.html#cb1236-10" aria-hidden="true" tabindex="-1"></a>sbo_tbl <span class="ot">&lt;-</span> <span class="fu">read_csv</span>( tf )</span>
+<span id="cb1236-11"><a href="survey-of-business-owners-sbo.html#cb1236-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1236-12"><a href="survey-of-business-owners-sbo.html#cb1236-12" aria-hidden="true" tabindex="-1"></a>sbo_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( sbo_tbl )</span>
+<span id="cb1236-13"><a href="survey-of-business-owners-sbo.html#cb1236-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1236-14"><a href="survey-of-business-owners-sbo.html#cb1236-14" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( sbo_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( sbo_df ) )</span>
+<span id="cb1236-15"><a href="survey-of-business-owners-sbo.html#cb1236-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1236-16"><a href="survey-of-business-owners-sbo.html#cb1236-16" aria-hidden="true" tabindex="-1"></a>sbo_df[ , <span class="st">&#39;one&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">1</span></span></code></pre></div>
 <p>Calculate the weights used for variance estimation:</p>
-<div class="sourceCode" id="cb1237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1237-1"><a href="survey-of-business-owners-sbo.html#cb1237-1" tabindex="-1"></a>sbo_df[ , <span class="st">&#39;newwgt&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="sc">*</span> sbo_df[ , <span class="st">&#39;tabwgt&#39;</span> ] <span class="sc">*</span> <span class="fu">sqrt</span>( <span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> sbo_df[ , <span class="st">&#39;tabwgt&#39;</span> ] )</span></code></pre></div>
+<div class="sourceCode" id="cb1237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1237-1"><a href="survey-of-business-owners-sbo.html#cb1237-1" aria-hidden="true" tabindex="-1"></a>sbo_df[ , <span class="st">&#39;newwgt&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="sc">*</span> sbo_df[ , <span class="st">&#39;tabwgt&#39;</span> ] <span class="sc">*</span> <span class="fu">sqrt</span>( <span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">/</span> sbo_df[ , <span class="st">&#39;tabwgt&#39;</span> ] )</span></code></pre></div>
 <p>Add business ownership percentages for both gender and ethnicity:</p>
-<div class="sourceCode" id="cb1238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1238-1"><a href="survey-of-business-owners-sbo.html#cb1238-1" tabindex="-1"></a><span class="co"># replace percent missings with zeroes</span></span>
-<span id="cb1238-2"><a href="survey-of-business-owners-sbo.html#cb1238-2" tabindex="-1"></a><span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ) sbo_df[ <span class="fu">is.na</span>( sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ] ) , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb1238-3"><a href="survey-of-business-owners-sbo.html#cb1238-3" tabindex="-1"></a></span>
-<span id="cb1238-4"><a href="survey-of-business-owners-sbo.html#cb1238-4" tabindex="-1"></a><span class="co"># sum up ownership ethnicity and gender</span></span>
-<span id="cb1238-5"><a href="survey-of-business-owners-sbo.html#cb1238-5" tabindex="-1"></a>sbo_df[ , <span class="st">&#39;hispanic_pct&#39;</span> ] <span class="ot">&lt;-</span> sbo_df[ , <span class="st">&#39;nonhispanic_pct&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb1238-6"><a href="survey-of-business-owners-sbo.html#cb1238-6" tabindex="-1"></a>sbo_df[ , <span class="st">&#39;male_pct&#39;</span> ] <span class="ot">&lt;-</span> sbo_df[ , <span class="st">&#39;female_pct&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb1238-7"><a href="survey-of-business-owners-sbo.html#cb1238-7" tabindex="-1"></a></span>
-<span id="cb1238-8"><a href="survey-of-business-owners-sbo.html#cb1238-8" tabindex="-1"></a><span class="co"># loop through the first four owners&#39; ethnicity and sex variables</span></span>
-<span id="cb1238-9"><a href="survey-of-business-owners-sbo.html#cb1238-9" tabindex="-1"></a><span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ) {</span>
-<span id="cb1238-10"><a href="survey-of-business-owners-sbo.html#cb1238-10" tabindex="-1"></a></span>
-<span id="cb1238-11"><a href="survey-of-business-owners-sbo.html#cb1238-11" tabindex="-1"></a>    sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;H&#39;</span> , <span class="st">&#39;hispanic_pct&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb1238-12"><a href="survey-of-business-owners-sbo.html#cb1238-12" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;H&#39;</span> , <span class="st">&#39;hispanic_pct&#39;</span> ] <span class="sc">+</span></span>
-<span id="cb1238-13"><a href="survey-of-business-owners-sbo.html#cb1238-13" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;H&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ]</span>
-<span id="cb1238-14"><a href="survey-of-business-owners-sbo.html#cb1238-14" tabindex="-1"></a>        </span>
-<span id="cb1238-15"><a href="survey-of-business-owners-sbo.html#cb1238-15" tabindex="-1"></a>    sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;N&#39;</span> , <span class="st">&#39;nonhispanic_pct&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb1238-16"><a href="survey-of-business-owners-sbo.html#cb1238-16" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;N&#39;</span> , <span class="st">&#39;nonhispanic_pct&#39;</span> ] <span class="sc">+</span></span>
-<span id="cb1238-17"><a href="survey-of-business-owners-sbo.html#cb1238-17" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;N&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ]</span>
-<span id="cb1238-18"><a href="survey-of-business-owners-sbo.html#cb1238-18" tabindex="-1"></a>        </span>
-<span id="cb1238-19"><a href="survey-of-business-owners-sbo.html#cb1238-19" tabindex="-1"></a>    sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , <span class="st">&#39;male_pct&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb1238-20"><a href="survey-of-business-owners-sbo.html#cb1238-20" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , <span class="st">&#39;male_pct&#39;</span> ] <span class="sc">+</span></span>
-<span id="cb1238-21"><a href="survey-of-business-owners-sbo.html#cb1238-21" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ]</span>
-<span id="cb1238-22"><a href="survey-of-business-owners-sbo.html#cb1238-22" tabindex="-1"></a>        </span>
-<span id="cb1238-23"><a href="survey-of-business-owners-sbo.html#cb1238-23" tabindex="-1"></a>    sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;F&#39;</span> , <span class="st">&#39;female_pct&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb1238-24"><a href="survey-of-business-owners-sbo.html#cb1238-24" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;F&#39;</span> , <span class="st">&#39;female_pct&#39;</span> ] <span class="sc">+</span></span>
-<span id="cb1238-25"><a href="survey-of-business-owners-sbo.html#cb1238-25" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;F&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ]</span>
-<span id="cb1238-26"><a href="survey-of-business-owners-sbo.html#cb1238-26" tabindex="-1"></a>        </span>
-<span id="cb1238-27"><a href="survey-of-business-owners-sbo.html#cb1238-27" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb1238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1238-1"><a href="survey-of-business-owners-sbo.html#cb1238-1" aria-hidden="true" tabindex="-1"></a><span class="co"># replace percent missings with zeroes</span></span>
+<span id="cb1238-2"><a href="survey-of-business-owners-sbo.html#cb1238-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ) sbo_df[ <span class="fu">is.na</span>( sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ] ) , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1238-3"><a href="survey-of-business-owners-sbo.html#cb1238-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1238-4"><a href="survey-of-business-owners-sbo.html#cb1238-4" aria-hidden="true" tabindex="-1"></a><span class="co"># sum up ownership ethnicity and gender</span></span>
+<span id="cb1238-5"><a href="survey-of-business-owners-sbo.html#cb1238-5" aria-hidden="true" tabindex="-1"></a>sbo_df[ , <span class="st">&#39;hispanic_pct&#39;</span> ] <span class="ot">&lt;-</span> sbo_df[ , <span class="st">&#39;nonhispanic_pct&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1238-6"><a href="survey-of-business-owners-sbo.html#cb1238-6" aria-hidden="true" tabindex="-1"></a>sbo_df[ , <span class="st">&#39;male_pct&#39;</span> ] <span class="ot">&lt;-</span> sbo_df[ , <span class="st">&#39;female_pct&#39;</span> ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1238-7"><a href="survey-of-business-owners-sbo.html#cb1238-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1238-8"><a href="survey-of-business-owners-sbo.html#cb1238-8" aria-hidden="true" tabindex="-1"></a><span class="co"># loop through the first four owners&#39; ethnicity and sex variables</span></span>
+<span id="cb1238-9"><a href="survey-of-business-owners-sbo.html#cb1238-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ) {</span>
+<span id="cb1238-10"><a href="survey-of-business-owners-sbo.html#cb1238-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1238-11"><a href="survey-of-business-owners-sbo.html#cb1238-11" aria-hidden="true" tabindex="-1"></a>    sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;H&#39;</span> , <span class="st">&#39;hispanic_pct&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1238-12"><a href="survey-of-business-owners-sbo.html#cb1238-12" aria-hidden="true" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;H&#39;</span> , <span class="st">&#39;hispanic_pct&#39;</span> ] <span class="sc">+</span></span>
+<span id="cb1238-13"><a href="survey-of-business-owners-sbo.html#cb1238-13" aria-hidden="true" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;H&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ]</span>
+<span id="cb1238-14"><a href="survey-of-business-owners-sbo.html#cb1238-14" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1238-15"><a href="survey-of-business-owners-sbo.html#cb1238-15" aria-hidden="true" tabindex="-1"></a>    sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;N&#39;</span> , <span class="st">&#39;nonhispanic_pct&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1238-16"><a href="survey-of-business-owners-sbo.html#cb1238-16" aria-hidden="true" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;N&#39;</span> , <span class="st">&#39;nonhispanic_pct&#39;</span> ] <span class="sc">+</span></span>
+<span id="cb1238-17"><a href="survey-of-business-owners-sbo.html#cb1238-17" aria-hidden="true" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;eth&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;N&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ]</span>
+<span id="cb1238-18"><a href="survey-of-business-owners-sbo.html#cb1238-18" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1238-19"><a href="survey-of-business-owners-sbo.html#cb1238-19" aria-hidden="true" tabindex="-1"></a>    sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , <span class="st">&#39;male_pct&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1238-20"><a href="survey-of-business-owners-sbo.html#cb1238-20" aria-hidden="true" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , <span class="st">&#39;male_pct&#39;</span> ] <span class="sc">+</span></span>
+<span id="cb1238-21"><a href="survey-of-business-owners-sbo.html#cb1238-21" aria-hidden="true" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;M&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ]</span>
+<span id="cb1238-22"><a href="survey-of-business-owners-sbo.html#cb1238-22" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1238-23"><a href="survey-of-business-owners-sbo.html#cb1238-23" aria-hidden="true" tabindex="-1"></a>    sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;F&#39;</span> , <span class="st">&#39;female_pct&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1238-24"><a href="survey-of-business-owners-sbo.html#cb1238-24" aria-hidden="true" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;F&#39;</span> , <span class="st">&#39;female_pct&#39;</span> ] <span class="sc">+</span></span>
+<span id="cb1238-25"><a href="survey-of-business-owners-sbo.html#cb1238-25" aria-hidden="true" tabindex="-1"></a>        sbo_df[ sbo_df[ , <span class="fu">paste0</span>( <span class="st">&#39;sex&#39;</span> , i ) ] <span class="sc">%in%</span> <span class="st">&#39;F&#39;</span> , <span class="fu">paste0</span>( <span class="st">&#39;pct&#39;</span> , i ) ]</span>
+<span id="cb1238-26"><a href="survey-of-business-owners-sbo.html#cb1238-26" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1238-27"><a href="survey-of-business-owners-sbo.html#cb1238-27" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <div id="save-locally-42" class="section level3 unnumbered hasAnchor">
 <h3>Save Locally  <a href="survey-of-business-owners-sbo.html#save-locally-42" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb1239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1239-1"><a href="survey-of-business-owners-sbo.html#cb1239-1" tabindex="-1"></a><span class="co"># sbo_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;SBO&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb1239-2"><a href="survey-of-business-owners-sbo.html#cb1239-2" tabindex="-1"></a><span class="co"># saveRDS( sbo_df , file = sbo_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb1239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1239-1"><a href="survey-of-business-owners-sbo.html#cb1239-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sbo_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;SBO&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb1239-2"><a href="survey-of-business-owners-sbo.html#cb1239-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( sbo_df , file = sbo_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb1240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1240-1"><a href="survey-of-business-owners-sbo.html#cb1240-1" tabindex="-1"></a><span class="co"># sbo_df &lt;- readRDS( sbo_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb1240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1240-1"><a href="survey-of-business-owners-sbo.html#cb1240-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sbo_df &lt;- readRDS( sbo_fn )</span></span></code></pre></div>
 </div>
 <div id="survey-design-definition-34" class="section level3 unnumbered hasAnchor">
 <h3>Survey Design Definition<a href="survey-of-business-owners-sbo.html#survey-design-definition-34" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Construct a multiply-imputed, complex sample survey design:</p>
-<div class="sourceCode" id="cb1241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1241-1"><a href="survey-of-business-owners-sbo.html#cb1241-1" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
-<span id="cb1241-2"><a href="survey-of-business-owners-sbo.html#cb1241-2" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
-<span id="cb1241-3"><a href="survey-of-business-owners-sbo.html#cb1241-3" tabindex="-1"></a></span>
-<span id="cb1241-4"><a href="survey-of-business-owners-sbo.html#cb1241-4" tabindex="-1"></a><span class="co"># break random groups into ten separate data.frame objects within a list</span></span>
-<span id="cb1241-5"><a href="survey-of-business-owners-sbo.html#cb1241-5" tabindex="-1"></a>var_list <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb1241-6"><a href="survey-of-business-owners-sbo.html#cb1241-6" tabindex="-1"></a></span>
-<span id="cb1241-7"><a href="survey-of-business-owners-sbo.html#cb1241-7" tabindex="-1"></a><span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span> ) { var_list <span class="ot">&lt;-</span> <span class="fu">c</span>( var_list , <span class="fu">list</span>( <span class="fu">subset</span>( sbo_df , rg <span class="sc">==</span> i ) ) ) }</span>
-<span id="cb1241-8"><a href="survey-of-business-owners-sbo.html#cb1241-8" tabindex="-1"></a></span>
-<span id="cb1241-9"><a href="survey-of-business-owners-sbo.html#cb1241-9" tabindex="-1"></a>sbo_coef <span class="ot">&lt;-</span></span>
-<span id="cb1241-10"><a href="survey-of-business-owners-sbo.html#cb1241-10" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
-<span id="cb1241-11"><a href="survey-of-business-owners-sbo.html#cb1241-11" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> <span class="dv">1</span> ,</span>
-<span id="cb1241-12"><a href="survey-of-business-owners-sbo.html#cb1241-12" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> tabwgt ,</span>
-<span id="cb1241-13"><a href="survey-of-business-owners-sbo.html#cb1241-13" tabindex="-1"></a>        <span class="at">data =</span> sbo_df</span>
-<span id="cb1241-14"><a href="survey-of-business-owners-sbo.html#cb1241-14" tabindex="-1"></a>    )</span>
-<span id="cb1241-15"><a href="survey-of-business-owners-sbo.html#cb1241-15" tabindex="-1"></a></span>
-<span id="cb1241-16"><a href="survey-of-business-owners-sbo.html#cb1241-16" tabindex="-1"></a>sbo_var <span class="ot">&lt;-</span></span>
-<span id="cb1241-17"><a href="survey-of-business-owners-sbo.html#cb1241-17" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
-<span id="cb1241-18"><a href="survey-of-business-owners-sbo.html#cb1241-18" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> <span class="dv">1</span> ,</span>
-<span id="cb1241-19"><a href="survey-of-business-owners-sbo.html#cb1241-19" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> newwgt ,</span>
-<span id="cb1241-20"><a href="survey-of-business-owners-sbo.html#cb1241-20" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( var_list )</span>
-<span id="cb1241-21"><a href="survey-of-business-owners-sbo.html#cb1241-21" tabindex="-1"></a>    )</span>
-<span id="cb1241-22"><a href="survey-of-business-owners-sbo.html#cb1241-22" tabindex="-1"></a></span>
-<span id="cb1241-23"><a href="survey-of-business-owners-sbo.html#cb1241-23" tabindex="-1"></a>sbo_design <span class="ot">&lt;-</span> <span class="fu">list</span>( <span class="at">coef =</span> sbo_coef , <span class="at">var =</span> sbo_var )</span>
-<span id="cb1241-24"><a href="survey-of-business-owners-sbo.html#cb1241-24" tabindex="-1"></a></span>
-<span id="cb1241-25"><a href="survey-of-business-owners-sbo.html#cb1241-25" tabindex="-1"></a><span class="fu">class</span>( sbo_design ) <span class="ot">&lt;-</span> <span class="st">&#39;sbosvyimputationList&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1241-1"><a href="survey-of-business-owners-sbo.html#cb1241-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)</span>
+<span id="cb1241-2"><a href="survey-of-business-owners-sbo.html#cb1241-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mitools)</span>
+<span id="cb1241-3"><a href="survey-of-business-owners-sbo.html#cb1241-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1241-4"><a href="survey-of-business-owners-sbo.html#cb1241-4" aria-hidden="true" tabindex="-1"></a><span class="co"># break random groups into ten separate data.frame objects within a list</span></span>
+<span id="cb1241-5"><a href="survey-of-business-owners-sbo.html#cb1241-5" aria-hidden="true" tabindex="-1"></a>var_list <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb1241-6"><a href="survey-of-business-owners-sbo.html#cb1241-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1241-7"><a href="survey-of-business-owners-sbo.html#cb1241-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span> ) { var_list <span class="ot">&lt;-</span> <span class="fu">c</span>( var_list , <span class="fu">list</span>( <span class="fu">subset</span>( sbo_df , rg <span class="sc">==</span> i ) ) ) }</span>
+<span id="cb1241-8"><a href="survey-of-business-owners-sbo.html#cb1241-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1241-9"><a href="survey-of-business-owners-sbo.html#cb1241-9" aria-hidden="true" tabindex="-1"></a>sbo_coef <span class="ot">&lt;-</span></span>
+<span id="cb1241-10"><a href="survey-of-business-owners-sbo.html#cb1241-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
+<span id="cb1241-11"><a href="survey-of-business-owners-sbo.html#cb1241-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> <span class="dv">1</span> ,</span>
+<span id="cb1241-12"><a href="survey-of-business-owners-sbo.html#cb1241-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> tabwgt ,</span>
+<span id="cb1241-13"><a href="survey-of-business-owners-sbo.html#cb1241-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> sbo_df</span>
+<span id="cb1241-14"><a href="survey-of-business-owners-sbo.html#cb1241-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1241-15"><a href="survey-of-business-owners-sbo.html#cb1241-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1241-16"><a href="survey-of-business-owners-sbo.html#cb1241-16" aria-hidden="true" tabindex="-1"></a>sbo_var <span class="ot">&lt;-</span></span>
+<span id="cb1241-17"><a href="survey-of-business-owners-sbo.html#cb1241-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svydesign</span>(</span>
+<span id="cb1241-18"><a href="survey-of-business-owners-sbo.html#cb1241-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">id =</span> <span class="sc">~</span> <span class="dv">1</span> ,</span>
+<span id="cb1241-19"><a href="survey-of-business-owners-sbo.html#cb1241-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> newwgt ,</span>
+<span id="cb1241-20"><a href="survey-of-business-owners-sbo.html#cb1241-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">imputationList</span>( var_list )</span>
+<span id="cb1241-21"><a href="survey-of-business-owners-sbo.html#cb1241-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1241-22"><a href="survey-of-business-owners-sbo.html#cb1241-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1241-23"><a href="survey-of-business-owners-sbo.html#cb1241-23" aria-hidden="true" tabindex="-1"></a>sbo_design <span class="ot">&lt;-</span> <span class="fu">list</span>( <span class="at">coef =</span> sbo_coef , <span class="at">var =</span> sbo_var )</span>
+<span id="cb1241-24"><a href="survey-of-business-owners-sbo.html#cb1241-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1241-25"><a href="survey-of-business-owners-sbo.html#cb1241-25" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>( sbo_design ) <span class="ot">&lt;-</span> <span class="st">&#39;sbosvyimputationList&#39;</span></span></code></pre></div>
 </div>
 <div id="variable-recoding-42" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="survey-of-business-owners-sbo.html#variable-recoding-42" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb1242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1242-1"><a href="survey-of-business-owners-sbo.html#cb1242-1" tabindex="-1"></a>sbo_design <span class="ot">&lt;-</span> </span>
-<span id="cb1242-2"><a href="survey-of-business-owners-sbo.html#cb1242-2" tabindex="-1"></a>    <span class="fu">sbo_update</span>( </span>
-<span id="cb1242-3"><a href="survey-of-business-owners-sbo.html#cb1242-3" tabindex="-1"></a>        sbo_design , </span>
-<span id="cb1242-4"><a href="survey-of-business-owners-sbo.html#cb1242-4" tabindex="-1"></a>        <span class="at">established_before_2000 =</span></span>
-<span id="cb1242-5"><a href="survey-of-business-owners-sbo.html#cb1242-5" tabindex="-1"></a>            <span class="fu">ifelse</span>( established <span class="sc">%in%</span> <span class="fu">c</span>( <span class="st">&#39;0&#39;</span> , <span class="st">&#39;A&#39;</span> ) , <span class="cn">NA</span> , <span class="fu">as.numeric</span>( established <span class="sc">&lt;</span> <span class="dv">4</span> ) ) ,</span>
-<span id="cb1242-6"><a href="survey-of-business-owners-sbo.html#cb1242-6" tabindex="-1"></a>            </span>
-<span id="cb1242-7"><a href="survey-of-business-owners-sbo.html#cb1242-7" tabindex="-1"></a>        <span class="at">healthins =</span></span>
-<span id="cb1242-8"><a href="survey-of-business-owners-sbo.html#cb1242-8" tabindex="-1"></a>            <span class="fu">factor</span>( healthins , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> ,</span>
-<span id="cb1242-9"><a href="survey-of-business-owners-sbo.html#cb1242-9" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;offered health insurance&quot;</span> , <span class="st">&quot;did not offer health insurance&quot;</span> )</span>
-<span id="cb1242-10"><a href="survey-of-business-owners-sbo.html#cb1242-10" tabindex="-1"></a>            ) ,</span>
-<span id="cb1242-11"><a href="survey-of-business-owners-sbo.html#cb1242-11" tabindex="-1"></a>            </span>
-<span id="cb1242-12"><a href="survey-of-business-owners-sbo.html#cb1242-12" tabindex="-1"></a>        <span class="at">hispanic_ownership =</span></span>
-<span id="cb1242-13"><a href="survey-of-business-owners-sbo.html#cb1242-13" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
-<span id="cb1242-14"><a href="survey-of-business-owners-sbo.html#cb1242-14" tabindex="-1"></a>                <span class="fu">ifelse</span>( hispanic_pct <span class="sc">==</span> nonhispanic_pct , <span class="dv">2</span> ,</span>
-<span id="cb1242-15"><a href="survey-of-business-owners-sbo.html#cb1242-15" tabindex="-1"></a>                <span class="fu">ifelse</span>( hispanic_pct <span class="sc">&gt;</span> nonhispanic_pct , <span class="dv">1</span> , </span>
-<span id="cb1242-16"><a href="survey-of-business-owners-sbo.html#cb1242-16" tabindex="-1"></a>                <span class="fu">ifelse</span>( nonhispanic_pct <span class="sc">&gt;</span> hispanic_pct , <span class="dv">3</span> , <span class="cn">NA</span> ) ) ) ,</span>
-<span id="cb1242-17"><a href="survey-of-business-owners-sbo.html#cb1242-17" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> ,</span>
-<span id="cb1242-18"><a href="survey-of-business-owners-sbo.html#cb1242-18" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;hispanic&#39;</span> , <span class="st">&#39;equally hisp/non&#39;</span> , <span class="st">&#39;non-hispanic&#39;</span> )</span>
-<span id="cb1242-19"><a href="survey-of-business-owners-sbo.html#cb1242-19" tabindex="-1"></a>            ) ,</span>
-<span id="cb1242-20"><a href="survey-of-business-owners-sbo.html#cb1242-20" tabindex="-1"></a>            </span>
-<span id="cb1242-21"><a href="survey-of-business-owners-sbo.html#cb1242-21" tabindex="-1"></a>        <span class="at">gender_ownership =</span></span>
-<span id="cb1242-22"><a href="survey-of-business-owners-sbo.html#cb1242-22" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
-<span id="cb1242-23"><a href="survey-of-business-owners-sbo.html#cb1242-23" tabindex="-1"></a>                <span class="fu">ifelse</span>( male_pct <span class="sc">==</span> female_pct , <span class="dv">2</span> ,</span>
-<span id="cb1242-24"><a href="survey-of-business-owners-sbo.html#cb1242-24" tabindex="-1"></a>                <span class="fu">ifelse</span>( male_pct <span class="sc">&gt;</span> female_pct , <span class="dv">1</span> , </span>
-<span id="cb1242-25"><a href="survey-of-business-owners-sbo.html#cb1242-25" tabindex="-1"></a>                <span class="fu">ifelse</span>( female_pct <span class="sc">&gt;</span> male_pct , <span class="dv">3</span> , <span class="cn">NA</span> ) ) ) ,</span>
-<span id="cb1242-26"><a href="survey-of-business-owners-sbo.html#cb1242-26" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> ,</span>
-<span id="cb1242-27"><a href="survey-of-business-owners-sbo.html#cb1242-27" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;equally male/female&#39;</span> , <span class="st">&#39;female&#39;</span> )</span>
-<span id="cb1242-28"><a href="survey-of-business-owners-sbo.html#cb1242-28" tabindex="-1"></a>            )</span>
-<span id="cb1242-29"><a href="survey-of-business-owners-sbo.html#cb1242-29" tabindex="-1"></a>        </span>
-<span id="cb1242-30"><a href="survey-of-business-owners-sbo.html#cb1242-30" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb1242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1242-1"><a href="survey-of-business-owners-sbo.html#cb1242-1" aria-hidden="true" tabindex="-1"></a>sbo_design <span class="ot">&lt;-</span> </span>
+<span id="cb1242-2"><a href="survey-of-business-owners-sbo.html#cb1242-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sbo_update</span>( </span>
+<span id="cb1242-3"><a href="survey-of-business-owners-sbo.html#cb1242-3" aria-hidden="true" tabindex="-1"></a>        sbo_design , </span>
+<span id="cb1242-4"><a href="survey-of-business-owners-sbo.html#cb1242-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">established_before_2000 =</span></span>
+<span id="cb1242-5"><a href="survey-of-business-owners-sbo.html#cb1242-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">ifelse</span>( established <span class="sc">%in%</span> <span class="fu">c</span>( <span class="st">&#39;0&#39;</span> , <span class="st">&#39;A&#39;</span> ) , <span class="cn">NA</span> , <span class="fu">as.numeric</span>( established <span class="sc">&lt;</span> <span class="dv">4</span> ) ) ,</span>
+<span id="cb1242-6"><a href="survey-of-business-owners-sbo.html#cb1242-6" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1242-7"><a href="survey-of-business-owners-sbo.html#cb1242-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">healthins =</span></span>
+<span id="cb1242-8"><a href="survey-of-business-owners-sbo.html#cb1242-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>( healthins , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> ,</span>
+<span id="cb1242-9"><a href="survey-of-business-owners-sbo.html#cb1242-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;offered health insurance&quot;</span> , <span class="st">&quot;did not offer health insurance&quot;</span> )</span>
+<span id="cb1242-10"><a href="survey-of-business-owners-sbo.html#cb1242-10" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
+<span id="cb1242-11"><a href="survey-of-business-owners-sbo.html#cb1242-11" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1242-12"><a href="survey-of-business-owners-sbo.html#cb1242-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">hispanic_ownership =</span></span>
+<span id="cb1242-13"><a href="survey-of-business-owners-sbo.html#cb1242-13" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
+<span id="cb1242-14"><a href="survey-of-business-owners-sbo.html#cb1242-14" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( hispanic_pct <span class="sc">==</span> nonhispanic_pct , <span class="dv">2</span> ,</span>
+<span id="cb1242-15"><a href="survey-of-business-owners-sbo.html#cb1242-15" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( hispanic_pct <span class="sc">&gt;</span> nonhispanic_pct , <span class="dv">1</span> , </span>
+<span id="cb1242-16"><a href="survey-of-business-owners-sbo.html#cb1242-16" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( nonhispanic_pct <span class="sc">&gt;</span> hispanic_pct , <span class="dv">3</span> , <span class="cn">NA</span> ) ) ) ,</span>
+<span id="cb1242-17"><a href="survey-of-business-owners-sbo.html#cb1242-17" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> ,</span>
+<span id="cb1242-18"><a href="survey-of-business-owners-sbo.html#cb1242-18" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;hispanic&#39;</span> , <span class="st">&#39;equally hisp/non&#39;</span> , <span class="st">&#39;non-hispanic&#39;</span> )</span>
+<span id="cb1242-19"><a href="survey-of-business-owners-sbo.html#cb1242-19" aria-hidden="true" tabindex="-1"></a>            ) ,</span>
+<span id="cb1242-20"><a href="survey-of-business-owners-sbo.html#cb1242-20" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1242-21"><a href="survey-of-business-owners-sbo.html#cb1242-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">gender_ownership =</span></span>
+<span id="cb1242-22"><a href="survey-of-business-owners-sbo.html#cb1242-22" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
+<span id="cb1242-23"><a href="survey-of-business-owners-sbo.html#cb1242-23" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( male_pct <span class="sc">==</span> female_pct , <span class="dv">2</span> ,</span>
+<span id="cb1242-24"><a href="survey-of-business-owners-sbo.html#cb1242-24" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( male_pct <span class="sc">&gt;</span> female_pct , <span class="dv">1</span> , </span>
+<span id="cb1242-25"><a href="survey-of-business-owners-sbo.html#cb1242-25" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( female_pct <span class="sc">&gt;</span> male_pct , <span class="dv">3</span> , <span class="cn">NA</span> ) ) ) ,</span>
+<span id="cb1242-26"><a href="survey-of-business-owners-sbo.html#cb1242-26" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> ,</span>
+<span id="cb1242-27"><a href="survey-of-business-owners-sbo.html#cb1242-27" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;equally male/female&#39;</span> , <span class="st">&#39;female&#39;</span> )</span>
+<span id="cb1242-28"><a href="survey-of-business-owners-sbo.html#cb1242-28" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb1242-29"><a href="survey-of-business-owners-sbo.html#cb1242-29" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1242-30"><a href="survey-of-business-owners-sbo.html#cb1242-30" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1489,167 +1491,167 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-42" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="survey-of-business-owners-sbo.html#unweighted-counts-42" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the survey sample, overall and by groups:</p>
-<div class="sourceCode" id="cb1243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1243-1"><a href="survey-of-business-owners-sbo.html#cb1243-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
-<span id="cb1243-2"><a href="survey-of-business-owners-sbo.html#cb1243-2" tabindex="-1"></a></span>
-<span id="cb1243-3"><a href="survey-of-business-owners-sbo.html#cb1243-3" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> gender_ownership , unwtd.count ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb1243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1243-1"><a href="survey-of-business-owners-sbo.html#cb1243-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> one , unwtd.count ) ) )</span>
+<span id="cb1243-2"><a href="survey-of-business-owners-sbo.html#cb1243-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1243-3"><a href="survey-of-business-owners-sbo.html#cb1243-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> gender_ownership , unwtd.count ) ) )</span></code></pre></div>
 </div>
 <div id="weighted-counts-34" class="section level3 unnumbered hasAnchor">
 <h3>Weighted Counts<a href="survey-of-business-owners-sbo.html#weighted-counts-34" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the weighted size of the generalizable population, overall and by groups:</p>
-<div class="sourceCode" id="cb1244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1244-1"><a href="survey-of-business-owners-sbo.html#cb1244-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
-<span id="cb1244-2"><a href="survey-of-business-owners-sbo.html#cb1244-2" tabindex="-1"></a></span>
-<span id="cb1244-3"><a href="survey-of-business-owners-sbo.html#cb1244-3" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1244-4"><a href="survey-of-business-owners-sbo.html#cb1244-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> gender_ownership , svytotal )</span>
-<span id="cb1244-5"><a href="survey-of-business-owners-sbo.html#cb1244-5" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb1244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1244-1"><a href="survey-of-business-owners-sbo.html#cb1244-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svytotal</span>( <span class="sc">~</span> one ) ) )</span>
+<span id="cb1244-2"><a href="survey-of-business-owners-sbo.html#cb1244-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1244-3"><a href="survey-of-business-owners-sbo.html#cb1244-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1244-4"><a href="survey-of-business-owners-sbo.html#cb1244-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> one , <span class="sc">~</span> gender_ownership , svytotal )</span>
+<span id="cb1244-5"><a href="survey-of-business-owners-sbo.html#cb1244-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-42" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="survey-of-business-owners-sbo.html#descriptive-statistics-42" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1245-1"><a href="survey-of-business-owners-sbo.html#cb1245-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy ) ) )</span>
-<span id="cb1245-2"><a href="survey-of-business-owners-sbo.html#cb1245-2" tabindex="-1"></a></span>
-<span id="cb1245-3"><a href="survey-of-business-owners-sbo.html#cb1245-3" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1245-4"><a href="survey-of-business-owners-sbo.html#cb1245-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> gender_ownership , svymean )</span>
-<span id="cb1245-5"><a href="survey-of-business-owners-sbo.html#cb1245-5" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb1245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1245-1"><a href="survey-of-business-owners-sbo.html#cb1245-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy ) ) )</span>
+<span id="cb1245-2"><a href="survey-of-business-owners-sbo.html#cb1245-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1245-3"><a href="survey-of-business-owners-sbo.html#cb1245-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1245-4"><a href="survey-of-business-owners-sbo.html#cb1245-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> gender_ownership , svymean )</span>
+<span id="cb1245-5"><a href="survey-of-business-owners-sbo.html#cb1245-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1246-1"><a href="survey-of-business-owners-sbo.html#cb1246-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svymean</span>( <span class="sc">~</span> n07_employer , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) ) )</span>
-<span id="cb1246-2"><a href="survey-of-business-owners-sbo.html#cb1246-2" tabindex="-1"></a></span>
-<span id="cb1246-3"><a href="survey-of-business-owners-sbo.html#cb1246-3" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1246-4"><a href="survey-of-business-owners-sbo.html#cb1246-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> n07_employer , <span class="sc">~</span> gender_ownership , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1246-5"><a href="survey-of-business-owners-sbo.html#cb1246-5" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb1246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1246-1"><a href="survey-of-business-owners-sbo.html#cb1246-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svymean</span>( <span class="sc">~</span> n07_employer , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) ) )</span>
+<span id="cb1246-2"><a href="survey-of-business-owners-sbo.html#cb1246-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1246-3"><a href="survey-of-business-owners-sbo.html#cb1246-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1246-4"><a href="survey-of-business-owners-sbo.html#cb1246-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> n07_employer , <span class="sc">~</span> gender_ownership , svymean , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1246-5"><a href="survey-of-business-owners-sbo.html#cb1246-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1247-1"><a href="survey-of-business-owners-sbo.html#cb1247-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svytotal</span>( <span class="sc">~</span> receipts_noisy ) ) )</span>
-<span id="cb1247-2"><a href="survey-of-business-owners-sbo.html#cb1247-2" tabindex="-1"></a></span>
-<span id="cb1247-3"><a href="survey-of-business-owners-sbo.html#cb1247-3" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1247-4"><a href="survey-of-business-owners-sbo.html#cb1247-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> gender_ownership , svytotal )</span>
-<span id="cb1247-5"><a href="survey-of-business-owners-sbo.html#cb1247-5" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb1247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1247-1"><a href="survey-of-business-owners-sbo.html#cb1247-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svytotal</span>( <span class="sc">~</span> receipts_noisy ) ) )</span>
+<span id="cb1247-2"><a href="survey-of-business-owners-sbo.html#cb1247-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1247-3"><a href="survey-of-business-owners-sbo.html#cb1247-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1247-4"><a href="survey-of-business-owners-sbo.html#cb1247-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> gender_ownership , svytotal )</span>
+<span id="cb1247-5"><a href="survey-of-business-owners-sbo.html#cb1247-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the weighted sum of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1248-1"><a href="survey-of-business-owners-sbo.html#cb1248-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svytotal</span>( <span class="sc">~</span> n07_employer , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) ) )</span>
-<span id="cb1248-2"><a href="survey-of-business-owners-sbo.html#cb1248-2" tabindex="-1"></a></span>
-<span id="cb1248-3"><a href="survey-of-business-owners-sbo.html#cb1248-3" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1248-4"><a href="survey-of-business-owners-sbo.html#cb1248-4" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> n07_employer , <span class="sc">~</span> gender_ownership , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1248-5"><a href="survey-of-business-owners-sbo.html#cb1248-5" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb1248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1248-1"><a href="survey-of-business-owners-sbo.html#cb1248-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svytotal</span>( <span class="sc">~</span> n07_employer , <span class="at">na.rm =</span> <span class="cn">TRUE</span> ) ) )</span>
+<span id="cb1248-2"><a href="survey-of-business-owners-sbo.html#cb1248-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1248-3"><a href="survey-of-business-owners-sbo.html#cb1248-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1248-4"><a href="survey-of-business-owners-sbo.html#cb1248-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>( <span class="sc">~</span> n07_employer , <span class="sc">~</span> gender_ownership , svytotal , <span class="at">na.rm =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1248-5"><a href="survey-of-business-owners-sbo.html#cb1248-5" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1249-1"><a href="survey-of-business-owners-sbo.html#cb1249-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1249-2"><a href="survey-of-business-owners-sbo.html#cb1249-2" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
-<span id="cb1249-3"><a href="survey-of-business-owners-sbo.html#cb1249-3" tabindex="-1"></a>        <span class="sc">~</span> receipts_noisy ,</span>
-<span id="cb1249-4"><a href="survey-of-business-owners-sbo.html#cb1249-4" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> </span>
-<span id="cb1249-5"><a href="survey-of-business-owners-sbo.html#cb1249-5" tabindex="-1"></a>) ) )</span>
-<span id="cb1249-6"><a href="survey-of-business-owners-sbo.html#cb1249-6" tabindex="-1"></a></span>
-<span id="cb1249-7"><a href="survey-of-business-owners-sbo.html#cb1249-7" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1249-8"><a href="survey-of-business-owners-sbo.html#cb1249-8" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
-<span id="cb1249-9"><a href="survey-of-business-owners-sbo.html#cb1249-9" tabindex="-1"></a>        <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> gender_ownership , svyquantile ,</span>
-<span id="cb1249-10"><a href="survey-of-business-owners-sbo.html#cb1249-10" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb1249-11"><a href="survey-of-business-owners-sbo.html#cb1249-11" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
-<span id="cb1249-12"><a href="survey-of-business-owners-sbo.html#cb1249-12" tabindex="-1"></a>) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb1249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1249-1"><a href="survey-of-business-owners-sbo.html#cb1249-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1249-2"><a href="survey-of-business-owners-sbo.html#cb1249-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyquantile</span>(</span>
+<span id="cb1249-3"><a href="survey-of-business-owners-sbo.html#cb1249-3" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> receipts_noisy ,</span>
+<span id="cb1249-4"><a href="survey-of-business-owners-sbo.html#cb1249-4" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> </span>
+<span id="cb1249-5"><a href="survey-of-business-owners-sbo.html#cb1249-5" aria-hidden="true" tabindex="-1"></a>) ) )</span>
+<span id="cb1249-6"><a href="survey-of-business-owners-sbo.html#cb1249-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1249-7"><a href="survey-of-business-owners-sbo.html#cb1249-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1249-8"><a href="survey-of-business-owners-sbo.html#cb1249-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyby</span>(</span>
+<span id="cb1249-9"><a href="survey-of-business-owners-sbo.html#cb1249-9" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> gender_ownership , svyquantile ,</span>
+<span id="cb1249-10"><a href="survey-of-business-owners-sbo.html#cb1249-10" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.5</span> , <span class="at">se =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb1249-11"><a href="survey-of-business-owners-sbo.html#cb1249-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ci =</span> <span class="cn">TRUE</span> </span>
+<span id="cb1249-12"><a href="survey-of-business-owners-sbo.html#cb1249-12" aria-hidden="true" tabindex="-1"></a>) ) )</span></code></pre></div>
 <p>Estimate a ratio:</p>
-<div class="sourceCode" id="cb1250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1250-1"><a href="survey-of-business-owners-sbo.html#cb1250-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1250-2"><a href="survey-of-business-owners-sbo.html#cb1250-2" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> receipts_noisy , <span class="at">denominator =</span> <span class="sc">~</span> employment_noisy )</span>
-<span id="cb1250-3"><a href="survey-of-business-owners-sbo.html#cb1250-3" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb1250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1250-1"><a href="survey-of-business-owners-sbo.html#cb1250-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1250-2"><a href="survey-of-business-owners-sbo.html#cb1250-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svyratio</span>( <span class="at">numerator =</span> <span class="sc">~</span> receipts_noisy , <span class="at">denominator =</span> <span class="sc">~</span> employment_noisy )</span>
+<span id="cb1250-3"><a href="survey-of-business-owners-sbo.html#cb1250-3" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 </div>
 <div id="subsetting-42" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="survey-of-business-owners-sbo.html#subsetting-42" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Restrict the survey design to jointly owned by husband and wife:</p>
-<div class="sourceCode" id="cb1251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1251-1"><a href="survey-of-business-owners-sbo.html#cb1251-1" tabindex="-1"></a>sub_sbo_design <span class="ot">&lt;-</span> <span class="fu">sbo_subset</span>( sbo_design , husbwife <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1251-1"><a href="survey-of-business-owners-sbo.html#cb1251-1" aria-hidden="true" tabindex="-1"></a>sub_sbo_design <span class="ot">&lt;-</span> <span class="fu">sbo_subset</span>( sbo_design , husbwife <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb1252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1252-1"><a href="survey-of-business-owners-sbo.html#cb1252-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sub_sbo_design , <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb1252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1252-1"><a href="survey-of-business-owners-sbo.html#cb1252-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sub_sbo_design , <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy ) ) )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-42" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="survey-of-business-owners-sbo.html#measures-of-uncertainty-42" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Extract the coefficient, standard error, confidence interval, and coefficient of variation from any descriptive statistics function result, overall and by groups:</p>
-<div class="sourceCode" id="cb1253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1253-1"><a href="survey-of-business-owners-sbo.html#cb1253-1" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
-<span id="cb1253-2"><a href="survey-of-business-owners-sbo.html#cb1253-2" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1253-3"><a href="survey-of-business-owners-sbo.html#cb1253-3" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy )</span>
-<span id="cb1253-4"><a href="survey-of-business-owners-sbo.html#cb1253-4" tabindex="-1"></a>    ) )</span>
-<span id="cb1253-5"><a href="survey-of-business-owners-sbo.html#cb1253-5" tabindex="-1"></a></span>
-<span id="cb1253-6"><a href="survey-of-business-owners-sbo.html#cb1253-6" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
-<span id="cb1253-7"><a href="survey-of-business-owners-sbo.html#cb1253-7" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
-<span id="cb1253-8"><a href="survey-of-business-owners-sbo.html#cb1253-8" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
-<span id="cb1253-9"><a href="survey-of-business-owners-sbo.html#cb1253-9" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
-<span id="cb1253-10"><a href="survey-of-business-owners-sbo.html#cb1253-10" tabindex="-1"></a></span>
-<span id="cb1253-11"><a href="survey-of-business-owners-sbo.html#cb1253-11" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
-<span id="cb1253-12"><a href="survey-of-business-owners-sbo.html#cb1253-12" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1253-13"><a href="survey-of-business-owners-sbo.html#cb1253-13" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> gender_ownership , svymean )</span>
-<span id="cb1253-14"><a href="survey-of-business-owners-sbo.html#cb1253-14" tabindex="-1"></a>    ) )</span>
-<span id="cb1253-15"><a href="survey-of-business-owners-sbo.html#cb1253-15" tabindex="-1"></a></span>
-<span id="cb1253-16"><a href="survey-of-business-owners-sbo.html#cb1253-16" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
-<span id="cb1253-17"><a href="survey-of-business-owners-sbo.html#cb1253-17" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
-<span id="cb1253-18"><a href="survey-of-business-owners-sbo.html#cb1253-18" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
-<span id="cb1253-19"><a href="survey-of-business-owners-sbo.html#cb1253-19" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
+<div class="sourceCode" id="cb1253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1253-1"><a href="survey-of-business-owners-sbo.html#cb1253-1" aria-hidden="true" tabindex="-1"></a>this_result <span class="ot">&lt;-</span></span>
+<span id="cb1253-2"><a href="survey-of-business-owners-sbo.html#cb1253-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1253-3"><a href="survey-of-business-owners-sbo.html#cb1253-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy )</span>
+<span id="cb1253-4"><a href="survey-of-business-owners-sbo.html#cb1253-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb1253-5"><a href="survey-of-business-owners-sbo.html#cb1253-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1253-6"><a href="survey-of-business-owners-sbo.html#cb1253-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( this_result )</span>
+<span id="cb1253-7"><a href="survey-of-business-owners-sbo.html#cb1253-7" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( this_result )</span>
+<span id="cb1253-8"><a href="survey-of-business-owners-sbo.html#cb1253-8" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( this_result )</span>
+<span id="cb1253-9"><a href="survey-of-business-owners-sbo.html#cb1253-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( this_result )</span>
+<span id="cb1253-10"><a href="survey-of-business-owners-sbo.html#cb1253-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1253-11"><a href="survey-of-business-owners-sbo.html#cb1253-11" aria-hidden="true" tabindex="-1"></a>grouped_result <span class="ot">&lt;-</span></span>
+<span id="cb1253-12"><a href="survey-of-business-owners-sbo.html#cb1253-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1253-13"><a href="survey-of-business-owners-sbo.html#cb1253-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> gender_ownership , svymean )</span>
+<span id="cb1253-14"><a href="survey-of-business-owners-sbo.html#cb1253-14" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb1253-15"><a href="survey-of-business-owners-sbo.html#cb1253-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1253-16"><a href="survey-of-business-owners-sbo.html#cb1253-16" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>( grouped_result )</span>
+<span id="cb1253-17"><a href="survey-of-business-owners-sbo.html#cb1253-17" aria-hidden="true" tabindex="-1"></a><span class="fu">SE</span>( grouped_result )</span>
+<span id="cb1253-18"><a href="survey-of-business-owners-sbo.html#cb1253-18" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>( grouped_result )</span>
+<span id="cb1253-19"><a href="survey-of-business-owners-sbo.html#cb1253-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cv</span>( grouped_result )</span></code></pre></div>
 <p>Calculate the degrees of freedom of any survey design object:</p>
-<div class="sourceCode" id="cb1254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1254-1"><a href="survey-of-business-owners-sbo.html#cb1254-1" tabindex="-1"></a><span class="fu">sbo_degf</span>( sbo_design )</span></code></pre></div>
+<div class="sourceCode" id="cb1254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1254-1"><a href="survey-of-business-owners-sbo.html#cb1254-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_degf</span>( sbo_design )</span></code></pre></div>
 <p>Calculate the complex sample survey-adjusted variance of any statistic:</p>
-<div class="sourceCode" id="cb1255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1255-1"><a href="survey-of-business-owners-sbo.html#cb1255-1" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svyvar</span>( <span class="sc">~</span> receipts_noisy ) ) )</span></code></pre></div>
+<div class="sourceCode" id="cb1255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1255-1"><a href="survey-of-business-owners-sbo.html#cb1255-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , <span class="fu">svyvar</span>( <span class="sc">~</span> receipts_noisy ) ) )</span></code></pre></div>
 <p>Include the complex sample design effect in the result for a specific statistic:</p>
-<div class="sourceCode" id="cb1256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1256-1"><a href="survey-of-business-owners-sbo.html#cb1256-1" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
-<span id="cb1256-2"><a href="survey-of-business-owners-sbo.html#cb1256-2" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1256-3"><a href="survey-of-business-owners-sbo.html#cb1256-3" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1256-4"><a href="survey-of-business-owners-sbo.html#cb1256-4" tabindex="-1"></a>) )</span>
-<span id="cb1256-5"><a href="survey-of-business-owners-sbo.html#cb1256-5" tabindex="-1"></a></span>
-<span id="cb1256-6"><a href="survey-of-business-owners-sbo.html#cb1256-6" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
-<span id="cb1256-7"><a href="survey-of-business-owners-sbo.html#cb1256-7" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1256-8"><a href="survey-of-business-owners-sbo.html#cb1256-8" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
-<span id="cb1256-9"><a href="survey-of-business-owners-sbo.html#cb1256-9" tabindex="-1"></a>) )</span></code></pre></div>
+<div class="sourceCode" id="cb1256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1256-1"><a href="survey-of-business-owners-sbo.html#cb1256-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS without replacement</span></span>
+<span id="cb1256-2"><a href="survey-of-business-owners-sbo.html#cb1256-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1256-3"><a href="survey-of-business-owners-sbo.html#cb1256-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy , <span class="at">deff =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1256-4"><a href="survey-of-business-owners-sbo.html#cb1256-4" aria-hidden="true" tabindex="-1"></a>) )</span>
+<span id="cb1256-5"><a href="survey-of-business-owners-sbo.html#cb1256-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1256-6"><a href="survey-of-business-owners-sbo.html#cb1256-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SRS with replacement</span></span>
+<span id="cb1256-7"><a href="survey-of-business-owners-sbo.html#cb1256-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1256-8"><a href="survey-of-business-owners-sbo.html#cb1256-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">svymean</span>( <span class="sc">~</span> receipts_noisy , <span class="at">deff =</span> <span class="st">&quot;replace&quot;</span> )</span>
+<span id="cb1256-9"><a href="survey-of-business-owners-sbo.html#cb1256-9" aria-hidden="true" tabindex="-1"></a>) )</span></code></pre></div>
 <p>Compute confidence intervals for proportions using methods that may be more accurate near 0 and 1. See <code>?svyciprop</code> for alternatives:</p>
-<div class="sourceCode" id="cb1257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1257-1"><a href="survey-of-business-owners-sbo.html#cb1257-1" tabindex="-1"></a><span class="co"># # sbo_MIsvyciprop( ~ established_before_2000 , sbo_design ,</span></span>
-<span id="cb1257-2"><a href="survey-of-business-owners-sbo.html#cb1257-2" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; , na.rm = TRUE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb1257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1257-1"><a href="survey-of-business-owners-sbo.html#cb1257-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # sbo_MIsvyciprop( ~ established_before_2000 , sbo_design ,</span></span>
+<span id="cb1257-2"><a href="survey-of-business-owners-sbo.html#cb1257-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   method = &quot;likelihood&quot; , na.rm = TRUE )</span></span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-42" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="survey-of-business-owners-sbo.html#regression-models-and-tests-of-association-42" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a design-based t-test:</p>
-<div class="sourceCode" id="cb1258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1258-1"><a href="survey-of-business-owners-sbo.html#cb1258-1" tabindex="-1"></a><span class="co"># # sbo_MIsvyttest( receipts_noisy ~ established_before_2000 , sbo_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb1258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1258-1"><a href="survey-of-business-owners-sbo.html#cb1258-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # sbo_MIsvyttest( receipts_noisy ~ established_before_2000 , sbo_design )</span></span></code></pre></div>
 <p>Perform a chi-squared test of association for survey data:</p>
-<div class="sourceCode" id="cb1259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1259-1"><a href="survey-of-business-owners-sbo.html#cb1259-1" tabindex="-1"></a><span class="co"># # sbo_MIsvychisq( ~ established_before_2000 + n07_employer , sbo_design )</span></span></code></pre></div>
+<div class="sourceCode" id="cb1259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1259-1"><a href="survey-of-business-owners-sbo.html#cb1259-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # sbo_MIsvychisq( ~ established_before_2000 + n07_employer , sbo_design )</span></span></code></pre></div>
 <p>Perform a survey-weighted generalized linear model:</p>
-<div class="sourceCode" id="cb1260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1260-1"><a href="survey-of-business-owners-sbo.html#cb1260-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb1260-2"><a href="survey-of-business-owners-sbo.html#cb1260-2" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
-<span id="cb1260-3"><a href="survey-of-business-owners-sbo.html#cb1260-3" tabindex="-1"></a>        <span class="fu">svyglm</span>( receipts_noisy <span class="sc">~</span> established_before_2000 <span class="sc">+</span> n07_employer )</span>
-<span id="cb1260-4"><a href="survey-of-business-owners-sbo.html#cb1260-4" tabindex="-1"></a>    ) )</span>
-<span id="cb1260-5"><a href="survey-of-business-owners-sbo.html#cb1260-5" tabindex="-1"></a>    </span>
-<span id="cb1260-6"><a href="survey-of-business-owners-sbo.html#cb1260-6" tabindex="-1"></a>glm_result</span></code></pre></div>
+<div class="sourceCode" id="cb1260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1260-1"><a href="survey-of-business-owners-sbo.html#cb1260-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb1260-2"><a href="survey-of-business-owners-sbo.html#cb1260-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design ,</span>
+<span id="cb1260-3"><a href="survey-of-business-owners-sbo.html#cb1260-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyglm</span>( receipts_noisy <span class="sc">~</span> established_before_2000 <span class="sc">+</span> n07_employer )</span>
+<span id="cb1260-4"><a href="survey-of-business-owners-sbo.html#cb1260-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb1260-5"><a href="survey-of-business-owners-sbo.html#cb1260-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1260-6"><a href="survey-of-business-owners-sbo.html#cb1260-6" aria-hidden="true" tabindex="-1"></a>glm_result</span></code></pre></div>
 <hr />
 </div>
 </div>
 <div id="replication-example-40" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="survey-of-business-owners-sbo.html#replication-example-40" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example matches the statistics and relative standard errors from three <a href="https://www2.census.gov/econ/sbo/07/pums/2007_sbo_pums_users_guide.pdf#page=15">Appendix B</a> columns:</p>
-<div class="sourceCode" id="cb1261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1261-1"><a href="survey-of-business-owners-sbo.html#cb1261-1" tabindex="-1"></a>hispanic_receipts_result <span class="ot">&lt;-</span></span>
-<span id="cb1261-2"><a href="survey-of-business-owners-sbo.html#cb1261-2" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , </span>
-<span id="cb1261-3"><a href="survey-of-business-owners-sbo.html#cb1261-3" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> hispanic_ownership , svytotal )</span>
-<span id="cb1261-4"><a href="survey-of-business-owners-sbo.html#cb1261-4" tabindex="-1"></a>    ) )</span>
-<span id="cb1261-5"><a href="survey-of-business-owners-sbo.html#cb1261-5" tabindex="-1"></a></span>
-<span id="cb1261-6"><a href="survey-of-business-owners-sbo.html#cb1261-6" tabindex="-1"></a>hispanic_payroll_result <span class="ot">&lt;-</span></span>
-<span id="cb1261-7"><a href="survey-of-business-owners-sbo.html#cb1261-7" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , </span>
-<span id="cb1261-8"><a href="survey-of-business-owners-sbo.html#cb1261-8" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> payroll_noisy , <span class="sc">~</span> hispanic_ownership , svytotal )</span>
-<span id="cb1261-9"><a href="survey-of-business-owners-sbo.html#cb1261-9" tabindex="-1"></a>    ) )</span>
-<span id="cb1261-10"><a href="survey-of-business-owners-sbo.html#cb1261-10" tabindex="-1"></a></span>
-<span id="cb1261-11"><a href="survey-of-business-owners-sbo.html#cb1261-11" tabindex="-1"></a>hispanic_employment_result <span class="ot">&lt;-</span></span>
-<span id="cb1261-12"><a href="survey-of-business-owners-sbo.html#cb1261-12" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , </span>
-<span id="cb1261-13"><a href="survey-of-business-owners-sbo.html#cb1261-13" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> employment_noisy , <span class="sc">~</span> hispanic_ownership , svytotal )</span>
-<span id="cb1261-14"><a href="survey-of-business-owners-sbo.html#cb1261-14" tabindex="-1"></a>    ) )</span></code></pre></div>
+<div class="sourceCode" id="cb1261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1261-1"><a href="survey-of-business-owners-sbo.html#cb1261-1" aria-hidden="true" tabindex="-1"></a>hispanic_receipts_result <span class="ot">&lt;-</span></span>
+<span id="cb1261-2"><a href="survey-of-business-owners-sbo.html#cb1261-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , </span>
+<span id="cb1261-3"><a href="survey-of-business-owners-sbo.html#cb1261-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> receipts_noisy , <span class="sc">~</span> hispanic_ownership , svytotal )</span>
+<span id="cb1261-4"><a href="survey-of-business-owners-sbo.html#cb1261-4" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb1261-5"><a href="survey-of-business-owners-sbo.html#cb1261-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1261-6"><a href="survey-of-business-owners-sbo.html#cb1261-6" aria-hidden="true" tabindex="-1"></a>hispanic_payroll_result <span class="ot">&lt;-</span></span>
+<span id="cb1261-7"><a href="survey-of-business-owners-sbo.html#cb1261-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , </span>
+<span id="cb1261-8"><a href="survey-of-business-owners-sbo.html#cb1261-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> payroll_noisy , <span class="sc">~</span> hispanic_ownership , svytotal )</span>
+<span id="cb1261-9"><a href="survey-of-business-owners-sbo.html#cb1261-9" aria-hidden="true" tabindex="-1"></a>    ) )</span>
+<span id="cb1261-10"><a href="survey-of-business-owners-sbo.html#cb1261-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1261-11"><a href="survey-of-business-owners-sbo.html#cb1261-11" aria-hidden="true" tabindex="-1"></a>hispanic_employment_result <span class="ot">&lt;-</span></span>
+<span id="cb1261-12"><a href="survey-of-business-owners-sbo.html#cb1261-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sbo_MIcombine</span>( <span class="fu">sbo_with</span>( sbo_design , </span>
+<span id="cb1261-13"><a href="survey-of-business-owners-sbo.html#cb1261-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">svyby</span>( <span class="sc">~</span> employment_noisy , <span class="sc">~</span> hispanic_ownership , svytotal )</span>
+<span id="cb1261-14"><a href="survey-of-business-owners-sbo.html#cb1261-14" aria-hidden="true" tabindex="-1"></a>    ) )</span></code></pre></div>
 <p>Estimates at the U.S. Level using the PUMS Tables for:</p>
-<div class="sourceCode" id="cb1262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1262-1"><a href="survey-of-business-owners-sbo.html#cb1262-1" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_receipts_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">350763923</span> )</span>
-<span id="cb1262-2"><a href="survey-of-business-owners-sbo.html#cb1262-2" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_receipts_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">56166354</span> )</span>
-<span id="cb1262-3"><a href="survey-of-business-owners-sbo.html#cb1262-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_receipts_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">10540609303</span> )</span>
-<span id="cb1262-4"><a href="survey-of-business-owners-sbo.html#cb1262-4" tabindex="-1"></a></span>
-<span id="cb1262-5"><a href="survey-of-business-owners-sbo.html#cb1262-5" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_payroll_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">54367702</span> )</span>
-<span id="cb1262-6"><a href="survey-of-business-owners-sbo.html#cb1262-6" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_payroll_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">11083148</span> )</span>
-<span id="cb1262-7"><a href="survey-of-business-owners-sbo.html#cb1262-7" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_payroll_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">1875353228</span> )</span>
-<span id="cb1262-8"><a href="survey-of-business-owners-sbo.html#cb1262-8" tabindex="-1"></a></span>
-<span id="cb1262-9"><a href="survey-of-business-owners-sbo.html#cb1262-9" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_employment_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">2026406</span> )</span>
-<span id="cb1262-10"><a href="survey-of-business-owners-sbo.html#cb1262-10" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_employment_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">400152</span> )</span>
-<span id="cb1262-11"><a href="survey-of-business-owners-sbo.html#cb1262-11" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_employment_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">56889606</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1262-1"><a href="survey-of-business-owners-sbo.html#cb1262-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_receipts_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">350763923</span> )</span>
+<span id="cb1262-2"><a href="survey-of-business-owners-sbo.html#cb1262-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_receipts_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">56166354</span> )</span>
+<span id="cb1262-3"><a href="survey-of-business-owners-sbo.html#cb1262-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_receipts_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">10540609303</span> )</span>
+<span id="cb1262-4"><a href="survey-of-business-owners-sbo.html#cb1262-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1262-5"><a href="survey-of-business-owners-sbo.html#cb1262-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_payroll_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">54367702</span> )</span>
+<span id="cb1262-6"><a href="survey-of-business-owners-sbo.html#cb1262-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_payroll_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">11083148</span> )</span>
+<span id="cb1262-7"><a href="survey-of-business-owners-sbo.html#cb1262-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_payroll_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">1875353228</span> )</span>
+<span id="cb1262-8"><a href="survey-of-business-owners-sbo.html#cb1262-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1262-9"><a href="survey-of-business-owners-sbo.html#cb1262-9" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_employment_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">2026406</span> )</span>
+<span id="cb1262-10"><a href="survey-of-business-owners-sbo.html#cb1262-10" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_employment_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">400152</span> )</span>
+<span id="cb1262-11"><a href="survey-of-business-owners-sbo.html#cb1262-11" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( hispanic_employment_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">56889606</span> )</span></code></pre></div>
 <p>Relative Standard Errors of Estimates at the U.S. Level using the PUMS Tables for:</p>
-<div class="sourceCode" id="cb1263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1263-1"><a href="survey-of-business-owners-sbo.html#cb1263-1" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_receipts_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.02</span> )</span>
-<span id="cb1263-2"><a href="survey-of-business-owners-sbo.html#cb1263-2" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_receipts_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.06</span> )</span>
-<span id="cb1263-3"><a href="survey-of-business-owners-sbo.html#cb1263-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_receipts_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="dv">0</span> )</span>
-<span id="cb1263-4"><a href="survey-of-business-owners-sbo.html#cb1263-4" tabindex="-1"></a></span>
-<span id="cb1263-5"><a href="survey-of-business-owners-sbo.html#cb1263-5" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_payroll_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.01</span> )</span>
-<span id="cb1263-6"><a href="survey-of-business-owners-sbo.html#cb1263-6" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_payroll_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.06</span> )</span>
-<span id="cb1263-7"><a href="survey-of-business-owners-sbo.html#cb1263-7" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_payroll_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="dv">0</span> )</span>
-<span id="cb1263-8"><a href="survey-of-business-owners-sbo.html#cb1263-8" tabindex="-1"></a></span>
-<span id="cb1263-9"><a href="survey-of-business-owners-sbo.html#cb1263-9" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_employment_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.01</span> )</span>
-<span id="cb1263-10"><a href="survey-of-business-owners-sbo.html#cb1263-10" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_employment_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.05</span> )</span>
-<span id="cb1263-11"><a href="survey-of-business-owners-sbo.html#cb1263-11" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_employment_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="dv">0</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1263-1"><a href="survey-of-business-owners-sbo.html#cb1263-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_receipts_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.02</span> )</span>
+<span id="cb1263-2"><a href="survey-of-business-owners-sbo.html#cb1263-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_receipts_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.06</span> )</span>
+<span id="cb1263-3"><a href="survey-of-business-owners-sbo.html#cb1263-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_receipts_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="dv">0</span> )</span>
+<span id="cb1263-4"><a href="survey-of-business-owners-sbo.html#cb1263-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1263-5"><a href="survey-of-business-owners-sbo.html#cb1263-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_payroll_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.01</span> )</span>
+<span id="cb1263-6"><a href="survey-of-business-owners-sbo.html#cb1263-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_payroll_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.06</span> )</span>
+<span id="cb1263-7"><a href="survey-of-business-owners-sbo.html#cb1263-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_payroll_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="dv">0</span> )</span>
+<span id="cb1263-8"><a href="survey-of-business-owners-sbo.html#cb1263-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1263-9"><a href="survey-of-business-owners-sbo.html#cb1263-9" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_employment_result )[ <span class="st">&#39;hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.01</span> )</span>
+<span id="cb1263-10"><a href="survey-of-business-owners-sbo.html#cb1263-10" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_employment_result )[ <span class="st">&#39;equally hisp/non&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.05</span> )</span>
+<span id="cb1263-11"><a href="survey-of-business-owners-sbo.html#cb1263-11" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">cv</span>( hispanic_employment_result )[ <span class="st">&#39;non-hispanic&#39;</span> ] , <span class="dv">2</span> ) <span class="sc">==</span> <span class="dv">0</span> )</span></code></pre></div>
 
 </div>
 </div>
