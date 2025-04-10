@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Social Security Public-Use Data Files (SSA) | Analyze Survey Data for Free</title>
   <meta name="description" content="Social Security Public-Use Data Files (SSA) | Analyze Survey Data for Free" />
-  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Social Security Public-Use Data Files (SSA) | Analyze Survey Data for Free" />
   <meta property="og:type" content="book" />
@@ -138,8 +138,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li style="list-style-type:disc; background-color:darkblue; color:white; font-weight:bold; text-align:center;">
 
 <br>Please Circulate: Half Day, In-Person, &<br>*Free* Survey Data Analysis Workshops!<br><br>
-
-<ul style="text-align:left"><a href="https://www.eventbrite.com/e/1246441021649" style="color:white;">Baltimore MD: Apr 9th, 2025</a></ul>
 
 <ul style="text-align:left"><a href="https://www.eventbrite.com/e/1281119606229" style="color:white;">Boston MA: Apr 11th, 2025</a></ul>
 
@@ -1237,119 +1235,119 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </blockquote>
 <p><br></p>
 <p>One Haiku:</p>
-<div class="sourceCode" id="cb1333"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1333-1"><a href="social-security-public-use-data-files-ssa.html#cb1333-1" aria-hidden="true" tabindex="-1"></a><span class="co"># annual earnings.</span></span>
-<span id="cb1333-2"><a href="social-security-public-use-data-files-ssa.html#cb1333-2" aria-hidden="true" tabindex="-1"></a><span class="co"># for pensioner payouts, see</span></span>
-<span id="cb1333-3"><a href="social-security-public-use-data-files-ssa.html#cb1333-3" aria-hidden="true" tabindex="-1"></a><span class="co"># the &#39;04 extract</span></span></code></pre></div>
+<div class="sourceCode" id="cb1333"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1333-1"><a href="social-security-public-use-data-files-ssa.html#cb1333-1" tabindex="-1"></a><span class="co"># annual earnings.</span></span>
+<span id="cb1333-2"><a href="social-security-public-use-data-files-ssa.html#cb1333-2" tabindex="-1"></a><span class="co"># for pensioner payouts, see</span></span>
+<span id="cb1333-3"><a href="social-security-public-use-data-files-ssa.html#cb1333-3" tabindex="-1"></a><span class="co"># the &#39;04 extract</span></span></code></pre></div>
 <hr />
 </div>
 <div id="download-import-preparation-45" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="social-security-public-use-data-files-ssa.html#download-import-preparation-45" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download and import the 1951-2006 one percent files with one record per person and per person-year:</p>
-<div class="sourceCode" id="cb1334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1334-1"><a href="social-security-public-use-data-files-ssa.html#cb1334-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
-<span id="cb1334-2"><a href="social-security-public-use-data-files-ssa.html#cb1334-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
-<span id="cb1334-3"><a href="social-security-public-use-data-files-ssa.html#cb1334-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-4"><a href="social-security-public-use-data-files-ssa.html#cb1334-4" aria-hidden="true" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb1334-5"><a href="social-security-public-use-data-files-ssa.html#cb1334-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-6"><a href="social-security-public-use-data-files-ssa.html#cb1334-6" aria-hidden="true" tabindex="-1"></a>ssa_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip&quot;</span></span>
-<span id="cb1334-7"><a href="social-security-public-use-data-files-ssa.html#cb1334-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-8"><a href="social-security-public-use-data-files-ssa.html#cb1334-8" aria-hidden="true" tabindex="-1"></a><span class="fu">GET</span>( ssa_url , <span class="fu">write_disk</span>( tf ) , <span class="fu">progress</span>() )</span>
-<span id="cb1334-9"><a href="social-security-public-use-data-files-ssa.html#cb1334-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-10"><a href="social-security-public-use-data-files-ssa.html#cb1334-10" aria-hidden="true" tabindex="-1"></a>ssa_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb1334-11"><a href="social-security-public-use-data-files-ssa.html#cb1334-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-12"><a href="social-security-public-use-data-files-ssa.html#cb1334-12" aria-hidden="true" tabindex="-1"></a>ssa_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;demographic&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1334-13"><a href="social-security-public-use-data-files-ssa.html#cb1334-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-14"><a href="social-security-public-use-data-files-ssa.html#cb1334-14" aria-hidden="true" tabindex="-1"></a>annual_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;annual&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1334-15"><a href="social-security-public-use-data-files-ssa.html#cb1334-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-16"><a href="social-security-public-use-data-files-ssa.html#cb1334-16" aria-hidden="true" tabindex="-1"></a>ssa_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( ssa_fn )</span>
-<span id="cb1334-17"><a href="social-security-public-use-data-files-ssa.html#cb1334-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-18"><a href="social-security-public-use-data-files-ssa.html#cb1334-18" aria-hidden="true" tabindex="-1"></a>annual_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( annual_fn )</span>
-<span id="cb1334-19"><a href="social-security-public-use-data-files-ssa.html#cb1334-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-20"><a href="social-security-public-use-data-files-ssa.html#cb1334-20" aria-hidden="true" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( ssa_tbl )</span>
-<span id="cb1334-21"><a href="social-security-public-use-data-files-ssa.html#cb1334-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-22"><a href="social-security-public-use-data-files-ssa.html#cb1334-22" aria-hidden="true" tabindex="-1"></a>annual_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( annual_tbl )</span>
-<span id="cb1334-23"><a href="social-security-public-use-data-files-ssa.html#cb1334-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-24"><a href="social-security-public-use-data-files-ssa.html#cb1334-24" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( ssa_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( ssa_df ) )</span>
-<span id="cb1334-25"><a href="social-security-public-use-data-files-ssa.html#cb1334-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1334-26"><a href="social-security-public-use-data-files-ssa.html#cb1334-26" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( annual_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( annual_df ) )</span></code></pre></div>
+<div class="sourceCode" id="cb1334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1334-1"><a href="social-security-public-use-data-files-ssa.html#cb1334-1" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb1334-2"><a href="social-security-public-use-data-files-ssa.html#cb1334-2" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb1334-3"><a href="social-security-public-use-data-files-ssa.html#cb1334-3" tabindex="-1"></a></span>
+<span id="cb1334-4"><a href="social-security-public-use-data-files-ssa.html#cb1334-4" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb1334-5"><a href="social-security-public-use-data-files-ssa.html#cb1334-5" tabindex="-1"></a></span>
+<span id="cb1334-6"><a href="social-security-public-use-data-files-ssa.html#cb1334-6" tabindex="-1"></a>ssa_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip&quot;</span></span>
+<span id="cb1334-7"><a href="social-security-public-use-data-files-ssa.html#cb1334-7" tabindex="-1"></a></span>
+<span id="cb1334-8"><a href="social-security-public-use-data-files-ssa.html#cb1334-8" tabindex="-1"></a><span class="fu">GET</span>( ssa_url , <span class="fu">write_disk</span>( tf ) , <span class="fu">progress</span>() )</span>
+<span id="cb1334-9"><a href="social-security-public-use-data-files-ssa.html#cb1334-9" tabindex="-1"></a></span>
+<span id="cb1334-10"><a href="social-security-public-use-data-files-ssa.html#cb1334-10" tabindex="-1"></a>ssa_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb1334-11"><a href="social-security-public-use-data-files-ssa.html#cb1334-11" tabindex="-1"></a></span>
+<span id="cb1334-12"><a href="social-security-public-use-data-files-ssa.html#cb1334-12" tabindex="-1"></a>ssa_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;demographic&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1334-13"><a href="social-security-public-use-data-files-ssa.html#cb1334-13" tabindex="-1"></a></span>
+<span id="cb1334-14"><a href="social-security-public-use-data-files-ssa.html#cb1334-14" tabindex="-1"></a>annual_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;annual&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1334-15"><a href="social-security-public-use-data-files-ssa.html#cb1334-15" tabindex="-1"></a></span>
+<span id="cb1334-16"><a href="social-security-public-use-data-files-ssa.html#cb1334-16" tabindex="-1"></a>ssa_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( ssa_fn )</span>
+<span id="cb1334-17"><a href="social-security-public-use-data-files-ssa.html#cb1334-17" tabindex="-1"></a></span>
+<span id="cb1334-18"><a href="social-security-public-use-data-files-ssa.html#cb1334-18" tabindex="-1"></a>annual_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( annual_fn )</span>
+<span id="cb1334-19"><a href="social-security-public-use-data-files-ssa.html#cb1334-19" tabindex="-1"></a></span>
+<span id="cb1334-20"><a href="social-security-public-use-data-files-ssa.html#cb1334-20" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( ssa_tbl )</span>
+<span id="cb1334-21"><a href="social-security-public-use-data-files-ssa.html#cb1334-21" tabindex="-1"></a></span>
+<span id="cb1334-22"><a href="social-security-public-use-data-files-ssa.html#cb1334-22" tabindex="-1"></a>annual_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( annual_tbl )</span>
+<span id="cb1334-23"><a href="social-security-public-use-data-files-ssa.html#cb1334-23" tabindex="-1"></a></span>
+<span id="cb1334-24"><a href="social-security-public-use-data-files-ssa.html#cb1334-24" tabindex="-1"></a><span class="fu">names</span>( ssa_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( ssa_df ) )</span>
+<span id="cb1334-25"><a href="social-security-public-use-data-files-ssa.html#cb1334-25" tabindex="-1"></a></span>
+<span id="cb1334-26"><a href="social-security-public-use-data-files-ssa.html#cb1334-26" tabindex="-1"></a><span class="fu">names</span>( annual_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( annual_df ) )</span></code></pre></div>
 <p>Sum up 1951-1952 and 1953-2006 earnings, and also 1953-2006 credits, copying the naming convention:</p>
-<div class="sourceCode" id="cb1335"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1335-1"><a href="social-security-public-use-data-files-ssa.html#cb1335-1" aria-hidden="true" tabindex="-1"></a>summed_earnings_5152 <span class="ot">&lt;-</span></span>
-<span id="cb1335-2"><a href="social-security-public-use-data-files-ssa.html#cb1335-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>( </span>
-<span id="cb1335-3"><a href="social-security-public-use-data-files-ssa.html#cb1335-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">subset</span>( annual_df , year_earn <span class="sc">%in%</span> <span class="dv">1951</span><span class="sc">:</span><span class="dv">1952</span> ) , </span>
-<span id="cb1335-4"><a href="social-security-public-use-data-files-ssa.html#cb1335-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aggregate</span>( annual_earnings , <span class="fu">list</span>( id ) , sum )</span>
-<span id="cb1335-5"><a href="social-security-public-use-data-files-ssa.html#cb1335-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1335-6"><a href="social-security-public-use-data-files-ssa.html#cb1335-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1335-7"><a href="social-security-public-use-data-files-ssa.html#cb1335-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( summed_earnings_5152 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;tot_cov_earn5152&#39;</span> )</span>
-<span id="cb1335-8"><a href="social-security-public-use-data-files-ssa.html#cb1335-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1335-9"><a href="social-security-public-use-data-files-ssa.html#cb1335-9" aria-hidden="true" tabindex="-1"></a>summed_earnings_5306 <span class="ot">&lt;-</span></span>
-<span id="cb1335-10"><a href="social-security-public-use-data-files-ssa.html#cb1335-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>( </span>
-<span id="cb1335-11"><a href="social-security-public-use-data-files-ssa.html#cb1335-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">subset</span>( annual_df , year_earn <span class="sc">&gt;</span> <span class="dv">1952</span> ) , </span>
-<span id="cb1335-12"><a href="social-security-public-use-data-files-ssa.html#cb1335-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aggregate</span>( annual_earnings , <span class="fu">list</span>( id ) , sum )</span>
-<span id="cb1335-13"><a href="social-security-public-use-data-files-ssa.html#cb1335-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1335-14"><a href="social-security-public-use-data-files-ssa.html#cb1335-14" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1335-15"><a href="social-security-public-use-data-files-ssa.html#cb1335-15" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( summed_earnings_5306 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;tot_cov_earn5306&#39;</span> )</span>
-<span id="cb1335-16"><a href="social-security-public-use-data-files-ssa.html#cb1335-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1335-17"><a href="social-security-public-use-data-files-ssa.html#cb1335-17" aria-hidden="true" tabindex="-1"></a>summed_quarters_5306 <span class="ot">&lt;-</span></span>
-<span id="cb1335-18"><a href="social-security-public-use-data-files-ssa.html#cb1335-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>( </span>
-<span id="cb1335-19"><a href="social-security-public-use-data-files-ssa.html#cb1335-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">subset</span>( annual_df , year_earn <span class="sc">&gt;</span> <span class="dv">1952</span> ) , </span>
-<span id="cb1335-20"><a href="social-security-public-use-data-files-ssa.html#cb1335-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aggregate</span>( annual_qtrs , <span class="fu">list</span>( id ) , sum )</span>
-<span id="cb1335-21"><a href="social-security-public-use-data-files-ssa.html#cb1335-21" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1335-22"><a href="social-security-public-use-data-files-ssa.html#cb1335-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1335-23"><a href="social-security-public-use-data-files-ssa.html#cb1335-23" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( summed_quarters_5306 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;qc5306&#39;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1335"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1335-1"><a href="social-security-public-use-data-files-ssa.html#cb1335-1" tabindex="-1"></a>summed_earnings_5152 <span class="ot">&lt;-</span></span>
+<span id="cb1335-2"><a href="social-security-public-use-data-files-ssa.html#cb1335-2" tabindex="-1"></a>    <span class="fu">with</span>( </span>
+<span id="cb1335-3"><a href="social-security-public-use-data-files-ssa.html#cb1335-3" tabindex="-1"></a>        <span class="fu">subset</span>( annual_df , year_earn <span class="sc">%in%</span> <span class="dv">1951</span><span class="sc">:</span><span class="dv">1952</span> ) , </span>
+<span id="cb1335-4"><a href="social-security-public-use-data-files-ssa.html#cb1335-4" tabindex="-1"></a>        <span class="fu">aggregate</span>( annual_earnings , <span class="fu">list</span>( id ) , sum )</span>
+<span id="cb1335-5"><a href="social-security-public-use-data-files-ssa.html#cb1335-5" tabindex="-1"></a>    )</span>
+<span id="cb1335-6"><a href="social-security-public-use-data-files-ssa.html#cb1335-6" tabindex="-1"></a>    </span>
+<span id="cb1335-7"><a href="social-security-public-use-data-files-ssa.html#cb1335-7" tabindex="-1"></a><span class="fu">names</span>( summed_earnings_5152 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;tot_cov_earn5152&#39;</span> )</span>
+<span id="cb1335-8"><a href="social-security-public-use-data-files-ssa.html#cb1335-8" tabindex="-1"></a></span>
+<span id="cb1335-9"><a href="social-security-public-use-data-files-ssa.html#cb1335-9" tabindex="-1"></a>summed_earnings_5306 <span class="ot">&lt;-</span></span>
+<span id="cb1335-10"><a href="social-security-public-use-data-files-ssa.html#cb1335-10" tabindex="-1"></a>    <span class="fu">with</span>( </span>
+<span id="cb1335-11"><a href="social-security-public-use-data-files-ssa.html#cb1335-11" tabindex="-1"></a>        <span class="fu">subset</span>( annual_df , year_earn <span class="sc">&gt;</span> <span class="dv">1952</span> ) , </span>
+<span id="cb1335-12"><a href="social-security-public-use-data-files-ssa.html#cb1335-12" tabindex="-1"></a>        <span class="fu">aggregate</span>( annual_earnings , <span class="fu">list</span>( id ) , sum )</span>
+<span id="cb1335-13"><a href="social-security-public-use-data-files-ssa.html#cb1335-13" tabindex="-1"></a>    )</span>
+<span id="cb1335-14"><a href="social-security-public-use-data-files-ssa.html#cb1335-14" tabindex="-1"></a>    </span>
+<span id="cb1335-15"><a href="social-security-public-use-data-files-ssa.html#cb1335-15" tabindex="-1"></a><span class="fu">names</span>( summed_earnings_5306 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;tot_cov_earn5306&#39;</span> )</span>
+<span id="cb1335-16"><a href="social-security-public-use-data-files-ssa.html#cb1335-16" tabindex="-1"></a></span>
+<span id="cb1335-17"><a href="social-security-public-use-data-files-ssa.html#cb1335-17" tabindex="-1"></a>summed_quarters_5306 <span class="ot">&lt;-</span></span>
+<span id="cb1335-18"><a href="social-security-public-use-data-files-ssa.html#cb1335-18" tabindex="-1"></a>    <span class="fu">with</span>( </span>
+<span id="cb1335-19"><a href="social-security-public-use-data-files-ssa.html#cb1335-19" tabindex="-1"></a>        <span class="fu">subset</span>( annual_df , year_earn <span class="sc">&gt;</span> <span class="dv">1952</span> ) , </span>
+<span id="cb1335-20"><a href="social-security-public-use-data-files-ssa.html#cb1335-20" tabindex="-1"></a>        <span class="fu">aggregate</span>( annual_qtrs , <span class="fu">list</span>( id ) , sum )</span>
+<span id="cb1335-21"><a href="social-security-public-use-data-files-ssa.html#cb1335-21" tabindex="-1"></a>    )</span>
+<span id="cb1335-22"><a href="social-security-public-use-data-files-ssa.html#cb1335-22" tabindex="-1"></a></span>
+<span id="cb1335-23"><a href="social-security-public-use-data-files-ssa.html#cb1335-23" tabindex="-1"></a><span class="fu">names</span>( summed_quarters_5306 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;qc5306&#39;</span> )</span></code></pre></div>
 <p>Isolate a single year of earnings:</p>
-<div class="sourceCode" id="cb1336"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1336-1"><a href="social-security-public-use-data-files-ssa.html#cb1336-1" aria-hidden="true" tabindex="-1"></a>earnings_2006 <span class="ot">&lt;-</span> annual_df[ annual_df[ , <span class="st">&#39;year_earn&#39;</span> ] <span class="sc">==</span> <span class="dv">2006</span> , <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;annual_earnings&#39;</span> ) ]</span>
-<span id="cb1336-2"><a href="social-security-public-use-data-files-ssa.html#cb1336-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1336-3"><a href="social-security-public-use-data-files-ssa.html#cb1336-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>( earnings_2006 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;tot_cov_earn06&#39;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1336"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1336-1"><a href="social-security-public-use-data-files-ssa.html#cb1336-1" tabindex="-1"></a>earnings_2006 <span class="ot">&lt;-</span> annual_df[ annual_df[ , <span class="st">&#39;year_earn&#39;</span> ] <span class="sc">==</span> <span class="dv">2006</span> , <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;annual_earnings&#39;</span> ) ]</span>
+<span id="cb1336-2"><a href="social-security-public-use-data-files-ssa.html#cb1336-2" tabindex="-1"></a></span>
+<span id="cb1336-3"><a href="social-security-public-use-data-files-ssa.html#cb1336-3" tabindex="-1"></a><span class="fu">names</span>( earnings_2006 ) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">&#39;id&#39;</span> , <span class="st">&#39;tot_cov_earn06&#39;</span> )</span></code></pre></div>
 <p>Merge each new column on to the person-level table, then add zeroes to person-years without earnings:</p>
-<div class="sourceCode" id="cb1337"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1337-1"><a href="social-security-public-use-data-files-ssa.html#cb1337-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="sc">!</span><span class="fu">is.na</span>( ssa_df ) ) )</span>
-<span id="cb1337-2"><a href="social-security-public-use-data-files-ssa.html#cb1337-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1337-3"><a href="social-security-public-use-data-files-ssa.html#cb1337-3" aria-hidden="true" tabindex="-1"></a>before_nrow <span class="ot">&lt;-</span> <span class="fu">nrow</span>( ssa_df )</span>
-<span id="cb1337-4"><a href="social-security-public-use-data-files-ssa.html#cb1337-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1337-5"><a href="social-security-public-use-data-files-ssa.html#cb1337-5" aria-hidden="true" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( ssa_df , summed_earnings_5152 , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1337-6"><a href="social-security-public-use-data-files-ssa.html#cb1337-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1337-7"><a href="social-security-public-use-data-files-ssa.html#cb1337-7" aria-hidden="true" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( ssa_df , summed_earnings_5306 , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1337-8"><a href="social-security-public-use-data-files-ssa.html#cb1337-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1337-9"><a href="social-security-public-use-data-files-ssa.html#cb1337-9" aria-hidden="true" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( ssa_df , summed_quarters_5306 , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1337-10"><a href="social-security-public-use-data-files-ssa.html#cb1337-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1337-11"><a href="social-security-public-use-data-files-ssa.html#cb1337-11" aria-hidden="true" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( ssa_df , earnings_2006 , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1337-12"><a href="social-security-public-use-data-files-ssa.html#cb1337-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1337-13"><a href="social-security-public-use-data-files-ssa.html#cb1337-13" aria-hidden="true" tabindex="-1"></a>ssa_df[ <span class="fu">is.na</span>( ssa_df ) ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb1337-14"><a href="social-security-public-use-data-files-ssa.html#cb1337-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1337-15"><a href="social-security-public-use-data-files-ssa.html#cb1337-15" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( ssa_df ) <span class="sc">==</span> before_nrow )</span></code></pre></div>
+<div class="sourceCode" id="cb1337"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1337-1"><a href="social-security-public-use-data-files-ssa.html#cb1337-1" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">all</span>( <span class="sc">!</span><span class="fu">is.na</span>( ssa_df ) ) )</span>
+<span id="cb1337-2"><a href="social-security-public-use-data-files-ssa.html#cb1337-2" tabindex="-1"></a></span>
+<span id="cb1337-3"><a href="social-security-public-use-data-files-ssa.html#cb1337-3" tabindex="-1"></a>before_nrow <span class="ot">&lt;-</span> <span class="fu">nrow</span>( ssa_df )</span>
+<span id="cb1337-4"><a href="social-security-public-use-data-files-ssa.html#cb1337-4" tabindex="-1"></a></span>
+<span id="cb1337-5"><a href="social-security-public-use-data-files-ssa.html#cb1337-5" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( ssa_df , summed_earnings_5152 , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1337-6"><a href="social-security-public-use-data-files-ssa.html#cb1337-6" tabindex="-1"></a></span>
+<span id="cb1337-7"><a href="social-security-public-use-data-files-ssa.html#cb1337-7" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( ssa_df , summed_earnings_5306 , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1337-8"><a href="social-security-public-use-data-files-ssa.html#cb1337-8" tabindex="-1"></a></span>
+<span id="cb1337-9"><a href="social-security-public-use-data-files-ssa.html#cb1337-9" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( ssa_df , summed_quarters_5306 , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1337-10"><a href="social-security-public-use-data-files-ssa.html#cb1337-10" tabindex="-1"></a></span>
+<span id="cb1337-11"><a href="social-security-public-use-data-files-ssa.html#cb1337-11" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( ssa_df , earnings_2006 , <span class="at">all.x =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1337-12"><a href="social-security-public-use-data-files-ssa.html#cb1337-12" tabindex="-1"></a></span>
+<span id="cb1337-13"><a href="social-security-public-use-data-files-ssa.html#cb1337-13" tabindex="-1"></a>ssa_df[ <span class="fu">is.na</span>( ssa_df ) ] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1337-14"><a href="social-security-public-use-data-files-ssa.html#cb1337-14" tabindex="-1"></a></span>
+<span id="cb1337-15"><a href="social-security-public-use-data-files-ssa.html#cb1337-15" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( ssa_df ) <span class="sc">==</span> before_nrow )</span></code></pre></div>
 <div id="save-locally-45" class="section level3 unnumbered hasAnchor">
 <h3>Save Locally  <a href="social-security-public-use-data-files-ssa.html#save-locally-45" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
-<div class="sourceCode" id="cb1338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1338-1"><a href="social-security-public-use-data-files-ssa.html#cb1338-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ssa_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;SSA&quot; , &quot;this_file.rds&quot; )</span></span>
-<span id="cb1338-2"><a href="social-security-public-use-data-files-ssa.html#cb1338-2" aria-hidden="true" tabindex="-1"></a><span class="co"># saveRDS( ssa_df , file = ssa_fn , compress = FALSE )</span></span></code></pre></div>
+<div class="sourceCode" id="cb1338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1338-1"><a href="social-security-public-use-data-files-ssa.html#cb1338-1" tabindex="-1"></a><span class="co"># ssa_fn &lt;- file.path( path.expand( &quot;~&quot; ) , &quot;SSA&quot; , &quot;this_file.rds&quot; )</span></span>
+<span id="cb1338-2"><a href="social-security-public-use-data-files-ssa.html#cb1338-2" tabindex="-1"></a><span class="co"># saveRDS( ssa_df , file = ssa_fn , compress = FALSE )</span></span></code></pre></div>
 <p>Load the same object:</p>
-<div class="sourceCode" id="cb1339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1339-1"><a href="social-security-public-use-data-files-ssa.html#cb1339-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ssa_df &lt;- readRDS( ssa_fn )</span></span></code></pre></div>
+<div class="sourceCode" id="cb1339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1339-1"><a href="social-security-public-use-data-files-ssa.html#cb1339-1" tabindex="-1"></a><span class="co"># ssa_df &lt;- readRDS( ssa_fn )</span></span></code></pre></div>
 </div>
 <div id="variable-recoding-45" class="section level3 unnumbered hasAnchor">
 <h3>Variable Recoding<a href="social-security-public-use-data-files-ssa.html#variable-recoding-45" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Add new columns to the data set:</p>
-<div class="sourceCode" id="cb1340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1340-1"><a href="social-security-public-use-data-files-ssa.html#cb1340-1" aria-hidden="true" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> </span>
-<span id="cb1340-2"><a href="social-security-public-use-data-files-ssa.html#cb1340-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transform</span>( </span>
-<span id="cb1340-3"><a href="social-security-public-use-data-files-ssa.html#cb1340-3" aria-hidden="true" tabindex="-1"></a>        ssa_df ,</span>
-<span id="cb1340-4"><a href="social-security-public-use-data-files-ssa.html#cb1340-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1340-5"><a href="social-security-public-use-data-files-ssa.html#cb1340-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">decade_of_birth =</span> <span class="fu">floor</span>( yob <span class="sc">/</span> <span class="dv">10</span> ) <span class="sc">*</span> <span class="dv">10</span> ,</span>
-<span id="cb1340-6"><a href="social-security-public-use-data-files-ssa.html#cb1340-6" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb1340-7"><a href="social-security-public-use-data-files-ssa.html#cb1340-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">sex =</span> <span class="fu">factor</span>( sex , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,</span>
-<span id="cb1340-8"><a href="social-security-public-use-data-files-ssa.html#cb1340-8" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb1340-9"><a href="social-security-public-use-data-files-ssa.html#cb1340-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">tot_cov_earn3706 =</span> ( tot_cov_earn3750 <span class="sc">+</span> tot_cov_earn5152 <span class="sc">+</span> tot_cov_earn5306 ) ,</span>
-<span id="cb1340-10"><a href="social-security-public-use-data-files-ssa.html#cb1340-10" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb1340-11"><a href="social-security-public-use-data-files-ssa.html#cb1340-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">qc3706 =</span> ( qc3750 <span class="sc">+</span> qc5152 <span class="sc">+</span> qc5306 ) ,</span>
-<span id="cb1340-12"><a href="social-security-public-use-data-files-ssa.html#cb1340-12" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb1340-13"><a href="social-security-public-use-data-files-ssa.html#cb1340-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">any_earnings_2006 =</span> ( tot_cov_earn06 <span class="sc">&gt;</span> <span class="dv">0</span> ) ,</span>
-<span id="cb1340-14"><a href="social-security-public-use-data-files-ssa.html#cb1340-14" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb1340-15"><a href="social-security-public-use-data-files-ssa.html#cb1340-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">earnings_periods =</span></span>
-<span id="cb1340-16"><a href="social-security-public-use-data-files-ssa.html#cb1340-16" aria-hidden="true" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
-<span id="cb1340-17"><a href="social-security-public-use-data-files-ssa.html#cb1340-17" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( ( tot_cov_earn5152 <span class="sc">+</span> tot_cov_earn5306 <span class="sc">&gt;</span> <span class="dv">0</span> ) <span class="sc">&amp;</span> tot_cov_earn3750 <span class="sc">&gt;</span> <span class="dv">0</span> , <span class="dv">1</span> ,</span>
-<span id="cb1340-18"><a href="social-security-public-use-data-files-ssa.html#cb1340-18" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( tot_cov_earn5152 <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">|</span> tot_cov_earn5306 <span class="sc">&gt;</span> <span class="dv">0</span> , <span class="dv">2</span> ,</span>
-<span id="cb1340-19"><a href="social-security-public-use-data-files-ssa.html#cb1340-19" aria-hidden="true" tabindex="-1"></a>                <span class="fu">ifelse</span>( tot_cov_earn3750 <span class="sc">&gt;</span> <span class="dv">0</span> , <span class="dv">3</span> , <span class="dv">4</span> ) ) ) ,</span>
-<span id="cb1340-20"><a href="social-security-public-use-data-files-ssa.html#cb1340-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ,</span>
-<span id="cb1340-21"><a href="social-security-public-use-data-files-ssa.html#cb1340-21" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span></span>
-<span id="cb1340-22"><a href="social-security-public-use-data-files-ssa.html#cb1340-22" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="st">&#39;Earnings in both periods&#39;</span> , <span class="st">&#39;Earnings during 1951-2006 only&#39;</span> ,</span>
-<span id="cb1340-23"><a href="social-security-public-use-data-files-ssa.html#cb1340-23" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&#39;Earnings during 1937-1950 only&#39;</span> , <span class="st">&#39;No earnings&#39;</span> ) )</span>
-<span id="cb1340-24"><a href="social-security-public-use-data-files-ssa.html#cb1340-24" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb1340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1340-1"><a href="social-security-public-use-data-files-ssa.html#cb1340-1" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> </span>
+<span id="cb1340-2"><a href="social-security-public-use-data-files-ssa.html#cb1340-2" tabindex="-1"></a>    <span class="fu">transform</span>( </span>
+<span id="cb1340-3"><a href="social-security-public-use-data-files-ssa.html#cb1340-3" tabindex="-1"></a>        ssa_df ,</span>
+<span id="cb1340-4"><a href="social-security-public-use-data-files-ssa.html#cb1340-4" tabindex="-1"></a></span>
+<span id="cb1340-5"><a href="social-security-public-use-data-files-ssa.html#cb1340-5" tabindex="-1"></a>        <span class="at">decade_of_birth =</span> <span class="fu">floor</span>( yob <span class="sc">/</span> <span class="dv">10</span> ) <span class="sc">*</span> <span class="dv">10</span> ,</span>
+<span id="cb1340-6"><a href="social-security-public-use-data-files-ssa.html#cb1340-6" tabindex="-1"></a>        </span>
+<span id="cb1340-7"><a href="social-security-public-use-data-files-ssa.html#cb1340-7" tabindex="-1"></a>        <span class="at">sex =</span> <span class="fu">factor</span>( sex , <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span> , <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&#39;male&#39;</span> , <span class="st">&#39;female&#39;</span> ) ) ,</span>
+<span id="cb1340-8"><a href="social-security-public-use-data-files-ssa.html#cb1340-8" tabindex="-1"></a>        </span>
+<span id="cb1340-9"><a href="social-security-public-use-data-files-ssa.html#cb1340-9" tabindex="-1"></a>        <span class="at">tot_cov_earn3706 =</span> ( tot_cov_earn3750 <span class="sc">+</span> tot_cov_earn5152 <span class="sc">+</span> tot_cov_earn5306 ) ,</span>
+<span id="cb1340-10"><a href="social-security-public-use-data-files-ssa.html#cb1340-10" tabindex="-1"></a>        </span>
+<span id="cb1340-11"><a href="social-security-public-use-data-files-ssa.html#cb1340-11" tabindex="-1"></a>        <span class="at">qc3706 =</span> ( qc3750 <span class="sc">+</span> qc5152 <span class="sc">+</span> qc5306 ) ,</span>
+<span id="cb1340-12"><a href="social-security-public-use-data-files-ssa.html#cb1340-12" tabindex="-1"></a>        </span>
+<span id="cb1340-13"><a href="social-security-public-use-data-files-ssa.html#cb1340-13" tabindex="-1"></a>        <span class="at">any_earnings_2006 =</span> ( tot_cov_earn06 <span class="sc">&gt;</span> <span class="dv">0</span> ) ,</span>
+<span id="cb1340-14"><a href="social-security-public-use-data-files-ssa.html#cb1340-14" tabindex="-1"></a>        </span>
+<span id="cb1340-15"><a href="social-security-public-use-data-files-ssa.html#cb1340-15" tabindex="-1"></a>        <span class="at">earnings_periods =</span></span>
+<span id="cb1340-16"><a href="social-security-public-use-data-files-ssa.html#cb1340-16" tabindex="-1"></a>            <span class="fu">factor</span>(</span>
+<span id="cb1340-17"><a href="social-security-public-use-data-files-ssa.html#cb1340-17" tabindex="-1"></a>                <span class="fu">ifelse</span>( ( tot_cov_earn5152 <span class="sc">+</span> tot_cov_earn5306 <span class="sc">&gt;</span> <span class="dv">0</span> ) <span class="sc">&amp;</span> tot_cov_earn3750 <span class="sc">&gt;</span> <span class="dv">0</span> , <span class="dv">1</span> ,</span>
+<span id="cb1340-18"><a href="social-security-public-use-data-files-ssa.html#cb1340-18" tabindex="-1"></a>                <span class="fu">ifelse</span>( tot_cov_earn5152 <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">|</span> tot_cov_earn5306 <span class="sc">&gt;</span> <span class="dv">0</span> , <span class="dv">2</span> ,</span>
+<span id="cb1340-19"><a href="social-security-public-use-data-files-ssa.html#cb1340-19" tabindex="-1"></a>                <span class="fu">ifelse</span>( tot_cov_earn3750 <span class="sc">&gt;</span> <span class="dv">0</span> , <span class="dv">3</span> , <span class="dv">4</span> ) ) ) ,</span>
+<span id="cb1340-20"><a href="social-security-public-use-data-files-ssa.html#cb1340-20" tabindex="-1"></a>                <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> ,</span>
+<span id="cb1340-21"><a href="social-security-public-use-data-files-ssa.html#cb1340-21" tabindex="-1"></a>                <span class="at">labels =</span></span>
+<span id="cb1340-22"><a href="social-security-public-use-data-files-ssa.html#cb1340-22" tabindex="-1"></a>                    <span class="fu">c</span>( <span class="st">&#39;Earnings in both periods&#39;</span> , <span class="st">&#39;Earnings during 1951-2006 only&#39;</span> ,</span>
+<span id="cb1340-23"><a href="social-security-public-use-data-files-ssa.html#cb1340-23" tabindex="-1"></a>                        <span class="st">&#39;Earnings during 1937-1950 only&#39;</span> , <span class="st">&#39;No earnings&#39;</span> ) )</span>
+<span id="cb1340-24"><a href="social-security-public-use-data-files-ssa.html#cb1340-24" tabindex="-1"></a>    )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1358,79 +1356,79 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="unweighted-counts-45" class="section level3 unnumbered hasAnchor">
 <h3>Unweighted Counts<a href="social-security-public-use-data-files-ssa.html#unweighted-counts-45" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Count the unweighted number of records in the table, overall and by groups:</p>
-<div class="sourceCode" id="cb1341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1341-1"><a href="social-security-public-use-data-files-ssa.html#cb1341-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>( ssa_df )</span>
-<span id="cb1341-2"><a href="social-security-public-use-data-files-ssa.html#cb1341-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1341-3"><a href="social-security-public-use-data-files-ssa.html#cb1341-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>( ssa_df[ , <span class="st">&quot;sex&quot;</span> ] , <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1341-1"><a href="social-security-public-use-data-files-ssa.html#cb1341-1" tabindex="-1"></a><span class="fu">nrow</span>( ssa_df )</span>
+<span id="cb1341-2"><a href="social-security-public-use-data-files-ssa.html#cb1341-2" tabindex="-1"></a></span>
+<span id="cb1341-3"><a href="social-security-public-use-data-files-ssa.html#cb1341-3" tabindex="-1"></a><span class="fu">table</span>( ssa_df[ , <span class="st">&quot;sex&quot;</span> ] , <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span> )</span></code></pre></div>
 </div>
 <div id="descriptive-statistics-45" class="section level3 unnumbered hasAnchor">
 <h3>Descriptive Statistics<a href="social-security-public-use-data-files-ssa.html#descriptive-statistics-45" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1342-1"><a href="social-security-public-use-data-files-ssa.html#cb1342-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] )</span>
-<span id="cb1342-2"><a href="social-security-public-use-data-files-ssa.html#cb1342-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1342-3"><a href="social-security-public-use-data-files-ssa.html#cb1342-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb1342-4"><a href="social-security-public-use-data-files-ssa.html#cb1342-4" aria-hidden="true" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] ,</span>
-<span id="cb1342-5"><a href="social-security-public-use-data-files-ssa.html#cb1342-5" aria-hidden="true" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;sex&quot;</span> ] ,</span>
-<span id="cb1342-6"><a href="social-security-public-use-data-files-ssa.html#cb1342-6" aria-hidden="true" tabindex="-1"></a>    mean </span>
-<span id="cb1342-7"><a href="social-security-public-use-data-files-ssa.html#cb1342-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb1342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1342-1"><a href="social-security-public-use-data-files-ssa.html#cb1342-1" tabindex="-1"></a><span class="fu">mean</span>( ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] )</span>
+<span id="cb1342-2"><a href="social-security-public-use-data-files-ssa.html#cb1342-2" tabindex="-1"></a></span>
+<span id="cb1342-3"><a href="social-security-public-use-data-files-ssa.html#cb1342-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb1342-4"><a href="social-security-public-use-data-files-ssa.html#cb1342-4" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] ,</span>
+<span id="cb1342-5"><a href="social-security-public-use-data-files-ssa.html#cb1342-5" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;sex&quot;</span> ] ,</span>
+<span id="cb1342-6"><a href="social-security-public-use-data-files-ssa.html#cb1342-6" tabindex="-1"></a>    mean </span>
+<span id="cb1342-7"><a href="social-security-public-use-data-files-ssa.html#cb1342-7" tabindex="-1"></a>)</span></code></pre></div>
 <p>Calculate the distribution of a categorical variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1343-1"><a href="social-security-public-use-data-files-ssa.html#cb1343-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>( <span class="fu">table</span>( ssa_df[ , <span class="st">&quot;decade_of_birth&quot;</span> ] ) )</span>
-<span id="cb1343-2"><a href="social-security-public-use-data-files-ssa.html#cb1343-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1343-3"><a href="social-security-public-use-data-files-ssa.html#cb1343-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(</span>
-<span id="cb1343-4"><a href="social-security-public-use-data-files-ssa.html#cb1343-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">table</span>( ssa_df[ , <span class="fu">c</span>( <span class="st">&quot;decade_of_birth&quot;</span> , <span class="st">&quot;sex&quot;</span> ) ] ) ,</span>
-<span id="cb1343-5"><a href="social-security-public-use-data-files-ssa.html#cb1343-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">margin =</span> <span class="dv">2</span></span>
-<span id="cb1343-6"><a href="social-security-public-use-data-files-ssa.html#cb1343-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb1343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1343-1"><a href="social-security-public-use-data-files-ssa.html#cb1343-1" tabindex="-1"></a><span class="fu">prop.table</span>( <span class="fu">table</span>( ssa_df[ , <span class="st">&quot;decade_of_birth&quot;</span> ] ) )</span>
+<span id="cb1343-2"><a href="social-security-public-use-data-files-ssa.html#cb1343-2" tabindex="-1"></a></span>
+<span id="cb1343-3"><a href="social-security-public-use-data-files-ssa.html#cb1343-3" tabindex="-1"></a><span class="fu">prop.table</span>(</span>
+<span id="cb1343-4"><a href="social-security-public-use-data-files-ssa.html#cb1343-4" tabindex="-1"></a>    <span class="fu">table</span>( ssa_df[ , <span class="fu">c</span>( <span class="st">&quot;decade_of_birth&quot;</span> , <span class="st">&quot;sex&quot;</span> ) ] ) ,</span>
+<span id="cb1343-5"><a href="social-security-public-use-data-files-ssa.html#cb1343-5" tabindex="-1"></a>    <span class="at">margin =</span> <span class="dv">2</span></span>
+<span id="cb1343-6"><a href="social-security-public-use-data-files-ssa.html#cb1343-6" tabindex="-1"></a>)</span></code></pre></div>
 <p>Calculate the sum of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1344-1"><a href="social-security-public-use-data-files-ssa.html#cb1344-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] )</span>
-<span id="cb1344-2"><a href="social-security-public-use-data-files-ssa.html#cb1344-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1344-3"><a href="social-security-public-use-data-files-ssa.html#cb1344-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb1344-4"><a href="social-security-public-use-data-files-ssa.html#cb1344-4" aria-hidden="true" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] ,</span>
-<span id="cb1344-5"><a href="social-security-public-use-data-files-ssa.html#cb1344-5" aria-hidden="true" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;sex&quot;</span> ] ,</span>
-<span id="cb1344-6"><a href="social-security-public-use-data-files-ssa.html#cb1344-6" aria-hidden="true" tabindex="-1"></a>    sum </span>
-<span id="cb1344-7"><a href="social-security-public-use-data-files-ssa.html#cb1344-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb1344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1344-1"><a href="social-security-public-use-data-files-ssa.html#cb1344-1" tabindex="-1"></a><span class="fu">sum</span>( ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] )</span>
+<span id="cb1344-2"><a href="social-security-public-use-data-files-ssa.html#cb1344-2" tabindex="-1"></a></span>
+<span id="cb1344-3"><a href="social-security-public-use-data-files-ssa.html#cb1344-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb1344-4"><a href="social-security-public-use-data-files-ssa.html#cb1344-4" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] ,</span>
+<span id="cb1344-5"><a href="social-security-public-use-data-files-ssa.html#cb1344-5" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;sex&quot;</span> ] ,</span>
+<span id="cb1344-6"><a href="social-security-public-use-data-files-ssa.html#cb1344-6" tabindex="-1"></a>    sum </span>
+<span id="cb1344-7"><a href="social-security-public-use-data-files-ssa.html#cb1344-7" tabindex="-1"></a>)</span></code></pre></div>
 <p>Calculate the median (50th percentile) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1345-1"><a href="social-security-public-use-data-files-ssa.html#cb1345-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>( ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] , <span class="fl">0.5</span> )</span>
-<span id="cb1345-2"><a href="social-security-public-use-data-files-ssa.html#cb1345-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1345-3"><a href="social-security-public-use-data-files-ssa.html#cb1345-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb1345-4"><a href="social-security-public-use-data-files-ssa.html#cb1345-4" aria-hidden="true" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] ,</span>
-<span id="cb1345-5"><a href="social-security-public-use-data-files-ssa.html#cb1345-5" aria-hidden="true" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;sex&quot;</span> ] ,</span>
-<span id="cb1345-6"><a href="social-security-public-use-data-files-ssa.html#cb1345-6" aria-hidden="true" tabindex="-1"></a>    quantile ,</span>
-<span id="cb1345-7"><a href="social-security-public-use-data-files-ssa.html#cb1345-7" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.5</span> </span>
-<span id="cb1345-8"><a href="social-security-public-use-data-files-ssa.html#cb1345-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb1345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1345-1"><a href="social-security-public-use-data-files-ssa.html#cb1345-1" tabindex="-1"></a><span class="fu">quantile</span>( ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] , <span class="fl">0.5</span> )</span>
+<span id="cb1345-2"><a href="social-security-public-use-data-files-ssa.html#cb1345-2" tabindex="-1"></a></span>
+<span id="cb1345-3"><a href="social-security-public-use-data-files-ssa.html#cb1345-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb1345-4"><a href="social-security-public-use-data-files-ssa.html#cb1345-4" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] ,</span>
+<span id="cb1345-5"><a href="social-security-public-use-data-files-ssa.html#cb1345-5" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;sex&quot;</span> ] ,</span>
+<span id="cb1345-6"><a href="social-security-public-use-data-files-ssa.html#cb1345-6" tabindex="-1"></a>    quantile ,</span>
+<span id="cb1345-7"><a href="social-security-public-use-data-files-ssa.html#cb1345-7" tabindex="-1"></a>    <span class="fl">0.5</span> </span>
+<span id="cb1345-8"><a href="social-security-public-use-data-files-ssa.html#cb1345-8" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="subsetting-45" class="section level3 unnumbered hasAnchor">
 <h3>Subsetting<a href="social-security-public-use-data-files-ssa.html#subsetting-45" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Limit your <code>data.frame</code> to individuals with at least forty lifetime credits:</p>
-<div class="sourceCode" id="cb1346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1346-1"><a href="social-security-public-use-data-files-ssa.html#cb1346-1" aria-hidden="true" tabindex="-1"></a>sub_ssa_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( ssa_df , qc3706 <span class="sc">&gt;=</span> <span class="dv">40</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1346-1"><a href="social-security-public-use-data-files-ssa.html#cb1346-1" tabindex="-1"></a>sub_ssa_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( ssa_df , qc3706 <span class="sc">&gt;=</span> <span class="dv">40</span> )</span></code></pre></div>
 <p>Calculate the mean (average) of this subset:</p>
-<div class="sourceCode" id="cb1347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1347-1"><a href="social-security-public-use-data-files-ssa.html#cb1347-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>( sub_ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] )</span></code></pre></div>
+<div class="sourceCode" id="cb1347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1347-1"><a href="social-security-public-use-data-files-ssa.html#cb1347-1" tabindex="-1"></a><span class="fu">mean</span>( sub_ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] )</span></code></pre></div>
 </div>
 <div id="measures-of-uncertainty-45" class="section level3 unnumbered hasAnchor">
 <h3>Measures of Uncertainty<a href="social-security-public-use-data-files-ssa.html#measures-of-uncertainty-45" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Calculate the variance, overall and by groups:</p>
-<div class="sourceCode" id="cb1348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1348-1"><a href="social-security-public-use-data-files-ssa.html#cb1348-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>( ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] )</span>
-<span id="cb1348-2"><a href="social-security-public-use-data-files-ssa.html#cb1348-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1348-3"><a href="social-security-public-use-data-files-ssa.html#cb1348-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(</span>
-<span id="cb1348-4"><a href="social-security-public-use-data-files-ssa.html#cb1348-4" aria-hidden="true" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] ,</span>
-<span id="cb1348-5"><a href="social-security-public-use-data-files-ssa.html#cb1348-5" aria-hidden="true" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;sex&quot;</span> ] ,</span>
-<span id="cb1348-6"><a href="social-security-public-use-data-files-ssa.html#cb1348-6" aria-hidden="true" tabindex="-1"></a>    var </span>
-<span id="cb1348-7"><a href="social-security-public-use-data-files-ssa.html#cb1348-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb1348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1348-1"><a href="social-security-public-use-data-files-ssa.html#cb1348-1" tabindex="-1"></a><span class="fu">var</span>( ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] )</span>
+<span id="cb1348-2"><a href="social-security-public-use-data-files-ssa.html#cb1348-2" tabindex="-1"></a></span>
+<span id="cb1348-3"><a href="social-security-public-use-data-files-ssa.html#cb1348-3" tabindex="-1"></a><span class="fu">tapply</span>(</span>
+<span id="cb1348-4"><a href="social-security-public-use-data-files-ssa.html#cb1348-4" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;tot_cov_earn3706&quot;</span> ] ,</span>
+<span id="cb1348-5"><a href="social-security-public-use-data-files-ssa.html#cb1348-5" tabindex="-1"></a>    ssa_df[ , <span class="st">&quot;sex&quot;</span> ] ,</span>
+<span id="cb1348-6"><a href="social-security-public-use-data-files-ssa.html#cb1348-6" tabindex="-1"></a>    var </span>
+<span id="cb1348-7"><a href="social-security-public-use-data-files-ssa.html#cb1348-7" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="regression-models-and-tests-of-association-45" class="section level3 unnumbered hasAnchor">
 <h3>Regression Models and Tests of Association<a href="social-security-public-use-data-files-ssa.html#regression-models-and-tests-of-association-45" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perform a t-test:</p>
-<div class="sourceCode" id="cb1349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1349-1"><a href="social-security-public-use-data-files-ssa.html#cb1349-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>( tot_cov_earn3706 <span class="sc">~</span> any_earnings_2006 , ssa_df )</span></code></pre></div>
+<div class="sourceCode" id="cb1349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1349-1"><a href="social-security-public-use-data-files-ssa.html#cb1349-1" tabindex="-1"></a><span class="fu">t.test</span>( tot_cov_earn3706 <span class="sc">~</span> any_earnings_2006 , ssa_df )</span></code></pre></div>
 <p>Perform a chi-squared test of association:</p>
-<div class="sourceCode" id="cb1350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1350-1"><a href="social-security-public-use-data-files-ssa.html#cb1350-1" aria-hidden="true" tabindex="-1"></a>this_table <span class="ot">&lt;-</span> <span class="fu">table</span>( ssa_df[ , <span class="fu">c</span>( <span class="st">&quot;any_earnings_2006&quot;</span> , <span class="st">&quot;decade_of_birth&quot;</span> ) ] )</span>
-<span id="cb1350-2"><a href="social-security-public-use-data-files-ssa.html#cb1350-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1350-3"><a href="social-security-public-use-data-files-ssa.html#cb1350-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>( this_table )</span></code></pre></div>
+<div class="sourceCode" id="cb1350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1350-1"><a href="social-security-public-use-data-files-ssa.html#cb1350-1" tabindex="-1"></a>this_table <span class="ot">&lt;-</span> <span class="fu">table</span>( ssa_df[ , <span class="fu">c</span>( <span class="st">&quot;any_earnings_2006&quot;</span> , <span class="st">&quot;decade_of_birth&quot;</span> ) ] )</span>
+<span id="cb1350-2"><a href="social-security-public-use-data-files-ssa.html#cb1350-2" tabindex="-1"></a></span>
+<span id="cb1350-3"><a href="social-security-public-use-data-files-ssa.html#cb1350-3" tabindex="-1"></a><span class="fu">chisq.test</span>( this_table )</span></code></pre></div>
 <p>Perform a generalized linear model:</p>
-<div class="sourceCode" id="cb1351"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1351-1"><a href="social-security-public-use-data-files-ssa.html#cb1351-1" aria-hidden="true" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
-<span id="cb1351-2"><a href="social-security-public-use-data-files-ssa.html#cb1351-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glm</span>( </span>
-<span id="cb1351-3"><a href="social-security-public-use-data-files-ssa.html#cb1351-3" aria-hidden="true" tabindex="-1"></a>        tot_cov_earn3706 <span class="sc">~</span> any_earnings_2006 <span class="sc">+</span> decade_of_birth , </span>
-<span id="cb1351-4"><a href="social-security-public-use-data-files-ssa.html#cb1351-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> ssa_df</span>
-<span id="cb1351-5"><a href="social-security-public-use-data-files-ssa.html#cb1351-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1351-6"><a href="social-security-public-use-data-files-ssa.html#cb1351-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1351-7"><a href="social-security-public-use-data-files-ssa.html#cb1351-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
+<div class="sourceCode" id="cb1351"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1351-1"><a href="social-security-public-use-data-files-ssa.html#cb1351-1" tabindex="-1"></a>glm_result <span class="ot">&lt;-</span> </span>
+<span id="cb1351-2"><a href="social-security-public-use-data-files-ssa.html#cb1351-2" tabindex="-1"></a>    <span class="fu">glm</span>( </span>
+<span id="cb1351-3"><a href="social-security-public-use-data-files-ssa.html#cb1351-3" tabindex="-1"></a>        tot_cov_earn3706 <span class="sc">~</span> any_earnings_2006 <span class="sc">+</span> decade_of_birth , </span>
+<span id="cb1351-4"><a href="social-security-public-use-data-files-ssa.html#cb1351-4" tabindex="-1"></a>        <span class="at">data =</span> ssa_df</span>
+<span id="cb1351-5"><a href="social-security-public-use-data-files-ssa.html#cb1351-5" tabindex="-1"></a>    )</span>
+<span id="cb1351-6"><a href="social-security-public-use-data-files-ssa.html#cb1351-6" tabindex="-1"></a></span>
+<span id="cb1351-7"><a href="social-security-public-use-data-files-ssa.html#cb1351-7" tabindex="-1"></a><span class="fu">summary</span>( glm_result )</span></code></pre></div>
 <hr />
 </div>
 </div>
@@ -1438,73 +1436,73 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Replication Example<a href="social-security-public-use-data-files-ssa.html#replication-example-43" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example matches statistics in <a href="https://www.ssa.gov/policy/docs/ssb/v71n4/v71n4p33.html">The 2006 Earnings Public-Use Microdata File: An Introduction</a>:</p>
 <p>Chart 5. Percentage distribution of individuals in EPUF, by capped Social Security taxable earnings status:</p>
-<div class="sourceCode" id="cb1352"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1352-1"><a href="social-security-public-use-data-files-ssa.html#cb1352-1" aria-hidden="true" tabindex="-1"></a>chart_five_results <span class="ot">&lt;-</span> <span class="fu">prop.table</span>( <span class="fu">table</span>( ssa_df[ , <span class="st">&#39;earnings_periods&#39;</span> ] ) )</span>
-<span id="cb1352-2"><a href="social-security-public-use-data-files-ssa.html#cb1352-2" aria-hidden="true" tabindex="-1"></a>chart_five_results <span class="ot">&lt;-</span> <span class="fu">round</span>( <span class="dv">100</span> <span class="sc">*</span> chart_five_results )</span>
-<span id="cb1352-3"><a href="social-security-public-use-data-files-ssa.html#cb1352-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1352-4"><a href="social-security-public-use-data-files-ssa.html#cb1352-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( chart_five_results[ <span class="st">&#39;Earnings in both periods&#39;</span> ] <span class="sc">==</span> <span class="dv">16</span> )</span>
-<span id="cb1352-5"><a href="social-security-public-use-data-files-ssa.html#cb1352-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( chart_five_results[ <span class="st">&#39;Earnings during 1951-2006 only&#39;</span> ] <span class="sc">==</span> <span class="dv">55</span> )</span>
-<span id="cb1352-6"><a href="social-security-public-use-data-files-ssa.html#cb1352-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( chart_five_results[ <span class="st">&#39;Earnings during 1937-1950 only&#39;</span> ] <span class="sc">==</span> <span class="dv">4</span> )</span>
-<span id="cb1352-7"><a href="social-security-public-use-data-files-ssa.html#cb1352-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( chart_five_results[ <span class="st">&#39;No earnings&#39;</span> ] <span class="sc">==</span> <span class="dv">25</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1352"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1352-1"><a href="social-security-public-use-data-files-ssa.html#cb1352-1" tabindex="-1"></a>chart_five_results <span class="ot">&lt;-</span> <span class="fu">prop.table</span>( <span class="fu">table</span>( ssa_df[ , <span class="st">&#39;earnings_periods&#39;</span> ] ) )</span>
+<span id="cb1352-2"><a href="social-security-public-use-data-files-ssa.html#cb1352-2" tabindex="-1"></a>chart_five_results <span class="ot">&lt;-</span> <span class="fu">round</span>( <span class="dv">100</span> <span class="sc">*</span> chart_five_results )</span>
+<span id="cb1352-3"><a href="social-security-public-use-data-files-ssa.html#cb1352-3" tabindex="-1"></a></span>
+<span id="cb1352-4"><a href="social-security-public-use-data-files-ssa.html#cb1352-4" tabindex="-1"></a><span class="fu">stopifnot</span>( chart_five_results[ <span class="st">&#39;Earnings in both periods&#39;</span> ] <span class="sc">==</span> <span class="dv">16</span> )</span>
+<span id="cb1352-5"><a href="social-security-public-use-data-files-ssa.html#cb1352-5" tabindex="-1"></a><span class="fu">stopifnot</span>( chart_five_results[ <span class="st">&#39;Earnings during 1951-2006 only&#39;</span> ] <span class="sc">==</span> <span class="dv">55</span> )</span>
+<span id="cb1352-6"><a href="social-security-public-use-data-files-ssa.html#cb1352-6" tabindex="-1"></a><span class="fu">stopifnot</span>( chart_five_results[ <span class="st">&#39;Earnings during 1937-1950 only&#39;</span> ] <span class="sc">==</span> <span class="dv">4</span> )</span>
+<span id="cb1352-7"><a href="social-security-public-use-data-files-ssa.html#cb1352-7" tabindex="-1"></a><span class="fu">stopifnot</span>( chart_five_results[ <span class="st">&#39;No earnings&#39;</span> ] <span class="sc">==</span> <span class="dv">25</span> )</span></code></pre></div>
 <p>Table 4. Average and median Social Security taxable earnings in EPUF, by sex, 1951–2006 (in dollars):</p>
-<div class="sourceCode" id="cb1353"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1353-1"><a href="social-security-public-use-data-files-ssa.html#cb1353-1" aria-hidden="true" tabindex="-1"></a>nonzero_2006_earners <span class="ot">&lt;-</span> ssa_df[ ssa_df[ , <span class="st">&#39;tot_cov_earn06&#39;</span> ] <span class="sc">&gt;</span> <span class="dv">0</span> , <span class="st">&#39;tot_cov_earn06&#39;</span> ]</span>
-<span id="cb1353-2"><a href="social-security-public-use-data-files-ssa.html#cb1353-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">mean</span>( nonzero_2006_earners ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">30953</span> )</span>
-<span id="cb1353-3"><a href="social-security-public-use-data-files-ssa.html#cb1353-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">quantile</span>( nonzero_2006_earners )[ <span class="dv">3</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">24000</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1353"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1353-1"><a href="social-security-public-use-data-files-ssa.html#cb1353-1" tabindex="-1"></a>nonzero_2006_earners <span class="ot">&lt;-</span> ssa_df[ ssa_df[ , <span class="st">&#39;tot_cov_earn06&#39;</span> ] <span class="sc">&gt;</span> <span class="dv">0</span> , <span class="st">&#39;tot_cov_earn06&#39;</span> ]</span>
+<span id="cb1353-2"><a href="social-security-public-use-data-files-ssa.html#cb1353-2" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">mean</span>( nonzero_2006_earners ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">30953</span> )</span>
+<span id="cb1353-3"><a href="social-security-public-use-data-files-ssa.html#cb1353-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">quantile</span>( nonzero_2006_earners )[ <span class="dv">3</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">24000</span> )</span></code></pre></div>
 <p>Table A1. Number and percentage distribution of individuals with Social Security taxable earnings records in EPUF, by sex, 1951–2006:</p>
-<div class="sourceCode" id="cb1354"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1354-1"><a href="social-security-public-use-data-files-ssa.html#cb1354-1" aria-hidden="true" tabindex="-1"></a>nonzero_2006_earners <span class="ot">&lt;-</span> ssa_df[ ssa_df[ , <span class="st">&#39;tot_cov_earn06&#39;</span> ] <span class="sc">&gt;</span> <span class="dv">0</span> , ]</span>
-<span id="cb1354-2"><a href="social-security-public-use-data-files-ssa.html#cb1354-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">mean</span>( nonzero_2006_earners[ , <span class="st">&#39;tot_cov_earn06&#39;</span> ] ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">30953</span> )</span>
-<span id="cb1354-3"><a href="social-security-public-use-data-files-ssa.html#cb1354-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">quantile</span>( nonzero_2006_earners[ , <span class="st">&#39;tot_cov_earn06&#39;</span> ] )[ <span class="dv">3</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">24000</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1354"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1354-1"><a href="social-security-public-use-data-files-ssa.html#cb1354-1" tabindex="-1"></a>nonzero_2006_earners <span class="ot">&lt;-</span> ssa_df[ ssa_df[ , <span class="st">&#39;tot_cov_earn06&#39;</span> ] <span class="sc">&gt;</span> <span class="dv">0</span> , ]</span>
+<span id="cb1354-2"><a href="social-security-public-use-data-files-ssa.html#cb1354-2" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">mean</span>( nonzero_2006_earners[ , <span class="st">&#39;tot_cov_earn06&#39;</span> ] ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">30953</span> )</span>
+<span id="cb1354-3"><a href="social-security-public-use-data-files-ssa.html#cb1354-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">quantile</span>( nonzero_2006_earners[ , <span class="st">&#39;tot_cov_earn06&#39;</span> ] )[ <span class="dv">3</span> ] , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">24000</span> )</span></code></pre></div>
 <p>This example matches statistics in <a href="https://www.ssa.gov/policy/docs/rsnotes/rsn2012-01.html">Comparing Earnings Estimates from the 2006 Earnings Public-Use File and the Annual Statistical Supplement</a>:</p>
 <p>Table 4. Comparing Supplement and EPUF estimates: Number of all, male, and female workers with any earnings during the year, 1951–2006:</p>
-<div class="sourceCode" id="cb1355"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1355-1"><a href="social-security-public-use-data-files-ssa.html#cb1355-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">nrow</span>( nonzero_2006_earners ) <span class="sc">*</span> <span class="dv">100</span> , <span class="sc">-</span><span class="dv">3</span> ) <span class="sc">==</span> <span class="dv">156280000</span> )</span>
-<span id="cb1355-2"><a href="social-security-public-use-data-files-ssa.html#cb1355-2" aria-hidden="true" tabindex="-1"></a>earners_in_2006_by_sex <span class="ot">&lt;-</span> <span class="fu">table</span>( nonzero_2006_earners[ , <span class="st">&#39;sex&#39;</span> ] ) <span class="sc">*</span> <span class="dv">100</span></span>
-<span id="cb1355-3"><a href="social-security-public-use-data-files-ssa.html#cb1355-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( earners_in_2006_by_sex[ <span class="st">&#39;male&#39;</span> ] , <span class="sc">-</span><span class="dv">3</span> ) <span class="sc">==</span> <span class="dv">81576000</span> )</span>
-<span id="cb1355-4"><a href="social-security-public-use-data-files-ssa.html#cb1355-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( earners_in_2006_by_sex[ <span class="st">&#39;female&#39;</span> ] , <span class="sc">-</span><span class="dv">3</span> ) <span class="sc">==</span> <span class="dv">74681000</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb1355"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1355-1"><a href="social-security-public-use-data-files-ssa.html#cb1355-1" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">nrow</span>( nonzero_2006_earners ) <span class="sc">*</span> <span class="dv">100</span> , <span class="sc">-</span><span class="dv">3</span> ) <span class="sc">==</span> <span class="dv">156280000</span> )</span>
+<span id="cb1355-2"><a href="social-security-public-use-data-files-ssa.html#cb1355-2" tabindex="-1"></a>earners_in_2006_by_sex <span class="ot">&lt;-</span> <span class="fu">table</span>( nonzero_2006_earners[ , <span class="st">&#39;sex&#39;</span> ] ) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb1355-3"><a href="social-security-public-use-data-files-ssa.html#cb1355-3" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( earners_in_2006_by_sex[ <span class="st">&#39;male&#39;</span> ] , <span class="sc">-</span><span class="dv">3</span> ) <span class="sc">==</span> <span class="dv">81576000</span> )</span>
+<span id="cb1355-4"><a href="social-security-public-use-data-files-ssa.html#cb1355-4" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( earners_in_2006_by_sex[ <span class="st">&#39;female&#39;</span> ] , <span class="sc">-</span><span class="dv">3</span> ) <span class="sc">==</span> <span class="dv">74681000</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-dplyr-8" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>dplyr</code>  <a href="social-security-public-use-data-files-ssa.html#analysis-examples-with-dplyr-8" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>dplyr</code> library offers an alternative grammar of data manipulation to base R and SQL syntax. <a href="https://github.com/tidyverse/dplyr/">dplyr</a> offers many verbs, such as <code>summarize</code>, <code>group_by</code>, and <code>mutate</code>, the convenience of pipe-able functions, and the <code>tidyverse</code> style of non-standard evaluation. <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html">This vignette</a> details the available features. As a starting point for SSA users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb1356"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1356-1"><a href="social-security-public-use-data-files-ssa.html#cb1356-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1356-2"><a href="social-security-public-use-data-files-ssa.html#cb1356-2" aria-hidden="true" tabindex="-1"></a>ssa_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>( ssa_df )</span></code></pre></div>
+<div class="sourceCode" id="cb1356"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1356-1"><a href="social-security-public-use-data-files-ssa.html#cb1356-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1356-2"><a href="social-security-public-use-data-files-ssa.html#cb1356-2" tabindex="-1"></a>ssa_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>( ssa_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1357"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1357-1"><a href="social-security-public-use-data-files-ssa.html#cb1357-1" aria-hidden="true" tabindex="-1"></a>ssa_tbl <span class="sc">%&gt;%</span></span>
-<span id="cb1357-2"><a href="social-security-public-use-data-files-ssa.html#cb1357-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( tot_cov_earn3706 ) )</span>
-<span id="cb1357-3"><a href="social-security-public-use-data-files-ssa.html#cb1357-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1357-4"><a href="social-security-public-use-data-files-ssa.html#cb1357-4" aria-hidden="true" tabindex="-1"></a>ssa_tbl <span class="sc">%&gt;%</span></span>
-<span id="cb1357-5"><a href="social-security-public-use-data-files-ssa.html#cb1357-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>( sex ) <span class="sc">%&gt;%</span></span>
-<span id="cb1357-6"><a href="social-security-public-use-data-files-ssa.html#cb1357-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( tot_cov_earn3706 ) )</span></code></pre></div>
+<div class="sourceCode" id="cb1357"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1357-1"><a href="social-security-public-use-data-files-ssa.html#cb1357-1" tabindex="-1"></a>ssa_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb1357-2"><a href="social-security-public-use-data-files-ssa.html#cb1357-2" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( tot_cov_earn3706 ) )</span>
+<span id="cb1357-3"><a href="social-security-public-use-data-files-ssa.html#cb1357-3" tabindex="-1"></a></span>
+<span id="cb1357-4"><a href="social-security-public-use-data-files-ssa.html#cb1357-4" tabindex="-1"></a>ssa_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb1357-5"><a href="social-security-public-use-data-files-ssa.html#cb1357-5" tabindex="-1"></a>    <span class="fu">group_by</span>( sex ) <span class="sc">%&gt;%</span></span>
+<span id="cb1357-6"><a href="social-security-public-use-data-files-ssa.html#cb1357-6" tabindex="-1"></a>    <span class="fu">summarize</span>( <span class="at">mean =</span> <span class="fu">mean</span>( tot_cov_earn3706 ) )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-data.table-8" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>data.table</code>  <a href="social-security-public-use-data-files-ssa.html#analysis-examples-with-data.table-8" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>data.table</code> library provides a high-performance version of base R’s data.frame with syntax and feature enhancements for ease of use, convenience and programming speed. <a href="https://r-datatable.com">data.table</a> offers concise syntax: fast to type, fast to read, fast speed, memory efficiency, a careful API lifecycle management, an active community, and a rich set of features. <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">This vignette</a> details the available features. As a starting point for SSA users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb1358"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1358-1"><a href="social-security-public-use-data-files-ssa.html#cb1358-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb1358-2"><a href="social-security-public-use-data-files-ssa.html#cb1358-2" aria-hidden="true" tabindex="-1"></a>ssa_dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>( ssa_df )</span></code></pre></div>
+<div class="sourceCode" id="cb1358"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1358-1"><a href="social-security-public-use-data-files-ssa.html#cb1358-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb1358-2"><a href="social-security-public-use-data-files-ssa.html#cb1358-2" tabindex="-1"></a>ssa_dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>( ssa_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1359"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1359-1"><a href="social-security-public-use-data-files-ssa.html#cb1359-1" aria-hidden="true" tabindex="-1"></a>ssa_dt[ , <span class="fu">mean</span>( tot_cov_earn3706 ) ]</span>
-<span id="cb1359-2"><a href="social-security-public-use-data-files-ssa.html#cb1359-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1359-3"><a href="social-security-public-use-data-files-ssa.html#cb1359-3" aria-hidden="true" tabindex="-1"></a>ssa_dt[ , <span class="fu">mean</span>( tot_cov_earn3706 ) , by <span class="ot">=</span> sex ]</span></code></pre></div>
+<div class="sourceCode" id="cb1359"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1359-1"><a href="social-security-public-use-data-files-ssa.html#cb1359-1" tabindex="-1"></a>ssa_dt[ , <span class="fu">mean</span>( tot_cov_earn3706 ) ]</span>
+<span id="cb1359-2"><a href="social-security-public-use-data-files-ssa.html#cb1359-2" tabindex="-1"></a></span>
+<span id="cb1359-3"><a href="social-security-public-use-data-files-ssa.html#cb1359-3" tabindex="-1"></a>ssa_dt[ , <span class="fu">mean</span>( tot_cov_earn3706 ) , by <span class="ot">=</span> sex ]</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-duckdb-8" class="section level2 unnumbered hasAnchor">
 <h2>Analysis Examples with <code>duckdb</code>  <a href="social-security-public-use-data-files-ssa.html#analysis-examples-with-duckdb-8" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R <code>duckdb</code> library provides an embedded analytical data management system with support for the Structured Query Language (SQL). <a href="https://duckdb.org">duckdb</a> offers a simple, feature-rich, fast, and free SQL OLAP management system. <a href="https://duckdb.org/docs/api/r">This vignette</a> details the available features. As a starting point for SSA users, this code replicates previously-presented examples:</p>
-<div class="sourceCode" id="cb1360"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1360-1"><a href="social-security-public-use-data-files-ssa.html#cb1360-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(duckdb)</span>
-<span id="cb1360-2"><a href="social-security-public-use-data-files-ssa.html#cb1360-2" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>( duckdb<span class="sc">::</span><span class="fu">duckdb</span>() , <span class="at">dbdir =</span> <span class="st">&#39;my-db.duckdb&#39;</span> )</span>
-<span id="cb1360-3"><a href="social-security-public-use-data-files-ssa.html#cb1360-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>( con , <span class="st">&#39;ssa&#39;</span> , ssa_df )</span></code></pre></div>
+<div class="sourceCode" id="cb1360"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1360-1"><a href="social-security-public-use-data-files-ssa.html#cb1360-1" tabindex="-1"></a><span class="fu">library</span>(duckdb)</span>
+<span id="cb1360-2"><a href="social-security-public-use-data-files-ssa.html#cb1360-2" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>( duckdb<span class="sc">::</span><span class="fu">duckdb</span>() , <span class="at">dbdir =</span> <span class="st">&#39;my-db.duckdb&#39;</span> )</span>
+<span id="cb1360-3"><a href="social-security-public-use-data-files-ssa.html#cb1360-3" tabindex="-1"></a><span class="fu">dbWriteTable</span>( con , <span class="st">&#39;ssa&#39;</span> , ssa_df )</span></code></pre></div>
 <p>Calculate the mean (average) of a linear variable, overall and by groups:</p>
-<div class="sourceCode" id="cb1361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1361-1"><a href="social-security-public-use-data-files-ssa.html#cb1361-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>( con , <span class="st">&#39;SELECT AVG( tot_cov_earn3706 ) FROM ssa&#39;</span> )</span>
-<span id="cb1361-2"><a href="social-security-public-use-data-files-ssa.html#cb1361-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1361-3"><a href="social-security-public-use-data-files-ssa.html#cb1361-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(</span>
-<span id="cb1361-4"><a href="social-security-public-use-data-files-ssa.html#cb1361-4" aria-hidden="true" tabindex="-1"></a>    con ,</span>
-<span id="cb1361-5"><a href="social-security-public-use-data-files-ssa.html#cb1361-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;SELECT</span></span>
-<span id="cb1361-6"><a href="social-security-public-use-data-files-ssa.html#cb1361-6" aria-hidden="true" tabindex="-1"></a><span class="st">        sex ,</span></span>
-<span id="cb1361-7"><a href="social-security-public-use-data-files-ssa.html#cb1361-7" aria-hidden="true" tabindex="-1"></a><span class="st">        AVG( tot_cov_earn3706 )</span></span>
-<span id="cb1361-8"><a href="social-security-public-use-data-files-ssa.html#cb1361-8" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM</span></span>
-<span id="cb1361-9"><a href="social-security-public-use-data-files-ssa.html#cb1361-9" aria-hidden="true" tabindex="-1"></a><span class="st">        ssa</span></span>
-<span id="cb1361-10"><a href="social-security-public-use-data-files-ssa.html#cb1361-10" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY</span></span>
-<span id="cb1361-11"><a href="social-security-public-use-data-files-ssa.html#cb1361-11" aria-hidden="true" tabindex="-1"></a><span class="st">        sex&#39;</span></span>
-<span id="cb1361-12"><a href="social-security-public-use-data-files-ssa.html#cb1361-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb1361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1361-1"><a href="social-security-public-use-data-files-ssa.html#cb1361-1" tabindex="-1"></a><span class="fu">dbGetQuery</span>( con , <span class="st">&#39;SELECT AVG( tot_cov_earn3706 ) FROM ssa&#39;</span> )</span>
+<span id="cb1361-2"><a href="social-security-public-use-data-files-ssa.html#cb1361-2" tabindex="-1"></a></span>
+<span id="cb1361-3"><a href="social-security-public-use-data-files-ssa.html#cb1361-3" tabindex="-1"></a><span class="fu">dbGetQuery</span>(</span>
+<span id="cb1361-4"><a href="social-security-public-use-data-files-ssa.html#cb1361-4" tabindex="-1"></a>    con ,</span>
+<span id="cb1361-5"><a href="social-security-public-use-data-files-ssa.html#cb1361-5" tabindex="-1"></a>    <span class="st">&#39;SELECT</span></span>
+<span id="cb1361-6"><a href="social-security-public-use-data-files-ssa.html#cb1361-6" tabindex="-1"></a><span class="st">        sex ,</span></span>
+<span id="cb1361-7"><a href="social-security-public-use-data-files-ssa.html#cb1361-7" tabindex="-1"></a><span class="st">        AVG( tot_cov_earn3706 )</span></span>
+<span id="cb1361-8"><a href="social-security-public-use-data-files-ssa.html#cb1361-8" tabindex="-1"></a><span class="st">    FROM</span></span>
+<span id="cb1361-9"><a href="social-security-public-use-data-files-ssa.html#cb1361-9" tabindex="-1"></a><span class="st">        ssa</span></span>
+<span id="cb1361-10"><a href="social-security-public-use-data-files-ssa.html#cb1361-10" tabindex="-1"></a><span class="st">    GROUP BY</span></span>
+<span id="cb1361-11"><a href="social-security-public-use-data-files-ssa.html#cb1361-11" tabindex="-1"></a><span class="st">        sex&#39;</span></span>
+<span id="cb1361-12"><a href="social-security-public-use-data-files-ssa.html#cb1361-12" tabindex="-1"></a>)</span></code></pre></div>
 
 </div>
 </div>
