@@ -1,4 +1,4 @@
-commit_memo <- "'cps fix related to https://github.com/walkerke/tigris/issues/201'"
+commit_memo <- "'cps try windows & linux'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
