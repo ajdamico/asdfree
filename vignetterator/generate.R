@@ -1,4 +1,4 @@
-commit_memo <- "'a to z'"
+commit_memo <- "'cps fix related to https://github.com/walkerke/tigris/issues/201'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
