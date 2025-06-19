@@ -76,7 +76,7 @@ library(haven)
 
 sas_tf <- tempfile()
 
-sas_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v2.zip"
+sas_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v3.zip"
 
 download.file( sas_url , sas_tf , mode = 'wb' )
 
@@ -181,39 +181,17 @@ needs_srvyr_block: yes
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-This example matches the statistic, standard error, and relative standard error shown on PDF page 8 of [Using the microdata file to compute estimates and relative standard errors (RSEs)](https://www.eia.gov/consumption/residential/data/2020/pdf/microdata-guide.pdf)
+This example matches the statistic, standard error, and relative standard error shown on PDF page 7 of [Using the microdata file to compute estimates and relative standard errors (RSEs)](https://www.eia.gov/consumption/residential/data/2020/pdf/microdata-guide.pdf#page=7)
 
 
 
 
 ```{r eval = FALSE , results = "hide" }
-sas_v1_tf <- tempfile()
 
-sas_v1_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v1.zip"
-
-download.file( sas_v1_url , sas_v1_tf , mode = 'wb' )
-
-chapter_tag_v1_tbl <- read_sas( sas_v1_tf )
-
-chapter_tag_v1_df <- data.frame( chapter_tag_v1_tbl )
-
-names( chapter_tag_v1_df ) <- tolower( names( chapter_tag_v1_df ) )
-
-chapter_tag_v1_design <-
-	svrepdesign(
-		data = chapter_tag_v1_df ,
-		weight = ~ nweight ,
-		repweights = 'nweight[1-9]+' ,
-		type = 'JK1' ,
-		combined.weights = TRUE ,
-		scale = 59 / 60 ,
-		mse = TRUE
-	)
-
-chapter_tag_v1_design <- 
+chapter_tag_design <- 
 	update( 
 
-		chapter_tag_v1_design , 
+		chapter_tag_design , 
 
 		natural_gas_mainspace_heat = as.numeric( fuelheat == 1 )
 		
@@ -222,12 +200,12 @@ chapter_tag_v1_design <-
 result <-
 	svytotal( 
 		~ natural_gas_mainspace_heat , 
-		chapter_tag_v1_design 
+		chapter_tag_design 
 	)
 
-stopifnot( round( coef( result ) , 0 ) == 56245389 )
-stopifnot( round( SE( result ) , 0 ) == 545591 )
-stopifnot( round( 100 * SE( result ) / coef( result ) , 2 ) == 0.97 )
+stopifnot( round( coef( result ) , 0 ) == 62713449 )
+stopifnot( round( SE( result ) , 0 ) == 483047 )
+stopifnot( round( 100 * SE( result ) / coef( result ) , 2 ) == 0.77 )
 ```
 
 ~~~

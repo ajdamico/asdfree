@@ -1258,7 +1258,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1181-2"><a href="residential-energy-consumption-survey-recs.html#cb1181-2" tabindex="-1"></a></span>
 <span id="cb1181-3"><a href="residential-energy-consumption-survey-recs.html#cb1181-3" tabindex="-1"></a>sas_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb1181-4"><a href="residential-energy-consumption-survey-recs.html#cb1181-4" tabindex="-1"></a></span>
-<span id="cb1181-5"><a href="residential-energy-consumption-survey-recs.html#cb1181-5" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v2.zip&quot;</span></span>
+<span id="cb1181-5"><a href="residential-energy-consumption-survey-recs.html#cb1181-5" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v3.zip&quot;</span></span>
 <span id="cb1181-6"><a href="residential-energy-consumption-survey-recs.html#cb1181-6" tabindex="-1"></a></span>
 <span id="cb1181-7"><a href="residential-energy-consumption-survey-recs.html#cb1181-7" tabindex="-1"></a><span class="fu">download.file</span>( sas_url , sas_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
 <span id="cb1181-8"><a href="residential-energy-consumption-survey-recs.html#cb1181-8" tabindex="-1"></a></span>
@@ -1459,48 +1459,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="replication-example-38" class="section level2 unnumbered hasAnchor">
 <h2>Replication Example<a href="residential-energy-consumption-survey-recs.html#replication-example-38" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>This example matches the statistic, standard error, and relative standard error shown on PDF page 8 of <a href="https://www.eia.gov/consumption/residential/data/2020/pdf/microdata-guide.pdf">Using the microdata file to compute estimates and relative standard errors (RSEs)</a></p>
-<div class="sourceCode" id="cb1204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1204-1"><a href="residential-energy-consumption-survey-recs.html#cb1204-1" tabindex="-1"></a>sas_v1_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb1204-2"><a href="residential-energy-consumption-survey-recs.html#cb1204-2" tabindex="-1"></a></span>
-<span id="cb1204-3"><a href="residential-energy-consumption-survey-recs.html#cb1204-3" tabindex="-1"></a>sas_v1_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v1.zip&quot;</span></span>
-<span id="cb1204-4"><a href="residential-energy-consumption-survey-recs.html#cb1204-4" tabindex="-1"></a></span>
-<span id="cb1204-5"><a href="residential-energy-consumption-survey-recs.html#cb1204-5" tabindex="-1"></a><span class="fu">download.file</span>( sas_v1_url , sas_v1_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb1204-6"><a href="residential-energy-consumption-survey-recs.html#cb1204-6" tabindex="-1"></a></span>
-<span id="cb1204-7"><a href="residential-energy-consumption-survey-recs.html#cb1204-7" tabindex="-1"></a>recs_v1_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( sas_v1_tf )</span>
-<span id="cb1204-8"><a href="residential-energy-consumption-survey-recs.html#cb1204-8" tabindex="-1"></a></span>
-<span id="cb1204-9"><a href="residential-energy-consumption-survey-recs.html#cb1204-9" tabindex="-1"></a>recs_v1_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( recs_v1_tbl )</span>
-<span id="cb1204-10"><a href="residential-energy-consumption-survey-recs.html#cb1204-10" tabindex="-1"></a></span>
-<span id="cb1204-11"><a href="residential-energy-consumption-survey-recs.html#cb1204-11" tabindex="-1"></a><span class="fu">names</span>( recs_v1_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( recs_v1_df ) )</span>
-<span id="cb1204-12"><a href="residential-energy-consumption-survey-recs.html#cb1204-12" tabindex="-1"></a></span>
-<span id="cb1204-13"><a href="residential-energy-consumption-survey-recs.html#cb1204-13" tabindex="-1"></a>recs_v1_design <span class="ot">&lt;-</span></span>
-<span id="cb1204-14"><a href="residential-energy-consumption-survey-recs.html#cb1204-14" tabindex="-1"></a>    <span class="fu">svrepdesign</span>(</span>
-<span id="cb1204-15"><a href="residential-energy-consumption-survey-recs.html#cb1204-15" tabindex="-1"></a>        <span class="at">data =</span> recs_v1_df ,</span>
-<span id="cb1204-16"><a href="residential-energy-consumption-survey-recs.html#cb1204-16" tabindex="-1"></a>        <span class="at">weight =</span> <span class="sc">~</span> nweight ,</span>
-<span id="cb1204-17"><a href="residential-energy-consumption-survey-recs.html#cb1204-17" tabindex="-1"></a>        <span class="at">repweights =</span> <span class="st">&#39;nweight[1-9]+&#39;</span> ,</span>
-<span id="cb1204-18"><a href="residential-energy-consumption-survey-recs.html#cb1204-18" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&#39;JK1&#39;</span> ,</span>
-<span id="cb1204-19"><a href="residential-energy-consumption-survey-recs.html#cb1204-19" tabindex="-1"></a>        <span class="at">combined.weights =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb1204-20"><a href="residential-energy-consumption-survey-recs.html#cb1204-20" tabindex="-1"></a>        <span class="at">scale =</span> <span class="dv">59</span> <span class="sc">/</span> <span class="dv">60</span> ,</span>
-<span id="cb1204-21"><a href="residential-energy-consumption-survey-recs.html#cb1204-21" tabindex="-1"></a>        <span class="at">mse =</span> <span class="cn">TRUE</span></span>
-<span id="cb1204-22"><a href="residential-energy-consumption-survey-recs.html#cb1204-22" tabindex="-1"></a>    )</span>
-<span id="cb1204-23"><a href="residential-energy-consumption-survey-recs.html#cb1204-23" tabindex="-1"></a></span>
-<span id="cb1204-24"><a href="residential-energy-consumption-survey-recs.html#cb1204-24" tabindex="-1"></a>recs_v1_design <span class="ot">&lt;-</span> </span>
-<span id="cb1204-25"><a href="residential-energy-consumption-survey-recs.html#cb1204-25" tabindex="-1"></a>    <span class="fu">update</span>( </span>
-<span id="cb1204-26"><a href="residential-energy-consumption-survey-recs.html#cb1204-26" tabindex="-1"></a></span>
-<span id="cb1204-27"><a href="residential-energy-consumption-survey-recs.html#cb1204-27" tabindex="-1"></a>        recs_v1_design , </span>
-<span id="cb1204-28"><a href="residential-energy-consumption-survey-recs.html#cb1204-28" tabindex="-1"></a></span>
-<span id="cb1204-29"><a href="residential-energy-consumption-survey-recs.html#cb1204-29" tabindex="-1"></a>        <span class="at">natural_gas_mainspace_heat =</span> <span class="fu">as.numeric</span>( fuelheat <span class="sc">==</span> <span class="dv">1</span> )</span>
-<span id="cb1204-30"><a href="residential-energy-consumption-survey-recs.html#cb1204-30" tabindex="-1"></a>        </span>
-<span id="cb1204-31"><a href="residential-energy-consumption-survey-recs.html#cb1204-31" tabindex="-1"></a>    )</span>
-<span id="cb1204-32"><a href="residential-energy-consumption-survey-recs.html#cb1204-32" tabindex="-1"></a>    </span>
-<span id="cb1204-33"><a href="residential-energy-consumption-survey-recs.html#cb1204-33" tabindex="-1"></a>result <span class="ot">&lt;-</span></span>
-<span id="cb1204-34"><a href="residential-energy-consumption-survey-recs.html#cb1204-34" tabindex="-1"></a>    <span class="fu">svytotal</span>( </span>
-<span id="cb1204-35"><a href="residential-energy-consumption-survey-recs.html#cb1204-35" tabindex="-1"></a>        <span class="sc">~</span> natural_gas_mainspace_heat , </span>
-<span id="cb1204-36"><a href="residential-energy-consumption-survey-recs.html#cb1204-36" tabindex="-1"></a>        recs_v1_design </span>
-<span id="cb1204-37"><a href="residential-energy-consumption-survey-recs.html#cb1204-37" tabindex="-1"></a>    )</span>
-<span id="cb1204-38"><a href="residential-energy-consumption-survey-recs.html#cb1204-38" tabindex="-1"></a></span>
-<span id="cb1204-39"><a href="residential-energy-consumption-survey-recs.html#cb1204-39" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">56245389</span> )</span>
-<span id="cb1204-40"><a href="residential-energy-consumption-survey-recs.html#cb1204-40" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">545591</span> )</span>
-<span id="cb1204-41"><a href="residential-energy-consumption-survey-recs.html#cb1204-41" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="dv">100</span> <span class="sc">*</span> <span class="fu">SE</span>( result ) <span class="sc">/</span> <span class="fu">coef</span>( result ) , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.97</span> )</span></code></pre></div>
+<p>This example matches the statistic, standard error, and relative standard error shown on PDF page 7 of <a href="https://www.eia.gov/consumption/residential/data/2020/pdf/microdata-guide.pdf#page=7">Using the microdata file to compute estimates and relative standard errors (RSEs)</a></p>
+<div class="sourceCode" id="cb1204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1204-1"><a href="residential-energy-consumption-survey-recs.html#cb1204-1" tabindex="-1"></a>recs_design <span class="ot">&lt;-</span> </span>
+<span id="cb1204-2"><a href="residential-energy-consumption-survey-recs.html#cb1204-2" tabindex="-1"></a>    <span class="fu">update</span>( </span>
+<span id="cb1204-3"><a href="residential-energy-consumption-survey-recs.html#cb1204-3" tabindex="-1"></a></span>
+<span id="cb1204-4"><a href="residential-energy-consumption-survey-recs.html#cb1204-4" tabindex="-1"></a>        recs_design , </span>
+<span id="cb1204-5"><a href="residential-energy-consumption-survey-recs.html#cb1204-5" tabindex="-1"></a></span>
+<span id="cb1204-6"><a href="residential-energy-consumption-survey-recs.html#cb1204-6" tabindex="-1"></a>        <span class="at">natural_gas_mainspace_heat =</span> <span class="fu">as.numeric</span>( fuelheat <span class="sc">==</span> <span class="dv">1</span> )</span>
+<span id="cb1204-7"><a href="residential-energy-consumption-survey-recs.html#cb1204-7" tabindex="-1"></a>        </span>
+<span id="cb1204-8"><a href="residential-energy-consumption-survey-recs.html#cb1204-8" tabindex="-1"></a>    )</span>
+<span id="cb1204-9"><a href="residential-energy-consumption-survey-recs.html#cb1204-9" tabindex="-1"></a>    </span>
+<span id="cb1204-10"><a href="residential-energy-consumption-survey-recs.html#cb1204-10" tabindex="-1"></a>result <span class="ot">&lt;-</span></span>
+<span id="cb1204-11"><a href="residential-energy-consumption-survey-recs.html#cb1204-11" tabindex="-1"></a>    <span class="fu">svytotal</span>( </span>
+<span id="cb1204-12"><a href="residential-energy-consumption-survey-recs.html#cb1204-12" tabindex="-1"></a>        <span class="sc">~</span> natural_gas_mainspace_heat , </span>
+<span id="cb1204-13"><a href="residential-energy-consumption-survey-recs.html#cb1204-13" tabindex="-1"></a>        recs_design </span>
+<span id="cb1204-14"><a href="residential-energy-consumption-survey-recs.html#cb1204-14" tabindex="-1"></a>    )</span>
+<span id="cb1204-15"><a href="residential-energy-consumption-survey-recs.html#cb1204-15" tabindex="-1"></a></span>
+<span id="cb1204-16"><a href="residential-energy-consumption-survey-recs.html#cb1204-16" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">coef</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">62713449</span> )</span>
+<span id="cb1204-17"><a href="residential-energy-consumption-survey-recs.html#cb1204-17" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="fu">SE</span>( result ) , <span class="dv">0</span> ) <span class="sc">==</span> <span class="dv">483047</span> )</span>
+<span id="cb1204-18"><a href="residential-energy-consumption-survey-recs.html#cb1204-18" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">round</span>( <span class="dv">100</span> <span class="sc">*</span> <span class="fu">SE</span>( result ) <span class="sc">/</span> <span class="fu">coef</span>( result ) , <span class="dv">2</span> ) <span class="sc">==</span> <span class="fl">0.77</span> )</span></code></pre></div>
 <hr />
 </div>
 <div id="analysis-examples-with-srvyr-27" class="section level2 unnumbered hasAnchor">
