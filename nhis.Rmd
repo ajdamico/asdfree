@@ -18,13 +18,13 @@ America's most detailed household survey of health status and medical experience
 
 Four Example Strengths & Limitations:
 
-✔️ [PRICSSA](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2022/2022-NHIS-PRICSSA-508.pdf)
+✔️ [PRICSSA](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2024/2024-NHIS-PRICSSA-508.pdf)
 
 ✔️ [Annual and rotating core questionnaires allow trend analysis](https://www.cdc.gov/nchs/data/nhis/Sample-Questionnaire-Brochure.pdf#page=3)
 
-❌ [High rate of missingness for family income questions](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2022/NHIS2022-imputation-techdoc-508.pdf)
+❌ [High rate of missingness for family income questions](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2024/NHIS2024-imputation-techdoc-508.pdf)
 
-❌ [2019 redesign interviews only one adult and one child (if present) per household](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Survey_Questionnaires/NHIS/2022/advance-letter-2022.pdf)
+❌ [2019 redesign interviews only one adult and one child (if present) per household](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Survey_Questionnaires/NHIS/2024/advance-letter-2024-508.pdf)
 
 <br>
 
@@ -40,7 +40,7 @@ Three Example Findings:
 
 Two Methodology Documents:
 
-> [2022 Survey Description](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2022/srvydesc-508.pdf)
+> [2024 Survey Description](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2024/srvydesc-508.pdf)
 
 > [Wikipedia Entry](https://en.wikipedia.org/wiki/National_Health_Interview_Survey)
 
@@ -92,12 +92,12 @@ Download and import the sample adult interview and imputed income files:
 ```{r eval = FALSE , results = "hide" }
 nhis_df <-
 	nhis_csv_import( 
-		"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adult21csv.zip" 
+		"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2024/adult24csv.zip" 
 	)
 
 imputed_income_df <- 
 	nhis_csv_import( 
-		"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2021/adultinc21csv.zip" 
+		"https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2024/adultinc24csv.zip" 
 	)
 ```
 
@@ -360,15 +360,16 @@ summary( glm_result )
 
 ## Replication Example {-}
 
-This example matches statistics and standard errors within 0.01% from [Figure 3](https://www.cdc.gov/nchs/data/databriefs/db470-tables.pdf#3) of this [Characteristics of Adults Aged 18–64 Who Did Not Take Medication as Prescribed to Reduce Costs](https://www.cdc.gov/nchs/products/databriefs/db470.htm) Data Brief:
+This example matches statistics and standard errors from PDF page 34 of [Multiple Imputation of Family Income in 2024 National Health
+Interview Survey: Methods](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHIS/2024/NHIS2024-imputation-techdoc-508.pdf#page=34):
 
 ```{r eval = FALSE , results = "hide" }
 results <-
 	MIcombine( 
 		with(
-			subset( nhis_design , agep_a < 65 ) , 
+			subset( nhis_design , notcov_a %in% 1:2 ) , 
 			svyby(
-				~ as.numeric( rxsk12m_a == 1 | rxls12m_a == 1 | rxdl12m_a == 1 ) , 
+				~ as.numeric( notcov_a == 1 ) , 
 				~ poverty_category , 
 				svymean , 
 				na.rm = TRUE 
@@ -378,13 +379,13 @@ results <-
 
 stopifnot(
 	all(
-		as.numeric( round( coef( results ) , 3 ) ) == c( 0.145 , 0.138 , 0.099 , 0.039 )
+		as.numeric( round( coef( results ) , 4 ) ) == c( 0.1776 , 0.1693 , 0.0994 , 0.0333 )
 	) 
 )
 
 stopifnot(
 	all( 
-		as.numeric( round( SE( results ) , 5 ) ) - c( 0.0126 , 0.0098 , 0.0062 , 0.0031 ) < 0.0001
+		as.numeric( round( SE( results ) , 4 ) ) == c( 0.0096 , 0.0075 , 0.0044 , 0.0022 )
 	) 
 )
 
