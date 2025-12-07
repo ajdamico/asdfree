@@ -1,4 +1,4 @@
-commit_memo <- "'nov 2025'"
+commit_memo <- "'acs 2024'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -384,7 +384,7 @@ rmd_files <- grep( "\\.Rmd$" , list.files( file.path( path.expand( "~" ) , "Gith
 ci_rmd_files <- sapply( rmd_files , function( w ) any( grepl( "Github Actions Badge" , readLines( w ) ) ) )
 ci_rmd_files <- names( ci_rmd_files[ ci_rmd_files ] )
 
-# stop( 'correct' )
+stop( 'correct' )
 
 for( this_ci_file in ci_rmd_files ){
 
