@@ -105,7 +105,7 @@ this_url <-
 	paste0(
 		"https://ftp.ibge.gov.br/Trabalho_e_Rendimento/" ,
 		"Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/" ,
-		"Trimestral/Microdados/2023/PNADC_012023.zip"
+		"Trimestral/Microdados/2023/PNADC_012023_20250815.zip"
 	)
 
 download.file( this_url , this_tf , mode = 'wb' )
@@ -274,33 +274,33 @@ svygini( ~ vd4020n , chapter_tag_design , na.rm = TRUE )
 ~~~{replication_example_block}
 ## Replication Example {-}
 
-This example matches statistics and coefficients of variation from [Tabela 4092 - Pessoas de 14 anos ou mais de idade, por condição em relação à força de trabalho e condição de ocupação](https://sidra.ibge.gov.br/tabela/4092):
+This example matches statistics and coefficients of variation from [Tabela 4092 - Pessoas de 14 anos ou mais de idade, por condição em relação à força de trabalho e condição de ocupação](https://sidra.ibge.gov.br/tabela/4092#/n1/all/n6/all/v/1641,4087/p/202301/c629/all/d/v4087%201/l/v,c629,t+p/resultado):
 
 ```{r eval = FALSE , results = "hide" }
 nationwide_adult_population <- svytotal( ~ pia , chapter_tag_design , na.rm = TRUE )
 	
-stopifnot( round( coef( nationwide_adult_population ) / 1000000 , 3 ) == 174.228 )
+stopifnot( round( coef( nationwide_adult_population ) / 1000000 , 3 ) == 171.116 )
 stopifnot( round( cv( nationwide_adult_population ) / 1000000 , 3 ) == 0 )
 	
 nationwide_labor_force <- svytotal( ~ pea_c , chapter_tag_design , na.rm = TRUE )
 
-stopifnot( round( coef( nationwide_labor_force ) / 1000000 , 3 ) == 107.257 )
+stopifnot( round( coef( nationwide_labor_force ) / 1000000 , 3 ) == 105.225 )
 stopifnot( round( cv( nationwide_labor_force ) * 100 , 1 ) == 0.2 )
 	
 nationwide_employed <- svytotal( ~ ocup_c , chapter_tag_design , na.rm = TRUE )
 
-stopifnot( round( coef( nationwide_employed ) / 1000000 , 3 ) == 97.825 )
+stopifnot( round( coef( nationwide_employed ) / 1000000 , 3 ) == 95.978 )
 stopifnot( round( cv( nationwide_employed ) * 100 , 1 ) == 0.2 )
 	
 nationwide_unemployed <- svytotal( ~ desocup30 , chapter_tag_design , na.rm = TRUE )
 
-stopifnot( round( coef( nationwide_unemployed ) / 1000000 , 3 ) == 9.432 )
+stopifnot( round( coef( nationwide_unemployed ) / 1000000 , 3 ) == 9.247 )
 stopifnot( round( cv( nationwide_unemployed ) * 100 , 1 ) == 1.2 )
 	
 nationwide_not_in_labor_force <-
 	svytotal( ~ as.numeric( pia & !pea_c ) , chapter_tag_design , na.rm = TRUE )
 
-stopifnot( round( coef( nationwide_not_in_labor_force ) / 1000000 , 3 ) == 66.972 )
+stopifnot( round( coef( nationwide_not_in_labor_force ) / 1000000 , 3 ) == 65.891 )
 stopifnot( round( cv( nationwide_not_in_labor_force ) * 100 , 1 ) == 0.3 )
 	
 
