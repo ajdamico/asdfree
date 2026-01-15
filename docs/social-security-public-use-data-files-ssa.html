@@ -1202,7 +1202,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="social-security-public-use-data-files-ssa" class="section level1 unnumbered hasAnchor">
 <h1>Social Security Public-Use Data Files (SSA)<a href="social-security-public-use-data-files-ssa.html#social-security-public-use-data-files-ssa" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3" /></a> <a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a> <a href="https://www.eventbrite.com/e/1977986334372"><img src="https://img.shields.io/badge/Free%20R%20Training%20in%20Arlington%20VA-February%2010th,%202026-yellow" alt="Arlington VA: February 10th, 2026"></a> <a href="https://www.eventbrite.com/e/1978765816825"><img src="https://img.shields.io/badge/Free%20Survey%20Analysis%20Workshop%20in%20Falls%20Church%20VA-February%2011th,%202026-orange" alt="Falls Church VA: February 11th, 2026"></a></p>
+<p><a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3" /></a> <a href="https://github.com/asdfree/ssa/actions"><img src="https://github.com/asdfree/ssa/actions/workflows/r.yml/badge.svg" alt="Github Actions Badge"></a> <a href="https://www.eventbrite.com/e/1977986334372"><img src="https://img.shields.io/badge/Free%20R%20Training%20in%20Arlington%20VA-February%2010th,%202026-yellow" alt="Arlington VA: February 10th, 2026"></a> <a href="https://www.eventbrite.com/e/1978765816825"><img src="https://img.shields.io/badge/Free%20Workshop%20in%20Falls%20Church%20VA-February%2011th,%202026-orange" alt="Falls Church VA: February 11th, 2026"></a></p>
 <p>Microdata from administrative sources like the Master Beneficiary Record, Supplemental Security Record.</p>
 <ul>
 <li><p>Tables contain either one record per person or one record per person per year.</p></li>
@@ -1233,29 +1233,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb1334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1334-1"><a href="social-security-public-use-data-files-ssa.html#cb1334-1" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
 <span id="cb1334-2"><a href="social-security-public-use-data-files-ssa.html#cb1334-2" tabindex="-1"></a><span class="fu">library</span>(curl)</span>
 <span id="cb1334-3"><a href="social-security-public-use-data-files-ssa.html#cb1334-3" tabindex="-1"></a></span>
-<span id="cb1334-4"><a href="social-security-public-use-data-files-ssa.html#cb1334-4" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb1334-4"><a href="social-security-public-use-data-files-ssa.html#cb1334-4" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="fu">new_handle</span>()</span>
 <span id="cb1334-5"><a href="social-security-public-use-data-files-ssa.html#cb1334-5" tabindex="-1"></a></span>
-<span id="cb1334-6"><a href="social-security-public-use-data-files-ssa.html#cb1334-6" tabindex="-1"></a>ssa_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip&quot;</span></span>
+<span id="cb1334-6"><a href="social-security-public-use-data-files-ssa.html#cb1334-6" tabindex="-1"></a><span class="fu">handle_setopt</span>( h , <span class="at">verbose =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb1334-7"><a href="social-security-public-use-data-files-ssa.html#cb1334-7" tabindex="-1"></a></span>
-<span id="cb1334-8"><a href="social-security-public-use-data-files-ssa.html#cb1334-8" tabindex="-1"></a><span class="fu">curl_download</span>( ssa_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb1334-8"><a href="social-security-public-use-data-files-ssa.html#cb1334-8" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb1334-9"><a href="social-security-public-use-data-files-ssa.html#cb1334-9" tabindex="-1"></a></span>
-<span id="cb1334-10"><a href="social-security-public-use-data-files-ssa.html#cb1334-10" tabindex="-1"></a>ssa_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb1334-10"><a href="social-security-public-use-data-files-ssa.html#cb1334-10" tabindex="-1"></a>ssa_url <span class="ot">&lt;-</span> <span class="st">&quot;https://www.ssa.gov/policy/docs/microdata/epuf/epuf2006_sas_files.zip&quot;</span></span>
 <span id="cb1334-11"><a href="social-security-public-use-data-files-ssa.html#cb1334-11" tabindex="-1"></a></span>
-<span id="cb1334-12"><a href="social-security-public-use-data-files-ssa.html#cb1334-12" tabindex="-1"></a>ssa_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;demographic&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1334-12"><a href="social-security-public-use-data-files-ssa.html#cb1334-12" tabindex="-1"></a><span class="fu">curl_download</span>( ssa_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> , <span class="at">handle =</span> h )</span>
 <span id="cb1334-13"><a href="social-security-public-use-data-files-ssa.html#cb1334-13" tabindex="-1"></a></span>
-<span id="cb1334-14"><a href="social-security-public-use-data-files-ssa.html#cb1334-14" tabindex="-1"></a>annual_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;annual&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1334-14"><a href="social-security-public-use-data-files-ssa.html#cb1334-14" tabindex="-1"></a>ssa_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb1334-15"><a href="social-security-public-use-data-files-ssa.html#cb1334-15" tabindex="-1"></a></span>
-<span id="cb1334-16"><a href="social-security-public-use-data-files-ssa.html#cb1334-16" tabindex="-1"></a>ssa_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( ssa_fn )</span>
+<span id="cb1334-16"><a href="social-security-public-use-data-files-ssa.html#cb1334-16" tabindex="-1"></a>ssa_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;demographic&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb1334-17"><a href="social-security-public-use-data-files-ssa.html#cb1334-17" tabindex="-1"></a></span>
-<span id="cb1334-18"><a href="social-security-public-use-data-files-ssa.html#cb1334-18" tabindex="-1"></a>annual_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( annual_fn )</span>
+<span id="cb1334-18"><a href="social-security-public-use-data-files-ssa.html#cb1334-18" tabindex="-1"></a>annual_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;annual&#39;</span> , ssa_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb1334-19"><a href="social-security-public-use-data-files-ssa.html#cb1334-19" tabindex="-1"></a></span>
-<span id="cb1334-20"><a href="social-security-public-use-data-files-ssa.html#cb1334-20" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( ssa_tbl )</span>
+<span id="cb1334-20"><a href="social-security-public-use-data-files-ssa.html#cb1334-20" tabindex="-1"></a>ssa_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( ssa_fn )</span>
 <span id="cb1334-21"><a href="social-security-public-use-data-files-ssa.html#cb1334-21" tabindex="-1"></a></span>
-<span id="cb1334-22"><a href="social-security-public-use-data-files-ssa.html#cb1334-22" tabindex="-1"></a>annual_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( annual_tbl )</span>
+<span id="cb1334-22"><a href="social-security-public-use-data-files-ssa.html#cb1334-22" tabindex="-1"></a>annual_tbl <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( annual_fn )</span>
 <span id="cb1334-23"><a href="social-security-public-use-data-files-ssa.html#cb1334-23" tabindex="-1"></a></span>
-<span id="cb1334-24"><a href="social-security-public-use-data-files-ssa.html#cb1334-24" tabindex="-1"></a><span class="fu">names</span>( ssa_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( ssa_df ) )</span>
+<span id="cb1334-24"><a href="social-security-public-use-data-files-ssa.html#cb1334-24" tabindex="-1"></a>ssa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( ssa_tbl )</span>
 <span id="cb1334-25"><a href="social-security-public-use-data-files-ssa.html#cb1334-25" tabindex="-1"></a></span>
-<span id="cb1334-26"><a href="social-security-public-use-data-files-ssa.html#cb1334-26" tabindex="-1"></a><span class="fu">names</span>( annual_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( annual_df ) )</span></code></pre></div>
+<span id="cb1334-26"><a href="social-security-public-use-data-files-ssa.html#cb1334-26" tabindex="-1"></a>annual_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( annual_tbl )</span>
+<span id="cb1334-27"><a href="social-security-public-use-data-files-ssa.html#cb1334-27" tabindex="-1"></a></span>
+<span id="cb1334-28"><a href="social-security-public-use-data-files-ssa.html#cb1334-28" tabindex="-1"></a><span class="fu">names</span>( ssa_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( ssa_df ) )</span>
+<span id="cb1334-29"><a href="social-security-public-use-data-files-ssa.html#cb1334-29" tabindex="-1"></a></span>
+<span id="cb1334-30"><a href="social-security-public-use-data-files-ssa.html#cb1334-30" tabindex="-1"></a><span class="fu">names</span>( annual_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( annual_df ) )</span></code></pre></div>
 <p>Sum up 1951-1952 and 1953-2006 earnings, and also 1953-2006 credits, copying the naming convention:</p>
 <div class="sourceCode" id="cb1335"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1335-1"><a href="social-security-public-use-data-files-ssa.html#cb1335-1" tabindex="-1"></a>summed_earnings_5152 <span class="ot">&lt;-</span></span>
 <span id="cb1335-2"><a href="social-security-public-use-data-files-ssa.html#cb1335-2" tabindex="-1"></a>    <span class="fu">with</span>( </span>
