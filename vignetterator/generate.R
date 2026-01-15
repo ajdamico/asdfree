@@ -1,4 +1,4 @@
-commit_memo <- "'pns, brfss, & gss bumps, cog, nbs, nppes, nhanes, & ssa attempts'"
+commit_memo <- "'nhts bump'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
