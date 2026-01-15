@@ -42,6 +42,8 @@ One Haiku:
 
 Download and import the national file:
 ```{r eval = FALSE , results = "hide" }
+options( timeout = 999 )
+
 library(readr)
 
 tf <- tempfile()
@@ -82,12 +84,12 @@ column_names <- gsub( "\\\\." , "_" , tolower( column_names ) )
 column_types <-
 	ifelse( 
 		grepl( "code" , column_names ) & 
-		!grepl( "country|state|gender|taxonomy|postal" , column_names ) , 
+		!grepl( "country|state|sex|taxonomy|postal" , column_names ) , 
 		'n' , 'c' 
 	)
 
 columns_to_import <-
-	c( "entity_type_code" , "provider_gender_code" , "provider_enumeration_date" ,
+	c( "entity_type_code" , "provider_sex_code" , "provider_enumeration_date" ,
 	"is_sole_proprietor" , "provider_business_practice_location_address_state_name" )
 
 stopifnot( all( columns_to_import %in% column_names ) )
@@ -129,7 +131,7 @@ chapter_tag_df <-
 	)
 ~~~
 
-group_by_variable: provider_gender_code
+group_by_variable: provider_sex_code
 linear_variable: provider_enumeration_year
 linear_narm: , na.rm = TRUE
 categorical_variable: is_sole_proprietor

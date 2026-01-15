@@ -1224,18 +1224,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="download-import-preparation-38" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="pesquisa-nacional-de-saude-pns.html#download-import-preparation-38" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download and import the dictionary file:</p>
-<div class="sourceCode" id="cb1116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1116-1"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-1" tabindex="-1"></a>dictionary_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<div class="sourceCode" id="cb1116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1116-1"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-1" tabindex="-1"></a><span class="fu">options</span>( <span class="at">timeout =</span> <span class="dv">999</span> )</span>
 <span id="cb1116-2"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-2" tabindex="-1"></a></span>
-<span id="cb1116-3"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-3" tabindex="-1"></a>dictionary_url <span class="ot">&lt;-</span></span>
-<span id="cb1116-4"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-4" tabindex="-1"></a>    <span class="st">&quot;https://ftp.ibge.gov.br/PNS/2019/Microdados/Documentacao/Dicionario_e_input_20220530.zip&quot;</span></span>
-<span id="cb1116-5"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-5" tabindex="-1"></a></span>
-<span id="cb1116-6"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-6" tabindex="-1"></a><span class="fu">download.file</span>( dictionary_url , dictionary_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb1116-3"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-3" tabindex="-1"></a>dictionary_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb1116-4"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-4" tabindex="-1"></a></span>
+<span id="cb1116-5"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-5" tabindex="-1"></a>dictionary_url <span class="ot">&lt;-</span></span>
+<span id="cb1116-6"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-6" tabindex="-1"></a>    <span class="st">&quot;https://ftp.ibge.gov.br/PNS/2019/Microdados/Documentacao/Dicionario_e_input_20220530.zip&quot;</span></span>
 <span id="cb1116-7"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-7" tabindex="-1"></a></span>
-<span id="cb1116-8"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-8" tabindex="-1"></a>dictionary_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( dictionary_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb1116-8"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-8" tabindex="-1"></a><span class="fu">download.file</span>( dictionary_url , dictionary_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
 <span id="cb1116-9"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-9" tabindex="-1"></a></span>
-<span id="cb1116-10"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-10" tabindex="-1"></a>sas_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.sas$&#39;</span> , dictionary_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1116-10"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-10" tabindex="-1"></a>dictionary_files <span class="ot">&lt;-</span> <span class="fu">unzip</span>( dictionary_tf , <span class="at">exdir =</span> <span class="fu">tempdir</span>() )</span>
 <span id="cb1116-11"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-11" tabindex="-1"></a></span>
-<span id="cb1116-12"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-12" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">readLines</span>( sas_fn , <span class="at">encoding =</span> <span class="st">&#39;latin1&#39;</span> )</span></code></pre></div>
+<span id="cb1116-12"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-12" tabindex="-1"></a>sas_fn <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.sas$&#39;</span> , dictionary_files , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1116-13"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-13" tabindex="-1"></a></span>
+<span id="cb1116-14"><a href="pesquisa-nacional-de-saude-pns.html#cb1116-14" tabindex="-1"></a>sas_lines <span class="ot">&lt;-</span> <span class="fu">readLines</span>( sas_fn , <span class="at">encoding =</span> <span class="st">&#39;latin1&#39;</span> )</span></code></pre></div>
 <p>Determine fixed-width file positions from the SAS import script:</p>
 <div class="sourceCode" id="cb1117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1117-1"><a href="pesquisa-nacional-de-saude-pns.html#cb1117-1" tabindex="-1"></a>sas_start <span class="ot">&lt;-</span> <span class="fu">grep</span>( <span class="st">&#39;@00001&#39;</span> , sas_lines )</span>
 <span id="cb1117-2"><a href="pesquisa-nacional-de-saude-pns.html#cb1117-2" tabindex="-1"></a></span>
