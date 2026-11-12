@@ -77,7 +77,11 @@ unzipped_files_household <- unzip( tf_household , exdir = tempdir() )
 chapter_tag_sas_household <-
 	grep( '\\\\.sas7bdat$' , unzipped_files_household , value = TRUE )
 
-chapter_tag_df_household <- read_sas( chapter_tag_sas_household )
+chapter_tag_household_list <- lapply( chapter_tag_sas_household , read_sas )
+
+chapter_tag_tbl_household <- do.call( rbind , chapter_tag_household_list )
+
+chapter_tag_df_household <- data.frame( chapter_tag_tbl_household )
 
 names( chapter_tag_df_household ) <- tolower( names( chapter_tag_df_household ) )
 ```
@@ -99,7 +103,11 @@ unzipped_files_person <- unzip( tf_person , exdir = tempdir() )
 chapter_tag_sas_person <-
 	grep( '\\\\.sas7bdat$' , unzipped_files_person , value = TRUE )
 
-chapter_tag_df_person <- read_sas( chapter_tag_sas_person )
+chapter_tag_person_list <- lapply( chapter_tag_sas_person , read_sas )
+
+chapter_tag_tbl_person <- do.call( rbind , chapter_tag_person_list )
+
+chapter_tag_df_person <- data.frame( chapter_tag_tbl_person )
 
 names( chapter_tag_df_person ) <- tolower( names( chapter_tag_df_person ) )
 ```

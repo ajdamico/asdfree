@@ -135,7 +135,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <nav role="navigation">
 
 <ul class="summary">
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Forty-Nine Public Microdatasets, One Easy To Type Website</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Forty-Nine Datasets, Easy To Type Website</a></li>
 <li class="chapter" data-level="" data-path="american-community-survey-acs.html"><a href="american-community-survey-acs.html"><i class="fa fa-check"></i>American Community Survey (ACS)</a>
 <ul>
 <li class="chapter" data-level="" data-path="american-community-survey-acs.html"><a href="american-community-survey-acs.html#recommended-reading"><i class="fa fa-check"></i>Recommended Reading</a></li>
@@ -1257,9 +1257,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-12"><a href="american-community-survey-acs.html#cb2-12" tabindex="-1"></a>acs_sas_household <span class="ot">&lt;-</span></span>
 <span id="cb2-13"><a href="american-community-survey-acs.html#cb2-13" tabindex="-1"></a>    <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.sas7bdat$&#39;</span> , unzipped_files_household , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb2-14"><a href="american-community-survey-acs.html#cb2-14" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="american-community-survey-acs.html#cb2-15" tabindex="-1"></a>acs_df_household <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( acs_sas_household )</span>
+<span id="cb2-15"><a href="american-community-survey-acs.html#cb2-15" tabindex="-1"></a>acs_household_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>( acs_sas_household , read_sas )</span>
 <span id="cb2-16"><a href="american-community-survey-acs.html#cb2-16" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="american-community-survey-acs.html#cb2-17" tabindex="-1"></a><span class="fu">names</span>( acs_df_household ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( acs_df_household ) )</span></code></pre></div>
+<span id="cb2-17"><a href="american-community-survey-acs.html#cb2-17" tabindex="-1"></a>acs_tbl_household <span class="ot">&lt;-</span> <span class="fu">do.call</span>( rbind , acs_household_list )</span>
+<span id="cb2-18"><a href="american-community-survey-acs.html#cb2-18" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="american-community-survey-acs.html#cb2-19" tabindex="-1"></a>acs_df_household <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( acs_tbl_household )</span>
+<span id="cb2-20"><a href="american-community-survey-acs.html#cb2-20" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="american-community-survey-acs.html#cb2-21" tabindex="-1"></a><span class="fu">names</span>( acs_df_household ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( acs_df_household ) )</span></code></pre></div>
 <p>Choose either the entire <strong>United States</strong> with <code>sas_pus.zip</code>, or use a state’s abbreviation like <code>sas_pal.zip</code> for <strong>Alabama</strong> or <code>sas_pak.zip</code> for <strong>Alaska</strong>. This imports the <strong>Alabama</strong> person file:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="american-community-survey-acs.html#cb3-1" tabindex="-1"></a>tf_person <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
 <span id="cb3-2"><a href="american-community-survey-acs.html#cb3-2" tabindex="-1"></a></span>
@@ -1273,9 +1277,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-10"><a href="american-community-survey-acs.html#cb3-10" tabindex="-1"></a>acs_sas_person <span class="ot">&lt;-</span></span>
 <span id="cb3-11"><a href="american-community-survey-acs.html#cb3-11" tabindex="-1"></a>    <span class="fu">grep</span>( <span class="st">&#39;</span><span class="sc">\\</span><span class="st">.sas7bdat$&#39;</span> , unzipped_files_person , <span class="at">value =</span> <span class="cn">TRUE</span> )</span>
 <span id="cb3-12"><a href="american-community-survey-acs.html#cb3-12" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="american-community-survey-acs.html#cb3-13" tabindex="-1"></a>acs_df_person <span class="ot">&lt;-</span> <span class="fu">read_sas</span>( acs_sas_person )</span>
+<span id="cb3-13"><a href="american-community-survey-acs.html#cb3-13" tabindex="-1"></a>acs_person_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>( acs_sas_person , read_sas )</span>
 <span id="cb3-14"><a href="american-community-survey-acs.html#cb3-14" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="american-community-survey-acs.html#cb3-15" tabindex="-1"></a><span class="fu">names</span>( acs_df_person ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( acs_df_person ) )</span></code></pre></div>
+<span id="cb3-15"><a href="american-community-survey-acs.html#cb3-15" tabindex="-1"></a>acs_tbl_person <span class="ot">&lt;-</span> <span class="fu">do.call</span>( rbind , acs_person_list )</span>
+<span id="cb3-16"><a href="american-community-survey-acs.html#cb3-16" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="american-community-survey-acs.html#cb3-17" tabindex="-1"></a>acs_df_person <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( acs_tbl_person )</span>
+<span id="cb3-18"><a href="american-community-survey-acs.html#cb3-18" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="american-community-survey-acs.html#cb3-19" tabindex="-1"></a><span class="fu">names</span>( acs_df_person ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( acs_df_person ) )</span></code></pre></div>
 <p>Remove overlapping column and merge household + person files:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="american-community-survey-acs.html#cb4-1" tabindex="-1"></a>acs_df_household[ , <span class="st">&#39;rt&#39;</span> ] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
 <span id="cb4-2"><a href="american-community-survey-acs.html#cb4-2" tabindex="-1"></a></span>

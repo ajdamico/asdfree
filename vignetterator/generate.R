@@ -1,4 +1,4 @@
-commit_memo <- "'cps'"
+commit_memo <- "'multiple sas tables in acs zipped files'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
