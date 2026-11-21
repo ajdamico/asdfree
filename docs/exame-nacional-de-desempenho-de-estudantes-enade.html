@@ -1230,52 +1230,53 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="download-import-preparation-10" class="section level2 unnumbered hasAnchor">
 <h2>Download, Import, Preparation<a href="exame-nacional-de-desempenho-de-estudantes-enade.html#download-import-preparation-10" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Download, import, and merge two of the 2021 files:</p>
-<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-1" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
-<span id="cb299-2"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-2" tabindex="-1"></a><span class="fu">library</span>(archive)</span>
-<span id="cb299-3"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-3" tabindex="-1"></a></span>
-<span id="cb299-4"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-4" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb299-5"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-5" tabindex="-1"></a></span>
-<span id="cb299-6"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-6" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://download.inep.gov.br/microdados/microdados_enade_2021.zip&quot;</span></span>
-<span id="cb299-7"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-7" tabindex="-1"></a></span>
-<span id="cb299-8"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-8" tabindex="-1"></a><span class="fu">GET</span>( this_url , <span class="fu">write_disk</span>( tf ) , <span class="fu">progress</span>() )</span>
-<span id="cb299-9"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-9" tabindex="-1"></a></span>
-<span id="cb299-10"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-10" tabindex="-1"></a><span class="fu">archive_extract</span>( tf , <span class="at">dir =</span> <span class="fu">tempdir</span>() )</span>
-<span id="cb299-11"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-11" tabindex="-1"></a></span>
-<span id="cb299-12"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-12" tabindex="-1"></a>read_enade_archive <span class="ot">&lt;-</span></span>
-<span id="cb299-13"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-13" tabindex="-1"></a>    <span class="cf">function</span>( this_regular_expression , this_directory ){</span>
-<span id="cb299-14"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-14" tabindex="-1"></a>        this_filename <span class="ot">&lt;-</span> </span>
-<span id="cb299-15"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-15" tabindex="-1"></a>            <span class="fu">grep</span>( </span>
-<span id="cb299-16"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-16" tabindex="-1"></a>                this_regular_expression , </span>
-<span id="cb299-17"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-17" tabindex="-1"></a>                <span class="fu">list.files</span>( </span>
-<span id="cb299-18"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-18" tabindex="-1"></a>                    this_directory ,</span>
-<span id="cb299-19"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-19" tabindex="-1"></a>                    <span class="at">recursive =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb299-20"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-20" tabindex="-1"></a>                    <span class="at">full.names =</span> <span class="cn">TRUE</span> </span>
-<span id="cb299-21"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-21" tabindex="-1"></a>                ) , </span>
-<span id="cb299-22"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-22" tabindex="-1"></a>                <span class="at">value =</span> <span class="cn">TRUE</span> </span>
-<span id="cb299-23"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-23" tabindex="-1"></a>            )</span>
-<span id="cb299-24"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-24" tabindex="-1"></a></span>
-<span id="cb299-25"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-25" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span></span>
-<span id="cb299-26"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-26" tabindex="-1"></a>            <span class="fu">read.table</span>(</span>
-<span id="cb299-27"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-27" tabindex="-1"></a>                this_filename ,</span>
-<span id="cb299-28"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-28" tabindex="-1"></a>                <span class="at">header =</span> <span class="cn">TRUE</span> ,</span>
-<span id="cb299-29"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-29" tabindex="-1"></a>                <span class="at">sep =</span> <span class="st">&quot;;&quot;</span> ,</span>
-<span id="cb299-30"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-30" tabindex="-1"></a>                <span class="at">na.strings =</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb299-31"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-31" tabindex="-1"></a>            )</span>
-<span id="cb299-32"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-32" tabindex="-1"></a>            </span>
-<span id="cb299-33"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-33" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
-<span id="cb299-34"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-34" tabindex="-1"></a>        </span>
-<span id="cb299-35"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-35" tabindex="-1"></a>        this_df</span>
-<span id="cb299-36"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-36" tabindex="-1"></a>    }</span>
-<span id="cb299-37"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-37" tabindex="-1"></a></span>
-<span id="cb299-38"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-38" tabindex="-1"></a>arq1_df <span class="ot">&lt;-</span> <span class="fu">read_enade_archive</span>( <span class="st">&#39;arq1</span><span class="sc">\\</span><span class="st">.txt$&#39;</span> , <span class="fu">tempdir</span>() )</span>
-<span id="cb299-39"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-39" tabindex="-1"></a></span>
-<span id="cb299-40"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-40" tabindex="-1"></a>arq1_df <span class="ot">&lt;-</span> <span class="fu">unique</span>( arq1_df[ <span class="fu">c</span>( <span class="st">&#39;co_curso&#39;</span> , <span class="st">&#39;co_uf_curso&#39;</span> , <span class="st">&#39;co_categad&#39;</span> , <span class="st">&#39;co_grupo&#39;</span> ) ] )</span>
-<span id="cb299-41"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-41" tabindex="-1"></a></span>
-<span id="cb299-42"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-42" tabindex="-1"></a>arq3_df <span class="ot">&lt;-</span> <span class="fu">read_enade_archive</span>( <span class="st">&#39;arq3</span><span class="sc">\\</span><span class="st">.txt$&#39;</span> , <span class="fu">tempdir</span>() )</span>
-<span id="cb299-43"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-43" tabindex="-1"></a></span>
-<span id="cb299-44"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-44" tabindex="-1"></a>enade_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( arq3_df , arq1_df )</span>
-<span id="cb299-45"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-45" tabindex="-1"></a></span>
-<span id="cb299-46"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-46" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( enade_df ) <span class="sc">==</span> <span class="fu">nrow</span>( arq3_df ) )</span></code></pre></div>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-1" tabindex="-1"></a><span class="fu">options</span>( <span class="at">timeout =</span> <span class="dv">999</span> )</span>
+<span id="cb299-2"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-2" tabindex="-1"></a></span>
+<span id="cb299-3"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-3" tabindex="-1"></a><span class="fu">library</span>(archive)</span>
+<span id="cb299-4"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-4" tabindex="-1"></a></span>
+<span id="cb299-5"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-5" tabindex="-1"></a>tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb299-6"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-6" tabindex="-1"></a></span>
+<span id="cb299-7"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-7" tabindex="-1"></a>this_url <span class="ot">&lt;-</span> <span class="st">&quot;https://download.inep.gov.br/microdados/microdados_enade_2021.zip&quot;</span></span>
+<span id="cb299-8"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-8" tabindex="-1"></a></span>
+<span id="cb299-9"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-9" tabindex="-1"></a><span class="fu">download.file</span>( this_url , tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
+<span id="cb299-10"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-10" tabindex="-1"></a></span>
+<span id="cb299-11"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-11" tabindex="-1"></a><span class="fu">archive_extract</span>( tf , <span class="at">dir =</span> <span class="fu">tempdir</span>() )</span>
+<span id="cb299-12"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-12" tabindex="-1"></a></span>
+<span id="cb299-13"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-13" tabindex="-1"></a>read_enade_archive <span class="ot">&lt;-</span></span>
+<span id="cb299-14"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-14" tabindex="-1"></a>    <span class="cf">function</span>( this_regular_expression , this_directory ){</span>
+<span id="cb299-15"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-15" tabindex="-1"></a>        this_filename <span class="ot">&lt;-</span> </span>
+<span id="cb299-16"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-16" tabindex="-1"></a>            <span class="fu">grep</span>( </span>
+<span id="cb299-17"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-17" tabindex="-1"></a>                this_regular_expression , </span>
+<span id="cb299-18"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-18" tabindex="-1"></a>                <span class="fu">list.files</span>( </span>
+<span id="cb299-19"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-19" tabindex="-1"></a>                    this_directory ,</span>
+<span id="cb299-20"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-20" tabindex="-1"></a>                    <span class="at">recursive =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb299-21"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-21" tabindex="-1"></a>                    <span class="at">full.names =</span> <span class="cn">TRUE</span> </span>
+<span id="cb299-22"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-22" tabindex="-1"></a>                ) , </span>
+<span id="cb299-23"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-23" tabindex="-1"></a>                <span class="at">value =</span> <span class="cn">TRUE</span> </span>
+<span id="cb299-24"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-24" tabindex="-1"></a>            )</span>
+<span id="cb299-25"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-25" tabindex="-1"></a></span>
+<span id="cb299-26"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-26" tabindex="-1"></a>        this_df <span class="ot">&lt;-</span></span>
+<span id="cb299-27"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-27" tabindex="-1"></a>            <span class="fu">read.table</span>(</span>
+<span id="cb299-28"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-28" tabindex="-1"></a>                this_filename ,</span>
+<span id="cb299-29"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-29" tabindex="-1"></a>                <span class="at">header =</span> <span class="cn">TRUE</span> ,</span>
+<span id="cb299-30"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-30" tabindex="-1"></a>                <span class="at">sep =</span> <span class="st">&quot;;&quot;</span> ,</span>
+<span id="cb299-31"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-31" tabindex="-1"></a>                <span class="at">na.strings =</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb299-32"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-32" tabindex="-1"></a>            )</span>
+<span id="cb299-33"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-33" tabindex="-1"></a>            </span>
+<span id="cb299-34"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-34" tabindex="-1"></a>        <span class="fu">names</span>( this_df ) <span class="ot">&lt;-</span> <span class="fu">tolower</span>( <span class="fu">names</span>( this_df ) )</span>
+<span id="cb299-35"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-35" tabindex="-1"></a>        </span>
+<span id="cb299-36"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-36" tabindex="-1"></a>        this_df</span>
+<span id="cb299-37"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-37" tabindex="-1"></a>    }</span>
+<span id="cb299-38"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-38" tabindex="-1"></a></span>
+<span id="cb299-39"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-39" tabindex="-1"></a>arq1_df <span class="ot">&lt;-</span> <span class="fu">read_enade_archive</span>( <span class="st">&#39;arq1</span><span class="sc">\\</span><span class="st">.txt$&#39;</span> , <span class="fu">tempdir</span>() )</span>
+<span id="cb299-40"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-40" tabindex="-1"></a></span>
+<span id="cb299-41"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-41" tabindex="-1"></a>arq1_df <span class="ot">&lt;-</span> <span class="fu">unique</span>( arq1_df[ <span class="fu">c</span>( <span class="st">&#39;co_curso&#39;</span> , <span class="st">&#39;co_uf_curso&#39;</span> , <span class="st">&#39;co_categad&#39;</span> , <span class="st">&#39;co_grupo&#39;</span> ) ] )</span>
+<span id="cb299-42"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-42" tabindex="-1"></a></span>
+<span id="cb299-43"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-43" tabindex="-1"></a>arq3_df <span class="ot">&lt;-</span> <span class="fu">read_enade_archive</span>( <span class="st">&#39;arq3</span><span class="sc">\\</span><span class="st">.txt$&#39;</span> , <span class="fu">tempdir</span>() )</span>
+<span id="cb299-44"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-44" tabindex="-1"></a></span>
+<span id="cb299-45"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-45" tabindex="-1"></a>enade_df <span class="ot">&lt;-</span> <span class="fu">merge</span>( arq3_df , arq1_df )</span>
+<span id="cb299-46"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-46" tabindex="-1"></a></span>
+<span id="cb299-47"><a href="exame-nacional-de-desempenho-de-estudantes-enade.html#cb299-47" tabindex="-1"></a><span class="fu">stopifnot</span>( <span class="fu">nrow</span>( enade_df ) <span class="sc">==</span> <span class="fu">nrow</span>( arq3_df ) )</span></code></pre></div>
 <div id="save-locally-10" class="section level3 unnumbered hasAnchor">
 <h3>Save Locally  <a href="exame-nacional-de-desempenho-de-estudantes-enade.html#save-locally-10" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Save the object at any point:</p>
