@@ -44,17 +44,17 @@ One Haiku:
 Download, import, and merge two of the 2021 files:
 
 ```{r eval = FALSE , results = "hide" }
-library(httr)
+options( timeout = 999 )
+
 library(archive)
 
 tf <- tempfile()
 
 this_url <-	"https://download.inep.gov.br/microdados/microdados_enade_2021.zip"
 
-GET( this_url , write_disk( tf ) , progress() )
+download.file( this_url , tf , mode = 'wb' )
 
 archive_extract( tf , dir = tempdir() )
-
 
 read_enade_archive <-
 	function( this_regular_expression , this_directory ){
@@ -91,7 +91,6 @@ arq3_df <- read_enade_archive( 'arq3\\\\.txt$' , tempdir() )
 chapter_tag_df <- merge( arq3_df , arq1_df )
 
 stopifnot( nrow( chapter_tag_df ) == nrow( arq3_df ) )
-
 ```
 ~~~
 
