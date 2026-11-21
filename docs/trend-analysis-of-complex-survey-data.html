@@ -1212,41 +1212,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb1451"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1451-1"><a href="trend-analysis-of-complex-survey-data.html#cb1451-1" tabindex="-1"></a><span class="fu">library</span>(SAScii)</span>
 <span id="cb1451-2"><a href="trend-analysis-of-complex-survey-data.html#cb1451-2" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
 <span id="cb1451-3"><a href="trend-analysis-of-complex-survey-data.html#cb1451-3" tabindex="-1"></a></span>
-<span id="cb1451-4"><a href="trend-analysis-of-complex-survey-data.html#cb1451-4" tabindex="-1"></a>sas_tf <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
-<span id="cb1451-5"><a href="trend-analysis-of-complex-survey-data.html#cb1451-5" tabindex="-1"></a></span>
-<span id="cb1451-6"><a href="trend-analysis-of-complex-survey-data.html#cb1451-6" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
-<span id="cb1451-7"><a href="trend-analysis-of-complex-survey-data.html#cb1451-7" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/yrbs/files/sadc_2019/2019-SADC-SAS-Input-Program.sas&quot;</span></span>
-<span id="cb1451-8"><a href="trend-analysis-of-complex-survey-data.html#cb1451-8" tabindex="-1"></a></span>
-<span id="cb1451-9"><a href="trend-analysis-of-complex-survey-data.html#cb1451-9" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span></span>
-<span id="cb1451-10"><a href="trend-analysis-of-complex-survey-data.html#cb1451-10" tabindex="-1"></a>    <span class="st">&quot;https://ftp.cdc.gov/pub/DATA/YRBS/SADC_2019/sadc_2019_national.dat&quot;</span></span>
-<span id="cb1451-11"><a href="trend-analysis-of-complex-survey-data.html#cb1451-11" tabindex="-1"></a></span>
-<span id="cb1451-12"><a href="trend-analysis-of-complex-survey-data.html#cb1451-12" tabindex="-1"></a><span class="fu">download.file</span>( sas_url , sas_tf , <span class="at">mode =</span> <span class="st">&#39;wb&#39;</span> )</span>
-<span id="cb1451-13"><a href="trend-analysis-of-complex-survey-data.html#cb1451-13" tabindex="-1"></a></span>
-<span id="cb1451-14"><a href="trend-analysis-of-complex-survey-data.html#cb1451-14" tabindex="-1"></a>sas_positions <span class="ot">&lt;-</span></span>
-<span id="cb1451-15"><a href="trend-analysis-of-complex-survey-data.html#cb1451-15" tabindex="-1"></a>    <span class="fu">parse.SAScii</span>( sas_tf )</span>
-<span id="cb1451-16"><a href="trend-analysis-of-complex-survey-data.html#cb1451-16" tabindex="-1"></a></span>
-<span id="cb1451-17"><a href="trend-analysis-of-complex-survey-data.html#cb1451-17" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb1451-18"><a href="trend-analysis-of-complex-survey-data.html#cb1451-18" tabindex="-1"></a>    <span class="fu">tolower</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] )</span>
-<span id="cb1451-19"><a href="trend-analysis-of-complex-survey-data.html#cb1451-19" tabindex="-1"></a>    </span>
-<span id="cb1451-20"><a href="trend-analysis-of-complex-survey-data.html#cb1451-20" tabindex="-1"></a>variables_to_keep <span class="ot">&lt;-</span></span>
-<span id="cb1451-21"><a href="trend-analysis-of-complex-survey-data.html#cb1451-21" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&quot;sex&quot;</span> , <span class="st">&quot;grade&quot;</span> , <span class="st">&quot;race4&quot;</span> , <span class="st">&quot;q30&quot;</span> , <span class="st">&quot;year&quot;</span> , <span class="st">&quot;psu&quot;</span> , <span class="st">&quot;stratum&quot;</span> , <span class="st">&quot;weight&quot;</span> )</span>
-<span id="cb1451-22"><a href="trend-analysis-of-complex-survey-data.html#cb1451-22" tabindex="-1"></a>    </span>
-<span id="cb1451-23"><a href="trend-analysis-of-complex-survey-data.html#cb1451-23" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] <span class="ot">&lt;-</span></span>
-<span id="cb1451-24"><a href="trend-analysis-of-complex-survey-data.html#cb1451-24" tabindex="-1"></a>    <span class="fu">ifelse</span>( <span class="sc">!</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="sc">%in%</span> variables_to_keep ) , <span class="st">&quot;_&quot;</span> ,</span>
-<span id="cb1451-25"><a href="trend-analysis-of-complex-survey-data.html#cb1451-25" tabindex="-1"></a>        <span class="fu">ifelse</span>( sas_positions[ , <span class="st">&#39;char&#39;</span> ] , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> ) )</span>
-<span id="cb1451-26"><a href="trend-analysis-of-complex-survey-data.html#cb1451-26" tabindex="-1"></a></span>
-<span id="cb1451-27"><a href="trend-analysis-of-complex-survey-data.html#cb1451-27" tabindex="-1"></a>yrbss_tbl <span class="ot">&lt;-</span></span>
-<span id="cb1451-28"><a href="trend-analysis-of-complex-survey-data.html#cb1451-28" tabindex="-1"></a>    <span class="fu">read_fwf</span>(</span>
-<span id="cb1451-29"><a href="trend-analysis-of-complex-survey-data.html#cb1451-29" tabindex="-1"></a>        dat_url ,</span>
-<span id="cb1451-30"><a href="trend-analysis-of-complex-survey-data.html#cb1451-30" tabindex="-1"></a>        <span class="fu">fwf_widths</span>( </span>
-<span id="cb1451-31"><a href="trend-analysis-of-complex-survey-data.html#cb1451-31" tabindex="-1"></a>            <span class="fu">abs</span>( sas_positions[ , <span class="st">&#39;width&#39;</span> ] ) , </span>
-<span id="cb1451-32"><a href="trend-analysis-of-complex-survey-data.html#cb1451-32" tabindex="-1"></a>            <span class="at">col_names =</span> sas_positions[ , <span class="st">&#39;varname&#39;</span> ] </span>
-<span id="cb1451-33"><a href="trend-analysis-of-complex-survey-data.html#cb1451-33" tabindex="-1"></a>        ) ,</span>
-<span id="cb1451-34"><a href="trend-analysis-of-complex-survey-data.html#cb1451-34" tabindex="-1"></a>        <span class="at">col_types =</span> <span class="fu">paste0</span>( sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] , <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> ) ,</span>
-<span id="cb1451-35"><a href="trend-analysis-of-complex-survey-data.html#cb1451-35" tabindex="-1"></a>        <span class="at">na =</span> <span class="fu">c</span>( <span class="st">&quot;&quot;</span> , <span class="st">&quot;.&quot;</span> )</span>
-<span id="cb1451-36"><a href="trend-analysis-of-complex-survey-data.html#cb1451-36" tabindex="-1"></a>    )</span>
-<span id="cb1451-37"><a href="trend-analysis-of-complex-survey-data.html#cb1451-37" tabindex="-1"></a>    </span>
-<span id="cb1451-38"><a href="trend-analysis-of-complex-survey-data.html#cb1451-38" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( yrbss_tbl )</span></code></pre></div>
+<span id="cb1451-4"><a href="trend-analysis-of-complex-survey-data.html#cb1451-4" tabindex="-1"></a>sas_url <span class="ot">&lt;-</span></span>
+<span id="cb1451-5"><a href="trend-analysis-of-complex-survey-data.html#cb1451-5" tabindex="-1"></a>    <span class="st">&quot;https://www.cdc.gov/yrbs/files/sadc_2019/2019-SADC-SAS-Input-Program.sas&quot;</span></span>
+<span id="cb1451-6"><a href="trend-analysis-of-complex-survey-data.html#cb1451-6" tabindex="-1"></a></span>
+<span id="cb1451-7"><a href="trend-analysis-of-complex-survey-data.html#cb1451-7" tabindex="-1"></a>dat_url <span class="ot">&lt;-</span></span>
+<span id="cb1451-8"><a href="trend-analysis-of-complex-survey-data.html#cb1451-8" tabindex="-1"></a>    <span class="st">&quot;https://ftp.cdc.gov/pub/DATA/YRBS/SADC_2019/sadc_2019_national.dat&quot;</span></span>
+<span id="cb1451-9"><a href="trend-analysis-of-complex-survey-data.html#cb1451-9" tabindex="-1"></a></span>
+<span id="cb1451-10"><a href="trend-analysis-of-complex-survey-data.html#cb1451-10" tabindex="-1"></a>sas_positions <span class="ot">&lt;-</span></span>
+<span id="cb1451-11"><a href="trend-analysis-of-complex-survey-data.html#cb1451-11" tabindex="-1"></a>    <span class="fu">parse.SAScii</span>( sas_url )</span>
+<span id="cb1451-12"><a href="trend-analysis-of-complex-survey-data.html#cb1451-12" tabindex="-1"></a></span>
+<span id="cb1451-13"><a href="trend-analysis-of-complex-survey-data.html#cb1451-13" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1451-14"><a href="trend-analysis-of-complex-survey-data.html#cb1451-14" tabindex="-1"></a>    <span class="fu">tolower</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] )</span>
+<span id="cb1451-15"><a href="trend-analysis-of-complex-survey-data.html#cb1451-15" tabindex="-1"></a>    </span>
+<span id="cb1451-16"><a href="trend-analysis-of-complex-survey-data.html#cb1451-16" tabindex="-1"></a>variables_to_keep <span class="ot">&lt;-</span></span>
+<span id="cb1451-17"><a href="trend-analysis-of-complex-survey-data.html#cb1451-17" tabindex="-1"></a>    <span class="fu">c</span>( <span class="st">&quot;sex&quot;</span> , <span class="st">&quot;grade&quot;</span> , <span class="st">&quot;race4&quot;</span> , <span class="st">&quot;q30&quot;</span> , <span class="st">&quot;year&quot;</span> , <span class="st">&quot;psu&quot;</span> , <span class="st">&quot;stratum&quot;</span> , <span class="st">&quot;weight&quot;</span> )</span>
+<span id="cb1451-18"><a href="trend-analysis-of-complex-survey-data.html#cb1451-18" tabindex="-1"></a>    </span>
+<span id="cb1451-19"><a href="trend-analysis-of-complex-survey-data.html#cb1451-19" tabindex="-1"></a>sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] <span class="ot">&lt;-</span></span>
+<span id="cb1451-20"><a href="trend-analysis-of-complex-survey-data.html#cb1451-20" tabindex="-1"></a>    <span class="fu">ifelse</span>( <span class="sc">!</span>( sas_positions[ , <span class="st">&#39;varname&#39;</span> ] <span class="sc">%in%</span> variables_to_keep ) , <span class="st">&quot;_&quot;</span> ,</span>
+<span id="cb1451-21"><a href="trend-analysis-of-complex-survey-data.html#cb1451-21" tabindex="-1"></a>        <span class="fu">ifelse</span>( sas_positions[ , <span class="st">&#39;char&#39;</span> ] , <span class="st">&quot;c&quot;</span> , <span class="st">&quot;d&quot;</span> ) )</span>
+<span id="cb1451-22"><a href="trend-analysis-of-complex-survey-data.html#cb1451-22" tabindex="-1"></a></span>
+<span id="cb1451-23"><a href="trend-analysis-of-complex-survey-data.html#cb1451-23" tabindex="-1"></a>yrbss_tbl <span class="ot">&lt;-</span></span>
+<span id="cb1451-24"><a href="trend-analysis-of-complex-survey-data.html#cb1451-24" tabindex="-1"></a>    <span class="fu">read_fwf</span>(</span>
+<span id="cb1451-25"><a href="trend-analysis-of-complex-survey-data.html#cb1451-25" tabindex="-1"></a>        dat_url ,</span>
+<span id="cb1451-26"><a href="trend-analysis-of-complex-survey-data.html#cb1451-26" tabindex="-1"></a>        <span class="fu">fwf_widths</span>( </span>
+<span id="cb1451-27"><a href="trend-analysis-of-complex-survey-data.html#cb1451-27" tabindex="-1"></a>            <span class="fu">abs</span>( sas_positions[ , <span class="st">&#39;width&#39;</span> ] ) , </span>
+<span id="cb1451-28"><a href="trend-analysis-of-complex-survey-data.html#cb1451-28" tabindex="-1"></a>            <span class="at">col_names =</span> sas_positions[ , <span class="st">&#39;varname&#39;</span> ] </span>
+<span id="cb1451-29"><a href="trend-analysis-of-complex-survey-data.html#cb1451-29" tabindex="-1"></a>        ) ,</span>
+<span id="cb1451-30"><a href="trend-analysis-of-complex-survey-data.html#cb1451-30" tabindex="-1"></a>        <span class="at">col_types =</span> <span class="fu">paste0</span>( sas_positions[ , <span class="st">&#39;column_types&#39;</span> ] , <span class="at">collapse =</span> <span class="st">&quot;&quot;</span> ) ,</span>
+<span id="cb1451-31"><a href="trend-analysis-of-complex-survey-data.html#cb1451-31" tabindex="-1"></a>        <span class="at">na =</span> <span class="fu">c</span>( <span class="st">&quot;&quot;</span> , <span class="st">&quot;.&quot;</span> )</span>
+<span id="cb1451-32"><a href="trend-analysis-of-complex-survey-data.html#cb1451-32" tabindex="-1"></a>    )</span>
+<span id="cb1451-33"><a href="trend-analysis-of-complex-survey-data.html#cb1451-33" tabindex="-1"></a>    </span>
+<span id="cb1451-34"><a href="trend-analysis-of-complex-survey-data.html#cb1451-34" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( yrbss_tbl )</span></code></pre></div>
 <p>Restrict the dataset to only years shown in the original analysis and re-name the main variable:</p>
 <div class="sourceCode" id="cb1452"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1452-1"><a href="trend-analysis-of-complex-survey-data.html#cb1452-1" tabindex="-1"></a>yrbss_df <span class="ot">&lt;-</span> <span class="fu">subset</span>( yrbss_df , year <span class="sc">%in%</span> <span class="fu">seq</span>( <span class="dv">1991</span> , <span class="dv">2011</span> , <span class="dv">2</span> ) )</span>
 <span id="cb1452-2"><a href="trend-analysis-of-complex-survey-data.html#cb1452-2" tabindex="-1"></a></span>

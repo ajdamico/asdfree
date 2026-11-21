@@ -1,4 +1,4 @@
-commit_memo <- "'r cmd checks'"
+commit_memo <- "'skip complex sample survey trends on linux'"
 
 # source( file.path( path.expand( "~" ) , "Github/asdfree/vignetterator/generate.R" ) )
 
@@ -489,6 +489,19 @@ for( this_ci_file in ci_rmd_files ){
 		for( this_copied_file in copied_files ){
 			
 			these_lines <- readLines( this_copied_file )
+			
+			# don't test complex sample survey trends on linux
+			if( grepl( 'r\\.yml' , this_copied_file ) & chapter_tag == 'zzztrends' ){
+				
+				these_lines <-
+					gsub( 
+						"          - {os: ubuntu-latest,   r: 'release'}" , 
+						"" , 
+						these_lines ,
+						fixed = TRUE 
+					)
+					
+			}
 			
 			# install.packages() lines should be skipped on continuous integration
 			these_lines <- these_lines[ !grepl( "^install\\.packages" , these_lines ) ]
